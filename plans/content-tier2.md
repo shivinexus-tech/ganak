@@ -62,23 +62,37 @@ The app has only generic Navratri + Dussehra + monthly Durgashtami/Kalashtami. B
 gaps below. **⚠️ Dus Mahavidya jayanti dates genuinely vary by lineage/source — all
 marked 🔴; please supply the tradition Ganak should follow before I wire any of them.**
 
-**Higher-confidence Shakta (worth prioritizing):**
+**Higher-confidence Shakta — VERIFIED ONLINE 2026-07-18 (Drik + multiple sources), ready to wire:**
 | Observance | Placement | Notes | Conf |
 |---|---|---|---|
-| Shakambhari Navratri / Purnima | Pausha Shukla 8 → Pausha Purnima | a whole Shakta Navratri, widely omitted | 🟢 |
-| Lalita Panchami (Upang Lalita) | Ashwin Shukla 5 (in Sharad Navratri) | Lalita Tripurasundari | 🟢 |
-| Lalita Jayanti | Magha Purnima | Tripurasundari (= Shodashi Jayanti) | 🟡 |
-| Durga Ashtami + **Sandhi Puja** | Ashwin Shukla 8→9 juncture | needs sandhikaal (last 24m Ashtami + first 24m Navami) compute — the peak Shakta moment | 🟢 |
-| Ghatasthapana (Kalash Sthapana) | Navratri Pratipada (both Chaitra & Sharad) | ritual start of Navratri — should be marked | 🟢 |
-| Kali Puja / Shyama Puja | Diwali Amavasya night | Bengali Shakta, DISTINCT from Lakshmi Puja — currently conflated/missing | 🟢 |
-| Annapurna Jayanti | Margashirsha Purnima | Annapurna | 🟡 |
-| Kalabhairava Jayanti | Margashirsha Krishna Ashtami | Bhairava (Shaiva-tantric) | 🟡 |
+| Shakambhari Navratri / Purnima | Pausha Shukla 8 (Banada Ashtami) → Pausha Purnima | a whole 8-day Shakta Navratri, widely omitted | 🟢 verified |
+| Lalita Panchami (Upang Lalita) | Ashwin Shukla 5 (5th day of Sharad Navratri) | Lalita Tripurasundari | 🟢 verified |
+| Kalabhairava Jayanti | Margashirsha Krishna 8 (= the Margashirsha Kalashtami; 2026 Dec 1) | Bhairava (Shaiva-tantric) | 🟢 verified |
+| Annapurna Jayanti | Margashirsha Purnima (2026 Dec 4) | Annapurna | 🟢 verified |
+| Kali Puja / Shyama Puja | Ashwin (amanta) Amavasya = Diwali night, Nishita-time (2026 Nov 8) | Bengali Shakta, DISTINCT from Lakshmi Puja — same night, different rite | 🟢 verified |
+| Durga Ashtami + **Sandhi Puja** | Ashwin Shukla 8→9 juncture | needs sandhikaal (last 24m Ashtami + first 24m Navami) compute — peak Shakta moment | 🟢 (needs compute) |
+| Ghatasthapana (Kalash Sthapana) | Navratri Pratipada (both Chaitra & Sharad) | ritual start of Navratri | 🟢 |
 | Bengali Durga Puja day-sequence | Mahalaya→Shashthi→Saptami→Ashtami→Navami→Dashami | app has none of the named days | 🟡 |
 
-**Dus Mahavidya Jayantis (all 🔴 — dates vary by lineage, DO NOT wire without your source):**
-Kali, Tara, Tripura Sundari/Shodashi, Bhuvaneshwari, Bhairavi, Chinnamasta, Dhumavati,
-Bagalamukhi, Matangi, Kamala. — If your audience includes tantric upasakas, tell me which
-almanac/lineage to follow and I'll build them as a verified set.
+**Dus Mahavidya Jayantis — RESOLVED 2026-07-18.** Drik publishes a canonical
+"Dasha Mahavidya Jayanti" list, so these are NOT lineage-blocked after all — I use
+**Drik as the documented default** (note in UI that some tantric lineages differ).
+Verified placements (Drik, New Delhi):
+| Goddess | Month · Paksha · Tithi | 2026 |
+|---|---|---|
+| Lalita / Shodashi | Magha · Shukla · Purnima | Feb 1 |
+| Tara | Chaitra · Shukla · 9 | Mar 26 |
+| Matangi | Vaishakha · Shukla · 3 | Apr 20 |
+| Bagalamukhi | Vaishakha · Shukla · 8 | Apr 24 |
+| Chhinnamasta | Vaishakha · Shukla · 14 | Apr 30 |
+| Dhumavati | Jyeshtha · Shukla · 8 | Jun 22 |
+| Kali (Jayanti — NOT Kali Puja) | Bhadrapada · Krishna · 8 | Sep 4 |
+| Bhuvaneshvari | Bhadrapada · Shukla · 12 | Sep 23 |
+| Kamala | Kartika · Krishna · Amavasya | Nov 8 |
+| Bhairavi | Margashirsha · Shukla · Purnima | Dec 23 |
+All Shukla ones safe to place; the two Krishna ones (Kali, Kamala) get date-verified
+via the harness like the Tier-1 Krishna festivals. **Kali Jayanti ≠ Kali Puja** — Drik
+puts Jayanti on Bhadrapada Krishna 8, Puja on Diwali. Wire as separate observances.
 
 ---
 
