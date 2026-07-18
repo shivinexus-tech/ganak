@@ -952,6 +952,79 @@ function pitruPakshaDay(rise, set) {
   else if (krishna && shraddhaTithi === 14) special = "ghataChaturdashi"; // for those who died unnaturally
   return { shraddhaTithi, krishna, special };
 }
+
+/* Tamil/Malayalam solar-calendar observances.
+   Festival days are sunrise-to-sunrise days. Because this scanner intentionally
+   has no latitude, 06:00 local is the stable sunrise boundary; the named
+   nakshatra occurrence is assigned to the sunrise on which it prevails. If an
+   unusually short occurrence falls wholly between two sunrise boundaries, the
+   day containing the greatest overlap is the documented fallback.
+   Solar-month checks use Lahiri sidereal signs (Tamil/Malayalam month mapping).
+   Vishukkani uses the first dawn after Mesha Sankranti. Vrischikam day 1 uses
+   the Malayalam month rule: a Sankranti up to the end of Madhyahna (approximated
+   as 3/5 of a 06:00–18:00 day = 13:12 local) belongs to that civil day; a later
+   Sankranti is observed the following day. */
+const SOLAR_NAK_FESTIVALS = [
+  { key: "panguniUthiram", sunSign: 11, nak: 11 }, // Meena · Uttara Phalguni
+  { key: "thaipusam", sunSign: 9, nak: 7 },       // Makara · Pushya
+  { key: "onam", sunSign: 4, nak: 21 },           // Simha/Chingam · Shravana
+  { key: "karthigaiDeepam", sunSign: 7, nak: 2 }, // Vrischika/Karthigai · Krittika
+];
+function localNoon(ms, tz) {
+  const d = new Date(ms + tz * 3600000);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12) - tz * 3600000;
+}
+function localPanchangDayStart(ms, tz) {
+  const shifted = ms + tz * 3600000 - 6 * 3600000;
+  const d = new Date(shifted);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 6) - tz * 3600000;
+}
+function malayalamSankrantiDay(ingressMs, tz) {
+  const d = new Date(ingressMs + tz * 3600000);
+  const localHour = d.getUTCHours() + d.getUTCMinutes() / 60 + d.getUTCSeconds() / 3600;
+  const noon = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12) - tz * 3600000;
+  return noon + (localHour > 13.2 ? 86400000 : 0);
+}
+function firstSunriseDayAfter(ingressMs, tz) {
+  const rise = localPanchangDayStart(ingressMs, tz);
+  return rise + (ingressMs > rise ? 86400000 : 0) + 6 * 3600000;
+}
+function solarNakshatraFestivalDays(fromMs, tz, days) {
+  const DAY = 86400000, firstNoon = localNoon(fromMs, tz), limit = firstNoon + days * DAY, out = [];
+  for (const rule of SOLAR_NAK_FESTIVALS) {
+    const startDeg = rule.nak * (360 / 27), endDeg = ((rule.nak + 1) % 27) * (360 / 27);
+    let nakStart = solveCross(moonSidMs, firstNoon - 3 * DAY, startDeg, days + 6);
+    while (nakStart && nakStart < limit + DAY) {
+      const nakEnd = solveCross(moonSidMs, nakStart + 60000, endDeg, 3);
+      if (!nakEnd) break;
+      let bucket = localPanchangDayStart(nakStart, tz), best = bucket, bestOverlap = -1, sunriseHit = null;
+      while (bucket < nakEnd) {
+        const overlap = Math.max(0, Math.min(nakEnd, bucket + DAY) - Math.max(nakStart, bucket));
+        if (overlap > bestOverlap) { bestOverlap = overlap; best = bucket; }
+        if (bucket >= nakStart && bucket < nakEnd && sunriseHit === null) sunriseHit = bucket;
+        bucket += DAY;
+      }
+      if (sunriseHit !== null) best = sunriseHit;
+      const festivalNoon = best + 6 * 3600000;
+      if (festivalNoon >= firstNoon && festivalNoon < limit && Math.floor(sunSidMs(best) / 30) === rule.sunSign) {
+        out.push({ key: rule.key, ms: festivalNoon, nakStart, nakEnd });
+      }
+      nakStart = solveCross(moonSidMs, nakEnd + 60000, startDeg, 32);
+    }
+  }
+  return out;
+}
+function ayyappaMandalaFor(ms, tz) {
+  const DAY = 86400000, civilNoon = localNoon(ms, tz), d = new Date(civilNoon + tz * 3600000), gy = d.getUTCFullYear();
+  for (const year of [gy, gy - 1]) {
+    const ingress = solveCross(sunSidMs, Date.UTC(year, 9, 20), 210, 45);
+    if (!ingress) continue;
+    const start = malayalamSankrantiDay(ingress, tz), end = start + 40 * DAY;
+    const day = Math.round((civilNoon - start) / DAY) + 1;
+    if (day >= 1 && day <= 41) return { day, start, end, ingress };
+  }
+  return null;
+}
 // tithi-based observances (fasting days) — accurate, month-independent
 
 /* ekadashi variants by lunar month */
@@ -1070,6 +1143,29 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46) {
         if (m.idx === f.month) festivals.push({ key: f.key, ms });
       }
     }
+  }
+  for (const f of solarNakshatraFestivalDays(fromMs, tz, days)) festivals.push(f);
+  // Vishu (Mesha Sankranti under Kerala's day rule) and the two endpoints of
+  // Ayyappa's inclusive 41-day Mandala Vratham.
+  const firstNoon = localNoon(fromMs, tz), rangeEnd = firstNoon + days * DAY;
+  const firstYear = new Date(firstNoon + tz * 3600000).getUTCFullYear();
+  for (let gy = firstYear - 1; gy <= firstYear + 2; gy++) {
+    try {
+      const mesha = solveCross(sunSidMs, Date.UTC(gy, 2, 18), 0, 45);
+      if (mesha) {
+        // Vishukkani is viewed at the first dawn after Mesha Sankranti. This is
+        // distinct from the civil date carrying the Sankranti itself (e.g. Drik:
+        // ingress 14 Apr 2026 morning, Vishukkani 15 Apr).
+        const vishu = firstSunriseDayAfter(mesha, tz);
+        if (vishu >= firstNoon && vishu < rangeEnd) festivals.push({ key: "vishu", ms: vishu, ingress: mesha });
+      }
+      const vrischika = solveCross(sunSidMs, Date.UTC(gy, 9, 20), 210, 45);
+      if (vrischika) {
+        const start = malayalamSankrantiDay(vrischika, tz), end = start + 40 * DAY;
+        if (start >= firstNoon && start < rangeEnd) festivals.push({ key: "ayyappaMandalaBegins", ms: start, spanEnd: end });
+        if (end >= firstNoon && end < rangeEnd) festivals.push({ key: "ayyappaMandalaPuja", ms: end, spanStart: start });
+      }
+    } catch (e) {}
   }
   // Makar Sankranti (solar): Sun enters Capricorn (270 deg sidereal)
   try { const mk = solveCross(sunSidMs, fromMs, 270, days); if (mk && mk < fromMs + days * DAY) festivals.push({ key: "makarSankranti", ms: mk }); } catch (e) {}
@@ -1191,6 +1287,7 @@ function muhuratForDate(place, ayanamsa, y, m, day) {
     lmonth: lm, lmonthName: lmi.amanta, adhik: lmi.adhik,
     sunSign, devshayana, venusAsta, guruAsta,
     pitruPaksha: pitruPakshaDay(ev.rise, ev.set),
+    ayyappaMandala: ayyappaMandalaFor(ev.rise, tz),
     choghaDay: choghaSlots(dow, ev.rise, ev.set, true),
     choghaNight: choghaSlots(dow, ev.set, ev.rise + 86400000, false),
     abhijit: dow === 3 ? null : { start: ev.transit - dayLen / 30, end: ev.transit + dayLen / 30 },
@@ -1524,6 +1621,7 @@ function computeTodayPanchang(place, ayanamsa = "lahiri", atMs) {
     rise: ev.rise, set: ev.set, moonrise: moonEv.rise, moonset: moonEv.set, rahu, abhijit, gulika, yama,
     dow,
     pitruPaksha: (ev.rise !== null && ev.set !== null) ? pitruPakshaDay(ev.rise, ev.set) : null,
+    ayyappaMandala: ayyappaMandalaFor(anchor, tz),
     choghaDay: ev.rise !== null ? choghaSlots(dow, ev.rise, ev.set, true) : null,
     choghaNight: ev.rise !== null ? choghaSlots(dow, ev.set, ev.rise + 86400000, false) : null,
     events: upcomingEvents(now),
@@ -3232,7 +3330,7 @@ const L = {
 };
 const CHOG_NAME = { udveg: { en: "Udveg", hi: "उद्वेग" }, char: { en: "Char", hi: "चर" }, labh: { en: "Labh", hi: "लाभ" }, amrit: { en: "Amrit", hi: "अमृत" }, kaal: { en: "Kaal", hi: "काल" }, shubh: { en: "Shubh", hi: "शुभ" }, rog: { en: "Rog", hi: "रोग" } };
 const OBS_NAME = { ekadashi: { en: "Ekadashi", hi: "एकादशी" }, pradosh: { en: "Pradosh Vrat", hi: "प्रदोष व्रत" }, sankashti: { en: "Sankashti Chaturthi", hi: "संकष्टी चतुर्थी" }, vinayakaChaturthi: { en: "Vinayaka Chaturthi", hi: "विनायक चतुर्थी" }, skandaShashti: { en: "Skanda Shashti", hi: "स्कंद षष्ठी" }, masikDurgashtami: { en: "Masik Durgashtami", hi: "मासिक दुर्गाष्टमी" }, kalashtami: { en: "Kalashtami", hi: "कालाष्टमी" }, masikShivaratri: { en: "Masik Shivaratri", hi: "मासिक शिवरात्रि" }, purnima: { en: "Purnima", hi: "पूर्णिमा" }, amavasya: { en: "Amavasya", hi: "अमावस्या" }, "Chaitra_Shukla_11": { en: "Kamada Ekadashi", hi: "कामदा एकादशी" }, "Vaisakha_Shukla_11": { en: "Mohini Ekadashi", hi: "मोहिनी एकादशी" }, "Jyeshtha_Shukla_11": { en: "Apara Ekadashi", hi: "अपरा एकादशी" }, "Ashadha_Shukla_11": { en: "Yogini Ekadashi", hi: "योगिनी एकादशी" }, "Shravan_Shukla_11": { en: "Varuthini Ekadashi", hi: "वरूथिनी एकादशी" }, "Bhadrapad_Shukla_11": { en: "Padma Ekadashi", hi: "पद्मा एकादशी" }, "Ashwin_Shukla_11": { en: "Indira Ekadashi", hi: "इंदिरा एकादशी" }, "Kartik_Shukla_11": { en: "Dev Uthani Ekadashi", hi: "देव उठनी एकादशी" }, "Margshirsh_Shukla_11": { en: "Utpanna Ekadashi", hi: "उत्पन्ना एकादशी" }, "Paush_Shukla_11": { en: "Mokshada Ekadashi", hi: "मोक्षदा एकादशी" }, "Magh_Shukla_11": { en: "Safala Ekadashi", hi: "सफला एकादशी" }, "Phalgun_Shukla_11": { en: "Amalaki Ekadashi", hi: "आमलकी एकादशी" }, "Chaitra_Krishna_11": { en: "Pap Mochini Ekadashi", hi: "पाप मोचिनी एकादशी" }, "Vaisakha_Krishna_11": { en: "Nrisimha Jayanti", hi: "नृसिंह जयंती" }, "Jyeshtha_Krishna_11": { en: "Nirjala Ekadashi", hi: "निर्जला एकादशी" }, "Ashadha_Krishna_11": { en: "Hari Bodhini Ekadashi", hi: "हरि बोधिनी एकादशी" }, "Shravan_Krishna_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" }, "Bhadrapad_Krishna_11": { en: "Aja Ekadashi", hi: "अजा एकादशी" }, "Ashwin_Krishna_11": { en: "Vijaya Ekadashi", hi: "विजया एकादशी" }, "Kartik_Krishna_11": { en: "Prabodhini Ekadashi", hi: "प्रबोधिनी एकादशी" }, "Margshirsh_Krishna_11": { en: "Gita Jayanti", hi: "गीता जयंती" }, "Paush_Krishna_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" }, "Magh_Krishna_11": { en: "Shatila Ekadashi", hi: "शतिला एकादशी" }, "Phalgun_Krishna_11": { en: "Phalaharini Ekadashi", hi: "फलहारिणी एकादशी" }, "pradosh_Sunday": { en: "Ravi Pradosh", hi: "रवि प्रदोष" }, "pradosh_Monday": { en: "Som Pradosh", hi: "सोम प्रदोष" }, "pradosh_Tuesday": { en: "Bhaum Pradosh", hi: "भौम प्रदोष" }, "pradosh_Wednesday": { en: "Budh Pradosh", hi: "बुध प्रदोष" }, "pradosh_Thursday": { en: "Guru Pradosh", hi: "गुरु प्रदोष" }, "pradosh_Friday": { en: "Shukra Pradosh", hi: "शुक्र प्रदोष" }, "pradosh_Saturday": { en: "Shani Pradosh", hi: "शनि प्रदोष" } };
-const FEST_NAME = { makarSankranti: { en: "Makar Sankranti", hi: "मकर संक्रांति" }, mahaShivaratri: { en: "Maha Shivaratri", hi: "महाशिवरात्रि" }, holika: { en: "Holi", hi: "होली" }, ramNavami: { en: "Ram Navami", hi: "राम नवमी" }, hanumanJ: { en: "Hanuman Jayanti", hi: "हनुमान जयंती" }, akshaya: { en: "Akshaya Tritiya", hi: "अक्षय तृतीया" }, guruPurnima: { en: "Guru Purnima", hi: "गुरु पूर्णिमा" }, rakshaBandhan: { en: "Raksha Bandhan", hi: "रक्षाबंधन" }, janmashtami: { en: "Janmashtami", hi: "जन्माष्टमी" }, ganeshChaturthi: { en: "Ganesh Chaturthi", hi: "गणेश चतुर्थी" }, navratri: { en: "Navratri begins", hi: "नवरात्रि आरंभ" }, dussehra: { en: "Dussehra", hi: "दशहरा" }, karvaChauth: { en: "Karva Chauth", hi: "करवा चौथ" }, diwali: { en: "Diwali", hi: "दिवाली" }, lakshmiPanchami: { en: "Lakshmi Panchami", hi: "लक्ष्मी पंचमी" }, buddhaPurnima: { en: "Buddha Purnima", hi: "बुद्ध पूर्णिमा" }, guptNavratriAshadha: { en: "Ashadha Gupt Navratri", hi: "आषाढ़ गुप्त नवरात्रि" }, rathYatra: { en: "Rath Yatra", hi: "रथ यात्रा" }, hariyaliTeej: { en: "Hariyali Teej", hi: "हरियाली तीज" }, nagPanchami: { en: "Nag Panchami", hi: "नाग पंचमी" }, hartalikaTeej: { en: "Hartalika Teej", hi: "हरतालिका तीज" }, radhaAshtami: { en: "Radha Ashtami", hi: "राधा अष्टमी" }, mahaAshtami: { en: "Maha Ashtami", hi: "महाअष्टमी" }, mahaNavami: { en: "Maha Navami", hi: "महानवमी" }, sharadPurnima: { en: "Sharad Purnima", hi: "शरद पूर्णिमा" }, ahoiAshtami: { en: "Ahoi Ashtami", hi: "अहोई अष्टमी" }, guptNavratriMagha: { en: "Magha Gupt Navratri", hi: "माघ गुप्त नवरात्रि" }, vasantPanchami: { en: "Vasant Panchami", hi: "वसंत पंचमी" }, sheetlaAshtami: { en: "Sheetla Ashtami (Basoda)", hi: "शीतला अष्टमी (बसोड़ा)" } };
+const FEST_NAME = { makarSankranti: { en: "Makar Sankranti", hi: "मकर संक्रांति" }, mahaShivaratri: { en: "Maha Shivaratri", hi: "महाशिवरात्रि" }, holika: { en: "Holi", hi: "होली" }, ramNavami: { en: "Ram Navami", hi: "राम नवमी" }, hanumanJ: { en: "Hanuman Jayanti", hi: "हनुमान जयंती" }, akshaya: { en: "Akshaya Tritiya", hi: "अक्षय तृतीया" }, guruPurnima: { en: "Guru Purnima", hi: "गुरु पूर्णिमा" }, rakshaBandhan: { en: "Raksha Bandhan", hi: "रक्षाबंधन" }, janmashtami: { en: "Janmashtami", hi: "जन्माष्टमी" }, ganeshChaturthi: { en: "Ganesh Chaturthi", hi: "गणेश चतुर्थी" }, navratri: { en: "Navratri begins", hi: "नवरात्रि आरंभ" }, dussehra: { en: "Dussehra", hi: "दशहरा" }, karvaChauth: { en: "Karva Chauth", hi: "करवा चौथ" }, diwali: { en: "Diwali", hi: "दिवाली" }, lakshmiPanchami: { en: "Lakshmi Panchami", hi: "लक्ष्मी पंचमी" }, buddhaPurnima: { en: "Buddha Purnima", hi: "बुद्ध पूर्णिमा" }, guptNavratriAshadha: { en: "Ashadha Gupt Navratri", hi: "आषाढ़ गुप्त नवरात्रि" }, rathYatra: { en: "Rath Yatra", hi: "रथ यात्रा" }, hariyaliTeej: { en: "Hariyali Teej", hi: "हरियाली तीज" }, nagPanchami: { en: "Nag Panchami", hi: "नाग पंचमी" }, hartalikaTeej: { en: "Hartalika Teej", hi: "हरतालिका तीज" }, radhaAshtami: { en: "Radha Ashtami", hi: "राधा अष्टमी" }, mahaAshtami: { en: "Maha Ashtami", hi: "महाअष्टमी" }, mahaNavami: { en: "Maha Navami", hi: "महानवमी" }, sharadPurnima: { en: "Sharad Purnima", hi: "शरद पूर्णिमा" }, ahoiAshtami: { en: "Ahoi Ashtami", hi: "अहोई अष्टमी" }, guptNavratriMagha: { en: "Magha Gupt Navratri", hi: "माघ गुप्त नवरात्रि" }, vasantPanchami: { en: "Vasant Panchami", hi: "वसंत पंचमी" }, sheetlaAshtami: { en: "Sheetla Ashtami (Basoda)", hi: "शीतला अष्टमी (बसोड़ा)" }, panguniUthiram: { en: "Panguni Uthiram", hi: "पंगुनी उथिरम" }, thaipusam: { en: "Thaipusam", hi: "थाईपूसम" }, onam: { en: "Onam (Thiruvonam)", hi: "ओणम (थिरुवोणम)" }, karthigaiDeepam: { en: "Karthigai Deepam", hi: "कार्तिगई दीपम" }, vishu: { en: "Vishu", hi: "विशु" }, ayyappaMandalaBegins: { en: "Ayyappa Mandala Vratham begins", hi: "अय्यप्पा मंडल व्रतम आरंभ" }, ayyappaMandalaPuja: { en: "Ayyappa Mandala Pooja", hi: "अय्यप्पा मंडल पूजा" } };
 
 const OBS_META = {
   ekadashi: { deity: { en: "Vishnu", hi: "विष्णु" }, gloss: { en: "Fasting day for Vishnu — 11th lunar day", hi: "विष्णु व्रत — एकादशी तिथि" }, rules: { en: "No grains or cereals; break the fast next morning at parana", hi: "अन्न-अनाज वर्जित; अगली सुबह पारण पर व्रत खोलें" }, timing: "parana" },
@@ -3276,6 +3374,13 @@ const FEST_META = {
   guptNavratriMagha: { deity: { en: "Shakti", hi: "शक्ति" }, gloss: { en: "Winter 'hidden' Navratri — tantric sadhana", hi: "माघ गुप्त नवरात्रि — तांत्रिक साधना" }, timing: null },
   vasantPanchami: { deity: { en: "Saraswati", hi: "सरस्वती" }, gloss: { en: "Saraswati puja — first day of spring", hi: "सरस्वती पूजा — वसंत का आरंभ" }, timing: null },
   sheetlaAshtami: { deity: { en: "Sheetla Mata", hi: "शीतला माता" }, gloss: { en: "Basoda — cold-food day after Holi", hi: "बसोड़ा — होली के बाद शीतल भोजन का दिन" }, timing: null },
+  panguniUthiram: { deity: { en: "Shiva, Parvati & Murugan", hi: "शिव, पार्वती व मुरुगन" }, gloss: { en: "Uttara Phalguni in Panguni — divine-marriage festival", hi: "पंगुनी में उत्तरा फाल्गुनी — दिव्य विवाह पर्व" }, rules: { en: "Temple worship and kalyana observances vary by community", hi: "मंदिर पूजा व कल्याण उत्सव समुदायानुसार भिन्न हो सकते हैं" }, timing: null },
+  thaipusam: { deity: { en: "Murugan", hi: "मुरुगन" }, gloss: { en: "Pushya in Thai — Parvati gives Murugan the divine Vel", hi: "थाई मास में पुष्य — पार्वती मुरुगन को दिव्य वेल देती हैं" }, rules: { en: "Fasting, kavadi and temple observances vary by family and temple", hi: "व्रत, कावड़ी व मंदिर अनुष्ठान परिवार और मंदिरानुसार भिन्न होते हैं" }, timing: null },
+  onam: { deity: { en: "Vamana & Mahabali", hi: "वामन व महाबली" }, gloss: { en: "Thiruvonam in Chingam — Kerala's homecoming festival", hi: "चिंगम में थिरुवोणम — केरल का महाबली आगमन पर्व" }, rules: { en: "Thiruvonam is the principal day of the wider Onam season", hi: "थिरुवोणम, विस्तृत ओणम उत्सव का मुख्य दिन है" }, timing: null },
+  karthigaiDeepam: { deity: { en: "Shiva & Murugan", hi: "शिव व मुरुगन" }, gloss: { en: "Krittika in Karthigai — Tamil festival of sacred lamps", hi: "कार्तिगई में कृत्तिका — तमिल दीप पर्व" }, rules: { en: "Light oil lamps in the evening; temple customs vary regionally", hi: "संध्या में तेल के दीप जलाएँ; मंदिर परंपराएँ क्षेत्रानुसार भिन्न हैं" }, timing: "sunset" },
+  vishu: { deity: { en: "Vishnu", hi: "विष्णु" }, gloss: { en: "Kerala's Mesha Sankranti observance — begin with Vishukkani", hi: "केरल का मेष संक्रांति पर्व — विशुक्कणी दर्शन से आरंभ" }, rules: { en: "Prepare Vishukkani for the first auspicious sight at dawn", hi: "भोर के प्रथम शुभ दर्शन हेतु विशुक्कणी सजाएँ" }, timing: null },
+  ayyappaMandalaBegins: { deity: { en: "Ayyappa", hi: "अय्यप्पा" }, gloss: { en: "Day 1 of the 41-day discipline before Sabarimala pilgrimage", hi: "सबरीमला यात्रा से पहले 41-दिवसीय अनुशासन का पहला दिन" }, rules: { en: "Mala and detailed observance should follow a Guru Swami or temple tradition", hi: "माला व विस्तृत नियम गुरु स्वामी या मंदिर परंपरा के अनुसार अपनाएँ" }, timing: null },
+  ayyappaMandalaPuja: { deity: { en: "Ayyappa", hi: "अय्यप्पा" }, gloss: { en: "Day 41 — completion of Mandala Vratham and Mandala Pooja", hi: "41वाँ दिन — मंडल व्रतम पूर्ण व मंडल पूजा" }, rules: { en: "Completion rites follow the pilgrim's Guru Swami and temple tradition", hi: "समापन विधि गुरु स्वामी व मंदिर परंपरा के अनुसार होती है" }, timing: null },
 };
 /* upcoming-occurrence search: tithi name, ekadashi/pradosh variants, festival, or fast */
 function searchUpcoming(query, fromMs, tz, maxN = 24) {
@@ -3738,6 +3843,20 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                   <div style={{ marginTop: 8, padding: "7px 11px", borderRadius: T.rMd, background: "rgba(120,90,60,.07)", border: "1px solid " + C.line }}>
                     <div style={{ fontSize: T.fSmall, fontWeight: 600, color: C.ivory }}>{lang === "hi" ? "पितृ पक्ष · " : "Pitru Paksha · "}{label}</div>
                     <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: 2 }}>{lang === "hi" ? "श्राद्ध व तर्पण का पक्ष — विवाह, गृह प्रवेश आदि शुभ कार्य वर्जित" : "Fortnight for shraddha & tarpan — weddings, housewarming & other auspicious work are avoided"}</div>
+                  </div>
+                );
+              })()}
+              {p.ayyappaMandala && (() => {
+                const av = p.ayyappaMandala, finalDay = av.day === 41;
+                return (
+                  <div style={{ marginTop: 8, padding: "7px 11px", borderRadius: T.rMd, background: "rgba(194,69,30,.06)", border: "1px solid rgba(194,69,30,.2)" }}>
+                    <div style={{ fontSize: T.fSmall, fontWeight: 600, color: C.ivory }}>
+                      {lang === "hi" ? `अय्यप्पा मंडल व्रतम · 41 में से दिन ${av.day}` : `Ayyappa Mandala Vratham · day ${av.day} of 41`}
+                      {finalDay ? (lang === "hi" ? " · मंडल पूजा" : " · Mandala Pooja") : ""}
+                    </div>
+                    <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: 2 }}>
+                      {lang === "hi" ? "सरल सात्त्विक जीवन, दैनिक प्रार्थना व संयम — विस्तृत नियम गुरु स्वामी या मंदिर परंपरा से लें" : "Simple sattvic living, daily prayer and restraint — follow a Guru Swami or temple tradition for the full discipline"}
+                    </div>
                   </div>
                 );
               })()}

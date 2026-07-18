@@ -38,21 +38,26 @@ Original scope notes:
 | Ghata/Ghayla Chaturdashi | Krishna Chaturdashi | for those who died by accident/weapon | 🟡 |
 | **Prohibitions** | whole Pitru Paksha | no weddings/griha pravesh/new purchases — **should feed the Muhurat finder as a blocker**, like Chaturmas/Kharmas already do | 🟢 |
 
-## 2B — Ayyappa Mandala Vratham (you asked; NOT covered)
+## 2B — Ayyappa Mandala Vratham ✅ CORE SPAN BUILT 2026-07-18
 | Item | Placement | Notes | Conf |
 |---|---|---|---|
-| Mandala Vratham (41-day) | begins ~Vrischika Sankranti (Sun→Scorpio, mid-Nov); 41 days | solar-anchored span like the 16-day vrats | 🟢 |
-| Makaravilakku / Makara Jyoti | Makar Sankranti (Sun→Capricorn) | culmination at Sabarimala | 🟢 |
+| Mandala Vratham (41-day) | begins Vrischikam day 1; 41 inclusive days | ✅ start + Mandala Pooja listed; Daily card shows day X of 41 with plain guidance | 🟢 verified |
+| Makaravilakku / Makara Jyoti | Makar Sankranti (Sun→Capricorn) | still generic Makar Sankranti in Ganak; Ayyappa-specific naming/detail remains | 🟢 |
 
-## 2C — Tamil Shaiva / Murugan (nakshatra-in-solar-month; NOT covered)
+2026 IST anchors: **17 Nov → 27 Dec (41 inclusive days)**, matching Drik and
+Sabarimala's published 41-day observance. Detailed mala/vratham vidhi remains in
+the separate sourced-vidhi track; the UI directs devotees to Guru Swami/temple
+tradition instead of pretending one short rule is universal.
+
+## 2C — Tamil Shaiva / Murugan (nakshatra-in-solar-month; CORE ENGINE BUILT 2026-07-18)
 These fire on a **nakshatra within a solar month** — new computation vs the lunar-tithi
 festivals. High value for South-Indian users; near-zero coverage today.
 
 | Festival | Rule | Deity | Conf |
 |---|---|---|---|
-| Karthigai Deepam | Krittika nakshatra in Karthigai (Sun in Vrischika) | Shiva/Murugan | 🟢 |
-| Thaipusam | Pushya nakshatra in Thai (Sun in Makara) | Murugan | 🟢 |
-| Panguni Uthiram | Uttara Phalguni nak. in Panguni (Sun in Meena) | Murugan/Shakti | 🟢 |
+| Karthigai Deepam | Krittika nakshatra in Karthigai (Sun in Vrischika) | ✅ built + bilingual detail | 🟢 verified |
+| Thaipusam | Pushya nakshatra in Thai (Sun in Makara) | ✅ built + bilingual detail | 🟢 verified |
+| Panguni Uthiram | Uttara Phalguni nak. in Panguni (Sun in Meena) | ✅ built + bilingual detail | 🟢 verified |
 | Arudra Darshan (Thiruvathirai) | Ardra nakshatra in Margazhi (Sun in Dhanu) | Nataraja/Shiva | 🟢 |
 | Vaikasi Visakam | Vishakha nak. in Vaikasi (Sun in Vrishabha) | Murugan | 🟡 |
 | Aadi Pooram | Purva Phalguni nak. in Aadi (Sun in Karka) | Andal/Shakta | 🟡 |
@@ -67,8 +72,8 @@ festivals. High value for South-Indian users; near-zero coverage today.
 | Vasant Panchami | Magha Shukla Panchami | **Saraswati — currently MISSING from app entirely, notable gap** | 🟢 |
 | Ganga Dussehra | Jyeshtha Shukla Dashami | Ganga | 🟡 |
 | Pongal / Makar Sankranti (Tamil) | Thai / Makara Sankranti (solar) | harvest | 🟢 |
-| Onam (Thiruvonam) | Shravana nakshatra in Chingam (Sun in Simha) | Kerala | 🟡 |
-| Vishu | Meda Sankranti (Sun→Mesha) | Kerala new year | 🟡 |
+| Onam (Thiruvonam) | Shravana nakshatra in Chingam (Sun in Simha) | ✅ built; principal Thiruvonam day | 🟢 verified |
+| Vishu | first Vishukkani dawn after Mesha Sankranti | ✅ built; kept distinct from the Sankranti civil date | 🟢 verified |
 | Ugadi / Gudi Padwa | Chaitra Shukla 1 | Deccan/Maharashtra new year (lunar — could be Tier 1) | 🟢 |
 
 ## 2E — Shakta / Tantric — "what else is missing" (your research ask)
@@ -111,6 +116,7 @@ puts Jayanti on Bhadrapada Krishna 8, Puja on Diwali. Wire as separate observanc
 ---
 
 ## Build-order note
-2A (Pitru Paksha, w/ Muhurat-finder prohibition) and 2E-high-confidence Shakta are the
-highest-value. Tamil Shaiva (2C) is one reusable "nakshatra-in-solar-month" engine that
-then unlocks Onam/Vishu (2D) too. Mahavidya jayantis wait on your lineage source.
+2A (Pitru Paksha) is built. The reusable solar-month/nakshatra engine and its first
+five festivals plus the Ayyappa span are now built and protected by seven exact 2026
+anchors in `validation/content-dates.cjs`. Next Tamil uses of the engine are Arudra
+Darshan, Vaikasi Visakam and Aadi Pooram; annual Skanda Shashti needs a six-day span.

@@ -24,14 +24,11 @@ Small scope on the *plumbing*, but the **content is NOT ready** — the Panchang
 is the flagship and its observance coverage is ~30%. Content gates below are
 first-class launch blockers, not nice-to-haves.
 
-**⚠️ LAUNCH TENSION (unresolved):** owner wants BOTH "fastest web launch" AND
-comprehensive content ("all traditions + beyond Drik") as a Panchang-launch gate.
-These pull hard against each other — exhaustive multi-tradition sourced content is
-weeks-to-months of research + verification, not a fast task. Resolution options on
-the table (owner to pick): (a) launch on a *credible baseline* and grow coverage
-post-launch via user feedback [recommended — fits the feedback strategy], or
-(b) hold the launch until content is comprehensive. Until decided, Phase 1's date
-is genuinely blocked on this, not on plumbing.
+**✅ LAUNCH TENSION RESOLVED (owner, 2026-07-18): baseline now, grow after.**
+Launch bar = Tiers 1+2 wired & verified (mostly done) + vrat vidhis for the ~15–20
+most-observed fasts. That's the "credible baseline" — weeks, not months. The
+exhaustive beyond-Drik long tail (Tier 3) grows *post-launch*, fed by user feedback.
+So Phase 1's content gate is now finite and near, not open-ended.
 
 **Content gates (must clear before a credible Panchang launch — scope = all 4
 traditions + regional + beyond-Drik, see §C-SCOPE):**
@@ -60,8 +57,13 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
 - [ ] **Light privacy note** — needed once analytics is added.
 - [ ] Optional polish before launch: Muhurat window labels bilingual (E-0.7).
 
+**Product polish (recommended for launch, in-place, no rewrite):**
+- [ ] Everyday-zone nav cleanup + gut MuhuratHub — see **EPIC-IA**.
+- [ ] Design-system pass (universal Card, spacing scale, shared primitives) —
+      see **EPIC-DS**. Directly fixes the "visual inconsistency" pain.
+
 **Not needed for Phase 1:** accounts, data persistence, backend proxy, AI,
-Android. Deliberately out of scope to keep the launch fast.
+Android, SDUI/paywalls. Deliberately out of scope to keep the launch fast.
 
 ---
 
@@ -69,6 +71,8 @@ Android. Deliberately out of scope to keep the launch fast.
 
 - [ ] **Reveal the birth-chart section** once its deep sub-section glosses are
       translated (E-0.6) and it's had a polish pass. Full Jyotish, still free.
+      Apply the Jyotish-zone hierarchy (Kundli/Dashas/Matching/Tools/Vault
+      sub-nav) at this point — see **EPIC-IA**.
 - [ ] Prioritize new features by what Phase 1 user feedback actually asks for.
 - [ ] Cheap feature candidates: **Prashnavali** (number-pick → verse, very low
       cost). Possibly **Gemstone/Remedy** if users ask.
@@ -101,6 +105,14 @@ Owner: hook users first; monetize narrowly. Never ads on Panchang.
       - AI Muhurat free-text search — type the request in any language.
 - [ ] Possibly paid: parts of the Jyotish section (TBD by demand + cost).
 - [ ] Cloud Sync (needs accounts + persistence).
+- [ ] **Subscription tiers / paywalls** (Free / Premium / Pro) — the gating layer
+      for the paid features above. See EPIC-PLATFORM. Narrow, never on Panchang basics.
+
+**Deferred platform architecture (from Kimi's proposal — good ideas, wrong time):**
+The BFF, Server-Driven UI, full auth/RBAC, and paywall tiers proposed in the Kimi
+architecture docs (2026-07-18) are tracked as EPIC-PLATFORM below. They belong
+*here or later*, gated on a real trigger (scale, or this phase's monetization) —
+not pulled forward into the launch. See the epic for the trigger conditions.
 
 ---
 
@@ -115,6 +127,68 @@ Owner explicitly deferred these.
 - Proactive Gochar / transit **alerts** (push) — needs backend + accounts + push
   (NOTE: transit *display* already exists in the app)
 - Custom Tithi + Reminders — needs push
+
+---
+
+## Epics (cross-phase)
+
+Larger threads that span multiple phases or cut across the whole app. Distilled
+from the Kimi architecture docs (2026-07-18) — keeping the good product/design
+ideas, deferring the premature infrastructure. Three-way convergence noted where
+Kimi, the owner's own words, and Ganak's messaging audit independently agree.
+
+### EPIC-IA — Two-Zone information architecture + navigation cleanup
+**Status: partially in motion (Phase 1 already leads with Everyday, hides Jyotish).**
+The organizing insight: Ganak is two culturally-distinct zones under one brand —
+- **Everyday zone** (householders + diaspora): Panchang, Muhurat, Festivals, Hora,
+  Prashnavali. Warm, plain-language, scannable.
+- **Jyotish zone** (serious practitioners, lower-priority persona): Kundli, Dashas,
+  Matching, Tools (BNN/BCP/KP/Shadbala/Ashtakavarga), Vault. Dense, technical.
+
+"Jyotish" is a culturally-understood boundary (a householder checking Rahu Kalam
+doesn't think they're "doing Jyotish"). This is *also* the resolution to the
+branding question: **one app, sub-branded sections** ("Ganak Panchang / Ganak
+Jyotish") — Kimi, the market research (Drik/AstroSage all do one app), and the
+Phase-1 plan all converge here.
+
+Work:
+- [ ] **Everyday-zone nav cleanup (Phase 1-relevant):** clear top-level tabs;
+      **gut the overloaded MuhuratHub** (it does ~10 jobs) into dedicated screens;
+      fix "too many taps" / "unclear where features live" (owner's own words,
+      confirmed by messaging audit). Do in-place in the Vite app — no rewrite.
+- [ ] **Jyotish-zone hierarchy (Phase 2, with the chart reveal):** the 17 flat
+      chart sub-sections (messaging audit finding) need grouping — Kundli / Dashas /
+      Matching / Tools / Vault sub-navigation, not one flat list.
+
+### EPIC-DS — Design-system discipline
+**Status: not started. Cross-cutting; Phase 1 polish (helps launch look coherent).**
+Targets the owner's own words: "visual inconsistency is hell a lot." The app already
+has a `T` design-token object, but values leak/hardcode everywhere — so this is
+*enforce + refactor*, not net-new.
+- [ ] One **universal Card** component (density variants: comfortable/compact),
+      no per-card overrides.
+- [ ] **Rigid spacing scale** — 4/8/12/16/20/24/32 only, no exceptions.
+- [ ] **Two font weights** (400/500); five sizes (display/title/body/secondary/caption).
+- [ ] **Semantic color roles** (text, muted, saffron=devotional/festival,
+      red=Rahu/warning, green=auspicious/Abhijit, blue=links).
+- [ ] Extract shared primitives: Card, DataRow, Badge, SectionHeader — used everywhere.
+- Do in-place in the single file (or as it's split); no stack change.
+
+### EPIC-PLATFORM — BFF / SDUI / Auth / Paywalls (DEFERRED — Phase 4 or later)
+**Status: deferred by design. Good ideas at the wrong time (Kimi docs).**
+Trigger conditions — build a piece only when one is actually true:
+- **BFF / API-key proxy** → when the first server-side secret is needed (the AI
+  features). Already listed as the Phase-4 "Backend proxy." ✓ has a real trigger.
+- **Auth / accounts / RBAC** → when there's something per-user to protect (saved
+  charts, subscriptions). Already Phase 4. ✓
+- **Subscription tiers / paywalls** (Free/Premium/Pro) → when there's a paid
+  feature to gate. Phase 4 monetization. ✓ Narrow; never on Panchang basics.
+- **Server-Driven UI (SDUI)** → ONLY at real scale, when remote layout updates /
+  A/B tests / gradual rollouts across many users justify the abstraction. **No
+  trigger yet** (0 users). Kimi's own risk note agrees: "start static, add later."
+  Explicitly NOT before scale.
+Guardrails carried from the review: none of this uses `localStorage`/`sessionStorage`
+(project ban); nothing requires rewriting the validated ephemeris engine.
 
 ---
 
@@ -193,6 +267,18 @@ Known-missing (owner-flagged 2026-07-18, non-exhaustive):
   that must feed into the Muhurat finder** so those days drop out of results).
   Also solar/nakshatra-timed: Chhath (arghya sunrise/sunset), Onam (nakshatra),
   Pongal/Baisakhi (Sankranti). New logic + Drik validation each.
+- **Tier-2 progress (2026-07-18):** ✅ Pitru Paksha computation + Muhurat blocker;
+  ✅ reusable Tamil/Malayalam solar-month + nakshatra engine; ✅ Thaipusam,
+  Panguni Uthiram, Karthigai Deepam, Onam and Vishu; ✅ Ayyappa Mandala Vratham
+  day 1→41 with Daily-screen progress and Mandala Pooja endpoint. Seven exact
+  2026 anchors pass. Remaining Tamil set: Arudra Darshan, Vaikasi Visakam, Aadi
+  Pooram and annual six-day Skanda Shashti; Makaravilakku still needs its
+  Ayyappa-specific identity/detail rather than the generic Sankranti entry.
+- **NEW P1 date-rule bug found by the Tier-2 verification pass:** Hartalika Teej
+  is currently selected from the tithi at noon (13 Sep 2026), but this vrat uses
+  the Pratahkala-vyapini rule and Drik places it on **14 Sep 2026**. Fix Hartalika
+  first, then audit every Tier-1 festival for its required day-part (sunrise,
+  Pratahkala, Madhyahna, Pradosha, moonrise or Nishita) instead of assuming noon.
 - **Tier 3 — exhaustive "beyond Drik" long tail.** Hundreds of regional/sampradaya
   observances, each sourced + verified. The *ongoing, post-launch, feedback-fed*
   effort — not a launch wall.
@@ -289,9 +375,21 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
 
 ---
 
-## Open decisions still needing the owner
+## Decisions — resolved (owner, 2026-07-18)
 
-- **Umbrella branding** — Ganak Panchang vs Ganak Jyotish vs one toggled app.
-  (Recommendation on record: one app, section-labeled. Unresolved.)
-- **Android route** (Phase 3) — PWA vs Capacitor vs rewrite.
-- **Investment ceiling** — informs how much paid infra (Phase 4) is worth standing up.
+- ✅ **Launch bar** — baseline now, grow after (see Phase 1 note).
+- ✅ **Investment ceiling** — small budget, ~$10–50/mo. Bites only at Phase 4;
+  Phase 1 stays on free tiers. Apple Dev ($99/yr ≈ $8/mo) and a small
+  proxy/server fit inside this when they arrive.
+
+## Open decisions — awaiting confirm (research/costs now provided)
+
+- **Umbrella branding** — market research done (2026-07-18): EVERY successful app
+  (Drik, AstroSage, AstroYogi, Astrotalk) uses ONE app + feature tabs; none split
+  panchang from kundli; the only spin-off anyone makes is a separate *consultation
+  marketplace* app (different business model). Recommendation: one Ganak app,
+  feature tabs, optional "Ganak Panchang/Jyotish" section labels (cosmetic).
+  Awaiting owner confirm.
+- **Android route** — cost ladder explained (2026-07-18): PWA $0 → Capacitor
+  (Play $25 once, Apple $99/yr) → RN rewrite (skip). Recommendation: PWA first,
+  Capacitor when stores + push are wanted. Awaiting owner confirm.
