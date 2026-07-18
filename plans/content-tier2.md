@@ -10,10 +10,19 @@ Confidence: 🟢 high · 🟡 check · 🔴 genuinely unsure / varies by lineage
 
 ---
 
-## 2A — Pitru Paksha / Shraddha (you asked; NOT covered)
-Bhadrapada Purnima → Ashwin Amavasya (16 tithis). Needs **aparahna-kaal tithi**
-(shraddha is an afternoon rite — tithi at aparahna, not sunrise) — that's the real
-work here.
+## 2A — Pitru Paksha / Shraddha ✅ COMPUTATION BUILT 2026-07-18
+`pitruPakshaDay(rise, set)` — detects the amanta Bhadrapada Purnima→Mahalaya
+fortnight using **aparahna-kaal tithi** (midpoint of the 4th of 5 daytime parts).
+Verified vs Drik: 2026 period Sep 26 (Bhadrapada Purnima / Purnima Shraddha) →
+Oct 10 (Sarva Pitru / Mahalaya Amavasya). Special days detected: purnimaShraddha,
+avidhavaNavami, ghataChaturdashi, mahalaya. **Wired as a universal Muhurat-finder
+prohibition** (blocks ALL activity categories — verified: 15/15 fortnight days
+blocked). All gates green.
+Remaining (follow-ups, not blocking): (a) surface Pitru Paksha + per-day shraddha
+tithi in the Daily/festival UI (engine ready, display not wired — blocker-reasons-
+not-shown is a known messaging item); (b) Bharani/Magha nakshatra-shraddha special
+days; (c) decide 16-day (Purnima-incl.) vs 15-day (Pratipada-start) display label.
+Original scope notes:
 
 | Item | Placement | Notes | Conf |
 |---|---|---|---|

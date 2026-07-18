@@ -933,6 +933,25 @@ function amantaMonthIdx(ms) {
   const adhik = sStart === sEnd;
   return { idx: adhik ? (sStart + 1) % 12 : sEnd, adhik };
 }
+/* Pitru Paksha (Shraddha Paksha): Bhadrapada Purnima → Mahalaya (Sarva Pitru)
+   Amavasya — the amanta Bhadrapada (idx 5) Purnima + its Krishna fortnight.
+   Shraddha is an aparahna rite (the 4th of five equal daytime parts), so the
+   day's shraddha tithi is taken at aparahna, not at sunrise. Given a day's
+   sunrise/sunset ms, returns { shraddhaTithi, krishna, special } or null.
+   Verified vs Drik: 2026 period = 27 Sep → 10 Oct (validation/content-dates.cjs). */
+function pitruPakshaDay(rise, set) {
+  const apMid = rise + 0.7 * (set - rise);           // midpoint of the aparahna (4th) part
+  if (amantaMonthIdx(apMid).idx !== 5) return null;  // amanta Bhadrapada only
+  const tnA = Math.floor(rev(moonSidMs(apMid) - sunSidMs(apMid)) / 12);
+  const shraddhaTithi = (tnA % 15) + 1, krishna = tnA >= 15;
+  if (!krishna && shraddhaTithi !== 15) return null; // Bhadrapada Shukla before Purnima = not yet Pitru Paksha
+  let special = null;
+  if (krishna && shraddhaTithi === 15) special = "mahalaya";        // Sarva Pitru Amavasya (last day)
+  else if (!krishna && shraddhaTithi === 15) special = "purnimaShraddha"; // first day
+  else if (krishna && shraddhaTithi === 9) special = "avidhavaNavami";    // for departed married women
+  else if (krishna && shraddhaTithi === 14) special = "ghataChaturdashi"; // for those who died unnaturally
+  return { shraddhaTithi, krishna, special };
+}
 // tithi-based observances (fasting days) — accurate, month-independent
 
 /* ekadashi variants by lunar month */
@@ -1171,6 +1190,7 @@ function muhuratForDate(place, ayanamsa, y, m, day) {
     tn, tithiNum: tithiNum0, krishna: krishna0, nak, nakName: NAKSHATRAS[nak], karana: karanaAt(kn),
     lmonth: lm, lmonthName: lmi.amanta, adhik: lmi.adhik,
     sunSign, devshayana, venusAsta, guruAsta,
+    pitruPaksha: pitruPakshaDay(ev.rise, ev.set),
     choghaDay: choghaSlots(dow, ev.rise, ev.set, true),
     choghaNight: choghaSlots(dow, ev.set, ev.rise + 86400000, false),
     abhijit: dow === 3 ? null : { start: ev.transit - dayLen / 30, end: ev.transit + dayLen / 30 },
@@ -1338,6 +1358,8 @@ function muhuratShuddhi(info, category) {
   const rule = MUHURTA_RULES[category];
   if (!rule) return { valid: true, blockers: [] };
   const b = [];
+  // Pitru Paksha (Shraddha fortnight) blocks ALL auspicious activities, every category.
+  if (info.pitruPaksha) b.push({ en: "Pitru Paksha (Shraddha fortnight — no auspicious work)", hi: "पितृ पक्ष (श्राद्ध पक्ष — शुभ कार्य वर्जित)" });
   if (info.adhik) b.push({ en: "Adhik (leap) month", hi: "अधिक मास" });
   else if (rule.forbiddenMonths && rule.forbiddenMonths.has(info.lmonth)) b.push(CHATURMAS_MONTHS.has(info.lmonth) ? { en: "Chaturmas (" + info.lmonthName + ")", hi: "चातुर्मास (" + info.lmonthName + ")" } : { en: info.lmonthName + " (avoided)", hi: info.lmonthName + " (वर्जित)" });
   if (rule.forbidWeekday && rule.forbidWeekday.has(info.dow)) b.push({ en: WN_SHORT[info.dow] + " (avoided)", hi: WN_SHORT[info.dow] + " (वर्जित)" });
