@@ -45,8 +45,8 @@ Add to `FESTIVALS` array. **Amanta months.**
 | Sharad Purnima (Kojagari) | Ashwin · Shukla · 15 | Lakshmi | — | Kojagari Lakshmi puja; amrit-moon night | 🟢 |
 | Maha Ashtami (Durga Ashtami) | Ashwin · Shukla · 8 | Durga | yes | Navratri's 8th — Durga Ashtami | 🟢 |
 | Maha Navami | Ashwin · Shukla · 9 | Durga | yes | Navratri's 9th | 🟢 |
-| Sheetla Ashtami (Basoda) | Chaitra · Krishna · 8 **(K — check amanta)** | Sheetla | yes | Cold-food day after Holi | 🟡 |
-| Ahoi Ashtami | Kartik · Krishna · 8 **(K — check amanta)** | Ahoi Mata | yes | Mothers' fast for children | 🟡 |
+| Sheetla Ashtami (Basoda) | Krishna · 8 — 8 days after Holi (you confirmed K8) | Sheetla | yes | Cold-food day after Holi | 🟢 tithi confirmed; **amanta month set by code-match + date-verify, not hand-derived** |
+| Ahoi Ashtami | Kartik · Krishna · 8 (you confirmed K8; 8 days before Diwali) | Ahoi Mata | yes | Mothers' fast for children | 🟢 tithi confirmed; month date-verified |
 | Gupt Navratri (Magha) | Magh · Shukla · 1 | Shakti (tantric) | — | Winter "hidden" Navratri | 🟢 |
 | Gupt Navratri (Ashadha) | Ashadha · Shukla · 1 | Shakti (tantric) | — | Monsoon "hidden" Navratri | 🟢 |
 | Rath Yatra | Ashadha · Shukla · 2 | Jagannath | — | Puri chariot festival | 🟢 |
@@ -55,7 +55,8 @@ Add to `FESTIVALS` array. **Amanta months.**
 | Lakshmi Panchami (Shri Vrat) | Chaitra · Shukla · 5 | Lakshmi | yes | Kalpadi tithi; Lakshmi worship | 🟢 verified |
 | Hariyali Teej | Shravan · Shukla · 3 | Parvati | yes | Monsoon Teej for Parvati | 🟢 |
 | Hartalika Teej | Bhadrapad · Shukla · 3 | Parvati | yes | Nirjala Teej for marital blessing | 🟢 |
-| Mahalakshmi Vrat | starts Bhadrapad · Shukla · 8 | Mahalakshmi | yes | 16-day Lakshmi vrat *(span — may be Tier 2)* | 🟡 |
+| Mahalakshmi Vrat — **begins** | Bhadrapad · Shukla · 8 | Mahalakshmi | yes | Start of the 16-day vrat | 🟢 |
+| Mahalakshmi Vrat — **Pujan/culmination** (the important standalone day) | 16th day = Krishna · 8 ("8th of Ashwin", purnimanta name) | Mahalakshmi | yes | Main Mahalakshmi pujan; many observe ONLY this day, not full 16 | 🟢 owner-flagged as key; month date-verified |
 | **Varalakshmi Vratam** | **Friday before Shravan Purnima** (not a plain tithi) | Lakshmi | yes | S-Indian Lakshmi vrat; last Fri of Shravan Shukla | 🟢 verified — **needs computed rule, Tier 1.5** |
 
 ## Questions on scope for this first batch
