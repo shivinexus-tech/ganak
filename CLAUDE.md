@@ -1,4 +1,4 @@
-# Janma Kundli
+# Ganak
 
 All project conventions live in **AGENTS.md** (canonical for every agent — Claude,
 Codex, Gemini, or human). Read it first and follow it exactly; do not let this

@@ -1,4 +1,9 @@
-# Janma Kundli — Project Conventions (canonical, for ALL agents)
+# Ganak — Project Conventions (canonical, for ALL agents)
+
+Product name: **Ganak** (गणक — Sanskrit for "one who calculates," a fitting name
+for an astrology engine). Renamed from "Janma Kundli" on 2026-07-17; the working
+directory and repo history still say "Kundli" in places — that's cosmetic, not a
+second product.
 
 A Vedic panchang + kundli app. The entire app is a single React file:
 `src/kundli-app.tsx` (~6,000 lines). Benchmark: Drik Panchang. Goal: beat it.

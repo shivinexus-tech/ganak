@@ -3053,7 +3053,7 @@ function ChartVault({ snapshot, result, onLoad, C, card }) {
   const exportJSON = () => {
     if (!ready) { flash("Cast a chart first."); return; }
     const data = {
-      app: "Janma Kundli", exportedAt: new Date().toISOString(),
+      app: "Ganak", exportedAt: new Date().toISOString(),
       birth: { name: snapshot.form.name, date: snapshot.form.date, time: snapshot.form.time, place: snapshot.place.label, lat: snapshot.place.lat, lon: snapshot.place.lon, tz: result.tz, ayanamsa: snapshot.ayanamsa },
       ascendant: { sign: SIGN_SHORT[result.ascSign], degree: result.ascDeg },
       planets: result.rows.map((p) => ({ name: p.name, sign: SIGN_SHORT[p.sign], degree: p.deg, retro: !!p.retro })),
@@ -5263,7 +5263,7 @@ export default function KundliApp() {
         <header className="rise" style={{ textAlign: "center", marginBottom: 36 }}>
           <div style={{ fontFamily: "Eczar, serif", color: C.gold, fontSize: 15, letterSpacing: "0.34em" }}>ज्योतिष</div>
           <h1 style={{ fontFamily: "Eczar, serif", fontWeight: 700, fontSize: 46, margin: "8px 0 6px", lineHeight: 1.08 }}>
-            Janma <span style={{ color: C.gold }}>Kundli</span>
+            <span style={{ color: C.gold }}>Ganak</span>
           </h1>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, margin: "10px 0 12px" }}>
             <span style={{ height: 1, width: 64, background: `linear-gradient(90deg, transparent, ${C.gold}99)` }} />

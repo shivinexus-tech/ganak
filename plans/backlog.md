@@ -1,4 +1,4 @@
-# Janma Kundli — Living Backlog
+# Ganak — Living Backlog
 
 Working priority order (supersedes kundli-feature-roadmap.docx ordering where they differ).
 Updated: 2026-07-16 with owner's review.
