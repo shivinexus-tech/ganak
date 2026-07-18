@@ -166,6 +166,42 @@ Known-missing (owner-flagged 2026-07-18, non-exhaustive):
 - **Present-but-incomplete:** e.g. Sankashti exists but may miss regional
   variants/rules — a second failure mode beyond outright absence.
 
+**Verified coverage spot-check (2026-07-18, against code):**
+- ✅ **Pradosh — done well:** all 7 weekday variants named (Ravi/Som/Bhaum/Budh/
+  Guru/Shukra/Shani Pradosh).
+- ❌ **Named Ashtamis — absent:** no Radha Ashtami, Sheetla Ashtami, Durga/Maha
+  Ashtami, Ahoi Ashtami. Only generic monthly Kalashtami.
+- ❌ **Pitru Paksha — absent:** only a one-line "tarpana" mention in the Amavasya
+  gloss. No 16-day shraddha calendar, no tithi→relative mapping, no Mahalaya
+  Amavasya, no prohibitions.
+- ❌ **Major named vrats/Purnimas — absent:** no Mahalakshmi Vrat, no Sharad
+  Purnima / Kojagari.
+- Takeaway: coverage is *uneven* (some things thorough, whole categories missing)
+  — confirms ad-hoc noticing won't catch it; needs the systematic methods above.
+
+**Three-tier cost model (corrects the earlier blanket "weeks-to-months"):**
+- **Tier 1 — data-only (fast, days).** Fixed tithi/paksha/month + deity + gloss +
+  vidhi. Named Ashtamis, Mahalakshmi Vrat, Sharad Purnima, named Purnimas, the
+  missing monthly-cycle observances (Shashti, Shukla Durgashtami, Vinayaka
+  Chaturthi, Durga Navami), straightforward annual/regional festivals. The
+  existing engine already computes the dates from the tithi rule — the work is
+  sourcing the placement + text. Calendar time gated by owner's *verification*
+  pace, not drafting.
+- **Tier 2 — needs new computation (real engineering).** **Pitru Paksha** (16-day
+  shraddha calendar on *aparāhna*-vyāpinī tithi — a midday rule, not the sunrise
+  tithi used elsewhere; Mahalaya; Bharani/Magha nakshatra shraddhas; **prohibitions
+  that must feed into the Muhurat finder** so those days drop out of results).
+  Also solar/nakshatra-timed: Chhath (arghya sunrise/sunset), Onam (nakshatra),
+  Pongal/Baisakhi (Sankranti). New logic + Drik validation each.
+- **Tier 3 — exhaustive "beyond Drik" long tail.** Hundreds of regional/sampradaya
+  observances, each sourced + verified. The *ongoing, post-launch, feedback-fed*
+  effort — not a launch wall.
+
+**Build order (owner, 2026-07-18): Tier 1 now → Tier 2 → then discuss Tier 3.**
+Enabling step before/with Tier 1: move observance content out of inline
+OBS_META/FEST_META into a structured data file (§C-SCOPE.4). Every religious
+entry ships only after owner verification (§C-SCOPE.3).
+
 **Method to build the full gap list (owner asked how to find these):**
 1. Diff vs Drik Panchang (the benchmark) — pull its festival/vrat list per month
    for a full year, subtract the app's output. Objective, partly automatable
