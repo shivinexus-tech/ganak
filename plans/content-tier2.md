@@ -18,10 +18,15 @@ Oct 10 (Sarva Pitru / Mahalaya Amavasya). Special days detected: purnimaShraddha
 avidhavaNavami, ghataChaturdashi, mahalaya. **Wired as a universal Muhurat-finder
 prohibition** (blocks ALL activity categories — verified: 15/15 fortnight days
 blocked). All gates green.
-Remaining (follow-ups, not blocking): (a) surface Pitru Paksha + per-day shraddha
-tithi in the Daily/festival UI (engine ready, display not wired — blocker-reasons-
-not-shown is a known messaging item); (b) Bharani/Magha nakshatra-shraddha special
-days; (c) decide 16-day (Purnima-incl.) vs 15-day (Pratipada-start) display label.
+Daily-screen surfacing DONE 2026-07-18: Pitru Paksha banner in the "today"
+summary card (bilingual, names the special day + shraddha tithi + the "auspicious
+work avoided" prohibition). Verified via computeTodayPanchang data-path (Node):
+Sep 26 Purnima Shraddha, Oct 4 Avidhava Navami, Oct 10 Mahalaya, null outside.
+(Live screenshot blocked by preview date-picker not accepting programmatic input —
+a test-tooling limit, not a code issue; gates green, no console errors.)
+Remaining (follow-ups, not blocking): (a) Bharani/Magha nakshatra-shraddha special
+days; (b) show Pitru Paksha in the "coming up" festival list; (c) decide 16-day
+(Purnima-incl.) vs 15-day (Pratipada-start) display label.
 Original scope notes:
 
 | Item | Placement | Notes | Conf |

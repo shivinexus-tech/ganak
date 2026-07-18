@@ -1523,6 +1523,7 @@ function computeTodayPanchang(place, ayanamsa = "lahiri", atMs) {
     sunSign: SIGNS[Math.floor(sun / 30)].split(" ")[0],
     rise: ev.rise, set: ev.set, moonrise: moonEv.rise, moonset: moonEv.set, rahu, abhijit, gulika, yama,
     dow,
+    pitruPaksha: (ev.rise !== null && ev.set !== null) ? pitruPakshaDay(ev.rise, ev.set) : null,
     choghaDay: ev.rise !== null ? choghaSlots(dow, ev.rise, ev.set, true) : null,
     choghaNight: ev.rise !== null ? choghaSlots(dow, ev.set, ev.rise + 86400000, false) : null,
     events: upcomingEvents(now),
@@ -3728,6 +3729,18 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                 <span style={{ fontSize: T.fSmall, fontWeight: 600, color: fastObs.fasting ? C.sindoor : C.gold }}>{obsLabel(lang, fastObs)}</span>
                 {OBS_GLOSS[fastObs.baseKey || fastObs.key] && <span style={{ fontSize: T.fMicro, color: C.muted }}>· {OBS_GLOSS[fastObs.baseKey || fastObs.key][L2]}</span>}
               </div>}
+              {p.pitruPaksha && (() => {
+                const pp = p.pitruPaksha;
+                const SP = { mahalaya: { en: "Sarva Pitru Amavasya (Mahalaya)", hi: "सर्वपितृ अमावस्या (महालय)" }, purnimaShraddha: { en: "Purnima Shraddha — Pitru Paksha begins", hi: "पूर्णिमा श्राद्ध — पितृ पक्ष आरंभ" }, avidhavaNavami: { en: "Avidhava Navami", hi: "अविधवा नवमी" }, ghataChaturdashi: { en: "Ghata Chaturdashi", hi: "घट चतुर्दशी" } };
+                const tithiName = pp.krishna ? (TITHIS[(pp.shraddhaTithi - 1) % 14] || "") : "Purnima";
+                const label = pp.special ? SP[pp.special][L2] : (lang === "hi" ? tithiName + " श्राद्ध" : tithiName + " Shraddha");
+                return (
+                  <div style={{ marginTop: 8, padding: "7px 11px", borderRadius: T.rMd, background: "rgba(120,90,60,.07)", border: "1px solid " + C.line }}>
+                    <div style={{ fontSize: T.fSmall, fontWeight: 600, color: C.ivory }}>{lang === "hi" ? "पितृ पक्ष · " : "Pitru Paksha · "}{label}</div>
+                    <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: 2 }}>{lang === "hi" ? "श्राद्ध व तर्पण का पक्ष — विवाह, गृह प्रवेश आदि शुभ कार्य वर्जित" : "Fortnight for shraddha & tarpan — weddings, housewarming & other auspicious work are avoided"}</div>
+                  </div>
+                );
+              })()}
             </div>
             <div style={{ padding: T.s3 + "px " + T.s5 + "px", borderTop: "1px solid " + C.line }}>
               <div style={{ ...T.label, color: C.muted, marginBottom: 7 }}>{lang === "hi" ? "आज के शुभ व अशुभ समय" : "Good & avoid times today"}</div>
