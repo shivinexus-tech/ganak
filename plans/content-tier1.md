@@ -7,6 +7,12 @@ row** → Claude wires the confirmed rows into `observancesFor()` (monthly) or t
 **Nothing here is shipped until you confirm it.** Religious content — I've drafted
 my best-known placement, but I am not the authority. Correct anything.
 
+**SCOPE (owner, 2026-07-18): Hindu observances ONLY.** No Jain, Buddhist,
+Christian, Islamic, or other-religion entries — target users are Hindu. Edge case
+to watch: full moons/new moons are Hindu panchang elements and stay, but do NOT
+add other-religion festival framings that share a date (e.g. no "Buddha Purnima"
+label on Vaishakh Purnima).
+
 ## ⚠️ Two things I need you to check specifically
 
 1. **Month reckoning = AMANTA.** The engine names months amanta (month ends at the
@@ -29,7 +35,6 @@ These fire *every month* (add to `observancesFor`). Gaps here show 12×/year.
 | Vinayaka Chaturthi | Shukla 4 | Ganesha | yes | Monthly Ganesha vrat on the waxing 4th | 🟢 | |
 | Skanda / Kanda Shashti | Shukla 6 | Kartikeya (Murugan) | yes | Monthly Murugan vrat on the waxing 6th | 🟢 | |
 | Masik Durgashtami | Shukla 8 | Durga | yes | Monthly Durga vrat (distinct from Kalashtami) | 🟢 | |
-| Rohini Vrat (Jain) | nakshatra-based | — | yes | *(Tier 2 — nakshatra, not tithi; flag if wanted)* | 🟡 | |
 
 ## Batch 1B — Named annual observances you called out
 Add to `FESTIVALS` array. **Amanta months.**

@@ -232,7 +232,14 @@ Must be sourced/accurate (religious content — cite tradition, don't invent).
 ### C-SCOPE — decided by owner 2026-07-18
 **In scope: ALL of Smarta / Vaishnava / Shaiva / Shakta + top regional, AND aim
 to cover observances even Drik doesn't.** This is the "beat Drik" bet, applied to
-content. Consequences that follow from it:
+content.
+
+**Religion scope: HINDU ONLY.** Target users are Hindu — no Jain, Buddhist,
+Christian, Islamic, or other-religion observances. (Full/new moons stay as Hindu
+panchang elements, but no other-religion festival labels on shared dates, e.g. no
+"Buddha Purnima" framing on Vaishakh Purnima.)
+
+Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
 
 1. **This becomes the largest workstream in the project** — and it's a *content /
    research* effort, not a coding one. Code holds it; sourcing and verification
