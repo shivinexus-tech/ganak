@@ -1120,6 +1120,7 @@ const WEEKDAY_FAV = {
   naming:   { 0: 1, 1: 1, 2: -1, 3: 1, 4: 2, 5: 1, 6: -1 },
 };
 const WN_SHORT = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const WN_HI = ["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"];
 function muhuratForDate(place, ayanamsa, y, m, day) {
   AYAN_MODE = ayanamsa || "lahiri";
   const tz = zoneOffset(place.zone, y, m, day) ?? 5.5;
@@ -1160,31 +1161,32 @@ function muhuratForDate(place, ayanamsa, y, m, day) {
 }
 function dayScore(info, category) {
   const f = []; let s = 0;
+  const nakHi = NAK_HI[info.nak] || info.nakName;
   // tithi
-  if (info.tithiNum === 15 && !info.krishna) { s += 2; f.push({ t: "Purnima", g: true }); }
-  else if (info.tn === 29) { s -= 3; f.push({ t: "Amavasya", g: false }); }
-  else if (RIKTA_TITHI.has(info.tithiNum)) { s -= 2; f.push({ t: "Rikta tithi", g: false }); }
+  if (info.tithiNum === 15 && !info.krishna) { s += 2; f.push({ en: "Purnima", hi: "पूर्णिमा", g: true }); }
+  else if (info.tn === 29) { s -= 3; f.push({ en: "Amavasya", hi: "अमावस्या", g: false }); }
+  else if (RIKTA_TITHI.has(info.tithiNum)) { s -= 2; f.push({ en: "Rikta tithi", hi: "रिक्ता तिथि", g: false }); }
   else { s += 1; }
   // nakshatra
   if (info.nak === 7) {
-    if (category === "wedding") { f.push({ t: "Pushya (not used for weddings)", g: false }); }
-    else { s += 3; f.push({ t: "Pushya nakshatra", g: true }); }
-  } else if (AUSP_NAK.has(info.nak)) { s += 2; f.push({ t: info.nakName + " nakshatra", g: true }); }
-  else if (INAUSP_NAK.has(info.nak)) { s -= 2; f.push({ t: info.nakName + " (avoid)", g: false }); }
+    if (category === "wedding") { f.push({ en: "Pushya (not used for weddings)", hi: "पुष्य (विवाह हेतु वर्जित)", g: false }); }
+    else { s += 3; f.push({ en: "Pushya nakshatra", hi: "पुष्य नक्षत्र", g: true }); }
+  } else if (AUSP_NAK.has(info.nak)) { s += 2; f.push({ en: info.nakName + " nakshatra", hi: nakHi + " नक्षत्र", g: true }); }
+  else if (INAUSP_NAK.has(info.nak)) { s -= 2; f.push({ en: info.nakName + " (avoid)", hi: nakHi + " (टालें)", g: false }); }
   // weekday
   const wd = (WEEKDAY_FAV[category] || WEEKDAY_FAV.general)[info.dow] ?? 0;
   s += wd;
-  if (wd > 0) f.push({ t: WN_SHORT[info.dow], g: true }); else if (wd < 0) f.push({ t: WN_SHORT[info.dow] + " (weak)", g: false });
+  if (wd > 0) f.push({ en: WN_SHORT[info.dow], hi: WN_HI[info.dow], g: true }); else if (wd < 0) f.push({ en: WN_SHORT[info.dow] + " (weak)", hi: WN_HI[info.dow] + " (कमज़ोर)", g: false });
   // Guru/Ravi-Pushya yoga
   if (info.nak === 7 && category !== "wedding") {
-    if (info.dow === 4) { s += 2; f.push({ t: "Guru-Pushya yoga", g: true }); }
-    else if (info.dow === 0) { s += 1; f.push({ t: "Ravi-Pushya yoga", g: true }); }
+    if (info.dow === 4) { s += 2; f.push({ en: "Guru-Pushya yoga", hi: "गुरु-पुष्य योग", g: true }); }
+    else if (info.dow === 0) { s += 1; f.push({ en: "Ravi-Pushya yoga", hi: "रवि-पुष्य योग", g: true }); }
   }
   // Bhadra (Vishti) karana
-  if (info.karana === "Vishti") { s -= 2; f.push({ t: "Bhadra (Vishti) karana", g: false }); }
+  if (info.karana === "Vishti") { s -= 2; f.push({ en: "Bhadra (Vishti) karana", hi: "भद्रा (विष्टि करण)", g: false }); }
   // intra-day flexibility
   const good = info.choghaDay.filter((c) => c.nat === "good").length;
-  if (good >= 3) { s += 1; f.push({ t: good + " good day choghadiya", g: true }); }
+  if (good >= 3) { s += 1; f.push({ en: good + " good day choghadiya", hi: good + " शुभ दिन चौघड़िया", g: true }); }
   return { score: s, factors: f };
 }
 /* classify an observance key to its base kind */
@@ -2518,10 +2520,11 @@ function eventDetail(ev, now) {
 }
 
 /* ---------------- compact reusable place search ---------------- */
-function PlaceInput({ value, onPick, C }) {
+function PlaceInput({ value, onPick, C, lang = "en" }) {
   const [q, setQ] = useState(value ? value.label : "");
   const [sugs, setSugs] = useState([]);
   const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
   const deb = React.useRef(null);
   const seq = React.useRef(0);
 
@@ -2535,8 +2538,9 @@ function PlaceInput({ value, onPick, C }) {
     const offline = searchOffline(text);
     setSugs(offline);
     if (deb.current) clearTimeout(deb.current);
-    if (text.trim().length < 2) return;
+    if (text.trim().length < 2) { setBusy(false); return; }
     const my = ++seq.current;
+    setBusy(true);
     deb.current = setTimeout(async () => {
       try {
         const online = await searchOnline(text);
@@ -2544,6 +2548,7 @@ function PlaceInput({ value, onPick, C }) {
         const seen = new Set(offline.map((o) => o.label.toLowerCase()));
         setSugs(offline.concat(online.filter((o) => !seen.has(o.label.toLowerCase()))).slice(0, 8));
       } catch { /* offline results already shown */ }
+      finally { if (my === seq.current) setBusy(false); }
     }, 350);
   };
 
@@ -2560,11 +2565,11 @@ function PlaceInput({ value, onPick, C }) {
         value={q}
         onChange={(e) => onChange(e.target.value)}
         onFocus={(e) => { e.target.select(); setOpen(true); }}
-        placeholder="Change city…"
+        placeholder={lang === "hi" ? "शहर बदलें…" : "Change city…"}
         autoComplete="off"
         style={{ width: "100%", height: T.ctrlH, boxSizing: "border-box", background: "#FFFDF7", border: `1px solid ${C.line}`, borderRadius: T.rMd, color: C.ivory, padding: "0 12px", fontSize: 13.5, fontFamily: "Spectral, serif", outline: "none" }}
       />
-      {open && sugs.length > 0 && (
+      {open && (sugs.length > 0 || busy) && (
         <div style={{ position: "absolute", left: 0, right: 0, top: "100%", zIndex: 20, background: "#FFFFFF", border: `1px solid ${C.gold}`, borderRadius: 8, marginTop: 4, overflow: "hidden", boxShadow: "0 12px 30px rgba(95,70,20,.18)" }}>
           {sugs.map((p) => (
             <button key={p.label + p.lat} className="sug" onClick={() => pick(p)}
@@ -2572,6 +2577,7 @@ function PlaceInput({ value, onPick, C }) {
               {p.label}
             </button>
           ))}
+          {busy && <div style={{ padding: "8px 12px", color: C.muted, fontSize: 12 }}>{lang === "hi" ? "और स्थान खोजे जा रहे हैं…" : "Searching more places…"}</div>}
         </div>
       )}
     </div>
@@ -3015,12 +3021,14 @@ function BhriguModule({ rows, ascSign, birthMs, tz, C, card }) {
   );
 }
 
-function ChartVault({ snapshot, result, onLoad, C, card }) {
+function ChartVault({ snapshot, result, onLoad, C, card, lang = "en" }) {
   const store = (typeof window !== "undefined" && window.storage) ? window.storage : null;
   const [saved, setSaved] = useState([]);
   const [msg, setMsg] = useState("");
   const [imp, setImp] = useState("");
+  const [confirmId, setConfirmId] = useState(null);
   const ready = !!(result && snapshot && snapshot.form && snapshot.place);
+  const t = (en, hi) => (lang === "hi" ? hi : en);
 
   const refresh = async () => {
     if (!store) return;
@@ -3038,20 +3046,25 @@ function ChartVault({ snapshot, result, onLoad, C, card }) {
 
   const saveCurrent = async () => {
     if (!store) { flash("Saving isn't available in this preview — export or share still work."); return; }
-    if (!ready) { flash("Cast a chart first."); return; }
+    if (!ready) { flash(t("Cast a chart first.", "पहले कुंडली बनाएँ।")); return; }
     const id = "chart:" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     const name = (snapshot.form.name || "").trim() || snapshot.place.label || "Unnamed";
     const obj = { id, name, savedAt: Date.now(), form: snapshot.form, place: snapshot.place, tzOverride: snapshot.tzOverride, ayanamsa: snapshot.ayanamsa, summary: `${snapshot.form.date} ${snapshot.form.time} · ${snapshot.place.label}` };
     try { await store.set(id, JSON.stringify(obj)); flash("Saved “" + name + "”."); await refresh(); } catch (e) { flash("Save failed."); }
   };
-  const remove = async (id) => { if (!store) return; try { await store.delete(id); await refresh(); flash("Removed."); } catch (e) {} };
+  const remove = async (id) => { if (!store) return; try { await store.delete(id); await refresh(); flash(lang === "hi" ? "हटा दिया गया।" : "Removed."); setConfirmId(null); } catch (e) {} };
+  const askRemove = (id) => {
+    if (confirmId === id) { remove(id); return; }
+    setConfirmId(id);
+    setTimeout(() => setConfirmId((cur) => (cur === id ? null : cur)), 4000);
+  };
 
   const copy = async (text, okMsg) => {
     try { await navigator.clipboard.writeText(text); flash(okMsg); } catch (e) { setImp(text); flash("Copy unavailable — text placed below to copy manually."); }
   };
 
   const exportJSON = () => {
-    if (!ready) { flash("Cast a chart first."); return; }
+    if (!ready) { flash(t("Cast a chart first.", "पहले कुंडली बनाएँ।")); return; }
     const data = {
       app: "Ganak", exportedAt: new Date().toISOString(),
       birth: { name: snapshot.form.name, date: snapshot.form.date, time: snapshot.form.time, place: snapshot.place.label, lat: snapshot.place.lat, lon: snapshot.place.lon, tz: result.tz, ayanamsa: snapshot.ayanamsa },
@@ -3068,24 +3081,24 @@ function ChartVault({ snapshot, result, onLoad, C, card }) {
       const a = document.createElement("a"); a.href = url; a.download = fname; document.body.appendChild(a); a.click();
       document.body.removeChild(a); URL.revokeObjectURL(url); downloaded = true;
     } catch (e) {}
-    copy(text, downloaded ? "Exported — downloaded and copied to clipboard." : "Copied chart JSON to clipboard.");
+    copy(text, downloaded ? t("Exported — downloaded and copied to clipboard.", "निर्यात हुआ — डाउनलोड और क्लिपबोर्ड पर कॉपी हुआ।") : t("Copied chart JSON to clipboard.", "कुंडली JSON क्लिपबोर्ड पर कॉपी हुआ।"));
   };
 
   const shareCode = () => {
-    if (!ready) { flash("Cast a chart first."); return; }
+    if (!ready) { flash(t("Cast a chart first.", "पहले कुंडली बनाएँ।")); return; }
     try {
       const code = btoa(encodeURIComponent(JSON.stringify({ form: snapshot.form, place: snapshot.place, tzOverride: snapshot.tzOverride, ayanamsa: snapshot.ayanamsa })));
-      copy(code, "Share code copied — paste into another session's Import box.");
-    } catch (e) { flash("Couldn't build the code."); }
+      copy(code, t("Share code copied — paste into another session's Import box.", "साझा कोड कॉपी हुआ — दूसरे सत्र के इम्पोर्ट बॉक्स में पेस्ट करें।"));
+    } catch (e) { flash(t("Couldn't build a share code — cast a chart first and try again.", "साझा कोड नहीं बना — पहले कुंडली बनाएँ और पुनः प्रयास करें।")); }
   };
 
   const importChart = () => {
-    const code = imp.trim(); if (!code) { flash("Paste a share code first."); return; }
+    const code = imp.trim(); if (!code) { flash(t("Paste a share code first.", "पहले एक साझा कोड पेस्ट करें।")); return; }
     try {
       const obj = JSON.parse(decodeURIComponent(atob(code)));
       if (!obj.form || !obj.place) throw new Error("bad");
-      onLoad(obj); setImp(""); flash("Chart loaded.");
-    } catch (e) { flash("That code didn't parse."); }
+      onLoad(obj); setImp(""); flash(t("Chart loaded.", "कुंडली लोड हुई।"));
+    } catch (e) { flash(t("That share code doesn't look right — check that you copied the whole thing and try again.", "यह साझा कोड सही नहीं लगता — देखें कि आपने पूरा कोड कॉपी किया है और पुनः प्रयास करें।")); }
   };
 
   const btn = (label, fn, on = true) => (
@@ -3095,11 +3108,11 @@ function ChartVault({ snapshot, result, onLoad, C, card }) {
   return (
     <div style={{ ...card, padding: 16, marginTop: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <span style={{ fontFamily: "Eczar, serif", fontSize: 15, color: C.ivory }}>Saved charts</span>
+        <span style={{ fontFamily: "Eczar, serif", fontSize: 15, color: C.ivory }}>{t("Saved charts", "सहेजी हुई कुंडलियाँ")}</span>
         <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
-          {btn("Save current", saveCurrent, ready)}
-          {btn("Export JSON", exportJSON, ready)}
-          {btn("Share code", shareCode, ready)}
+          {btn(t("Save current", "वर्तमान सहेजें"), saveCurrent, ready)}
+          {btn(t("Export JSON", "JSON निर्यात"), exportJSON, ready)}
+          {btn(t("Share code", "साझा कोड"), shareCode, ready)}
         </div>
       </div>
 
@@ -3112,21 +3125,21 @@ function ChartVault({ snapshot, result, onLoad, C, card }) {
                 <div style={{ fontSize: 11, color: C.muted, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.summary}</div>
               </div>
               <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
-                <button onClick={() => onLoad(c)} style={{ padding: "5px 11px", borderRadius: 6, fontSize: 12.5, fontFamily: "Eczar, serif", cursor: "pointer", border: `1px solid ${C.gold}`, background: "transparent", color: C.gold }}>Load</button>
-                <button onClick={() => remove(c.id)} aria-label="Delete" style={{ padding: "5px 9px", borderRadius: 6, fontSize: 13, cursor: "pointer", border: `1px solid ${C.line}`, background: "transparent", color: C.muted }}>✕</button>
+                <button onClick={() => onLoad(c)} style={{ padding: "5px 11px", borderRadius: 6, fontSize: 12.5, fontFamily: "Eczar, serif", cursor: "pointer", border: `1px solid ${C.gold}`, background: "transparent", color: C.gold }}>{t("Load", "लोड")}</button>
+                <button onClick={() => askRemove(c.id)} aria-label={confirmId === c.id ? (lang === "hi" ? "पक्का हटाएँ" : "Confirm delete") : (lang === "hi" ? "हटाएँ" : "Delete")} style={{ padding: "5px 9px", borderRadius: 6, fontSize: confirmId === c.id ? 12 : 13, cursor: "pointer", border: `1px solid ${confirmId === c.id ? C.sindoor : C.line}`, background: confirmId === c.id ? "rgba(194,69,30,.08)" : "transparent", color: confirmId === c.id ? C.sindoor : C.muted, fontWeight: confirmId === c.id ? 600 : 400, whiteSpace: "nowrap" }}>{confirmId === c.id ? (lang === "hi" ? "हटाएँ?" : "Delete?") : "✕"}</button>
               </div>
             </div>
           ))}
         </div>
       ) : (
         <div style={{ marginTop: 10, fontSize: 12, color: C.muted, fontStyle: "italic" }}>
-          {store ? "No saved charts yet — cast one and press Save current." : "Saving isn't available in this preview. Export and Share still work here."}
+          {store ? t("No saved charts yet — cast one and press Save current.", "अभी कोई सहेजी कुंडली नहीं — एक बनाएँ और \"वर्तमान सहेजें\" दबाएँ।") : t("Saving isn't available in this preview. Export and Share still work here.", "इस प्रीव्यू में सहेजना उपलब्ध नहीं। निर्यात और साझा फिर भी काम करते हैं।")}
         </div>
       )}
 
       <div style={{ marginTop: 12, display: "flex", gap: 7, alignItems: "stretch", flexWrap: "wrap" }}>
-        <input value={imp} onChange={(e) => setImp(e.target.value)} placeholder="Paste a share code to import…" style={{ flex: 1, minWidth: 180, padding: "8px 11px", borderRadius: 7, border: `1px solid ${C.line}`, background: "#FFFDF7", color: C.ivory, fontFamily: "Spectral, serif", fontSize: 13.5 }} />
-        {btn("Import", importChart, true)}
+        <input value={imp} onChange={(e) => setImp(e.target.value)} placeholder={t("Paste a share code to import…", "इम्पोर्ट हेतु साझा कोड पेस्ट करें…")} style={{ flex: 1, minWidth: 180, padding: "8px 11px", borderRadius: 7, border: `1px solid ${C.line}`, background: "#FFFDF7", color: C.ivory, fontFamily: "Spectral, serif", fontSize: 13.5 }} />
+        {btn(t("Import", "इम्पोर्ट"), importChart, true)}
       </div>
       {msg && <div style={{ marginTop: 10, fontSize: 12.5, color: C.gold }}>{msg}</div>}
     </div>
@@ -3564,9 +3577,10 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
     setTimeout(() => {
       try {
         const dd = muhuratScanRange(place, "lahiri", from, to, cat);
-        setAns({ category: cat, days: dd });
+        setAns({ category: cat, days: dd, from: fromIso || mfFrom, to: toIso || mfTo });
       } catch (e) {
-        setMfErr((lang === "hi" ? "गणना विफल — " : "Calculation failed — ") + (e && e.message ? e.message : String(e)));
+        if (typeof console !== "undefined") console.error("muhurat scan failed:", e);
+        setMfErr(lang === "hi" ? "गणना नहीं हो सकी — कृपया छोटी अवधि आज़माएँ या पुनः प्रयास करें।" : "Couldn't complete the search — try a shorter date range or try again.");
       } finally {
         setMfBusy(false);
       }
@@ -3723,17 +3737,17 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         rows.push(["Tithi", multi(P.tithis)]);
         rows.push(["Nakshatra", multi(P.naks)]);
         rows.push(["Yoga", multi(P.yogasP)]);
-        rows.push(["Karana", multi(P.karanas)]);
+        rows.push([lang === "hi" ? "करण (तिथि का आधा भाग)" : "Karana (half of a tithi)", multi(P.karanas)]);
         rows.push(["Paksha", P.paksha]);
         rows.push(["Weekday", P.vara]);
         rows.push(["Amanta Month", P.months.amanta]);
         rows.push(["Purnimanta Month", P.months.purnimanta]);
         rows.push(["Moonsign", P.moonSignEnd ? upto(P.moonSign, P.moonSignEnd) : P.moonSign]);
         rows.push(["Sunsign", P.sunSign]);
-        rows.push(["Pravishte / Gate", String(P.pravishte)]);
-        rows.push(["Shaka Samvat", P.samvat.shaka]);
-        rows.push(["Vikram Samvat", P.samvat.vikram]);
-        rows.push(["Gujarati Samvat", P.samvat.guj]);
+        rows.push([lang === "hi" ? "प्रविष्टे (सौर मास में बीते दिन)" : "Pravishte (days into the solar month)", String(P.pravishte)]);
+        rows.push([lang === "hi" ? "शक संवत् (राष्ट्रीय पंचांग वर्ष)" : "Shaka Samvat (national calendar year)", P.samvat.shaka]);
+        rows.push([lang === "hi" ? "विक्रम संवत् (उत्तर भारतीय पंचांग वर्ष)" : "Vikram Samvat (north Indian calendar year)", P.samvat.vikram]);
+        rows.push([lang === "hi" ? "गुजराती संवत् (गुजराती पंचांग वर्ष)" : "Gujarati Samvat (Gujarati calendar year)", P.samvat.guj]);
         rows.push(["Abhijit Muhurat", P.abhijit ? span2(P.abhijit, C.gold) : <span style={{ color: C.muted }}>None — avoided on Budhavara</span>]);
         rows.push(["Rahu Kalam", span2(P.rahu, C.sindoor)]);
         rows.push(["Gulikai Kalam", span2(P.gulika, C.sindoor)]);
@@ -3841,6 +3855,11 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
             <button key={k} onClick={() => { setTab(k); setFexp(null); }} style={{ padding: "6px 14px", borderRadius: T.rPill, fontFamily: "Eczar, serif", fontSize: 13, cursor: "pointer", border: `1px solid ${tab === k ? C.gold : "transparent"}`, background: tab === k ? "rgba(168,106,18,.1)" : "transparent", color: tab === k ? C.gold : C.muted }}>{tr(lang, lbl)}</button>
           ))}
         </div>
+        {tab === "fasting" && trad === "vaishnava" && (
+          <div style={{ fontSize: 11.5, color: C.muted, padding: "0 12px 8px", fontStyle: "italic", lineHeight: 1.45 }}>
+            {lang === "hi" ? "ISKCON (वैष्णव) तिथियों में कुछ एकादशी व्रत एक दिन बाद पड़ सकते हैं।" : "ISKCON (Vaishnava) dates may fall a day later for some Ekadashi fasts."}
+          </div>
+        )}
         {(() => {
           const items = (tab === "fasting" ? effFasts : cal.festivals).slice(0, 10);
           if (!items.length) return <div style={{ padding: "12px", fontSize: 12.5, color: C.muted, fontStyle: "italic" }}>{tr(lang, "noneToday")}</div>;
@@ -3871,7 +3890,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                     return (
                       <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px dashed #EBDFC6", display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-start" }}>
                         {meta && meta.gloss && <div style={{ fontSize: T.fSmall, color: C.ivory }}>{meta.gloss[LL]}{meta.deity && <span style={{ color: C.muted }}> · {meta.deity[LL]}</span>}</div>}
-                        {d && d.info && <div style={{ fontSize: T.fMicro, color: C.muted }}>{d.info.lmonthName} · {d.info.krishna ? (lang === "hi" ? "कृष्ण पक्ष" : "Krishna Paksha") : (lang === "hi" ? "शुक्ल पक्ष" : "Shukla Paksha")} · {d.info.nakName}</div>}
+                        {d && d.info && <div style={{ fontSize: T.fMicro, color: C.muted }}>{d.info.lmonthName} · {d.info.krishna ? (lang === "hi" ? "कृष्ण पक्ष" : "Krishna Paksha") : (lang === "hi" ? "शुक्ल पक्ष" : "Shukla Paksha")} · {(lang === "hi" ? (NAK_HI[d.info.nak] || d.info.nakName) : d.info.nakName)}</div>}
                         {d && (d.parana || d.moonrise != null || d.sunset != null) && (
                           <div style={{ fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
                             {d.parana ? <>{lang === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, it.ms)}{lang === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {lang === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, it.ms)}</span>}</>
@@ -3944,6 +3963,11 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           {mfErr && (
             <div style={{ marginTop: 10, padding: "10px 12px", borderRadius: T.rMd, background: "rgba(194,69,30,.08)", border: `1.5px solid ${C.sindoor}`, color: C.sindoor, fontSize: 13 }}>{mfErr}</div>
           )}
+          {ans && !mfBusy && (ans.from !== mfFrom || ans.to !== mfTo || ans.category !== mfCat) && (
+            <div style={{ marginTop: 10, padding: "9px 12px", borderRadius: T.rMd, background: "#FDF3E0", border: `1px solid #E0B25E`, color: "#8A5A00", fontSize: 12.5, lineHeight: 1.45 }}>
+              {lang === "hi" ? "चुनाव बदल गया है — नए परिणामों हेतु \"शुभ दिन खोजें\" दबाएँ। नीचे पिछले परिणाम दिख रहे हैं।" : "Your selection changed — press \"Find good days\" to update. The results below are from your previous search."}
+            </div>
+          )}
           {ans && (() => {
             const catInfo = MUH_CATS.find((c) => c.key === ans.category) || { hi: "", en: "" };
             const allValid = ans.days.filter((d) => d.valid);
@@ -3953,14 +3977,22 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
             const dlFull = (r) => new Date(r.rise + r.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
             const fmtIso = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
             const top = days[0];
+            // tally the reasons the excluded days were skipped, most-common first
+            const blockerTally = (() => {
+              const m = new Map();
+              for (const d of ans.days) { if (d.valid) continue; for (const b of (d.blockers || [])) { if (!m.has(b.en)) m.set(b.en, { en: b.en, hi: b.hi, n: 0 }); m.get(b.en).n++; } }
+              return [...m.values()].sort((a, b) => b.n - a.n).slice(0, 4);
+            })();
+            const whyList = blockerTally.map((b) => (lang === "hi" ? b.hi : b.en) + " (" + b.n + ")").join(lang === "hi" ? ", " : ", ");
             return (
               <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.line}` }}>
                 <div style={{ fontFamily: "Eczar, serif", fontSize: 15.5, color: C.ivory }}>
-                  {(lang === "hi" ? "शुभ दिन · " : "Best days · ")}{lang === "hi" ? catInfo.hi : catInfo.en} <span style={{ color: C.muted, fontSize: 13 }}>· {fmtIso(mfFrom)} – {fmtIso(mfTo)}</span>
+                  {(lang === "hi" ? "शुभ दिन · " : "Best days · ")}{lang === "hi" ? catInfo.hi : catInfo.en} <span style={{ color: C.muted, fontSize: 13 }}>· {fmtIso(ans.from || mfFrom)} – {fmtIso(ans.to || mfTo)}</span>
                 </div>
                 {days.length === 0 ? (
                   <div style={{ fontSize: 12.5, color: C.muted, marginTop: 10, lineHeight: 1.6 }}>
                     <span style={{ color: C.sindoor, fontWeight: 600 }}>{lang === "hi" ? "इस अवधि में कोई शुभ मुहूर्त नहीं।" : "No auspicious muhurat in this range."}</span>
+                    {whyList && <><br />{(lang === "hi" ? "अधिकांश दिन इन कारणों से टले: " : "Most days were skipped because of: ") + whyList + "."}</>}
                     <br />{(lang === "hi" ? "शुभ काल: " : "When it's possible: ") + MUHURTA_RULES[ans.category].monthsLabel[lang === "hi" ? "hi" : "en"] + ". " + (lang === "hi" ? "बड़ी अवधि आज़माएँ।" : "Try a wider range.")}
                   </div>
                 ) : (
@@ -3970,10 +4002,10 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                         <div style={{ ...T.label, color: C.gold, marginBottom: 3 }}>{lang === "hi" ? "सर्वोत्तम दिन" : "Best day"}</div>
                         <div style={{ fontFamily: "Eczar, serif", fontSize: 19, color: C.ivory, lineHeight: 1.25 }}>{dlFull(top)}</div>
                         <div style={{ fontSize: 12, color: C.muted, margin: "3px 0 8px" }}>
-                          {top.nakName} · {(lang === "hi" ? "तिथि " : "tithi ") + top.tithiNum}
+                          {(lang === "hi" ? (NAK_HI[top.nak] || top.nakName) : top.nakName)} · {(lang === "hi" ? "तिथि " : "tithi ") + top.tithiNum}
                           <span style={{ marginLeft: 8, fontSize: 11, padding: "1px 9px", borderRadius: 10, background: qual(top.score).c + "20", color: qual(top.score).c }}>{qual(top.score).t}</span>
                         </div>
-                        <div style={{ fontSize: 12.5, color: C.ivory, marginBottom: 10, lineHeight: 1.5 }}>{(lang === "hi" ? "क्यों यह दिन: " : "Why this day: ") + (top.factors.filter((f) => f.g).map((f) => f.t).join(", ") || "—")}</div>
+                        <div style={{ fontSize: 12.5, color: C.ivory, marginBottom: 10, lineHeight: 1.5 }}>{(lang === "hi" ? "क्यों यह दिन: " : "Why this day: ") + (top.factors.filter((f) => f.g).map((f) => lang === "hi" ? f.hi : f.en).join(lang === "hi" ? ", " : ", ") || "—")}</div>
                         {finderTopPanchaka && (finderTopPanchaka.panchakaWindows || []).length ? (() => {
                           const ptz = finderTopPanchaka.tz;
                           const shubha = finderTopPanchaka.panchakaWindows.filter((w) => w.shubha);
@@ -4019,12 +4051,18 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                           <div key={i} style={{ display: "flex", justifyContent: "space-between", gap: 10, padding: "7px 0", borderBottom: "1px solid #F1EADA", alignItems: "baseline" }}>
                             <span style={{ minWidth: 92, fontFamily: "Eczar, serif", fontSize: 13.5, color: C.ivory }}>{dl(r)}</span>
                             <span style={{ fontSize: 11, padding: "1px 9px", borderRadius: 10, background: Q.c + "20", color: Q.c, whiteSpace: "nowrap" }}>{Q.t}</span>
-                            <span style={{ flex: 1, textAlign: "right", fontSize: 11.5, color: C.muted, lineHeight: 1.4 }}>{r.factors.filter((f) => f.g).map((f) => f.t).join(" · ") || "—"}</span>
+                            <span style={{ flex: 1, textAlign: "right", fontSize: 11.5, color: C.muted, lineHeight: 1.4 }}>{r.factors.filter((f) => f.g).map((f) => lang === "hi" ? f.hi : f.en).join(" · ") || "—"}</span>
                           </div>
                         ); })}
                       </div>
                     )}
                     <div style={{ fontSize: 11, color: C.muted, marginTop: 8, fontStyle: "italic" }}>{lang === "hi" ? "केवल मास, तिथि, नक्षत्र व वार शुद्धि पर खरे दिन दिखाए गए हैं।" : "Only dates passing month, tithi, nakshatra & weekday shuddhi are shown."}</div>
+                    {whyList && (
+                      <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: T.rMd, background: "#FBF5E7", border: `1px solid ${C.line}` }}>
+                        <div style={{ ...T.label, color: C.muted, marginBottom: 4 }}>{lang === "hi" ? "अन्य दिन क्यों शामिल नहीं" : "Why other days weren't included"}</div>
+                        <div style={{ fontSize: 12, color: C.ivory, lineHeight: 1.5 }}>{whyList}</div>
+                      </div>
+                    )}
                   </>
                 )}
                 <div style={{ fontSize: 11, color: C.muted, marginTop: 12, lineHeight: 1.5, fontStyle: "italic" }}>
@@ -4044,7 +4082,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
           <div>
             <div style={{ ...T.label, color: "#1F7A4D", marginBottom: 6 }}>{tr(lang, "goodWindows")}</div>
-            {goodSlots.length === 0 ? <div style={{ fontSize: 12.5, color: C.muted, fontStyle: "italic" }}>—</div> :
+            {goodSlots.length === 0 ? <div style={{ fontSize: 12.5, color: C.muted, fontStyle: "italic" }}>{lang === "hi" ? "आज इसके लिए और कोई शुभ समय नहीं — कल देखें।" : "No more good windows for this today — check tomorrow."}</div> :
               goodSlots.map((c, i) => (
                 <div key={i} style={{ fontSize: 13, padding: "4px 0", display: "flex", justifyContent: "space-between", gap: 8 }}>
                   <span style={{ color: C.ivory }}>{trN(lang, CHOG_NAME, c.key)}</span>
@@ -4867,7 +4905,8 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
       setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms) });
       setShowFull(false);
     } catch (e) {
-      setError(`गणना विफल — calculation failed: ${e && e.message ? e.message : String(e)}. कृपया पुनः प्रयास करें.`);
+      if (typeof console !== "undefined") console.error("prashna cast failed:", e);
+      setError(hi ? "गणना नहीं हो सकी — कृपया पुनः प्रयास करें।" : "Couldn't complete the calculation — please try again.");
     }
   };
 
@@ -4889,7 +4928,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         {QUESTIONS.map(q => {
           const on = selected === q.key;
           return (
-            <button key={q.key} onClick={() => setSelected(q.key)}
+            <button key={q.key} onClick={() => { setSelected(q.key); setResult(null); setError(null); }}
               style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, padding: '0 14px',
                 border: `1.5px solid ${on ? TOKENS.gold : TOKENS.line}`,
                 background: on ? TOKENS.goldSoft : TOKENS.card,
@@ -4968,8 +5007,8 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr style={{ color: TOKENS.muted, textAlign: 'left' }}>
-                    <th style={{ padding: '4px 2px' }}>Graha</th><th>Rashi</th>
-                    <th>Nakshatra</th><th>Star/Sub</th><th>H</th>
+                    <th style={{ padding: '4px 2px' }}>{hi ? 'ग्रह' : 'Graha'}</th><th>{hi ? 'राशि' : 'Rashi'}</th>
+                    <th>{hi ? 'नक्षत्र' : 'Nakshatra'}</th><th>{hi ? 'तारा/उप' : 'Star/Sub'}</th><th>{hi ? 'भाव' : 'House'}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -4990,11 +5029,14 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                   ))}
                 </tbody>
               </table>
-              <div style={{ marginTop: 10 }}>
+              <div style={{ marginTop: 8, fontSize: 11.5, color: TOKENS.muted }}>
+                {hi ? "Rx = वक्री, आकाश में पीछे चलता प्रतीत होता है" : "Rx = retrograde, appears to move backward in the sky"}
+              </div>
+              <div style={{ marginTop: 8 }}>
                 <Gloss>
                   {hi
-                    ? `Star/Sub = नक्षत्र स्वामी / KP उप-स्वामी — प्रश्न इसी दो-स्तरीय स्वामित्व को पढ़ता है। H = ग्रह का भाव (${result.chart.system === 'placidus' ? 'प्लेसिडस भाव — KP मानक' : 'समान भाव — उच्च अक्षांश विकल्प'})। स्थितियाँ: लाहिरी अयनांश, मध्यम राहु/केतु — द्रिक पंचांग की मानक परिपाटी।`
-                    : `Star/Sub = nakshatra lord / KP sub-lord — the two-level rulership Prashna reads. H = house occupied (${result.chart.system === 'placidus' ? 'Placidus cusps, the KP standard' : 'equal houses — high-latitude fallback'}). Positions: Lahiri ayanamsa, mean Rahu/Ketu — the same conventions as Drik Panchang defaults.`}
+                    ? `तारा/उप = नक्षत्र स्वामी / KP उप-स्वामी — प्रश्न इसी दो-स्तरीय स्वामित्व को पढ़ता है। भाव = ग्रह का भाव (${result.chart.system === 'placidus' ? 'प्लेसिडस भाव — KP मानक' : 'समान भाव — उच्च अक्षांश विकल्प'})। स्थितियाँ: लाहिरी अयनांश, मध्यम राहु/केतु — द्रिक पंचांग की मानक परिपाटी।`
+                    : `Star/Sub = nakshatra lord / KP sub-lord — the two-level rulership Prashna reads. House = the house the planet occupies (${result.chart.system === 'placidus' ? 'Placidus cusps, the KP standard' : 'equal houses — high-latitude fallback'}). Positions: Lahiri ayanamsa, mean Rahu/Ketu — the same conventions as Drik Panchang defaults.`}
                 </Gloss>
               </div>
             </div>
@@ -5110,23 +5152,25 @@ export default function KundliApp() {
       const tz = c.tzOverride !== "" && c.tzOverride != null ? parseFloat(c.tzOverride) : zoneOffset(c.place.zone, y, m, day);
       setResult(computeKundli({ y, m, day, hh, mi, tz, lat: c.place.lat, lon: c.place.lon, ayanamsa: c.ayanamsa || "lahiri" }));
       setTimeout(() => { const el = document.getElementById("summary"); if (el) el.scrollIntoView({ behavior: "smooth" }); }, 150);
-    } catch (e) { setErr("Couldn't load that chart."); }
+    } catch (e) { setErr(lang === "hi" ? "यह सहेजी हुई कुंडली नहीं खुल सकी — शायद यह ख़राब है। कोई और सहेजी कुंडली आज़माएँ या विवरण फिर से भरें।" : "This saved chart couldn't be loaded — it may be corrupted. Try another saved chart, or re-enter the details."); }
   };
 
   const generate = () => {
     setErr("");
     const [y, m, day] = (form.date || "").split("-").map(Number);
     const [hh, mi] = (form.time || "").split(":").map(Number);
-    if (!y || isNaN(hh)) { setErr("Enter a complete date and time of birth."); return; }
-    if (!place) {
+    if (!y || isNaN(hh)) { setErr(lang === "hi" ? "जन्म की पूरी तारीख़ और समय भरें।" : "Enter a complete date and time of birth."); return; }
+    // Use the picked place if present; otherwise, if the typed text resolves to
+    // exactly one known place, adopt it and cast in the same click (no second press).
+    let effPlace = place;
+    if (!effPlace) {
       const offline = searchOffline(query);
-      if (offline.length === 1) { choosePlace(offline[0]); setErr("Confirmed the place as " + offline[0].label + " — press the button again."); return; }
-      setErr("Start typing the birth place and pick it from the suggestions.");
-      return;
+      if (offline.length === 1) { effPlace = offline[0]; choosePlace(offline[0]); }
+      else { setErr(lang === "hi" ? "जन्म स्थान लिखना शुरू करें और सुझावों में से चुनें।" : "Start typing the birth place and pick it from the suggestions."); return; }
     }
-    const tz = tzOverride !== "" ? parseFloat(tzOverride) : zoneOffset(place.zone, y, m, day);
-    if (tz === null || isNaN(tz)) { setErr("Couldn't resolve the timezone for this place — enter the UTC offset manually below."); return; }
-    setResult(computeKundli({ y, m, day, hh, mi, tz, lat: place.lat, lon: place.lon, ayanamsa }));
+    const tz = tzOverride !== "" ? parseFloat(tzOverride) : zoneOffset(effPlace.zone, y, m, day);
+    if (tz === null || isNaN(tz)) { setErr(lang === "hi" ? "इस स्थान का समय-क्षेत्र नहीं मिला — कृपया नीचे UTC ऑफ़सेट स्वयं भरें।" : "Couldn't resolve the timezone for this place — enter the UTC offset manually below."); return; }
+    setResult(computeKundli({ y, m, day, hh, mi, tz, lat: effPlace.lat, lon: effPlace.lon, ayanamsa }));
     setTimeout(() => { const el = document.getElementById("summary"); if (el) el.scrollIntoView({ behavior: "smooth" }); }, 150);
   };
 
@@ -5297,10 +5341,24 @@ export default function KundliApp() {
           </nav>
         )}
 
+        {mode === "daily" && !todayP && (
+          <div className="rise" style={{ marginBottom: 20 }}>
+            <div style={{ ...card, padding: "18px 20px", borderColor: "#E0B25E" }}>
+              <div style={{ fontFamily: "Eczar, serif", fontSize: 17, color: C.ivory, marginBottom: 6 }}>
+                {lang === "hi" ? "इस स्थान या तारीख़ के लिए आज का पंचांग नहीं बन सका।" : "We couldn't work out the panchang for this place or date."}
+              </div>
+              <div style={{ fontSize: 13.5, color: C.muted, marginBottom: 14, lineHeight: 1.55 }}>
+                {lang === "hi" ? "कृपया दूसरी तारीख़ चुनें, या नीचे कोई और शहर खोजें।" : "Try picking a different date, or search for another city below."}
+              </div>
+              <div style={{ maxWidth: 320 }}><PlaceInput value={panchEff} onPick={setPanchPlace} C={C} lang={lang} /></div>
+            </div>
+          </div>
+        )}
+
         {mode === "daily" && todayP && (
           <>
             <div className="rise" style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 20 }}>
-              <div style={{ flex: "1 1 200px", minWidth: 180 }}><PlaceInput value={panchEff} onPick={setPanchPlace} C={C} /></div>
+              <div style={{ flex: "1 1 200px", minWidth: 180 }}><PlaceInput value={panchEff} onPick={setPanchPlace} C={C} lang={lang} /></div>
               {(() => {
                 const [py, pm, pd] = panchDate.split("-").map(Number);
                 const baseUTC = Date.UTC(py, pm - 1, pd);
@@ -5380,8 +5438,11 @@ export default function KundliApp() {
             <MuhuratHub todayP={todayP} place={panchEff} lang={lang} ayanamsa={ayanamsa} isToday={isPanchToday} onCal={setCalView} C={C} card={card} />
 
             <div className="rise2" style={{ ...card, padding: "16px 20px", marginTop: 12 }}>
-              <div style={{ ...T.label, color: C.muted, marginBottom: 10 }}>
-                Upcoming planetary events
+              <div style={{ ...T.label, color: C.muted, marginBottom: 4 }}>
+                {lang === "hi" ? "आगामी ग्रह गोचर" : "Upcoming planetary events"}
+              </div>
+              <div style={{ fontSize: 11.5, color: C.muted, fontStyle: "italic", marginBottom: 10, lineHeight: 1.45 }}>
+                {lang === "hi" ? "आने वाले दिनों में ग्रह किस राशि में प्रवेश करते हैं या वक्री/मार्गी होते हैं" : "when each planet changes sign, or turns retrograde or direct, in the days ahead"}
               </div>
               {todayP.events.map((e2) => {
                 const ed = eventDetail(e2, Date.now());
@@ -5394,7 +5455,7 @@ export default function KundliApp() {
                     >
                       <span style={{ fontSize: 13.5, display: "flex", gap: 14, alignItems: "baseline", flex: 1 }}>
                         <span style={{ color: C.gold, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap", minWidth: 92, fontSize: 12.5 }}>
-                          {new Date(e2.t + todayP.tz * 3600000).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })} · {fmtTime(e2.t, todayP.tz)}
+                          {new Date(e2.t + todayP.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { month: "short", day: "numeric", timeZone: "UTC" })} · {fmtTime(e2.t, todayP.tz)}
                         </span>
                         <span style={{ color: e2.label.includes("℞") ? C.sindoor : C.ivory, flex: 1, overflow: "hidden", textOverflow: "ellipsis" }}>{e2.label}</span>
                       </span>
@@ -5410,8 +5471,11 @@ export default function KundliApp() {
                       return (
                         <div style={{ marginTop: 10, paddingTop: 12, borderTop: `1px solid #EEDCC4`, fontSize: 13, color: C.ivory, lineHeight: 1.55 }}>
                           <div style={{ fontSize: 12.5, color: C.muted, fontStyle: "italic", marginBottom: 12 }}>{ed.desc}</div>
-                          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: ".1em", color: C.gold, marginBottom: 10, fontWeight: 600 }}>
-                            {PLANET_DEVA[pl]} {pl} Rashi Gochar
+                          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: ".1em", color: C.gold, marginBottom: 2, fontWeight: 600 }}>
+                            {PLANET_DEVA[pl]} {pl} {lang === "hi" ? "राशि गोचर" : "Rashi Gochar"}
+                          </div>
+                          <div style={{ fontSize: 11, color: C.muted, fontStyle: "italic", marginBottom: 10 }}>
+                            {lang === "hi" ? "यह ग्रह अभी किस राशि से गुज़र रहा है" : "which zodiac sign this planet is currently moving through"}
                           </div>
                           <div style={{ position: "relative", paddingLeft: 4 }}>
                             {g.seq.map((x, i) => {
@@ -5432,12 +5496,12 @@ export default function KundliApp() {
                                       {dur && <span style={{ fontSize: 11, color: C.muted }}>{dur}</span>}
                                     </div>
                                     <div style={{ fontSize: 11.5, color: C.muted, marginTop: 2, fontVariantNumeric: "tabular-nums" }}>
-                                      {x.enter ? new Date(x.enter + todayP.tz * 3600000).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }) + " · " + fmtTime(x.enter, todayP.tz) : "transiting since before"}
-                                      {isCur && <span style={{ color: C.gold, fontWeight: 600 }}> · now here</span>}
+                                      {x.enter ? new Date(x.enter + todayP.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }) + " · " + fmtTime(x.enter, todayP.tz) : (lang === "hi" ? "पहले से गोचर में" : "transiting since before")}
+                                      {isCur && <span style={{ color: C.gold, fontWeight: 600 }}>{lang === "hi" ? " · अभी यहाँ" : " · now here"}</span>}
                                     </div>
                                     {stationsInSign.map((st, si) => (
                                       <div key={si} style={{ fontSize: 11, color: C.sindoor, marginTop: 3 }}>
-                                        ↺ turns {st.retro ? "retrograde" : "direct"} — {new Date(st.t + todayP.tz * 3600000).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}
+                                        ↺ {lang === "hi" ? (st.retro ? "वक्री होता है" : "मार्गी होता है") : ("turns " + (st.retro ? "retrograde" : "direct"))} — {new Date(st.t + todayP.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}
                                       </div>
                                     ))}
                                   </div>
@@ -5445,7 +5509,7 @@ export default function KundliApp() {
                               );
                             })}
                           </div>
-                          <div style={{ fontSize: 10.5, color: C.muted, marginTop: 4, fontStyle: "italic" }}>Sidereal (Lahiri) · times in {(panchEff && panchEff.label) || "local"} time · ±1 day for slow planets</div>
+                          <div style={{ fontSize: 10.5, color: C.muted, marginTop: 4, fontStyle: "italic" }}>{lang === "hi" ? "सायन (लाहिरी) · समय " : "Sidereal (Lahiri) · times in "}{(panchEff && panchEff.label) || (lang === "hi" ? "स्थानीय" : "local")}{lang === "hi" ? " समय अनुसार · धीमे ग्रहों हेतु ±1 दिन" : " time · ±1 day for slow planets"}</div>
                         </div>
                       );
                     })()}
@@ -5463,24 +5527,24 @@ export default function KundliApp() {
         <section className="rise2" style={{ ...card, padding: 24 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 14 }}>
             <div style={{ gridColumn: "1 / -1" }}>
-              <label style={labelStyle}>Name</label>
-              <input style={inputStyle} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Name of the native" />
+              <label style={labelStyle}>{lang === "hi" ? "नाम" : "Name"}</label>
+              <input style={inputStyle} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={lang === "hi" ? "जैसे: प्रिया शर्मा" : "e.g. Priya Sharma"} />
             </div>
             <div>
-              <label style={labelStyle}>Date of birth</label>
+              <label style={labelStyle}>{lang === "hi" ? "जन्म तिथि" : "Date of birth"}</label>
               <input type="date" style={inputStyle} value={form.date} onChange={(e) => set("date", e.target.value)} />
             </div>
             <div>
-              <label style={labelStyle}>Time of birth</label>
+              <label style={labelStyle}>{lang === "hi" ? "जन्म समय" : "Time of birth"}</label>
               <input type="time" style={inputStyle} value={form.time} onChange={(e) => set("time", e.target.value)} />
             </div>
             <div style={{ gridColumn: "1 / -1", position: "relative" }}>
-              <label style={labelStyle}>Place of birth</label>
+              <label style={labelStyle}>{lang === "hi" ? "जन्म स्थान" : "Place of birth"}</label>
               <input
                 style={inputStyle}
                 value={query}
                 onChange={(e) => onQuery(e.target.value)}
-                placeholder="Start typing a city or village name…"
+                placeholder={lang === "hi" ? "शहर या गाँव का नाम लिखना शुरू करें…" : "Start typing a city or village name…"}
                 autoComplete="off"
               />
               {sugs.length > 0 && !place && (
@@ -5498,7 +5562,7 @@ export default function KundliApp() {
                       </span>
                     </button>
                   ))}
-                  {searching && <div style={{ padding: "8px 14px", color: C.muted, fontSize: 12 }}>Searching more places…</div>}
+                  {searching && <div style={{ padding: "8px 14px", color: C.muted, fontSize: 12 }}>{lang === "hi" ? "और स्थान खोजे जा रहे हैं…" : "Searching more places…"}</div>}
                 </div>
               )}
               {place && (
@@ -5506,23 +5570,23 @@ export default function KundliApp() {
                   <span style={{ color: C.gold }}>✓</span>{" "}
                   {Math.abs(place.lat).toFixed(2)}°{place.lat >= 0 ? "N" : "S"}, {Math.abs(place.lon).toFixed(2)}°{place.lon >= 0 ? "E" : "W"}
                   {place.zone && <> · {place.zone}</>}
-                  {autoTz !== null && <> · UTC{autoTz >= 0 ? "+" : ""}{autoTz} on the birth date{tzOverride !== "" && " (overridden)"}</>}
+                  {autoTz !== null && <> · UTC{autoTz >= 0 ? "+" : ""}{autoTz}{lang === "hi" ? " (जन्म तिथि पर)" : " on the birth date"}{tzOverride !== "" && (lang === "hi" ? " (बदला गया)" : " (overridden)")}</>}
                 </p>
               )}
             </div>
             <div>
-              <label style={labelStyle}>UTC offset (auto)</label>
+              <label style={labelStyle}>{lang === "hi" ? "UTC ऑफ़सेट (स्वतः)" : "UTC offset (auto)"}</label>
               <input
                 type="number" step="0.25" style={inputStyle}
                 value={tzOverride !== "" ? tzOverride : autoTz ?? ""}
                 onChange={(e) => setTzOverride(e.target.value)}
-                placeholder="resolved from place"
+                placeholder={lang === "hi" ? "जैसे: +5.5" : "e.g. +5.5"}
               />
             </div>
           </div>
-          {err && <p style={{ color: C.sindoor, fontSize: 14, margin: "12px 0 0" }}>{err}</p>}
+          {err && <p style={{ color: C.sindoor, fontSize: 14, margin: "12px 0 0" }}><span aria-hidden="true">⚠ </span>{err}</p>}
           <div style={{ marginTop: 16 }}>
-            <label style={labelStyle}>Ayanamsa</label>
+            <label style={labelStyle}>{lang === "hi" ? "अयनांश" : "Ayanamsa"}</label>
             <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
               {Object.entries(AYANAMSA).map(([k, v]) => (
                 <button key={k} onClick={() => setAyanamsa(k)}
@@ -5535,7 +5599,9 @@ export default function KundliApp() {
               ))}
             </div>
             <p style={{ color: C.muted, fontSize: 11.5, margin: "6px 0 0", lineHeight: 1.5 }}>
-              Lahiri is the government/Vedic standard. KP (Krishnamurti) shifts every position ~5′48″ earlier — required for Krishnamurti Paddhati sub-lord work.
+              {lang === "hi"
+                ? "लाहिरी सरकारी/वैदिक मानक है। KP (कृष्णमूर्ति) हर स्थिति को लगभग 5′48″ पहले खिसकाता है — कृष्णमूर्ति पद्धति के उप-स्वामी कार्य हेतु आवश्यक।"
+                : "Lahiri is the government/Vedic standard. KP (Krishnamurti) shifts every position ~5′48″ earlier — required for Krishnamurti Paddhati sub-lord work."}
             </p>
           </div>
           <button
@@ -5545,11 +5611,13 @@ export default function KundliApp() {
             {lang === "hi" ? "कुंडली बनाएँ" : "Cast the chart"}
           </button>
           <p style={{ color: C.muted, fontSize: 12, margin: "10px 0 0", lineHeight: 1.5 }}>
-            The UTC offset is resolved automatically from the birth place and date, including historical daylight saving. Sun and Moon use an arc-second ephemeris (Meeus/VSOP), and the five star-planets use VSOP87 with light-time, annual aberration, and nutation — apparent positions accurate to about an arc-second, validated against Meeus's worked example (Venus) to 0.8″.
+            {lang === "hi"
+              ? "UTC ऑफ़सेट जन्म स्थान और तिथि से स्वतः निकाला जाता है, ऐतिहासिक डेलाइट सेविंग सहित। सूर्य और चन्द्र आर्क-सेकंड परिशुद्धता वाले एफ़ेमेरिस (Meeus/VSOP) से, और पाँच तारा-ग्रह VSOP87 से (प्रकाश-काल, वार्षिक विपथन व नमन सहित) — लगभग आर्क-सेकंड तक सटीक स्थितियाँ।"
+              : "The UTC offset is resolved automatically from the birth place and date, including historical daylight saving. Sun and Moon use an arc-second ephemeris (Meeus/VSOP), and the five star-planets use VSOP87 with light-time, annual aberration, and nutation — apparent positions accurate to about an arc-second, validated against Meeus's worked example (Venus) to 0.8″."}
           </p>
         </section>
 
-        <ChartVault snapshot={{ form, place, tzOverride, ayanamsa }} result={result} onLoad={loadChart} C={C} card={card} />
+        <ChartVault snapshot={{ form, place, tzOverride, ayanamsa }} result={result} onLoad={loadChart} C={C} card={card} lang={lang} />
 
         {/* kundali matching */}
         <Eyebrow id="match" deva="कुण्डली मिलान" en="Kundali matching · Guna Milan" />
@@ -5591,6 +5659,9 @@ export default function KundliApp() {
                   ))}
                 </div>
               </div>
+              <div style={{ fontSize: 11.5, color: C.muted, textAlign: "center", margin: "0 4px 8px", fontStyle: "italic", lineHeight: 1.4 }}>
+                {lang === "hi" ? "षोडशवर्ग हर एक जीवन-क्षेत्र को विस्तार से दिखाते हैं — विवरण हेतु किसी भी वर्ग को दबाएँ।" : "Divisional charts each zoom into one area of life — tap any chart to see its focus."}
+              </div>
               {/* varga strip: single horizontally-scrollable row, never overflows the card */}
               <div className="hscroll" style={{ display: "flex", gap: 6, overflowX: "auto", padding: "2px 4px 8px", margin: "0 0 4px", WebkitOverflowScrolling: "touch" }}>
                 {VARGAS.map((v) => (
@@ -5624,7 +5695,7 @@ export default function KundliApp() {
             {/* yogas */}
             <Eyebrow id="yogas" deva="योग" en={`Yogas detected · ${r.yogas.length}`} />
             {r.yogas.length === 0 ? (
-              <p style={{ color: C.muted, fontSize: 14 }}>No major classical yogas detected by the current rule set.</p>
+              <p style={{ color: C.muted, fontSize: 14 }}>{lang === "hi" ? "इस कुंडली में कोई प्रमुख शास्त्रीय योग नहीं मिला।" : "No major classical yogas were found in this chart."}</p>
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
                 {r.yogas.map((yg) => (
@@ -5796,6 +5867,7 @@ export default function KundliApp() {
                       </tbody>
                     </table>
                   </div>
+                  <div style={{ fontSize: 11, color: C.muted, marginTop: 6, fontStyle: "italic" }}>{lang === "hi" ? "— का अर्थ है कोई नहीं" : "— means none"}</div>
 
                   <div style={{ ...T.label, color: C.muted, margin: "18px 0 8px" }}>
                     Houses signified by each planet
@@ -5833,6 +5905,13 @@ export default function KundliApp() {
 
             {/* shadbala */}
             <Eyebrow id="shadbala" deva="षड्बल" en="Shadbala · six-fold strength" />
+            <div style={{ ...card, padding: "12px 16px", marginBottom: 12, background: "#FBF5E7" }}>
+              <p style={{ margin: 0, fontSize: 13.5, color: C.ivory, lineHeight: 1.55 }}>
+                {lang === "hi"
+                  ? <>षड्बल मापता है कि हर ग्रह अपने फल देने में कितना बलवान है। यहाँ सबसे बलवान <strong style={{ color: C.gold }}>{PLANET_DEVA[r.shadbala.ranked[0]]}</strong> है — इसके कारकत्व अपेक्षाकृत सहजता से फलित होते हैं; सबसे निर्बल <strong style={{ color: C.sindoor }}>{PLANET_DEVA[r.shadbala.ranked[6]]}</strong> है — इसके कारकत्व अधिक प्रयास माँग सकते हैं।</>
+                  : <>Shadbala measures how much strength each planet has to deliver its results. Here <strong style={{ color: C.gold }}>{r.shadbala.ranked[0]}</strong> is strongest — its matters tend to come with more ease; <strong style={{ color: C.sindoor }}>{r.shadbala.ranked[6]}</strong> is weakest — its matters may take more effort.</>}
+              </p>
+            </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 12 }}>
               {BALA_PARTS.map((b) => (
                 <span key={b.k} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11.5, color: C.muted }}>
