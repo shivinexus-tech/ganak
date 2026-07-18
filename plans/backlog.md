@@ -24,15 +24,27 @@ Small scope on the *plumbing*, but the **content is NOT ready** — the Panchang
 is the flagship and its observance coverage is ~30%. Content gates below are
 first-class launch blockers, not nice-to-haves.
 
-**Content gates (must clear before a credible Panchang launch):**
+**⚠️ LAUNCH TENSION (unresolved):** owner wants BOTH "fastest web launch" AND
+comprehensive content ("all traditions + beyond Drik") as a Panchang-launch gate.
+These pull hard against each other — exhaustive multi-tradition sourced content is
+weeks-to-months of research + verification, not a fast task. Resolution options on
+the table (owner to pick): (a) launch on a *credible baseline* and grow coverage
+post-launch via user feedback [recommended — fits the feedback strategy], or
+(b) hold the launch until content is comprehensive. Until decided, Phase 1's date
+is genuinely blocked on this, not on plumbing.
+
+**Content gates (must clear before a credible Panchang launch — scope = all 4
+traditions + regional + beyond-Drik, see §C-SCOPE):**
 - [ ] **P1-CONTENT: Fasts & festivals coverage** — see the Content Track (§C1).
       Fill the tradition + observance gaps (Shakta, Tamil/regional, missing
       tithi vratas: Skanda Shashti, Gupt Navratri, Rath Yatra, Sheetla Ashtami,
-      Durgashtami, etc.). Method: diff vs Drik + owner walkthrough.
+      Durgashtami, etc.). Method: diff vs Drik + beyond-Drik sources + owner
+      walkthrough. Enabling step: move content to a structured data file (§C-SCOPE.4).
 - [ ] **P1-VRATVIDHI: Vrat vidhis & fasting guidance** — see §C2. For each fast:
       the vidhi (how to observe), what's permitted/forbidden to eat, sankalpa,
       puja steps, timing/paran (breaking-fast window), and udyapan where it
-      applies. Owner wants this *on* the Panchang launch, not later.
+      applies. Owner wants this *on* the Panchang launch, not later. Sourced +
+      owner-verified, never AI-invented (§C-SCOPE.3).
 
 **Plumbing:**
 - [ ] **Hide the birth-chart tab** for launch (leaves Daily + Prashna; Muhurat
@@ -181,9 +193,43 @@ Note: the app already has partial `rules`/`timing` fields in OBS_META and a
 `vratDetail` function — extend that structure rather than rebuild. Bilingual.
 Must be sourced/accurate (religious content — cite tradition, don't invent).
 
-**Open question for owner:** which traditions are in-scope for the *launch*
-(all of Smarta/Vaishnava/Shaiva/Shakta + top regional, or a prioritized subset)?
-This sizes C1 and C2.
+### C-SCOPE — decided by owner 2026-07-18
+**In scope: ALL of Smarta / Vaishnava / Shaiva / Shakta + top regional, AND aim
+to cover observances even Drik doesn't.** This is the "beat Drik" bet, applied to
+content. Consequences that follow from it:
+
+1. **This becomes the largest workstream in the project** — and it's a *content /
+   research* effort, not a coding one. Code holds it; sourcing and verification
+   are the actual work.
+
+2. **"Beyond Drik" means Drik-diff alone is insufficient** (it only finds what Drik
+   has). Additional sources required: regional panchangs (Tamil, Bengali, Odia,
+   Malayalam, Marathi, Gujarati…), classical nibandha texts (Nirnaya Sindhu,
+   Dharmasindhu, Vrata Raj, Hemadri's Chaturvarga Chintamani), sampradaya-specific
+   calendars, and the owner's own expert knowledge + community input.
+
+3. **ACCURACY IS NON-NEGOTIABLE (religious content).** Vrat vidhis, diet rules, and
+   festival dates must be *sourced*, not generated. An AI-drafted vidhi that's wrong
+   is actively harmful. Working rule: Claude may draft/structure/research/diff and
+   propose citations, but every entry is a **draft pending source + owner (or pandit/
+   text) verification** before it ships. Each entry carries its citation(s).
+
+4. **Enabling architecture — decouple content from code.** Today observances are
+   hardcoded in OBS_META/FEST_META inside kundli-app.tsx. "Everything" cannot live
+   sanely inline. Move to a **structured data file** (e.g. `data/observances.*`)
+   with a schema per entry: id · names (en/hi/regional) · tradition(s) · region(s) ·
+   tithi/computation rule · deity · type (vrat/festival) · vidhi · diet · sankalpa ·
+   puja steps · paran/timing · udyapan · sources[]. App just renders the data. This
+   also lets a content agent or human contributor extend coverage without touching
+   app logic (fits the multi-agent goal).
+
+5. **Phasing (comprehensive ≠ all-at-once, and it conflicts with "fastest launch"
+   — see launch-tension note in Phase 1):** ship a launch-credible *baseline* first
+   (monthly recurring observances complete across all 4 traditions + the major
+   annual/regional festivals, especially where Drik is weak — Shakta, regional),
+   then grow toward exhaustive coverage as an **ongoing post-launch track fed by
+   user feedback** (aligns with the "gather user input" strategy — users surface
+   their own missing local observances).
 
 ---
 
