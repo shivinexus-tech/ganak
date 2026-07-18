@@ -234,10 +234,10 @@ Must be sourced/accurate (religious content — cite tradition, don't invent).
 to cover observances even Drik doesn't.** This is the "beat Drik" bet, applied to
 content.
 
-**Religion scope: HINDU ONLY.** Target users are Hindu — no Jain, Buddhist,
-Christian, Islamic, or other-religion observances. (Full/new moons stay as Hindu
-panchang elements, but no other-religion festival labels on shared dates, e.g. no
-"Buddha Purnima" framing on Vaishakh Purnima.)
+**Religion scope: HINDU ONLY.** Target users are Hindu — no Jain, Christian,
+Islamic, or other-religion observances. **Exception (owner 2026-07-18): Buddha
+Purnima IS included** (Buddha = Dashavatar of Vishnu; owner's call). Full/new
+moons stay as Hindu panchang elements.
 
 Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
 

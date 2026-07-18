@@ -7,11 +7,11 @@ row** → Claude wires the confirmed rows into `observancesFor()` (monthly) or t
 **Nothing here is shipped until you confirm it.** Religious content — I've drafted
 my best-known placement, but I am not the authority. Correct anything.
 
-**SCOPE (owner, 2026-07-18): Hindu observances ONLY.** No Jain, Buddhist,
-Christian, Islamic, or other-religion entries — target users are Hindu. Edge case
-to watch: full moons/new moons are Hindu panchang elements and stay, but do NOT
-add other-religion festival framings that share a date (e.g. no "Buddha Purnima"
-label on Vaishakh Purnima).
+**SCOPE (owner, 2026-07-18): Hindu observances ONLY.** No Jain, Christian,
+Islamic, or other-religion entries — target users are Hindu. **Exception (owner,
+2026-07-18): Buddha Purnima IS included** (Buddha is a Dashavatar of Vishnu in
+Hindu tradition; owner's explicit call). The general rule still excludes other
+non-Hindu festivals.
 
 ## ⚠️ Two things I need you to check specifically
 
@@ -50,15 +50,22 @@ Add to `FESTIVALS` array. **Amanta months.**
 | Gupt Navratri (Magha) | Magh · Shukla · 1 | Shakti (tantric) | — | Winter "hidden" Navratri | 🟢 |
 | Gupt Navratri (Ashadha) | Ashadha · Shukla · 1 | Shakti (tantric) | — | Monsoon "hidden" Navratri | 🟢 |
 | Rath Yatra | Ashadha · Shukla · 2 | Jagannath | — | Puri chariot festival | 🟢 |
-| Nag Panchami | Shravan · Shukla · 5 | Nagas | — | Serpent worship | 🟡 (region: some Krishna 5) |
+| Nag Panchami | Shravan · Shukla · 5 | Nagas | — | Serpent worship (North + most of India; Gujarat/Raj/Bihar use Krishna 5) | 🟢 verified |
+| Buddha Purnima | Vaisakha · Shukla · 15 | Vishnu (Buddha avatar) | — | Full-moon of Vaishakh; owner-approved incl. | 🟢 |
+| Lakshmi Panchami (Shri Vrat) | Chaitra · Shukla · 5 | Lakshmi | yes | Kalpadi tithi; Lakshmi worship | 🟢 verified |
 | Hariyali Teej | Shravan · Shukla · 3 | Parvati | yes | Monsoon Teej for Parvati | 🟢 |
 | Hartalika Teej | Bhadrapad · Shukla · 3 | Parvati | yes | Nirjala Teej for marital blessing | 🟢 |
 | Mahalakshmi Vrat | starts Bhadrapad · Shukla · 8 | Mahalakshmi | yes | 16-day Lakshmi vrat *(span — may be Tier 2)* | 🟡 |
+| **Varalakshmi Vratam** | **Friday before Shravan Purnima** (not a plain tithi) | Lakshmi | yes | S-Indian Lakshmi vrat; last Fri of Shravan Shukla | 🟢 verified — **needs computed rule, Tier 1.5** |
 
 ## Questions on scope for this first batch
 - **Mahalakshmi Vrat** is a 16-day span (Bhadrapad Shukla 8 → Ashwin Krishna 8).
   Show as a single start-date entry now, or model the full span (Tier 2)?
-- **Nag Panchami** — Shukla or Krishna 5 depends on region. Which for Ganak?
+- ~~Nag Panchami paksha~~ — RESOLVED: Shravan Shukla 5 (North + most), Gujarat/
+  Raj/Bihar Krishna-5 variant noted. Verified vs sources 2026-07-18.
+- **Varalakshmi Vratam** needs a small computed rule ("Friday before Shravan
+  Purnima") — I'll add the logic when wiring, not just a data row. Confirm you
+  want it in the launch batch.
 - Any of your **core-audience** observances (you mentioned Shakta) missing from
   this first batch that you want prioritized in?
 
