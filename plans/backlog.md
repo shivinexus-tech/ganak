@@ -20,8 +20,21 @@ Status verified against `src/kundli-app.tsx`, not assumed.
 
 ## PHASE 1 — Free web launch (Panchang + Prashna + Muhurat)
 
-Small scope; most is already built. This is the near-term work.
+Small scope on the *plumbing*, but the **content is NOT ready** — the Panchang
+is the flagship and its observance coverage is ~30%. Content gates below are
+first-class launch blockers, not nice-to-haves.
 
+**Content gates (must clear before a credible Panchang launch):**
+- [ ] **P1-CONTENT: Fasts & festivals coverage** — see the Content Track (§C1).
+      Fill the tradition + observance gaps (Shakta, Tamil/regional, missing
+      tithi vratas: Skanda Shashti, Gupt Navratri, Rath Yatra, Sheetla Ashtami,
+      Durgashtami, etc.). Method: diff vs Drik + owner walkthrough.
+- [ ] **P1-VRATVIDHI: Vrat vidhis & fasting guidance** — see §C2. For each fast:
+      the vidhi (how to observe), what's permitted/forbidden to eat, sankalpa,
+      puja steps, timing/paran (breaking-fast window), and udyapan where it
+      applies. Owner wants this *on* the Panchang launch, not later.
+
+**Plumbing:**
 - [ ] **Hide the birth-chart tab** for launch (leaves Daily + Prashna; Muhurat
       lives inside Daily). Also removes the currently-broken "Save charts" feature
       from the free tier automatically (it lives inside the Chart tab).
@@ -99,7 +112,10 @@ Feature exists and renders; not a claim of polish/parity.
 
 - **Daily / Panchang** — tithi, nakshatra, yoga, karana, rise/set, Rahu/Gulika/Yama
   kalam, Abhijit, choghadiya, full panchang table, samvats.
-- **Fasts & festivals** — Smarta + ISKCON traditions, 400-day scan.
+- **Fasts & festivals** — ⚠️ *engine built, content ~30% covered.* 400-day scan
+  works, but only ~14 festivals + ~7 monthly observances, and only Smarta +
+  ISKCON traditions. NOT launch-ready — see Content Track §C1. (Was wrongly
+  marked Done before 2026-07-18.)
 - **Muhurat date-range finder** — 7 activities, Drik-validated. ✅ 2026-07-17.
 - **Prashna (horary)** — verdict-first, birth-data-free. ✅ 2026-07-16.
 - **Hora / planetary hours** — with advice input.
@@ -111,6 +127,63 @@ Feature exists and renders; not a claim of polish/parity.
 - **Divisional charts** D1–D60. **Dosha** logic in matching.
 - **Bilingual hi/en** across Daily, Prashna, Muhurat + core Chart path.
   ✅ Messaging audit (3 tiers) 2026-07-18.
+
+---
+
+## C. Content coverage & correctness track
+
+A quality axis my earlier audits never checked: **is the domain content complete
+and correct across traditions?** Form-audits (messaging) and math-gates
+(validation) are blind to a *missing* festival. This track owns that. For a
+Panchang competing with Drik, this content IS the product — so C1 and C2 are
+Phase-1 launch gates (see above), not "later."
+
+### C1 — Fasts & festivals coverage (P1 gate)
+Current: ~14 festivals, ~7 monthly observances, Smarta + ISKCON only.
+Known-missing (owner-flagged 2026-07-18, non-exhaustive):
+- **Whole traditions:** Shakta (only generic Navratri today), Tamil/South-Indian
+  Shaiva, Bengali, Odia, regional calendars.
+- **Missing recurring tithi observances:** Skanda/Kanda **Shashti** (Murugan) —
+  no Shashti at all today; **Durgashtami** (Shukla Ashtami, distinct from the
+  Kalashtami that exists); Vinayaka (Shukla) Chaturthi alongside Sankashti;
+  Saptami vratas (Ratha/Sheetala Saptami); Masik Durga Navami.
+- **Missing annual/regional festivals:** Gupt Navratri (Magha & Ashadha), Rath
+  Yatra, Sheetla Ashtami/Basoda, Chhath, Nag Panchami, Teej (Hariyali/Hartalika/
+  Kajari), Gudi Padwa/Ugadi, Onam, Pongal, Baisakhi, Bihu, Vishu, regional new
+  years, and many more.
+- **Present-but-incomplete:** e.g. Sankashti exists but may miss regional
+  variants/rules — a second failure mode beyond outright absence.
+
+**Method to build the full gap list (owner asked how to find these):**
+1. Diff vs Drik Panchang (the benchmark) — pull its festival/vrat list per month
+   for a full year, subtract the app's output. Objective, partly automatable
+   (same technique as validation/muhurat-anchors.cjs). ← highest value.
+2. Owner domain walkthrough — catches what matters to target users + the rituals
+   Drik itself under-documents. Irreplaceable.
+3. Tithi-cycle map — per tithi × paksha, which observances attach; find tithis
+   with nothing wired up (this is how "no Shashti" would've surfaced).
+4. Tradition × observance matrix — reveals whole missing traditions.
+5. Panchang-element completeness — Gandmool, Panchak, Bhadra, siddhi yogas,
+   Disha Shool, etc. vs Drik.
+
+### C2 — Vrat vidhis & fasting guidance (P1 gate, owner-requested 2026-07-18)
+"General Vrat vidhis — everything needed for fasting — on the Panchang launch."
+Per fast/observance, provide:
+- **Vidhi** — how to observe it, step by step.
+- **Diet rules** — what's permitted / forbidden (nirjala, phalahar, saatvic,
+  grains-avoided, etc.), and any per-tradition differences.
+- **Sankalpa** — the intention/vow wording.
+- **Puja steps** — the ritual sequence, deity, offerings.
+- **Timing / paran** — start time and the fast-breaking window (the app already
+  computes some paran windows — build on that).
+- **Udyapan** — the concluding ritual, where applicable.
+Note: the app already has partial `rules`/`timing` fields in OBS_META and a
+`vratDetail` function — extend that structure rather than rebuild. Bilingual.
+Must be sourced/accurate (religious content — cite tradition, don't invent).
+
+**Open question for owner:** which traditions are in-scope for the *launch*
+(all of Smarta/Vaishnava/Shaiva/Shakta + top regional, or a prioritized subset)?
+This sizes C1 and C2.
 
 ---
 
