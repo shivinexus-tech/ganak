@@ -1,114 +1,135 @@
 # Ganak — Product Backlog
 
-Rebuilt 2026-07-18 from a stale feature-list into a full product backlog.
-Organized as: **Done · Features · Infrastructure & Launch · Decisions · Debt**.
+Rebuilt 2026-07-18 into a phased launch plan reflecting the owner's strategy.
+Status verified against `src/kundli-app.tsx`, not assumed.
 
-Status of each item was verified against `src/kundli-app.tsx`, not assumed.
-Priority numbers exist only where the owner has actually ranked something;
-newly-surfaced items are marked **[unranked]** pending the owner's reprioritization.
+## Strategy (owner, 2026-07-18)
 
-Supersedes `kundli-feature-roadmap.docx` (that doc was competitor research, not a
-plan, and predates most of the app being built).
+- **Free to start.** Hook users first, gather heavy user feedback, let real usage
+  guide the roadmap.
+- **Fastest path to a web launch**, leading with Panchang.
+- **Phase 1 web scope:** Daily/Panchang + Prashna + Muhurat visible. Birth-chart
+  section hidden until it's polished + partly monetizable.
+- **Web first; Android + Apple wait a little** (after web proves out).
+- **Monetize narrowly, later, and only where it costs money:** saving charts
+  (needs paid storage), and possibly parts of the Jyotish section + the AI
+  features (which cost per-call). Investment level still TBD.
+- **Hard rule: never ads on the Panchang section.**
+
+---
+
+## PHASE 1 — Free web launch (Panchang + Prashna + Muhurat)
+
+Small scope; most is already built. This is the near-term work.
+
+- [ ] **Hide the birth-chart tab** for launch (leaves Daily + Prashna; Muhurat
+      lives inside Daily). Also removes the currently-broken "Save charts" feature
+      from the free tier automatically (it lives inside the Chart tab).
+- [ ] **Deploy to a web host** — this IS the web launch. App only runs on
+      localhost today. Static Vite build → free tier (Vercel / Netlify /
+      Cloudflare Pages). No backend needed for this scope.
+- [ ] **Error monitoring** — owner wants failure points logged. Phone-only means
+      crashes are invisible without this. Sentry free tier or similar.
+- [ ] **Analytics + a feedback channel** — owner wants "immense user input."
+      Privacy-friendly analytics + an in-app feedback button/form.
+- [ ] **Light privacy note** — needed once analytics is added.
+- [ ] Optional polish before launch: Muhurat window labels bilingual (E-0.7).
+
+**Not needed for Phase 1:** accounts, data persistence, backend proxy, AI,
+Android. Deliberately out of scope to keep the launch fast.
+
+---
+
+## PHASE 2 — Broaden the free app, iterate on feedback
+
+- [ ] **Reveal the birth-chart section** once its deep sub-section glosses are
+      translated (E-0.6) and it's had a polish pass. Full Jyotish, still free.
+- [ ] Prioritize new features by what Phase 1 user feedback actually asks for.
+- [ ] Cheap feature candidates: **Prashnavali** (number-pick → verse, very low
+      cost). Possibly **Gemstone/Remedy** if users ask.
+- Still free. Still no ads on Panchang.
+
+---
+
+## PHASE 3 — Mobile apps (Android + Apple)
+
+Owner will wait a little; sequence after web proves out.
+
+- [ ] **Decide the Android/iOS route** — PWA (cheapest, installable web) vs
+      Capacitor (native shell around the web app) vs React Native rewrite. This
+      one choice sizes the whole epic.
+- [ ] Play Store + App Store accounts, signing, store listings.
+- [ ] **Legal — privacy policy + terms** (required before either store lists you).
+
+---
+
+## PHASE 4 — Selective monetization (only where it costs money)
+
+Owner: hook users first; monetize narrowly. Never ads on Panchang.
+
+- [ ] **Backend proxy** (holds API key) — prerequisite for all AI features.
+- [ ] **Accounts / auth** + **real data persistence** (replaces the sandbox-only
+      `window.storage`).
+- [ ] **Paid: Save charts** — the first paid feature (storage costs money).
+- [ ] **Paid AI features** (each costs per-call, natural to charge for):
+      - AI chart explanation — ask questions about your own chart in natural language.
+      - AI Muhurat free-text search — type the request in any language.
+- [ ] Possibly paid: parts of the Jyotish section (TBD by demand + cost).
+- [ ] Cloud Sync (needs accounts + persistence).
+
+---
+
+## LATER / MUCH LATER — features, not near-term
+
+Owner explicitly deferred these.
+
+- Gemstone / Remedy suggestions (unless Phase 2 feedback pulls it forward)
+- Vastu Compass
+- Numerology (out of scope for core personas)
+- Sade Sati tracker — needs backend + push
+- Proactive Gochar / transit **alerts** (push) — needs backend + accounts + push
+  (NOTE: transit *display* already exists in the app)
+- Custom Tithi + Reminders — needs push
 
 ---
 
 ## A. Done — already in the app (verified in code)
 
-Not claiming these are polished or validated to Drik parity — only that the
-feature exists and renders. Listed so they stop showing up as "to build."
+Feature exists and renders; not a claim of polish/parity.
 
-- **Daily / Panchang** — tithi, nakshatra, yoga, karana, sunrise/set, moonrise/set,
-  Rahu/Gulika/Yama kalam, Abhijit, choghadiya, full panchang table, samvats.
-- **Fasts & festivals** — Smarta + ISKCON/Vaishnava traditions, 400-day scan.
-- **Muhurat date-range finder** — 7 activities, Drik-validated rules. ✅ 2026-07-17.
-- **Prashna (horary) chart** — verdict-first, birth-data-free. ✅ 2026-07-16.
-- **Hora / planetary hours** — with an advice input.
-- **Gochar / transit display** — "upcoming planetary events" (sign changes, retro/direct).
-  NOTE: this is *display only*; proactive/push alerts are still a feature (see B).
+- **Daily / Panchang** — tithi, nakshatra, yoga, karana, rise/set, Rahu/Gulika/Yama
+  kalam, Abhijit, choghadiya, full panchang table, samvats.
+- **Fasts & festivals** — Smarta + ISKCON traditions, 400-day scan.
+- **Muhurat date-range finder** — 7 activities, Drik-validated. ✅ 2026-07-17.
+- **Prashna (horary)** — verdict-first, birth-data-free. ✅ 2026-07-16.
+- **Hora / planetary hours** — with advice input.
+- **Gochar / transit display** — upcoming sign changes, retro/direct (display only).
 - **Full birth chart (17 sub-sections)** — Kundli, Yogas, Grahas, KP sub-lords,
-  KP significators, **Kundali Matching / Guna Milan**, Karakas, Shadbala, Special
-  lagnas, Bhava Chalit, Ashtakavarga, Arudha, Birth-time Rectification, BNN,
-  Bhrigu, Vimshottari Dasha (with sub-periods), plain-language Reading.
-- **Divisional charts** D1–D60 (Shodashvarga).
-- **Dosha logic** present (Manglik/dosha references throughout matching).
-- **Bilingual Hindi/English** across Daily, Prashna, Muhurat + core Chart path.
-  ✅ Messaging audit (all 3 tiers) 2026-07-18.
-
-*Implication: items the old backlog listed as TODO — Guna Milan, Manglik, Dasha
-sub-periods, Divisional charts, Shadbala, Ashtakavarga — are already built.*
-
----
-
-## B. Features — not yet built
-
-None of these exist in code (verified: 0 references each). All are net-new.
-
-| Item | Notes | Depends on | Ranked? |
-|---|---|---|---|
-| Gochar / Transit **alerts** (proactive) | Transit *display* exists; push alerts don't | Backend + push infra | prev. #5 |
-| Sade Sati tracker | Push-notification alert, not static report | Backend + push infra | prev. #5 |
-| Gemstone / Remedy suggestions | Low build cost, high perceived value; advisory tone | — | [unranked] |
-| Prashnavali (Rama Shalaka etc.) | Number-pick → verse; very cheap | — | prev. #6 |
-| Vastu Compass | Tactile/visual feature; Drik-exclusive | — | [unranked] |
-| Custom Tithi + Reminders | Personal alerts | Backend + push infra | [unranked] |
-| Numerology | Out of scope for core personas per research doc | — | [unranked, low] |
-| Muhurat free-text search (AI) | Typing box returns, any language | Backend proxy | prev. #4 |
-| AI conversational chart explanation | AskSoma's differentiator | Backend proxy | prev. #3 |
-
----
-
-## C. Infrastructure & Launch — the epics no launch can skip
-
-**None of this is tracked anywhere yet. This is the real gap.** The app has
-never left localhost.
-
-| Epic | Why unavoidable | Ranked? |
-|---|---|---|
-| **Backend proxy** (holds API key for AI calls) | Unblocks all AI features (B) | prev. #0 (highest) |
-| **Web hosting / deployment** | "Web launch" IS this. App only runs on dev server today. | [unranked — likely #1] |
-| **Real data persistence** | Saved charts don't persist on real web (`window.storage` is a sandbox API). Needed before accounts/cloud sync. | [unranked] |
-| **Accounts / auth** | Gates cloud sync, cross-device saved charts | [unranked] |
-| **Android packaging** | Owner's stated goal. Route decision needed: PWA vs Capacitor vs wrapper. Play Store account, signing, listing. | [unranked] |
-| **Cloud Sync** | Depends on accounts + persistence | prev. #13 (low) |
-| **Legal — privacy policy + terms** | *Required* before Play Store will list | [unranked] |
-| **Error monitoring** | Phone-only, no console — prod crashes are currently invisible | [unranked] |
-| **Analytics** | To know what users actually do | [unranked] |
-| **Onboarding / first-run** | First-time orientation | [unranked] |
-| **SEO / discoverability** | Web reach | [unranked] |
-| **Performance** | ~1.8s startup calendar scan still the largest cost | [unranked] |
-
----
-
-## D. Open decisions (gate other work — owner's call)
-
-- **Umbrella branding** — Ganak Panchang vs Ganak Jyotish vs one toggled app.
-  Recommendation on record: one app, section-labeled, don't fork. Unresolved.
-- **Monetization model** — free / ads / paid tiers. Research doc floated
-  free-panchang + paid-jyotish. Affects accounts, hosting cost, Android listing.
-- **Android route** — PWA (cheapest, installable web) vs Capacitor (native shell)
-  vs React Native rewrite (most work). Affects the whole Android epic's size.
-- **Storage philosophy** — the no-browser-storage rule vs users wanting saved
-  charts to persist. Resolving this unblocks persistence + accounts.
+  KP significators, Kundali Matching / Guna Milan, Karakas, Shadbala, Special
+  lagnas, Bhava Chalit, Ashtakavarga, Arudha, Rectification, BNN, Bhrigu,
+  Vimshottari Dasha (+ sub-periods), plain-language Reading.
+- **Divisional charts** D1–D60. **Dosha** logic in matching.
+- **Bilingual hi/en** across Daily, Prashna, Muhurat + core Chart path.
+  ✅ Messaging audit (3 tiers) 2026-07-18.
 
 ---
 
 ## E. Repo debt & small follow-ups
 
-- **Chart deep-gloss Hindi translation** (0.6) — advanced sub-section explanation
-  paragraphs (KP, Ashtakavarga, BNN, Bhrigu, Special Lagnas, Dasha levels) still
-  English-only. Needs specialist-Hindi pass.
-- **Muhurat window labels** (0.7) — "Rahu Kalam"/"Abhijit Muhurat" inside finder
-  results still English in Hindi mode. Tiny fix.
+- **E-0.6 Chart deep-gloss Hindi translation** — advanced sub-section paragraphs
+  (KP, Ashtakavarga, BNN, Bhrigu, Special Lagnas, Dasha levels) still English-only.
+  Specialist-Hindi pass. Gates Phase 2's chart reveal.
+- **E-0.7 Muhurat window labels bilingual** — "Rahu Kalam"/"Abhijit Muhurat" in
+  finder results still English in Hindi mode. Tiny; optional Phase 1 polish.
 - `parseMuhuratQuery` dead AI path — fetch to api.anthropic.com with no key;
-  route via proxy or remove.
+  route via proxy (Phase 4) or remove.
 - Startup performance — `scanPanchangCalendar` 400-day scan ~1.8s.
 
 ---
 
-## Next step
+## Open decisions still needing the owner
 
-Everything in B, C, and E is **unranked** — that's for you to order. The only
-items with a real priority today are the ones you set earlier (backend proxy
-was your "highest"; messaging audit is done). Tell me the ranking — or the
-principle to rank by (fastest-to-launch, cheapest-wins, Hindi-first, revenue-first)
-— and I'll assign the numbers and reorder.
+- **Umbrella branding** — Ganak Panchang vs Ganak Jyotish vs one toggled app.
+  (Recommendation on record: one app, section-labeled. Unresolved.)
+- **Android route** (Phase 3) — PWA vs Capacitor vs rewrite.
+- **Investment ceiling** — informs how much paid infra (Phase 4) is worth standing up.
