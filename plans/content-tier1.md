@@ -1,4 +1,22 @@
-# Content Tier 1 — verification sheet (owner to confirm before wiring)
+# Content Tier 1 — verification sheet
+
+## ✅ WIRED 2026-07-18 (locked by owner). 18 observances added.
+Monthly: Vinayaka Chaturthi, Skanda Shashti, Masik Durgashtami. Annual: Lakshmi
+Panchami, Buddha Purnima, Gupt Navratri (Ashadha + Magha), Rath Yatra, Hariyali
+Teej, Nag Panchami, Hartalika Teej, Radha Ashtami, Maha Ashtami, Maha Navami,
+Sharad Purnima, Ahoi Ashtami, Vasant Panchami, Sheetla Ashtami.
+Dates verified via `validation/content-dates.cjs` against 2026 + 2027; 7 anchors
+matched known dates; Krishna-paksha month-matching confirmed. Gates all green.
+**Deferred (need more work, not shipped):** Mahalakshmi Vrat (span + culmination —
+Tier 2 span logic); Varalakshmi Vratam (Friday-before-Purnima computed rule).
+**KNOWN EDGE:** in Adhik-Maas years (2026 is one), Ashadha Gupt Navratri doesn't
+fire — the app's leap-month festival handling needs an adhik-aware pass, and
+adhik-year observance rules are tradition-dependent (owner call). Fires correctly
+in normal years (verified 2027). Tracked for Tier 2.
+
+---
+
+# (original verification sheet below)
 
 **Workflow:** Claude drafts placement + text below → **owner verifies/corrects each
 row** → Claude wires the confirmed rows into `observancesFor()` (monthly) or the

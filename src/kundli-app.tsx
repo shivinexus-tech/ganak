@@ -986,6 +986,9 @@ function observancesFor(krishna, tithiNum, month = null, dow = null) {
     out.push({ key: variantKey, fasting: true, isVariant: !!variant, baseKey: "pradosh" });
   }
   if (tithiNum === 4 && krishna) out.push({ key: "sankashti", fasting: true });
+  if (tithiNum === 4 && !krishna) out.push({ key: "vinayakaChaturthi", fasting: true });
+  if (tithiNum === 6 && !krishna) out.push({ key: "skandaShashti", fasting: true });
+  if (tithiNum === 8 && !krishna) out.push({ key: "masikDurgashtami", fasting: true });
   if (tithiNum === 8 && krishna) out.push({ key: "kalashtami", fasting: false });
   if (tithiNum === 14 && krishna) out.push({ key: "masikShivaratri", fasting: true });
   if (tithiNum === 15 && !krishna) out.push({ key: "purnima", fasting: true });
@@ -994,18 +997,33 @@ function observancesFor(krishna, tithiNum, month = null, dow = null) {
 }
 // major festivals by amanta month index (into MONTHS_HINDU) + paksha + tithi
 const FESTIVALS = [
+  { key: "lakshmiPanchami", month: 0, krishna: false, tithi: 5 },
   { key: "ramNavami",   month: 0,  krishna: false, tithi: 9 },
   { key: "hanumanJ",    month: 0,  krishna: false, tithi: 15 },
   { key: "akshaya",     month: 1,  krishna: false, tithi: 3 },
+  { key: "buddhaPurnima", month: 1, krishna: false, tithi: 15 },
+  { key: "guptNavratriAshadha", month: 3, krishna: false, tithi: 1 },
+  { key: "rathYatra",   month: 3,  krishna: false, tithi: 2 },
   { key: "guruPurnima", month: 3,  krishna: false, tithi: 15 },
+  { key: "hariyaliTeej", month: 4, krishna: false, tithi: 3 },
+  { key: "nagPanchami", month: 4,  krishna: false, tithi: 5 },
   { key: "janmashtami", month: 4,  krishna: true,  tithi: 8 },
   { key: "rakshaBandhan", month: 4, krishna: false, tithi: 15 },
+  { key: "hartalikaTeej", month: 5, krishna: false, tithi: 3 },
   { key: "ganeshChaturthi", month: 5, krishna: false, tithi: 4 },
+  { key: "radhaAshtami", month: 5, krishna: false, tithi: 8 },
   { key: "navratri",    month: 6,  krishna: false, tithi: 1 },
+  { key: "mahaAshtami", month: 6,  krishna: false, tithi: 8 },
+  { key: "mahaNavami",  month: 6,  krishna: false, tithi: 9 },
   { key: "dussehra",    month: 6,  krishna: false, tithi: 10 },
+  { key: "sharadPurnima", month: 6, krishna: false, tithi: 15 },
+  { key: "ahoiAshtami", month: 6,  krishna: true,  tithi: 8 },
   { key: "karvaChauth", month: 6,  krishna: true,  tithi: 4 },
   { key: "diwali",      month: 6,  krishna: true,  tithi: 15 },
+  { key: "guptNavratriMagha", month: 10, krishna: false, tithi: 1 },
+  { key: "vasantPanchami", month: 10, krishna: false, tithi: 5 },
   { key: "mahaShivaratri", month: 10, krishna: true, tithi: 14 },
+  { key: "sheetlaAshtami", month: 11, krishna: true, tithi: 8 },
   { key: "holika",      month: 11, krishna: false, tithi: 15 },
 ];
 function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46) {
@@ -3190,8 +3208,8 @@ const L = {
   natGood: { en: "good", hi: "शुभ" }, natBad: { en: "avoid", hi: "अशुभ" }, natNeutral: { en: "travel", hi: "सम" },
 };
 const CHOG_NAME = { udveg: { en: "Udveg", hi: "उद्वेग" }, char: { en: "Char", hi: "चर" }, labh: { en: "Labh", hi: "लाभ" }, amrit: { en: "Amrit", hi: "अमृत" }, kaal: { en: "Kaal", hi: "काल" }, shubh: { en: "Shubh", hi: "शुभ" }, rog: { en: "Rog", hi: "रोग" } };
-const OBS_NAME = { ekadashi: { en: "Ekadashi", hi: "एकादशी" }, pradosh: { en: "Pradosh Vrat", hi: "प्रदोष व्रत" }, sankashti: { en: "Sankashti Chaturthi", hi: "संकष्टी चतुर्थी" }, kalashtami: { en: "Kalashtami", hi: "कालाष्टमी" }, masikShivaratri: { en: "Masik Shivaratri", hi: "मासिक शिवरात्रि" }, purnima: { en: "Purnima", hi: "पूर्णिमा" }, amavasya: { en: "Amavasya", hi: "अमावस्या" }, "Chaitra_Shukla_11": { en: "Kamada Ekadashi", hi: "कामदा एकादशी" }, "Vaisakha_Shukla_11": { en: "Mohini Ekadashi", hi: "मोहिनी एकादशी" }, "Jyeshtha_Shukla_11": { en: "Apara Ekadashi", hi: "अपरा एकादशी" }, "Ashadha_Shukla_11": { en: "Yogini Ekadashi", hi: "योगिनी एकादशी" }, "Shravan_Shukla_11": { en: "Varuthini Ekadashi", hi: "वरूथिनी एकादशी" }, "Bhadrapad_Shukla_11": { en: "Padma Ekadashi", hi: "पद्मा एकादशी" }, "Ashwin_Shukla_11": { en: "Indira Ekadashi", hi: "इंदिरा एकादशी" }, "Kartik_Shukla_11": { en: "Dev Uthani Ekadashi", hi: "देव उठनी एकादशी" }, "Margshirsh_Shukla_11": { en: "Utpanna Ekadashi", hi: "उत्पन्ना एकादशी" }, "Paush_Shukla_11": { en: "Mokshada Ekadashi", hi: "मोक्षदा एकादशी" }, "Magh_Shukla_11": { en: "Safala Ekadashi", hi: "सफला एकादशी" }, "Phalgun_Shukla_11": { en: "Amalaki Ekadashi", hi: "आमलकी एकादशी" }, "Chaitra_Krishna_11": { en: "Pap Mochini Ekadashi", hi: "पाप मोचिनी एकादशी" }, "Vaisakha_Krishna_11": { en: "Nrisimha Jayanti", hi: "नृसिंह जयंती" }, "Jyeshtha_Krishna_11": { en: "Nirjala Ekadashi", hi: "निर्जला एकादशी" }, "Ashadha_Krishna_11": { en: "Hari Bodhini Ekadashi", hi: "हरि बोधिनी एकादशी" }, "Shravan_Krishna_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" }, "Bhadrapad_Krishna_11": { en: "Aja Ekadashi", hi: "अजा एकादशी" }, "Ashwin_Krishna_11": { en: "Vijaya Ekadashi", hi: "विजया एकादशी" }, "Kartik_Krishna_11": { en: "Prabodhini Ekadashi", hi: "प्रबोधिनी एकादशी" }, "Margshirsh_Krishna_11": { en: "Gita Jayanti", hi: "गीता जयंती" }, "Paush_Krishna_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" }, "Magh_Krishna_11": { en: "Shatila Ekadashi", hi: "शतिला एकादशी" }, "Phalgun_Krishna_11": { en: "Phalaharini Ekadashi", hi: "फलहारिणी एकादशी" }, "pradosh_Sunday": { en: "Ravi Pradosh", hi: "रवि प्रदोष" }, "pradosh_Monday": { en: "Som Pradosh", hi: "सोम प्रदोष" }, "pradosh_Tuesday": { en: "Bhaum Pradosh", hi: "भौम प्रदोष" }, "pradosh_Wednesday": { en: "Budh Pradosh", hi: "बुध प्रदोष" }, "pradosh_Thursday": { en: "Guru Pradosh", hi: "गुरु प्रदोष" }, "pradosh_Friday": { en: "Shukra Pradosh", hi: "शुक्र प्रदोष" }, "pradosh_Saturday": { en: "Shani Pradosh", hi: "शनि प्रदोष" } };
-const FEST_NAME = { makarSankranti: { en: "Makar Sankranti", hi: "मकर संक्रांति" }, mahaShivaratri: { en: "Maha Shivaratri", hi: "महाशिवरात्रि" }, holika: { en: "Holi", hi: "होली" }, ramNavami: { en: "Ram Navami", hi: "राम नवमी" }, hanumanJ: { en: "Hanuman Jayanti", hi: "हनुमान जयंती" }, akshaya: { en: "Akshaya Tritiya", hi: "अक्षय तृतीया" }, guruPurnima: { en: "Guru Purnima", hi: "गुरु पूर्णिमा" }, rakshaBandhan: { en: "Raksha Bandhan", hi: "रक्षाबंधन" }, janmashtami: { en: "Janmashtami", hi: "जन्माष्टमी" }, ganeshChaturthi: { en: "Ganesh Chaturthi", hi: "गणेश चतुर्थी" }, navratri: { en: "Navratri begins", hi: "नवरात्रि आरंभ" }, dussehra: { en: "Dussehra", hi: "दशहरा" }, karvaChauth: { en: "Karva Chauth", hi: "करवा चौथ" }, diwali: { en: "Diwali", hi: "दिवाली" } };
+const OBS_NAME = { ekadashi: { en: "Ekadashi", hi: "एकादशी" }, pradosh: { en: "Pradosh Vrat", hi: "प्रदोष व्रत" }, sankashti: { en: "Sankashti Chaturthi", hi: "संकष्टी चतुर्थी" }, vinayakaChaturthi: { en: "Vinayaka Chaturthi", hi: "विनायक चतुर्थी" }, skandaShashti: { en: "Skanda Shashti", hi: "स्कंद षष्ठी" }, masikDurgashtami: { en: "Masik Durgashtami", hi: "मासिक दुर्गाष्टमी" }, kalashtami: { en: "Kalashtami", hi: "कालाष्टमी" }, masikShivaratri: { en: "Masik Shivaratri", hi: "मासिक शिवरात्रि" }, purnima: { en: "Purnima", hi: "पूर्णिमा" }, amavasya: { en: "Amavasya", hi: "अमावस्या" }, "Chaitra_Shukla_11": { en: "Kamada Ekadashi", hi: "कामदा एकादशी" }, "Vaisakha_Shukla_11": { en: "Mohini Ekadashi", hi: "मोहिनी एकादशी" }, "Jyeshtha_Shukla_11": { en: "Apara Ekadashi", hi: "अपरा एकादशी" }, "Ashadha_Shukla_11": { en: "Yogini Ekadashi", hi: "योगिनी एकादशी" }, "Shravan_Shukla_11": { en: "Varuthini Ekadashi", hi: "वरूथिनी एकादशी" }, "Bhadrapad_Shukla_11": { en: "Padma Ekadashi", hi: "पद्मा एकादशी" }, "Ashwin_Shukla_11": { en: "Indira Ekadashi", hi: "इंदिरा एकादशी" }, "Kartik_Shukla_11": { en: "Dev Uthani Ekadashi", hi: "देव उठनी एकादशी" }, "Margshirsh_Shukla_11": { en: "Utpanna Ekadashi", hi: "उत्पन्ना एकादशी" }, "Paush_Shukla_11": { en: "Mokshada Ekadashi", hi: "मोक्षदा एकादशी" }, "Magh_Shukla_11": { en: "Safala Ekadashi", hi: "सफला एकादशी" }, "Phalgun_Shukla_11": { en: "Amalaki Ekadashi", hi: "आमलकी एकादशी" }, "Chaitra_Krishna_11": { en: "Pap Mochini Ekadashi", hi: "पाप मोचिनी एकादशी" }, "Vaisakha_Krishna_11": { en: "Nrisimha Jayanti", hi: "नृसिंह जयंती" }, "Jyeshtha_Krishna_11": { en: "Nirjala Ekadashi", hi: "निर्जला एकादशी" }, "Ashadha_Krishna_11": { en: "Hari Bodhini Ekadashi", hi: "हरि बोधिनी एकादशी" }, "Shravan_Krishna_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" }, "Bhadrapad_Krishna_11": { en: "Aja Ekadashi", hi: "अजा एकादशी" }, "Ashwin_Krishna_11": { en: "Vijaya Ekadashi", hi: "विजया एकादशी" }, "Kartik_Krishna_11": { en: "Prabodhini Ekadashi", hi: "प्रबोधिनी एकादशी" }, "Margshirsh_Krishna_11": { en: "Gita Jayanti", hi: "गीता जयंती" }, "Paush_Krishna_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" }, "Magh_Krishna_11": { en: "Shatila Ekadashi", hi: "शतिला एकादशी" }, "Phalgun_Krishna_11": { en: "Phalaharini Ekadashi", hi: "फलहारिणी एकादशी" }, "pradosh_Sunday": { en: "Ravi Pradosh", hi: "रवि प्रदोष" }, "pradosh_Monday": { en: "Som Pradosh", hi: "सोम प्रदोष" }, "pradosh_Tuesday": { en: "Bhaum Pradosh", hi: "भौम प्रदोष" }, "pradosh_Wednesday": { en: "Budh Pradosh", hi: "बुध प्रदोष" }, "pradosh_Thursday": { en: "Guru Pradosh", hi: "गुरु प्रदोष" }, "pradosh_Friday": { en: "Shukra Pradosh", hi: "शुक्र प्रदोष" }, "pradosh_Saturday": { en: "Shani Pradosh", hi: "शनि प्रदोष" } };
+const FEST_NAME = { makarSankranti: { en: "Makar Sankranti", hi: "मकर संक्रांति" }, mahaShivaratri: { en: "Maha Shivaratri", hi: "महाशिवरात्रि" }, holika: { en: "Holi", hi: "होली" }, ramNavami: { en: "Ram Navami", hi: "राम नवमी" }, hanumanJ: { en: "Hanuman Jayanti", hi: "हनुमान जयंती" }, akshaya: { en: "Akshaya Tritiya", hi: "अक्षय तृतीया" }, guruPurnima: { en: "Guru Purnima", hi: "गुरु पूर्णिमा" }, rakshaBandhan: { en: "Raksha Bandhan", hi: "रक्षाबंधन" }, janmashtami: { en: "Janmashtami", hi: "जन्माष्टमी" }, ganeshChaturthi: { en: "Ganesh Chaturthi", hi: "गणेश चतुर्थी" }, navratri: { en: "Navratri begins", hi: "नवरात्रि आरंभ" }, dussehra: { en: "Dussehra", hi: "दशहरा" }, karvaChauth: { en: "Karva Chauth", hi: "करवा चौथ" }, diwali: { en: "Diwali", hi: "दिवाली" }, lakshmiPanchami: { en: "Lakshmi Panchami", hi: "लक्ष्मी पंचमी" }, buddhaPurnima: { en: "Buddha Purnima", hi: "बुद्ध पूर्णिमा" }, guptNavratriAshadha: { en: "Ashadha Gupt Navratri", hi: "आषाढ़ गुप्त नवरात्रि" }, rathYatra: { en: "Rath Yatra", hi: "रथ यात्रा" }, hariyaliTeej: { en: "Hariyali Teej", hi: "हरियाली तीज" }, nagPanchami: { en: "Nag Panchami", hi: "नाग पंचमी" }, hartalikaTeej: { en: "Hartalika Teej", hi: "हरतालिका तीज" }, radhaAshtami: { en: "Radha Ashtami", hi: "राधा अष्टमी" }, mahaAshtami: { en: "Maha Ashtami", hi: "महाअष्टमी" }, mahaNavami: { en: "Maha Navami", hi: "महानवमी" }, sharadPurnima: { en: "Sharad Purnima", hi: "शरद पूर्णिमा" }, ahoiAshtami: { en: "Ahoi Ashtami", hi: "अहोई अष्टमी" }, guptNavratriMagha: { en: "Magha Gupt Navratri", hi: "माघ गुप्त नवरात्रि" }, vasantPanchami: { en: "Vasant Panchami", hi: "वसंत पंचमी" }, sheetlaAshtami: { en: "Sheetla Ashtami (Basoda)", hi: "शीतला अष्टमी (बसोड़ा)" } };
 
 const OBS_META = {
   ekadashi: { deity: { en: "Vishnu", hi: "विष्णु" }, gloss: { en: "Fasting day for Vishnu — 11th lunar day", hi: "विष्णु व्रत — एकादशी तिथि" }, rules: { en: "No grains or cereals; break the fast next morning at parana", hi: "अन्न-अनाज वर्जित; अगली सुबह पारण पर व्रत खोलें" }, timing: "parana" },
@@ -3201,6 +3219,9 @@ const OBS_META = {
   amavasya: { deity: { en: "Pitru", hi: "पितृ" }, gloss: { en: "New-moon day", hi: "अमावस्या" }, rules: { en: "Ancestor rites (tarpana) and charity; new ventures avoided", hi: "पितृ तर्पण व दान; नए कार्य वर्जित" }, timing: null },
   masikShivaratri: { deity: { en: "Shiva", hi: "शिव" }, gloss: { en: "Monthly Shivaratri — Krishna Chaturdashi", hi: "मासिक शिवरात्रि — कृष्ण चतुर्दशी" }, rules: { en: "Night vigil and Shiva puja; fast till next morning", hi: "रात्रि जागरण व शिव पूजा; अगली सुबह तक व्रत" }, timing: "sunset" },
   kalashtami: { deity: { en: "Bhairava", hi: "भैरव" }, gloss: { en: "Kala Bhairava day — Krishna Ashtami", hi: "काल भैरव दिवस — कृष्ण अष्टमी" }, rules: { en: "Evening and night worship of Bhairava", hi: "संध्या व रात्रि में भैरव पूजा" }, timing: "sunset" },
+  vinayakaChaturthi: { deity: { en: "Ganesha", hi: "गणेश" }, gloss: { en: "Ganesha vrat — Shukla Chaturthi", hi: "गणेश व्रत — शुक्ल चतुर्थी" }, rules: { en: "Midday Ganesha puja; avoid seeing the moon this night", hi: "मध्याह्न गणेश पूजा; इस रात्रि चंद्र-दर्शन वर्जित" }, timing: null },
+  skandaShashti: { deity: { en: "Kartikeya (Murugan)", hi: "कार्तिकेय (मुरुगन)" }, gloss: { en: "Murugan vrat — Shukla Shashti", hi: "मुरुगन व्रत — शुक्ल षष्ठी" }, rules: { en: "Fast through the day; Murugan puja", hi: "दिन भर व्रत; मुरुगन पूजा" }, timing: null },
+  masikDurgashtami: { deity: { en: "Durga", hi: "दुर्गा" }, gloss: { en: "Monthly Durga vrat — Shukla Ashtami", hi: "मासिक दुर्गा व्रत — शुक्ल अष्टमी" }, rules: { en: "Fast and Durga puja on the waxing eighth", hi: "शुक्ल अष्टमी पर व्रत व दुर्गा पूजा" }, timing: null },
 };
 const FEST_META = {
   makarSankranti: { deity: { en: "Surya", hi: "सूर्य" }, gloss: { en: "Sun enters Makara — harvest festival", hi: "सूर्य मकर में — फसल पर्व" }, timing: null },
@@ -3217,6 +3238,21 @@ const FEST_META = {
   dussehra: { deity: { en: "Devi", hi: "देवी" }, gloss: { en: "Victory of good over evil — Vijayadashami", hi: "बुराई पर अच्छाई की जीत — विजयादशमी" }, timing: null },
   karvaChauth: { deity: { en: "Parvati", hi: "पार्वती" }, gloss: { en: "Wives' fast, broken after moonrise", hi: "सुहाग व्रत — चंद्रोदय पर पारण" }, timing: "moonrise" },
   diwali: { deity: { en: "Lakshmi", hi: "लक्ष्मी" }, gloss: { en: "Festival of lights — Lakshmi puja on Amavasya", hi: "दीपोत्सव — अमावस्या पर लक्ष्मी पूजा" }, timing: null },
+  lakshmiPanchami: { deity: { en: "Lakshmi", hi: "लक्ष्मी" }, gloss: { en: "Shri Vrat — Lakshmi worship on Chaitra Shukla Panchami", hi: "श्री व्रत — चैत्र शुक्ल पंचमी पर लक्ष्मी पूजा" }, timing: null },
+  buddhaPurnima: { deity: { en: "Vishnu (Buddha)", hi: "विष्णु (बुद्ध)" }, gloss: { en: "Full moon of Vaishakh — Buddha's day", hi: "वैशाख पूर्णिमा — बुद्ध जयंती" }, timing: null },
+  guptNavratriAshadha: { deity: { en: "Shakti", hi: "शक्ति" }, gloss: { en: "Monsoon 'hidden' Navratri — tantric sadhana", hi: "आषाढ़ गुप्त नवरात्रि — तांत्रिक साधना" }, timing: null },
+  rathYatra: { deity: { en: "Jagannath", hi: "जगन्नाथ" }, gloss: { en: "Puri chariot festival of Jagannath", hi: "पुरी की जगन्नाथ रथ यात्रा" }, timing: null },
+  hariyaliTeej: { deity: { en: "Parvati", hi: "पार्वती" }, gloss: { en: "Monsoon Teej — fast for Parvati", hi: "सावन तीज — पार्वती व्रत" }, timing: null },
+  nagPanchami: { deity: { en: "Nagas", hi: "नाग" }, gloss: { en: "Serpent worship — Shravan Shukla Panchami", hi: "नाग पूजा — श्रावण शुक्ल पंचमी" }, timing: null },
+  hartalikaTeej: { deity: { en: "Parvati", hi: "पार्वती" }, gloss: { en: "Nirjala fast for marital blessing", hi: "निर्जला व्रत — अखंड सौभाग्य हेतु" }, timing: null },
+  radhaAshtami: { deity: { en: "Radha", hi: "राधा" }, gloss: { en: "Appearance day of Radha", hi: "राधा जन्मोत्सव" }, timing: null },
+  mahaAshtami: { deity: { en: "Durga", hi: "दुर्गा" }, gloss: { en: "Navratri's eighth — Durga Ashtami", hi: "नवरात्रि की अष्टमी — दुर्गाष्टमी" }, timing: null },
+  mahaNavami: { deity: { en: "Durga", hi: "दुर्गा" }, gloss: { en: "Navratri's ninth — Mahanavami", hi: "नवरात्रि की नवमी — महानवमी" }, timing: null },
+  sharadPurnima: { deity: { en: "Lakshmi", hi: "लक्ष्मी" }, gloss: { en: "Kojagari full moon — amrit-moon night", hi: "कोजागरी पूर्णिमा — अमृत-चंद्र रात्रि" }, timing: null },
+  ahoiAshtami: { deity: { en: "Ahoi Mata", hi: "अहोई माता" }, gloss: { en: "Mothers' fast for children's wellbeing", hi: "संतान हेतु माताओं का व्रत" }, timing: "moonrise" },
+  guptNavratriMagha: { deity: { en: "Shakti", hi: "शक्ति" }, gloss: { en: "Winter 'hidden' Navratri — tantric sadhana", hi: "माघ गुप्त नवरात्रि — तांत्रिक साधना" }, timing: null },
+  vasantPanchami: { deity: { en: "Saraswati", hi: "सरस्वती" }, gloss: { en: "Saraswati puja — first day of spring", hi: "सरस्वती पूजा — वसंत का आरंभ" }, timing: null },
+  sheetlaAshtami: { deity: { en: "Sheetla Mata", hi: "शीतला माता" }, gloss: { en: "Basoda — cold-food day after Holi", hi: "बसोड़ा — होली के बाद शीतल भोजन का दिन" }, timing: null },
 };
 /* upcoming-occurrence search: tithi name, ekadashi/pradosh variants, festival, or fast */
 function searchUpcoming(query, fromMs, tz, maxN = 24) {
