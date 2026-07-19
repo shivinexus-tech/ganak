@@ -1,10 +1,20 @@
 # Ganak — Parallel-Agent Work Brief
 
-> **Historical brief (superseded 2026-07-19).** Its single-file/no-code rules describe
-> the earlier architecture. The owner has approved a modular UI split and ten
-> concurrent worktree lanes. Use `AGENTS.md`, `plans/backlog.md` P0 and
-> `plans/task-log.md` for current coordination. Do not issue new assignments from
-> this document until it is rewritten as the live ownership board.
+> # ⛔ HISTORICAL — DO NOT USE FOR ASSIGNMENTS
+>
+> **Superseded 2026-07-19.** This brief describes the **single-file era**, when the
+> whole app lived in one `kundli-app.tsx` and the rule was "one writer for the entire
+> app, everyone else writes docs." That constraint is gone — `src/` is now modular
+> (`engine/`, `screens/`, `components/`, `data/`), so multiple agents can write code
+> at once in separate modules.
+>
+> **The live board is now → [`plans/module-ownership-map.md`](module-ownership-map.md)**
+> (which lane is open, which files exist, how to reserve).
+> Reserve work in [`plans/task-log.md`](task-log.md). Conventions: `AGENTS.md`.
+> Priorities: `plans/backlog.md` (P0).
+>
+> Kept only as a record of how the project coordinated before the split. The two
+> assignments below are **complete** — both shipped.
 
 Hand this whole file to Codex or Cursor. It is self-contained. Pick your assigned
 section. **Read the "Iron rules" first — they are non-negotiable and exist because
