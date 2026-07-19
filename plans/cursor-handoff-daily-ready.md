@@ -1,5 +1,9 @@
 # Cursor → Claude: Daily modules ready (2026-07-19)
 
+**Cursor idle on `src/` as of 2026-07-19 ~16:37 PT.** No further peels, wires, or
+`src/**` edits until Claude finishes `SPLIT-UI-03-WIRE` (or the owner reopens the
+lane). Claude owns the shell for the Daily wire.
+
 Cursor stayed **modules-only** (no `kundli-app.tsx` edits) per owner. Shell still holds
 copies of everything below until you wire.
 
