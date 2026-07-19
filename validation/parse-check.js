@@ -151,10 +151,16 @@ src.split('\n').forEach((ln, i) => {
 
 // ---------------------------------------- 5. NO INTERNAL NOTES IN VRAT COPY
 {
+  // Locate the displayed vrat-copy block. The end sentinel only exists while the
+  // data lives inside kundli-app.tsx; once extracted to src/data/vrat-vidhis.ts
+  // the module IS the copy, so scan to EOF. (Requiring both sentinels silently
+  // disabled this gate the moment the data was split out — don't reintroduce that.)
+  // Match the DEFINITION only ("const"/"export const"), never a bare import of the
+  // name — otherwise this scans the whole app file and false-positives on app code.
   const start = src.indexOf('const VRAT_VIDHI_SAFETY');
-  const end = src.indexOf('/* upcoming-occurrence search', start);
-  if (start >= 0 && end > start) {
-    const copy = src.slice(start, end);
+  if (start >= 0) {
+    const endSentinel = src.indexOf('/* upcoming-occurrence search', start);
+    const copy = endSentinel > start ? src.slice(start, endSentinel) : src.slice(start);
     const forbidden = [
       { re: /\bGanak\b/i, label: 'product/editorial instruction' },
       { re: /\b(?:the\s+)?app(?:\x27s)?\b/i, label: 'app/editorial instruction' },
@@ -163,6 +169,10 @@ src.split('\n').forEach((ln, i) => {
       { re: /\bdo not ship\b/i, label: 'release instruction' },
       { re: /\bas calculated\b/i, label: 'unresolved calculation placeholder' },
       { re: /गणक|ऐप/, label: 'product/editorial instruction in Hindi' },
+      // Copy must address the devotee, never the app's author/reader-as-"user".
+      { re: /\bdo not (?:shame|blame|scare)\b/i, label: 'instruction addressed to the writer' },
+      { re: /\busers?\b/i, label: 'refers to "users" — copy should address the devotee directly' },
+      { re: /उपयोगकर्ता/, label: 'refers to "उपयोगकर्ता" — address the devotee directly' },
     ];
     for (const { re, label } of forbidden) {
       const match = re.exec(copy);

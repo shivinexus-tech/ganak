@@ -332,15 +332,15 @@ export const VRAT_VIDHI = {
       { en: "Bathe, dress cleanly and take sankalpa; make or place simple clay/sand Shiva-Parvati forms; worship Ganesha first, then Uma-Maheshwara; hear the Hartalika katha; where customary continue bhajan/vigil and conclude next morning.", hi: "स्नान, स्वच्छ वस्त्र, संकल्प; मिट्टी/बालू के सरल शिव-पार्वती रूप; पहले गणेश, फिर उमा-महेश्वर पूजा; हरतालिका कथा; परम्परानुसार भजन/जागरण और अगली सुबह समापन।" },
     ],
     diet: {
-      en: "Nirjala is a regional strict practice, not a universal health instruction. A pre-chosen water/phalahar form is acceptable as modified observance; do not shame users.",
-      hi: "निर्जला क्षेत्रीय कठोर परम्परा है, सार्वभौमिक स्वास्थ्य-निर्देश नहीं। पहले चुना जल/फलाहार संशोधित व्रत मान्य; उपयोगकर्ता को दोष न दें।",
+      en: "Nirjala (without water) is a regional strict practice, not a universal requirement. If your health needs it, a water or phalahar form chosen in advance is an accepted modified observance.",
+      hi: "निर्जला (बिना जल) क्षेत्रीय कठोर परम्परा है, सार्वभौमिक अनिवार्यता नहीं। स्वास्थ्य की आवश्यकता हो तो पहले से चुना गया जल या फलाहार रूप मान्य संशोधित व्रत है।",
     },
     sankalpa: {
       en: "“I honour Parvati's resolve and Shiva-Parvati's partnership. May my relationships have consent, loyalty, courage and mutual respect.”",
       hi: "“मैं पार्वती के संकल्प और शिव-पार्वती के साथ का सम्मान करती/करता हूँ। मेरे सम्बन्ध सहमति, निष्ठा, साहस और परस्पर आदर पर टिकें।”",
     },
     puja: {
-      en: "Ganesha; Shiva-Parvati; water, sandal, turmeric/kumkum according to custom, flowers, bilva to Shiva, fruit/sweet; 16-step worship only for users who know it; katha and aarti.",
+      en: "Ganesha; Shiva-Parvati; water, sandal, turmeric/kumkum according to custom, flowers, bilva to Shiva, fruit/sweet; the 16-step (shodashopachara) worship only if you know it; katha and aarti.",
       hi: "गणेश; शिव-पार्वती; जल, कुलानुसार चन्दन, हल्दी/कुमकुम, फूल, शिव को बिल्व, फल/मिष्ठान्न; षोडशोपचार केवल जानकार के लिए; कथा और आरती।",
     },
     paran: {
