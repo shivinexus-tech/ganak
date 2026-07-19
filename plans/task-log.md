@@ -46,6 +46,9 @@ same file.
 | SPLIT-UI-CHART-01c | MERGED | Cursor | `main` (modules only) | `src/data/chart-divisions.ts` | VARGAS + SPECIAL_CHARTS catalogs | Wire deferred. |
 | SPLIT-UI-CHART-02 | MERGED | Cursor | `main` (modules only) | `src/engine/kundli.ts` | `computeKundli` birth-chart engine | Smoke OK (Delhi sample). Shell wire still pending — Daily owns shell. |
 
+| SPLIT-UI-JYOTISH-02 | MERGED | Cursor | `main` (modules only) | `src/screens/JyotishBnnScreen.tsx`, `src/components/format.ts` (fmtDateT), `src/data/chart-divisions.ts` (SIGN_SHORT) | BNN + Bhrigu UI modules | Wire deferred. |
+| SPLIT-UI-JYOTISH-03 | MERGED | Cursor | `main` (modules only) | `src/screens/RectifyScreen.tsx` | Birth-time rectification UI | Wire deferred. |
+
 ## Ten-lane target ownership
 
 **→ Live board with file-existence detail: [`plans/module-ownership-map.md`](module-ownership-map.md)**

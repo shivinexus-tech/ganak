@@ -21,4 +21,14 @@ const fmtTime = (ms, tz) => {
   return `${h}:${String(mi).padStart(2, "0")} ${ap}`;
 };
 
-export { fmtDeg, fmtTimeD, fmtTime };
+const fmtDateT = (ms, tz = 0, withTime = false) => {
+  const d = new Date(ms + tz * 3600000);
+  if (!withTime) return d.toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
+  const date = d.toLocaleDateString("en-IN", { month: "short", day: "numeric", timeZone: "UTC" });
+  let h = d.getUTCHours(); const mi = d.getUTCMinutes();
+  const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
+  return `${date}, ${h}:${String(mi).padStart(2, "0")} ${ap}`;
+};
+
+export { fmtDeg, fmtTimeD, fmtTime, fmtDateT };
+

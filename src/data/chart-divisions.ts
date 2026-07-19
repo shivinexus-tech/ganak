@@ -31,4 +31,6 @@ const SPECIAL_CHARTS = [
   { k: "KARAK", name: "Karakamsa", theme: "Jaimini swamsa — the navamsa seen from the Atmakaraka" },
 ];
 
-export { VARGAS, SPECIAL_CHARTS };
+const SIGN_SHORT = ["Ar", "Ta", "Ge", "Cn", "Le", "Vi", "Li", "Sc", "Sg", "Cp", "Aq", "Pi"];
+
+export { VARGAS, SPECIAL_CHARTS, SIGN_SHORT };

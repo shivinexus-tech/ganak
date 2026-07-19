@@ -211,6 +211,7 @@ function jupiterProgression(rows, fromAge, toAge) {
 
 export {
   computeBNN,
+  bnnRelations,
   bnnDirectional,
   bnnReading,
   bnnTiming,
