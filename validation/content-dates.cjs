@@ -22,7 +22,7 @@ const NEW = ['lakshmiPanchami','buddhaPurnima','guptNavratriAshadha','rathYatra'
 const KNOWN = {
   vasantPanchami: '2026-01-23', mahaShivaratri: '2026-02-15', sheetlaAshtami: '~8 days after Holi (Mar 2026)',
   buddhaPurnima: '2026-05-01', rathYatra: '2026-07-15', hariyaliTeej: '2026-08-15', nagPanchami: '2026-08-17',
-  hartalikaTeej: '2026-09-14 (Drik Pratahkala rule; app currently one day early)', radhaAshtami: '2026-09-19', sharadPurnima: '2026-10-25', ahoiAshtami: '2026-11-02', vasantPanchami2: 'Magha Shukla 5',
+  hartalikaTeej: '2026-09-14 (Udaya rule — FIXED)', radhaAshtami: '2026-09-19', sharadPurnima: '2026-10-25', ahoiAshtami: '2026-11-02', vasantPanchami2: 'Magha Shukla 5',
 };
 console.log('New Tier-1 festival dates computed for 2026 (verify against Drik):\n');
 const seen = {};
@@ -61,6 +61,21 @@ if (solarFailures) {
 } else {
   console.log('\n✓ 7/7 Tier-2 solar/nakshatra anchors match');
 }
+
+// Day-part fix anchors (hard pass/fail) — festivals whose deciding day-part is Udaya,
+// not the noon default. Regression guard for the 2026-07-18 day-part mechanism fix.
+console.log('\nDay-part fix anchors (Udaya-rule festivals):');
+const dpAnchors = { hartalikaTeej: '2026-09-14', guptNavratriAshadha: '2026-07-15' };
+let dpFailures = 0;
+for (const [key, exp] of Object.entries(dpAnchors)) {
+  const hit = cal.festivals.find((f) => f.key === key);
+  const got = hit ? fmt(hit.ms) : 'DID NOT FIRE';
+  const ok = got === exp;
+  console.log(`  ${ok ? '✓' : '✗'} ${key}: ${got} (expected ${exp})`);
+  if (!ok) dpFailures++;
+}
+if (dpFailures) { console.error(`\n✗ ${dpFailures} day-part anchor(s) failed`); process.exitCode = 1; }
+else console.log('✓ day-part fix anchors match');
 
 const localAnchor = (y, m, d) => Date.UTC(y, m - 1, d, 12) - IST * 3600000;
 const mandalaChecks = [

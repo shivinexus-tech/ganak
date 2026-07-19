@@ -1094,14 +1094,14 @@ const FESTIVALS = [
   { key: "hanumanJ",    month: 0,  krishna: false, tithi: 15 },
   { key: "akshaya",     month: 1,  krishna: false, tithi: 3 },
   { key: "buddhaPurnima", month: 1, krishna: false, tithi: 15 },
-  { key: "guptNavratriAshadha", month: 3, krishna: false, tithi: 1 },
+  { key: "guptNavratriAshadha", month: 3, krishna: false, tithi: 1, dp: "udaya" }, // Ghatasthapana at sunrise; noon misses Pratipada (was not firing)
   { key: "rathYatra",   month: 3,  krishna: false, tithi: 2 },
   { key: "guruPurnima", month: 3,  krishna: false, tithi: 15 },
   { key: "hariyaliTeej", month: 4, krishna: false, tithi: 3 },
   { key: "nagPanchami", month: 4,  krishna: false, tithi: 5 },
   { key: "janmashtami", month: 4,  krishna: true,  tithi: 8 },
   { key: "rakshaBandhan", month: 4, krishna: false, tithi: 15 },
-  { key: "hartalikaTeej", month: 5, krishna: false, tithi: 3 },
+  { key: "hartalikaTeej", month: 5, krishna: false, tithi: 3, dp: "udaya" }, // Pratahkala/Udaya rule (Drik); noon landed it a day early
   { key: "ganeshChaturthi", month: 5, krishna: false, tithi: 4 },
   { key: "radhaAshtami", month: 5, krishna: false, tithi: 8 },
   { key: "navratri",    month: 6,  krishna: false, tithi: 1 },
@@ -1118,30 +1118,48 @@ const FESTIVALS = [
   { key: "sheetlaAshtami", month: 11, krishna: true, tithi: 8 },
   { key: "holika",      month: 11, krishna: false, tithi: 15 },
 ];
+/* Deciding day-part → local clock hour used to sample a festival's tithi. Shastra
+   assigns a different vyapini rule per festival (Udaya=sunrise for most, Madhyahna=
+   noon for Ganesh Chaturthi/Ram Navami, Nishita=midnight for Janmashtami/Shivaratri,
+   Aparahna for Vijayadashami, etc.). Without lat/lon the scanner uses fixed local-clock
+   proxies. `dp` on a FESTIVALS entry overrides the default.
+   NOTE: the default is Madhyahna (noon) — NOT because that's the correct principled
+   default (Udaya is), but because the app historically used noon and every festival
+   except the two below was already right at noon (verified vs Drik anchors). Keeping
+   noon as default = zero regression; only the two proven-broken festivals are flipped
+   to Udaya. The principled pass — Udaya default + each festival's sourced day-part —
+   is EPIC content work (Codex Assignment A, plans/parallel-agent-brief.md). When that
+   sourced table lands, flip this default to "udaya" and add per-festival `dp`. */
+const DAYPART_HOUR = { udaya: 6, madhyahna: 12, aparahna: 15, pradosha: 18, nishita: 24 };
 function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46) {
   const DAY = 86400000, fasts = [], festivals = [];
-  const noon = (k) => { const d = new Date(fromMs + k * DAY + tz * 3600000); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12) - tz * 3600000; };
+  const probeMs = (k, hour) => { const d = new Date(fromMs + k * DAY + tz * 3600000); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), hour) - tz * 3600000; };
+  const noon = (k) => probeMs(k, 12);
+  const tithiAt = (mst) => { const t = Math.floor(rev(moonSidMs(mst) - sunSidMs(mst)) / 12); return { tithiNum: (t % 15) + 1, krishna: t >= 15 }; };
   for (let k = 0; k < days; k++) {
-    const ms = noon(k);
-    const elong = rev(moonSidMs(ms) - sunSidMs(ms));
-    const tn = Math.floor(elong / 12), tithiNum = (tn % 15) + 1, krishna = tn >= 15;
     if (k < fastDays) {
       const dayMs = noon(k), d = new Date(dayMs + tz * 3600000);
+      const nt = tithiAt(dayMs); // fasts retain the noon rule for now (audit tracked separately)
       const monthN = d.getUTCMonth() + 1, dow = d.getUTCDay();
       const monthNames = ["Chaitra", "Vaisakha", "Jyeshtha", "Ashadha", "Shravan", "Bhadrapad", "Ashwin", "Kartik", "Margshirsh", "Paush", "Magh", "Phalgun"];
       const month = monthNames[(monthN - 1 + 9) % 12]; // amanta offset
-      for (const o of observancesFor(krishna, tithiNum, month, dow)) {
+      for (const o of observancesFor(nt.krishna, nt.tithiNum, month, dow)) {
         if (!o.fasting) continue;
         const prev = [...fasts].reverse().find((x) => x.key === o.key);
-        if (prev && ms - prev.ms <= 1.5 * DAY) continue; // same tithi spanning two days → list the fast once
-        fasts.push({ key: o.key, ms });
+        if (prev && dayMs - prev.ms <= 1.5 * DAY) continue; // same tithi spanning two days → list the fast once
+        fasts.push({ key: o.key, ms: dayMs });
       }
     }
+    // Festivals fire on their deciding day-part's tithi (Udaya/sunrise default, per-
+    // festival `dp` override), anchored to that civil day. Replaces the old noon-only
+    // rule that landed Hartalika Teej a day early and dropped Ashadha Gupt Navratri.
+    const udayaMs = probeMs(k, DAYPART_HOUR.udaya);
+    const monthIdx = amantaMonthIdx(udayaMs).idx;
     for (const f of FESTIVALS) {
-      if (f.krishna === krishna && f.tithi === tithiNum && !festivals.some((x) => x.key === f.key)) {
-        const m = amantaMonthIdx(ms);
-        if (m.idx === f.month) festivals.push({ key: f.key, ms });
-      }
+      if (festivals.some((x) => x.key === f.key)) continue;
+      const t = tithiAt(probeMs(k, DAYPART_HOUR[f.dp || "madhyahna"]));
+      if (f.krishna === t.krishna && f.tithi === t.tithiNum && monthIdx === f.month)
+        festivals.push({ key: f.key, ms: udayaMs });
     }
   }
   for (const f of solarNakshatraFestivalDays(fromMs, tz, days)) festivals.push(f);

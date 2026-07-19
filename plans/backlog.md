@@ -315,6 +315,23 @@ Note: the app already has partial `rules`/`timing` fields in OBS_META and a
 `vratDetail` function — extend that structure rather than rebuild. Bilingual.
 Must be sourced/accurate (religious content — cite tradition, don't invent).
 
+### C-DAYPART — festival deciding day-part (P1 content-accuracy)
+Discovered 2026-07-18 (Codex found Hartalika a day early; Claude found Gupt Navratri
+Ashadha silently not firing). Root cause: the festival scanner decided *every*
+festival's date from the tithi at **noon**, but shastra assigns a different deciding
+day-part per festival (Udaya/sunrise for most; Madhyahna/noon for Ganesh Chaturthi,
+Ram Navami; Nishita/midnight for Janmashtami, Shivaratri; Aparahna for Vijayadashami;
+moonrise for Karva Chauth/Sankashti).
+- ✅ **Mechanism built + both bugs fixed 2026-07-18.** Per-festival `dp` day-part
+  override (`DAYPART_HOUR` proxies); Hartalika → 2026-09-14, Gupt Navratri Ashadha →
+  fires 2026-07-15. Zero regression (all other festivals byte-identical to prior/
+  sourced dates — verified). Hard anchors added to validation/content-dates.cjs.
+  Default kept at noon deliberately (zero-regression) pending the sourced audit.
+- [ ] **Pending: principled day-part pass (Codex Assignment A).** Once the sourced
+  per-festival day-part table lands (plans/festival-daypart-audit.md), flip the
+  scanner default to Udaya and add each festival's correct `dp`. Then extend the same
+  day-part logic to the **fasts** loop (still noon-only). This is P1 content-accuracy.
+
 ### C-SCOPE — decided by owner 2026-07-18
 **In scope: ALL of Smarta / Vaishnava / Shaiva / Shakta + top regional, AND aim
 to cover observances even Drik doesn't.** This is the "beat Drik" bet, applied to
