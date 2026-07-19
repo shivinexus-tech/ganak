@@ -3507,7 +3507,8 @@ const FEST_META = {
   ayyappaMandalaPuja: { deity: { en: "Ayyappa", hi: "अय्यप्पा" }, gloss: { en: "Day 41 — completion of Mandala Vratham and Mandala Pooja", hi: "41वाँ दिन — मंडल व्रतम पूर्ण व मंडल पूजा" }, rules: { en: "Completion rites follow the pilgrim's Guru Swami and temple tradition", hi: "समापन विधि गुरु स्वामी व मंदिर परंपरा के अनुसार होती है" }, timing: null },
 };
 
-/* Vrat vidhi content — sourced from plans/vrat-vidhis.md. Add more keys later; the card is reusable. */
+/* Vrat vidhi content — sourced from plans/vrat-vidhis.md. User-facing copy only;
+   implementation and editorial instructions stay in plans, never in this object. */
 const VRAT_VIDHI_LABELS = {
   hideHowTo: { en: "Hide observance steps", hi: "विधि छिपाएँ" },
   showHowTo: { en: "Observance steps", hi: "व्रत की विधि" },
@@ -3522,20 +3523,20 @@ const VRAT_VIDHI_LABELS = {
   safety: { en: "Health note", hi: "स्वास्थ्य टिप्पणी" },
 };
 const VRAT_VIDHI_SAFETY = {
-  en: "Devotion is not measured by dehydration. Nirjala (no food or water) is a strict traditional option, never Ganak's default recommendation. Children, older people, anyone who is pregnant or breastfeeding, unwell, taking medicines, or living with diabetes, kidney disease or an eating disorder should use a modified observance and seek medical advice where relevant. Break the fast and seek help if you become faint, confused, severely weak, cannot keep fluids down, or have unsafe blood-sugar symptoms. Never stop or retime prescribed medicine on the app's advice.",
-  hi: "भक्ति का माप निर्जलीकरण नहीं है। निर्जला (बिना अन्न-जल) व्रत एक कठोर पारम्परिक विकल्प है, गणक की सामान्य सलाह नहीं। बच्चे, वृद्ध, गर्भवती या स्तनपान कराने वाली महिलाएँ, अस्वस्थ व्यक्ति, दवा लेने वाले, मधुमेह, गुर्दे की बीमारी या ईटिंग-डिसऑर्डर वाले लोग संशोधित व्रत रखें और आवश्यकता अनुसार चिकित्सकीय सलाह लें। चक्कर, भ्रम, अत्यधिक कमजोरी, पानी न रुकना या असुरक्षित रक्त-शर्करा लक्षण हों तो व्रत तोड़ें और सहायता लें। ऐप की सलाह पर दवा बन्द या उसका समय न बदलें।",
+  en: "Devotion is not measured by dehydration. Nirjala (no food or water) is a strict traditional option, not the usual choice. Children, older people, anyone who is pregnant or breastfeeding, unwell, taking medicines, or living with diabetes, kidney disease or an eating disorder should use a modified observance and seek medical advice where relevant. Break the fast and seek help if you become faint, confused, severely weak, cannot keep fluids down, or have unsafe blood-sugar symptoms. Never stop or retime prescribed medicine without medical advice.",
+  hi: "भक्ति का माप निर्जलीकरण नहीं है। निर्जला (बिना अन्न-जल) व्रत एक कठोर पारम्परिक विकल्प है, सामान्य विकल्प नहीं। बच्चे, वृद्ध, गर्भवती या स्तनपान कराने वाली महिलाएँ, अस्वस्थ व्यक्ति, दवा लेने वाले, मधुमेह, गुर्दे की बीमारी या ईटिंग-डिसऑर्डर वाले लोग संशोधित व्रत रखें और आवश्यकता अनुसार चिकित्सकीय सलाह लें। चक्कर, भ्रम, अत्यधिक कमजोरी, पानी न रुकना या असुरक्षित रक्त-शर्करा लक्षण हों तो व्रत तोड़ें और सहायता लें। चिकित्सकीय सलाह के बिना दवा बन्द न करें और न उसका समय बदलें।",
 };
 const VRAT_VIDHI = {
   ekadashi: {
     verdict: {
-      en: "A Vishnu fast from local sunrise on Ekadashi until the app's Dwadashi paran window. Avoid all grains and cereals even if you choose a lighter fast.",
-      hi: "स्थानीय सूर्योदय से एकादशी व्रत रखें और ऐप में दिए द्वादशी पारण समय में खोलें। हल्का व्रत रखने पर भी सभी अनाज और धान्य छोड़ें।",
+      en: "Keep the Vishnu fast from local sunrise on Ekadashi until the Dwadashi paran time shown for your location. Avoid all grains and cereals even if you choose a lighter fast.",
+      hi: "स्थानीय सूर्योदय से एकादशी व्रत रखें और अपने स्थान के लिए दिखाए द्वादशी पारण समय में खोलें। हल्का व्रत रखने पर भी सभी अनाज और धान्य छोड़ें।",
     },
     vidhi: [
       { en: "On Dashami, eat one simple satvik meal; avoid a late grain-heavy dinner.", hi: "दशमी को एक सरल सात्त्विक भोजन लें; देर रात भारी अन्न-भोजन न करें।" },
       { en: "At Ekadashi sunrise, state the chosen fasting level and intention. Spend the day in Vishnu/Krishna/Rama remembrance, japa, reading and service.", hi: "एकादशी सूर्योदय पर व्रत का स्तर और भाव-संकल्प बोलें। दिन विष्णु/कृष्ण/राम स्मरण, जप, पाठ और सेवा में बिताएँ।" },
       { en: "Worship Vishnu simply; offer Tulsi only where the household normally does so. Rest rather than treating a strict fast as an endurance test.", hi: "विष्णु की सरल पूजा करें; कुल-परम्परा हो तभी तुलसी चढ़ाएँ। कठोर व्रत को सहनशक्ति की परीक्षा न बनाएँ, आवश्यकता पर विश्राम करें।" },
-      { en: "On Dwadashi, complete morning worship and break only inside Ganak's location-specific paran window.", hi: "द्वादशी को प्रातः पूजा के बाद गणक के स्थान-विशिष्ट पारण समय में ही खोलें।" },
+      { en: "On Dwadashi, complete morning worship and break only inside the paran window shown for your location.", hi: "द्वादशी को प्रातः पूजा के बाद अपने स्थान के लिए दिखाए पारण समय में ही खोलें।" },
     ],
     dietAvoid: {
       en: "all rice, wheat, millet, corn, barley, pulses and foods made from grains; ordinary table salt if the family uses only sendha namak for vrat.",
@@ -3554,23 +3555,23 @@ const VRAT_VIDHI = {
       hi: "स्नान, दीप, गणेश स्मरण; विष्णु/कृष्ण/राम को जल, फूल, परम्परानुसार तुलसी और अन्न-रहित भोग; परिचित विष्णु-नाम या उस एकादशी की कथा; आरती।",
     },
     paran: {
-      en: "Use the displayed Dwadashi window. Do not break during Harivasara (the protected first quarter of Dwadashi). Begin gently with water and prasad, then a satvik meal; do not postpone beyond Dwadashi unless the displayed rule says so. Smarta and Vaishnava dates can differ; use the selected tradition's date and paran.",
-      hi: "ऐप का द्वादशी पारण समय मानें। हरिवासर (द्वादशी का निषिद्ध आरम्भिक भाग) में न खोलें। जल-प्रसाद से धीरे खोलकर सात्त्विक भोजन लें। चुनी हुई स्मार्त या वैष्णव परम्परा का दिन और पारण ही मानें।",
+      en: "Use the Dwadashi window shown above. Do not break during Harivasara (the protected first quarter of Dwadashi). Begin gently with water and prasad, then a satvik meal; do not postpone beyond Dwadashi unless your tradition requires it. Smarta and Vaishnava dates can differ, so use the date and paran for your chosen tradition.",
+      hi: "ऊपर दिखाया द्वादशी पारण समय मानें। हरिवासर (द्वादशी का निषिद्ध आरम्भिक भाग) में न खोलें। जल-प्रसाद से धीरे खोलकर सात्त्विक भोजन लें। आपकी परम्परा में आवश्यक न हो तो द्वादशी के बाद तक पारण न टालें। चुनी हुई स्मार्त या वैष्णव परम्परा का दिन और पारण ही मानें।",
     },
     udyapan: {
-      en: "Not needed after an occasional fast. A person concluding a long vowed series should arrange Vishnu-Lakshmi puja, havan, feeding/charity under a learned priest; scope follows means, not display.",
+      en: "Not needed after an occasional fast. To conclude a long vowed series, arrange Vishnu-Lakshmi puja, havan and feeding or charity under a learned priest, according to your means.",
       hi: "कभी-कभार व्रत के बाद उद्यापन नहीं। दीर्घ संकल्पित श्रृंखला पूरी करने पर विद्वान पुरोहित के निर्देशन में विष्णु-लक्ष्मी पूजा, हवन और सामर्थ्य अनुसार भोजन/दान करें।",
     },
   },
   pradosh: {
     verdict: {
-      en: "A twice-monthly Shiva observance chosen when Trayodashi overlaps the local evening Pradosh period; the essential act is Shiva and Nandi worship in that displayed window.",
-      hi: "मास में दो बार होने वाला शिव-व्रत, जिस दिन त्रयोदशी स्थानीय सायंकालीन प्रदोष से मिलती है; मुख्य कर्म ऐप में दिए समय में शिव और नन्दी की पूजा है।",
+      en: "This twice-monthly Shiva observance falls when Trayodashi overlaps the local evening Pradosh period. Worship Shiva and Nandi in the time shown above.",
+      hi: "यह मास में दो बार होने वाला शिव-व्रत उस दिन पड़ता है जब त्रयोदशी स्थानीय सायंकालीन प्रदोष से मिलती है। ऊपर दिखाए समय में शिव और नन्दी की पूजा करें।",
     },
     vidhi: [
       { en: "Bathe in the morning and choose full fast, phalahar or one satvik meal.", hi: "प्रातः स्नान कर पूर्ण उपवास, फलाहार या एक सात्त्विक भोजन चुनें।" },
       { en: "Keep the day quiet; repeat a familiar Shiva name. Bathe or wash before the evening puja.", hi: "दिन संयम से बिताएँ, परिचित शिव-नाम जपें; सायं पूजा से पहले स्नान या शुद्धि करें।" },
-      { en: "During the displayed Pradosh window, worship Shiva and Nandi; at a temple, join abhisheka, archana and aarti.", hi: "प्रदर्शित प्रदोष समय में शिव-नन्दी पूजन करें; मंदिर में अभिषेक, अर्चना और आरती में सम्मिलित हो सकते हैं।" },
+      { en: "During the Pradosh time shown above, worship Shiva and Nandi; at a temple, join abhisheka, archana and aarti.", hi: "ऊपर दिखाए प्रदोष समय में शिव-नन्दी पूजन करें; मंदिर में अभिषेक, अर्चना और आरती में सम्मिलित हो सकते हैं।" },
     ],
     diet: {
       en: "No single pan-Indian menu is established. Common household forms are water/fruit/milk through the day, or one salt-free/satvik meal. Follow the chosen family form.",
@@ -3599,7 +3600,7 @@ const VRAT_VIDHI = {
       hi: "स्थानीय सूर्योदय से चन्द्रोदय तक गणेश-व्रत, उस दिन जब आपके स्थान पर चन्द्रोदय के समय चतुर्थी हो।",
     },
     vidhi: [
-      { en: "Bathe and take sankalpa after sunrise; keep a strict or phalahar fast; worship Ganesha in the evening; hear the month's Sankashti katha if your tradition uses it; after the app's moonrise, sight the moon if visible, offer water, pray, then break.", hi: "स्नान कर सूर्योदय बाद संकल्प लें; कठोर या फलाहार व्रत रखें; शाम को गणेश-पूजा और परम्परानुसार मास की कथा; ऐप के चन्द्रोदय बाद चन्द्र-दर्शन हो सके तो जल-अर्घ्य देकर प्रार्थना करें और व्रत खोलें।" },
+      { en: "Bathe and take sankalpa after sunrise; keep a strict or phalahar fast; worship Ganesha in the evening; hear the month's Sankashti katha if your tradition uses it; after the local moonrise shown above, sight the moon if visible, offer water, pray, then break.", hi: "स्नान कर सूर्योदय बाद संकल्प लें; कठोर या फलाहार व्रत रखें; शाम को गणेश-पूजा और परम्परानुसार मास की कथा; ऊपर दिखाए स्थानीय चन्द्रोदय के बाद चन्द्र-दर्शन हो सके तो जल-अर्घ्य देकर प्रार्थना करें और व्रत खोलें।" },
     ],
     diet: {
       en: "Fruit, roots and vegetable foods are the sourced lighter form; common foods include sabudana, potato and peanuts. Avoid ordinary grains/pulses and follow family salt rules.",
@@ -3614,8 +3615,8 @@ const VRAT_VIDHI = {
       hi: "दीप, गणेश ध्यान, उपयुक्त हो तो जल-अभिषेक, लाल/उपलब्ध फूल, परम्परानुसार दूर्वा, फल या मोदक भोग, नाम-जप, कथा और आरती; चन्द्रोदय के बाद चन्द्र-अर्घ्य।",
     },
     paran: {
-      en: "After the location-specific moonrise and moon prayer; if clouds hide the moon, use the app's computed moonrise and family rule rather than waiting indefinitely.",
-      hi: "स्थान-विशिष्ट चन्द्रोदय और चन्द्र-प्रार्थना के बाद; बादल हों तो अनन्त प्रतीक्षा के बजाय ऐप का चन्द्रोदय और कुल-नियम मानें।",
+      en: "Break after the local moonrise and moon prayer. If clouds hide the moon, use the moonrise time shown above and your family rule rather than waiting indefinitely.",
+      hi: "स्थानीय चन्द्रोदय और चन्द्र-प्रार्थना के बाद व्रत खोलें। बादल हों तो अनन्त प्रतीक्षा के बजाय ऊपर दिखाया चन्द्रोदय समय और कुल-नियम मानें।",
     },
     udyapan: {
       en: "No universal monthly requirement. Conclude a vowed series with Ganesha puja, prasad/feeding and charity as directed by the family priest.",
@@ -3643,8 +3644,8 @@ const VRAT_VIDHI = {
       hi: "गणेश व कलश स्मरण; सत्यनारायण/विष्णु चित्र या कुल में स्थापित शालिग्राम (नए व्यक्ति को सहज खरीदने की सलाह नहीं); परम्परानुसार जल/पंचामृत, वस्त्र/सूत्र, चन्दन, फूल, तुलसी, फल, केला, पंजीरी; कथा; आरती।",
     },
     paran: {
-      en: "After the puja and aarti, first receive Panchamrit, then prasad and a light meal. Satyanarayan's evening date can differ from the sunrise Purnima fasting date; Ganak must label the selected observance.",
-      hi: "पूजा-आरती के बाद पहले पंचामृत, फिर प्रसाद और हल्का भोजन। सायं सत्यनारायण पूजा-दिन सूर्योदय-आधारित पूर्णिमा व्रत से अलग हो सकता है; गणक दोनों को स्पष्ट नाम दे।",
+      en: "After the puja and aarti, first receive Panchamrit, then prasad and a light meal. Satyanarayan's evening puja date can differ from the sunrise-based Purnima fasting date, so check whether you are following the puja or fasting observance.",
+      hi: "पूजा-आरती के बाद पहले पंचामृत, फिर प्रसाद और हल्का भोजन। सायं सत्यनारायण पूजा-दिन सूर्योदय-आधारित पूर्णिमा व्रत से अलग हो सकता है, इसलिए देखें कि आप पूजा-दिन मान रहे हैं या व्रत-दिन।",
     },
     udyapan: {
       en: "A single puja needs no separate udyapan. If a fixed series was vowed, complete the promised count with puja, katha, prasad, feeding/charity under the same family procedure.",
@@ -3660,7 +3661,7 @@ const VRAT_VIDHI = {
       { en: "Bathe; remember ancestors by name with gratitude; offer a lamp/prayer to the household deity; give food or useful charity; if the family has an inherited shraddha/tarpan practice, perform it at its prescribed time with an elder or priest.", hi: "स्नान; पितरों का नाम लेकर कृतज्ञ स्मरण; गृह-देवता को दीप और प्रार्थना; अन्न या उपयोगी वस्तु का दान; कुल में श्राद्ध/तर्पण विधि हो तो उसके समय पर बड़े या पुरोहित के मार्गदर्शन में करें।" },
     ],
     diet: {
-      en: "Optional—regular satvik food, one meal, phalahar or fast according to the named Amavasya and family tradition. Ganak must not silently apply Diwali, Somavati, Mauni or Sarva-Pitru rules to every Amavasya.",
+      en: "Choose regular satvik food, one meal, phalahar or a full fast according to the named Amavasya and your family tradition. Diwali, Somavati, Mauni and Sarva-Pitru Amavasya each have their own rules; do not apply them to every Amavasya.",
       hi: "वैकल्पिक—उस विशिष्ट अमावस्या और कुल के अनुसार सात्त्विक भोजन, एक समय, फलाहार या उपवास। दीपावली, सोमवती, मौनी या सर्वपितृ नियम हर अमावस्या पर न लगाएँ।",
     },
     sankalpa: {
@@ -3682,15 +3683,15 @@ const VRAT_VIDHI = {
   },
   masikShivaratri: {
     verdict: {
-      en: "Monthly Shiva observance on Krishna Chaturdashi; the central practice is Shiva puja in the app's Nishita (local midnight) window.",
-      hi: "कृष्ण चतुर्दशी का मासिक शिव-व्रत; मुख्य साधना ऐप के निषीथ (स्थानीय मध्यरात्रि) समय में शिव-पूजा है।",
+      en: "This monthly Shiva observance falls on Krishna Chaturdashi. Perform the main Shiva puja in the local Nishita (midnight) time shown above.",
+      hi: "यह कृष्ण चतुर्दशी का मासिक शिव-व्रत है। ऊपर दिखाए स्थानीय निषीथ (मध्यरात्रि) समय में मुख्य शिव-पूजा करें।",
     },
     vidhi: [
       { en: "Keep the chosen fast during the day; bathe again in the evening; worship Shiva once at Nishita; keep a quiet vigil as health and duties allow; conclude the next morning.", hi: "दिन चुना हुआ व्रत रखें; सायं पुनः स्नान; निषीथ में एक बार शिव-पूजा; स्वास्थ्य और कर्तव्य अनुसार जागरण; अगली सुबह पूर्ण करें।" },
     ],
     diet: {
-      en: "Phalahar (fruit, milk, roots, family-approved vrat food) is a practical default; water-only/nirjala is optional and not advised by Ganak. Avoid grains/pulses if following the standard vrat form.",
-      hi: "फल, दूध, कन्द और कुल-मान्य व्रत-आहार व्यावहारिक सामान्य रूप; जल-मात्र/निर्जला वैकल्पिक है, गणक की सलाह नहीं। मानक व्रत में अन्न-दाल छोड़ें।",
+      en: "Phalahar (fruit, milk, roots and family-approved vrat food) is a practical choice. Water-only or nirjala fasting is optional and can be unsafe; avoid grains and pulses if following the standard vrat form.",
+      hi: "फल, दूध, कन्द और कुल-मान्य व्रत-आहार व्यावहारिक विकल्प हैं। जल-मात्र या निर्जला व्रत वैकल्पिक है और असुरक्षित हो सकता है; मानक व्रत में अन्न-दाल छोड़ें।",
     },
     sankalpa: {
       en: "“I observe Masik Shivaratri in remembrance of Shiva. May I release harmful habits and act with stillness and courage.”",
@@ -3701,8 +3702,8 @@ const VRAT_VIDHI = {
       hi: "जल-अभिषेक, परम्परानुसार चन्दन/विभूति, फूल-बिल्व, परिचित शिव-मन्त्र या नाम, आरती। सरल गृह-विधि में एक भावपूर्ण पूजा पर्याप्त।",
     },
     paran: {
-      en: "After next sunrise and morning bath/puja; because a detailed monthly paran rule is not uniform in the reviewed sources, show the family's rule and do not copy Maha Shivaratri's Chaturdashi-end rule automatically.",
-      hi: "अगली सुबह सूर्योदय और स्नान/पूजा बाद; मासिक पारण नियम सर्वत्र समान नहीं, इसलिए कुल-नियम दिखाएँ और महाशिवरात्रि का चतुर्दशी-अन्त नियम स्वतः न लगाएँ।",
+      en: "Break after the next sunrise and morning bath or puja. Monthly paran practice varies by family; do not automatically use Maha Shivaratri's Chaturdashi-end rule.",
+      hi: "अगली सुबह सूर्योदय और स्नान या पूजा के बाद व्रत खोलें। मासिक पारण नियम कुलानुसार बदलता है; महाशिवरात्रि का चतुर्दशी-अन्त नियम स्वतः न अपनाएँ।",
     },
     udyapan: {
       en: "Those who begin a one-year series from Maha Shivaratri should conclude the year with Shiva puja, feeding/charity and priest/family guidance.",
@@ -3730,8 +3731,8 @@ const VRAT_VIDHI = {
       hi: "सरल—निषीथ में एक पूजा; विस्तृत—रात के चार प्रहर। हर बार जल-अभिषेक, चन्दन/विभूति, फूल/बिल्व, जप और आरती। व्यर्थ होने वाला बहुत दूध न चढ़ाएँ।",
     },
     paran: {
-      en: "After next sunrise and bath, before Chaturdashi ends, using the location-specific displayed window. A documented alternate opinion waits for Chaturdashi to end; Ganak should show the selected tradition, not merge the two.",
-      hi: "अगली सुबह सूर्योदय-स्नान बाद और चतुर्दशी समाप्ति से पहले स्थान-विशिष्ट समय में। एक अन्य मत चतुर्दशी समाप्ति बाद का है; गणक चुना मत दिखाए, दोनों न मिलाए।",
+      en: "The common rule is to break after the next sunrise and bath, before Chaturdashi ends, within the local window shown above. Another accepted opinion waits until Chaturdashi has ended; follow your family's chosen tradition rather than combining the two.",
+      hi: "सामान्य नियम में अगली सुबह सूर्योदय-स्नान के बाद, चतुर्दशी समाप्ति से पहले, ऊपर दिखाए स्थानीय समय में पारण करें। एक अन्य मान्य मत चतुर्दशी समाप्ति के बाद का है; दोनों को मिलाने के बजाय अपनी कुल-परम्परा मानें।",
     },
     udyapan: {
       en: "A single annual observance needs none. A special multi-year vow should be concluded with priest-guided Shiva puja/homa and charity according to its original sankalpa.",
@@ -3740,11 +3741,11 @@ const VRAT_VIDHI = {
   },
   navratri: {
     verdict: {
-      en: "Both begin with Ghatasthapana in the app's local Pratipada morning window and honour Shakti for nine days. Chaitra commonly reaches Rama Navami; Sharad commonly reaches Durga Ashtami/Navami and Vijayadashami.",
-      hi: "दोनों का आरम्भ ऐप के स्थानीय प्रतिपदा-प्रातः घटस्थापना समय में होता है और नौ दिन शक्ति-पूजन होता है। चैत्र में राम नवमी, शारदीय में दुर्गाष्टमी/नवमी व विजयादशमी प्रमुख।",
+      en: "Begin with Ghatasthapana in the local Pratipada morning time shown above and honour Shakti for nine days. Chaitra commonly reaches Rama Navami; Sharad commonly reaches Durga Ashtami or Navami and Vijayadashami.",
+      hi: "ऊपर दिखाए स्थानीय प्रतिपदा-प्रातः घटस्थापना समय में आरम्भ करें और नौ दिन शक्ति-पूजन करें। चैत्र में राम नवमी, शारदीय में दुर्गाष्टमी या नवमी और विजयादशमी प्रमुख हैं।",
     },
     vidhi: [
-      { en: "Before starting, choose all nine days, first/last days, or a family-approved shorter pattern; the app must not imply all users vowed nine full fasts.", hi: "पहले नौ दिन, प्रथम-अन्तिम दिन या कुल-मान्य छोटा क्रम चुनें; ऐप सबको नौ पूर्ण उपवास का संकल्प न माने।" },
+      { en: "Before starting, choose all nine days, the first and last days, or a family-approved shorter pattern. You do not need to promise nine full fasts unless that is your chosen sankalpa.", hi: "आरम्भ से पहले नौ दिन, प्रथम-अन्तिम दिन या कुल-मान्य छोटा क्रम चुनें। नौ पूर्ण उपवास का संकल्प तभी लें जब आपने वही रूप चुना हो।" },
       { en: "Install the kalasha only in the displayed Ghatasthapana window and only if someone can care for the shrine safely. A simple image-and-lamp practice is valid.", hi: "कलश केवल दिखाए घटस्थापना समय में और तभी स्थापित करें जब सुरक्षित देखभाल हो; चित्र और दीप की सरल पूजा भी मान्य।" },
       { en: "Each day worship the displayed Navadurga form, offer suitable prasad, chant or read a familiar Devi text. Keep diet and conduct satvik.", hi: "प्रतिदिन दिखाए नवदुर्गा रूप की पूजा, उचित प्रसाद, परिचित देवी-पाठ/जप; आहार-आचरण सात्त्विक रखें।" },
       { en: "Perform Kanya Puja only if customary, with consent, dignity, equal welcome and no pressure on children. Conclude according to the selected Ashtami/Navami/Dashami tradition.", hi: "कन्या-पूजन कुल में हो तो सहमति, सम्मान, समान स्वागत और बच्चों पर बिना दबाव; चुनी अष्टमी/नवमी/दशमी परम्परा अनुसार समापन।" },
@@ -3762,8 +3763,8 @@ const VRAT_VIDHI = {
       hi: "दीप, गणेश, कलश/देवी-चित्र, दैनिक देवी-नाम, जल, फूल, परम्परानुसार कुमकुम, फल/मिष्ठान्न, पाठ/जप, आरती। तांत्रिक मन्त्र, न्यास, बलि या होम को नए व्यक्ति की स्वयं-विधि न बनाएँ।",
     },
     paran: {
-      en: "Valid customs differ. Formal nine-day paran is after Navami ends; many North-Indian households break after Ashtami or Navami Kanya Puja. Show the chosen option and exact local window. Break gently, not with a large fried meal.",
-      hi: "मान्य मत अलग हैं। औपचारिक नौ-दिवसीय पारण नवमी समाप्ति बाद; कई उत्तर भारतीय घर अष्टमी/नवमी कन्या-पूजन बाद खोलते हैं। चुना विकल्प और स्थानीय समय दिखाएँ; भारी तला भोजन नहीं, धीरे खोलें।",
+      en: "Valid customs differ. Formal nine-day paran is after Navami ends; many North-Indian households break after Ashtami or Navami Kanya Puja. Follow the local time for your chosen custom, and break gently rather than with a large fried meal.",
+      hi: "मान्य मत अलग हैं। औपचारिक नौ-दिवसीय पारण नवमी समाप्ति के बाद होता है; कई उत्तर भारतीय घर अष्टमी या नवमी कन्या-पूजन के बाद खोलते हैं। अपनी चुनी परम्परा का स्थानीय समय मानें और भारी तले भोजन के बजाय धीरे व्रत खोलें।",
     },
     udyapan: {
       en: "The concluding Kanya Puja/homa/kalasha visarjana varies by the original sankalpa. A simple observer completes prayer, distributes prasad and respectfully concludes the kalasha; elaborate homa requires guidance.",
@@ -3791,12 +3792,12 @@ const VRAT_VIDHI = {
       hi: "गणेश स्मरण; शिव, पार्वती/गौरी, कार्तिकेय, गणेश; जल-भरा करवा, दीप, रोली/अक्षत, फूल, फल/मिष्ठान्न; कुलानुसार कथा और थाली फेरना; चन्द्र-अर्घ्य।",
     },
     paran: {
-      en: "After actual local moonrise, moon sighting/prayer and arghya. Clouded sky: use the app's verified moonrise plus family practice; do not wait in a way that endangers health. Begin with water, then prasad/light food.",
-      hi: "वास्तविक स्थानीय चन्द्रोदय, दर्शन/प्रार्थना और अर्घ्य बाद। बादल हों तो ऐप का सत्यापित चन्द्रोदय और कुल-नियम; स्वास्थ्य संकट तक प्रतीक्षा नहीं। पहले जल, फिर प्रसाद/हल्का भोजन।",
+      en: "Break after local moonrise, moon sighting or prayer, and arghya. If clouds hide the moon, use the verified moonrise shown above and your family practice; do not wait in a way that endangers health. Begin with water, then prasad or light food.",
+      hi: "स्थानीय चन्द्रोदय, चन्द्र-दर्शन या प्रार्थना और अर्घ्य के बाद व्रत खोलें। बादल हों तो ऊपर दिखाया सत्यापित चन्द्रोदय और कुल-नियम मानें; स्वास्थ्य संकट तक प्रतीक्षा न करें। पहले जल, फिर प्रसाद या हल्का भोजन लें।",
     },
     udyapan: {
-      en: "There is no single pan-Indian year count. If the observer made a numbered vow, conclude with the family's elder/priest; do not invent “11/13 years” as a universal app rule.",
-      hi: "पूरे भारत में एक वर्ष-संख्या नहीं। गिनती का संकल्प हो तो कुल की बड़ी महिला/पुरोहित के अनुसार पूर्ण करें; “11/13 वर्ष” को सार्वभौमिक न बताएँ।",
+      en: "There is no single pan-Indian year count. If you made a numbered vow, conclude it with guidance from a family elder or priest rather than assuming that 11 or 13 years applies to everyone.",
+      hi: "पूरे भारत में एक ही वर्ष-संख्या नहीं है। गिनती का संकल्प हो तो कुल की बड़ी महिला या पुरोहित के मार्गदर्शन में पूर्ण करें; 11 या 13 वर्ष का नियम सब पर लागू न मानें।",
     },
   },
   ahoiAshtami: {
@@ -3808,8 +3809,8 @@ const VRAT_VIDHI = {
       { en: "Bathe and state whether family paran is by stars or moon; draw/place an Ahoi Mata image and, where customary, Sei/Syau; prepare a water pot; in the evening worship, hear the katha and perform aarti; offer arghya to stars or moon, then break.", hi: "स्नान कर संकल्प में स्पष्ट करें कि कुल में पारण तारे या चन्द्र से; अहोई माता का चित्र और परम्परानुसार सेई/स्याऊ रखें; जल-कलश; शाम पूजा, कथा, आरती; तारों या चन्द्र को अर्घ्य देकर खोलें।" },
     ],
     diet: {
-      en: "Traditional strict form is often nirjala. A health-modified level must be selected before the fast. This is not restricted in meaning to sons; Ganak copy should say all children.",
-      hi: "कठोर पारम्परिक रूप प्रायः निर्जला; स्वास्थ्य-संशोधित स्तर पहले चुनें। अर्थ केवल पुत्र तक सीमित नहीं; गणक “सभी बच्चे” कहे।",
+      en: "The traditional strict form is often nirjala. Choose a health-modified level before the fast if needed. The prayer is for the wellbeing of all children, not only sons.",
+      hi: "कठोर पारम्परिक रूप प्रायः निर्जला है। आवश्यकता हो तो व्रत से पहले स्वास्थ्य-संशोधित स्तर चुनें। प्रार्थना सभी बच्चों के कल्याण के लिए है, केवल पुत्रों के लिए नहीं।",
     },
     sankalpa: {
       en: "“I observe Ahoi Ashtami with gratitude and prayer for the health, safety and good character of all children in my care.”",
@@ -3820,8 +3821,8 @@ const VRAT_VIDHI = {
       hi: "अहोई चित्र, जल-कलश/करवा, रोली, अक्षत, दूध, हलवा और परम्परानुसार सेई के लिए सात तिनके; कथा, आरती, तारा/चन्द्र अर्घ्य। चाँदी का स्याऊ सामुदायिक विकल्प है, अनिवार्य नहीं।",
     },
     paran: {
-      en: "Primary sourced form: after stars appear at twilight. Variant: after moonrise. The app must ask/show the selected family rule because moonrise can be much later.",
-      hi: "मुख्य स्रोत-विधि: संध्या में तारे दिखने बाद। विकल्प: चन्द्रोदय बाद। चन्द्र बहुत देर से निकल सकता है, इसलिए ऐप चुना कुल-नियम स्पष्ट दिखाए।",
+      en: "Most families break after the stars appear at twilight; some wait until moonrise. Follow your family rule, keeping in mind that moonrise can be much later.",
+      hi: "अधिकांश परिवार संध्या में तारे दिखने के बाद व्रत खोलते हैं; कुछ चन्द्रोदय तक प्रतीक्षा करते हैं। अपना कुल-नियम मानें, क्योंकि चन्द्रोदय काफी देर से हो सकता है।",
     },
     udyapan: {
       en: "No universal requirement. Conclude only a specifically numbered family vow under that family's procedure.",
@@ -3830,8 +3831,8 @@ const VRAT_VIDHI = {
   },
   hartalikaTeej: {
     verdict: {
-      en: "Worship Shiva and Parvati in the displayed early-morning Hartalika window; some regions use Pradosh if morning puja is impossible. The widely practised nirjala form must remain an optional strict level.",
-      hi: "ऐप के प्रातः हरतालिका समय में शिव-पार्वती पूजा; कुछ क्षेत्रों में प्रातः सम्भव न हो तो प्रदोष विकल्प। प्रचलित निर्जला रूप को कठोर वैकल्पिक स्तर ही रखें।",
+      en: "Worship Shiva and Parvati in the early-morning Hartalika time shown above; some regions use Pradosh if morning puja is impossible. Nirjala is a widely practised but optional strict form.",
+      hi: "ऊपर दिखाए प्रातः हरतालिका समय में शिव-पार्वती पूजा करें; कुछ क्षेत्रों में प्रातः सम्भव न हो तो प्रदोष विकल्प है। निर्जला प्रचलित लेकिन वैकल्पिक कठोर रूप है।",
     },
     vidhi: [
       { en: "Bathe, dress cleanly and take sankalpa; make or place simple clay/sand Shiva-Parvati forms; worship Ganesha first, then Uma-Maheshwara; hear the Hartalika katha; where customary continue bhajan/vigil and conclude next morning.", hi: "स्नान, स्वच्छ वस्त्र, संकल्प; मिट्टी/बालू के सरल शिव-पार्वती रूप; पहले गणेश, फिर उमा-महेश्वर पूजा; हरतालिका कथा; परम्परानुसार भजन/जागरण और अगली सुबह समापन।" },
@@ -3849,12 +3850,12 @@ const VRAT_VIDHI = {
       hi: "गणेश; शिव-पार्वती; जल, कुलानुसार चन्दन, हल्दी/कुमकुम, फूल, शिव को बिल्व, फल/मिष्ठान्न; षोडशोपचार केवल जानकार के लिए; कथा और आरती।",
     },
     paran: {
-      en: "Regional sources commonly conclude the next morning after bath and final prayer/prasad. Exact food and whether a vigil is required vary; show family practice and never infer it solely from the date.",
-      hi: "सामान्य क्षेत्रीय स्रोत अगली सुबह स्नान, अन्तिम पूजा/प्रसाद बाद खोलते हैं। भोजन और जागरण बदलते हैं; कुल-परम्परा दिखाएँ, केवल तिथि से अनुमान न करें।",
+      en: "Common regional practice concludes the next morning after bathing and final prayer or prasad. Exact food and whether a vigil is required vary, so follow your family practice rather than the date alone.",
+      hi: "सामान्य क्षेत्रीय परम्परा में अगली सुबह स्नान और अन्तिम पूजा या प्रसाद के बाद व्रत खुलता है। भोजन और जागरण के नियम बदलते हैं, इसलिए केवल तिथि नहीं, अपनी कुल-परम्परा मानें।",
     },
     udyapan: {
-      en: "No reliable universal year count found. Numbered vows need Vratraj/family-priest guidance; do not ship unsourced internet counts.",
-      hi: "विश्वसनीय सार्वभौमिक वर्ष-संख्या नहीं मिली। गिनती वाले संकल्प में व्रतराज/कुल-पुरोहित मार्गदर्शन; बिना स्रोत इंटरनेट संख्या न दें।",
+      en: "There is no reliable universal year count. If you made a numbered vow, conclude it with guidance from your family priest or the Vratraj tradition you followed.",
+      hi: "कोई विश्वसनीय सार्वभौमिक वर्ष-संख्या नहीं है। गिनती वाला संकल्प लिया हो तो अपनी अपनाई व्रतराज परम्परा या कुल-पुरोहित के मार्गदर्शन में पूर्ण करें।",
     },
   },
   sheetlaAshtami: {
@@ -3863,7 +3864,7 @@ const VRAT_VIDHI = {
       hi: "पारम्परिक भोग पिछले दिन बनाएँ, सुरक्षित ठंडा कर फ्रिज में रखें, फिर शीतला अष्टमी पर ठंडा भोग/प्रसाद लें। “ठंडा भोजन” का अर्थ रातभर कमरे में पड़ा नाशवान भोजन नहीं।",
     },
     vidhi: [
-      { en: "On Saptami, cook the family dishes and store safely; on Ashtami, do not light the stove where that is the family custom; bathe, worship Sheetala Mata during the displayed day window, offer the safely stored food and receive it as prasad.", hi: "सप्तमी को कुल के व्यंजन बनाकर सुरक्षित रखें; कुल-परम्परा हो तो अष्टमी चूल्हा न जलाएँ; स्नान, दिखाए दिन-समय में शीतला माता पूजा, सुरक्षित रखा भोग चढ़ाकर प्रसाद लें।" },
+      { en: "On Saptami, cook the family dishes and store them safely; on Ashtami, do not light the stove where that is the family custom; bathe, worship Sheetala Mata in the daytime, offer the safely stored food and receive it as prasad.", hi: "सप्तमी को कुल के व्यंजन बनाकर सुरक्षित रखें; कुल-परम्परा हो तो अष्टमी चूल्हा न जलाएँ; स्नान कर दिन में शीतला माता की पूजा करें, सुरक्षित रखा भोग चढ़ाकर प्रसाद लें।" },
     ],
     diet: {
       en: "Regional offerings include puri/pua, curd dishes, rice, jaggery, buttermilk, bajra roti/khichdi or kheer. Follow food-safety rules: refrigerate perishables within two hours (one hour in heat above 32°C); cooked rice should be cooled especially quickly; discard unsafe food.",
@@ -3888,15 +3889,15 @@ const VRAT_VIDHI = {
   },
   ganeshChaturthi: {
     verdict: {
-      en: "Worship Ganesha in the displayed local Madhyahna (midday) window. Home installation is optional; an already worshipped household murti is not treated as a new temporary idol and is not immersed.",
-      hi: "ऐप के स्थानीय मध्याह्न समय में गणेश-पूजा। घर में नई स्थापना वैकल्पिक; नित्य-पूजित गृह-मूर्ति को नई अस्थायी प्रतिमा मानकर विसर्जित नहीं किया जाता।",
+      en: "Worship Ganesha in the local Madhyahna (midday) time shown above. Home installation is optional; an already worshipped household murti is not treated as a new temporary idol and is not immersed.",
+      hi: "ऊपर दिखाए स्थानीय मध्याह्न समय में गणेश-पूजा करें। घर में नई स्थापना वैकल्पिक है; नित्य-पूजित गृह-मूर्ति को नई अस्थायी प्रतिमा मानकर विसर्जित नहीं किया जाता।",
     },
     vidhi: [
       { en: "Bathe, take sankalpa and chosen fast; light lamp; for a new clay murti perform invocation only if the family knows the installation/visarjana sequence; otherwise worship the existing image; perform Madhyahna puja, aarti and share prasad.", hi: "स्नान, संकल्प और चुना व्रत; दीप; नई मिट्टी प्रतिमा हो तो स्थापना-विसर्जन क्रम जानने पर ही आवाहन, अन्यथा स्थापित चित्र/मूर्ति पूजा; मध्याह्न पूजा, आरती, प्रसाद।" },
     ],
     diet: {
-      en: "A day-long fast is documented, but detailed menus vary. Choose phalahar or one satvik meal; avoid claiming that every Ganesh Chaturthi observer must be nirjala. Modak is naivedya/prasad, not automatically fasting food.",
-      hi: "दिनभर व्रत का उल्लेख है, पर आहार बदलता है। फलाहार या एक सात्त्विक भोजन चुनें; सबको निर्जला न बताएँ। मोदक भोग/प्रसाद है, स्वतः व्रत-आहार नहीं।",
+      en: "Detailed menus vary. Choose phalahar or one satvik meal; nirjala is not required for every Ganesh Chaturthi observer. Modak is naivedya or prasad, not automatically fasting food.",
+      hi: "आहार-विधि बदलती है। फलाहार या एक सात्त्विक भोजन चुनें; हर गणेश चतुर्थी व्रती के लिए निर्जला आवश्यक नहीं। मोदक भोग या प्रसाद है, स्वतः व्रत-आहार नहीं।",
     },
     sankalpa: {
       en: "“I worship Shri Ganesha, seeking clear understanding, humility and perseverance before beginning important work.”",
@@ -3907,8 +3908,8 @@ const VRAT_VIDHI = {
       hi: "गणेश ध्यान; उपयुक्त जल/स्वागत; चन्दन, फूल, दूर्वा, फल, मोदक; परिचित गणेश-नाम; आरती। षोडशोपचार वैकल्पिक।",
     },
     paran: {
-      en: "Sources reviewed establish day-long fasting and Madhyahna puja but not one universal paran moment. Safe app copy: break after the day's principal puja according to family practice; if a local tradition waits until moonrise or another rite, show that selected variant.",
-      hi: "स्रोत दिनभर व्रत और मध्याह्न पूजा बताते हैं, एक सार्वभौमिक पारण नहीं। ऐप: मुख्य पूजा बाद कुलानुसार खोलें; कुल चन्द्रोदय या अन्य कर्म तक रखे तो वही चुना रूप दिखाएँ।",
+      en: "There is no single universal paran time. Most observers break after the day's main puja according to family practice; if your tradition waits until moonrise or another rite, follow that rule.",
+      hi: "एक सार्वभौमिक पारण समय नहीं है। अधिकांश लोग मुख्य पूजा के बाद कुलानुसार व्रत खोलते हैं; आपकी परम्परा चन्द्रोदय या किसी अन्य कर्म तक प्रतीक्षा करती हो तो वही नियम मानें।",
     },
     udyapan: {
       en: "Not applicable to a single annual fast. Temporary-idol visarjana is a festival conclusion, not vrat udyapan.",
@@ -3917,11 +3918,11 @@ const VRAT_VIDHI = {
   },
   janmashtami: {
     verdict: {
-      en: "Fast during the day and worship Bal Krishna in the app's local Nishita (midnight) window. Smarta and ISKCON/Vaishnava dates and paran can differ; never combine them silently.",
-      hi: "दिन व्रत और ऐप के स्थानीय निषीथ में बालकृष्ण पूजा। स्मार्त और इस्कॉन/वैष्णव दिन-पारण अलग हो सकते हैं; चुपचाप न मिलाएँ।",
+      en: "Fast during the day and worship Bal Krishna in the local Nishita (midnight) time. Smarta and ISKCON/Vaishnava dates and paran can differ, so follow one tradition consistently.",
+      hi: "दिन में व्रत रखें और स्थानीय निषीथ (मध्यरात्रि) में बालकृष्ण की पूजा करें। स्मार्त और इस्कॉन/वैष्णव तिथि व पारण अलग हो सकते हैं, इसलिए एक ही परम्परा लगातार मानें।",
     },
     vidhi: [
-      { en: "Select tradition and fasting level first; bathe and take sankalpa; spend the day in Krishna remembrance; prepare the cradle/image and milk-based/fruit offerings; at Nishita worship Bal Krishna and celebrate the birth; perform aarti; paran by the selected rule.", hi: "पहले परम्परा और व्रत-स्तर; स्नान-संकल्प; दिन कृष्ण-स्मरण; झूला/चित्र और दुग्ध/फल भोग; निषीथ में बालकृष्ण पूजा और जन्म-उत्सव; आरती; चुने नियम से पारण।" },
+      { en: "Choose your tradition and fasting level first; bathe and take sankalpa; spend the day in Krishna remembrance; prepare the cradle or image and milk-based or fruit offerings; at Nishita worship Bal Krishna, celebrate the birth and perform aarti; break the fast according to the same tradition.", hi: "पहले अपनी परम्परा और व्रत-स्तर चुनें; स्नान-संकल्प करें; दिन कृष्ण-स्मरण में बिताएँ; झूला या चित्र और दुग्ध या फल भोग तैयार करें; निषीथ में बालकृष्ण पूजा, जन्म-उत्सव और आरती करें; उसी परम्परा के अनुसार पारण करें।" },
     ],
     diet: {
       en: "Full fast or non-grain phalahar is common. ISKCON Bangalore's manual breaks at midnight with non-grain fruit/root/milk prasad; grain may remain restricted until the next prescribed paran in stricter Vaishnava practice.",
@@ -3936,19 +3937,19 @@ const VRAT_VIDHI = {
       hi: "बालकृष्ण चित्र/मूर्ति; ध्यान; केवल उपयुक्त मूर्ति का स्नान; वस्त्र, चन्दन, फूल, तुलसी, माखन-मिश्री, फल, दुग्ध-मिष्ठान्न; नाम/भजन; जन्म-आरती। परम्परानुसार नन्द, यशोदा, बलराम, सुभद्रा स्मरण।",
     },
     paran: {
-      en: "Ganak must show three labels, not one blended time: (1) Dharma-shastra—after Ashtami and Rohini obligations end as calculated; (2) alternate next-sunrise after morning deity rites; (3) common modern/ISKCON practice—after Nishita celebration, usually non-grain prasad. Follow selected tradition.",
-      hi: "गणक तीन अलग लेबल दिखाए: (1) धर्मशास्त्र—गणना अनुसार अष्टमी/रोहिणी नियम बाद; (2) वैकल्पिक अगली सुबह देव-पूजा बाद; (3) आधुनिक/इस्कॉन—निषीथ उत्सव बाद, सामान्यतः अन्न-रहित प्रसाद।",
+      en: "When to break the fast depends on your tradition. Smarta observers wait until the required Ashtami (eighth lunar day) and Rohini (Krishna's birth star) conditions are complete. Some families wait until the next morning's worship. In common ISKCON practice, non-grain prasad may be taken after the midnight celebration, while grains remain restricted until the temple or Panchang paran time. Use the same tradition for both the Janmashtami date and paran.",
+      hi: "व्रत कब खोलना है, यह आपकी परम्परा पर निर्भर है। स्मार्त परम्परा में अष्टमी तिथि (आठवाँ चन्द्र दिवस) और रोहिणी नक्षत्र (कृष्ण का जन्म नक्षत्र) के आवश्यक नियम पूरे होने के बाद पारण होता है। कुछ परिवार अगली सुबह की पूजा तक प्रतीक्षा करते हैं। सामान्य इस्कॉन परम्परा में मध्यरात्रि उत्सव के बाद अन्न-रहित प्रसाद लिया जा सकता है, पर धान्य मंदिर या पंचांग के पारण समय तक वर्जित रहता है। जन्माष्टमी की तिथि और पारण के लिए एक ही परम्परा मानें।",
     },
     udyapan: {
       en: "None for the annual fast.",
       hi: "वार्षिक व्रत में नहीं।",
     },
   },
-  // TODO: source — Chhath is not yet a calendar festival key in this app; data ready for when it is wired.
+  // TODO: source — Chhath has no calendar festival key yet; data is ready for later wiring.
   chhath: {
     verdict: {
-      en: "Chhath is one connected four-day Surya observance: Nahay Khay, Kharna, evening arghya, then dawn arghya and paran. Do not display only the Shashthi sunset as if it were a one-day fast.",
-      hi: "छठ एक जुड़ा चार-दिवसीय सूर्य-अनुष्ठान है—नहाय-खाय, खरना, सन्ध्या अर्घ्य, फिर उषा अर्घ्य और पारण। केवल षष्ठी सूर्यास्त को एक-दिवसीय व्रत की तरह न दिखाएँ।",
+      en: "Chhath is one connected four-day Surya observance: Nahay Khay, Kharna, evening arghya, then dawn arghya and paran. The Shashthi sunset is one stage, not the whole fast.",
+      hi: "छठ एक जुड़ा चार-दिवसीय सूर्य-अनुष्ठान है—नहाय-खाय, खरना, सन्ध्या अर्घ्य, फिर उषा अर्घ्य और पारण। षष्ठी का सूर्यास्त एक चरण है, पूरा व्रत नहीं।",
     },
     vidhi: [
       { en: "Day 1 — Nahay Khay: Bathe; clean the kitchen and preparation area; the vratin takes one carefully prepared satvik meal. River bathing is optional and only at a legally accessible, safe location.", hi: "दिन 1 — नहाय-खाय: स्नान, रसोई और तैयारी-स्थान की शुद्धि; व्रती एक सावधानी से बना सात्त्विक भोजन। नदी-स्नान वैकल्पिक, केवल कानूनी और सुरक्षित स्थान पर।" },
@@ -3957,16 +3958,16 @@ const VRAT_VIDHI = {
       { en: "Day 4 — Usha Arghya and paran: Before local sunrise assemble safely; offer arghya to the rising Sun; pray, receive prasad and break the fast.", hi: "दिन 4 — उषा अर्घ्य और पारण: स्थानीय सूर्योदय से पहले सुरक्षित एकत्र हों; उदय सूर्य को अर्घ्य; प्रार्थना, प्रसाद और पारण।" },
     ],
     diet: {
-      en: "This is among the strictest observances; Ganak must lead with the medical warning and allow a supported/modified observance. Family rules often exclude onion, garlic, ordinary salt and processed/contaminated foods, but exact ingredients and kitchen purity are lineage-specific.",
-      hi: "यह अत्यन्त कठोर व्रतों में है; गणक पहले स्वास्थ्य चेतावनी और सहायक/संशोधित विकल्प दे। प्याज, लहसुन, साधारण नमक, प्रसंस्कृत/मिश्रित भोजन प्रायः छोड़े जाते हैं, पर सामग्री और रसोई-शुद्धि कुलानुसार।",
+      en: "This is among the strictest observances, so read the health note above and choose a supported or modified form if needed. Family rules often exclude onion, garlic, ordinary salt and processed or contaminated foods, but exact ingredients and kitchen purity are lineage-specific.",
+      hi: "यह अत्यन्त कठोर व्रतों में है, इसलिए ऊपर की स्वास्थ्य टिप्पणी पढ़ें और आवश्यकता हो तो सहायक या संशोधित रूप चुनें। प्याज, लहसुन, साधारण नमक और प्रसंस्कृत या मिश्रित भोजन प्रायः छोड़े जाते हैं, पर सामग्री और रसोई-शुद्धि कुलानुसार बदलती है।",
     },
     sankalpa: {
       en: "“Across these four days I honour Surya and Chhathi Maiya with gratitude for life, health and family. May I complete only the level safe for my body and keep every riverbank and public place clean.”",
       hi: "“इन चार दिनों में मैं जीवन, स्वास्थ्य और परिवार के लिए सूर्य और छठी मैया का कृतज्ञ पूजन करती/करता हूँ। शरीर के लिए सुरक्षित स्तर ही पूरा करूँ और हर घाट व सार्वजनिक स्थान स्वच्छ रखूँ।”",
     },
     puja: {
-      en: "Arghya water, seasonal fruit, sugarcane and family-prepared prasad such as thekua/kheer according to tradition; lamps only where fire rules and crowd safety allow. Ganak should never direct users into deep, polluted or restricted water.",
-      hi: "अर्घ्य-जल, मौसमी फल, गन्ना, कुलानुसार ठेकुआ/खीर प्रसाद; दीप केवल अग्नि और भीड़-सुरक्षा अनुसार। गहरे, प्रदूषित या निषिद्ध जल में जाने का निर्देश नहीं।",
+      en: "Use arghya water, seasonal fruit, sugarcane and family-prepared prasad such as thekua or kheer according to tradition; use lamps only where fire rules and crowd safety allow. Never enter deep, polluted or restricted water.",
+      hi: "अर्घ्य-जल, मौसमी फल, गन्ना और कुलानुसार ठेकुआ या खीर प्रसाद रखें; दीप केवल अग्नि और भीड़-सुरक्षा के अनुसार जलाएँ। गहरे, प्रदूषित या निषिद्ध जल में न जाएँ।",
     },
     paran: {
       en: "Only after Usha Arghya on day 4, with prasad and fluid first. Kharna on day 2 is an intermediate ritual meal, not the final paran.",
@@ -7098,3 +7099,16 @@ export default function KundliApp() {
     </div>
   );
 }
+
+/* Named exports for the validation harnesses (validation/_load-app.cjs bundles this
+   module and reads them). Kept as one explicit list so the gates never depend on
+   flat-file scope — which is what lets src/ be split into modules safely. */
+export {
+  scanPanchangCalendar,
+  FEST_NAME,
+  ayyappaMandalaFor,
+  muhuratScanRange,
+  muhuratForDate,
+  muhuratShuddhi,
+  MUHURTA_RULES,
+};

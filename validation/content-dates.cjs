@@ -2,14 +2,10 @@
 // Computes Tier-1 festival dates and fails when a sourced regression anchor
 // moves. The longer listing remains useful for human review of new coverage.
 'use strict';
-const fs = require('fs');
-const path = require('path');
-const ts = require('typescript');
-const src = fs.readFileSync(path.join(__dirname, '..', 'src/kundli-app.tsx'), 'utf8');
-const out = ts.transpileModule(src, { compilerOptions: { jsx: ts.JsxEmit.React, module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true } }).outputText;
-const tmp = path.join(__dirname, '.content-dates.tmp.cjs');
-fs.writeFileSync(tmp, out + '\nmodule.exports.__t = { scanPanchangCalendar, FEST_NAME, ayyappaMandalaFor };\n');
-let app; try { app = require(tmp).__t; } finally { fs.unlinkSync(tmp); }
+// Loads the app via esbuild bundling so this gate keeps working once src/ is
+// split into modules (see validation/_load-app.cjs).
+const { loadApp } = require('./_load-app.cjs');
+const app = loadApp();
 
 // scan Jan 1 2026 → ~14 months, IST
 const IST = 5.5;

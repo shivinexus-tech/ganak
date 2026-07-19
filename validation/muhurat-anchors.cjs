@@ -15,19 +15,10 @@
 // (most arise when the qualifying nakshatra starts after sunrise).
 // ============================================================================
 'use strict';
-const fs = require('fs');
-const path = require('path');
-const ts = require('typescript');
-
-const ROOT = path.resolve(__dirname, '..');
-const src = fs.readFileSync(path.join(ROOT, 'src/kundli-app.tsx'), 'utf8');
-const out = ts.transpileModule(src, {
-  compilerOptions: { jsx: ts.JsxEmit.React, module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true },
-}).outputText;
-const tmp = path.join(__dirname, '.app-transpiled.tmp.cjs');
-fs.writeFileSync(tmp, out + '\nmodule.exports.__muh = { muhuratScanRange, muhuratForDate, muhuratShuddhi, MUHURTA_RULES };\n');
-let app;
-try { app = require(tmp).__muh; } finally { fs.unlinkSync(tmp); }
+// Loads the app via esbuild bundling so this gate keeps working once src/ is
+// split into modules (see validation/_load-app.cjs).
+const { loadApp, ROOT } = require('./_load-app.cjs');
+const app = loadApp();
 
 const DELHI = { label: 'New Delhi', lat: 28.6139, lon: 77.209, zone: 'Asia/Kolkata' };
 const D = (m, d) => `2026-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;

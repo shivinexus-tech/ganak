@@ -9,7 +9,8 @@
 //   2. No duplicate top-level definitions (the recurring failure mode)
 //   3. No orphaned references             (used but never defined/imported)
 //   4. No localStorage / sessionStorage   (standing architectural constraint)
-//   5. cutBlock registration              (every component before `export
+//   5. No internal notes in vrat copy      (research instructions stay in plans)
+//   6. cutBlock registration              (every component before `export
 //      default` appears in validation/build-engine.js, if that file exists)
 //
 // Requires: npm i -D typescript
@@ -148,7 +149,31 @@ src.split('\n').forEach((ln, i) => {
     failures.push(`STORAGE  line ${i + 1}: browser storage is banned in this project`);
 });
 
-// ------------------------------------------------- 5. CUTBLOCK REGISTRATION
+// ---------------------------------------- 5. NO INTERNAL NOTES IN VRAT COPY
+{
+  const start = src.indexOf('const VRAT_VIDHI_SAFETY');
+  const end = src.indexOf('/* upcoming-occurrence search', start);
+  if (start >= 0 && end > start) {
+    const copy = src.slice(start, end);
+    const forbidden = [
+      { re: /\bGanak\b/i, label: 'product/editorial instruction' },
+      { re: /\b(?:the\s+)?app(?:\x27s)?\b/i, label: 'app/editorial instruction' },
+      { re: /\bSafe app copy\b/i, label: 'copywriting instruction' },
+      { re: /\bSources reviewed\b/i, label: 'research note' },
+      { re: /\bdo not ship\b/i, label: 'release instruction' },
+      { re: /\bas calculated\b/i, label: 'unresolved calculation placeholder' },
+      { re: /गणक|ऐप/, label: 'product/editorial instruction in Hindi' },
+    ];
+    for (const { re, label } of forbidden) {
+      const match = re.exec(copy);
+      if (!match) continue;
+      const line = src.slice(0, start + match.index).split('\n').length;
+      failures.push(`USER_COPY  line ${line}: ${label} leaked into displayed vrat guidance`);
+    }
+  }
+}
+
+// ------------------------------------------------- 6. CUTBLOCK REGISTRATION
 const engine = path.join(path.dirname(target), 'validation', 'build-engine.js');
 const engineAlt = path.join(process.cwd(), 'validation', 'build-engine.js');
 const enginePath = fs.existsSync(engine) ? engine : fs.existsSync(engineAlt) ? engineAlt : null;
@@ -168,4 +193,4 @@ if (failures.length) {
   console.error('');
   process.exit(1);
 }
-console.log(`✓ parse-check clean: ${target}  (syntax, no duplicates, no orphans, no browser storage${enginePath ? ', cutBlock registered' : ''})`);
+console.log(`✓ parse-check clean: ${target}  (syntax, no duplicates, no orphans, no browser storage, no internal vrat notes${enginePath ? ', cutBlock registered' : ''})`);
