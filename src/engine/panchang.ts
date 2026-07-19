@@ -274,7 +274,11 @@ function setAyanMode(ayanamsa) {
   AYAN_MODE = ayanamsa;
 }
 
+// Sign lords (zodiac rulers) — shared by chart, hora and muhurat code.
+const SIGN_LORD = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
+
 export {
+  SIGN_LORD,
   SIGNS, NAKSHATRAS, YOGAS, TITHIS, KARANAS_MOV, karanaName, PLANET_DEVA,
   sunEvents, moonEvents, RAHU_SEGMENT, YAMA_SEGMENT, GULIKA_SEGMENT,
   setAyanMode, ayanAt, sunSidMs, moonSidMs, elongMs, lunYogaMs, planetSidMs,

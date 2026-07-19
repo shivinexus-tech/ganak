@@ -39,7 +39,7 @@ Status: `MERGED` (extracted + integrated) · `Partial` (engine/data out, UI not)
 | 4 | **Chart** | `src/screens/ChartScreen.tsx` + chart components | ❌ TBD | Waiting | After Daily slice |
 | 5 | **Matching** | `src/features/matching/*` | ❌ TBD | Waiting | After Chart slice |
 | 6 | **Prashna** | `src/screens/PrashnaScreen.tsx` ✅ (487 lines) | ✅ | **MERGED** | ✅ **Open now** — any agent, exclusive |
-| 7 | **Hora/Gochar** | `src/features/hora/*`, `src/features/gochar/*` | ❌ TBD | Waiting | After Daily slice |
+| 7 | **Hora/Gochar** | Engine: `src/engine/hora.ts` ✅<br>UI: `src/features/hora/*`, `src/features/gochar/*` ❌ TBD | Partial | **Hora engine reservable now** (SPLIT-UI-03a). UI waits for Daily slice |
 | 8 | **Jyotish tools** | `src/features/jyotish-tools/*` (KP, BNN, Bhrigu, rectification) | ❌ TBD | Waiting | Last UI slice |
 | 9 | **Validation** | `validation/*` | ✅ | Open | ✅ Reservable per-file (name the exact gate file) |
 | 10 | **Backend/deployment** | `server/*`, hosting/monitoring config | ✅ | Open | ✅ **Open now** — fully independent of `src/` |
@@ -48,11 +48,12 @@ Status: `MERGED` (extracted + integrated) · `Partial` (engine/data out, UI not)
 
 | File | Lines | Note |
 |---|---|---|
-| `src/kundli-app.tsx` | 4,787 | The shell. **Integration-owned.** Every UI slice shrinks it. |
+| `src/kundli-app.tsx` | 4,593 | The shell. **Integration-owned.** Every UI slice shrinks it. |
 | `src/engine/ephemeris.ts` | 319 | Astronomy. Guarded by parity + calc gates. |
 | `src/engine/panchang.ts` | 284 | Tithi/nakshatra/sunrise/ayanamsa. |
 | `src/engine/festivals.ts` | 356 | Festival + day-part selection. |
 | `src/engine/muhurat.ts` | 323 | Muhurat scoring/shuddhi. |
+| `src/engine/hora.ts` | 199 | Planetary hours + hora advisor. Extracted SPLIT-UI-03a. |
 | `src/components/tokens.ts` | 14 | Design tokens — **shared, integration-owned.** |
 | `src/components/format.ts` | 7 | `fmtDeg` — shared. |
 | `src/components/PlaceInput.tsx` | 72 | Shared place search UI. |
