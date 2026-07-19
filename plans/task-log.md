@@ -44,6 +44,7 @@ same file.
 | SPLIT-UI-JYOTISH-01f | MERGED | Cursor | `main` (modules only) | `src/engine/bhava.ts` | Bhava Chalit + Bhava Bala | Wire deferred. |
 | SPLIT-UI-CHART-01b | MERGED | Cursor | `main` (modules only) | `src/engine/houses.ts` | Placidus cusps | Wire deferred. |
 | SPLIT-UI-CHART-01c | MERGED | Cursor | `main` (modules only) | `src/data/chart-divisions.ts` | VARGAS + SPECIAL_CHARTS catalogs | Wire deferred. |
+| SPLIT-UI-CHART-02 | MERGED | Cursor | `main` (modules only) | `src/engine/kundli.ts` | `computeKundli` birth-chart engine | Smoke OK (Delhi sample). Shell wire still pending — Daily owns shell. |
 
 ## Ten-lane target ownership
 
