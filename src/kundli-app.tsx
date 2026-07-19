@@ -3506,6 +3506,124 @@ const FEST_META = {
   ayyappaMandalaBegins: { deity: { en: "Ayyappa", hi: "अय्यप्पा" }, gloss: { en: "Day 1 of the 41-day discipline before Sabarimala pilgrimage", hi: "सबरीमला यात्रा से पहले 41-दिवसीय अनुशासन का पहला दिन" }, rules: { en: "Mala and detailed observance should follow a Guru Swami or temple tradition", hi: "माला व विस्तृत नियम गुरु स्वामी या मंदिर परंपरा के अनुसार अपनाएँ" }, timing: null },
   ayyappaMandalaPuja: { deity: { en: "Ayyappa", hi: "अय्यप्पा" }, gloss: { en: "Day 41 — completion of Mandala Vratham and Mandala Pooja", hi: "41वाँ दिन — मंडल व्रतम पूर्ण व मंडल पूजा" }, rules: { en: "Completion rites follow the pilgrim's Guru Swami and temple tradition", hi: "समापन विधि गुरु स्वामी व मंदिर परंपरा के अनुसार होती है" }, timing: null },
 };
+
+/* Vrat vidhi content — sourced from plans/vrat-vidhis.md. Add more keys later; the card is reusable. */
+const VRAT_VIDHI_LABELS = {
+  hideHowTo: { en: "Hide observance steps", hi: "विधि छिपाएँ" },
+  showHowTo: { en: "Observance steps", hi: "व्रत की विधि" },
+  vidhi: { en: "Vidhi", hi: "विधि" },
+  diet: { en: "Diet rules", hi: "आहार नियम" },
+  avoid: { en: "Avoid", hi: "वर्जित" },
+  lighter: { en: "Lighter options", hi: "हल्के विकल्प" },
+  sankalpa: { en: "Sankalpa", hi: "संकल्प" },
+  puja: { en: "Puja steps", hi: "पूजा" },
+  paran: { en: "Paran", hi: "पारण" },
+  udyapan: { en: "Udyapan", hi: "उद्यापन" },
+  safety: { en: "Health note", hi: "स्वास्थ्य टिप्पणी" },
+};
+const VRAT_VIDHI_SAFETY = {
+  en: "Devotion is not measured by dehydration. Nirjala (no food or water) is a strict traditional option, never Ganak's default recommendation. Children, older people, anyone who is pregnant or breastfeeding, unwell, taking medicines, or living with diabetes, kidney disease or an eating disorder should use a modified observance and seek medical advice where relevant. Break the fast and seek help if you become faint, confused, severely weak, cannot keep fluids down, or have unsafe blood-sugar symptoms. Never stop or retime prescribed medicine on the app's advice.",
+  hi: "भक्ति का माप निर्जलीकरण नहीं है। निर्जला (बिना अन्न-जल) व्रत एक कठोर पारम्परिक विकल्प है, गणक की सामान्य सलाह नहीं। बच्चे, वृद्ध, गर्भवती या स्तनपान कराने वाली महिलाएँ, अस्वस्थ व्यक्ति, दवा लेने वाले, मधुमेह, गुर्दे की बीमारी या ईटिंग-डिसऑर्डर वाले लोग संशोधित व्रत रखें और आवश्यकता अनुसार चिकित्सकीय सलाह लें। चक्कर, भ्रम, अत्यधिक कमजोरी, पानी न रुकना या असुरक्षित रक्त-शर्करा लक्षण हों तो व्रत तोड़ें और सहायता लें। ऐप की सलाह पर दवा बन्द या उसका समय न बदलें।",
+};
+const VRAT_VIDHI = {
+  ekadashi: {
+    verdict: {
+      en: "A Vishnu fast from local sunrise on Ekadashi until the app's Dwadashi paran window. Avoid all grains and cereals even if you choose a lighter fast.",
+      hi: "स्थानीय सूर्योदय से एकादशी व्रत रखें और ऐप में दिए द्वादशी पारण समय में खोलें। हल्का व्रत रखने पर भी सभी अनाज और धान्य छोड़ें।",
+    },
+    vidhi: [
+      { en: "On Dashami, eat one simple satvik meal; avoid a late grain-heavy dinner.", hi: "दशमी को एक सरल सात्त्विक भोजन लें; देर रात भारी अन्न-भोजन न करें।" },
+      { en: "At Ekadashi sunrise, state the chosen fasting level and intention. Spend the day in Vishnu/Krishna/Rama remembrance, japa, reading and service.", hi: "एकादशी सूर्योदय पर व्रत का स्तर और भाव-संकल्प बोलें। दिन विष्णु/कृष्ण/राम स्मरण, जप, पाठ और सेवा में बिताएँ।" },
+      { en: "Worship Vishnu simply; offer Tulsi only where the household normally does so. Rest rather than treating a strict fast as an endurance test.", hi: "विष्णु की सरल पूजा करें; कुल-परम्परा हो तभी तुलसी चढ़ाएँ। कठोर व्रत को सहनशक्ति की परीक्षा न बनाएँ, आवश्यकता पर विश्राम करें।" },
+      { en: "On Dwadashi, complete morning worship and break only inside Ganak's location-specific paran window.", hi: "द्वादशी को प्रातः पूजा के बाद गणक के स्थान-विशिष्ट पारण समय में ही खोलें।" },
+    ],
+    dietAvoid: {
+      en: "all rice, wheat, millet, corn, barley, pulses and foods made from grains; ordinary table salt if the family uses only sendha namak for vrat.",
+      hi: "सभी चावल, गेहूँ, बाजरा, मक्का, जौ, दालें और अन्न-निर्मित पदार्थ; कुल-नियम हो तो साधारण नमक।",
+    },
+    dietLighter: {
+      en: "water; fruit and milk; or one phalahar meal such as potato/sweet potato, fruit, dairy, nuts and family-approved vrat foods. Sabudana, samak and other pseudo-grains vary by lineage.",
+      hi: "जल; फल-दूध; या आलू/शकरकंद, फल, दुग्ध, मेवे और कुल में मान्य व्रत-आहार। साबूदाना, सामक आदि पर मत अलग हैं।",
+    },
+    sankalpa: {
+      en: "“Today I observe Ekadashi in remembrance of Shri Vishnu. May I keep it with steadiness, compassion and purity, within my health.”",
+      hi: "“आज मैं श्रीविष्णु के स्मरण में एकादशी व्रत रखता/रखती हूँ। स्वास्थ्य की मर्यादा में इसे स्थिरता, करुणा और शुद्ध भाव से पूरा करूँ।”",
+    },
+    puja: {
+      en: "Bathe; light a lamp; remember Ganesha; worship Vishnu/Krishna/Rama with water, flowers, Tulsi where customary and grain-free naivedya; chant a familiar Vishnu name or read/listen to the named Ekadashi katha; aarti.",
+      hi: "स्नान, दीप, गणेश स्मरण; विष्णु/कृष्ण/राम को जल, फूल, परम्परानुसार तुलसी और अन्न-रहित भोग; परिचित विष्णु-नाम या उस एकादशी की कथा; आरती।",
+    },
+    paran: {
+      en: "Use the displayed Dwadashi window. Do not break during Harivasara (the protected first quarter of Dwadashi). Begin gently with water and prasad, then a satvik meal; do not postpone beyond Dwadashi unless the displayed rule says so. Smarta and Vaishnava dates can differ; use the selected tradition's date and paran.",
+      hi: "ऐप का द्वादशी पारण समय मानें। हरिवासर (द्वादशी का निषिद्ध आरम्भिक भाग) में न खोलें। जल-प्रसाद से धीरे खोलकर सात्त्विक भोजन लें। चुनी हुई स्मार्त या वैष्णव परम्परा का दिन और पारण ही मानें।",
+    },
+    udyapan: {
+      en: "Not needed after an occasional fast. A person concluding a long vowed series should arrange Vishnu-Lakshmi puja, havan, feeding/charity under a learned priest; scope follows means, not display.",
+      hi: "कभी-कभार व्रत के बाद उद्यापन नहीं। दीर्घ संकल्पित श्रृंखला पूरी करने पर विद्वान पुरोहित के निर्देशन में विष्णु-लक्ष्मी पूजा, हवन और सामर्थ्य अनुसार भोजन/दान करें।",
+    },
+  },
+  pradosh: {
+    verdict: {
+      en: "A twice-monthly Shiva observance chosen when Trayodashi overlaps the local evening Pradosh period; the essential act is Shiva and Nandi worship in that displayed window.",
+      hi: "मास में दो बार होने वाला शिव-व्रत, जिस दिन त्रयोदशी स्थानीय सायंकालीन प्रदोष से मिलती है; मुख्य कर्म ऐप में दिए समय में शिव और नन्दी की पूजा है।",
+    },
+    vidhi: [
+      { en: "Bathe in the morning and choose full fast, phalahar or one satvik meal.", hi: "प्रातः स्नान कर पूर्ण उपवास, फलाहार या एक सात्त्विक भोजन चुनें।" },
+      { en: "Keep the day quiet; repeat a familiar Shiva name. Bathe or wash before the evening puja.", hi: "दिन संयम से बिताएँ, परिचित शिव-नाम जपें; सायं पूजा से पहले स्नान या शुद्धि करें।" },
+      { en: "During the displayed Pradosh window, worship Shiva and Nandi; at a temple, join abhisheka, archana and aarti.", hi: "प्रदर्शित प्रदोष समय में शिव-नन्दी पूजन करें; मंदिर में अभिषेक, अर्चना और आरती में सम्मिलित हो सकते हैं।" },
+    ],
+    diet: {
+      en: "No single pan-Indian menu is established. Common household forms are water/fruit/milk through the day, or one salt-free/satvik meal. Follow the chosen family form.",
+      hi: "पूरे भारत में एक ही आहार-विधि नहीं। सामान्य विकल्प दिन भर जल/फल/दूध या एक नमक-रहित/सात्त्विक भोजन हैं; कुल-परम्परा मानें।",
+    },
+    sankalpa: {
+      en: "“I observe Pradosh in remembrance of Shiva and Parvati. May this evening bring steadiness, forgiveness and wise action.”",
+      hi: "“मैं शिव-पार्वती के स्मरण में प्रदोष व्रत रखता/रखती हूँ। यह संध्या मुझे स्थिरता, क्षमा और विवेकपूर्ण कर्म दे।”",
+    },
+    puja: {
+      en: "Lamp; Ganesha remembrance; Shiva-linga abhisheka with clean water (milk only if it can be used without waste); sandal/paste, flowers and bilva where available; Nandi namaskar; Shiva-Parvati prayer; aarti.",
+      hi: "दीप, गणेश स्मरण, शिवलिंग का स्वच्छ जल से अभिषेक (दूध केवल बिना अपव्यय), चन्दन, फूल, उपलब्ध हो तो बिल्व; नन्दी प्रणाम; शिव-पार्वती प्रार्थना; आरती।",
+    },
+    paran: {
+      en: "Break after the Pradosh puja with water/prasad and a light satvik meal. If it follows Ekadashi, the sourced strict convention permits symbolic Ekadashi paran with water before continuing Pradosh; health takes priority.",
+      hi: "प्रदोष पूजा के बाद जल/प्रसाद और हल्के सात्त्विक भोजन से खोलें। एकादशी के अगले दिन हो तो कठोर परम्परा में जल से प्रतीकात्मक एकादशी पारण कर प्रदोष जारी रखा जाता है; स्वास्थ्य प्रधान है।",
+    },
+    udyapan: {
+      en: "No universal requirement for ordinary monthly observance. A numbered vow should be concluded according to the original sankalpa with Shiva puja and charity under family guidance.",
+      hi: "सामान्य मासिक व्रत में सार्वभौमिक उद्यापन नहीं। गिनती का संकल्प हो तो उसी संकल्प के अनुसार शिव-पूजा और दान से कुल-मार्गदर्शन में पूर्ण करें।",
+    },
+  },
+  sankashti: {
+    verdict: {
+      en: "Ganesha fast from local sunrise until moonrise, on the day Chaturthi prevails at that location's moonrise.",
+      hi: "स्थानीय सूर्योदय से चन्द्रोदय तक गणेश-व्रत, उस दिन जब आपके स्थान पर चन्द्रोदय के समय चतुर्थी हो।",
+    },
+    vidhi: [
+      { en: "Bathe and take sankalpa after sunrise; keep a strict or phalahar fast; worship Ganesha in the evening; hear the month's Sankashti katha if your tradition uses it; after the app's moonrise, sight the moon if visible, offer water, pray, then break.", hi: "स्नान कर सूर्योदय बाद संकल्प लें; कठोर या फलाहार व्रत रखें; शाम को गणेश-पूजा और परम्परानुसार मास की कथा; ऐप के चन्द्रोदय बाद चन्द्र-दर्शन हो सके तो जल-अर्घ्य देकर प्रार्थना करें और व्रत खोलें।" },
+    ],
+    diet: {
+      en: "Fruit, roots and vegetable foods are the sourced lighter form; common foods include sabudana, potato and peanuts. Avoid ordinary grains/pulses and follow family salt rules.",
+      hi: "फल, कन्द और वनस्पति-आहार स्रोतों में हल्का विकल्प; साबूदाना, आलू और मूँगफली प्रचलित। सामान्य अन्न-दाल और कुलानुसार नमक छोड़ें।",
+    },
+    sankalpa: {
+      en: "“I observe Sankashti in remembrance of Shri Ganesha. May obstacles be met with patience, clarity and right effort.”",
+      hi: "“मैं श्रीगणेश के स्मरण में संकष्टी व्रत रखता/रखती हूँ। विघ्नों का सामना धैर्य, स्पष्टता और सही प्रयत्न से करूँ।”",
+    },
+    puja: {
+      en: "Lamp; Ganesha meditation; water/abhisheka where suitable; red or available flowers, durva where customary, fruit or modak as naivedya; Ganesha name, katha and aarti; moon arghya after moonrise.",
+      hi: "दीप, गणेश ध्यान, उपयुक्त हो तो जल-अभिषेक, लाल/उपलब्ध फूल, परम्परानुसार दूर्वा, फल या मोदक भोग, नाम-जप, कथा और आरती; चन्द्रोदय के बाद चन्द्र-अर्घ्य।",
+    },
+    paran: {
+      en: "After the location-specific moonrise and moon prayer; if clouds hide the moon, use the app's computed moonrise and family rule rather than waiting indefinitely.",
+      hi: "स्थान-विशिष्ट चन्द्रोदय और चन्द्र-प्रार्थना के बाद; बादल हों तो अनन्त प्रतीक्षा के बजाय ऐप का चन्द्रोदय और कुल-नियम मानें।",
+    },
+    udyapan: {
+      en: "No universal monthly requirement. Conclude a vowed series with Ganesha puja, prasad/feeding and charity as directed by the family priest.",
+      hi: "सामान्य मासिक व्रत में उद्यापन नहीं; संकल्पित श्रृंखला गणेश-पूजा, प्रसाद/भोजन और दान से कुल-पुरोहित के अनुसार पूर्ण करें।",
+    },
+  },
+};
+
 /* upcoming-occurrence search: tithi name, ekadashi/pradosh variants, festival, or fast */
 function searchUpcoming(query, fromMs, tz, maxN = 24, place = null) {
   const q = (query || "").trim().toLowerCase();
@@ -3822,6 +3940,66 @@ const horaResultText = (res, ascIdx) => {
   return null;
 };
 
+
+function VratVidhiCard({ data, lang, C }) {
+  const [open, setOpen] = useState(false);
+  if (!data) return null;
+  const L = lang === "hi" ? "hi" : "en";
+  const lbl = (k) => VRAT_VIDHI_LABELS[k][L];
+  const txt = (obj) => (obj && (obj[L] || obj.en)) || "";
+  const section = (title, body) => (
+    <div style={{ marginTop: 8 }}>
+      <div style={{ ...T.label, color: C.gold, marginBottom: 3 }}>{title}</div>
+      <div style={{ fontSize: T.fSmall, color: C.ivory, lineHeight: 1.55 }}>{body}</div>
+    </div>
+  );
+  return (
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{ marginTop: 8, width: "100%", boxSizing: "border-box", border: `1px solid ${C.line}`, borderRadius: T.rMd, background: "#FFFDF7", overflow: "hidden" }}
+    >
+      <div style={{ padding: "9px 11px", fontSize: T.fSmall, color: C.ivory, lineHeight: 1.5, fontWeight: 600 }}>
+        {txt(data.verdict)}
+      </div>
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
+        style={{ width: "100%", minHeight: T.ctrlH, boxSizing: "border-box", padding: "0 11px", border: "none", borderTop: `1px solid ${C.line}`, background: open ? "rgba(168,106,18,.06)" : "transparent", color: C.gold, cursor: "pointer", fontFamily: T.serif, fontSize: T.fSmall, fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, textAlign: "left" }}
+      >
+        <span>{open ? lbl("hideHowTo") : lbl("showHowTo")}</span>
+        <span aria-hidden="true" style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .15s", flexShrink: 0 }}>▾</span>
+      </button>
+      {open && (
+        <div style={{ padding: "10px 11px 12px", borderTop: `1px solid ${C.line}`, display: "flex", flexDirection: "column", gap: 2 }}>
+          <div style={{ padding: "7px 9px", borderRadius: T.rSm, background: "rgba(194,69,30,.06)", border: "1px solid rgba(194,69,30,.18)" }}>
+            <div style={{ ...T.label, color: C.sindoor, marginBottom: 3 }}>{lbl("safety")}</div>
+            <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5 }}>{txt(VRAT_VIDHI_SAFETY)}</div>
+          </div>
+          {section(lbl("vidhi"), (
+            <ol style={{ margin: 0, paddingLeft: 18 }}>
+              {(data.vidhi || []).map((step, i) => (
+                <li key={i} style={{ marginBottom: 4 }}>{txt(step)}</li>
+              ))}
+            </ol>
+          ))}
+          {section(lbl("diet"), (
+            data.dietAvoid || data.dietLighter ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                {data.dietAvoid && <div><span style={{ color: C.sindoor, fontWeight: 600 }}>{lbl("avoid")}: </span>{txt(data.dietAvoid)}</div>}
+                {data.dietLighter && <div><span style={{ color: "#1F7A4D", fontWeight: 600 }}>{lbl("lighter")}: </span>{txt(data.dietLighter)}</div>}
+              </div>
+            ) : txt(data.diet)
+          ))}
+          {section(lbl("sankalpa"), <span style={{ fontStyle: "italic" }}>{txt(data.sankalpa)}</span>)}
+          {section(lbl("puja"), txt(data.puja))}
+          {section(lbl("paran"), txt(data.paran))}
+          {section(lbl("udyapan"), txt(data.udyapan))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, onCal = () => {}, C, card }) {
   const tz = todayP.tz;
@@ -4194,15 +4372,21 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
             return (
               <div key={id}>
                 {header}
-                <div onClick={() => setFexp(open ? null : { id, ms: it.ms, timing: meta ? meta.timing : null, shifted: it.shifted, reason: it.reason })} style={{ cursor: "pointer", padding: "10px 12px", borderTop: "1px solid #F3ECDC", background: open ? "rgba(168,106,18,.05)" : undefined }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>
+                <div style={{ borderTop: "1px solid #F3ECDC", background: open ? "rgba(168,106,18,.05)" : undefined }}>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setFexp(open ? null : { id, ms: it.ms, timing: meta ? meta.timing : null, shifted: it.shifted, reason: it.reason })}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFexp(open ? null : { id, ms: it.ms, timing: meta ? meta.timing : null, shifted: it.shifted, reason: it.reason }); } }}
+                    style={{ cursor: "pointer", padding: "10px 12px", display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}
+                  >
                     <span style={{ fontSize: 14, color: C.ivory, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
                     <span style={{ flexShrink: 0, fontSize: 12.5, color: C.muted, fontVariantNumeric: "tabular-nums" }}><span style={{ color: C.gold }}>{fmtDay(it.ms)}</span> · {away(it.ms)}</span>
                   </div>
                   {open && (() => {
                     const d = fexpDetail;
                     return (
-                      <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px dashed #EBDFC6", display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-start" }}>
+                      <div style={{ padding: "0 12px 10px", marginTop: -2, paddingTop: 8, borderTop: "1px dashed #EBDFC6", display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-start" }}>
                         {meta && meta.gloss && <div style={{ fontSize: T.fSmall, color: C.ivory }}>{meta.gloss[LL]}{meta.deity && <span style={{ color: C.muted }}> · {meta.deity[LL]}</span>}</div>}
                         {d && d.info && <div style={{ fontSize: T.fMicro, color: C.muted }}>{d.info.lmonthName} · {d.info.krishna ? (lang === "hi" ? "कृष्ण पक्ष" : "Krishna Paksha") : (lang === "hi" ? "शुक्ल पक्ष" : "Shukla Paksha")} · {(lang === "hi" ? (NAK_HI[d.info.nak] || d.info.nakName) : d.info.nakName)}</div>}
                         {d && (d.parana || d.moonrise != null || d.sunset != null || d.stars) && (
@@ -4215,6 +4399,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                         )}
                         {fexp && fexp.shifted && <div style={{ color: C.gold, fontSize: T.fMicro }}>{fexp.reason === "spans" ? (lang === "hi" ? "वैष्णव तिथि — दो अरुणोदय पर एकादशी; दूसरे दिन व्रत" : "Vaishnava date — Ekadashi at two dawns; observed on the second") : (lang === "hi" ? "वैष्णव तिथि — अरुणोदय पर दशमी होने से व्रत एक दिन आगे" : "Vaishnava date — Dashami touched arunodaya (dawn), so the fast shifts one day")}</div>}
                         {meta && meta.rules && <div style={{ color: C.muted, fontSize: T.fMicro, fontStyle: "italic" }}>{meta.rules[LL]}</div>}
+                        {tab === "fasting" && VRAT_VIDHI[kind] && <VratVidhiCard data={VRAT_VIDHI[kind]} lang={lang} C={C} />}
                       </div>
                     );
                   })()}
