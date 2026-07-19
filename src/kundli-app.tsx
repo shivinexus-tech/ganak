@@ -4,6 +4,8 @@ import { fmtDeg } from "./components/format";
 import PrashnaScreen from "./screens/PrashnaScreen";
 import { VRAT_VIDHI, VRAT_VIDHI_LABELS, VRAT_VIDHI_SAFETY } from "./data/vrat-vidhis";
 import { CHOG_NAME, OBS_NAME, FEST_NAME, OBS_META, FEST_META } from "./data/festival-meta";
+import { searchOffline, searchOnline } from "./data/places";
+import PlaceInput from "./components/PlaceInput";
 
 /* ============================================================
    JANMA — Vedic Kundli
@@ -556,18 +558,6 @@ function computeTodayPanchang(place, ayanamsa = "lahiri", atMs) {
   };
 }
 
-/* ---------------- places: offline gazetteer + online geocoder ---------------- */
-const ZONES = ["Asia/Kolkata", "Asia/Kathmandu", "Asia/Colombo", "Asia/Dhaka", "Asia/Karachi", "Asia/Kabul", "Asia/Dubai", "Asia/Qatar", "Asia/Riyadh", "Asia/Muscat", "Asia/Kuwait", "Asia/Tehran", "Europe/Istanbul", "Asia/Singapore", "Asia/Kuala_Lumpur", "Asia/Bangkok", "Asia/Jakarta", "Asia/Manila", "Asia/Hong_Kong", "Asia/Shanghai", "Asia/Tokyo", "Asia/Seoul", "Australia/Sydney", "Australia/Melbourne", "Australia/Perth", "Pacific/Auckland", "Europe/London", "Europe/Dublin", "Europe/Paris", "Europe/Berlin", "Europe/Amsterdam", "Europe/Brussels", "Europe/Madrid", "Europe/Lisbon", "Europe/Rome", "Europe/Zurich", "Europe/Vienna", "Europe/Stockholm", "Europe/Oslo", "Europe/Copenhagen", "Europe/Helsinki", "Europe/Moscow", "Europe/Warsaw", "Europe/Prague", "Europe/Athens", "Africa/Cairo", "Africa/Nairobi", "Africa/Lagos", "Africa/Johannesburg", "America/New_York", "America/Chicago", "America/Denver", "America/Phoenix", "America/Los_Angeles", "America/Toronto", "America/Vancouver", "America/Edmonton", "America/Mexico_City", "America/Sao_Paulo", "America/Argentina/Buenos_Aires", "America/Lima", "America/Santiago", "America/Bogota", "Indian/Mauritius", "Pacific/Fiji"];
-
-// [name, lat, lon, zoneIndex] — major birth-place cities; the online geocoder covers everything else
-const CITY_DB = [
-  ["New Delhi, India", 28.61, 77.21, 0], ["Delhi, India", 28.66, 77.23, 0], ["Mumbai, India", 19.08, 72.88, 0], ["Kolkata, India", 22.57, 88.36, 0], ["Chennai, India", 13.08, 80.27, 0], ["Bengaluru, India", 12.97, 77.59, 0], ["Hyderabad, India", 17.39, 78.49, 0], ["Ahmedabad, India", 23.02, 72.57, 0], ["Pune, India", 18.52, 73.86, 0], ["Surat, India", 21.17, 72.83, 0], ["Jaipur, India", 26.91, 75.79, 0], ["Lucknow, India", 26.85, 80.95, 0], ["Kanpur, India", 26.45, 80.33, 0], ["Nagpur, India", 21.15, 79.09, 0], ["Indore, India", 22.72, 75.86, 0], ["Thane, India", 19.22, 72.98, 0], ["Bhopal, India", 23.26, 77.41, 0], ["Visakhapatnam, India", 17.69, 83.22, 0], ["Patna, India", 25.59, 85.14, 0], ["Vadodara, India", 22.31, 73.18, 0], ["Ghaziabad, India", 28.67, 77.42, 0], ["Ludhiana, India", 30.9, 75.86, 0], ["Agra, India", 27.18, 78.01, 0], ["Nashik, India", 20.0, 73.79, 0], ["Faridabad, India", 28.41, 77.31, 0], ["Meerut, India", 28.98, 77.71, 0], ["Rajkot, India", 22.3, 70.8, 0], ["Varanasi, India", 25.32, 82.97, 0], ["Srinagar, India", 34.08, 74.8, 0], ["Aurangabad, India", 19.88, 75.34, 0], ["Dhanbad, India", 23.8, 86.43, 0], ["Amritsar, India", 31.63, 74.87, 0], ["Prayagraj (Allahabad), India", 25.44, 81.85, 0], ["Ranchi, India", 23.34, 85.31, 0], ["Howrah, India", 22.59, 88.31, 0], ["Coimbatore, India", 11.02, 76.96, 0], ["Jabalpur, India", 23.18, 79.99, 0], ["Gwalior, India", 26.22, 78.18, 0], ["Vijayawada, India", 16.51, 80.65, 0], ["Jodhpur, India", 26.24, 73.02, 0], ["Madurai, India", 9.93, 78.12, 0], ["Raipur, India", 21.25, 81.63, 0], ["Kota, India", 25.21, 75.86, 0], ["Guwahati, India", 26.14, 91.74, 0], ["Chandigarh, India", 30.73, 76.78, 0], ["Solapur, India", 17.66, 75.91, 0], ["Hubballi, India", 15.36, 75.12, 0], ["Mysuru, India", 12.3, 76.64, 0], ["Tiruchirappalli, India", 10.79, 78.7, 0], ["Bareilly, India", 28.37, 79.43, 0], ["Aligarh, India", 27.88, 78.08, 0], ["Moradabad, India", 28.84, 78.78, 0], ["Jalandhar, India", 31.33, 75.58, 0], ["Bhubaneswar, India", 20.27, 85.84, 0], ["Salem, India", 11.66, 78.15, 0], ["Warangal, India", 17.97, 79.59, 0], ["Guntur, India", 16.31, 80.44, 0], ["Saharanpur, India", 29.97, 77.55, 0], ["Gorakhpur, India", 26.76, 83.37, 0], ["Bikaner, India", 28.02, 73.31, 0], ["Amravati, India", 20.93, 77.75, 0], ["Noida, India", 28.57, 77.32, 0], ["Jamshedpur, India", 22.8, 86.18, 0], ["Bhilai, India", 21.19, 81.35, 0], ["Cuttack, India", 20.46, 85.88, 0], ["Kochi, India", 9.93, 76.27, 0], ["Nellore, India", 14.44, 79.99, 0], ["Bhavnagar, India", 21.76, 72.15, 0], ["Dehradun, India", 30.32, 78.03, 0], ["Durgapur, India", 23.52, 87.31, 0], ["Asansol, India", 23.68, 86.99, 0], ["Rourkela, India", 22.26, 84.85, 0], ["Nanded, India", 19.15, 77.31, 0], ["Kolhapur, India", 16.69, 74.24, 0], ["Ajmer, India", 26.45, 74.64, 0], ["Gulbarga, India", 17.33, 76.83, 0], ["Jamnagar, India", 22.47, 70.06, 0], ["Ujjain, India", 23.18, 75.78, 0], ["Siliguri, India", 26.73, 88.4, 0], ["Jhansi, India", 25.45, 78.57, 0], ["Jammu, India", 32.73, 74.86, 0], ["Mangaluru, India", 12.91, 74.86, 0], ["Erode, India", 11.34, 77.72, 0], ["Belagavi, India", 15.85, 74.5, 0], ["Thiruvananthapuram, India", 8.52, 76.94, 0], ["Kozhikode, India", 11.26, 75.78, 0], ["Thrissur, India", 10.52, 76.21, 0], ["Puducherry, India", 11.94, 79.83, 0], ["Shimla, India", 31.1, 77.17, 0], ["Gandhinagar, India", 23.22, 72.65, 0], ["Imphal, India", 24.82, 93.94, 0], ["Shillong, India", 25.57, 91.88, 0], ["Aizawl, India", 23.73, 92.72, 0], ["Itanagar, India", 27.08, 93.61, 0], ["Gangtok, India", 27.33, 88.61, 0], ["Agartala, India", 23.83, 91.28, 0], ["Panaji, India", 15.49, 73.83, 0], ["Udaipur, India", 24.59, 73.71, 0], ["Haridwar, India", 29.95, 78.16, 0], ["Rishikesh, India", 30.09, 78.27, 0], ["Mathura, India", 27.49, 77.67, 0], ["Tirupati, India", 13.63, 79.42, 0], ["Shirdi, India", 19.77, 74.48, 0], ["Patiala, India", 30.34, 76.39, 0], ["Rohtak, India", 28.9, 76.57, 0], ["Gurugram, India", 28.46, 77.03, 0], ["Muzaffarpur, India", 26.12, 85.39, 0], ["Gaya, India", 24.78, 85.0, 0], ["Vellore, India", 12.92, 79.13, 0], ["Tirunelveli, India", 8.71, 77.76, 0], ["Anantapur, India", 14.68, 77.6, 0], ["Kurnool, India", 15.83, 78.04, 0], ["Akola, India", 20.7, 77.0, 0], ["Latur, India", 18.4, 76.58, 0], ["Sangli, India", 16.85, 74.57, 0], ["Bilaspur, India", 22.08, 82.15, 0],
-  ["Kathmandu, Nepal", 27.71, 85.32, 1], ["Pokhara, Nepal", 28.21, 83.99, 1], ["Colombo, Sri Lanka", 6.93, 79.85, 2], ["Jaffna, Sri Lanka", 9.66, 80.03, 2], ["Dhaka, Bangladesh", 23.81, 90.41, 3], ["Chittagong, Bangladesh", 22.36, 91.78, 3], ["Karachi, Pakistan", 24.86, 67.0, 4], ["Lahore, Pakistan", 31.55, 74.34, 4], ["Islamabad, Pakistan", 33.69, 73.06, 4], ["Kabul, Afghanistan", 34.56, 69.21, 5], ["Dubai, UAE", 25.2, 55.27, 6], ["Abu Dhabi, UAE", 24.45, 54.38, 6], ["Sharjah, UAE", 25.35, 55.42, 6], ["Doha, Qatar", 25.29, 51.53, 7], ["Riyadh, Saudi Arabia", 24.71, 46.68, 8], ["Jeddah, Saudi Arabia", 21.49, 39.19, 8], ["Muscat, Oman", 23.59, 58.41, 9], ["Kuwait City, Kuwait", 29.38, 47.99, 10], ["Tehran, Iran", 35.69, 51.39, 11], ["Istanbul, Turkey", 41.01, 28.98, 12], ["Singapore", 1.35, 103.82, 13], ["Kuala Lumpur, Malaysia", 3.14, 101.69, 14], ["Bangkok, Thailand", 13.76, 100.5, 15], ["Jakarta, Indonesia", -6.21, 106.85, 16], ["Manila, Philippines", 14.6, 120.98, 17], ["Hong Kong", 22.32, 114.17, 18], ["Shanghai, China", 31.23, 121.47, 19], ["Beijing, China", 39.9, 116.41, 19], ["Tokyo, Japan", 35.68, 139.69, 20], ["Osaka, Japan", 34.69, 135.5, 20], ["Seoul, South Korea", 37.57, 126.98, 21], ["Sydney, Australia", -33.87, 151.21, 22], ["Melbourne, Australia", -37.81, 144.96, 23], ["Brisbane, Australia", -27.47, 153.03, 22], ["Perth, Australia", -31.95, 115.86, 24], ["Auckland, New Zealand", -36.85, 174.76, 25],
-  ["London, UK", 51.51, -0.13, 26], ["Birmingham, UK", 52.49, -1.89, 26], ["Manchester, UK", 53.48, -2.24, 26], ["Leicester, UK", 52.64, -1.13, 26], ["Glasgow, UK", 55.86, -4.25, 26], ["Dublin, Ireland", 53.35, -6.26, 27], ["Paris, France", 48.86, 2.35, 28], ["Berlin, Germany", 52.52, 13.41, 29], ["Frankfurt, Germany", 50.11, 8.68, 29], ["Munich, Germany", 48.14, 11.58, 29], ["Amsterdam, Netherlands", 52.37, 4.9, 30], ["Brussels, Belgium", 50.85, 4.35, 31], ["Madrid, Spain", 40.42, -3.7, 32], ["Barcelona, Spain", 41.39, 2.17, 32], ["Lisbon, Portugal", 38.72, -9.14, 33], ["Rome, Italy", 41.9, 12.5, 34], ["Milan, Italy", 45.46, 9.19, 34], ["Zurich, Switzerland", 47.38, 8.54, 35], ["Geneva, Switzerland", 46.2, 6.14, 35], ["Vienna, Austria", 48.21, 16.37, 36], ["Stockholm, Sweden", 59.33, 18.07, 37], ["Oslo, Norway", 59.91, 10.75, 38], ["Copenhagen, Denmark", 55.68, 12.57, 39], ["Helsinki, Finland", 60.17, 24.94, 40], ["Moscow, Russia", 55.76, 37.62, 41], ["Warsaw, Poland", 52.23, 21.01, 42], ["Prague, Czechia", 50.08, 14.44, 43], ["Athens, Greece", 37.98, 23.73, 44], ["Cairo, Egypt", 30.04, 31.24, 45], ["Nairobi, Kenya", -1.29, 36.82, 46], ["Lagos, Nigeria", 6.52, 3.38, 47], ["Johannesburg, South Africa", -26.2, 28.05, 48], ["Durban, South Africa", -29.86, 31.03, 48], ["Cape Town, South Africa", -33.92, 18.42, 48], ["Port Louis, Mauritius", -20.16, 57.5, 62], ["Suva, Fiji", -18.12, 178.45, 63],
-  ["New York, USA", 40.71, -74.01, 49], ["Boston, USA", 42.36, -71.06, 49], ["Philadelphia, USA", 39.95, -75.17, 49], ["Washington DC, USA", 38.91, -77.04, 49], ["Atlanta, USA", 33.75, -84.39, 49], ["Miami, USA", 25.76, -80.19, 49], ["Edison NJ, USA", 40.52, -74.41, 49], ["Chicago, USA", 41.88, -87.63, 50], ["Dallas, USA", 32.78, -96.8, 50], ["Houston, USA", 29.76, -95.37, 50], ["Austin, USA", 30.27, -97.74, 50], ["Minneapolis, USA", 44.98, -93.27, 50], ["Denver, USA", 39.74, -104.99, 51], ["Phoenix, USA", 33.45, -112.07, 52], ["Los Angeles, USA", 34.05, -118.24, 53], ["San Francisco, USA", 37.77, -122.42, 53], ["San Jose, USA", 37.34, -121.89, 53], ["Seattle, USA", 47.61, -122.33, 53], ["San Diego, USA", 32.72, -117.16, 53], ["Las Vegas, USA", 36.17, -115.14, 53], ["Portland, USA", 45.52, -122.68, 53], ["Toronto, Canada", 43.65, -79.38, 54], ["Ottawa, Canada", 45.42, -75.7, 54], ["Montreal, Canada", 45.5, -73.57, 54], ["Vancouver, Canada", 49.28, -123.12, 55], ["Calgary, Canada", 51.05, -114.07, 56], ["Edmonton, Canada", 53.55, -113.49, 56], ["Mexico City, Mexico", 19.43, -99.13, 57], ["São Paulo, Brazil", -23.55, -46.63, 58], ["Rio de Janeiro, Brazil", -22.91, -43.17, 58], ["Buenos Aires, Argentina", -34.6, -58.38, 59], ["Lima, Peru", -12.05, -77.04, 60], ["Santiago, Chile", -33.45, -70.67, 61], ["Bogotá, Colombia", 4.71, -74.07, 62],
-];
-
-
 /* ===== Udaya Lagna schedule + Panchaka Rahita Muhurta (Drik-parity) =====
    Panchaka = (tithi[1-30] + vaara[Sun=1..Sat=7] + nakshatra[1-27] + lagna[Aries=1..Pisces=12]) mod 9.
    rem 1 Mrityu · 2 Agni · 4 Raja · 6 Chora · 8 Roga (dosha) · 0/3/5/7 Shubha (Rahita). */
@@ -626,31 +616,6 @@ function computeLagnaPanchaka(place, ayanamsa = "lahiri", atMs) {
   }
   return { rise, nextRise, tz, lagnaSchedule, panchakaWindows };
 }
-function searchOffline(q) {
-  const s = q.trim().toLowerCase();
-  if (s.length < 2) return [];
-  const starts = [], contains = [];
-  for (const [n, lat, lon, z] of CITY_DB) {
-    const ln = n.toLowerCase();
-    const item = { label: n, lat, lon, zone: ZONES[z] };
-    if (ln.startsWith(s)) starts.push(item);
-    else if (ln.includes(s)) contains.push(item);
-    if (starts.length >= 7) break;
-  }
-  return starts.concat(contains).slice(0, 7);
-}
-
-async function searchOnline(q) {
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=en&format=json`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("geocoder unavailable");
-  const data = await res.json();
-  return (data.results || []).map((p) => ({
-    label: [p.name, p.admin1, p.country].filter(Boolean).join(", "),
-    lat: p.latitude, lon: p.longitude, zone: p.timezone || null,
-  }));
-}
-
 /* ---------------- chart computation ---------------- */
 /* ascendant (sidereal) at an arbitrary instant — used for Gulika/Mandi and special lagnas */
 /* Placidus house cusps (tropical, equinox of date) via iterative semi-arc trisection.
@@ -1566,71 +1531,6 @@ function eventDetail(ev, now) {
   return { desc, timeStr, days, hours };
 }
 
-/* ---------------- compact reusable place search ---------------- */
-function PlaceInput({ value, onPick, C, lang = "en" }) {
-  const [q, setQ] = useState(value ? value.label : "");
-  const [sugs, setSugs] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const deb = React.useRef(null);
-  const seq = React.useRef(0);
-
-  React.useEffect(() => {
-    if (!open && value) setQ(value.label);
-  }, [value, open]);
-
-  const onChange = (text) => {
-    setQ(text);
-    setOpen(true);
-    const offline = searchOffline(text);
-    setSugs(offline);
-    if (deb.current) clearTimeout(deb.current);
-    if (text.trim().length < 2) { setBusy(false); return; }
-    const my = ++seq.current;
-    setBusy(true);
-    deb.current = setTimeout(async () => {
-      try {
-        const online = await searchOnline(text);
-        if (my !== seq.current) return;
-        const seen = new Set(offline.map((o) => o.label.toLowerCase()));
-        setSugs(offline.concat(online.filter((o) => !seen.has(o.label.toLowerCase()))).slice(0, 8));
-      } catch { /* offline results already shown */ }
-      finally { if (my === seq.current) setBusy(false); }
-    }, 350);
-  };
-
-  const pick = (p) => {
-    onPick(p);
-    setQ(p.label);
-    setSugs([]);
-    setOpen(false);
-  };
-
-  return (
-    <div style={{ position: "relative", minWidth: 180, flex: "0 1 240px" }}>
-      <input
-        value={q}
-        onChange={(e) => onChange(e.target.value)}
-        onFocus={(e) => { e.target.select(); setOpen(true); }}
-        placeholder={lang === "hi" ? "शहर बदलें…" : "Change city…"}
-        autoComplete="off"
-        style={{ width: "100%", height: T.ctrlH, boxSizing: "border-box", background: "#FFFDF7", border: `1px solid ${C.line}`, borderRadius: T.rMd, color: C.ivory, padding: "0 12px", fontSize: 13.5, fontFamily: "Spectral, serif", outline: "none" }}
-      />
-      {open && (sugs.length > 0 || busy) && (
-        <div style={{ position: "absolute", left: 0, right: 0, top: "100%", zIndex: 20, background: "#FFFFFF", border: `1px solid ${C.gold}`, borderRadius: 8, marginTop: 4, overflow: "hidden", boxShadow: "0 12px 30px rgba(95,70,20,.18)" }}>
-          {sugs.map((p) => (
-            <button key={p.label + p.lat} className="sug" onClick={() => pick(p)}
-              style={{ display: "block", width: "100%", textAlign: "left", padding: "8px 12px", background: "transparent", border: "none", borderBottom: `1px solid ${C.line}`, color: C.ivory, fontFamily: "Spectral, serif", fontSize: 13, cursor: "pointer" }}>
-              {p.label}
-            </button>
-          ))}
-          {busy && <div style={{ padding: "8px 12px", color: C.muted, fontSize: 12 }}>{lang === "hi" ? "और स्थान खोजे जा रहे हैं…" : "Searching more places…"}</div>}
-        </div>
-      )}
-    </div>
-  );
-}
-
 /* ---------------- main app ---------------- */
 function DoshaCard({ C, card, ok, title, good, bad }) {
   return (
@@ -2376,9 +2276,6 @@ const HORA_GLYPH = { Sun: "\u2609", Moon: "\u263D", Mars: "\u2642", Mercury: "\u
 const HORA_COLOR = { Sun: "#C2451E", Moon: "#5B7FB0", Mars: "#B23B2E", Mercury: "#2E8B6F", Jupiter: "#A86A12", Venus: "#9A5BA3", Saturn: "#5A6470" };
 const HORA_NAME = { Sun: { en: "Sun", hi: "\u0938\u0942\u0930\u094D\u092F" }, Moon: { en: "Moon", hi: "\u091A\u0902\u0926\u094D\u0930" }, Mars: { en: "Mars", hi: "\u092E\u0902\u0917\u0932" }, Mercury: { en: "Mercury", hi: "\u092C\u0941\u0927" }, Jupiter: { en: "Jupiter", hi: "\u0917\u0941\u0930\u0941" }, Venus: { en: "Venus", hi: "\u0936\u0941\u0915\u094D\u0930" }, Saturn: { en: "Saturn", hi: "\u0936\u0928\u093F" } };
 const HORA_NATURE = { Sun: { en: "authority, health, government", hi: "\u0905\u0927\u093F\u0915\u093E\u0930, \u0938\u094D\u0935\u093E\u0938\u094D\u0925\u094D\u092F" }, Moon: { en: "travel, home, public dealings", hi: "\u092F\u093E\u0924\u094D\u0930\u093E, \u0917\u0943\u0939, \u091C\u0928\u0938\u0902\u092A\u0930\u094D\u0915" }, Mars: { en: "energy, property, contests", hi: "\u090A\u0930\u094D\u091C\u093E, \u0938\u0902\u092A\u0924\u094D\u0924\u093F" }, Mercury: { en: "study, trade, communication", hi: "\u0905\u0927\u094D\u092F\u092F\u0928, \u0935\u094D\u092F\u093E\u092A\u093E\u0930" }, Jupiter: { en: "learning, finance, auspicious acts", hi: "\u0936\u093F\u0915\u094D\u0937\u093E, \u0927\u0928, \u0936\u0941\u092D \u0915\u093E\u0930\u094D\u092F" }, Venus: { en: "arts, relationships, purchases", hi: "\u0915\u0932\u093E, \u0938\u0902\u092C\u0902\u0927, \u0916\u0930\u0940\u0926" }, Saturn: { en: "labour, real estate, patience", hi: "\u0936\u094D\u0930\u092E, \u092D\u0942\u092E\u093F, \u0927\u0948\u0930\u094D\u092F" } };
-
-
-
 
 
 /* ===== HORA ADVISOR ENGINE ===== */

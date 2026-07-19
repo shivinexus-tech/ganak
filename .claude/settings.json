@@ -40,8 +40,9 @@
     "allowUnsandboxedCommands": false,
     "network": {
       "allowedDomains": [
-        "www.drikpanchang.com",
-        "*.drikpanchang.com"
+        "*.drikpanchang.com",
+        "geocoding-api.open-meteo.com",
+        "*.open-meteo.com"
       ]
     },
     "filesystem": {

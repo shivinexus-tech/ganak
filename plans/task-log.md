@@ -29,17 +29,24 @@ same file.
 |---|---|---|---|---|---|---|
 | SPLIT-ENGINE-01 | MERGED | Codex | `main` @ `a21260d` | `src/kundli-app.tsx`, `src/engine/*`, `plans/codex-handoff-engine-split.md` | Pure astronomy engine split | Gates/build/browser green; handoff `plans/codex-handoff-engine-split.md`; committed+pushed in `a21260d` (2026-07-19) |
 | SPLIT-UI-01 | MERGED | Codex | `main` @ `a21260d` | `src/kundli-app.tsx`, `src/screens/PrashnaScreen.tsx`, `src/components/tokens.ts`, `src/components/format.ts`, `validation/prashna-parity.js`, coordination docs | First pure UI slice: extracted Prashna screen plus exact shared tokens/formatter moves; no intended behaviour or styling change | Parse clean; parity EXACT (198 values/6 charts); Prashna 24/24; Muhurat/content anchors pass; production build passes; Daily + Prashna browser smoke pass with 0 console errors; review: `plans/codex-review-ui-split.md`; committed+pushed in `a21260d` (2026-07-19) |
+| SPLIT-UI-02 | MERGED | Cursor | `main` | `src/kundli-app.tsx`, `src/data/places.ts`, `src/components/PlaceInput.tsx`, coordination docs | Shared place search + gazetteer extraction (pure move) | Gates green; auto commit+push per owner standing policy 2026-07-19 |
+| PARALLEL-LANES-01 | REVIEW | Claude Code | `main` (docs-only) | `plans/module-ownership-map.md` (new), `plans/parallel-agent-brief.md`, `plans/backlog.md` (one line), `plans/task-log.md` (this row + lanes table) | Turn ten-lane brief into a live ownership board | Docs-only — no gates required; `src/**` untouched. Board: `plans/module-ownership-map.md`. Lane states verified against the real working tree. **Flagged hazard:** stale `src/PrashnaScreen.jsx` duplicates the live `src/screens/PrashnaScreen.tsx` (plus `src/kundli-app.tsx.backup-before-prashna`) — integration owner should delete both in the next `src/` slice |
 
 ## Ten-lane target ownership
 
+**→ Live board with file-existence detail: [`plans/module-ownership-map.md`](module-ownership-map.md)**
+
 These lanes become simultaneously assignable as their files are extracted. A lane
 must replace `TBD` with real branch/worktree and exact files before work starts.
+**Reality check (2026-07-19): ~4 code lanes are actually open** (Prashna, Validation,
+Backend, Content-data) plus unlimited `plans/` research lanes — the rest await UI
+extraction. Daily is the highest-leverage next slice; it gates three lanes.
 
 | Lane | Scope | Intended module ownership | Current state |
 |---|---|---|---|
-| 1 | Daily/Panchang | `src/screens/DailyScreen.tsx`, daily-only components | Waiting for extraction |
-| 2 | Festivals/Vrats | `src/features/festivals/*` | Waiting for extraction |
-| 3 | Muhurat | `src/features/muhurat/*` | Waiting for extraction |
+| 1 | Daily/Panchang | `src/screens/DailyScreen.tsx`, daily-only components | Waiting — **next slice (SPLIT-UI-03), gates lanes 1/7 and 2/3 UI** |
+| 2 | Festivals/Vrats | UI `src/features/festivals/*` TBD; data `src/data/festival-meta.ts` + `src/data/vrat-vidhis.ts` exist | **Partial — data files reservable now** (P1-CONTENT work) |
+| 3 | Muhurat | UI `src/features/muhurat/*` TBD; engine `src/engine/muhurat.ts` exists | Partial — engine reservable for fixes |
 | 4 | Chart | `src/screens/ChartScreen.tsx`, chart-only components | Waiting for extraction |
 | 5 | Matching | `src/features/matching/*` | Waiting for extraction |
 | 6 | Prashna | `src/screens/PrashnaScreen.tsx` | Extracted; MERGED on `main` @ `a21260d` |

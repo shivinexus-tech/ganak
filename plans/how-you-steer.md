@@ -54,48 +54,45 @@ desk ──commit──► local history ──push──► GitHub
                     └── optional: refresh ~/Ganak-Recovery
 ```
 
+### Standing owner decision (2026-07-19)
+**Do not ask every time.** When a named slice (or docs sync) is finished and
+gates are green (or the change is docs-only), agents **commit and push** on
+their own, then say what they did in one line. Ask only if something is
+risky, gates are red, or the change is an unstable experiment.
+
+Owner can still override with: “commit only,” “don’t push,” or “wait.”
+
 ### When to **commit** (save a chapter)
-Say **yes to commit** when all of these feel true:
-1. The agent finished a **named backlog slice** (or a clear docs/coordination fix).
-2. **Gates are green** (or the change is docs-only, like the task-log MERGED update).
-3. You want a restore point *even if* the epic isn’t finished.
+Default **yes** when:
+1. A **named backlog slice** (or clear docs/coordination fix) is finished.
+2. **Gates are green** (or docs-only).
+3. A restore point is useful even if the epic isn’t finished.
 
-You do **not** need the whole EPIC done. One finished checkbox is enough.
-
-Skip commit if: still mid-edit, gates red, or “just exploring.”
+Skip if: still mid-edit, gates red, or “just exploring.”
 
 ### When to **push** (publish that chapter)
-Say **yes to push** after a commit when you want any of:
-- GitHub to match your Mac (backup / other agents / other machines)
-- The work to be “official” for the project history
-- Peace of mind after a big slice
-
-You can commit today and push tomorrow. Pushing later is fine.
-
-Skip push if: you’re still unsure the chapter is right *and* you’re okay with it only existing on this Mac + Recovery.
+Default **yes** right after that commit (GitHub should match the Mac).
 
 ### When to refresh **~/Ganak-Recovery**
-After a good commit (especially before a scary next slice).  
-This is a belt-and-suspenders offline copy agents must not touch.
+After a good commit (especially before a scary next slice), without waiting
+for another owner click unless the owner said not to.
 
 ### Tiny vs big changes
 | Change type | Commit? | Push? |
 |---|---|---|
-| Product/code slice (Prashna extract, engine move) | Yes, after gates | Yes soon |
-| Task-log “MERGED” / backlog checkbox | Yes (small docs commit) | Optional same day |
-| Sandbox/settings experiments still unstable | Wait | Wait |
-| Failed experiment | Don’t commit — leave or discard | Never |
+| Product/code slice after green gates | Yes (auto) | Yes (auto) |
+| Task-log / backlog / steer docs | Yes (auto) | Yes (auto) |
+| Sandbox/settings still unstable | Wait | Wait |
+| Failed experiment | Don’t | Never |
 
-### One sentence to tell the agent
-- “**Commit** the finished slice; don’t push yet.”
-- “**Push** what’s already committed.”
+### Override phrases (owner → agent)
+- “**Commit only** — don’t push.”
+- “**Don’t touch git** until I say.”
 - “**Commit + push**, then refresh Recovery.”
-- “Docs-only: update the task-log and commit that.”
 
-### The question agents will ask you
-When you hear *“local only — commit or push?”* translate it as:
-
-> Is this moment worth a save? If yes → **commit**.  
-> Should the online copy match? If yes → **push**.
-
-You don’t need to understand the files. You need: **backlog name + gates green + save/publish preference**.
+### Why `*.drikpanchang.com` is in Claude settings
+Ganak’s **benchmark** website is Drik Panchang. Agents sometimes **look up**
+festival/muhurat pages there to verify accuracy. The sandbox allow-list lets
+those lookups run without an Allow prompt. It is **not** shipping Drik code
+into the app, and it is **not** required for city search (that uses
+Open-Meteo). Listing it once is enough; we don’t need to keep re-adding it.

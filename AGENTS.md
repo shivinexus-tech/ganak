@@ -66,6 +66,10 @@ assertions. If a gate fails, fix the cause — never weaken a gate to pass it
 - The owner is non-technical: explain in plain language, one step at a time, and
   ask before anything irreversible or scope-changing *as a product decision*
   (new feature, monetization, launch), not for routine shell/tool calls.
+- **Standing git policy (owner, 2026-07-19):** after a finished backlog slice or
+  docs sync with green gates (or docs-only), **commit and push without asking**.
+  Ask only for risky/unstable work, or when the owner said “don’t push.”
+  See `plans/how-you-steer.md`.
 - Complete fixes only. If a fix is partial, say so explicitly.
 
 ## Design system

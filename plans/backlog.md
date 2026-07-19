@@ -29,7 +29,7 @@ same file.
       styling, text, state transitions or astronomy. Extract one cohesive slice at a
       time, run every gate + build + browser smoke test, then continue.
   - [x] Prashna screen (first slice; parity markers preserved and gate repointed).
-  - [ ] Shared place search and shared display primitives.
+  - [x] Shared place search and shared display primitives. _(SPLIT-UI-02 REVIEW — places.ts + PlaceInput; tokens/format already from UI-01)_
   - [ ] Daily/Panchang screen shell.
   - [ ] Fasts, festivals and vrat-vidhi UI.
   - [ ] Muhurat finder and hora UI.
@@ -44,8 +44,10 @@ same file.
       Hora/Gochar, specialist Jyotish tools, validation, and backend/deployment.
 - [ ] **Integration lane** — one designated integrator owns shared shell/design-token
       changes, reviews each branch, merges sequentially and reruns all gates.
-- [ ] **Module ownership map** — record agent, branch/worktree, allowed files,
-      dependencies and status before work starts. No unreserved shared-file edits.
+- [x] **Module ownership map** — live board at `plans/module-ownership-map.md`
+      (lane → files → exists? → status → who reserves next). Records agent,
+      branch/worktree, allowed files, dependencies and status before work starts.
+      No unreserved shared-file edits.
 - [x] **Durable task log** — `plans/task-log.md`; every agent records assignment,
       files, branch/worktree, validation evidence, blocker and handoff.
 - [ ] Update the older `plans/parallel-agent-brief.md` into the live ten-lane board
