@@ -36,7 +36,8 @@ same file.
 | PARALLEL-LANES-01 | MERGED | Claude Code | `main` @ `11d339e` | `plans/module-ownership-map.md`, `plans/parallel-agent-brief.md`, `plans/backlog.md`, `plans/task-log.md` | Turn ten-lane brief into a live ownership board | Docs-only on GitHub as `11d339e`. Stale `src/PrashnaScreen.jsx` removed in follow-up `73c08dd`. |
 | SPLIT-UI-MATCH-01 | ACTIVE | Cursor | `main` @ `0fb00b5` (modules only) | `src/engine/matching.ts`, `src/screens/MatchingScreen.tsx`, `plans/cursor-handoff-matching-wire.md` | Extract Matching calc+UI modules; **shell wire deferred** while Claude finishes format helpers | Modules on GitHub; parse-clean + gunaMilan smoke OK. Next: wire after Claude releases `kundli-app.tsx` / `format.ts`. |
 | SPLIT-UI-CHART-01a | ACTIVE | Cursor | `main` (new file only) | `src/components/DiamondChart.tsx` | Extract North Indian diamond chart SVG; wire deferred (Claude owns shell for panchaka/format) | Module parse-clean. Clear of Matching wire and Claude shell edits. |
-| SPLIT-UI-JYOTISH-01a | ACTIVE | Cursor | `main` (new file only) | `src/engine/bhrigu.ts` | Extract BNN+BCP/BSP calc; UI still in shell | Module parse-clean + smoke. Clear of Claude shell/panchaka work. |
+| SPLIT-UI-JYOTISH-01a | MERGED | Cursor | `main` @ follow-up | `src/engine/bhrigu.ts`, `src/engine/gochar.ts` | Extract BNN+BCP/BSP calc + gochar helpers for bnnTiming | Modules on GitHub; parse-clean after gochar import fix. |
+| SPLIT-UI-JYOTISH-01b | ACTIVE | Cursor | `main` (new file only) | `src/engine/classical.ts` | Extract Ashtakavarga/Arudhas/Yogas calc | Module parse-clean. |
 
 ## Ten-lane target ownership
 

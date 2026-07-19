@@ -2,6 +2,7 @@
    Calculation only; UI modules (BNNModule / BhriguModule) still in the shell until wired. */
 
 import { SIGN_LORD } from "./panchang";
+import { planetGochar } from "./gochar";
 
 /* ---------------- Bhrigu Nandi Nadi (BNN) — Tier A: pure calculation ----------------
    Lagna-less (read from any reference planet, default Jupiter male / Venus female),
