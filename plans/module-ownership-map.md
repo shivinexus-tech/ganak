@@ -33,7 +33,7 @@ Status: `MERGED` (extracted + integrated) · `Partial` (engine/data out, UI not)
 
 | # | Lane | Files | Exists? | Status | Who may reserve next |
 |---|---|---|---|---|---|
-| 1 | **Daily/Panchang** | `src/screens/DailyScreen.tsx` + daily-only components | ❌ TBD | Waiting | Next UI slice (**SPLIT-UI-03**) — integration-owned until extracted |
+| 1 | **Daily/Panchang** | `src/screens/DailyScreen.tsx` + daily-only components | ❌ TBD | Waiting | Next UI slice (**SPLIT-UI-03**) — **all 10 circular-import blockers now cleared** by 03a/b/c; the extraction itself is unblocked |
 | 2 | **Festivals/Vrats** | UI: `src/features/festivals/*` ❌ TBD<br>Data: `src/data/festival-meta.ts` ✅, `src/data/vrat-vidhis.ts` ✅<br>Engine: `src/engine/festivals.ts` ✅ | Partial | Partial | **Content agent may take the two `src/data/` files now.** UI waits for SPLIT-UI-04 |
 | 3 | **Muhurat** | UI: `src/features/muhurat/*` ❌ TBD<br>Engine: `src/engine/muhurat.ts` ✅ | Partial | Partial | Engine reservable for fixes; UI waits for SPLIT-UI-05 |
 | 4 | **Chart** | `src/screens/ChartScreen.tsx` + chart components | ❌ TBD | Waiting | After Daily slice |
@@ -48,15 +48,16 @@ Status: `MERGED` (extracted + integrated) · `Partial` (engine/data out, UI not)
 
 | File | Lines | Note |
 |---|---|---|
-| `src/kundli-app.tsx` | 4,534 | The shell. **Integration-owned.** Every UI slice shrinks it. |
+| `src/kundli-app.tsx` | 4,460 | The shell. **Integration-owned.** Every UI slice shrinks it. |
 | `src/engine/ephemeris.ts` | 319 | Astronomy. Guarded by parity + calc gates. |
 | `src/engine/panchang.ts` | 284 | Tithi/nakshatra/sunrise/ayanamsa. |
 | `src/engine/festivals.ts` | 356 | Festival + day-part selection. |
 | `src/engine/muhurat.ts` | 323 | Muhurat scoring/shuddhi. |
+| `src/engine/panchaka.ts` | 62 | Lagna schedule + Panchaka windows. Extracted SPLIT-UI-03c. |
 | `src/engine/hora.ts` | 199 | Planetary hours + hora advisor. Extracted SPLIT-UI-03a. |
 | `src/i18n.ts` | 71 | Bilingual strings + `tr`/`trN`/`obsLabel`. **Shared, integration-owned** — add strings, never fork. |
 | `src/components/tokens.ts` | 14 | Design tokens — **shared, integration-owned.** |
-| `src/components/format.ts` | 7 | `fmtDeg` — shared. |
+| `src/components/format.ts` | 23 | `fmtDeg`, `fmtTime`, `fmtTimeD` — shared. |
 | `src/components/PlaceInput.tsx` | 72 | Shared place search UI. |
 | `src/data/places.ts` | 43 | Gazetteer. |
 

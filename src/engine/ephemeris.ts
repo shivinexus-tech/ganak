@@ -312,8 +312,18 @@ function tropicalLongitudes(d) {
     Rahu: rev(125.1228 - 0.0529538083 * d),
   };
 }
+// Sidereal ascendant for an instant -- moved from the shell (SPLIT-UI-03c).
+function ascendantAt(JD, lat, lon, ayan) {
+  const dd = JD - 2451543.5;
+  const gmst = rev(280.46061837 + 360.98564736629 * (JD - 2451545.0));
+  const ramc = rev(gmst + lon);
+  const eps = 23.4393 - 3.563e-7 * dd;
+  const ascTrop = atan2d(cdg(ramc), -(sd(ramc) * cdg(eps) + tdg(lat) * sd(eps)));
+  return rev(ascTrop - ayan);
+}
+
 export {
-  D2R, rev, sd, cdg, tdg, atan2d,
+  D2R, rev, sd, cdg, tdg, atan2d, ascendantAt,
   deltaTsec, nutationLon, moonGeo, sunGeo, jdeFromD, sunPos, keplerE,
   moonLon, planetGeoApparent, planetGeoLon, tropicalLongitudes,
 };

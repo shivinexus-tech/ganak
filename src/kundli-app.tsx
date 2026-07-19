@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { T } from "./components/tokens";
-import { fmtDeg } from "./components/format";
+import { fmtDeg, fmtTimeD, fmtTime } from "./components/format";
 import PrashnaScreen from "./screens/PrashnaScreen";
 import { VRAT_VIDHI, VRAT_VIDHI_LABELS, VRAT_VIDHI_SAFETY } from "./data/vrat-vidhis";
 import { CHOG_NAME, OBS_NAME, FEST_NAME, OBS_META, FEST_META } from "./data/festival-meta";
@@ -14,7 +14,7 @@ import PlaceInput from "./components/PlaceInput";
    ============================================================ */
 
 import {
-  D2R, rev, sd, cdg, tdg, atan2d,
+  D2R, rev, sd, cdg, tdg, atan2d, ascendantAt,
   moonGeo, jdeFromD, sunPos, moonLon, planetGeoLon, tropicalLongitudes,
 } from "./engine/ephemeris";
 
@@ -33,6 +33,8 @@ import {
 } from "./engine/hora";
 
 import { tr, trN, obsLabel } from "./i18n";
+
+import { computeLagnaPanchaka } from "./engine/panchaka";
 
 import {
   ayyappaMandalaFor, EKADASHI_NAMES, PRADOSH_NAMES_BY_DAY, observancesFor,
@@ -567,61 +569,9 @@ function computeTodayPanchang(place, ayanamsa = "lahiri", atMs) {
 /* ===== Udaya Lagna schedule + Panchaka Rahita Muhurta (Drik-parity) =====
    Panchaka = (tithi[1-30] + vaara[Sun=1..Sat=7] + nakshatra[1-27] + lagna[Aries=1..Pisces=12]) mod 9.
    rem 1 Mrityu · 2 Agni · 4 Raja · 6 Chora · 8 Roga (dosha) · 0/3/5/7 Shubha (Rahita). */
-const PANCHAKA_TYPE = { 1: "mrityu", 2: "agni", 4: "raja", 6: "chora", 8: "roga" };
 const PANCHAKA_NAME = { shubha: { en: "Panchaka Rahita", hi: "पञ्चक रहित" }, mrityu: { en: "Mrityu Panchaka", hi: "मृत्यु पञ्चक" }, agni: { en: "Agni Panchaka", hi: "अग्नि पञ्चक" }, raja: { en: "Raja Panchaka", hi: "राज पञ्चक" }, chora: { en: "Chora Panchaka", hi: "चोर पञ्चक" }, roga: { en: "Roga Panchaka", hi: "रोग पञ्चक" } };
 const PANCHAKA_SHORT = { shubha: { en: "Shubha", hi: "शुभ" }, mrityu: { en: "Mrityu", hi: "मृत्यु" }, agni: { en: "Agni", hi: "अग्नि" }, raja: { en: "Raja", hi: "राज" }, chora: { en: "Chora", hi: "चोर" }, roga: { en: "Roga", hi: "रोग" } };
 const PANCHAKA_GLOSS = { shubha: { en: "auspicious — free of blemish", hi: "शुभ — दोषरहित" }, mrityu: { en: "avoid — risk to life", hi: "टालें — प्राण जोखिम" }, agni: { en: "avoid — fire risk", hi: "टालें — अग्नि भय" }, raja: { en: "caution — authority/government", hi: "सावधानी — सत्ता" }, chora: { en: "avoid — theft risk", hi: "टालें — चोरी भय" }, roga: { en: "avoid — illness risk", hi: "टालें — रोग भय" } };
-const panchakaRem = (t30, vaara, n27, lagna12) => (t30 + vaara + n27 + lagna12) % 9;
-function computeLagnaPanchaka(place, ayanamsa = "lahiri", atMs) {
-  setAyanMode(ayanamsa);
-  const now = atMs != null ? atMs : Date.now();
-  const probe = new Date(now);
-  const tz = zoneOffset(place.zone, probe.getUTCFullYear(), probe.getUTCMonth() + 1, probe.getUTCDate()) ?? 5.5;
-  const local = new Date(now + tz * 3600000);
-  const y = local.getUTCFullYear(), m = local.getUTCMonth() + 1, day = local.getUTCDate();
-  const vaara = local.getUTCDay() + 1;
-  const ev = sunEvents(y, m, day, tz, place.lat, place.lon);
-  const evN = sunEvents(y, m, day + 1, tz, place.lat, place.lon);
-  const rise = ev.rise, nextRise = evN.rise;
-  if (rise == null || nextRise == null) return { rise, nextRise, tz, lagnaSchedule: [], panchakaWindows: [] };
-  const at = (ms) => {
-    const jd = jdOf(ms);
-    const sign = Math.floor(rev(ascendantAt(jd, place.lat, place.lon, ayanAt(jd))) / 30);
-    const t30 = Math.floor(rev(elongMs(ms)) / 12) + 1;
-    const n27 = Math.floor(rev(moonSidMs(ms)) / (360 / 27)) + 1;
-    return { sign, rem: panchakaRem(t30, vaara, n27, sign + 1) };
-  };
-  const step = 60000, segs = [];
-  let s0 = rise, cur = at(rise);
-  for (let t = rise + step; t <= nextRise; t += step) {
-    const nx = at(t);
-    if (nx.sign !== cur.sign || nx.rem !== cur.rem) {
-      let a = t - step, b = t;
-      for (let i = 0; i < 16; i++) { const mid = (a + b) / 2, mm = at(mid); if (mm.sign === cur.sign && mm.rem === cur.rem) a = mid; else b = mid; }
-      segs.push({ start: s0, end: b, sign: cur.sign, rem: cur.rem });
-      s0 = b; cur = nx;
-    }
-  }
-  segs.push({ start: s0, end: nextRise, sign: cur.sign, rem: cur.rem });
-  const lagnaSchedule = [];
-  for (const sg of segs) {
-    const last = lagnaSchedule[lagnaSchedule.length - 1];
-    if (last && last.sign === sg.sign) last.end = sg.end;
-    else lagnaSchedule.push({ sign: sg.sign, start: sg.start, end: sg.end });
-  }
-  for (const w of lagnaSchedule) {
-    const a = at((w.start + w.end) / 2);
-    w.rem = a.rem; w.type = PANCHAKA_TYPE[a.rem] || "shubha"; w.shubha = !PANCHAKA_TYPE[a.rem];
-  }
-  const panchakaWindows = [];
-  for (const sg of segs) {
-    const type = PANCHAKA_TYPE[sg.rem] || "shubha";
-    const last = panchakaWindows[panchakaWindows.length - 1];
-    if (last && last.type === type) last.end = sg.end;
-    else panchakaWindows.push({ start: sg.start, end: sg.end, type, shubha: !PANCHAKA_TYPE[sg.rem], rem: sg.rem });
-  }
-  return { rise, nextRise, tz, lagnaSchedule, panchakaWindows };
-}
 /* ---------------- chart computation ---------------- */
 /* ascendant (sidereal) at an arbitrary instant — used for Gulika/Mandi and special lagnas */
 /* Placidus house cusps (tropical, equinox of date) via iterative semi-arc trisection.
@@ -659,14 +609,6 @@ function placidusCusps(RAMC, eps, phi) {
   return { cusps: c, ok };
 }
 
-function ascendantAt(JD, lat, lon, ayan) {
-  const dd = JD - 2451543.5;
-  const gmst = rev(280.46061837 + 360.98564736629 * (JD - 2451545.0));
-  const ramc = rev(gmst + lon);
-  const eps = 23.4393 - 3.563e-7 * dd;
-  const ascTrop = atan2d(cdg(ramc), -(sd(ramc) * cdg(eps) + tdg(lat) * sd(eps)));
-  return rev(ascTrop - ayan);
-}
 
 const VIM_LORDS = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
 const INDU_KALA = { Sun: 30, Moon: 16, Mars: 6, Mercury: 8, Jupiter: 10, Venus: 12, Saturn: 1 };
@@ -1347,22 +1289,6 @@ const fmtDateT = (ms, tz = 0, withTime = false) => {
   let h = d.getUTCHours(); const mi = d.getUTCMinutes();
   const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
   return `${date}, ${h}:${String(mi).padStart(2, "0")} ${ap}`;
-};
-const fmtTimeD = (ms, tz, refMs) => {
-  if (ms === null || ms === undefined) return "—";
-  const t = new Date(ms + tz * 3600000), r = new Date(refMs + tz * 3600000);
-  const sameDay = t.getUTCDate() === r.getUTCDate() && t.getUTCMonth() === r.getUTCMonth();
-  let h = t.getUTCHours(); const mi = t.getUTCMinutes();
-  const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
-  const base = `${h}:${String(mi).padStart(2, "0")} ${ap}`;
-  return sameDay ? base : base + ", " + t.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
-};
-const fmtTime = (ms, tz) => {
-  if (ms === null) return "—";
-  const t = new Date(ms + tz * 3600000);
-  let h = t.getUTCHours(); const mi = t.getUTCMinutes();
-  const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
-  return `${h}:${String(mi).padStart(2, "0")} ${ap}`;
 };
 
 /* ---------------- North Indian chart SVG ---------------- */
