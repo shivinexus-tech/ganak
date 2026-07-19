@@ -146,18 +146,4 @@ function computeShadbala(ctx) {
   return { perPlanet: out, ranked };
 }
 
-/* read/write small UI preferences in the query string (?lang=hi&screen=daily) —
-   survives reloads without touching the banned browser storage APIs */
-function urlPrefGet(k) { try { return new URLSearchParams(window.location.search).get(k); } catch (e) { return null; } }
-function urlPrefSet(k, v) { try { const q = new URLSearchParams(window.location.search); q.set(k, v); window.history.replaceState(null, "", "?" + q.toString() + window.location.hash); } catch (e) {} }
-const MUH_CATS = [
-  { key: "wedding", hi: "विवाह", en: "Wedding" },
-  { key: "housewarming", hi: "गृह प्रवेश", en: "Housewarming" },
-  { key: "vehicle", hi: "वाहन", en: "Vehicle" },
-  { key: "property", hi: "सम्पत्ति", en: "Property" },
-  { key: "mundan", hi: "मुंडन", en: "Mundan" },
-  { key: "naming", hi: "नामकरण", en: "Naming" },
-  { key: "venture", hi: "व्यापार", en: "Business" },
-];
-
 export { computeShadbala, naturalRel, compoundVal, NF, BALA_PARTS, MT_SIGN };

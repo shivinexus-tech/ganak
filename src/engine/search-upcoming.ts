@@ -88,18 +88,4 @@ function searchUpcoming(query, fromMs, tz, maxN = 24, place = null) {
   return out.slice(0, maxN);
 }
 
-const EVENTS = [
-  { key: "purchase", en: "New purchase", hi: "नई खरीद", good: ["labh", "amrit", "shubh"] },
-  { key: "venture", en: "New venture / business", hi: "नया व्यवसाय", good: ["labh", "amrit", "shubh"] },
-  { key: "puja", en: "Puja / ritual", hi: "पूजा / अनुष्ठान", good: ["amrit", "shubh", "labh"] },
-  { key: "travel", en: "Travel", hi: "यात्रा", good: ["char", "labh", "amrit", "shubh"] },
-  { key: "housewarming", en: "Housewarming", hi: "गृह प्रवेश", good: ["amrit", "shubh", "labh"] },
-  { key: "wedding", en: "Wedding-related", hi: "विवाह संबंधी", good: ["amrit", "shubh", "labh"] },
-];
-
-
-/* Free-text muhurat search was removed in v1 (chips + date range instead) — the
-   AI-parse path needed an API key the web build can't hold. It returns via the
-   backend proxy: see plans/backlog.md item 4. */
-
 export { searchUpcoming };

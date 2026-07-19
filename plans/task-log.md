@@ -59,6 +59,8 @@ same file.
 | SPLIT-UI-03e | MERGED | Cursor | `main` (modules only) | `src/engine/search-upcoming.ts` | Upcoming observances search | Wire deferred. |
 | SPLIT-UI-03f | MERGED | Cursor | `main` (modules only) | `src/screens/CalendarPage.tsx` | Calendar page UI | Wire deferred — helps Daily. |
 
+| SPLIT-UI-03g | MERGED | Cursor | `main` (modules only) | `src/screens/MuhuratHub.tsx`, `src/data/muhurat-ui.ts`, `src/components/url-prefs.ts` | Muhurat hub UI + catalogs + URL prefs | Parse-clean; wire deferred. Also cleaned accidental scrape pollution in shadbala/search-upcoming. |
+
 ## Ten-lane target ownership
 
 **→ Live board with file-existence detail: [`plans/module-ownership-map.md`](module-ownership-map.md)**
