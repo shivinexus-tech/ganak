@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // ============================================================================
-// validation/prashna-parity.js — proves the Prashna engine INLINED in the app
+// validation/prashna-parity.js — proves the Prashna engine in the screen module
 // is behaviourally identical to the standalone engine validated against Drik.
 //
-//   node validation/prashna-parity.js kundli-app.jsx
+//   node validation/prashna-parity.js src/screens/PrashnaScreen.tsx
 //
 // Works on any file that still contains the two engine markers. If the markers
 // are gone (someone refactored the block away), this fails loudly rather than

@@ -9,3 +9,11 @@ Claude-specific notes:
   prefix shell commands with `export PATH="/opt/homebrew/bin:$PATH"`.
 - Dev server: use the Browser pane with launch config `kundli-dev`
   (`.claude/launch.json`), not a raw shell.
+- **NEVER write to `/tmp` (or anywhere outside this repo).** Temp backups go in
+  `.scratch/` only. Writing outside the project escapes the sandbox and forces an
+  "Allow once" prompt — that is a bug in the command, not something the owner
+  should approve. Rewrite the command; do not ask to run unsandboxed.
+- **NEVER touch `~/Ganak-Recovery/`.** That is the owner's restore vault.
+- Work autonomously inside the sandbox. Do not wait for Allow/Run clicks for
+  routine gates, git, or builds. The owner steers via `plans/backlog.md` and
+  `plans/task-log.md`.

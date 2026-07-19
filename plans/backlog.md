@@ -18,6 +18,45 @@ Status verified against `src/kundli-app.tsx`, not assumed.
 
 ---
 
+## P0 — Parallel-agent architecture and pure UI split
+
+**Owner decision, 2026-07-19:** Ganak must support at least ten agents working
+concurrently. The old single-file structure is now a delivery blocker. Replace it
+gradually with one-writer-per-module ownership; do not allow concurrent edits to the
+same file.
+
+- [ ] **EPIC-UI-SPLIT: Pure UI extraction** — move UI without changing behaviour,
+      styling, text, state transitions or astronomy. Extract one cohesive slice at a
+      time, run every gate + build + browser smoke test, then continue.
+  - [x] Prashna screen (first slice; parity markers preserved and gate repointed).
+  - [ ] Shared place search and shared display primitives.
+  - [ ] Daily/Panchang screen shell.
+  - [ ] Fasts, festivals and vrat-vidhi UI.
+  - [ ] Muhurat finder and hora UI.
+  - [ ] Chart form and primary chart UI.
+  - [ ] Kundali matching UI.
+  - [ ] Dashas and divisional-chart UI.
+  - [ ] Rectification, KP, BNN and Bhrigu tools.
+  - [ ] Reduce `kundli-app.tsx` to navigation, shared app state and composition.
+- [ ] **EPIC-10-LANES: Ten concurrent implementation lanes** — after the relevant
+      modules exist, give each lane an isolated Git branch + worktree and exclusive
+      file ownership: Daily, Festivals/Vrats, Muhurat, Chart, Matching, Prashna,
+      Hora/Gochar, specialist Jyotish tools, validation, and backend/deployment.
+- [ ] **Integration lane** — one designated integrator owns shared shell/design-token
+      changes, reviews each branch, merges sequentially and reruns all gates.
+- [ ] **Module ownership map** — record agent, branch/worktree, allowed files,
+      dependencies and status before work starts. No unreserved shared-file edits.
+- [x] **Durable task log** — `plans/task-log.md`; every agent records assignment,
+      files, branch/worktree, validation evidence, blocker and handoff.
+- [ ] Update the older `plans/parallel-agent-brief.md` into the live ten-lane board
+      once the UI modules are available; its single-file instructions are historical.
+
+**Concurrency rule:** ten agents may work at once, but never ten writers in one file.
+Parallel safety comes from separate modules + separate worktrees + an integration
+owner, not from relying on Git to reconcile overlapping generated code.
+
+---
+
 ## PHASE 1 — Free web launch (Panchang + Prashna + Muhurat)
 
 Small scope on the *plumbing*, but the **content is NOT ready** — the Panchang

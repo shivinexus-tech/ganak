@@ -1,5 +1,11 @@
 # Ganak — Parallel-Agent Work Brief
 
+> **Historical brief (superseded 2026-07-19).** Its single-file/no-code rules describe
+> the earlier architecture. The owner has approved a modular UI split and ten
+> concurrent worktree lanes. Use `AGENTS.md`, `plans/backlog.md` P0 and
+> `plans/task-log.md` for current coordination. Do not issue new assignments from
+> this document until it is rewritten as the live ownership board.
+
 Hand this whole file to Codex or Cursor. It is self-contained. Pick your assigned
 section. **Read the "Iron rules" first — they are non-negotiable and exist because
 this is a single-file app where parallel edits create duplicate/orphaned code.**

@@ -1,0 +1,356 @@
+import { rev, sd } from "./ephemeris";
+import {
+  amantaMonthIdx, elongMs, moonEvents, moonSidMs, solveCross,
+  sunEvents, sunSidMs, zoneOffset, karanaName,
+} from "./panchang";
+
+/* Tamil/Malayalam solar-calendar observances.
+   Festival days are sunrise-to-sunrise days. Because this scanner intentionally
+   has no latitude, 06:00 local is the stable sunrise boundary; the named
+   nakshatra occurrence is assigned to the sunrise on which it prevails. If an
+   unusually short occurrence falls wholly between two sunrise boundaries, the
+   day containing the greatest overlap is the documented fallback.
+   Solar-month checks use Lahiri sidereal signs (Tamil/Malayalam month mapping).
+   Vishukkani uses the first dawn after Mesha Sankranti. Vrischikam day 1 uses
+   the Malayalam month rule: a Sankranti up to the end of Madhyahna (approximated
+   as 3/5 of a 06:00–18:00 day = 13:12 local) belongs to that civil day; a later
+   Sankranti is observed the following day. */
+const SOLAR_NAK_FESTIVALS = [
+  { key: "panguniUthiram", sunSign: 11, nak: 11 }, // Meena · Uttara Phalguni
+  { key: "thaipusam", sunSign: 9, nak: 7 },       // Makara · Pushya
+  { key: "onam", sunSign: 4, nak: 21 },           // Simha/Chingam · Shravana
+  { key: "karthigaiDeepam", sunSign: 7, nak: 2 }, // Vrischika/Karthigai · Krittika
+];
+function localNoon(ms, tz) {
+  const d = new Date(ms + tz * 3600000);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12) - tz * 3600000;
+}
+function localPanchangDayStart(ms, tz) {
+  const shifted = ms + tz * 3600000 - 6 * 3600000;
+  const d = new Date(shifted);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 6) - tz * 3600000;
+}
+function malayalamSankrantiDay(ingressMs, tz) {
+  const d = new Date(ingressMs + tz * 3600000);
+  const localHour = d.getUTCHours() + d.getUTCMinutes() / 60 + d.getUTCSeconds() / 3600;
+  const noon = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12) - tz * 3600000;
+  return noon + (localHour > 13.2 ? 86400000 : 0);
+}
+function firstSunriseDayAfter(ingressMs, tz) {
+  const rise = localPanchangDayStart(ingressMs, tz);
+  return rise + (ingressMs > rise ? 86400000 : 0) + 6 * 3600000;
+}
+function solarNakshatraFestivalDays(fromMs, tz, days) {
+  const DAY = 86400000, firstNoon = localNoon(fromMs, tz), limit = firstNoon + days * DAY, out = [];
+  for (const rule of SOLAR_NAK_FESTIVALS) {
+    const startDeg = rule.nak * (360 / 27), endDeg = ((rule.nak + 1) % 27) * (360 / 27);
+    let nakStart = solveCross(moonSidMs, firstNoon - 3 * DAY, startDeg, days + 6);
+    while (nakStart && nakStart < limit + DAY) {
+      const nakEnd = solveCross(moonSidMs, nakStart + 60000, endDeg, 3);
+      if (!nakEnd) break;
+      let bucket = localPanchangDayStart(nakStart, tz), best = bucket, bestOverlap = -1, sunriseHit = null;
+      while (bucket < nakEnd) {
+        const overlap = Math.max(0, Math.min(nakEnd, bucket + DAY) - Math.max(nakStart, bucket));
+        if (overlap > bestOverlap) { bestOverlap = overlap; best = bucket; }
+        if (bucket >= nakStart && bucket < nakEnd && sunriseHit === null) sunriseHit = bucket;
+        bucket += DAY;
+      }
+      if (sunriseHit !== null) best = sunriseHit;
+      const festivalNoon = best + 6 * 3600000;
+      if (festivalNoon >= firstNoon && festivalNoon < limit && Math.floor(sunSidMs(best) / 30) === rule.sunSign) {
+        out.push({ key: rule.key, ms: festivalNoon, nakStart, nakEnd });
+      }
+      nakStart = solveCross(moonSidMs, nakEnd + 60000, startDeg, 32);
+    }
+  }
+  return out;
+}
+function ayyappaMandalaFor(ms, tz) {
+  const DAY = 86400000, civilNoon = localNoon(ms, tz), d = new Date(civilNoon + tz * 3600000), gy = d.getUTCFullYear();
+  for (const year of [gy, gy - 1]) {
+    const ingress = solveCross(sunSidMs, Date.UTC(year, 9, 20), 210, 45);
+    if (!ingress) continue;
+    const start = malayalamSankrantiDay(ingress, tz), end = start + 40 * DAY;
+    const day = Math.round((civilNoon - start) / DAY) + 1;
+    if (day >= 1 && day <= 41) return { day, start, end, ingress };
+  }
+  return null;
+}
+// tithi-based observances (fasting days) — accurate, month-independent
+
+/* ekadashi variants by lunar month */
+const EKADASHI_NAMES = {
+  "Chaitra_Shukla_11": { en: "Kamada Ekadashi", hi: "कामदा एकादशी" },
+  "Vaisakha_Shukla_11": { en: "Mohini Ekadashi", hi: "मोहिनी एकादशी" },
+  "Jyeshtha_Shukla_11": { en: "Apara Ekadashi", hi: "अपरा एकादशी" },
+  "Ashadha_Shukla_11": { en: "Yogini Ekadashi", hi: "योगिनी एकादशी" },
+  "Shravan_Shukla_11": { en: "Varuthini Ekadashi", hi: "वरूथिनी एकादशी" },
+  "Bhadrapad_Shukla_11": { en: "Padma Ekadashi", hi: "पद्मा एकादशी" },
+  "Ashwin_Shukla_11": { en: "Indira Ekadashi", hi: "इंदिरा एकादशी" },
+  "Kartik_Shukla_11": { en: "Dev Uthani Ekadashi", hi: "देव उठनी एकादशी" },
+  "Margshirsh_Shukla_11": { en: "Utpanna Ekadashi", hi: "उत्पन्ना एकादशी" },
+  "Paush_Shukla_11": { en: "Mokshada Ekadashi", hi: "मोक्षदा एकादशी" },
+  "Magh_Shukla_11": { en: "Safala Ekadashi", hi: "सफला एकादशी" },
+  "Phalgun_Shukla_11": { en: "Amalaki Ekadashi", hi: "आमलकी एकादशी" },
+  "Chaitra_Krishna_11": { en: "Pap Mochini Ekadashi", hi: "पाप मोचिनी एकादशी" },
+  "Vaisakha_Krishna_11": { en: "Nrisimha Jayanti", hi: "नृसिंह जयंती" },
+  "Jyeshtha_Krishna_11": { en: "Nirjala Ekadashi", hi: "निर्जला एकादशी" },
+  "Ashadha_Krishna_11": { en: "Hari Bodhini Ekadashi", hi: "हरि बोधिनी एकादशी" },
+  "Shravan_Krishna_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" },
+  "Bhadrapad_Krishna_11": { en: "Aja Ekadashi", hi: "अजा एकादशी" },
+  "Ashwin_Krishna_11": { en: "Vijaya Ekadashi", hi: "विजया एकादशी" },
+  "Kartik_Krishna_11": { en: "Prabodhini Ekadashi", hi: "प्रबोधिनी एकादशी" },
+  "Margshirsh_Krishna_11": { en: "Gita Jayanti", hi: "गीता जयंती" },
+  "Paush_Krishna_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" },
+  "Magh_Krishna_11": { en: "Shatila Ekadashi", hi: "शतिला एकादशी" },
+  "Phalgun_Krishna_11": { en: "Phalaharini Ekadashi", hi: "फलहारिणी एकादशी" }
+};
+const PRADOSH_NAMES_BY_DAY = {
+  0: { en: "Ravi Pradosh", hi: "रवि प्रदोष" },
+  1: { en: "Som Pradosh", hi: "सोम प्रदोष" },
+  2: { en: "Bhaum Pradosh", hi: "भौम प्रदोष" },
+  3: { en: "Budh Pradosh", hi: "बुध प्रदोष" },
+  4: { en: "Guru Pradosh", hi: "गुरु प्रदोष" },
+  5: { en: "Shukra Pradosh", hi: "शुक्र प्रदोष" },
+  6: { en: "Shani Pradosh", hi: "शनि प्रदोष" }
+};
+
+function observancesFor(krishna, tithiNum, month = null, dow = null) {
+  const out = [];
+  if (tithiNum === 11) {
+    const pk = krishna ? "Krishna" : "Shukla";
+    const key = month ? `${month}_${pk}_11` : null;
+    const variant = key && EKADASHI_NAMES[key] ? key : null;
+    out.push({ key: variant || "ekadashi", fasting: true, isVariant: !!variant, baseKey: "ekadashi" });
+  }
+  if (tithiNum === 13) {
+    const variant = dow != null ? PRADOSH_NAMES_BY_DAY[dow % 7] : null;
+    const variantKey = variant ? `pradosh_${dow % 7}` : "pradosh";
+    out.push({ key: variantKey, fasting: true, isVariant: !!variant, baseKey: "pradosh" });
+  }
+  if (tithiNum === 4 && krishna) out.push({ key: "sankashti", fasting: true });
+  if (tithiNum === 4 && !krishna) out.push({ key: "vinayakaChaturthi", fasting: true });
+  if (tithiNum === 6 && !krishna) out.push({ key: "skandaShashti", fasting: true });
+  if (tithiNum === 8 && !krishna) out.push({ key: "masikDurgashtami", fasting: true });
+  if (tithiNum === 8 && krishna) out.push({ key: "kalashtami", fasting: false });
+  if (tithiNum === 14 && krishna) out.push({ key: "masikShivaratri", fasting: true });
+  if (tithiNum === 15 && !krishna) out.push({ key: "purnima", fasting: true });
+  if (tithiNum === 15 && krishna) out.push({ key: "amavasya", fasting: true });
+  return out;
+}
+// major festivals by amanta month index (into MONTHS_HINDU) + paksha + tithi
+const FESTIVALS = [
+  { key: "lakshmiPanchami", month: 0, krishna: false, tithi: 5, kala: "udaya" },
+  { key: "ramNavami", month: 0, krishna: false, tithi: 9, kala: "madhyahna" },
+  { key: "hanumanJ", month: 0, krishna: false, tithi: 15, kala: "udaya" },
+  { key: "akshaya", month: 1, krishna: false, tithi: 3, kala: "purvahna", selection: "first" },
+  { key: "buddhaPurnima", month: 1, krishna: false, tithi: 15, kala: "udaya" },
+  { key: "guptNavratriAshadha", month: 3, krishna: false, tithi: 1, kala: "pratahkala", selection: "first" },
+  { key: "rathYatra", month: 3, krishna: false, tithi: 2, kala: "udaya" },
+  { key: "guruPurnima", month: 3, krishna: false, tithi: 15, kala: "udaya" },
+  { key: "hariyaliTeej", month: 4, krishna: false, tithi: 3, kala: "udaya" },
+  { key: "nagPanchami", month: 4, krishna: false, tithi: 5, kala: "udaya" },
+  { key: "janmashtami", month: 4, krishna: true, tithi: 8, kala: "nishita" },
+  { key: "rakshaBandhan", month: 4, krishna: false, tithi: 15, policy: "raksha" },
+  { key: "hartalikaTeej", month: 5, krishna: false, tithi: 3, kala: "udaya" },
+  { key: "ganeshChaturthi", month: 5, krishna: false, tithi: 4, kala: "madhyahna" },
+  { key: "radhaAshtami", month: 5, krishna: false, tithi: 8, kala: "madhyahna" },
+  { key: "navratri", month: 6, krishna: false, tithi: 1, kala: "pratahkala", selection: "first" },
+  { key: "mahaAshtami", month: 6, krishna: false, tithi: 8, kala: "udaya" },
+  { key: "mahaNavami", month: 6, krishna: false, tithi: 9, kala: "aparahna" },
+  { key: "dussehra", month: 6, krishna: false, tithi: 10, kala: "aparahna" },
+  { key: "sharadPurnima", month: 6, krishna: false, tithi: 15, kala: "nishita" },
+  { key: "ahoiAshtami", month: 6, krishna: true, tithi: 8, kala: "pradosha" },
+  { key: "karvaChauth", month: 6, krishna: true, tithi: 4, kala: "moonrise" },
+  { key: "diwali", month: 6, krishna: true, tithi: 15, kala: "pradosha" },
+  { key: "guptNavratriMagha", month: 10, krishna: false, tithi: 1, kala: "pratahkala", selection: "first" },
+  { key: "vasantPanchami", month: 10, krishna: false, tithi: 5, kala: "purvahna" },
+  { key: "mahaShivaratri", month: 10, krishna: true, tithi: 14, kala: "nishita" },
+  { key: "sheetlaAshtami", month: 11, krishna: true, tithi: 8, kala: "udaya" },
+  { key: "holika", month: 11, krishna: false, tithi: 15, policy: "holika" },
+];
+/* Festival kala are true local intervals derived from sunrise/sunset. The fallback
+   path (no coordinates) retains 06:00/18:00 boundaries for validation/import use,
+   but every UI caller passes the selected place. Daytime is split into five equal
+   parts; Nishita is the central 1/15 of the local night. */
+const FAST_KALA_RULES = [
+  { baseKey: "ekadashi", tithi: 11, krishna: null, kala: "udaya" },
+  { baseKey: "pradosh", tithi: 13, krishna: null, kala: "pradosha" },
+  { baseKey: "sankashti", tithi: 4, krishna: true, kala: "moonrise" },
+  { baseKey: "vinayakaChaturthi", tithi: 4, krishna: false, kala: "madhyahna" },
+  { baseKey: "skandaShashti", tithi: 6, krishna: false, kala: "udaya" },
+  { baseKey: "masikDurgashtami", tithi: 8, krishna: false, kala: "udaya" },
+  { baseKey: "masikShivaratri", tithi: 14, krishna: true, kala: "nishita" },
+  { baseKey: "purnima", tithi: 15, krishna: false, kala: "udaya" },
+  { baseKey: "amavasya", tithi: 15, krishna: true, kala: "udaya" },
+];
+const tithiIndexAt = (ms) => Math.floor(rev(moonSidMs(ms) - sunSidMs(ms)) / 12);
+const targetTithiIndex = (krishna, tithi) => (krishna ? 15 : 0) + tithi - 1;
+function scanDayParts(y, m, day, fallbackTz, place) {
+  const zone = place && place.zone, lat = Number(place && place.lat), lon = Number(place && place.lon);
+  const tz = (zone && zoneOffset(zone, y, m, day)) ?? fallbackTz;
+  const nd = new Date(Date.UTC(y, m - 1, day + 1));
+  const ny = nd.getUTCFullYear(), nm = nd.getUTCMonth() + 1, nda = nd.getUTCDate();
+  const ntz = (zone && zoneOffset(zone, ny, nm, nda)) ?? fallbackTz;
+  const noon = Date.UTC(y, m - 1, day, 12) - tz * 3600000;
+  let rise = Date.UTC(y, m - 1, day, 6) - tz * 3600000;
+  let set = Date.UTC(y, m - 1, day, 18) - tz * 3600000;
+  let nextRise = Date.UTC(ny, nm - 1, nda, 6) - ntz * 3600000;
+  const hasObserver = Number.isFinite(lat) && Number.isFinite(lon);
+  if (Number.isFinite(lat) && Number.isFinite(lon)) {
+    const ev = sunEvents(y, m, day, tz, lat, lon), evN = sunEvents(ny, nm, nda, ntz, lat, lon);
+    if (ev.rise != null && ev.set != null) { rise = ev.rise; set = ev.set; }
+    if (evN.rise != null) nextRise = evN.rise;
+  }
+  const dayLen = set - rise, nightLen = nextRise - set, nightMid = set + nightLen / 2;
+  return {
+    y, m, day, tz, noon, rise, set, nextRise, moonrise: undefined, observer: hasObserver ? { lat, lon } : null,
+    udaya: [rise, rise + 60000],
+    pratahkala: [rise, rise + dayLen / 5],
+    purvahna: [rise, rise + 2 * dayLen / 5],
+    madhyahna: [rise + 2 * dayLen / 5, rise + 3 * dayLen / 5],
+    aparahna: [rise + 3 * dayLen / 5, rise + 4 * dayLen / 5],
+    pradosha: [set - dayLen / 10, set + nightLen / 10],
+    nishita: [nightMid - nightLen / 30, nightMid + nightLen / 30],
+  };
+}
+function kalaInterval(parts, kala) {
+  if (kala === "moonrise") {
+    if (parts.moonrise === undefined) {
+      parts.moonrise = parts.observer
+        ? moonEvents(parts.y, parts.m, parts.day, parts.tz, parts.observer.lat, parts.observer.lon, 1800000).rise
+        : Date.UTC(parts.y, parts.m - 1, parts.day, 18) - parts.tz * 3600000;
+    }
+    return parts.moonrise == null ? null : [parts.moonrise, parts.moonrise + 60000];
+  }
+  return parts[kala || "udaya"] || parts.udaya;
+}
+function tithiKalaOverlap(parts, kala, target) {
+  if (kala === "moonrise") {
+    const noonIdx = tithiIndexAt(parts.noon), delta = (target - noonIdx + 30) % 30;
+    if (delta !== 0 && delta !== 1 && delta !== 29) return 0; // avoid an expensive moonrise solve on unrelated tithis
+  }
+  const span = kalaInterval(parts, kala);
+  if (!span || span[1] <= span[0]) return 0;
+  const start = span[0] + 1000, end = span[1] - 1000;
+  const atStart = tithiIndexAt(start) === target, atEnd = tithiIndexAt(end) === target;
+  if (atStart && atEnd) return end - start;
+  if (atStart) {
+    const exit = solveCross(elongMs, start, ((target + 1) % 30) * 12, 2);
+    return Math.max(0, Math.min(end, exit || end) - start);
+  }
+  if (atEnd) {
+    const enter = solveCross(elongMs, start, target * 12, 2);
+    return Math.max(0, end - Math.max(start, enter || end));
+  }
+  return 0;
+}
+function kalaIsBhadra(parts, kala) {
+  const span = kalaInterval(parts, kala);
+  if (!span) return true;
+  return karanaName(elongMs((span[0] + span[1]) / 2)) === "Vishti";
+}
+function festivalMatch(f, parts) {
+  const target = targetTithiIndex(f.krishna, f.tithi);
+  if (f.policy === "raksha") {
+    for (const [kala, rank] of [["aparahna", 0], ["pradosha", 1], ["udaya", 2]]) {
+      const overlap = tithiKalaOverlap(parts, kala, target);
+      if (overlap && !kalaIsBhadra(parts, kala)) return { rank, reason: kala, overlap };
+    }
+    return null;
+  }
+  if (f.policy === "holika") {
+    const pradosha = tithiKalaOverlap(parts, "pradosha", target), udaya = tithiKalaOverlap(parts, "udaya", target);
+    if (pradosha && !kalaIsBhadra(parts, "pradosha")) return { rank: 0, reason: "pradosha", overlap: pradosha };
+    if (udaya && !kalaIsBhadra(parts, "udaya")) return { rank: 1, reason: "udaya-fallback", overlap: udaya };
+    return null;
+  }
+  const kala = f.kala || "udaya", overlap = tithiKalaOverlap(parts, kala, target);
+  return overlap ? { rank: 0, reason: kala, overlap } : null;
+}
+function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = null) {
+  const DAY = 86400000, fasts = [], festivals = [], candidates = new Map();
+  const start = new Date(fromMs + tz * 3600000);
+  const sy = start.getUTCFullYear(), sm = start.getUTCMonth(), sd = start.getUTCDate();
+  const monthNames = ["Chaitra", "Vaisakha", "Jyeshtha", "Ashadha", "Shravan", "Bhadrapad", "Ashwin", "Kartik", "Margshirsh", "Paush", "Magh", "Phalgun"];
+  for (let k = 0; k < days; k++) {
+    const civil = new Date(Date.UTC(sy, sm, sd + k));
+    const y = civil.getUTCFullYear(), m = civil.getUTCMonth() + 1, day = civil.getUTCDate();
+    const parts = scanDayParts(y, m, day, tz, place), dow = civil.getUTCDay();
+    if (k < fastDays) {
+      const month = monthNames[(m - 1 + 9) % 12]; // existing display-name mapping; date rules use lunar tithi below
+      for (const rule of FAST_KALA_RULES) {
+        for (const krishna of rule.krishna == null ? [false, true] : [rule.krishna]) {
+          const target = targetTithiIndex(krishna, rule.tithi);
+          if (!tithiKalaOverlap(parts, rule.kala, target)) continue;
+          const obs = observancesFor(krishna, rule.tithi, month, dow).filter((o) => obsKind(o.key) === rule.baseKey);
+          for (const o of obs) {
+            if (!o.fasting) continue;
+            const prev = [...fasts].reverse().find((x) => x.key === o.key);
+            if (prev && parts.noon - prev.ms <= 1.5 * DAY) continue;
+            fasts.push({ key: o.key, ms: parts.noon, decidingKala: rule.kala });
+          }
+        }
+      }
+    }
+    const monthIdx = amantaMonthIdx(parts.rise).idx;
+    for (const f of FESTIVALS) {
+      if (monthIdx !== f.month) continue;
+      const match = festivalMatch(f, parts);
+      if (!match) continue;
+      if (!candidates.has(f.key)) candidates.set(f.key, []);
+      candidates.get(f.key).push({ key: f.key, ms: parts.noon, y, m, day, decidingKala: match.reason, rank: match.rank, overlap: match.overlap, selection: f.selection });
+    }
+  }
+  for (const f of FESTIVALS) {
+    const all = (candidates.get(f.key) || []).sort((a, b) => a.ms - b.ms);
+    if (!all.length) continue;
+    const occurrence = all.filter((x) => x.ms - all[0].ms <= 2.5 * DAY);
+    occurrence.sort((a, b) => a.rank - b.rank || (a.selection === "first" ? a.ms - b.ms : b.overlap - a.overlap || a.ms - b.ms));
+    festivals.push(occurrence[0]);
+  }
+  const holika = festivals.find((f) => f.key === "holika");
+  if (holika) {
+    const nd = new Date(Date.UTC(holika.y, holika.m - 1, holika.day + 1));
+    const ny = nd.getUTCFullYear(), nm = nd.getUTCMonth() + 1, nda = nd.getUTCDate();
+    const ntz = (place && place.zone && zoneOffset(place.zone, ny, nm, nda)) ?? tz;
+    festivals.push({ key: "rangwaliHoli", ms: Date.UTC(ny, nm - 1, nda, 12) - ntz * 3600000, decidingKala: "day-after-holika" });
+  }
+  for (const f of solarNakshatraFestivalDays(fromMs, tz, days)) festivals.push(f);
+  // Vishu (Mesha Sankranti under Kerala's day rule) and the two endpoints of
+  // Ayyappa's inclusive 41-day Mandala Vratham.
+  const firstNoon = localNoon(fromMs, tz), rangeEnd = firstNoon + days * DAY;
+  const firstYear = new Date(firstNoon + tz * 3600000).getUTCFullYear();
+  for (let gy = firstYear - 1; gy <= firstYear + 2; gy++) {
+    try {
+      const mesha = solveCross(sunSidMs, Date.UTC(gy, 2, 18), 0, 45);
+      if (mesha) {
+        // Vishukkani is viewed at the first dawn after Mesha Sankranti. This is
+        // distinct from the civil date carrying the Sankranti itself (e.g. Drik:
+        // ingress 14 Apr 2026 morning, Vishukkani 15 Apr).
+        const vishu = firstSunriseDayAfter(mesha, tz);
+        if (vishu >= firstNoon && vishu < rangeEnd) festivals.push({ key: "vishu", ms: vishu, ingress: mesha });
+      }
+      const vrischika = solveCross(sunSidMs, Date.UTC(gy, 9, 20), 210, 45);
+      if (vrischika) {
+        const start = malayalamSankrantiDay(vrischika, tz), end = start + 40 * DAY;
+        if (start >= firstNoon && start < rangeEnd) festivals.push({ key: "ayyappaMandalaBegins", ms: start, spanEnd: end });
+        if (end >= firstNoon && end < rangeEnd) festivals.push({ key: "ayyappaMandalaPuja", ms: end, spanStart: start });
+      }
+    } catch (e) {}
+  }
+  // Makar Sankranti (solar): Sun enters Capricorn (270 deg sidereal)
+  try { const mk = solveCross(sunSidMs, fromMs, 270, days); if (mk && mk < fromMs + days * DAY) festivals.push({ key: "makarSankranti", ms: mk }); } catch (e) {}
+  festivals.sort((a, b) => a.ms - b.ms);
+  return { fasts, festivals };
+}
+
+
+/* classify an observance key to its base kind */
+const obsKind = (key) => (key === "ekadashi" || /_11$/.test(key)) ? "ekadashi" : (key || "").startsWith("pradosh") ? "pradosh" : key;
+
+export {
+  SOLAR_NAK_FESTIVALS, ayyappaMandalaFor, EKADASHI_NAMES,
+  PRADOSH_NAMES_BY_DAY, observancesFor, FESTIVALS, FAST_KALA_RULES,
+  scanPanchangCalendar, obsKind,
+};

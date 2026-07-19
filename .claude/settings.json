@@ -2,26 +2,8 @@
   "permissions": {
     "defaultMode": "acceptEdits",
     "allow": [
-      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
-      "Bash(node validation/*)",
-      "Bash(tail *)",
-      "Bash(grep *)",
-      "Bash(git add *)",
-      "Bash(git commit *)",
-      "Bash(git -c *)",
-      "Bash(git push *)",
-      "Bash(git fetch *)",
-      "Bash(git checkout *)",
-      "Bash(git merge *)",
-      "Bash(git branch *)",
-      "Bash(git stash *)",
-      "Bash(git restore *)",
-      "Bash(git status *)",
-      "Bash(git diff *)",
-      "Bash(git log *)",
-      "Bash(git show *)",
-      "Bash(npm run dev*)",
-      "Bash(npm run build*)",
+      "WebSearch",
+      "WebFetch",
       "mcp__Claude_Browser__computer",
       "mcp__Claude_Browser__read_page",
       "mcp__Claude_Browser__get_page_text",
@@ -38,6 +20,38 @@
       "mcp__Claude_Browser__tabs_select",
       "mcp__visualize__read_me",
       "mcp__visualize__show_widget"
+    ],
+    "ask": [],
+    "deny": [
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.netrc)",
+      "Read(~/.config/gh/**)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Edit(~/Ganak-Recovery/**)",
+      "Write(~/Ganak-Recovery/**)"
     ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": false,
+    "network": {
+      "allowedDomains": [
+        "www.drikpanchang.com",
+        "*.drikpanchang.com"
+      ]
+    },
+    "filesystem": {
+      "denyWrite": [
+        "~/Ganak-Recovery"
+      ],
+      "allowRead": [
+        "~/.gitconfig",
+        "~/.config/git"
+      ]
+    }
   }
 }
