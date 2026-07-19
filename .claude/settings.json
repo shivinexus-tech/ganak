@@ -1,7 +1,13 @@
 {
   "permissions": {
+    "defaultMode": "acceptEdits",
     "allow": [
       "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\" && node validation/*)",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\" && git *)",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\" && echo *)",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\" && npm run dev*)",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\" && npm run build*)",
       "Bash(node validation/parse-check.js*)",
       "Bash(node validation/prashna-parity.js*)",
       "Bash(node validation/prashna-calc.js*)",
