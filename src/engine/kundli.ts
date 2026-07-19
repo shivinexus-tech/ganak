@@ -1,20 +1,18 @@
 /* Birth-chart computation (SPLIT-UI-CHART-02). Modules-only copy; shell still has its own until wired. */
 
 import {
-  rev, sd, cdg, tdg, atan2d, D2R, tropicalLongitudes, ascendantAt,
-  moonLon, sunPos, planetGeoApparent, deltaTsec, nutationLon,
+  rev, sd, cdg, tdg, atan2d, tropicalLongitudes, ascendantAt, moonLon,
 } from "./ephemeris";
 import {
-  setAyanMode, ayanAt, sunSidMs, moonSidMs, jdOf, SIGN_LORD, NAKSHATRAS, SIGNS,
+  setAyanMode, ayanAt, SIGN_LORD, NAKSHATRAS, SIGNS,
   TITHIS, YOGAS, karanaName, sunEvents,
 } from "./panchang";
 import { placidusCusps } from "./houses";
 import { vargaSign } from "./varga";
-import { VARGAS } from "../data/chart-divisions";
-import { computeAshtakavarga, computeArudhas, detectYogas, SEVEN, OWN_SIGNS, EXALT } from "./classical";
+import { computeAshtakavarga, computeArudhas, detectYogas, SEVEN } from "./classical";
 import { computeShadbala } from "./shadbala";
 import {
-  DASHA_SEQ, VIM_LORDS, subLordChain, nakLordOf, vimSub,
+  DASHA_SEQ, VIM_LORDS, subLordChain, vimSub,
   computeKPSignificators, computeRulingPlanets, WEEKDAY_LORDS,
 } from "./dasha";
 import { computeSpecialPoints } from "./special-points";
