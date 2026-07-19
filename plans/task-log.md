@@ -27,8 +27,8 @@ same file.
 
 | ID | Status | Agent | Branch/worktree | Exclusive files | Task | Evidence / handoff |
 |---|---|---|---|---|---|---|
-| SPLIT-ENGINE-01 | REVIEW | Codex | current integration worktree | `src/kundli-app.tsx`, `src/engine/*`, `plans/codex-handoff-engine-split.md` | Pure astronomy engine split | All gates/build/browser green; see `plans/codex-handoff-engine-split.md`; uncommitted |
-| SPLIT-UI-01 | REVIEW | Codex | current integration worktree | `src/kundli-app.tsx`, `src/screens/PrashnaScreen.tsx`, `src/components/tokens.ts`, `src/components/format.ts`, `validation/prashna-parity.js`, coordination docs | First pure UI slice: extracted Prashna screen plus exact shared tokens/formatter moves; no intended behaviour or styling change | Parse clean; parity EXACT (198 values/6 charts); deliberate mutation made parity fail, then restored; Prashna 24/24; Muhurat/content anchors pass; production build passes; Daily + Prashna browser smoke pass with 0 console errors; review: `plans/codex-review-ui-split.md`; uncommitted |
+| SPLIT-ENGINE-01 | MERGED | Codex | `main` @ `a21260d` | `src/kundli-app.tsx`, `src/engine/*`, `plans/codex-handoff-engine-split.md` | Pure astronomy engine split | Gates/build/browser green; handoff `plans/codex-handoff-engine-split.md`; committed+pushed in `a21260d` (2026-07-19) |
+| SPLIT-UI-01 | MERGED | Codex | `main` @ `a21260d` | `src/kundli-app.tsx`, `src/screens/PrashnaScreen.tsx`, `src/components/tokens.ts`, `src/components/format.ts`, `validation/prashna-parity.js`, coordination docs | First pure UI slice: extracted Prashna screen plus exact shared tokens/formatter moves; no intended behaviour or styling change | Parse clean; parity EXACT (198 values/6 charts); Prashna 24/24; Muhurat/content anchors pass; production build passes; Daily + Prashna browser smoke pass with 0 console errors; review: `plans/codex-review-ui-split.md`; committed+pushed in `a21260d` (2026-07-19) |
 
 ## Ten-lane target ownership
 
@@ -42,7 +42,7 @@ must replace `TBD` with real branch/worktree and exact files before work starts.
 | 3 | Muhurat | `src/features/muhurat/*` | Waiting for extraction |
 | 4 | Chart | `src/screens/ChartScreen.tsx`, chart-only components | Waiting for extraction |
 | 5 | Matching | `src/features/matching/*` | Waiting for extraction |
-| 6 | Prashna | `src/screens/PrashnaScreen.tsx` | Extracted; available after review/integration |
+| 6 | Prashna | `src/screens/PrashnaScreen.tsx` | Extracted; MERGED on `main` @ `a21260d` |
 | 7 | Hora/Gochar | `src/features/hora/*`, `src/features/gochar/*` | Waiting for extraction |
 | 8 | Jyotish tools | `src/features/jyotish-tools/*` | Waiting for extraction |
 | 9 | Validation | `validation/*` with task-specific reservation | Available for non-overlapping gates |
