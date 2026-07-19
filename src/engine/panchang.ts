@@ -274,11 +274,14 @@ function setAyanMode(ayanamsa) {
   AYAN_MODE = ayanamsa;
 }
 
+// Vimshottari dasha lord sequence -- moved from the shell (SPLIT-UI-03d).
+const VIM_LORDS = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+
 // Sign lords (zodiac rulers) — shared by chart, hora and muhurat code.
 const SIGN_LORD = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
 
 export {
-  SIGN_LORD,
+  SIGN_LORD, VIM_LORDS,
   SIGNS, NAKSHATRAS, YOGAS, TITHIS, KARANAS_MOV, karanaName, PLANET_DEVA,
   sunEvents, moonEvents, RAHU_SEGMENT, YAMA_SEGMENT, GULIKA_SEGMENT,
   setAyanMode, ayanAt, sunSidMs, moonSidMs, elongMs, lunYogaMs, planetSidMs,
