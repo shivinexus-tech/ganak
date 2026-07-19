@@ -1,0 +1,34 @@
+# Ganak — rules for Cursor (and any AI agent working in this editor)
+
+Read `AGENTS.md` at the repo root FIRST and follow it exactly. It is the canonical
+conventions file for every agent (Claude, Codex, Cursor). This file just restates
+the non-negotiables so Cursor's AI can't miss them.
+
+## Non-negotiable rules
+1. **ONE writer on `src/kundli-app.tsx` at a time.** Never edit that file while
+   another agent (Claude Code, Codex) is also editing it. If unsure, ask the owner.
+   Parallel work should be research/writing into NEW files under `plans/`.
+2. **Run the validation gates after any structural edit** and paste the passing
+   output — never claim "done" without it:
+   ```
+   export PATH="/opt/homebrew/bin:$PATH"
+   node validation/parse-check.js src/kundli-app.tsx   # syntax, orphans, storage ban
+   node validation/prashna-parity.js src/kundli-app.tsx
+   node validation/prashna-calc.js
+   node validation/muhurat-anchors.cjs
+   node validation/content-dates.cjs                   # festival/day-part anchors
+   ```
+3. **No `localStorage` / `sessionStorage`** — banned. UI prefs go in the URL query.
+4. **Content is Hindu observances only** (Buddha Purnima excepted). Religious
+   content (festival dates, vrat vidhis) must be SOURCED (cite Drik + a second
+   source or a named text) and owner-verified — never invented.
+5. **Bilingual** (English + Hindi) for all user-facing text.
+
+## How to run the app
+Dev server: `npm run dev` (Node is at /opt/homebrew/bin). Node/npm not on PATH by
+default — prefix with `export PATH="/opt/homebrew/bin:$PATH"`.
+
+## Where things are
+- App: `src/kundli-app.tsx` (single ~6,000-line React file).
+- Plans / backlog / research: `plans/`.
+- Validation gates: `validation/`.
