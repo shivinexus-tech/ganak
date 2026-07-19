@@ -61,6 +61,8 @@ same file.
 
 | SPLIT-UI-03g | MERGED | Cursor | `main` (modules only) | `src/screens/MuhuratHub.tsx`, `src/data/muhurat-ui.ts`, `src/components/url-prefs.ts` | Muhurat hub UI + catalogs + URL prefs | Parse-clean; wire deferred. Also cleaned accidental scrape pollution in shadbala/search-upcoming. |
 
+| DAILY-HANDOFF-01 | MERGED | Cursor | `main` | `plans/cursor-handoff-daily-ready.md`, `plans/module-ownership-map.md` | Inventory of peeled Daily modules for Claude wire | Docs only. |
+
 ## Ten-lane target ownership
 
 **→ Live board with file-existence detail: [`plans/module-ownership-map.md`](module-ownership-map.md)**

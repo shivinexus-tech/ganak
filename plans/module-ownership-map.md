@@ -33,7 +33,7 @@ Status: `MERGED` (extracted + integrated) · `Partial` (engine/data out, UI not)
 
 | # | Lane | Files | Exists? | Status | Who may reserve next |
 |---|---|---|---|---|---|
-| 1 | **Daily/Panchang** | `src/screens/DailyScreen.tsx` + daily-only components | ❌ TBD | Waiting | Next UI slice (**SPLIT-UI-03**) — **all 10 circular-import blockers now cleared** by 03a/b/c; the extraction itself is unblocked |
+| 1 | **Daily/Panchang** | Modules ready: `MuhuratHub.tsx`, `CalendarPage.tsx`, `today-panchang.ts`, `search-upcoming.ts`, `muhurat-ui.ts` (Cursor peels). `DailyScreen.tsx` shell still TBD | Partial | Waiting on **wire** into `kundli-app.tsx` | See `plans/cursor-handoff-daily-ready.md` |
 | 2 | **Festivals/Vrats** | UI: `src/features/festivals/*` ❌ TBD<br>Data: `src/data/festival-meta.ts` ✅, `src/data/vrat-vidhis.ts` ✅<br>Engine: `src/engine/festivals.ts` ✅ | Partial | Partial | **Content agent may take the two `src/data/` files now.** UI waits for SPLIT-UI-04 |
 | 3 | **Muhurat** | UI: `src/features/muhurat/*` ❌ TBD<br>Engine: `src/engine/muhurat.ts` ✅ | Partial | Partial | Engine reservable for fixes; UI waits for SPLIT-UI-05 |
 | 4 | **Chart** | `src/screens/ChartScreen.tsx` + chart components | ❌ TBD | Waiting | After Daily slice |
