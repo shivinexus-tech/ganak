@@ -322,15 +322,15 @@ festival's date from the tithi at **noon**, but shastra assigns a different deci
 day-part per festival (Udaya/sunrise for most; Madhyahna/noon for Ganesh Chaturthi,
 Ram Navami; Nishita/midnight for Janmashtami, Shivaratri; Aparahna for Vijayadashami;
 moonrise for Karva Chauth/Sankashti).
-- ✅ **Mechanism built + both bugs fixed 2026-07-18.** Per-festival `dp` day-part
-  override (`DAYPART_HOUR` proxies); Hartalika → 2026-09-14, Gupt Navratri Ashadha →
-  fires 2026-07-15. Zero regression (all other festivals byte-identical to prior/
-  sourced dates — verified). Hard anchors added to validation/content-dates.cjs.
-  Default kept at noon deliberately (zero-regression) pending the sourced audit.
-- [ ] **Pending: principled day-part pass (Codex Assignment A).** Once the sourced
-  per-festival day-part table lands (plans/festival-daypart-audit.md), flip the
-  scanner default to Udaya and add each festival's correct `dp`. Then extend the same
-  day-part logic to the **fasts** loop (still noon-only). This is P1 content-accuracy.
+- ✅ **Mechanism built + both original bugs fixed 2026-07-18.** Hartalika →
+  2026-09-14; Gupt Navratri Ashadha → 2026-07-15.
+- [x] **Principled day-part pass completed 2026-07-18 (Codex Assignment A).** The
+  scanner now derives Udaya, Pratahkala, Purvahna, Madhyahna, Aparahna, Pradosha,
+  Nishita and moonrise from each user's exact place and local sunrise/sunset instead
+  of fixed clock-hour proxies. Every festival has an explicit sourced kala or special
+  policy; Raksha Bandhan and Holika Dahan exclude Bhadra. The fasts loop now applies
+  its own deciding kala too. Holika Dahan and Rangwali Holi are separate calendar
+  entries. 17 New Delhi regression anchors plus the full validation suite pass.
 
 ### C-SCOPE — decided by owner 2026-07-18
 **In scope: ALL of Smarta / Vaishnava / Shaiva / Shakta + top regional, AND aim

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-// Prints computed 2026 dates for the new Tier-1 festivals so placements can be
-// verified against known/Drik dates before shipping. Not a pass/fail gate —
-// a human (owner) reads the output and confirms each date is right.
+// Computes Tier-1 festival dates and fails when a sourced regression anchor
+// moves. The longer listing remains useful for human review of new coverage.
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -14,15 +13,16 @@ let app; try { app = require(tmp).__t; } finally { fs.unlinkSync(tmp); }
 
 // scan Jan 1 2026 → ~14 months, IST
 const IST = 5.5;
+const DELHI = { zone: 'Asia/Kolkata', lat: 28.6139, lon: 77.2090 };
 const from = Date.UTC(2026, 0, 1) - IST * 3600000;
-const cal = app.scanPanchangCalendar(from, IST, 430);
+const cal = app.scanPanchangCalendar(from, IST, 430, 46, DELHI);
 const fmt = (ms) => new Date(ms + IST * 3600000).toISOString().slice(0, 10);
 const SOLAR_NEW = ['thaipusam','panguniUthiram','vishu','onam','karthigaiDeepam','ayyappaMandalaBegins','ayyappaMandalaPuja'];
 const NEW = ['lakshmiPanchami','buddhaPurnima','guptNavratriAshadha','rathYatra','hariyaliTeej','nagPanchami','hartalikaTeej','radhaAshtami','mahaAshtami','mahaNavami','sharadPurnima','ahoiAshtami','guptNavratriMagha','vasantPanchami','sheetlaAshtami', ...SOLAR_NEW];
 const KNOWN = {
   vasantPanchami: '2026-01-23', mahaShivaratri: '2026-02-15', sheetlaAshtami: '~8 days after Holi (Mar 2026)',
-  buddhaPurnima: '2026-05-01', rathYatra: '2026-07-15', hariyaliTeej: '2026-08-15', nagPanchami: '2026-08-17',
-  hartalikaTeej: '2026-09-14 (Udaya rule — FIXED)', radhaAshtami: '2026-09-19', sharadPurnima: '2026-10-25', ahoiAshtami: '2026-11-02', vasantPanchami2: 'Magha Shukla 5',
+  buddhaPurnima: '2026-05-01', rathYatra: '2026-07-16', hariyaliTeej: '2026-08-15', nagPanchami: '2026-08-17',
+  hartalikaTeej: '2026-09-14 (Udaya rule — FIXED)', radhaAshtami: '2026-09-19', sharadPurnima: '2026-10-25', ahoiAshtami: '2026-11-01', vasantPanchami2: 'Magha Shukla 5',
 };
 console.log('New Tier-1 festival dates computed for 2026 (verify against Drik):\n');
 const seen = {};
@@ -62,10 +62,28 @@ if (solarFailures) {
   console.log('\n✓ 7/7 Tier-2 solar/nakshatra anchors match');
 }
 
-// Day-part fix anchors (hard pass/fail) — festivals whose deciding day-part is Udaya,
-// not the noon default. Regression guard for the 2026-07-18 day-part mechanism fix.
-console.log('\nDay-part fix anchors (Udaya-rule festivals):');
-const dpAnchors = { hartalikaTeej: '2026-09-14', guptNavratriAshadha: '2026-07-15' };
+// Day-part anchors (hard pass/fail): boundary cases where a noon/sunrise-only
+// scanner is wrong. Delhi coordinates are passed so kala use real rise/set/moonrise.
+console.log('\nFestival day-part anchors (New Delhi 2026):');
+const dpAnchors = {
+  holika: '2026-03-03',
+  rangwaliHoli: '2026-03-04',
+  akshaya: '2026-04-19',
+  rathYatra: '2026-07-16',
+  rakshaBandhan: '2026-08-28',
+  janmashtami: '2026-09-04',
+  hartalikaTeej: '2026-09-14',
+  radhaAshtami: '2026-09-19',
+  mahaAshtami: '2026-10-19',
+  mahaNavami: '2026-10-19',
+  dussehra: '2026-10-20',
+  sharadPurnima: '2026-10-25',
+  karvaChauth: '2026-10-29',
+  ahoiAshtami: '2026-11-01',
+  diwali: '2026-11-08',
+  guptNavratriAshadha: '2026-07-15',
+  mahaShivaratri: '2026-02-15',
+};
 let dpFailures = 0;
 for (const [key, exp] of Object.entries(dpAnchors)) {
   const hit = cal.festivals.find((f) => f.key === key);
@@ -75,7 +93,7 @@ for (const [key, exp] of Object.entries(dpAnchors)) {
   if (!ok) dpFailures++;
 }
 if (dpFailures) { console.error(`\n✗ ${dpFailures} day-part anchor(s) failed`); process.exitCode = 1; }
-else console.log('✓ day-part fix anchors match');
+else console.log(`✓ ${Object.keys(dpAnchors).length}/${Object.keys(dpAnchors).length} festival day-part anchors match`);
 
 const localAnchor = (y, m, d) => Date.UTC(y, m - 1, d, 12) - IST * 3600000;
 const mandalaChecks = [

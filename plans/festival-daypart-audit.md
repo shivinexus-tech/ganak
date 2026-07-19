@@ -1,6 +1,7 @@
 # Festival deciding-daypart audit
 
-Status: research handoff for Claude Code; no application code changed by Codex.
+Status: implemented by Codex on 2026-07-18; the sourced table below remains the
+audit trail for the scanner policies and regression anchors.
 
 Scope: every Tier-1 row currently present in `FESTIVALS` in `src/kundli-app.tsx`.
 Reference location for the 2026 anchors is **Delhi / New Delhi, India** unless a
@@ -14,8 +15,9 @@ hour. The governing rule is whether the festival tithi occupies its prescribed
 **kala** (part of the local Hindu day), sometimes with exclusions and fallbacks.
 Those kalas move with local sunrise and sunset. Moonrise is independently local.
 
-The current `DAYPART_HOUR = { udaya: 6, madhyahna: 12, aparahna: 15,
-pradosha: 18, nishita: 24 }` is therefore only a temporary approximation:
+Before this pass, `DAYPART_HOUR = { udaya: 6, madhyahna: 12, aparahna: 15,
+pradosha: 18, nishita: 24 }` was only a temporary approximation. The implemented
+scanner now derives these periods from the selected place's rise/set times:
 
 - Pratahkala, Madhyahna and Aparahna are divisions of the actual sunrise-to-sunset
   interval, not fixed wall-clock hours. Drik explicitly divides daytime into five
@@ -101,7 +103,7 @@ or a regional/tradition decision remains.
 6. **Raksha Bandhan and Holika Dahan need ordered fallback policies.** A `dp` string
    cannot represent their rules.
 
-## Implementation contract for Claude Code
+## Implementation contract (implemented 2026-07-18)
 
 Represent a festival rule as policy, not only a representative hour. Suggested
 shape (illustrative, not a required source-code design):

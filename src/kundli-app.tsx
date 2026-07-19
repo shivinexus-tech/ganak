@@ -762,8 +762,8 @@ function moonRefine(a, b, lat, lon, h0) {
   return (a + b) / 2;
 }
 /* Moonrise / moonset (UTC ms) for the local calendar day, or null if the Moon doesn't cross the horizon */
-function moonEvents(y, m, day, tz, lat, lon) {
-  const h0 = 0.125, DAY = 86400000, step = 300000;
+function moonEvents(y, m, day, tz, lat, lon, step = 300000) {
+  const h0 = 0.125, DAY = 86400000;
   const start = Date.UTC(y, m - 1, day, 0, 0) - tz * 3600000;
   let rise = null, set = null, prev = moonAltitude(start, lat, lon) - h0;
   for (let t = step; t <= DAY; t += step) {
@@ -1089,78 +1089,181 @@ function observancesFor(krishna, tithiNum, month = null, dow = null) {
 }
 // major festivals by amanta month index (into MONTHS_HINDU) + paksha + tithi
 const FESTIVALS = [
-  { key: "lakshmiPanchami", month: 0, krishna: false, tithi: 5 },
-  { key: "ramNavami",   month: 0,  krishna: false, tithi: 9 },
-  { key: "hanumanJ",    month: 0,  krishna: false, tithi: 15 },
-  { key: "akshaya",     month: 1,  krishna: false, tithi: 3 },
-  { key: "buddhaPurnima", month: 1, krishna: false, tithi: 15 },
-  { key: "guptNavratriAshadha", month: 3, krishna: false, tithi: 1, dp: "udaya" }, // Ghatasthapana at sunrise; noon misses Pratipada (was not firing)
-  { key: "rathYatra",   month: 3,  krishna: false, tithi: 2 },
-  { key: "guruPurnima", month: 3,  krishna: false, tithi: 15 },
-  { key: "hariyaliTeej", month: 4, krishna: false, tithi: 3 },
-  { key: "nagPanchami", month: 4,  krishna: false, tithi: 5 },
-  { key: "janmashtami", month: 4,  krishna: true,  tithi: 8 },
-  { key: "rakshaBandhan", month: 4, krishna: false, tithi: 15 },
-  { key: "hartalikaTeej", month: 5, krishna: false, tithi: 3, dp: "udaya" }, // Pratahkala/Udaya rule (Drik); noon landed it a day early
-  { key: "ganeshChaturthi", month: 5, krishna: false, tithi: 4 },
-  { key: "radhaAshtami", month: 5, krishna: false, tithi: 8 },
-  { key: "navratri",    month: 6,  krishna: false, tithi: 1 },
-  { key: "mahaAshtami", month: 6,  krishna: false, tithi: 8 },
-  { key: "mahaNavami",  month: 6,  krishna: false, tithi: 9 },
-  { key: "dussehra",    month: 6,  krishna: false, tithi: 10 },
-  { key: "sharadPurnima", month: 6, krishna: false, tithi: 15 },
-  { key: "ahoiAshtami", month: 6,  krishna: true,  tithi: 8 },
-  { key: "karvaChauth", month: 6,  krishna: true,  tithi: 4 },
-  { key: "diwali",      month: 6,  krishna: true,  tithi: 15 },
-  { key: "guptNavratriMagha", month: 10, krishna: false, tithi: 1 },
-  { key: "vasantPanchami", month: 10, krishna: false, tithi: 5 },
-  { key: "mahaShivaratri", month: 10, krishna: true, tithi: 14 },
-  { key: "sheetlaAshtami", month: 11, krishna: true, tithi: 8 },
-  { key: "holika",      month: 11, krishna: false, tithi: 15 },
+  { key: "lakshmiPanchami", month: 0, krishna: false, tithi: 5, kala: "udaya" },
+  { key: "ramNavami", month: 0, krishna: false, tithi: 9, kala: "madhyahna" },
+  { key: "hanumanJ", month: 0, krishna: false, tithi: 15, kala: "udaya" },
+  { key: "akshaya", month: 1, krishna: false, tithi: 3, kala: "purvahna", selection: "first" },
+  { key: "buddhaPurnima", month: 1, krishna: false, tithi: 15, kala: "udaya" },
+  { key: "guptNavratriAshadha", month: 3, krishna: false, tithi: 1, kala: "pratahkala", selection: "first" },
+  { key: "rathYatra", month: 3, krishna: false, tithi: 2, kala: "udaya" },
+  { key: "guruPurnima", month: 3, krishna: false, tithi: 15, kala: "udaya" },
+  { key: "hariyaliTeej", month: 4, krishna: false, tithi: 3, kala: "udaya" },
+  { key: "nagPanchami", month: 4, krishna: false, tithi: 5, kala: "udaya" },
+  { key: "janmashtami", month: 4, krishna: true, tithi: 8, kala: "nishita" },
+  { key: "rakshaBandhan", month: 4, krishna: false, tithi: 15, policy: "raksha" },
+  { key: "hartalikaTeej", month: 5, krishna: false, tithi: 3, kala: "udaya" },
+  { key: "ganeshChaturthi", month: 5, krishna: false, tithi: 4, kala: "madhyahna" },
+  { key: "radhaAshtami", month: 5, krishna: false, tithi: 8, kala: "madhyahna" },
+  { key: "navratri", month: 6, krishna: false, tithi: 1, kala: "pratahkala", selection: "first" },
+  { key: "mahaAshtami", month: 6, krishna: false, tithi: 8, kala: "udaya" },
+  { key: "mahaNavami", month: 6, krishna: false, tithi: 9, kala: "aparahna" },
+  { key: "dussehra", month: 6, krishna: false, tithi: 10, kala: "aparahna" },
+  { key: "sharadPurnima", month: 6, krishna: false, tithi: 15, kala: "nishita" },
+  { key: "ahoiAshtami", month: 6, krishna: true, tithi: 8, kala: "pradosha" },
+  { key: "karvaChauth", month: 6, krishna: true, tithi: 4, kala: "moonrise" },
+  { key: "diwali", month: 6, krishna: true, tithi: 15, kala: "pradosha" },
+  { key: "guptNavratriMagha", month: 10, krishna: false, tithi: 1, kala: "pratahkala", selection: "first" },
+  { key: "vasantPanchami", month: 10, krishna: false, tithi: 5, kala: "purvahna" },
+  { key: "mahaShivaratri", month: 10, krishna: true, tithi: 14, kala: "nishita" },
+  { key: "sheetlaAshtami", month: 11, krishna: true, tithi: 8, kala: "udaya" },
+  { key: "holika", month: 11, krishna: false, tithi: 15, policy: "holika" },
 ];
-/* Deciding day-part → local clock hour used to sample a festival's tithi. Shastra
-   assigns a different vyapini rule per festival (Udaya=sunrise for most, Madhyahna=
-   noon for Ganesh Chaturthi/Ram Navami, Nishita=midnight for Janmashtami/Shivaratri,
-   Aparahna for Vijayadashami, etc.). Without lat/lon the scanner uses fixed local-clock
-   proxies. `dp` on a FESTIVALS entry overrides the default.
-   NOTE: the default is Madhyahna (noon) — NOT because that's the correct principled
-   default (Udaya is), but because the app historically used noon and every festival
-   except the two below was already right at noon (verified vs Drik anchors). Keeping
-   noon as default = zero regression; only the two proven-broken festivals are flipped
-   to Udaya. The principled pass — Udaya default + each festival's sourced day-part —
-   is EPIC content work (Codex Assignment A, plans/parallel-agent-brief.md). When that
-   sourced table lands, flip this default to "udaya" and add per-festival `dp`. */
-const DAYPART_HOUR = { udaya: 6, madhyahna: 12, aparahna: 15, pradosha: 18, nishita: 24 };
-function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46) {
-  const DAY = 86400000, fasts = [], festivals = [];
-  const probeMs = (k, hour) => { const d = new Date(fromMs + k * DAY + tz * 3600000); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), hour) - tz * 3600000; };
-  const noon = (k) => probeMs(k, 12);
-  const tithiAt = (mst) => { const t = Math.floor(rev(moonSidMs(mst) - sunSidMs(mst)) / 12); return { tithiNum: (t % 15) + 1, krishna: t >= 15 }; };
+/* Festival kala are true local intervals derived from sunrise/sunset. The fallback
+   path (no coordinates) retains 06:00/18:00 boundaries for validation/import use,
+   but every UI caller passes the selected place. Daytime is split into five equal
+   parts; Nishita is the central 1/15 of the local night. */
+const FAST_KALA_RULES = [
+  { baseKey: "ekadashi", tithi: 11, krishna: null, kala: "udaya" },
+  { baseKey: "pradosh", tithi: 13, krishna: null, kala: "pradosha" },
+  { baseKey: "sankashti", tithi: 4, krishna: true, kala: "moonrise" },
+  { baseKey: "vinayakaChaturthi", tithi: 4, krishna: false, kala: "madhyahna" },
+  { baseKey: "skandaShashti", tithi: 6, krishna: false, kala: "udaya" },
+  { baseKey: "masikDurgashtami", tithi: 8, krishna: false, kala: "udaya" },
+  { baseKey: "masikShivaratri", tithi: 14, krishna: true, kala: "nishita" },
+  { baseKey: "purnima", tithi: 15, krishna: false, kala: "udaya" },
+  { baseKey: "amavasya", tithi: 15, krishna: true, kala: "udaya" },
+];
+const tithiIndexAt = (ms) => Math.floor(rev(moonSidMs(ms) - sunSidMs(ms)) / 12);
+const targetTithiIndex = (krishna, tithi) => (krishna ? 15 : 0) + tithi - 1;
+function scanDayParts(y, m, day, fallbackTz, place) {
+  const zone = place && place.zone, lat = Number(place && place.lat), lon = Number(place && place.lon);
+  const tz = (zone && zoneOffset(zone, y, m, day)) ?? fallbackTz;
+  const nd = new Date(Date.UTC(y, m - 1, day + 1));
+  const ny = nd.getUTCFullYear(), nm = nd.getUTCMonth() + 1, nda = nd.getUTCDate();
+  const ntz = (zone && zoneOffset(zone, ny, nm, nda)) ?? fallbackTz;
+  const noon = Date.UTC(y, m - 1, day, 12) - tz * 3600000;
+  let rise = Date.UTC(y, m - 1, day, 6) - tz * 3600000;
+  let set = Date.UTC(y, m - 1, day, 18) - tz * 3600000;
+  let nextRise = Date.UTC(ny, nm - 1, nda, 6) - ntz * 3600000;
+  const hasObserver = Number.isFinite(lat) && Number.isFinite(lon);
+  if (Number.isFinite(lat) && Number.isFinite(lon)) {
+    const ev = sunEvents(y, m, day, tz, lat, lon), evN = sunEvents(ny, nm, nda, ntz, lat, lon);
+    if (ev.rise != null && ev.set != null) { rise = ev.rise; set = ev.set; }
+    if (evN.rise != null) nextRise = evN.rise;
+  }
+  const dayLen = set - rise, nightLen = nextRise - set, nightMid = set + nightLen / 2;
+  return {
+    y, m, day, tz, noon, rise, set, nextRise, moonrise: undefined, observer: hasObserver ? { lat, lon } : null,
+    udaya: [rise, rise + 60000],
+    pratahkala: [rise, rise + dayLen / 5],
+    purvahna: [rise, rise + 2 * dayLen / 5],
+    madhyahna: [rise + 2 * dayLen / 5, rise + 3 * dayLen / 5],
+    aparahna: [rise + 3 * dayLen / 5, rise + 4 * dayLen / 5],
+    pradosha: [set - dayLen / 10, set + nightLen / 10],
+    nishita: [nightMid - nightLen / 30, nightMid + nightLen / 30],
+  };
+}
+function kalaInterval(parts, kala) {
+  if (kala === "moonrise") {
+    if (parts.moonrise === undefined) {
+      parts.moonrise = parts.observer
+        ? moonEvents(parts.y, parts.m, parts.day, parts.tz, parts.observer.lat, parts.observer.lon, 1800000).rise
+        : Date.UTC(parts.y, parts.m - 1, parts.day, 18) - parts.tz * 3600000;
+    }
+    return parts.moonrise == null ? null : [parts.moonrise, parts.moonrise + 60000];
+  }
+  return parts[kala || "udaya"] || parts.udaya;
+}
+function tithiKalaOverlap(parts, kala, target) {
+  if (kala === "moonrise") {
+    const noonIdx = tithiIndexAt(parts.noon), delta = (target - noonIdx + 30) % 30;
+    if (delta !== 0 && delta !== 1 && delta !== 29) return 0; // avoid an expensive moonrise solve on unrelated tithis
+  }
+  const span = kalaInterval(parts, kala);
+  if (!span || span[1] <= span[0]) return 0;
+  const start = span[0] + 1000, end = span[1] - 1000;
+  const atStart = tithiIndexAt(start) === target, atEnd = tithiIndexAt(end) === target;
+  if (atStart && atEnd) return end - start;
+  if (atStart) {
+    const exit = solveCross(elongMs, start, ((target + 1) % 30) * 12, 2);
+    return Math.max(0, Math.min(end, exit || end) - start);
+  }
+  if (atEnd) {
+    const enter = solveCross(elongMs, start, target * 12, 2);
+    return Math.max(0, end - Math.max(start, enter || end));
+  }
+  return 0;
+}
+function kalaIsBhadra(parts, kala) {
+  const span = kalaInterval(parts, kala);
+  if (!span) return true;
+  return karanaName(elongMs((span[0] + span[1]) / 2)) === "Vishti";
+}
+function festivalMatch(f, parts) {
+  const target = targetTithiIndex(f.krishna, f.tithi);
+  if (f.policy === "raksha") {
+    for (const [kala, rank] of [["aparahna", 0], ["pradosha", 1], ["udaya", 2]]) {
+      const overlap = tithiKalaOverlap(parts, kala, target);
+      if (overlap && !kalaIsBhadra(parts, kala)) return { rank, reason: kala, overlap };
+    }
+    return null;
+  }
+  if (f.policy === "holika") {
+    const pradosha = tithiKalaOverlap(parts, "pradosha", target), udaya = tithiKalaOverlap(parts, "udaya", target);
+    if (pradosha && !kalaIsBhadra(parts, "pradosha")) return { rank: 0, reason: "pradosha", overlap: pradosha };
+    if (udaya && !kalaIsBhadra(parts, "udaya")) return { rank: 1, reason: "udaya-fallback", overlap: udaya };
+    return null;
+  }
+  const kala = f.kala || "udaya", overlap = tithiKalaOverlap(parts, kala, target);
+  return overlap ? { rank: 0, reason: kala, overlap } : null;
+}
+function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = null) {
+  const DAY = 86400000, fasts = [], festivals = [], candidates = new Map();
+  const start = new Date(fromMs + tz * 3600000);
+  const sy = start.getUTCFullYear(), sm = start.getUTCMonth(), sd = start.getUTCDate();
+  const monthNames = ["Chaitra", "Vaisakha", "Jyeshtha", "Ashadha", "Shravan", "Bhadrapad", "Ashwin", "Kartik", "Margshirsh", "Paush", "Magh", "Phalgun"];
   for (let k = 0; k < days; k++) {
+    const civil = new Date(Date.UTC(sy, sm, sd + k));
+    const y = civil.getUTCFullYear(), m = civil.getUTCMonth() + 1, day = civil.getUTCDate();
+    const parts = scanDayParts(y, m, day, tz, place), dow = civil.getUTCDay();
     if (k < fastDays) {
-      const dayMs = noon(k), d = new Date(dayMs + tz * 3600000);
-      const nt = tithiAt(dayMs); // fasts retain the noon rule for now (audit tracked separately)
-      const monthN = d.getUTCMonth() + 1, dow = d.getUTCDay();
-      const monthNames = ["Chaitra", "Vaisakha", "Jyeshtha", "Ashadha", "Shravan", "Bhadrapad", "Ashwin", "Kartik", "Margshirsh", "Paush", "Magh", "Phalgun"];
-      const month = monthNames[(monthN - 1 + 9) % 12]; // amanta offset
-      for (const o of observancesFor(nt.krishna, nt.tithiNum, month, dow)) {
-        if (!o.fasting) continue;
-        const prev = [...fasts].reverse().find((x) => x.key === o.key);
-        if (prev && dayMs - prev.ms <= 1.5 * DAY) continue; // same tithi spanning two days → list the fast once
-        fasts.push({ key: o.key, ms: dayMs });
+      const month = monthNames[(m - 1 + 9) % 12]; // existing display-name mapping; date rules use lunar tithi below
+      for (const rule of FAST_KALA_RULES) {
+        for (const krishna of rule.krishna == null ? [false, true] : [rule.krishna]) {
+          const target = targetTithiIndex(krishna, rule.tithi);
+          if (!tithiKalaOverlap(parts, rule.kala, target)) continue;
+          const obs = observancesFor(krishna, rule.tithi, month, dow).filter((o) => obsKind(o.key) === rule.baseKey);
+          for (const o of obs) {
+            if (!o.fasting) continue;
+            const prev = [...fasts].reverse().find((x) => x.key === o.key);
+            if (prev && parts.noon - prev.ms <= 1.5 * DAY) continue;
+            fasts.push({ key: o.key, ms: parts.noon, decidingKala: rule.kala });
+          }
+        }
       }
     }
-    // Festivals fire on their deciding day-part's tithi (Udaya/sunrise default, per-
-    // festival `dp` override), anchored to that civil day. Replaces the old noon-only
-    // rule that landed Hartalika Teej a day early and dropped Ashadha Gupt Navratri.
-    const udayaMs = probeMs(k, DAYPART_HOUR.udaya);
-    const monthIdx = amantaMonthIdx(udayaMs).idx;
+    const monthIdx = amantaMonthIdx(parts.rise).idx;
     for (const f of FESTIVALS) {
-      if (festivals.some((x) => x.key === f.key)) continue;
-      const t = tithiAt(probeMs(k, DAYPART_HOUR[f.dp || "madhyahna"]));
-      if (f.krishna === t.krishna && f.tithi === t.tithiNum && monthIdx === f.month)
-        festivals.push({ key: f.key, ms: udayaMs });
+      if (monthIdx !== f.month) continue;
+      const match = festivalMatch(f, parts);
+      if (!match) continue;
+      if (!candidates.has(f.key)) candidates.set(f.key, []);
+      candidates.get(f.key).push({ key: f.key, ms: parts.noon, y, m, day, decidingKala: match.reason, rank: match.rank, overlap: match.overlap, selection: f.selection });
     }
+  }
+  for (const f of FESTIVALS) {
+    const all = (candidates.get(f.key) || []).sort((a, b) => a.ms - b.ms);
+    if (!all.length) continue;
+    const occurrence = all.filter((x) => x.ms - all[0].ms <= 2.5 * DAY);
+    occurrence.sort((a, b) => a.rank - b.rank || (a.selection === "first" ? a.ms - b.ms : b.overlap - a.overlap || a.ms - b.ms));
+    festivals.push(occurrence[0]);
+  }
+  const holika = festivals.find((f) => f.key === "holika");
+  if (holika) {
+    const nd = new Date(Date.UTC(holika.y, holika.m - 1, holika.day + 1));
+    const ny = nd.getUTCFullYear(), nm = nd.getUTCMonth() + 1, nda = nd.getUTCDate();
+    const ntz = (place && place.zone && zoneOffset(place.zone, ny, nm, nda)) ?? tz;
+    festivals.push({ key: "rangwaliHoli", ms: Date.UTC(ny, nm - 1, nda, 12) - ntz * 3600000, decidingKala: "day-after-holika" });
   }
   for (const f of solarNakshatraFestivalDays(fromMs, tz, days)) festivals.push(f);
   // Vishu (Mesha Sankranti under Kerala's day rule) and the two endpoints of
@@ -1401,6 +1504,8 @@ function vratDetail(place, ayanamsa, ms, timing) {
     } else if (timing === "moonrise") {
       const me = moonEvents(y, m, day, tz, place.lat, place.lon);
       out.moonrise = me.rise != null ? me.rise : (moonEvents(y, m, day + 1, tz, place.lat, place.lon).rise);
+    } else if (timing === "stars") {
+      out.stars = true;
     } else if (timing === "sunset") {
       out.sunset = info.set;
     }
@@ -3348,7 +3453,7 @@ const L = {
 };
 const CHOG_NAME = { udveg: { en: "Udveg", hi: "उद्वेग" }, char: { en: "Char", hi: "चर" }, labh: { en: "Labh", hi: "लाभ" }, amrit: { en: "Amrit", hi: "अमृत" }, kaal: { en: "Kaal", hi: "काल" }, shubh: { en: "Shubh", hi: "शुभ" }, rog: { en: "Rog", hi: "रोग" } };
 const OBS_NAME = { ekadashi: { en: "Ekadashi", hi: "एकादशी" }, pradosh: { en: "Pradosh Vrat", hi: "प्रदोष व्रत" }, sankashti: { en: "Sankashti Chaturthi", hi: "संकष्टी चतुर्थी" }, vinayakaChaturthi: { en: "Vinayaka Chaturthi", hi: "विनायक चतुर्थी" }, skandaShashti: { en: "Skanda Shashti", hi: "स्कंद षष्ठी" }, masikDurgashtami: { en: "Masik Durgashtami", hi: "मासिक दुर्गाष्टमी" }, kalashtami: { en: "Kalashtami", hi: "कालाष्टमी" }, masikShivaratri: { en: "Masik Shivaratri", hi: "मासिक शिवरात्रि" }, purnima: { en: "Purnima", hi: "पूर्णिमा" }, amavasya: { en: "Amavasya", hi: "अमावस्या" }, "Chaitra_Shukla_11": { en: "Kamada Ekadashi", hi: "कामदा एकादशी" }, "Vaisakha_Shukla_11": { en: "Mohini Ekadashi", hi: "मोहिनी एकादशी" }, "Jyeshtha_Shukla_11": { en: "Apara Ekadashi", hi: "अपरा एकादशी" }, "Ashadha_Shukla_11": { en: "Yogini Ekadashi", hi: "योगिनी एकादशी" }, "Shravan_Shukla_11": { en: "Varuthini Ekadashi", hi: "वरूथिनी एकादशी" }, "Bhadrapad_Shukla_11": { en: "Padma Ekadashi", hi: "पद्मा एकादशी" }, "Ashwin_Shukla_11": { en: "Indira Ekadashi", hi: "इंदिरा एकादशी" }, "Kartik_Shukla_11": { en: "Dev Uthani Ekadashi", hi: "देव उठनी एकादशी" }, "Margshirsh_Shukla_11": { en: "Utpanna Ekadashi", hi: "उत्पन्ना एकादशी" }, "Paush_Shukla_11": { en: "Mokshada Ekadashi", hi: "मोक्षदा एकादशी" }, "Magh_Shukla_11": { en: "Safala Ekadashi", hi: "सफला एकादशी" }, "Phalgun_Shukla_11": { en: "Amalaki Ekadashi", hi: "आमलकी एकादशी" }, "Chaitra_Krishna_11": { en: "Pap Mochini Ekadashi", hi: "पाप मोचिनी एकादशी" }, "Vaisakha_Krishna_11": { en: "Nrisimha Jayanti", hi: "नृसिंह जयंती" }, "Jyeshtha_Krishna_11": { en: "Nirjala Ekadashi", hi: "निर्जला एकादशी" }, "Ashadha_Krishna_11": { en: "Hari Bodhini Ekadashi", hi: "हरि बोधिनी एकादशी" }, "Shravan_Krishna_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" }, "Bhadrapad_Krishna_11": { en: "Aja Ekadashi", hi: "अजा एकादशी" }, "Ashwin_Krishna_11": { en: "Vijaya Ekadashi", hi: "विजया एकादशी" }, "Kartik_Krishna_11": { en: "Prabodhini Ekadashi", hi: "प्रबोधिनी एकादशी" }, "Margshirsh_Krishna_11": { en: "Gita Jayanti", hi: "गीता जयंती" }, "Paush_Krishna_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" }, "Magh_Krishna_11": { en: "Shatila Ekadashi", hi: "शतिला एकादशी" }, "Phalgun_Krishna_11": { en: "Phalaharini Ekadashi", hi: "फलहारिणी एकादशी" }, "pradosh_Sunday": { en: "Ravi Pradosh", hi: "रवि प्रदोष" }, "pradosh_Monday": { en: "Som Pradosh", hi: "सोम प्रदोष" }, "pradosh_Tuesday": { en: "Bhaum Pradosh", hi: "भौम प्रदोष" }, "pradosh_Wednesday": { en: "Budh Pradosh", hi: "बुध प्रदोष" }, "pradosh_Thursday": { en: "Guru Pradosh", hi: "गुरु प्रदोष" }, "pradosh_Friday": { en: "Shukra Pradosh", hi: "शुक्र प्रदोष" }, "pradosh_Saturday": { en: "Shani Pradosh", hi: "शनि प्रदोष" } };
-const FEST_NAME = { makarSankranti: { en: "Makar Sankranti", hi: "मकर संक्रांति" }, mahaShivaratri: { en: "Maha Shivaratri", hi: "महाशिवरात्रि" }, holika: { en: "Holi", hi: "होली" }, ramNavami: { en: "Ram Navami", hi: "राम नवमी" }, hanumanJ: { en: "Hanuman Jayanti", hi: "हनुमान जयंती" }, akshaya: { en: "Akshaya Tritiya", hi: "अक्षय तृतीया" }, guruPurnima: { en: "Guru Purnima", hi: "गुरु पूर्णिमा" }, rakshaBandhan: { en: "Raksha Bandhan", hi: "रक्षाबंधन" }, janmashtami: { en: "Janmashtami", hi: "जन्माष्टमी" }, ganeshChaturthi: { en: "Ganesh Chaturthi", hi: "गणेश चतुर्थी" }, navratri: { en: "Navratri begins", hi: "नवरात्रि आरंभ" }, dussehra: { en: "Dussehra", hi: "दशहरा" }, karvaChauth: { en: "Karva Chauth", hi: "करवा चौथ" }, diwali: { en: "Diwali", hi: "दिवाली" }, lakshmiPanchami: { en: "Lakshmi Panchami", hi: "लक्ष्मी पंचमी" }, buddhaPurnima: { en: "Buddha Purnima", hi: "बुद्ध पूर्णिमा" }, guptNavratriAshadha: { en: "Ashadha Gupt Navratri", hi: "आषाढ़ गुप्त नवरात्रि" }, rathYatra: { en: "Rath Yatra", hi: "रथ यात्रा" }, hariyaliTeej: { en: "Hariyali Teej", hi: "हरियाली तीज" }, nagPanchami: { en: "Nag Panchami", hi: "नाग पंचमी" }, hartalikaTeej: { en: "Hartalika Teej", hi: "हरतालिका तीज" }, radhaAshtami: { en: "Radha Ashtami", hi: "राधा अष्टमी" }, mahaAshtami: { en: "Maha Ashtami", hi: "महाअष्टमी" }, mahaNavami: { en: "Maha Navami", hi: "महानवमी" }, sharadPurnima: { en: "Sharad Purnima", hi: "शरद पूर्णिमा" }, ahoiAshtami: { en: "Ahoi Ashtami", hi: "अहोई अष्टमी" }, guptNavratriMagha: { en: "Magha Gupt Navratri", hi: "माघ गुप्त नवरात्रि" }, vasantPanchami: { en: "Vasant Panchami", hi: "वसंत पंचमी" }, sheetlaAshtami: { en: "Sheetla Ashtami (Basoda)", hi: "शीतला अष्टमी (बसोड़ा)" }, panguniUthiram: { en: "Panguni Uthiram", hi: "पंगुनी उथिरम" }, thaipusam: { en: "Thaipusam", hi: "थाईपूसम" }, onam: { en: "Onam (Thiruvonam)", hi: "ओणम (थिरुवोणम)" }, karthigaiDeepam: { en: "Karthigai Deepam", hi: "कार्तिगई दीपम" }, vishu: { en: "Vishu", hi: "विशु" }, ayyappaMandalaBegins: { en: "Ayyappa Mandala Vratham begins", hi: "अय्यप्पा मंडल व्रतम आरंभ" }, ayyappaMandalaPuja: { en: "Ayyappa Mandala Pooja", hi: "अय्यप्पा मंडल पूजा" } };
+const FEST_NAME = { makarSankranti: { en: "Makar Sankranti", hi: "मकर संक्रांति" }, mahaShivaratri: { en: "Maha Shivaratri", hi: "महाशिवरात्रि" }, holika: { en: "Holika Dahan (Chhoti Holi)", hi: "होलिका दहन (छोटी होली)" }, rangwaliHoli: { en: "Rangwali Holi", hi: "रंगवाली होली" }, ramNavami: { en: "Ram Navami", hi: "राम नवमी" }, hanumanJ: { en: "Hanuman Jayanti", hi: "हनुमान जयंती" }, akshaya: { en: "Akshaya Tritiya", hi: "अक्षय तृतीया" }, guruPurnima: { en: "Guru Purnima", hi: "गुरु पूर्णिमा" }, rakshaBandhan: { en: "Raksha Bandhan", hi: "रक्षाबंधन" }, janmashtami: { en: "Janmashtami", hi: "जन्माष्टमी" }, ganeshChaturthi: { en: "Ganesh Chaturthi", hi: "गणेश चतुर्थी" }, navratri: { en: "Navratri begins", hi: "नवरात्रि आरंभ" }, dussehra: { en: "Dussehra", hi: "दशहरा" }, karvaChauth: { en: "Karva Chauth", hi: "करवा चौथ" }, diwali: { en: "Diwali", hi: "दिवाली" }, lakshmiPanchami: { en: "Lakshmi Panchami", hi: "लक्ष्मी पंचमी" }, buddhaPurnima: { en: "Buddha Purnima", hi: "बुद्ध पूर्णिमा" }, guptNavratriAshadha: { en: "Ashadha Gupt Navratri", hi: "आषाढ़ गुप्त नवरात्रि" }, rathYatra: { en: "Rath Yatra", hi: "रथ यात्रा" }, hariyaliTeej: { en: "Hariyali Teej", hi: "हरियाली तीज" }, nagPanchami: { en: "Nag Panchami", hi: "नाग पंचमी" }, hartalikaTeej: { en: "Hartalika Teej", hi: "हरतालिका तीज" }, radhaAshtami: { en: "Radha Ashtami", hi: "राधा अष्टमी" }, mahaAshtami: { en: "Maha Ashtami", hi: "महाअष्टमी" }, mahaNavami: { en: "Maha Navami", hi: "महानवमी" }, sharadPurnima: { en: "Sharad Purnima", hi: "शरद पूर्णिमा" }, ahoiAshtami: { en: "Ahoi Ashtami", hi: "अहोई अष्टमी" }, guptNavratriMagha: { en: "Magha Gupt Navratri", hi: "माघ गुप्त नवरात्रि" }, vasantPanchami: { en: "Vasant Panchami", hi: "वसंत पंचमी" }, sheetlaAshtami: { en: "Sheetla Ashtami (Basoda)", hi: "शीतला अष्टमी (बसोड़ा)" }, panguniUthiram: { en: "Panguni Uthiram", hi: "पंगुनी उथिरम" }, thaipusam: { en: "Thaipusam", hi: "थाईपूसम" }, onam: { en: "Onam (Thiruvonam)", hi: "ओणम (थिरुवोणम)" }, karthigaiDeepam: { en: "Karthigai Deepam", hi: "कार्तिगई दीपम" }, vishu: { en: "Vishu", hi: "विशु" }, ayyappaMandalaBegins: { en: "Ayyappa Mandala Vratham begins", hi: "अय्यप्पा मंडल व्रतम आरंभ" }, ayyappaMandalaPuja: { en: "Ayyappa Mandala Pooja", hi: "अय्यप्पा मंडल पूजा" } };
 
 const OBS_META = {
   ekadashi: { deity: { en: "Vishnu", hi: "विष्णु" }, gloss: { en: "Fasting day for Vishnu — 11th lunar day", hi: "विष्णु व्रत — एकादशी तिथि" }, rules: { en: "No grains or cereals; break the fast next morning at parana", hi: "अन्न-अनाज वर्जित; अगली सुबह पारण पर व्रत खोलें" }, timing: "parana" },
@@ -3365,7 +3470,8 @@ const OBS_META = {
 const FEST_META = {
   makarSankranti: { deity: { en: "Surya", hi: "सूर्य" }, gloss: { en: "Sun enters Makara — harvest festival", hi: "सूर्य मकर में — फसल पर्व" }, timing: null },
   mahaShivaratri: { deity: { en: "Shiva", hi: "शिव" }, gloss: { en: "The great night of Shiva — vigil and fast", hi: "शिव की महारात्रि — जागरण व व्रत" }, timing: "sunset" },
-  holika: { deity: null, gloss: { en: "Festival of colours; Holika Dahan on the eve", hi: "रंगों का पर्व; पूर्व संध्या पर होलिका दहन" }, timing: null },
+  holika: { deity: { en: "Vishnu", hi: "विष्णु" }, gloss: { en: "The ritual bonfire on Chhoti Holi, observed after sunset", hi: "छोटी होली का अग्नि-पूजन — सूर्यास्त के बाद होलिका दहन" }, timing: "sunset" },
+  rangwaliHoli: { deity: null, gloss: { en: "The colour festival celebrated the day after Holika Dahan", hi: "होलिका दहन के अगले दिन मनाया जाने वाला रंगोत्सव" }, timing: null },
   ramNavami: { deity: { en: "Rama", hi: "राम" }, gloss: { en: "Birth of Lord Rama", hi: "श्रीराम जन्मोत्सव" }, timing: null },
   hanumanJ: { deity: { en: "Hanuman", hi: "हनुमान" }, gloss: { en: "Birth of Hanuman — Chaitra Purnima", hi: "हनुमान जन्मोत्सव — चैत्र पूर्णिमा" }, timing: null },
   akshaya: { deity: { en: "Lakshmi", hi: "लक्ष्मी" }, gloss: { en: "Undiminishing merit — gold and new beginnings", hi: "अक्षय पुण्य — स्वर्ण व शुभारंभ" }, timing: null },
@@ -3388,7 +3494,7 @@ const FEST_META = {
   mahaAshtami: { deity: { en: "Durga", hi: "दुर्गा" }, gloss: { en: "Navratri's eighth — Durga Ashtami", hi: "नवरात्रि की अष्टमी — दुर्गाष्टमी" }, timing: null },
   mahaNavami: { deity: { en: "Durga", hi: "दुर्गा" }, gloss: { en: "Navratri's ninth — Mahanavami", hi: "नवरात्रि की नवमी — महानवमी" }, timing: null },
   sharadPurnima: { deity: { en: "Lakshmi", hi: "लक्ष्मी" }, gloss: { en: "Kojagari full moon — amrit-moon night", hi: "कोजागरी पूर्णिमा — अमृत-चंद्र रात्रि" }, timing: null },
-  ahoiAshtami: { deity: { en: "Ahoi Mata", hi: "अहोई माता" }, gloss: { en: "Mothers' fast for children's wellbeing", hi: "संतान हेतु माताओं का व्रत" }, timing: "moonrise" },
+  ahoiAshtami: { deity: { en: "Ahoi Mata", hi: "अहोई माता" }, gloss: { en: "Mothers' fast for children's wellbeing", hi: "संतान हेतु माताओं का व्रत" }, rules: { en: "Traditionally broken after sighting the stars; some families wait for moonrise", hi: "परंपरागत रूप से तारे देखकर व्रत खोलें; कुछ परिवार चंद्रोदय की प्रतीक्षा करते हैं" }, timing: "stars" },
   guptNavratriMagha: { deity: { en: "Shakti", hi: "शक्ति" }, gloss: { en: "Winter 'hidden' Navratri — tantric sadhana", hi: "माघ गुप्त नवरात्रि — तांत्रिक साधना" }, timing: null },
   vasantPanchami: { deity: { en: "Saraswati", hi: "सरस्वती" }, gloss: { en: "Saraswati puja — first day of spring", hi: "सरस्वती पूजा — वसंत का आरंभ" }, timing: null },
   sheetlaAshtami: { deity: { en: "Sheetla Mata", hi: "शीतला माता" }, gloss: { en: "Basoda — cold-food day after Holi", hi: "बसोड़ा — होली के बाद शीतल भोजन का दिन" }, timing: null },
@@ -3401,7 +3507,7 @@ const FEST_META = {
   ayyappaMandalaPuja: { deity: { en: "Ayyappa", hi: "अय्यप्पा" }, gloss: { en: "Day 41 — completion of Mandala Vratham and Mandala Pooja", hi: "41वाँ दिन — मंडल व्रतम पूर्ण व मंडल पूजा" }, rules: { en: "Completion rites follow the pilgrim's Guru Swami and temple tradition", hi: "समापन विधि गुरु स्वामी व मंदिर परंपरा के अनुसार होती है" }, timing: null },
 };
 /* upcoming-occurrence search: tithi name, ekadashi/pradosh variants, festival, or fast */
-function searchUpcoming(query, fromMs, tz, maxN = 24) {
+function searchUpcoming(query, fromMs, tz, maxN = 24, place = null) {
   const q = (query || "").trim().toLowerCase();
   const qraw = (query || "").trim();
   if (!q) return [];
@@ -3429,7 +3535,7 @@ function searchUpcoming(query, fromMs, tz, maxN = 24) {
   
   // If ekadashi variant or pradosh variant matched, use scanPanchangCalendar which has lunar context
   if (ekVariantMatch || pradoshDayMatch !== null) {
-    const r = scanPanchangCalendar(fromMs, tz, 430, 430);
+    const r = scanPanchangCalendar(fromMs, tz, 430, 430, place);
     const out = [];
     for (const fast of r.fasts) {
       if (ekVariantMatch && fast.key === ekVariantMatch) {
@@ -3474,7 +3580,7 @@ function searchUpcoming(query, fromMs, tz, maxN = 24) {
   
   // Festival/fast name search (generic fasts without variants)
   const matchN = (dict, key) => { const e = dict[key]; return !!e && (key.toLowerCase().includes(q) || (e.en && e.en.toLowerCase().includes(q)) || (e.hi && e.hi.includes(qraw))); };
-  const r = scanPanchangCalendar(fromMs, tz, 430, 430);
+  const r = scanPanchangCalendar(fromMs, tz, 430, 430, place);
   for (const f of r.festivals) if (matchN(FEST_NAME, f.key)) out.push({ ms: f.ms, kind: "festival", key: f.key });
   for (const f of r.fasts) {
     // Skip if it's a variant (has underscore) - variants are handled above
@@ -3768,7 +3874,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       }
     }, 30);
   };
-  const cal = useMemo(() => { try { return scanPanchangCalendar(todayP.anchor, tz, 400); } catch (e) { return { fasts: [], festivals: [] }; } }, [todayP.anchor, tz]);
+  const cal = useMemo(() => { try { return scanPanchangCalendar(todayP.anchor, tz, 400, 46, place); } catch (e) { return { fasts: [], festivals: [] }; } }, [todayP.anchor, tz, place]);
   const [trad, setTrad] = useState("smarta");
   useEffect(() => { let alive = true; (async () => { try { const st = (typeof window !== "undefined" && window.storage) ? window.storage : null; if (st) { const r = await st.get("janma_trad"); if (alive && r && r.value) setTrad(r.value); } } catch (e) {} })(); return () => { alive = false; }; }, []);
   const chooseTrad = (v) => { setTrad(v); try { const st = (typeof window !== "undefined" && window.storage) ? window.storage : null; if (st) st.set("janma_trad", v); } catch (e) {} };
@@ -4099,10 +4205,11 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                       <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px dashed #EBDFC6", display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-start" }}>
                         {meta && meta.gloss && <div style={{ fontSize: T.fSmall, color: C.ivory }}>{meta.gloss[LL]}{meta.deity && <span style={{ color: C.muted }}> · {meta.deity[LL]}</span>}</div>}
                         {d && d.info && <div style={{ fontSize: T.fMicro, color: C.muted }}>{d.info.lmonthName} · {d.info.krishna ? (lang === "hi" ? "कृष्ण पक्ष" : "Krishna Paksha") : (lang === "hi" ? "शुक्ल पक्ष" : "Shukla Paksha")} · {(lang === "hi" ? (NAK_HI[d.info.nak] || d.info.nakName) : d.info.nakName)}</div>}
-                        {d && (d.parana || d.moonrise != null || d.sunset != null) && (
+                        {d && (d.parana || d.moonrise != null || d.sunset != null || d.stars) && (
                           <div style={{ fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
                             {d.parana ? <>{lang === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, it.ms)}{lang === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {lang === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, it.ms)}</span>}</>
                               : d.moonrise != null ? <>{lang === "hi" ? "चंद्रोदय पर व्रत खोलें: " : "Break fast after moonrise: "}{fmtTimeD(d.moonrise, d.tz, it.ms)}</>
+                              : d.stars ? <>{lang === "hi" ? "तारे दिखाई देने के बाद व्रत खोलें" : "Break the fast after the stars are visible"}</>
                               : <>{lang === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, it.ms)}</>}
                           </div>
                         )}
@@ -4730,15 +4837,15 @@ function CalendarPage({ view, place, lang, onBack, C, card }) {
     if (view.type !== "year") return null;
     const year = now.getUTCFullYear();
     const from = Date.UTC(year, 0, 1, 6) - tz * 3600000;
-    const r = scanPanchangCalendar(from, tz, 366, 366);
+    const r = scanPanchangCalendar(from, tz, 366, 366, place);
     const all = [...r.festivals.map((f) => ({ ms: f.ms, kind: "festival", key: f.key })), ...r.fasts.map((f) => ({ ms: f.ms, kind: "fast", key: f.key }))]
       .filter((x) => new Date(x.ms + tz * 3600000).getUTCFullYear() === year).sort((a, b) => a.ms - b.ms);
     const byMonth = Array.from({ length: 12 }, () => []);
     for (const it of all) byMonth[new Date(it.ms + tz * 3600000).getUTCMonth()].push(it);
     return { year, byMonth };
-  }, [view.type, tz]);
+  }, [view.type, tz, place]);
 
-  const results = useMemo(() => view.type === "search" ? searchUpcoming(q, Date.now(), tz, 30) : null, [view.type, q, tz]);
+  const results = useMemo(() => view.type === "search" ? searchUpcoming(q, Date.now(), tz, 30, place) : null, [view.type, q, tz, place]);
 
   const labelOf = (it) => it.kind === "tithi"
     ? ((it.paksha ? (lang === "hi" ? (it.paksha === "Krishna" ? "कृष्ण " : "शुक्ल ") : it.paksha + " ") : "") + it.label)
@@ -5437,7 +5544,7 @@ export default function KundliApp() {
       const first = new Date(Date.UTC(cy, cm - 1, 1));
       const gs = new Date(Date.UTC(cy, cm - 1, 1 - first.getUTCDay()));
       const fromMs = Date.UTC(gs.getUTCFullYear(), gs.getUTCMonth(), gs.getUTCDate(), 12) - ctz * 3600000;
-      const r = scanPanchangCalendar(fromMs, ctz, 42);
+      const r = scanPanchangCalendar(fromMs, ctz, 42, 46, panchEff);
       const toISO = (ms) => { const d = new Date(ms + ctz * 3600000); return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`; };
       return { fest: new Set(r.festivals.map((f) => toISO(f.ms))), fast: new Set(r.fasts.map((f) => toISO(f.ms))) };
     } catch (e) { return { fest: new Set(), fast: new Set() }; }
