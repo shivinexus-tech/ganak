@@ -52,6 +52,9 @@ same file.
 | SPLIT-UI-CHART-03 | MERGED | Cursor | `main` (modules only) | `src/components/DashaTree.tsx`, `src/engine/dasha.ts` (DASHA_LEVELS) | Dasha tree UI | Wire deferred. |
 | SPLIT-UI-CONTENT-01 | MERGED | Cursor | `main` (modules only) | `src/components/VratVidhiCard.tsx` | Vrat vidhi card UI | Wire deferred. |
 
+| SPLIT-UI-CHART-04 | MERGED | Cursor | `main` (modules only) | `src/components/ChartVault.tsx` | Vault/export/share UI | Wire deferred. |
+| SPLIT-UI-CHART-05 | MERGED | Cursor | `main` (modules only) | `src/engine/transit-copy.ts` | Transit duration + event gloss | Wire deferred. |
+
 ## Ten-lane target ownership
 
 **→ Live board with file-existence detail: [`plans/module-ownership-map.md`](module-ownership-map.md)**
