@@ -42,6 +42,8 @@ same file.
 | SPLIT-UI-JYOTISH-01d | MERGED | Cursor | `main` (modules only) | `src/engine/dasha.ts` | Vimshottari + KP sub-lord/significators + rectification helpers | Own VIM_LORDS (no fight with Claude's panchang WIP). Wire deferred. |
 | SPLIT-UI-JYOTISH-01e | MERGED | Cursor | `main` (modules only) | `src/engine/special-points.ts` | Special lagnas / points / upagrahas | Wire deferred. |
 | SPLIT-UI-JYOTISH-01f | MERGED | Cursor | `main` (modules only) | `src/engine/bhava.ts` | Bhava Chalit + Bhava Bala | Wire deferred. |
+| SPLIT-UI-CHART-01b | MERGED | Cursor | `main` (modules only) | `src/engine/houses.ts` | Placidus cusps | Wire deferred. |
+| SPLIT-UI-CHART-01c | MERGED | Cursor | `main` (modules only) | `src/data/chart-divisions.ts` | VARGAS + SPECIAL_CHARTS catalogs | Wire deferred. |
 
 ## Ten-lane target ownership
 
