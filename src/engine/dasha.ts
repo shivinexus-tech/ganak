@@ -7,6 +7,7 @@ import { vargaSign } from "./varga";
 
 const DASHA_SEQ = [["Ketu", 7], ["Venus", 20], ["Sun", 6], ["Moon", 10], ["Mars", 7], ["Rahu", 18], ["Jupiter", 16], ["Saturn", 19], ["Mercury", 17]];
 const VIM_LORDS = DASHA_SEQ.map(([l]) => l);
+const DASHA_LEVELS = ["Antardasha", "Pratyantardasha", "Sookshma", "Prana"];
 const nakLordOf = (L) => VIM_LORDS[Math.floor(L / (360 / 27)) % 9];
 
 /* KP sub-lord chain (249 scheme): nakshatra subdivided into 9 Vimshottari-proportioned
@@ -151,7 +152,7 @@ function runDashaAt(tl, eventMs) {
 
 
 export {
-  DASHA_SEQ, VIM_LORDS, VIM_YEARS, KP_PLANETS, WEEKDAY_LORDS,
+  DASHA_SEQ, VIM_LORDS, VIM_YEARS, DASHA_LEVELS, KP_PLANETS, WEEKDAY_LORDS,
   nakLordOf, subLordChain, vimSub,
   computeKPSignificators, computeRulingPlanets,
   rectAtMin, rectSweep, mahaTimelineAt, runDashaAt,

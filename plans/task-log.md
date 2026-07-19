@@ -49,6 +49,9 @@ same file.
 | SPLIT-UI-JYOTISH-02 | MERGED | Cursor | `main` (modules only) | `src/screens/JyotishBnnScreen.tsx`, `src/components/format.ts` (fmtDateT), `src/data/chart-divisions.ts` (SIGN_SHORT) | BNN + Bhrigu UI modules | Wire deferred. |
 | SPLIT-UI-JYOTISH-03 | MERGED | Cursor | `main` (modules only) | `src/screens/RectifyScreen.tsx` | Birth-time rectification UI | Wire deferred. |
 
+| SPLIT-UI-CHART-03 | MERGED | Cursor | `main` (modules only) | `src/components/DashaTree.tsx`, `src/engine/dasha.ts` (DASHA_LEVELS) | Dasha tree UI | Wire deferred. |
+| SPLIT-UI-CONTENT-01 | MERGED | Cursor | `main` (modules only) | `src/components/VratVidhiCard.tsx` | Vrat vidhi card UI | Wire deferred. |
+
 ## Ten-lane target ownership
 
 **→ Live board with file-existence detail: [`plans/module-ownership-map.md`](module-ownership-map.md)**
