@@ -38,6 +38,7 @@ same file.
 | SPLIT-UI-CHART-01a | MERGED | Cursor | `main` | `src/components/DiamondChart.tsx`, `src/kundli-app.tsx` | Extract + wire North Indian DiamondChart | Gates green; shell uses imported component. |
 | SPLIT-UI-JYOTISH-01a | MERGED | Cursor | `main` @ follow-up | `src/engine/bhrigu.ts`, `src/engine/gochar.ts` | Extract BNN+BCP/BSP calc + gochar helpers for bnnTiming | Modules on GitHub; parse-clean after gochar import fix. |
 | SPLIT-UI-JYOTISH-01b | MERGED | Cursor | `main` (modules only) | `src/engine/classical.ts` | Extract Ashtakavarga/Arudhas/Yogas calc | Module on GitHub; shell wire still pending. |
+| SPLIT-UI-JYOTISH-01c | MERGED | Cursor | `main` (modules only) | `src/engine/shadbala.ts`, `src/engine/varga.ts` | Extract Shadbala calc + shared `vargaSign` helper | Modules on GitHub; shell wire still pending. Claude owns shell (Daily). |
 
 ## Ten-lane target ownership
 
