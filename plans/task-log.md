@@ -39,6 +39,9 @@ same file.
 | SPLIT-UI-JYOTISH-01a | MERGED | Cursor | `main` @ follow-up | `src/engine/bhrigu.ts`, `src/engine/gochar.ts` | Extract BNN+BCP/BSP calc + gochar helpers for bnnTiming | Modules on GitHub; parse-clean after gochar import fix. |
 | SPLIT-UI-JYOTISH-01b | MERGED | Cursor | `main` (modules only) | `src/engine/classical.ts` | Extract Ashtakavarga/Arudhas/Yogas calc | Module on GitHub; shell wire still pending. |
 | SPLIT-UI-JYOTISH-01c | MERGED | Cursor | `main` (modules only) | `src/engine/shadbala.ts`, `src/engine/varga.ts` | Extract Shadbala calc + shared `vargaSign` helper | Modules on GitHub; shell wire still pending. Claude owns shell (Daily). |
+| SPLIT-UI-JYOTISH-01d | MERGED | Cursor | `main` (modules only) | `src/engine/dasha.ts` | Vimshottari + KP sub-lord/significators + rectification helpers | Own VIM_LORDS (no fight with Claude's panchang WIP). Wire deferred. |
+| SPLIT-UI-JYOTISH-01e | MERGED | Cursor | `main` (modules only) | `src/engine/special-points.ts` | Special lagnas / points / upagrahas | Wire deferred. |
+| SPLIT-UI-JYOTISH-01f | MERGED | Cursor | `main` (modules only) | `src/engine/bhava.ts` | Bhava Chalit + Bhava Bala | Wire deferred. |
 
 ## Ten-lane target ownership
 
