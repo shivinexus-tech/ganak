@@ -6,6 +6,8 @@ import { VRAT_VIDHI, VRAT_VIDHI_LABELS, VRAT_VIDHI_SAFETY } from "./data/vrat-vi
 import { CHOG_NAME, OBS_NAME, FEST_NAME, OBS_META, FEST_META } from "./data/festival-meta";
 import { searchOffline, searchOnline } from "./data/places";
 import PlaceInput from "./components/PlaceInput";
+import MatchMaker from "./screens/MatchingScreen";
+import DiamondChart from "./components/DiamondChart";
 
 /* ============================================================
    JANMA — Vedic Kundli
@@ -22,7 +24,7 @@ import {
   SIGNS, NAKSHATRAS, YOGAS, TITHIS, KARANAS_MOV, karanaName, PLANET_DEVA,
   sunEvents, moonEvents, RAHU_SEGMENT, YAMA_SEGMENT, GULIKA_SEGMENT,
   setAyanMode, ayanAt, sunSidMs, moonSidMs, elongMs, lunYogaMs, planetSidMs,
-  jdOf, AYANAMSA, SIGN_LORD,
+  jdOf, AYANAMSA, SIGN_LORD, VIM_LORDS,
   solveCross, lunarMonthInfo, samvatInfo, upcomingEvents, choghaSlots,
   amantaMonthIdx, pitruPakshaDay, zoneOffset,
 } from "./engine/panchang";
@@ -610,7 +612,6 @@ function placidusCusps(RAMC, eps, phi) {
 }
 
 
-const VIM_LORDS = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
 const INDU_KALA = { Sun: 30, Moon: 16, Mars: 6, Mercury: 8, Jupiter: 10, Venus: 12, Saturn: 1 };
 const nakLordOf = (L) => VIM_LORDS[Math.floor(L / (360 / 27)) % 9];
 
@@ -808,65 +809,6 @@ function computeBhavaChalit(ascSid, mcSid, planetLons, ascSign, shadbala) {
   }
   const ranked = bhavaBala.slice().sort((a, b) => b.total - a.total);
   return { madhyas: M, sandhis: S, chalit, bhavaBala, strongest: ranked[0].house, weakest: ranked[11].house };
-}
-
-/* ---------------- Ashtakoota Guna Milan (Kundali matching) ----------------
-   8 kootas, 36 points. Nakshatra/rashi-indexed tables validated standalone:
-   Gana & Nadi distributions 9/9/9; Yoni matrix symmetric with same=4 and the
-   7 sworn-enemy pairs=0 (universal); Bhakoot/Nadi dosha logic exact. */
-const NAK_YONI = [0,1,2,3,3,4,5,2,5,6,6,7,8,9,8,9,10,10,4,11,12,11,13,0,13,7,1];
-const NAK_GANA = [0,1,2,1,0,1,0,0,2,2,1,1,0,2,0,2,0,2,2,1,1,0,2,2,1,1,0];
-const NAK_NADI = [0,1,2,2,1,0,0,1,2,2,1,0,0,1,2,2,1,0,0,1,2,2,1,0,0,1,2];
-const SIGN_VARNA = [3,2,1,4,3,2,1,4,3,2,1,4];
-const SIGN_VASHYA = [0,0,1,2,3,1,1,4,1,2,1,2];
-const YONI_NAMES = ["Horse","Elephant","Sheep","Serpent","Dog","Cat","Rat","Cow","Buffalo","Tiger","Deer","Monkey","Mongoose","Lion"];
-const GANA_NAMES = ["Deva","Manushya","Rakshasa"];
-const NADI_NAMES = ["Aadi","Madhya","Antya"];
-const VARNA_NAMES = ["", "Shudra", "Vaishya", "Kshatriya", "Brahmin"];
-const VASHYA_NAMES = ["Quadruped","Human","Waterborne","Wild","Insect"];
-const _MORTAL=[[7,9],[1,13],[0,8],[4,10],[3,12],[11,2],[5,6]];
-const _YFRI=[[8,7],[8,1],[8,2],[5,10],[5,11],[5,12],[7,10],[7,2],[1,11],[1,2],[1,3],[0,3]];
-const _YENE=[[8,13],[8,3],[5,3],[5,9],[5,13],[7,0],[7,13],[7,3],[4,13],[4,12],[4,6],[4,2],[4,9],[1,9],[10,0],[10,13],[10,9]];
-const YONI_MATRIX = (() => { const M=Array.from({length:14},()=>Array(14).fill(2)); for(let i=0;i<14;i++)M[i][i]=4;
-  for(const[a,b]of _YFRI){M[a][b]=3;M[b][a]=3;} for(const[a,b]of _YENE){M[a][b]=1;M[b][a]=1;} for(const[a,b]of _MORTAL){M[a][b]=0;M[b][a]=0;} return M; })();
-const GANA_MATRIX = [[6,6,1],[5,6,0],[1,0,6]];
-const VASHYA_MATRIX = [[2,1,1,0,1],[0.5,2,0.5,0.5,1],[1,1,2,1,1],[1,0,1,2,0],[1,1,1,1,2]];
-const MANGLIK_HOUSES = [1,2,4,7,8,12];
-function _gmRel(a,b){ if(a===b)return"F"; if(NF[a].F.includes(b))return"F"; if(NF[a].E.includes(b))return"E"; return"N"; }
-function _maitri(bl,gl){ if(bl===gl)return 5; const r1=_gmRel(bl,gl),r2=_gmRel(gl,bl);
-  if(r1==="F"&&r2==="F")return 5; if((r1==="F"&&r2==="N")||(r1==="N"&&r2==="F"))return 4; if(r1==="N"&&r2==="N")return 3;
-  if((r1==="F"&&r2==="E")||(r1==="E"&&r2==="F"))return 1; if((r1==="N"&&r2==="E")||(r1==="E"&&r2==="N"))return 0.5; return 0; }
-function _taraFav(f,t){ const c=((t-f+27)%27)+1; return (c%9)%2===0; }
-function gunaMilan(boy, girl) {
-  const k = [
-    { name:"Varna", got: SIGN_VARNA[boy.rashi]>=SIGN_VARNA[girl.rashi]?1:0, max:1,
-      note: VARNA_NAMES[SIGN_VARNA[boy.rashi]]+" / "+VARNA_NAMES[SIGN_VARNA[girl.rashi]] },
-    { name:"Vashya", got: SIGN_VASHYA[boy.rashi]===SIGN_VASHYA[girl.rashi]?2:VASHYA_MATRIX[SIGN_VASHYA[boy.rashi]][SIGN_VASHYA[girl.rashi]], max:2,
-      note: VASHYA_NAMES[SIGN_VASHYA[boy.rashi]]+" / "+VASHYA_NAMES[SIGN_VASHYA[girl.rashi]] },
-    { name:"Tara", got: (_taraFav(boy.nak,girl.nak)?1.5:0)+(_taraFav(girl.nak,boy.nak)?1.5:0), max:3, note:"birth-star harmony" },
-    { name:"Yoni", got: YONI_MATRIX[NAK_YONI[boy.nak]][NAK_YONI[girl.nak]], max:4,
-      note: YONI_NAMES[NAK_YONI[boy.nak]]+" / "+YONI_NAMES[NAK_YONI[girl.nak]] },
-    { name:"Graha Maitri", got: _maitri(SIGN_LORD[boy.rashi],SIGN_LORD[girl.rashi]), max:5,
-      note: SIGN_LORD[boy.rashi]+" / "+SIGN_LORD[girl.rashi] },
-    { name:"Gana", got: GANA_MATRIX[NAK_GANA[boy.nak]][NAK_GANA[girl.nak]], max:6,
-      note: GANA_NAMES[NAK_GANA[boy.nak]]+" / "+GANA_NAMES[NAK_GANA[girl.nak]] },
-    { name:"Bhakoot", got: [2,5,6,8,9,12].includes(((girl.rashi-boy.rashi+12)%12)+1)?0:7, max:7, note:"emotional & prosperity axis" },
-    { name:"Nadi", got: NAK_NADI[boy.nak]===NAK_NADI[girl.nak]?0:8, max:8,
-      note: NADI_NAMES[NAK_NADI[boy.nak]]+" / "+NADI_NAMES[NAK_NADI[girl.nak]] },
-  ];
-  const total = k.reduce((s,x)=>s+x.got,0);
-  return { kootas:k, total, max:36, nadiDosha:k[7].got===0, bhakootDosha:k[6].got===0 };
-}
-function computeMatch(boyDetails, girlDetails) {
-  const cb = computeKundli(boyDetails), cg = computeKundli(girlDetails);
-  const ex = (c) => { const mars=c.rows.find(p=>p.name==="Mars");
-    const hL=((mars.sign-c.ascSign+12)%12)+1, hM=((mars.sign-c.moon.sign+12)%12)+1;
-    return { nak:c.moon.nak, rashi:c.moon.sign, lord:SIGN_LORD[c.moon.sign], marsSign:mars.sign,
-      marsHouseLagna:hL, marsHouseMoon:hM, manglikLagna:MANGLIK_HOUSES.includes(hL), manglikMoon:MANGLIK_HOUSES.includes(hM) }; };
-  const boy=ex(cb), girl=ex(cg), gm=gunaMilan(boy,girl);
-  const manglik = { boy:boy.manglikLagna, girl:girl.manglikLagna, boyMoon:boy.manglikMoon, girlMoon:girl.manglikMoon,
-    cancelled: boy.manglikLagna===girl.manglikLagna };
-  return { boy, girl, ...gm, manglik, charts:{ boy:cb, girl:cg } };
 }
 
 // Generalized Vimshottari subdivision: any period (its lord, start ms, duration
@@ -1291,96 +1233,6 @@ const fmtDateT = (ms, tz = 0, withTime = false) => {
   return `${date}, ${h}:${String(mi).padStart(2, "0")} ${ap}`;
 };
 
-/* ---------------- North Indian chart SVG ---------------- */
-/* num: rashi number at the house's innermost corner (authentic placement —
-   houses 1/4/7/10 cluster around the bindu, the rest around the four crossings).
-   pc: planet cluster centroid. tight: narrow side triangle → 2 glyphs per row. */
-const HOUSES_NI = [
-  { num: [200, 186], pc: [200, 94] },
-  { num: [100, 86],  pc: [100, 42] },
-  { num: [85, 104],  pc: [46, 98],  tight: true },
-  { num: [182, 204], pc: [92, 200] },
-  { num: [85, 306],  pc: [46, 300], tight: true },
-  { num: [100, 322], pc: [100, 360] },
-  { num: [200, 222], pc: [200, 312] },
-  { num: [300, 322], pc: [300, 360] },
-  { num: [315, 306], pc: [354, 300], tight: true },
-  { num: [218, 204], pc: [308, 200] },
-  { num: [315, 104], pc: [354, 98],  tight: true },
-  { num: [300, 86],  pc: [300, 42] },
-];
-
-function DiamondChart({ title, ascSign, houseOfPlanet, showDeg, lagnaLabel = "LAGNA", gold, ivory, muted, sindoor }) {
-  const byHouse = Array.from({ length: 12 }, () => []);
-  houseOfPlanet.forEach((p) => byHouse[p.house - 1].push(p));
-  return (
-    <div style={{ textAlign: "center" }}>
-      <svg viewBox="-14 -14 428 428" style={{ width: "100%", maxWidth: 400 }}>
-        <defs>
-          <radialGradient id="chartbg" cx="50%" cy="42%" r="75%">
-            <stop offset="0%" stopColor="#FFF8E9" />
-            <stop offset="100%" stopColor="#F7EDD7" />
-          </radialGradient>
-          <radialGradient id="lagnaGlow" cx="50%" cy="50%" r="62%">
-            <stop offset="0%" stopColor={gold} stopOpacity="0.20" />
-            <stop offset="100%" stopColor={gold} stopOpacity="0" />
-          </radialGradient>
-        </defs>
-
-        {/* parchment of night: vignette + outer hairline frame */}
-        <rect x="0" y="0" width="400" height="400" fill="url(#chartbg)" />
-        <rect x="-9" y="-9" width="418" height="418" fill="none" stroke={gold} strokeOpacity="0.35" strokeWidth="0.8" />
-        {[[-9, -9], [409, -9], [-9, 409], [409, 409]].map(([x, y], i) => (
-          <rect key={i} x={x - 3.5} y={y - 3.5} width="7" height="7" fill={gold} transform={`rotate(45 ${x} ${y})`} />
-        ))}
-
-        <polygon points="200,0 300,100 200,200 100,100" fill="url(#lagnaGlow)" />
-
-        {/* frame, diagonals, inner diamond */}
-        <polyline points="0,0 400,0 400,400 0,400 0,0" fill="none" stroke={gold} strokeWidth="1.8" className="drawline" />
-        <line x1="0" y1="0" x2="400" y2="400" stroke={gold} strokeWidth="1.1" strokeOpacity="0.9" className="drawline" />
-        <line x1="400" y1="0" x2="0" y2="400" stroke={gold} strokeWidth="1.1" strokeOpacity="0.9" className="drawline" />
-        <polyline points="200,0 400,200 200,400 0,200 200,0" fill="none" stroke={gold} strokeWidth="1.1" strokeOpacity="0.9" className="drawline" />
-        <circle cx="200" cy="200" r="2.4" fill={gold} />
-
-        {HOUSES_NI.map((g, h) => {
-          const sign = ((ascSign + h) % 12) + 1;
-          const planets = byHouse[h];
-          const per = g.tight || showDeg ? 2 : 3;
-          const rows = [];
-          for (let i = 0; i < planets.length; i += per) rows.push(planets.slice(i, i + per));
-          return (
-            <g key={h}>
-              <text x={g.num[0]} y={g.num[1]} textAnchor="middle" dominantBaseline="middle"
-                fontSize="11.5" fill={gold} fillOpacity="0.85" fontFamily="Eczar, serif">{sign}</text>
-              {rows.map((row, ri) => (
-                <text key={ri} x={g.pc[0]} y={g.pc[1] + ri * 15 - (rows.length - 1) * 7.5}
-                  textAnchor="middle" dominantBaseline="middle" fontSize="13" fontWeight="600"
-                  fontFamily="Spectral, serif" style={{ letterSpacing: ".02em" }}>
-                  {row.map((p, pi) => (
-                    <tspan key={pi}>
-                      {pi > 0 && <tspan> </tspan>}
-                      <tspan fill={p.color || ivory}>{p.label}</tspan>
-                      {p.retro && <tspan fill={sindoor} fontSize="9.5">℞</tspan>}
-                      {showDeg && p.deg !== undefined && <tspan fill={muted} fontSize="8.5"> {Math.floor(p.deg)}°</tspan>}
-                    </tspan>
-                  ))}
-                </text>
-              ))}
-              {h === 0 && (
-                <text x="200" y="26" textAnchor="middle" fontSize="9" fill={gold} fillOpacity="0.8"
-                  letterSpacing="3" fontFamily="Spectral, serif">{lagnaLabel}</text>
-              )}
-            </g>
-          );
-        })}
-      </svg>
-      <div style={{ fontSize: 11.5, letterSpacing: "0.18em", color: muted, marginTop: 8, textTransform: "uppercase", overflowWrap: "anywhere", padding: "0 8px" }}>{title}</div>
-    </div>
-  );
-}
-
-
 /* ---- Gochar (transit) timeline for a planet: its sign-change sequence with durations & retro stations ---- */
 const PLANET_PERIOD_DAYS = { Sun: 400, Moon: 35, Mars: 760, Mercury: 400, Jupiter: 430, Venus: 400, Saturn: 1200, Rahu: 560, Ketu: 560 };
 
@@ -1464,133 +1316,6 @@ function eventDetail(ev, now) {
 }
 
 /* ---------------- main app ---------------- */
-function DoshaCard({ C, card, ok, title, good, bad }) {
-  return (
-    <div style={{ ...card, padding: "14px 16px", borderLeft: `3px solid ${ok ? "#1F7A4D" : C.sindoor}` }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-        <span style={{ fontSize: 15 }}>{ok ? "✓" : "⚠"}</span>
-        <span style={{ fontFamily: "Eczar, serif", color: ok ? "#1F7A4D" : C.sindoor, fontSize: 15 }}>{title}</span>
-      </div>
-      <div style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.5 }}>{ok ? good : bad}</div>
-    </div>
-  );
-}
-
-function MatchPerson({ C, card, title, name, setName, date, setDate, time, setTime, place, setPlace }) {
-  const inp = { width: "100%", padding: "10px 12px", background: "#FFFDF7", border: `1px solid ${C.line}`, borderRadius: 8, color: C.ivory, fontFamily: "Spectral, serif", fontSize: 15, boxSizing: "border-box" };
-  const lab = { display: "block", ...T.label, color: C.muted, marginBottom: 5 };
-  return (
-    <div style={{ ...card, padding: T.s4 }}>
-      <div style={{ fontFamily: "Eczar, serif", color: C.gold, fontSize: 16, marginBottom: 12 }}>{title}</div>
-      <div style={{ display: "grid", gap: 10 }}>
-        <div><label style={lab}>Name</label><input style={inp} value={name} onChange={(e) => setName(e.target.value)} placeholder="optional" /></div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          <div><label style={lab}>Date of birth</label><input style={inp} type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
-          <div><label style={lab}>Time</label><input style={inp} type="time" value={time} onChange={(e) => setTime(e.target.value)} /></div>
-        </div>
-        <div><label style={lab}>Place of birth</label><PlaceInput value={place} onPick={setPlace} C={C} /></div>
-      </div>
-    </div>
-  );
-}
-
-function MatchMaker({ C, card }) {
-  const [boyName, setBoyName] = useState("");
-  const [girlName, setGirlName] = useState("");
-  const [bDate, setBDate] = useState("1990-04-12");
-  const [bTime, setBTime] = useState("09:30");
-  const [bPlace, setBPlace] = useState({ label: "New Delhi, India", lat: 28.61, lon: 77.21, zone: "Asia/Kolkata" });
-  const [gDate, setGDate] = useState("1992-11-20");
-  const [gTime, setGTime] = useState("14:15");
-  const [gPlace, setGPlace] = useState({ label: "Mumbai, India", lat: 19.08, lon: 72.88, zone: "Asia/Kolkata" });
-  const [res, setRes] = useState(null);
-  const [err, setErr] = useState("");
-
-  const run = () => {
-    setErr("");
-    const [by, bm, bd] = (bDate || "").split("-").map(Number);
-    const [bhh, bmi] = (bTime || "").split(":").map(Number);
-    const [gy, gm, gd] = (gDate || "").split("-").map(Number);
-    const [ghh, gmi] = (gTime || "").split(":").map(Number);
-    if (!by || isNaN(bhh) || !gy || isNaN(ghh)) { setErr("Enter a complete date and time of birth for both people."); return; }
-    if (!bPlace || !gPlace) { setErr("Pick a birth place for both people from the suggestions."); return; }
-    const btz = zoneOffset(bPlace.zone, by, bm, bd) ?? 5.5;
-    const gtz = zoneOffset(gPlace.zone, gy, gm, gd) ?? 5.5;
-    setRes(computeMatch(
-      { y: by, m: bm, day: bd, hh: bhh, mi: bmi, tz: btz, lat: bPlace.lat, lon: bPlace.lon },
-      { y: gy, m: gm, day: gd, hh: ghh, mi: gmi, tz: gtz, lat: gPlace.lat, lon: gPlace.lon }
-    ));
-    setTimeout(() => { const el = document.getElementById("matchresult"); if (el) el.scrollIntoView({ behavior: "smooth" }); }, 150);
-  };
-
-  const verdict = (t) => t >= 33 ? ["Excellent match", "#1F7A4D"] : t >= 25 ? ["Very good match", C.gold] : t >= 18 ? ["Acceptable match", "#B0610F"] : ["Not recommended", C.sindoor];
-
-  return (
-    <div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
-        <MatchPerson C={C} card={card} title="वर · Groom" name={boyName} setName={setBoyName} date={bDate} setDate={setBDate} time={bTime} setTime={setBTime} place={bPlace} setPlace={setBPlace} />
-        <MatchPerson C={C} card={card} title="कन्या · Bride" name={girlName} setName={setGirlName} date={gDate} setDate={setGDate} time={gTime} setTime={setGTime} place={gPlace} setPlace={setGPlace} />
-      </div>
-      <button onClick={run} style={{ marginTop: 16, width: "100%", padding: "13px 0", background: "linear-gradient(180deg, #E08A22, #C9711A 55%, #B0610F)", color: "#FFF8E9", border: "1px solid #D98E33", borderRadius: 9, fontFamily: "Eczar, serif", fontWeight: 700, fontSize: 16, letterSpacing: "0.06em", cursor: "pointer", boxShadow: "0 6px 18px rgba(168,106,18,.25)" }}>
-        Match the kundalis
-      </button>
-      {err && <p style={{ color: C.sindoor, fontSize: 13, marginTop: 10 }}>{err}</p>}
-
-      {res && (() => {
-        const [vlabel, vcolor] = verdict(res.total);
-        const mBoy = res.manglik.boy, mGirl = res.manglik.girl, mOk = res.manglik.cancelled;
-        return (
-          <div id="matchresult" style={{ marginTop: 20 }}>
-            <div style={{ ...card, padding: "22px 20px", textAlign: "center", borderTop: `3px solid ${vcolor}` }}>
-              <div style={{ ...T.label, color: C.muted }}>Ashtakoota Guna Milan</div>
-              <div style={{ fontFamily: "Eczar, serif", fontSize: 46, color: vcolor, lineHeight: 1.1, margin: "4px 0" }}>{res.total}<span style={{ fontSize: 22, color: C.muted }}> / 36</span></div>
-              <div style={{ fontFamily: "Eczar, serif", fontSize: 18, color: vcolor }}>{vlabel}</div>
-            </div>
-
-            <div style={{ ...card, padding: "8px 4px", overflowX: "auto", marginTop: 14 }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5, minWidth: 360 }}>
-                <thead><tr style={{ color: C.muted, textAlign: "left", fontSize: 11, letterSpacing: ".05em", textTransform: "uppercase" }}>
-                  <th style={{ padding: "7px 10px" }}>Koota</th><th style={{ padding: "7px 10px" }}>Detail</th><th style={{ padding: "7px 10px", textAlign: "right" }}>Points</th>
-                </tr></thead>
-                <tbody>
-                  {res.kootas.map((k) => {
-                    const full = k.got === k.max, zero = k.got === 0;
-                    return (
-                      <tr key={k.name} style={{ borderTop: "1px solid #EBDFC6" }}>
-                        <td style={{ padding: "8px 10px", fontFamily: "Eczar, serif", color: C.ivory, whiteSpace: "nowrap" }}>{k.name}</td>
-                        <td style={{ padding: "8px 10px", color: C.muted, fontSize: 12.5 }}>{k.note}</td>
-                        <td style={{ padding: "8px 10px", textAlign: "right", fontVariantNumeric: "tabular-nums", color: zero ? C.sindoor : full ? "#1F7A4D" : C.gold, fontWeight: 700, whiteSpace: "nowrap" }}>{k.got} / {k.max}</td>
-                      </tr>
-                    );
-                  })}
-                  <tr style={{ borderTop: `2px solid ${C.line}` }}>
-                    <td style={{ padding: "9px 10px", fontFamily: "Eczar, serif", color: C.gold }} colSpan={2}>Total</td>
-                    <td style={{ padding: "9px 10px", textAlign: "right", fontFamily: "Eczar, serif", fontWeight: 700, color: vcolor, whiteSpace: "nowrap" }}>{res.total} / 36</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10, marginTop: 14 }}>
-              <DoshaCard C={C} card={card} ok={!res.nadiDosha} title="Nadi dosha"
-                good="Clear — the partners have different nadis." bad="Present — both share the same nadi. The weightiest koota (8 points lost); tradition advises caution, though strong overall charts and remedies are said to mitigate it." />
-              <DoshaCard C={C} card={card} ok={!res.bhakootDosha} title="Bhakoot dosha"
-                good="Clear — the Moon signs are favourably placed." bad="Present — the Moon signs form a 2/12, 5/9 or 6/8 axis, said to bear on emotional harmony, health and prosperity." />
-              <DoshaCard C={C} card={card} ok={mOk} title="Manglik (Mangal) dosha"
-                good={(mBoy || mGirl) ? "Both partners are Manglik — the dosha is considered mutually cancelled." : "Clear — neither partner is Manglik from the Lagna."}
-                bad={(mBoy ? "The groom" : "The bride") + " is Manglik (Mars falls in house 1, 2, 4, 7, 8 or 12 from the Lagna) while the other is not. Traditionally flagged for marriage; an astrologer can advise on remedies and the Moon/Venus-based checks."} />
-            </div>
-
-            <p style={{ color: C.muted, fontSize: 12, marginTop: 14, lineHeight: 1.55 }}>
-              Guna Milan reads instinctive and karmic compatibility from each Moon's nakshatra and rashi. A high score is encouraging but never the whole story — Manglik status, the 7th house and its lord, Venus and Jupiter, and the running dashas all matter. Treat this as a structured starting point rather than a verdict. Varna, Vashya, Gana and Yoni carry minor source variation between traditions; Nadi, Bhakoot and the Manglik check follow the standard rules and use the same validated ephemeris as the rest of the app.
-            </p>
-          </div>
-        );
-      })()}
-    </div>
-  );
-}
-
 // Recursive Vimshottari drill-down: antar -> pratyantar -> sookshma -> prana.
 // Each row past level 0 is expandable; children are derived on demand via vimSub.
 const DASHA_LEVELS = ["Antardasha", "Pratyantardasha", "Sookshma", "Prana"];
@@ -3823,7 +3548,7 @@ export default function KundliApp() {
 
         {/* kundali matching */}
         <Eyebrow id="match" deva="कुण्डली मिलान" en="Kundali matching · Guna Milan" />
-        <MatchMaker C={C} card={card} />
+        <MatchMaker C={C} card={card} computeKundli={computeKundli} />
           </>
         )}
 
