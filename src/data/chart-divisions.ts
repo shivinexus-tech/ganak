@@ -33,4 +33,7 @@ const SPECIAL_CHARTS = [
 
 const SIGN_SHORT = ["Ar", "Ta", "Ge", "Cn", "Le", "Vi", "Li", "Sc", "Sg", "Cp", "Aq", "Pi"];
 
-export { VARGAS, SPECIAL_CHARTS, SIGN_SHORT };
+const PLANET_GLYPH = { Sun: "Su", Moon: "Mo", Mars: "Ma", Mercury: "Me", Jupiter: "Ju", Venus: "Ve", Saturn: "Sa", Rahu: "Ra", Ketu: "Ke" };
+
+export { VARGAS, SPECIAL_CHARTS, SIGN_SHORT, PLANET_GLYPH };
+
