@@ -55,6 +55,10 @@ same file.
 | SPLIT-UI-CHART-04 | MERGED | Cursor | `main` (modules only) | `src/components/ChartVault.tsx` | Vault/export/share UI | Wire deferred. |
 | SPLIT-UI-CHART-05 | MERGED | Cursor | `main` (modules only) | `src/engine/transit-copy.ts` | Transit duration + event gloss | Wire deferred. |
 
+| SPLIT-UI-03d | MERGED | Cursor | `main` (modules only) | `src/engine/today-panchang.ts` | computeTodayPanchang engine | Smoke Delhi 2026-07-19 OK. Wire deferred. |
+| SPLIT-UI-03e | MERGED | Cursor | `main` (modules only) | `src/engine/search-upcoming.ts` | Upcoming observances search | Wire deferred. |
+| SPLIT-UI-03f | MERGED | Cursor | `main` (modules only) | `src/screens/CalendarPage.tsx` | Calendar page UI | Wire deferred — helps Daily. |
+
 ## Ten-lane target ownership
 
 **→ Live board with file-existence detail: [`plans/module-ownership-map.md`](module-ownership-map.md)**
