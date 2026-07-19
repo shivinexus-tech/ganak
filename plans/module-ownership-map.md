@@ -48,12 +48,13 @@ Status: `MERGED` (extracted + integrated) · `Partial` (engine/data out, UI not)
 
 | File | Lines | Note |
 |---|---|---|
-| `src/kundli-app.tsx` | 4,593 | The shell. **Integration-owned.** Every UI slice shrinks it. |
+| `src/kundli-app.tsx` | 4,534 | The shell. **Integration-owned.** Every UI slice shrinks it. |
 | `src/engine/ephemeris.ts` | 319 | Astronomy. Guarded by parity + calc gates. |
 | `src/engine/panchang.ts` | 284 | Tithi/nakshatra/sunrise/ayanamsa. |
 | `src/engine/festivals.ts` | 356 | Festival + day-part selection. |
 | `src/engine/muhurat.ts` | 323 | Muhurat scoring/shuddhi. |
 | `src/engine/hora.ts` | 199 | Planetary hours + hora advisor. Extracted SPLIT-UI-03a. |
+| `src/i18n.ts` | 71 | Bilingual strings + `tr`/`trN`/`obsLabel`. **Shared, integration-owned** — add strings, never fork. |
 | `src/components/tokens.ts` | 14 | Design tokens — **shared, integration-owned.** |
 | `src/components/format.ts` | 7 | `fmtDeg` — shared. |
 | `src/components/PlaceInput.tsx` | 72 | Shared place search UI. |
