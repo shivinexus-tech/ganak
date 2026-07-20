@@ -96,6 +96,26 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       the current Fasts & Festivals card click/expand behaviour exactly as it is.
       After launch, compare direct-link use with in-app card use and only reconsider
       navigation after observing real user behaviour. _(P1-FESTIVAL-DEEPLINKS — shipped)_
+- [ ] **P0 before go-live — complete festival and vrat page-link coverage (no
+      tier exclusions).** Every festival, vrat, fast, recurring observance and named
+      variant that a user can open anywhere in the website/app must also have a
+      stable, shareable dedicated-page URL. This covers the **full current inventory:
+      125 festival/calendar labels + 41 fasting/recurring labels = 166 openable
+      labels**, not merely P1/P2 items. The first four routes above are complete;
+      every remaining item is pending. Keep the existing in-app click/expand action
+      as well. Add a generated coverage gate that compares the live openable-item
+      registries against the route registry, so adding a future festival without a
+      page link fails validation. Full checkable snapshot and rules:
+      `plans/festival-page-link-inventory.md`. _(P0-FESTIVAL-PAGES-ALL)_
+- [ ] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
+      selection box directly on every dedicated festival/vrat page. Replace “Open
+      this festival in the Daily Panchang to see the local timing referred to below.”
+      with the selected city, the applicable local festival date and the relevant
+      local puja/paran/day-part timing on that page. Changing place must visibly
+      recalculate without silently clearing the guide; provide bilingual loading,
+      failure and recovery messages. Preserve the dedicated route and language while
+      the place changes, and keep a Daily Panchang link as optional navigation—not as
+      a requirement for understanding the guide. _(P0-FESTIVAL-PAGE-PLACE)_
 - [x] **Hide the birth-chart tab** for launch — Daily + Prashna only; Chart route falls
       back to Daily. _(P1-HIDE-DEPLOY, live at ganak.pages.dev)_
 - [x] **Deploy to a web host** — https://ganak.pages.dev (Cloudflare Pages, `main`
