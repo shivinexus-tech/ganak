@@ -128,6 +128,23 @@ function mahalakshmiVratDay(fromMs, tz, days, place) {
   }
   return null;
 }
+/* Annual Skanda Sashti (Kanda Sashti) — Shukla Shashti while Sun is in Tula (Aippasi).
+   Six-day fast Nov 10–15 2026 Delhi; Soorasamharam on day 6, Thirukalyanam next sunrise.
+   Sourced: Drik/Tiruchendur calendar; Hindu Blog 2026 span. Distinct from monthly skandaShashti fast. */
+function skandaSashtiAnchor(fromMs, tz, days, place) {
+  const start = new Date(fromMs + tz * 3600000);
+  const sy = start.getUTCFullYear(), sm = start.getUTCMonth(), sd = start.getUTCDate();
+  for (let k = 0; k < days; k++) {
+    const civil = new Date(Date.UTC(sy, sm, sd + k));
+    const y = civil.getUTCFullYear(), m = civil.getUTCMonth() + 1, day = civil.getUTCDate();
+    const parts = scanDayParts(y, m, day, tz, place);
+    if (Math.floor(sunSidMs(parts.rise) / 30) !== 6) continue;
+    const shukla6 = targetTithiIndex(false, 6);
+    if (!tithiKalaOverlap(parts, "udaya", shukla6)) continue;
+    return { y, m, day, ms: parts.noon };
+  }
+  return null;
+}
 function ayyappaMandalaFor(ms, tz) {
   const DAY = 86400000, civilNoon = localNoon(ms, tz), d = new Date(civilNoon + tz * 3600000), gy = d.getUTCFullYear();
   for (const year of [gy, gy - 1]) {
@@ -450,6 +467,24 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
   if (vara) festivals.push({ key: "varalakshmi", ms: vara.ms, y: vara.y, m: vara.m, day: vara.day, decidingKala: "last-shravana-shukla-friday" });
   const mlv = mahalakshmiVratDay(fromMs, tz, days, place);
   if (mlv) festivals.push({ key: "mahalakshmiVrat", ms: mlv.ms, y: mlv.y, m: mlv.m, day: mlv.day, decidingKala: "15th-day-from-bhadrapada-shukla-8" });
+  const skanda = skandaSashtiAnchor(fromMs, tz, days, place);
+  if (skanda) {
+    festivals.push({ key: "skandaSashtiSoorasamharam", ...skanda, sequenceDay: 6, decidingKala: "aippasi-shukla-shashti" });
+    for (const [offset, key, sequenceDay] of [
+      [-5, "skandaSashtiBegins", 1],
+      [1, "skandaSashtiThirukalyanam", 7],
+    ]) {
+      const d = new Date(Date.UTC(skanda.y, skanda.m - 1, skanda.day + offset));
+      const y = d.getUTCFullYear(), m = d.getUTCMonth() + 1, day = d.getUTCDate();
+      const dayTz = (place && place.zone && zoneOffset(place.zone, y, m, day)) ?? tz;
+      festivals.push({
+        key,
+        ms: Date.UTC(y, m - 1, day, 12) - dayTz * 3600000,
+        y, m, day, sequenceDay,
+        decidingKala: offset === 1 ? "next-sunrise" : "sequence-from-shashti",
+      });
+    }
+  }
   // Vishu (Mesha Sankranti under Kerala's day rule) and the two endpoints of
   // Ayyappa's inclusive 41-day Mandala Vratham.
   const firstNoon = localNoon(fromMs, tz), rangeEnd = firstNoon + days * DAY;

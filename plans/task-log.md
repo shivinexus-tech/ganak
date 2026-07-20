@@ -15,6 +15,28 @@ same file.
 5. Finish with gate evidence and a handoff. Never mark a task done because code was
    drafted but not validated.
 
+## Pre-flight check (mandatory before any code edit)
+
+Every agent must read this log **and** `plans/module-ownership-map.md` before
+touching code. Then tell the owner, in plain language, which case applies:
+
+| Case | What you found | What to report to the owner |
+|------|----------------|----------------------------|
+| **In progress** | Same file(s) have another row with status `ACTIVE` or `RESERVED` | **"In progress"** — name the task ID, agent, branch, and files. Do not edit those files. Wait, pick a non-overlapping lane, or ask the owner. |
+| **Unassigned** | No `ACTIVE`/`RESERVED` row covers those files; no matching task in this log | **"Unassigned"** — say what you were asked to do and which files it would touch. Check `plans/backlog.md` for intent. Do not start code until you add a `RESERVED` row (or the owner assigns one). |
+| **Stopped midway** | A task exists for this work but status is `REVIEW`, `BLOCKED`, `OPEN`, or stale `ACTIVE` with no recent evidence | **"Stopped midway"** — cite task ID, last known status, **where it stopped** (handoff path, branch, commit, or "Evidence / handoff" column), and **why** (blocker text, waiting on owner, session ended, merge incident, gates not run). Read any `plans/*handoff*.md` linked from that row before continuing. |
+
+**How to investigate "stopped midway":**
+
+1. This table — status + Evidence / handoff column.
+2. Matching plan under `plans/` (task brief, handoff, review).
+3. `git log` / `git status` on the listed branch (uncommitted changes?).
+4. If status is `ACTIVE` but evidence is old and another agent's edits overlap,
+   treat as a coordination incident — report to the owner; do not silently take over.
+
+**After the owner clears you:** add or update your row (`RESERVED` → `ACTIVE`),
+list exact allowed files, then edit.
+
 ## Status key
 
 - `RESERVED` — assigned; editing may begin.
@@ -48,6 +70,7 @@ same file.
 | CURSOR-SUNEVENTS-01 | MERGED | Cursor | `main` | `src/engine/festivals.ts`, `plans/perf-startup-scan.md`, `plans/task-log.md` | Chip F #4: rolling reuse of `sunEvents` across adjacent scan days | Parse clean; parity EXACT; Prashna 24/24; muhurat; content 27/27; build pass. Delhi timing: 90d **~0.43s**, 400d **~1.7s**. |
 | CODEX-P1-CONTENT-02 | MERGED | Cursor | `main` | `src/engine/festivals.ts`, `src/data/festival-meta.ts`, `validation/content-dates.cjs` | P1 festival calendar batch 2 (Slice A+B) | **2026-07-20.** +11 keys: Chaitra Navratri, Gudi Padwa, Ugadi, Vat Savitri/Purnima, Anant Chaturdashi, Kartika Purnima, Tulasi Vivah, Pongal, Pitru Paksha bookends. 38/38 content-dates anchors green; build green. |
 | CURSOR-PANCHAKA-GATE | MERGED | Cursor | `main` | `validation/panchaka-windows.cjs`, `AGENTS.md`, `.cursorrules` | Regression gate for display-safe Panchaka/Lagna windows (Chip A follow-up) | **2026-07-20.** 120-day Delhi scan: 0 sub-minute / 0 same-minute rows; 3308 windows tile sunrise-to-sunrise; reported 2026-07-30 Agni row absent. Listed in AGENTS.md + `.cursorrules` gate list. |
+| CURSOR-P1-CONTENT-03 | MERGED | Cursor | `main` | `src/engine/festivals.ts`, `src/data/festival-meta.ts`, `validation/content-dates.cjs` | P1 Slice D — Tamil/Shakta Tier-2 | **2026-07-20.** Vaikasi Visakam, Aadi Pooram, Arudra Darshan, Skanda Sashti 6-day span; also Varalakshmi, Mahalakshmi culmination, Kali/Kalabhairav Jayanti. 48/48 content-dates anchors; build green. |
 | CLAUDE-P1-VRATVIDHI-VERIFY | ACTIVE | Codex (owner reassigned) | `main` | `plans/claude-task-p1-vratvidhi-verify.md`, `plans/p1-vratvidhi-owner-queue.md` | Verify wired vidhis + owner queue + UI smoke | **2026-07-20.** All 15 guides passed the bilingual completeness audit. Live EN+HI smoke covered Pradosh, Purnima, Sankashti, Masik Shivaratri and Amavasya; Ekadashi timing checked separately; 0 console errors. Owner wording sign-off and wiring fixes remain. |
 | CURSOR-P1-CONTENT-CPLUS | MERGED | Cursor | `main` | `src/engine/festivals.ts`, `src/data/festival-meta.ts`, `validation/content-dates.cjs`, `plans/drik-gap-analysis.md`, `plans/task-log.md` | P1-CONTENT Slice C+ (Varalakshmi, Mahalakshmi culmination, Tamil solar-nak, Shakta jayantis) | **2026-07-20.** +7 keys. Varalakshmi Aug 28; Mahalakshmi Oct 2 (15-day span from Bhadrapada Shukla 8); Vaikasi Visakam May 30; Aadi Pooram Aug 14; Arudra Darshan Dec 24; Kali Jayanti Oct 3; Kalabhairav Dec 1. 45/45 content-dates + 10/10 solar anchors green; all gates pass. |
 | CODEX-NEXT | OPEN | Codex | `main` | see notes | Chart panel peels OR assist content batch 2 | Deploy MERGED (ganak.pages.dev). |

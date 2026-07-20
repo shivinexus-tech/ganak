@@ -14,7 +14,7 @@ const from = Date.UTC(2026, 0, 1) - IST * 3600000;
 const cal = app.scanPanchangCalendar(from, IST, 430, 46, DELHI);
 const fmt = (ms) => new Date(ms + IST * 3600000).toISOString().slice(0, 10);
 const SOLAR_NEW = ['thaipusam','panguniUthiram','vishu','onam','karthigaiDeepam','vaikasiVisakam','aadiPooram','arudraDarshan','ayyappaMandalaBegins','ayyappaMandalaPuja'];
-const NEW = ['varalakshmi','mahalakshmiVrat','kaliJayanti','kalabhairavJayanti', ...['chaitraNavratri','gudiPadwa','ugadi','vatSavitri','vatPurnima','anantChaturdashi','kartikaPurnima','tulasiVivah','pongal','pitruPakshaBegins','sarvaPitruAmavasya','lakshmiPanchami','buddhaPurnima','guptNavratriAshadha','rathYatra','hariyaliTeej','nagPanchami','hartalikaTeej','radhaAshtami','mahaAshtami','mahaNavami','sharadPurnima','ahoiAshtami','guptNavratriMagha','vasantPanchami','sheetlaAshtami','govatsaDwadashi','dhanteras','kaliChaudas','narakChaturdashi','govardhanPuja','bhaiDooj','chhathNahayKhay','chhathKharna','chhath','chhathUshaArghya'], ...SOLAR_NEW];
+const NEW = ['varalakshmi','mahalakshmiVrat','kaliJayanti','kalabhairavJayanti','skandaSashtiBegins','skandaSashtiSoorasamharam','skandaSashtiThirukalyanam', ...['chaitraNavratri','gudiPadwa','ugadi','vatSavitri','vatPurnima','anantChaturdashi','kartikaPurnima','tulasiVivah','pongal','pitruPakshaBegins','sarvaPitruAmavasya','lakshmiPanchami','buddhaPurnima','guptNavratriAshadha','rathYatra','hariyaliTeej','nagPanchami','hartalikaTeej','radhaAshtami','mahaAshtami','mahaNavami','sharadPurnima','ahoiAshtami','guptNavratriMagha','vasantPanchami','sheetlaAshtami','govatsaDwadashi','dhanteras','kaliChaudas','narakChaturdashi','govardhanPuja','bhaiDooj','chhathNahayKhay','chhathKharna','chhath','chhathUshaArghya'], ...SOLAR_NEW];
 const KNOWN = {
   vasantPanchami: '2026-01-23', mahaShivaratri: '2026-02-15', sheetlaAshtami: '~8 days after Holi (Mar 2026)',
   buddhaPurnima: '2026-05-01', rathYatra: '2026-07-16', hariyaliTeej: '2026-08-15', nagPanchami: '2026-08-17',
@@ -110,6 +110,9 @@ const dpAnchors = {
   vaikasiVisakam: '2026-05-30',
   aadiPooram: '2026-08-14',
   arudraDarshan: '2026-12-24',
+  skandaSashtiBegins: '2026-11-10',
+  skandaSashtiSoorasamharam: '2026-11-15',
+  skandaSashtiThirukalyanam: '2026-11-16',
 };
 let dpFailures = 0;
 for (const [key, exp] of Object.entries(dpAnchors)) {
