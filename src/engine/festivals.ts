@@ -276,14 +276,21 @@ const FESTIVALS = [
   { key: "ugadi", month: 0, krishna: false, tithi: 1, kala: "pratahkala", selection: "first", policy: "chaitraPratipada" },
   { key: "lakshmiPanchami", month: 0, krishna: false, tithi: 5, kala: "udaya" },
   { key: "ramNavami", month: 0, krishna: false, tithi: 9, kala: "madhyahna" },
+  { key: "swaminarayanJayanti", month: 0, krishna: false, tithi: 9, kala: "udaya" },
   { key: "taraJayanti", month: 0, krishna: false, tithi: 9, kala: "madhyahna" },
+  { key: "gangaur", month: 0, krishna: false, tithi: 3, kala: "udaya" },
   { key: "hanumanJ", month: 0, krishna: false, tithi: 15, kala: "udaya" },
   { key: "akshaya", month: 1, krishna: false, tithi: 3, kala: "purvahna", selection: "first" },
+  { key: "parashuramaJayanti", month: 1, krishna: false, tithi: 3, kala: "purvahna", selection: "first" },
   { key: "matangiJayanti", month: 1, krishna: false, tithi: 3, kala: "udaya" },
+  { key: "sitaNavami", month: 1, krishna: false, tithi: 9, kala: "udaya" },
+  { key: "naradaJayanti", month: 1, krishna: true, tithi: 1, kala: "udaya" },
   { key: "bagalamukhiJayanti", month: 1, krishna: false, tithi: 8, kala: "udaya" },
   { key: "chhinnamastaJayanti", month: 1, krishna: false, tithi: 14, kala: "udaya" },
+  { key: "narasimhaJayanti", month: 1, krishna: false, tithi: 14, kala: "udaya" },
   { key: "buddhaPurnima", month: 1, krishna: false, tithi: 15, kala: "udaya" },
   { key: "vatSavitri", month: 1, krishna: true, tithi: 15, kala: "udaya" },
+  { key: "shaniJayanti", month: 1, krishna: true, tithi: 15, kala: "udaya" },
   { key: "vatPurnima", month: 2, krishna: false, tithi: 15, kala: "udaya", skipAdhik: true },
   { key: "dhumavatiJayanti", month: 2, krishna: false, tithi: 8, kala: "udaya", skipAdhik: true },
   { key: "gangaDussehra", month: 2, krishna: false, tithi: 10, kala: "udaya" },
@@ -295,6 +302,9 @@ const FESTIVALS = [
   { key: "janmashtami", month: 4, krishna: true, tithi: 8, kala: "nishita" },
   { key: "rakshaBandhan", month: 4, krishna: false, tithi: 15, policy: "raksha" },
   { key: "hartalikaTeej", month: 5, krishna: false, tithi: 3, kala: "udaya" },
+  { key: "kajariTeej", month: 4, krishna: true, tithi: 3, kala: "udaya" },
+  { key: "rishiPanchami", month: 5, krishna: false, tithi: 5, kala: "purvahna" },
+  { key: "balaramaJayanti", month: 5, krishna: false, tithi: 6, kala: "madhyahna" },
   { key: "kaliJayanti", month: 5, krishna: true, tithi: 8, kala: "nishita" },
   { key: "bhuvaneshvariJayanti", month: 5, krishna: false, tithi: 12, kala: "udaya" },
   { key: "ganeshChaturthi", month: 5, krishna: false, tithi: 4, kala: "madhyahna" },
@@ -326,12 +336,17 @@ const FESTIVALS = [
   { key: "kalabhairavJayanti", month: 7, krishna: true, tithi: 8, kala: "udaya" },
   { key: "shakambhariPurnima", month: 9, krishna: false, tithi: 15, kala: "pratahkala" },
   { key: "guptNavratriMagha", month: 10, krishna: false, tithi: 1, kala: "pratahkala", selection: "first" },
+  { key: "sakatChauth", month: 9, krishna: true, tithi: 4, kala: "moonrise" },
+  { key: "mauniAmavasya", month: 9, krishna: true, tithi: 15, kala: "udaya" },
   { key: "rathaSaptami", month: 10, krishna: false, tithi: 7, kala: "udaya" },
   { key: "vasantPanchami", month: 10, krishna: false, tithi: 5, kala: "purvahna" },
   { key: "lalitaJayanti", month: 10, krishna: false, tithi: 15, kala: "udaya" },
   { key: "mahaShivaratri", month: 10, krishna: true, tithi: 14, kala: "nishita" },
+  { key: "vivahPanchami", month: 8, krishna: false, tithi: 5, kala: "udaya" },
+  { key: "gitaJayanti", month: 8, krishna: false, tithi: 11, kala: "udaya" },
   { key: "bhairaviJayanti", month: 8, krishna: false, tithi: 15, kala: "madhyahna" },
   { key: "annapurnaJayanti", month: 8, krishna: false, tithi: 15, kala: "madhyahna" },
+  { key: "dattatreyaJayanti", month: 8, krishna: false, tithi: 15, kala: "madhyahna" },
   { key: "sheetlaAshtami", month: 11, krishna: true, tithi: 8, kala: "udaya" },
   { key: "holika", month: 11, krishna: false, tithi: 15, policy: "holika" },
 ];
@@ -589,6 +604,8 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
     } catch (e) {}
   }
   for (const g of grahanDays(fromMs, tz, days)) festivals.push(g);
+  const kanyaSk = festivals.find((f) => f.key === "kanyaSankranti");
+  if (kanyaSk) festivals.push({ key: "vishwakarmaPuja", ms: kanyaSk.ms, decidingKala: "kanya-sankranti-vishwakarma" });
   // Pitru Paksha list bookends — engine already computes daily shraddha tithi;
   // surface the fortnight's opening Purnima Shraddha and closing Mahalaya.
   for (let k = 0; k < days; k++) {
@@ -613,6 +630,12 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
   if (dashami) festivals.push({ key: "durgaPujaDashami", ms: dashami.ms, y: dashami.y, m: dashami.m, day: dashami.day, decidingKala: "vijayadashami" });
   const kali = festivals.find((f) => f.key === "kaliPuja");
   if (kali) festivals.push({ key: "kamalaJayanti", ms: kali.ms, y: kali.y, m: kali.m, day: kali.day, decidingKala: "kartik-amavasya-purnimanta" });
+  const sharadPurnima = festivals.find((f) => f.key === "sharadPurnima");
+  if (sharadPurnima) festivals.push({ key: "kojagaraPuja", ms: sharadPurnima.ms, y: sharadPurnima.y, m: sharadPurnima.m, day: sharadPurnima.day, decidingKala: "kojagara-nishita-purnima" });
+  const durgaShashthi = festivals.find((f) => f.key === "durgaPujaShashthi");
+  if (durgaShashthi) festivals.push({ key: "saraswatiAvahan", ms: durgaShashthi.ms, y: durgaShashthi.y, m: durgaShashthi.m, day: durgaShashthi.day, decidingKala: "durga-shashthi-saraswati-avahan" });
+  const durgaSaptami = festivals.find((f) => f.key === "durgaPujaSaptami");
+  if (durgaSaptami) festivals.push({ key: "saraswatiPuja", ms: durgaSaptami.ms, y: durgaSaptami.y, m: durgaSaptami.m, day: durgaSaptami.day, decidingKala: "durga-saptami-saraswati-puja" });
   const shPurnima = festivals.find((f) => f.key === "shakambhariPurnima");
   if (shPurnima) {
     const d = new Date(Date.UTC(shPurnima.y, shPurnima.m - 1, shPurnima.day - 7));

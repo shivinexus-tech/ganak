@@ -50,6 +50,12 @@ assertions. If a gate fails, fix the cause — never weaken a gate to pass it
 (whitelisting a genuine browser global in parse-check is the one allowed exception).
 
 ## Workflow
+- **Check before you edit.** Read `plans/task-log.md` and
+  `plans/module-ownership-map.md` first. Report to the owner in plain language:
+  **In progress** (another agent has those files), **Unassigned** (no reservation —
+  do not code until one exists), or **Stopped midway** (task exists but paused —
+  say **which agent** stopped, where, and why using the log, handoff docs, and git).
+  Full rules live in `plans/task-log.md` § Pre-flight check.
 - **Owner steers by backlog, not by clicking Allow.** Priorities live in
   `plans/backlog.md`. Feature plans live in `plans/`. Agents work autonomously
   inside the sandbox; the owner decides *what* is next by reading the backlog

@@ -1,8 +1,13 @@
-# Claude task — P1-VRATVIDHI verify + extend
+# P1-VRATVIDHI verify + extend
 
-**ID:** `CLAUDE-P1-VRATVIDHI-VERIFY`  
-**Agent:** Codex (owner reassigned 2026-07-20)
-**Status:** COMPLETE — owner approved; bilingual browser smoke passed
+> **History:** Task ID `CLAUDE-P1-VRATVIDHI-VERIFY` and this filename predate execution.
+> The brief was **initially assigned to Claude Code** (parallel lane with Codex content
+> batch 2, 2026-07-20). The owner **reassigned to Codex** before work started; Codex
+> merged the slice (`9987c83`). The `CLAUDE-` prefix is legacy naming only.
+
+**ID:** `CLAUDE-P1-VRATVIDHI-VERIFY` (legacy — executed by Codex)  
+**Agent:** Codex (owner reassigned 2026-07-20)  
+**Status:** MERGED — owner approved; bilingual browser smoke passed
 **Owner assigned:** 2026-07-20
 
 Read `AGENTS.md` and `.cursorrules`. Log RESERVED → ACTIVE → MERGED in
@@ -121,5 +126,6 @@ npm run build
 
 ## Parallelism
 
-Runs parallel with Codex `CODEX-P1-CONTENT-02`. Coordinate: after Codex merges new
-festival keys, Claude adds vidhis in a follow-up commit (no same-file edits).
+Ran parallel with Codex `CODEX-P1-CONTENT-02` (festival keys). Vidhi verify was
+reassigned to Codex before execution. Future vidhi stubs for new festivals: any
+agent, coordinate via `plans/task-log.md`.

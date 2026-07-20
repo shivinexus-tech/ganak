@@ -7,6 +7,15 @@
 2. `plans/task-log.md` — which agent is doing what, on which branch
 3. Browser / phone smoke test when a slice says “ready”
 
+When an agent starts work, it should tell you one of three things:
+
+- **In progress** — someone else already has those files; it will not step on them.
+- **Unassigned** — nothing reserved yet; it will wait for you or log a reservation
+  before coding.
+- **Stopped midway** — a task was started before but paused; it will say **which
+  agent** worked on it, where (handoff doc, branch, last evidence), and why
+  (blocked, review, session ended).
+
 You do **not** need to approve every shell command.
 
 ## Safety net

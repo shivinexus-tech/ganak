@@ -17,3 +17,5 @@ Claude-specific notes:
 - Work autonomously inside the sandbox. Do not wait for Allow/Run clicks for
   routine gates, git, or builds. The owner steers via `plans/backlog.md` and
   `plans/task-log.md`.
+- **Pre-flight:** before code edits, read `plans/task-log.md` and report to the
+  owner: In progress / Unassigned / Stopped midway (which agent + where + why; see AGENTS.md Workflow).

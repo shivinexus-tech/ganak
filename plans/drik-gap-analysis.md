@@ -76,10 +76,11 @@ of the North Indian year and are entirely absent:
 | Shakta labels | Shakambhari Navratri span, Lalita Panchami, Kali Puja, Sandhi Puja, Ghatasthapana ×2, Annapurna |
 | Bengali Durga Puja | Mahalaya → Shashthi → Saptami → Ashtami → Navami (Bengal) → Dashami |
 | P2 regional | Ratha Saptami, Ganga Dussehra, 12 monthly sankrantis, 4 grahan (2026) |
+| P2 regional + jayantis | Sakat Chauth, Mauni Amavasya, Gangaur, Kajari Teej, Rishi Panchami, Vishwakarma, Saraswati Avahan/Puja, Kojagara, Vivah Panchami, Gita Jayanti; 8 jayantis (Parashurama, Sita, Narasimha, Narada, Shani, Balarama, Dattatreya, Swaminarayan) |
 
-## P2 — significant, add after P1
+## P2 — significant, add after P1 — ✅ MERGED (`CURSOR-P2-CONTENT-01`, 2026-07-20)
 
-Ratha Saptami (Jan 25) · Sakat Chauth (Jan 6, currently only a generic Sankashti) ·
+Previously listed (now shipped):
 Mauni Amavasya (Jan 18, generic amavasya) · Gauri/Gangaur (Mar 21) · Ganga Dussehra
 (May 25) · Kajari Teej (Aug 31) · Rishi Panchami (Sep 15) · Vishwakarma
 Puja (Sep 17) · Saraswati Avahan/Puja (Oct 16–17) · Kojagara Puja (Oct 25, same day as
@@ -88,14 +89,17 @@ our Sharad Purnima) · Vivah Panchami (Dec 14) · Gita Jayanti (Dec 20).
 **Jayantis:** Parashurama (Apr 19), Sita Navami (Apr 25), Narasimha (Apr 30), Narada
 (May 2), Shani (May 16), Balarama (Sep 16), Dattatreya (Dec 23), Swaminarayan (Mar 27).
 
-**Eclipses — a category we have nothing for:** Drik lists Surya Grahan (Feb 17,
+**Eclipses — dates only (sutak UI still open):** Drik lists Surya Grahan (Feb 17,
 Aug 12) and Chandra Grahan (Mar 3, Aug 28). Eclipses carry real observance rules
 (sutak, what to avoid) and a panchang without them looks incomplete.
 
-**Sankrantis:** we fire only Makar. Drik names all twelve monthly sankrantis. Mesha
-Sankranti (Apr 14, solar new year) is the notable one.
+**Sankrantis:** all twelve monthly sankrantis now fire (Makar also labels Pongal).
 
 ---
+
+## Still open after P2
+
+- **Eclipse sutak UI** — grahan dates fire; dedicated sutak guidance is not yet a feature.
 
 ## Fair-comparison notes (not gaps)
 
@@ -120,7 +124,8 @@ Sankranti (Apr 14, solar new year) is the notable one.
 5. ~~Surface Pitru Paksha in the list~~ ✅ MERGED
 6. ~~Varalakshmi + Mahalakshmi culmination~~ ✅ MERGED (`CURSOR-P1-CONTENT-CPLUS`)
 7. ~~Tamil solar-nak (Vaikasi, Aadi Pooram, Arudra) + Shakta Jayantis (Kali, Kalabhairav)~~ ✅ MERGED
-8. Then P2 + annual Skanda Shashti 6-day; eclipses as their own feature
+8. ~~P2 regional + jayantis~~ ✅ MERGED (`CURSOR-P2-CONTENT-01`)
+9. Annual Skanda Shashti 6-day span — ✅ MERGED; eclipses as dedicated sutak feature remains open
 
 Each needs: sourced date rule + deciding day-part (per `festival-daypart-audit.md`),
 bilingual name/gloss in `src/data/festival-meta.ts`, and a 2026 regression anchor in

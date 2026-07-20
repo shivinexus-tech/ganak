@@ -5,6 +5,10 @@ conventions file for every agent (Claude, Codex, Cursor). This file just restate
 the non-negotiables so Cursor's AI can't miss them.
 
 ## Non-negotiable rules
+0. **Pre-flight coordination.** Before any code edit, read `plans/task-log.md` and
+   `plans/module-ownership-map.md`. Report to the owner: **In progress**,
+   **Unassigned**, or **Stopped midway** (which agent + where + why). Do not edit files another
+   agent has `ACTIVE`/`RESERVED`. See `plans/task-log.md` § Pre-flight check.
 1. **ONE writer per file.** Ganak is migrating to feature modules with owner approval.
    Concurrent code work is allowed only in isolated branches/worktrees with explicit,
    non-overlapping file ownership recorded in `plans/task-log.md`. The app shell,

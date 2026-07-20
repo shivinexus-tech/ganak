@@ -69,7 +69,7 @@ or multi-day logic — **one festival per commit**, gates after each.
 ## Forbidden (unless owner reassigns)
 
 - `src/kundli-app.tsx`, `src/screens/*` (shell/UI)
-- `src/data/vrat-vidhis.ts` (Claude's P1-VRATVIDHI track)
+- `src/data/vrat-vidhis.ts` (Codex vidhi verify — task ID still says `CLAUDE-*`; see brief history)
 - `server/**`
 
 ---
@@ -109,5 +109,6 @@ or multi-day logic — **one festival per commit**, gates after each.
 
 ## Parallelism
 
-May run **in parallel** with Claude's `CLAUDE-P1-VRATVIDHI-VERIFY` — no file overlap.
+Ran **in parallel** with `CLAUDE-P1-VRATVIDHI-VERIFY` (vidhi verify — **Codex
+executed**; ID/filename legacy from initial Claude assignment). No file overlap.
 Do **not** run two agents on `festivals.ts` at once.
