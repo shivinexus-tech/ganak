@@ -17,9 +17,9 @@ Ashtami, Navratri, Durga Ashtami, Maha Navami, Dussehra, Sharad Purnima, Karwa
 Chauth, Ahoi Ashtami, Diwali, Maha Shivaratri, Vasant Panchami, Makar Sankranti —
 all match. **The day-part/kala work paid off; the engine is sound.**
 
-**2. Coverage is the problem, not correctness.** Ganak fires **37** festivals in 2026;
-Drik lists roughly **100** observances. The gap is concentrated in mainstream,
-heavily-observed festivals — several would be conspicuous at launch.
+**2. Coverage is the problem, not correctness.** Ganak fires **~58** named festivals in
+2026 (up from ~37 before P1-CONTENT batch 2, 2026-07-20); Drik lists roughly **100**
+observances. The gap is narrowing but P2 and regional observances remain.
 
 **3. Ganak is genuinely ahead of Drik's Delhi page in places** — Thaipusam, Panguni
 Uthiram, Vishu, Karthigai Deepam, Ayyappa Mandala (start + Pooja), both Gupt
@@ -42,21 +42,20 @@ of the North Indian year and are entirely absent:
 | **Govardhan Puja / Annakut** | Nov 10 | Major |
 | **Bhaiya Dooj** | Nov 11 | Major |
 
-### Other P1 misses
-| Missing | Drik 2026 | Why it matters |
+### Other P1 misses — **batch 2 MERGED 2026-07-20** (`CURSOR-P1-CONTENT-02`)
+| Was missing | Drik 2026 | Status |
 |---|---|---|
-| **Chhath Puja** | Nov 15 | Tens of millions (Bihar/UP/Jharkhand). **Vidhi content already written — just no calendar entry.** Cheapest P1 win. |
-| **Chaitra Navratri** | Mar 19 | We list Sharad Navratri but not Chaitra — half the Navratris missing |
-| **Gudi Padwa / Ugadi** | Mar 19 | Maharashtra + Deccan new year |
-| **Vat Savitri Vrat** | May 16 | Major married-women's vrat |
-| **Vat Purnima Vrat** | Jun 29 | Western-India variant of the above |
-| **Kartika Purnima** | Nov 24 | Dev Deepawali / Guru Nanak Jayanti |
-| **Tulasi Vivah** | Nov 21 | Major Vaishnava |
-| **Pongal** | Jan 14 | Major Tamil (we fire Makar Sankranti that day but not Pongal) |
-| **Anant Chaturdashi / Ganesh Visarjan** | Sep 25 | Closes the Ganesh festival |
-| **Pitru Paksha in the festival list** | Sep 27 → Oct 10 | Engine computes it and shows a banner, but "Pitrupaksha Begins" and "Sarva Pitru Amavasya" never appear as list entries |
+| **Chaitra Navratri** | Mar 19 | ✅ |
+| **Gudi Padwa / Ugadi** | Mar 19 | ✅ |
+| **Vat Savitri Vrat** | May 16 | ✅ (Vaisakha Amavasya — North / purnimanta Jyeshtha) |
+| **Vat Purnima Vrat** | Jun 29 | ✅ (nija Jyeshtha Purnima; adhik skipped) |
+| **Kartika Purnima** | Nov 24 | ✅ |
+| **Tulasi Vivah** | Nov 21 | ✅ |
+| **Pongal** | Jan 14 | ✅ (label alongside Makar Sankranti) |
+| **Anant Chaturdashi / Ganesh Visarjan** | Sep 25 | ✅ |
+| **Pitru Paksha list bookends** | Sep 26 → Oct 10 | ✅ Purnima Shraddha + Sarva Pitru Amavasya |
 
----
+### Remaining P1-style gaps (slice C+)
 
 ## P2 — significant, add after P1
 
@@ -98,10 +97,10 @@ Sankranti (Apr 14, solar new year) is the notable one.
 
 1. ~~Diwali cluster~~ ✅ MERGED (`phase1-content-diwali-chhath.md`)
 2. ~~Chhath four-day sequence~~ ✅ MERGED (reuses sourced vidhi)
-3. **Chaitra Navratri + Gudi Padwa/Ugadi** — `CODEX-P1-CONTENT-02` slice A
-4. **Vat Savitri, Kartika Purnima, Tulasi Vivah, Pongal, Anant Chaturdashi** — slice A
-5. **Surface Pitru Paksha in the list** — slice B
-6. **Varalakshmi + Mahalakshmi culmination** — slice C
+3. ~~Chaitra Navratri + Gudi Padwa/Ugadi~~ ✅ MERGED (`CURSOR-P1-CONTENT-02`)
+4. ~~Vat Savitri, Kartika Purnima, Tulasi Vivah, Pongal, Anant Chaturdashi~~ ✅ MERGED
+5. ~~Surface Pitru Paksha in the list~~ ✅ MERGED
+6. **Varalakshmi + Mahalakshmi culmination** — slice C (`CODEX-P1-CONTENT-02` remainder)
 7. Then P2 + Tamil/Shakta slice D; eclipses as their own feature
 
 Each needs: sourced date rule + deciding day-part (per `festival-daypart-audit.md`),

@@ -14,7 +14,7 @@ const from = Date.UTC(2026, 0, 1) - IST * 3600000;
 const cal = app.scanPanchangCalendar(from, IST, 430, 46, DELHI);
 const fmt = (ms) => new Date(ms + IST * 3600000).toISOString().slice(0, 10);
 const SOLAR_NEW = ['thaipusam','panguniUthiram','vishu','onam','karthigaiDeepam','ayyappaMandalaBegins','ayyappaMandalaPuja'];
-const NEW = ['lakshmiPanchami','buddhaPurnima','guptNavratriAshadha','rathYatra','hariyaliTeej','nagPanchami','hartalikaTeej','radhaAshtami','mahaAshtami','mahaNavami','sharadPurnima','ahoiAshtami','guptNavratriMagha','vasantPanchami','sheetlaAshtami','govatsaDwadashi','dhanteras','kaliChaudas','narakChaturdashi','govardhanPuja','bhaiDooj','chhathNahayKhay','chhathKharna','chhath','chhathUshaArghya', ...SOLAR_NEW];
+const NEW = ['chaitraNavratri','gudiPadwa','ugadi','vatSavitri','vatPurnima','anantChaturdashi','kartikaPurnima','tulasiVivah','pongal','pitruPakshaBegins','sarvaPitruAmavasya','lakshmiPanchami','buddhaPurnima','guptNavratriAshadha','rathYatra','hariyaliTeej','nagPanchami','hartalikaTeej','radhaAshtami','mahaAshtami','mahaNavami','sharadPurnima','ahoiAshtami','guptNavratriMagha','vasantPanchami','sheetlaAshtami','govatsaDwadashi','dhanteras','kaliChaudas','narakChaturdashi','govardhanPuja','bhaiDooj','chhathNahayKhay','chhathKharna','chhath','chhathUshaArghya', ...SOLAR_NEW];
 const KNOWN = {
   vasantPanchami: '2026-01-23', mahaShivaratri: '2026-02-15', sheetlaAshtami: '~8 days after Holi (Mar 2026)',
   buddhaPurnima: '2026-05-01', rathYatra: '2026-07-16', hariyaliTeej: '2026-08-15', nagPanchami: '2026-08-17',
@@ -89,6 +89,17 @@ const dpAnchors = {
   chhathUshaArghya: '2026-11-16',
   guptNavratriAshadha: '2026-07-15',
   mahaShivaratri: '2026-02-15',
+  chaitraNavratri: '2026-03-19',
+  gudiPadwa: '2026-03-19',
+  ugadi: '2026-03-19',
+  vatSavitri: '2026-05-16',
+  vatPurnima: '2026-06-29',
+  anantChaturdashi: '2026-09-25',
+  tulasiVivah: '2026-11-21',
+  kartikaPurnima: '2026-11-24',
+  pongal: '2026-01-14',
+  pitruPakshaBegins: '2026-09-26',
+  sarvaPitruAmavasya: '2026-10-10',
 };
 let dpFailures = 0;
 for (const [key, exp] of Object.entries(dpAnchors)) {

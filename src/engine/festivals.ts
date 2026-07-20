@@ -1,6 +1,6 @@
 import { rev, sd } from "./ephemeris";
 import {
-  amantaMonthIdx, elongMs, moonEvents, moonSidMs, solveCross,
+  amantaMonthIdx, elongMs, moonEvents, moonSidMs, pitruPakshaDay, solveCross,
   sunEvents, sunSidMs, zoneOffset, karanaName,
 } from "./panchang";
 
@@ -140,11 +140,16 @@ function observancesFor(krishna, tithiNum, month = null, dow = null) {
 }
 // major festivals by amanta month index (into MONTHS_HINDU) + paksha + tithi
 const FESTIVALS = [
+  { key: "chaitraNavratri", month: 0, krishna: false, tithi: 1, kala: "pratahkala", selection: "first", policy: "chaitraPratipada" },
+  { key: "gudiPadwa", month: 0, krishna: false, tithi: 1, kala: "pratahkala", selection: "first", policy: "chaitraPratipada" },
+  { key: "ugadi", month: 0, krishna: false, tithi: 1, kala: "pratahkala", selection: "first", policy: "chaitraPratipada" },
   { key: "lakshmiPanchami", month: 0, krishna: false, tithi: 5, kala: "udaya" },
   { key: "ramNavami", month: 0, krishna: false, tithi: 9, kala: "madhyahna" },
   { key: "hanumanJ", month: 0, krishna: false, tithi: 15, kala: "udaya" },
   { key: "akshaya", month: 1, krishna: false, tithi: 3, kala: "purvahna", selection: "first" },
   { key: "buddhaPurnima", month: 1, krishna: false, tithi: 15, kala: "udaya" },
+  { key: "vatSavitri", month: 1, krishna: true, tithi: 15, kala: "udaya" },
+  { key: "vatPurnima", month: 2, krishna: false, tithi: 15, kala: "udaya", skipAdhik: true },
   { key: "guptNavratriAshadha", month: 3, krishna: false, tithi: 1, kala: "pratahkala", selection: "first" },
   { key: "rathYatra", month: 3, krishna: false, tithi: 2, kala: "udaya" },
   { key: "guruPurnima", month: 3, krishna: false, tithi: 15, kala: "udaya" },
@@ -155,6 +160,7 @@ const FESTIVALS = [
   { key: "hartalikaTeej", month: 5, krishna: false, tithi: 3, kala: "udaya" },
   { key: "ganeshChaturthi", month: 5, krishna: false, tithi: 4, kala: "madhyahna" },
   { key: "radhaAshtami", month: 5, krishna: false, tithi: 8, kala: "madhyahna" },
+  { key: "anantChaturdashi", month: 5, krishna: false, tithi: 14, kala: "aparahna" },
   { key: "navratri", month: 6, krishna: false, tithi: 1, kala: "pratahkala", selection: "first" },
   { key: "mahaAshtami", month: 6, krishna: false, tithi: 8, kala: "udaya" },
   { key: "mahaNavami", month: 6, krishna: false, tithi: 9, kala: "aparahna" },
@@ -169,6 +175,8 @@ const FESTIVALS = [
   { key: "diwali", month: 6, krishna: true, tithi: 15, kala: "pradosha" },
   { key: "govardhanPuja", month: 7, krishna: false, tithi: 1, kala: "pratahkala" },
   { key: "bhaiDooj", month: 7, krishna: false, tithi: 2, kala: "aparahna" },
+  { key: "tulasiVivah", month: 7, krishna: false, tithi: 12, kala: "aparahna" },
+  { key: "kartikaPurnima", month: 7, krishna: false, tithi: 15, kala: "udaya" },
   { key: "chhath", month: 7, krishna: false, tithi: 6, kala: "sunset" },
   { key: "guptNavratriMagha", month: 10, krishna: false, tithi: 1, kala: "pratahkala", selection: "first" },
   { key: "vasantPanchami", month: 10, krishna: false, tithi: 5, kala: "purvahna" },
@@ -275,7 +283,18 @@ function kalaIsBhadra(parts, kala) {
   return karanaName(elongMs((span[0] + span[1]) / 2)) === "Vishti";
 }
 function festivalMatch(f, parts) {
+  if (f.skipAdhik && amantaMonthIdx(parts.rise).adhik) return null;
   const target = targetTithiIndex(f.krishna, f.tithi);
+  if (f.policy === "chaitraPratipada") {
+    const overlap = tithiKalaOverlap(parts, "pratahkala", target);
+    if (!overlap) return null;
+    const { idx, adhik } = amantaMonthIdx(parts.rise);
+    if (adhik) return null;
+    if (idx === 0) return { rank: 0, reason: "pratahkala", overlap };
+    // Drik Ugadi rule: when Pratipada does not prevail at sunrise, use the day it begins in Pratahkala after Phalgun Amavasya.
+    if (idx === 11 && tithiIndexAt(parts.rise) === targetTithiIndex(true, 15)) return { rank: 0, reason: "pratahkala-kshaya", overlap };
+    return null;
+  }
   if (f.policy === "raksha") {
     for (const [kala, rank] of [["aparahna", 0], ["pradosha", 1], ["udaya", 2]]) {
       const overlap = tithiKalaOverlap(parts, kala, target);
@@ -319,7 +338,7 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
     }
     const monthIdx = amantaMonthIdx(parts.rise).idx;
     for (const f of FESTIVALS) {
-      if (monthIdx !== f.month) continue;
+      if (f.policy !== "chaitraPratipada" && monthIdx !== f.month) continue;
       const match = festivalMatch(f, parts);
       if (!match) continue;
       if (!candidates.has(f.key)) candidates.set(f.key, []);
@@ -385,7 +404,24 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
     } catch (e) {}
   }
   // Makar Sankranti (solar): Sun enters Capricorn (270 deg sidereal)
-  try { const mk = solveCross(sunSidMs, fromMs, 270, days); if (mk && mk < fromMs + days * DAY) festivals.push({ key: "makarSankranti", ms: mk }); } catch (e) {}
+  try {
+    const mk = solveCross(sunSidMs, fromMs, 270, days);
+    if (mk && mk < fromMs + days * DAY) {
+      festivals.push({ key: "makarSankranti", ms: mk });
+      festivals.push({ key: "pongal", ms: mk, decidingKala: "same-as-makar-sankranti" });
+    }
+  } catch (e) {}
+  // Pitru Paksha list bookends — engine already computes daily shraddha tithi;
+  // surface the fortnight's opening Purnima Shraddha and closing Mahalaya.
+  for (let k = 0; k < days; k++) {
+    const civil = new Date(Date.UTC(sy, sm, sd + k));
+    const y = civil.getUTCFullYear(), m = civil.getUTCMonth() + 1, day = civil.getUTCDate();
+    const parts = scanDayParts(y, m, day, tz, place);
+    const pp = pitruPakshaDay(parts.rise, parts.set);
+    if (!pp || !pp.special) continue;
+    if (pp.special === "purnimaShraddha") festivals.push({ key: "pitruPakshaBegins", ms: parts.noon, y, m, day, decidingKala: "aparahna-shraddha" });
+    if (pp.special === "mahalaya") festivals.push({ key: "sarvaPitruAmavasya", ms: parts.noon, y, m, day, decidingKala: "aparahna-shraddha" });
+  }
   festivals.sort((a, b) => a.ms - b.ms);
   return { fasts, festivals };
 }
