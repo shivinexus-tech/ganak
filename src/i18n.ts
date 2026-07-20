@@ -36,6 +36,12 @@ const L = {
   rahuL: { en: "Rahu Kalam", hi: "राहु काल" },
   gulikaL: { en: "Gulika Kalam", hi: "गुलिक काल" },
   yamaL: { en: "Yamaganda", hi: "यमगण्ड" },
+  abhijitNone: { en: "None — avoided on Budhavara", hi: "नहीं — बुधवार को वर्जित" },
+  pakshaL: { en: "Paksha", hi: "पक्ष" },
+  amantaL: { en: "Amanta Month", hi: "अमान्त मास" },
+  purnimantaL: { en: "Purnimanta Month", hi: "पूर्णिमान्त मास" },
+  moonsignL: { en: "Moonsign", hi: "चन्द्र राशि" },
+  sunsignL: { en: "Sunsign", hi: "सूर्य राशि" },
   tithiL: { en: "Tithi", hi: "तिथि" },
   nakL: { en: "Nakshatra", hi: "नक्षत्र" },
   varaL: { en: "Weekday", hi: "वार" },
@@ -49,7 +55,10 @@ const L = {
   natGood: { en: "good", hi: "शुभ" }, natBad: { en: "avoid", hi: "अशुभ" }, natNeutral: { en: "travel", hi: "सम" },
 };
 
-const tr = (lang, k) => (L[k] && (L[lang === "hi" ? "hi" : "en"] === undefined ? L[k].en : (L[k][lang] || L[k].en))) || (L[k] ? L[k].en : k);
+// Looks up L[key][lang], falling back to English, then to the key itself.
+// (The previous form tested `L["hi"]` — a top-level key that never exists — so the
+// ternary always took the English branch and Hindi mode silently stayed English.)
+const tr = (lang, k) => (L[k] ? (L[k][lang] || L[k].en) : k);
 const trN = (lang, dict, key) => (dict[key] ? (dict[key][lang] || dict[key].en) : key);
 
 const obsLabel = (lang, obs) => {

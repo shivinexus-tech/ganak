@@ -259,20 +259,20 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         rows.push(["Nakshatra", multi(P.naks)]);
         rows.push(["Yoga", multi(P.yogasP)]);
         rows.push([lang === "hi" ? "करण (तिथि का आधा भाग)" : "Karana (half of a tithi)", multi(P.karanas)]);
-        rows.push(["Paksha", P.paksha]);
-        rows.push(["Weekday", P.vara]);
-        rows.push(["Amanta Month", P.months.amanta]);
-        rows.push(["Purnimanta Month", P.months.purnimanta]);
-        rows.push(["Moonsign", P.moonSignEnd ? upto(P.moonSign, P.moonSignEnd) : P.moonSign]);
-        rows.push(["Sunsign", P.sunSign]);
+        rows.push([tr(lang, "pakshaL"), P.paksha]);
+        rows.push([tr(lang, "varaL"), P.vara]);
+        rows.push([tr(lang, "amantaL"), P.months.amanta]);
+        rows.push([tr(lang, "purnimantaL"), P.months.purnimanta]);
+        rows.push([tr(lang, "moonsignL"), P.moonSignEnd ? upto(P.moonSign, P.moonSignEnd) : P.moonSign]);
+        rows.push([tr(lang, "sunsignL"), P.sunSign]);
         rows.push([lang === "hi" ? "प्रविष्टे (सौर मास में बीते दिन)" : "Pravishte (days into the solar month)", String(P.pravishte)]);
         rows.push([lang === "hi" ? "शक संवत् (राष्ट्रीय पंचांग वर्ष)" : "Shaka Samvat (national calendar year)", P.samvat.shaka]);
         rows.push([lang === "hi" ? "विक्रम संवत् (उत्तर भारतीय पंचांग वर्ष)" : "Vikram Samvat (north Indian calendar year)", P.samvat.vikram]);
         rows.push([lang === "hi" ? "गुजराती संवत् (गुजराती पंचांग वर्ष)" : "Gujarati Samvat (Gujarati calendar year)", P.samvat.guj]);
-        rows.push(["Abhijit Muhurat", P.abhijit ? span2(P.abhijit, C.gold) : <span style={{ color: C.muted }}>None — avoided on Budhavara</span>]);
-        rows.push(["Rahu Kalam", span2(P.rahu, C.sindoor)]);
-        rows.push(["Gulikai Kalam", span2(P.gulika, C.sindoor)]);
-        rows.push(["Yamaganda", span2(P.yama, C.sindoor)]);
+        rows.push([tr(lang, "abhijitL"), P.abhijit ? span2(P.abhijit, C.gold) : <span style={{ color: C.muted }}>{tr(lang, "abhijitNone")}</span>]);
+        rows.push([tr(lang, "rahuL"), span2(P.rahu, C.sindoor)]);
+        rows.push([tr(lang, "gulikaL"), span2(P.gulika, C.sindoor)]);
+        rows.push([tr(lang, "yamaL"), span2(P.yama, C.sindoor)]);
         return (
           <>
           <div className="rise" style={{ ...card, padding: "18px 20px", marginBottom: T.s4 }}>
@@ -762,7 +762,7 @@ return (
                   <span style={{ fontFamily: T.serif, fontSize: T.fSmall, color: dragInfo.isGood ? C.gold : dragInfo.isDangerous ? C.sindoor : C.muted }}>{dragInfo.isGood ? "✓ Auspicious" : dragInfo.isDangerous ? "✗ Inauspicious" : "○ Neutral"}</span>
                   <span style={{ fontSize: T.fMicro, color: C.muted }}>{fmtT(dragInfo.time)}</span>
                   {dragInfo.chog && <span style={{ fontSize: T.fMicro, color: C.muted }}>· {trN(lang, CHOG_NAME, dragInfo.chog.key)}</span>}
-                  {dragInfo.inRahu && <span style={{ fontSize: T.fMicro, color: C.sindoor }}>· Rahu Kalam</span>}
+                  {dragInfo.inRahu && <span style={{ fontSize: T.fMicro, color: C.sindoor }}>· {tr(lang, "rahuL")}</span>}
                 </div>
               ) : showHora != null && (
                 <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "6px 2px 2px", flexWrap: "wrap", justifyContent: "center", fontVariantNumeric: "tabular-nums" }}>
