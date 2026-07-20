@@ -439,7 +439,9 @@ export const VRAT_VIDHI = {
       hi: "वार्षिक व्रत में नहीं।",
     },
   },
-  // TODO: source — Chhath has no calendar festival key yet; data is ready for later wiring.
+  // Sourced Chhath card; wired to the main (day 3) calendar key. The calendar
+  // separately surfaces all four sequence days so this card is not read as a
+  // one-day fast. Sources: plans/vrat-vidhis.md and phase1-content-diwali-chhath.md.
   chhath: {
     verdict: {
       en: "Chhath is one connected four-day Surya observance: Nahay Khay, Kharna, evening arghya, then dawn arghya and paran. The Shashthi sunset is one stage, not the whole fast.",

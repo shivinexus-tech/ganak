@@ -14,7 +14,7 @@ const from = Date.UTC(2026, 0, 1) - IST * 3600000;
 const cal = app.scanPanchangCalendar(from, IST, 430, 46, DELHI);
 const fmt = (ms) => new Date(ms + IST * 3600000).toISOString().slice(0, 10);
 const SOLAR_NEW = ['thaipusam','panguniUthiram','vishu','onam','karthigaiDeepam','ayyappaMandalaBegins','ayyappaMandalaPuja'];
-const NEW = ['lakshmiPanchami','buddhaPurnima','guptNavratriAshadha','rathYatra','hariyaliTeej','nagPanchami','hartalikaTeej','radhaAshtami','mahaAshtami','mahaNavami','sharadPurnima','ahoiAshtami','guptNavratriMagha','vasantPanchami','sheetlaAshtami', ...SOLAR_NEW];
+const NEW = ['lakshmiPanchami','buddhaPurnima','guptNavratriAshadha','rathYatra','hariyaliTeej','nagPanchami','hartalikaTeej','radhaAshtami','mahaAshtami','mahaNavami','sharadPurnima','ahoiAshtami','guptNavratriMagha','vasantPanchami','sheetlaAshtami','govatsaDwadashi','dhanteras','kaliChaudas','narakChaturdashi','govardhanPuja','bhaiDooj','chhathNahayKhay','chhathKharna','chhath','chhathUshaArghya', ...SOLAR_NEW];
 const KNOWN = {
   vasantPanchami: '2026-01-23', mahaShivaratri: '2026-02-15', sheetlaAshtami: '~8 days after Holi (Mar 2026)',
   buddhaPurnima: '2026-05-01', rathYatra: '2026-07-16', hariyaliTeej: '2026-08-15', nagPanchami: '2026-08-17',
@@ -76,7 +76,17 @@ const dpAnchors = {
   sharadPurnima: '2026-10-25',
   karvaChauth: '2026-10-29',
   ahoiAshtami: '2026-11-01',
+  govatsaDwadashi: '2026-11-05',
+  dhanteras: '2026-11-06',
+  kaliChaudas: '2026-11-07',
+  narakChaturdashi: '2026-11-08',
   diwali: '2026-11-08',
+  govardhanPuja: '2026-11-10',
+  bhaiDooj: '2026-11-11',
+  chhathNahayKhay: '2026-11-13',
+  chhathKharna: '2026-11-14',
+  chhath: '2026-11-15',
+  chhathUshaArghya: '2026-11-16',
   guptNavratriAshadha: '2026-07-15',
   mahaShivaratri: '2026-02-15',
 };

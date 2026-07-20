@@ -162,7 +162,14 @@ const FESTIVALS = [
   { key: "sharadPurnima", month: 6, krishna: false, tithi: 15, kala: "nishita" },
   { key: "ahoiAshtami", month: 6, krishna: true, tithi: 8, kala: "pradosha" },
   { key: "karvaChauth", month: 6, krishna: true, tithi: 4, kala: "moonrise" },
+  { key: "govatsaDwadashi", month: 6, krishna: true, tithi: 12, kala: "pradosha" },
+  { key: "dhanteras", month: 6, krishna: true, tithi: 13, kala: "pradosha" },
+  { key: "kaliChaudas", month: 6, krishna: true, tithi: 14, kala: "nishita" },
+  { key: "narakChaturdashi", month: 6, krishna: true, tithi: 14, kala: "arunodaya" },
   { key: "diwali", month: 6, krishna: true, tithi: 15, kala: "pradosha" },
+  { key: "govardhanPuja", month: 7, krishna: false, tithi: 1, kala: "pratahkala" },
+  { key: "bhaiDooj", month: 7, krishna: false, tithi: 2, kala: "aparahna" },
+  { key: "chhath", month: 7, krishna: false, tithi: 6, kala: "sunset" },
   { key: "guptNavratriMagha", month: 10, krishna: false, tithi: 1, kala: "pratahkala", selection: "first" },
   { key: "vasantPanchami", month: 10, krishna: false, tithi: 5, kala: "purvahna" },
   { key: "mahaShivaratri", month: 10, krishna: true, tithi: 14, kala: "nishita" },
@@ -205,11 +212,13 @@ function scanDayParts(y, m, day, fallbackTz, place) {
   const dayLen = set - rise, nightLen = nextRise - set, nightMid = set + nightLen / 2;
   return {
     y, m, day, tz, noon, rise, set, nextRise, moonrise: undefined, observer: hasObserver ? { lat, lon } : null,
+    arunodaya: [rise - 96 * 60000, rise],
     udaya: [rise, rise + 60000],
     pratahkala: [rise, rise + dayLen / 5],
     purvahna: [rise, rise + 2 * dayLen / 5],
     madhyahna: [rise + 2 * dayLen / 5, rise + 3 * dayLen / 5],
     aparahna: [rise + 3 * dayLen / 5, rise + 4 * dayLen / 5],
+    sunset: [set - 60000, set + 60000],
     pradosha: [set - dayLen / 10, set + nightLen / 10],
     nishita: [nightMid - nightLen / 30, nightMid + nightLen / 30],
   };
@@ -315,6 +324,27 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
     const ny = nd.getUTCFullYear(), nm = nd.getUTCMonth() + 1, nda = nd.getUTCDate();
     const ntz = (place && place.zone && zoneOffset(place.zone, ny, nm, nda)) ?? tz;
     festivals.push({ key: "rangwaliHoli", ms: Date.UTC(ny, nm - 1, nda, 12) - ntz * 3600000, decidingKala: "day-after-holika" });
+  }
+  // Chhath is one four-day observance. The Shashthi sunset is day 3, so surface
+  // its two preparation days and the next-sunrise conclusion instead of making
+  // the calendar look like a one-day fast.
+  const chhath = festivals.find((f) => f.key === "chhath");
+  if (chhath) {
+    for (const [offset, key, sequenceDay] of [
+      [-2, "chhathNahayKhay", 1],
+      [-1, "chhathKharna", 2],
+      [1, "chhathUshaArghya", 4],
+    ]) {
+      const d = new Date(Date.UTC(chhath.y, chhath.m - 1, chhath.day + offset));
+      const y = d.getUTCFullYear(), m = d.getUTCMonth() + 1, day = d.getUTCDate();
+      const dayTz = (place && place.zone && zoneOffset(place.zone, y, m, day)) ?? tz;
+      festivals.push({
+        key,
+        ms: Date.UTC(y, m - 1, day, 12) - dayTz * 3600000,
+        y, m, day, sequenceDay,
+        decidingKala: offset === 1 ? "next-sunrise" : "sequence-from-shashthi",
+      });
+    }
   }
   for (const f of solarNakshatraFestivalDays(fromMs, tz, days)) festivals.push(f);
   // Vishu (Mesha Sankranti under Kerala's day rule) and the two endpoints of
