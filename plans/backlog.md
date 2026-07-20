@@ -77,38 +77,36 @@ So Phase 1's content gate is now finite and near, not open-ended.
 
 **Content gates (must clear before a credible Panchang launch — scope = all 4
 traditions + regional + beyond-Drik, see §C-SCOPE):**
-- [ ] **P1-CONTENT: Fasts & festivals coverage** — see the Content Track (§C1).
-      Fill the tradition + observance gaps (Shakta, Tamil/regional, missing
-      tithi vratas: Skanda Shashti, Gupt Navratri, Rath Yatra, Sheetla Ashtami,
-      Durgashtami, etc.). Method: diff vs Drik + beyond-Drik sources + owner
-      walkthrough. Enabling step: move content to a structured data file (§C-SCOPE.4).
-- [ ] **P1-VRATVIDHI: Vrat vidhis & fasting guidance** — see §C2. For each fast:
-      the vidhi (how to observe), what's permitted/forbidden to eat, sankalpa,
-      puja steps, timing/paran (breaking-fast window), and udyapan where it
-      applies. Owner wants this *on* the Panchang launch, not later. Sourced +
-      owner-verified, never AI-invented (§C-SCOPE.3).
+- [ ] **P1-CONTENT: Fasts & festivals coverage** — see §C1 and
+      `plans/drik-gap-analysis.md`. **Batch 1 done** (Tier-1 monthly cycle + Diwali/
+      Chhath cluster). **Next batch (P0):** Chaitra Navratri, Gudi Padwa/Ugadi, Vat
+      Savitri, Kartika Purnima, Tulasi Vivah, Pongal, Anant Chaturdashi, Pitru Paksha
+      list surfacing, Varalakshmi, remaining Tamil/Shakta Tier-2. Brief:
+      `plans/codex-task-p1-content-batch2.md`.
+- [ ] **P1-VRATVIDHI: Vrat vidhis & fasting guidance** — see §C2. Core monthly +
+      major fasts **wired** in `src/data/vrat-vidhis.ts` (15 observances). **P0:**
+      owner verification pass + extend vidhis when new festivals land. Brief:
+      `plans/claude-task-p1-vratvidhi-verify.md`.
 
 **Plumbing:**
-- [ ] **Hide the birth-chart tab** for launch (leaves Daily + Prashna; Muhurat
-      lives inside Daily). Also removes the currently-broken "Save charts" feature
-      from the free tier automatically (it lives inside the Chart tab).
-- [ ] **Deploy to a web host** — this IS the web launch. App only runs on
-      localhost today. Static Vite build → free tier (Vercel / Netlify /
-      Cloudflare Pages). No backend needed for this scope.
+- [x] **Hide the birth-chart tab** for launch — Daily + Prashna only; Chart route falls
+      back to Daily. _(P1-HIDE-DEPLOY, live at ganak.pages.dev)_
+- [x] **Deploy to a web host** — https://ganak.pages.dev (Cloudflare Pages, `main`
+      auto-deploy). _(P1-HIDE-DEPLOY)_
 - [ ] **Error monitoring** — owner wants failure points logged. Phone-only means
       crashes are invisible without this. Sentry free tier or similar.
 - [ ] **Analytics + a feedback channel** — owner wants "immense user input."
       Privacy-friendly analytics + an in-app feedback button/form.
-- [ ] **Light privacy note** — needed once analytics is added.
-      _Draft exists: `plans/legal-privacy-terms-draft.md`. Ship blockers from §4:_
-  - [ ] **Fix false footer + self-host fonts** — `CLAUDE-LAUNCH-PRIVACY` (Claude).
-  - [ ] Run `server` smoke suite (Claude — was UNRUN in sandbox).
+- [ ] **Publish privacy/terms page** — draft at `plans/legal-privacy-terms-draft.md`;
+      footer + fonts accurate _(CLAUDE-LAUNCH-PRIVACY MERGED)_. Needs owner contact
+      email + counsel review before linking publicly.
+- [ ] **Owner chore:** one local `cd server && npm run smoke` (agents verified via
+      browser; suite itself unrun as-written).
 - [x] Optional polish before launch: Muhurat window labels bilingual (E-0.7). _(CHIP-B)_
-- [x] **MuhuratHub startup perf** — kill 16.6s sync 400-day scan.
-      `CURSOR-MUHURAT-PERF` (async + 90d) + `CURSOR-LUNAR-CACHE` (shared
-      lunation window for `amantaMonthIdx`) → scan90 ~0.7s, scan400 ~1.1s.
-      Still open: sunEvents reuse, sunSidMs investigate
-      (`plans/perf-startup-scan.md`).
+- [x] **MuhuratHub startup perf** — async 90d scan + lunar cache + sunEvents reuse.
+      Scan90 ~0.4s bg; scan400 ~1.7s. _(CURSOR-MUHURAT-PERF, CURSOR-LUNAR-CACHE,
+      CURSOR-SUNEVENTS-01)_
+- [ ] Optional engine perf: investigate `sunSidMs` (`plans/perf-startup-scan.md` #5).
 
 **Product polish (recommended for launch, in-place, no rewrite):**
 - [ ] Everyday-zone nav cleanup + gut MuhuratHub — see **EPIC-IA**.
@@ -251,10 +249,10 @@ Feature exists and renders; not a claim of polish/parity.
 
 - **Daily / Panchang** — tithi, nakshatra, yoga, karana, rise/set, Rahu/Gulika/Yama
   kalam, Abhijit, choghadiya, full panchang table, samvats.
-- **Fasts & festivals** — ⚠️ *engine built, content ~30% covered.* 400-day scan
-  works, but only ~14 festivals + ~7 monthly observances, and only Smarta +
-  ISKCON traditions. NOT launch-ready — see Content Track §C1. (Was wrongly
-  marked Done before 2026-07-18.)
+- **Fasts & festivals** — engine built; **~37 festivals fire in 2026** (was ~14).
+  Diwali cluster + Chhath four-day sequence MERGED 2026-07-19. Still below Drik's
+  ~100 — see `plans/drik-gap-analysis.md` for P1/P2 gap list. NOT launch-ready on
+  coverage alone — see Content Track §C1.
 - **Muhurat date-range finder** — 7 activities, Drik-validated. ✅ 2026-07-17.
 - **Prashna (horary)** — verdict-first, birth-data-free. ✅ 2026-07-16.
 - **Hora / planetary hours** — with advice input.

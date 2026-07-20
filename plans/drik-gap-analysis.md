@@ -94,12 +94,15 @@ Sankranti (Apr 14, solar new year) is the notable one.
 
 ## Recommended order of work
 
-1. **Diwali cluster** (6 entries) — biggest visible gap, all simple tithi rules.
-2. **Chhath** — vidhi content already exists; only the calendar entry is missing.
-3. **Chaitra Navratri + Gudi Padwa/Ugadi** — completes the Navratri story.
-4. **Vat Savitri, Kartika Purnima, Tulasi Vivah, Pongal, Anant Chaturdashi.**
-5. **Surface Pitru Paksha in the list** (engine already computes it).
-6. Then P2, with eclipses as their own small feature (they need sutak rules, not just a date).
+**Updated 2026-07-20** — items 1–2 below are **MERGED** (Diwali cluster + Chhath).
+
+1. ~~Diwali cluster~~ ✅ MERGED (`phase1-content-diwali-chhath.md`)
+2. ~~Chhath four-day sequence~~ ✅ MERGED (reuses sourced vidhi)
+3. **Chaitra Navratri + Gudi Padwa/Ugadi** — `CODEX-P1-CONTENT-02` slice A
+4. **Vat Savitri, Kartika Purnima, Tulasi Vivah, Pongal, Anant Chaturdashi** — slice A
+5. **Surface Pitru Paksha in the list** — slice B
+6. **Varalakshmi + Mahalakshmi culmination** — slice C
+7. Then P2 + Tamil/Shakta slice D; eclipses as their own feature
 
 Each needs: sourced date rule + deciding day-part (per `festival-daypart-audit.md`),
 bilingual name/gloss in `src/data/festival-meta.ts`, and a 2026 regression anchor in

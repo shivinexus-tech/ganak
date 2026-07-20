@@ -2,93 +2,52 @@
 
 **This is the live coordination board.** Before editing any code, find your lane
 here, confirm the file exists, and reserve it in `plans/task-log.md`.
-Superseded: `plans/parallel-agent-brief.md` (historical, single-file era).
 
-Verified against the working tree on 2026-07-19 **after DailyScreen
-(`SPLIT-UI-DAILY-SCREEN`)** — shell **143 lines**. Nav-only shell ideal: hit.
+Verified 2026-07-20 — shell **143 lines**; live at **ganak.pages.dev**.
 
 ---
 
-## Honest status: how many lanes are actually live today
+## Honest status
 
 | | Lanes |
 |---|---|
-| ✅ **Assignable now (code)** | Daily · Muhurat · Hora/Gochar · Prashna · Matching · Chart · Validation · Backend · more content |
-| 🔒 **Reserved right now** | Claude privacy (`CLAUDE-LAUNCH-PRIVACY` → shell/fonts) · Codex deploy (`P1-HIDE-DEPLOY`) |
-| ♾️ **Always open** | Research/docs lanes in `plans/` — no file contention |
+| ✅ **Assignable now** | Content (Codex batch 2) · Vidhi verify (Claude) · Chart polish · Validation · EPIC-IA/DS |
+| 🔒 **Reserved** | `CODEX-P1-CONTENT-02` · `CLAUDE-P1-VRATVIDHI-VERIFY` |
+| ♾️ **Always open** | Research/docs in `plans/` |
 
-The single-file bottleneck is **resolved**. Shell is **143 lines** (was 6,000+):
-theme, lang/screen URL prefs, shared place, hero/nav/footer, compose
-`DailyScreen` / `PrashnaScreen` / `ChartScreen`.
-
-### Wired vs peeled
-
-Everything users see is in a module. The shell only composes.
-
-> ⚠️ After a peel, verify the shell imports the module and check the browser —
-> gates alone are not enough.
+Architecture + deploy + privacy + perf: **done**. Launch gate is now **content**.
 
 ---
 
 ## The board
 
-| # | Lane | Files | Status | Who may reserve next |
-|---|---|---|---|---|
-| 1 | **Daily/Panchang** | DailyScreen, MuhuratHub, CalendarPage, today-panchang, … | **MERGED** | ✅ Open |
-| 2 | **Festivals/Vrats** | festival-meta, vrat-vidhis, festivals engine | **MERGED** | ✅ Open for more content |
-| 3 | **Muhurat** | muhurat.ts, panchaka.ts; UI in MuhuratHub | **MERGED** | ✅ Open — further perf (lunarMonthInfo cache) optional |
-| 4 | **Chart** | ChartScreen + engines/UI | **MERGED** | ✅ Open for panel peels / polish |
-| 5 | **Matching** | matching.ts, MatchingScreen | **MERGED** | ✅ Open |
-| 6 | **Prashna** | PrashnaScreen | **MERGED** | ✅ Open |
-| 7 | **Hora/Gochar** | hora, gochar, transit-copy; UI in MuhuratHub / DailyScreen | **MERGED** | ✅ Open |
-| 8 | **Jyotish tools** | bhrigu, dasha, JyotishBnnScreen, RectifyScreen | **MERGED** | ✅ Open for polish |
-| 9 | **Validation** | `validation/*` | Open | ✅ Reservable per-file |
-| 10 | **Backend/deployment** | `server/*`, hosting | Open | 🔒 Codex on `P1-HIDE-DEPLOY` |
+| # | Lane | Status | Who may reserve next |
+|---|---|---|---|
+| 1 | Daily/Panchang | **MERGED** | ✅ Open (EPIC-IA nav cleanup) |
+| 2 | **Festivals/Vrats content** | **Partial** | 🔒 Codex (`CODEX-P1-CONTENT-02`) |
+| 2b | **Vrat vidhis** | **Partial** (15 wired) | 🔒 Claude (`CLAUDE-P1-VRATVIDHI-VERIFY`) |
+| 3 | Muhurat | **MERGED** | ✅ Open |
+| 4 | Chart | **MERGED** (hidden) | ✅ Open for panel peels |
+| 5–10 | Matching, Prashna, Hora, Jyotish, Validation, Backend | **MERGED** / open | ✅ Reservable |
 
-### Shared / integration-owned files (reserve before editing)
+### Shared files
 
-| File | Lines | Note |
-|---|---|---|
-| `src/kundli-app.tsx` | **143** | Shell. 🔒 Claude (`CLAUDE-LAUNCH-PRIVACY` — footer + fonts). Shared `panchPlace` (Prashna + Daily). |
-| `src/screens/DailyScreen.tsx` | ~255 | Daily chrome + MuhuratHub + gochar. |
-| `src/i18n.ts` | — | Bilingual strings + `tr`/`trN`/`obsLabel`. **Add keys; never fork `L`.** |
-| `src/components/tokens.ts` | 14 | Design tokens. |
-| `src/components/format.ts` | — | `fmtDeg`, `fmtTime`, `fmtTimeD`, `fmtDateT`. |
-| `src/engine/ephemeris.ts` | — | Astronomy + `ascendantAt`. |
-| `src/engine/panchang.ts` | — | Tithi/nakshatra/sunrise/ayanamsa, `SIGN_LORD`, `VIM_LORDS`. |
-| `src/engine/festivals.ts` | — | Festival + day-part selection. |
+| File | Note |
+|---|---|
+| `src/kundli-app.tsx` | Shell 143 lines — open; reserve before edit |
+| `src/engine/festivals.ts` | 🔒 Codex content batch |
+| `src/data/vrat-vidhis.ts` | 🔒 Claude vidhi verify |
 
 ---
 
-## Reservation protocol
-
-1. Find your lane above and check the status column.
-2. Add a row to `plans/task-log.md` with: ID, agent, branch/worktree, **exact file
-   list**, task, status `RESERVED`.
-3. Work only inside your listed files. Anything outside needs a new reservation.
-4. Finish with gate evidence + a handoff. `REVIEW` → integrator merges → `MERGED`.
-
-**Never** edit an integration-owned file (shell, tokens, i18n, navigation) without an
-explicit assignment in the log.
-
-### ⚠️ Failure modes we have actually hit
-
-- **A foreign staged index.** Check `git status` for staged files you did not add
-  before committing while someone else is active.
-- **Half-committed cross-file move.** A move that changes two files must land in
-  *one* commit.
-- **Hooks that only fail at runtime.** Browser smoke is not optional.
-
----
-
-## What unlocks what (remaining)
+## What unlocks launch credibility
 
 ```
-Claude — CLAUDE-LAUNCH-PRIVACY (footer + self-host fonts + server smoke)  ← do this next
-Codex  — P1-HIDE-DEPLOY       → Phase-1 public URL
-Cursor — CURSOR-MUHURAT-PERF  MERGED (async + 90d scan)
+Codex  — CODEX-P1-CONTENT-02     → more festivals on calendar (P1 gaps)
+Claude — CLAUDE-P1-VRATVIDHI     → owner sign-off on vidhi cards
+Owner  — npm run smoke (one time) · contact email for legal page
+Later  — error monitoring · analytics/feedback · EPIC-IA nav cleanup
 ```
 
-Agents needing work *today* and not already reserved should take: Matching (Lane 5),
-Validation (Lane 9), more P1 content (Lane 2), Chart panel peels (Lane 4, modules
-only — stay off shell while Claude has it), or any `plans/` research.
+Agents not on the above: Chart panel peels, validation gates, `sunSidMs` perf,
+or docs/research.
