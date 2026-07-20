@@ -14,7 +14,7 @@ Verified against the working tree on 2026-07-19 **after DailyScreen
 | | Lanes |
 |---|---|
 | ✅ **Assignable now (code)** | Daily · Muhurat · Hora/Gochar · Prashna · Matching · Chart · Validation · Backend · more content |
-| 🔒 **Reserved right now** | Codex deploy (`P1-HIDE-DEPLOY`) — stay off shell |
+| 🔒 **Reserved right now** | Claude privacy (`CLAUDE-LAUNCH-PRIVACY` → shell/fonts) · Codex deploy (`P1-HIDE-DEPLOY`) |
 | ♾️ **Always open** | Research/docs lanes in `plans/` — no file contention |
 
 The single-file bottleneck is **resolved**. Shell is **143 lines** (was 6,000+):
@@ -36,7 +36,7 @@ Everything users see is in a module. The shell only composes.
 |---|---|---|---|---|
 | 1 | **Daily/Panchang** | DailyScreen, MuhuratHub, CalendarPage, today-panchang, … | **MERGED** | ✅ Open |
 | 2 | **Festivals/Vrats** | festival-meta, vrat-vidhis, festivals engine | **MERGED** | ✅ Open for more content |
-| 3 | **Muhurat** | muhurat.ts, panchaka.ts; UI in MuhuratHub | **MERGED** | ✅ Open — **perf:** 400-day sync scan (~16.6s) in `plans/perf-startup-scan.md` |
+| 3 | **Muhurat** | muhurat.ts, panchaka.ts; UI in MuhuratHub | **MERGED** | ✅ Open — further perf (lunarMonthInfo cache) optional |
 | 4 | **Chart** | ChartScreen + engines/UI | **MERGED** | ✅ Open for panel peels / polish |
 | 5 | **Matching** | matching.ts, MatchingScreen | **MERGED** | ✅ Open |
 | 6 | **Prashna** | PrashnaScreen | **MERGED** | ✅ Open |
@@ -49,7 +49,7 @@ Everything users see is in a module. The shell only composes.
 
 | File | Lines | Note |
 |---|---|---|
-| `src/kundli-app.tsx` | **143** | Shell. Open for integrator; reserve before editing. Shared `panchPlace` (Prashna + Daily). |
+| `src/kundli-app.tsx` | **143** | Shell. 🔒 Claude (`CLAUDE-LAUNCH-PRIVACY` — footer + fonts). Shared `panchPlace` (Prashna + Daily). |
 | `src/screens/DailyScreen.tsx` | ~255 | Daily chrome + MuhuratHub + gochar. |
 | `src/i18n.ts` | — | Bilingual strings + `tr`/`trN`/`obsLabel`. **Add keys; never fork `L`.** |
 | `src/components/tokens.ts` | 14 | Design tokens. |
@@ -84,11 +84,11 @@ explicit assignment in the log.
 ## What unlocks what (remaining)
 
 ```
-Codex  — P1-HIDE-DEPLOY                         → Phase-1 public URL
-Anyone — MuhuratHub startup perf (~16.6s scan)  → biggest remaining UX pain
-Anyone — more P1 content / Chart panel peels    → stay off shell unless reserved
+Claude — CLAUDE-LAUNCH-PRIVACY (footer + self-host fonts + server smoke)  ← do this next
+Codex  — P1-HIDE-DEPLOY       → Phase-1 public URL
+Cursor — CURSOR-MUHURAT-PERF  MERGED (async + 90d scan)
 ```
 
 Agents needing work *today* and not already reserved should take: Matching (Lane 5),
 Validation (Lane 9), more P1 content (Lane 2), Chart panel peels (Lane 4, modules
-only), Muhurat perf (Lane 3), or any `plans/` research.
+only — stay off shell while Claude has it), or any `plans/` research.

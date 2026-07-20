@@ -95,3 +95,21 @@ since it is called throughout.
 (2) then (1) — together they take the perceived startup from ~16.6 s of frozen tab to
 an immediate paint with a short fill-in. (3), (4) and (5) are real but secondary once
 the scan is off the critical path.
+
+---
+
+## Shipped — `CURSOR-MUHURAT-PERF` (2026-07-19)
+
+| Proposal | Status |
+|---|---|
+| (2) Off critical path | **Shipped** — `useEffect` + `setTimeout(0)`; Fasts & festivals card shows “Checking the panchang…” until fill |
+| (1) Shorter window | **Shipped** — **400 → 90 days** (cap still 46; UI still `.slice(0, 10)`) |
+| (3) Memoize `lunarMonthInfo` | Still open |
+| (4) Reuse `sunEvents` | Still open |
+| (5) Investigate `sunSidMs` | Still open |
+
+Expected: first paint immediate; background scan ~90/400 × 16.6 s ≈ **~3.7 s** wall (non-blocking).
+
+**Measured after ship (Node, Delhi, same loader as gates):** 90-day scan **2.8 s**
+(17 fasts / 10 festivals); 400-day still **16.4 s** for comparison. UI no longer
+blocks on it.

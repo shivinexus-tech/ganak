@@ -81,7 +81,26 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       }
     }, 30);
   };
-  const cal = useMemo(() => { try { return scanPanchangCalendar(todayP.anchor, tz, 400, 46, place); } catch (e) { return { fasts: [], festivals: [] }; } }, [todayP.anchor, tz, place]);
+  // Startup scan: was a sync 400-day useMemo (~16.6s freeze). Now async + 90 days —
+  // the list only shows top 10; CalendarPage owns the full year behind a click.
+  const SCAN_DAYS = 90, SCAN_CAP = 46;
+  const [cal, setCal] = useState({ fasts: [], festivals: [] });
+  const [calBusy, setCalBusy] = useState(true);
+  useEffect(() => {
+    let alive = true;
+    setCalBusy(true);
+    const id = setTimeout(() => {
+      try {
+        const r = scanPanchangCalendar(todayP.anchor, tz, SCAN_DAYS, SCAN_CAP, place);
+        if (alive) setCal(r);
+      } catch (e) {
+        if (alive) setCal({ fasts: [], festivals: [] });
+      } finally {
+        if (alive) setCalBusy(false);
+      }
+    }, 0);
+    return () => { alive = false; clearTimeout(id); };
+  }, [todayP.anchor, tz, place]);
   const [trad, setTrad] = useState("smarta");
   useEffect(() => { let alive = true; (async () => { try { const st = (typeof window !== "undefined" && window.storage) ? window.storage : null; if (st) { const r = await st.get("janma_trad"); if (alive && r && r.value) setTrad(r.value); } } catch (e) {} })(); return () => { alive = false; }; }, []);
   const chooseTrad = (v) => { setTrad(v); try { const st = (typeof window !== "undefined" && window.storage) ? window.storage : null; if (st) st.set("janma_trad", v); } catch (e) {} };
@@ -382,6 +401,9 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           </div>
         )}
         {(() => {
+          if (calBusy) {
+            return <div style={{ padding: "12px", fontSize: 12.5, color: C.muted, fontStyle: "italic" }}>{lang === "hi" ? "पंचांग देखा जा रहा है…" : "Checking the panchang…"}</div>;
+          }
           const items = (tab === "fasting" ? effFasts : cal.festivals).slice(0, 10);
           if (!items.length) return <div style={{ padding: "12px", fontSize: 12.5, color: C.muted, fontStyle: "italic" }}>{tr(lang, "noneToday")}</div>;
           const LL = lang === "hi" ? "hi" : "en";

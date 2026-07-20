@@ -100,7 +100,14 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
 - [ ] **Analytics + a feedback channel** — owner wants "immense user input."
       Privacy-friendly analytics + an in-app feedback button/form.
 - [ ] **Light privacy note** — needed once analytics is added.
-- [ ] Optional polish before launch: Muhurat window labels bilingual (E-0.7).
+      _Draft exists: `plans/legal-privacy-terms-draft.md`. Ship blockers from §4:_
+  - [ ] **Fix false footer + self-host fonts** — `CLAUDE-LAUNCH-PRIVACY` (Claude).
+  - [ ] Run `server` smoke suite (Claude — was UNRUN in sandbox).
+- [x] Optional polish before launch: Muhurat window labels bilingual (E-0.7). _(CHIP-B)_
+- [x] **MuhuratHub startup perf** — kill 16.6s sync 400-day scan.
+      `CURSOR-MUHURAT-PERF` (Cursor) · async + 90-day window (2.8s bg vs 16.4s).
+      Further wins (lunarMonthInfo cache, sunEvents reuse) still open in
+      `plans/perf-startup-scan.md`.
 
 **Product polish (recommended for launch, in-place, no rewrite):**
 - [ ] Everyday-zone nav cleanup + gut MuhuratHub — see **EPIC-IA**.
