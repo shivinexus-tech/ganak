@@ -260,14 +260,33 @@ invested, and decline to judge if not.
 **The question was:** ship the number method *without* these two, and add them later
 as a v1.1?
 
-**My recommendation: yes, defer both.** Ruling planets mainly add *timing*
-("by mid-August"), and timing predictions are the highest-risk thing this app could
-say — most likely to be wrong, most likely to be quoted back at you. The
-Moon-sincerity test means the app would sometimes **refuse to answer**, which needs
-careful, kind wording or it feels like a broken button. Neither is needed for a
-verdict; both deserve their own design pass.
+**My recommendation was: defer both.**
 
-**You can simply say "agreed, defer" — or "no, I want timing in v1".**
+### ✅ DECIDED (owner, 2026-07-20) — ship BOTH in v1, do not defer
+
+Owner's reasoning: shipping the full method is how you find out which parts people
+actually use and who the users are. A half-method teaches you less.
+
+**I accept the call.** It is the right instinct for a learning launch, and the "which
+features get used" question it serves is answerable — see
+`plans/understanding-users-without-login.md`.
+
+**Three consequences that follow, and must not be lost:**
+
+1. **KSK verification scope grows.** `P0-PRASHNA-249-KSK-VERIFY` must now also cover
+   the ruling-planet rules (which five, how ranked, how used for timing) and the
+   Moon-sincerity doctrine (what condition disqualifies a question). These are
+   precisely the areas where popular KP websites vary most, so primary-text anchoring
+   matters more here, not less.
+2. **Timing is the highest-risk output in the whole app.** "By mid-August" is
+   falsifiable in a way "favourable" is not, and it is the sentence a user will quote
+   back. It needs hedged, plain wording and a visible reminder that it is traditional
+   guidance, not prediction — consistent with the Terms draft §3.2.
+3. **"Refuse to answer" needs kind wording.** If the Moon test says the question isn't
+   ripe, the screen must explain *why*, in warm plain language, and say what to do
+   instead (wait, ask again later, ask more specifically). Written badly it reads as
+   a broken button. This is a copy task, and it should be drafted at mock-up time —
+   not left to the engine.
 
 ---
 
@@ -294,8 +313,8 @@ recommend seeing it.
 | # | Question | Status |
 |---|---|---|
 | Q3 | Naming | ✅ **DECIDED 2026-07-20** — "कृष्णमूर्ति पद्धति अंक विधि", full name, no initials |
+| Q4 | Ruling planets + Moon-sincerity | ✅ **DECIDED 2026-07-20** — ship **both in v1**; KSK verify scope grows to match |
 | Q1 | Chips to tier 2, compress repeated lines, question-specific house glosses | ⏳ open (recommended) |
 | Q2 | Lahiri + disclosure, or true-KP fork | ⏳ open (Lahiri recommended; 1-in-15 divergence measured) |
-| Q4 | Defer ruling planets + Moon-sincerity to v1.1 | ⏳ open (defer recommended) |
 | Q5 | Mock-up before code | ⏳ open (recommended) |
 | — | Fix the live **`2th` house** bug now | ⏳ open — it is on production right now |

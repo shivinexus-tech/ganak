@@ -170,6 +170,33 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       `plans/prashna-249-findings.md`, owner answers `plans/prashna-249-owner-answers.md`.
       **Naming DECIDED:** "कृष्णमूर्ति पद्धति अंक विधि" / "Krishnamurti Paddhati number
       method" — full name, no "KP" initials. Q1/Q2/Q4/Q5 still open.)_
+- [ ] **P0 — Understand users without login (research DONE, execution pending).**
+      Owner blocker: "can't tell who the users are or how they navigate without
+      signup." Research says login is **not** the blocker and would not solve it —
+      three separate questions, three tools, none needing auth. Full findings:
+      `plans/understanding-users-without-login.md`.
+      **Do in this order:**
+      1. **5 moderated usability tests** (₹0, this week, no launch traffic needed) —
+         Nielsen: 5 users surface ~85% of usability problems. At least 2 participants
+         should be elders, per the elder-friendly requirement. Answers the EPIC-IA
+         "is the nav broken / do people know to tap" question that analytics cannot.
+      2. **Instrument behavioural cohorts** — infer astrologer vs everyday user from
+         behaviour (opens Full Prashna chart / divisional charts / switches ayanamsa to
+         KP vs only reads tithi). No identity needed. Better signal than login.
+      3. **Recruit ~10 astrologers into a WhatsApp/Telegram group** + a footer
+         "help us improve" link. Recruitment problem, not an auth problem.
+      Login stays Phase 4, driven by saved charts + reminders, not by analytics.
+      _(P0-USER-INSIGHT)_
+- [ ] **P0 blocker on the above — analytics breaks the "no tracking" footer claim.**
+      The footer says "no account, no tracking". **Any** analytics, even cookieless or
+      self-hosted, makes that false — the same trap as the Google Fonts leak. Footer,
+      `plans/legal-privacy-terms-draft.md` §2.2, an in-app plain-language note, and a
+      DPDP/GDPR check must all land in **one change** with the instrumentation.
+      Tooling: Plausible (~$9/mo, cookieless, custom events) or self-hosted Umami
+      (free tier, data stays ours). Cloudflare Web Analytics is free and already
+      available but samples data, keeps 30 days, and is weak on custom events — which
+      is exactly what we need. Avoid PostHog (cookie/profile based).
+      _(P0-ANALYTICS-PRIVACY)_
 - [ ] **P0 pre-condition for the 249 engine — primary-text verification (KSK).**
       Before the KP-number engine ships, verify the judgment conventions against
       K. S. Krishnamurti's own Horary readers (number fixes the lagna at the sub's
@@ -179,7 +206,11 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       devotional audience Ganak anchors on source texts, not on calculator websites —
       same religious-accuracy rule as festival content. Output: a short citations note
       in `plans/` mapping each engine rule to reader/chapter, plus any corrections.
-      Blocks implementation, not research. _(P0-PRASHNA-249-KSK-VERIFY)_
+      Blocks implementation, not research.
+      **Scope grew 2026-07-20** (owner shipped ruling planets + Moon-sincerity in v1):
+      must now also anchor the ruling-planet rules (which five, ranking, timing use)
+      and the sincerity doctrine — the areas where popular KP sites vary most.
+      _(P0-PRASHNA-249-KSK-VERIFY)_
 - [ ] **P1 — Prashna ordinal bug (LIVE).** Verdict copy prints "1th / 2th / 3th house":
       `src/screens/PrashnaScreen.tsx` lines 295/299/303 hardcode `${h}th`. Visible on
       ganak.pages.dev now; 2nd/3rd houses are common in readings. English only —
