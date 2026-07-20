@@ -202,9 +202,40 @@ inline click/expand experience remains available in parallel.
 6. Shukra Pradosh
 7. Shani Pradosh
 
-## Owner decision still required before implementation
+## Multi-day and family-page decisions
 
-For multi-day or family observances, decide whether each displayed row gets a unique
-URL or whether related rows may share one comprehensive page while opening at the
-relevant day/variant section. Examples: four Chhath days, seven Durga Puja days,
-three Skanda Sashti milestones, the named Ekadashis and weekday Pradosh variants.
+### Chhath — researched recommendation awaiting owner confirmation
+
+Use **one complete Chhath page with four directly linkable day-sections**: Nahay Khay,
+Kharna, Sandhya Arghya and Usha Arghya/paran. Each calendar row should open the same
+page at its relevant section and clearly show the user's current stage. Government of
+India and Bihar sources describe Chhath as one connected four-day spiritual observance,
+not four unrelated festivals:
+
+- https://www.incredibleindia.gov.in/en/festivals-and-events/chhath-puja
+- https://tourism.bihar.gov.in/hi/experiences/festivals-and-fairs/festivals/chhath-puja
+
+### Chaitra and Sharad Navratri — owner requirement
+
+- Both Chaitra and Sharad Navratri must provide a dedicated page for each of the nine
+  worship days/forms: Shailaputri, Brahmacharini, Chandraghanta, Kushmanda,
+  Skandamata, Katyayani, Kalaratri, Mahagauri and Siddhidatri.
+- Each day-page needs a respectfully sourced/owner-approved image of that Goddess,
+  accessible alt text, her identity and significance, and separate household puja
+  guidance. Verify iconography and image rights; do not use an unreviewed generic
+  Goddess image.
+- Suggest Durga Saptashati/Devi Mahatmya as an available Navratri worship text in
+  appropriate plain language. Do not imply that every user must perform an advanced
+  ritual recitation.
+- Add a later child item on the Chaitra/Sharad parent pages for a sourced, owner-reviewed
+  guide to arranging Durga Saptashati reading across the nine days.
+- This Navadurga nine-day page structure applies **only to Chaitra and Sharad
+  Navratri**. Do not copy it to Magha or Ashadha Gupt Navratri.
+
+### Still to research
+
+Research the correct structure before choosing page boundaries for the Bengal Durga
+Puja sequence, annual Skanda Sashti milestones, named Ekadashis, weekday Pradosh
+variants, Ayyappa Mandala and other multi-day/family observances. Shared pages are
+allowed only when the religious observance is genuinely one connected sequence; each
+calendar row must still have a stable deep link to its relevant section.

@@ -116,6 +116,21 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       failure and recovery messages. Preserve the dedicated route and language while
       the place changes, and keep a Daily Panchang link as optional navigation—not as
       a requirement for understanding the guide. _(P0-FESTIVAL-PAGE-PLACE)_
+- [ ] **P0 before go-live — Prashna improvement research + owner-approved number
+      method.** The current screen needs a broader product and calculation audit.
+      Research and prototype an additional **KP Horary Number (1–249)** mode: the
+      user concentrates on one sincere, specific question and supplies the first
+      number that comes naturally; the number maps to a KP zodiac subdivision and
+      fixes the Prashna ascendant, while the question moment and selected place still
+      matter. This is **not numerology** and is separate from the future Prashnavali
+      “number → verse” idea. Do not build from the suggestion alone: first bring the
+      owner the proposed inputs, plain-language flow, method/convention choices and
+      sample outputs for confirmation. Research must resolve KP-vs-Lahiri ayanamsa,
+      249-boundary mapping, house cusps, ruling planets, significators, question-house
+      rules, repeated-question handling and calculation anchors. After owner sign-off,
+      build it as a clearly labelled alternative to—not a silent replacement for—the
+      existing time-based Prashna. Full brief: `plans/prashna-number-method-research.md`.
+      _(P0-PRASHNA-249-RESEARCH)_
 - [x] **Hide the birth-chart tab** for launch — Daily + Prashna only; Chart route falls
       back to Daily. _(P1-HIDE-DEPLOY, live at ganak.pages.dev)_
 - [x] **Deploy to a web host** — https://ganak.pages.dev (Cloudflare Pages, `main`
