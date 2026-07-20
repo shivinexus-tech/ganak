@@ -43,6 +43,7 @@ node validation/parse-check.js src/kundli-app.tsx    # syntax, duplicates, orpha
 node validation/prashna-parity.js src/screens/PrashnaScreen.tsx # Prashna engine == validated engine
 node validation/prashna-calc.js                      # 24 self-tests vs Drik anchors
 node validation/muhurat-anchors.cjs                  # muhurat rules vs Drik 2026 published dates
+node validation/panchaka-windows.cjs                 # no sub-minute/same-minute display windows or gaps
 ```
 Never claim work is done without pasting the passing output. Evidence before
 assertions. If a gate fails, fix the cause — never weaken a gate to pass it

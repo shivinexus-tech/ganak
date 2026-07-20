@@ -18,6 +18,7 @@ the non-negotiables so Cursor's AI can't miss them.
    node validation/prashna-calc.js
    node validation/muhurat-anchors.cjs
    node validation/content-dates.cjs                   # festival/day-part anchors
+   node validation/panchaka-windows.cjs                 # no sub-minute/same-minute Panchaka windows
    ```
 3. **No `localStorage` / `sessionStorage`** — banned. UI prefs go in the URL query.
 4. **Content is Hindu observances only** (Buddha Purnima excepted). Religious
