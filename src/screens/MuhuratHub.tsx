@@ -30,6 +30,15 @@ import { planetGochar } from "../engine/gochar";
 import { fmtDur, eventDetail } from "../engine/transit-copy";
 import { observancesFor, scanPanchangCalendar, EKADASHI_NAMES, PRADOSH_NAMES_BY_DAY } from "../engine/festivals";
 
+const VRAT_VIDHI_KEY = Object.freeze({
+  chhathNahayKhay: "chhath",
+  chhathKharna: "chhath",
+  chhath: "chhath",
+  chhathUshaArghya: "chhath",
+  chaitraNavratri: "chaitraNavratri",
+  sharadNavratri: "sharadNavratri",
+});
+
 function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, onCal = () => {}, C, card }) {
   const tz = todayP.tz;
   const nowMs = isToday ? Date.now() : null;
@@ -413,6 +422,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           let lastMonth = null;
           return items.map((it) => {
             const kind = tab === "fasting" ? obsKind(it.key) : it.key;
+            const vidhiKey = VRAT_VIDHI_KEY[kind] || kind;
             const meta = tab === "fasting" ? OBS_META[kind] : FEST_META[it.key];
             const name = tab === "fasting" ? obsLabel(lang, { key: it.key, baseKey: kind, isVariant: it.key !== kind }) : trN(lang, FEST_NAME, it.key);
             const mLbl = monthLbl(it.ms);
@@ -450,7 +460,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                         )}
                         {fexp && fexp.shifted && <div style={{ color: C.gold, fontSize: T.fMicro }}>{fexp.reason === "spans" ? (lang === "hi" ? "वैष्णव तिथि — दो अरुणोदय पर एकादशी; दूसरे दिन व्रत" : "Vaishnava date — Ekadashi at two dawns; observed on the second") : (lang === "hi" ? "वैष्णव तिथि — अरुणोदय पर दशमी होने से व्रत एक दिन आगे" : "Vaishnava date — Dashami touched arunodaya (dawn), so the fast shifts one day")}</div>}
                         {meta && meta.rules && <div style={{ color: C.muted, fontSize: T.fMicro, fontStyle: "italic" }}>{meta.rules[LL]}</div>}
-                        {VRAT_VIDHI[kind] && <VratVidhiCard data={VRAT_VIDHI[kind]} lang={lang} C={C} />}
+                        {VRAT_VIDHI[vidhiKey] && <VratVidhiCard data={VRAT_VIDHI[vidhiKey]} lang={lang} C={C} />}
                       </div>
                     );
                   })()}

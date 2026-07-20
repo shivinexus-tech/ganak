@@ -17,8 +17,8 @@ export const VRAT_VIDHI_LABELS = {
   safety: { en: "Health note", hi: "स्वास्थ्य टिप्पणी" },
 };
 export const VRAT_VIDHI_SAFETY = {
-  en: "Devotion is not measured by dehydration. Nirjala (no food or water) is a strict traditional option, not the usual choice. Children, older people, anyone who is pregnant or breastfeeding, unwell, taking medicines, or living with diabetes, kidney disease or an eating disorder should use a modified observance and seek medical advice where relevant. Break the fast and seek help if you become faint, confused, severely weak, cannot keep fluids down, or have unsafe blood-sugar symptoms. Never stop or retime prescribed medicine without medical advice.",
-  hi: "भक्ति का माप निर्जलीकरण नहीं है। निर्जला (बिना अन्न-जल) व्रत एक कठोर पारम्परिक विकल्प है, सामान्य विकल्प नहीं। बच्चे, वृद्ध, गर्भवती या स्तनपान कराने वाली महिलाएँ, अस्वस्थ व्यक्ति, दवा लेने वाले, मधुमेह, गुर्दे की बीमारी या ईटिंग-डिसऑर्डर वाले लोग संशोधित व्रत रखें और आवश्यकता अनुसार चिकित्सकीय सलाह लें। चक्कर, भ्रम, अत्यधिक कमजोरी, पानी न रुकना या असुरक्षित रक्त-शर्करा लक्षण हों तो व्रत तोड़ें और सहायता लें। चिकित्सकीय सलाह के बिना दवा बन्द न करें और न उसका समय बदलें।",
+  en: "This health note does not change the religious rule described below. Some vrats are traditionally nirjala (without food or water). Children, older people, anyone who is pregnant or breastfeeding, unwell, taking medicines, or living with diabetes, kidney disease or an eating disorder should seek medical advice and guidance from their family or religious tradition before observing a strict fast. Seek help if you become faint, confused, severely weak, cannot keep fluids down, or have unsafe blood-sugar symptoms. Never stop or retime prescribed medicine without medical advice.",
+  hi: "यह स्वास्थ्य टिप्पणी नीचे लिखे धार्मिक नियम को नहीं बदलती। कुछ व्रत परम्परागत रूप से निर्जला (बिना अन्न-जल) रखे जाते हैं। बच्चे, वृद्ध, गर्भवती या स्तनपान कराने वाली महिलाएँ, अस्वस्थ व्यक्ति, दवा लेने वाले, मधुमेह, गुर्दे की बीमारी या ईटिंग-डिसऑर्डर वाले लोग कठोर व्रत से पहले चिकित्सकीय सलाह और अपनी कुल या धार्मिक परम्परा का मार्गदर्शन लें। चक्कर, भ्रम, अत्यधिक कमजोरी, पानी न रुकना या असुरक्षित रक्त-शर्करा लक्षण हों तो सहायता लें। चिकित्सकीय सलाह के बिना दवा बन्द न करें और न उसका समय बदलें।",
 };
 export const VRAT_VIDHI = {
   ekadashi: {
@@ -233,36 +233,67 @@ export const VRAT_VIDHI = {
       hi: "वार्षिक एक व्रत में नहीं; विशेष बहुवर्षीय संकल्प का उद्यापन मूल संकल्प अनुसार पुरोहित-निर्देशित शिव-पूजा/होम और दान से।",
     },
   },
-  navratri: {
+  chaitraNavratri: {
     verdict: {
-      en: "Begin with Ghatasthapana in the local Pratipada morning time shown above and honour Shakti for nine days. Chaitra commonly reaches Rama Navami; Sharad commonly reaches Durga Ashtami or Navami and Vijayadashami.",
-      hi: "ऊपर दिखाए स्थानीय प्रतिपदा-प्रातः घटस्थापना समय में आरम्भ करें और नौ दिन शक्ति-पूजन करें। चैत्र में राम नवमी, शारदीय में दुर्गाष्टमी या नवमी और विजयादशमी प्रमुख हैं।",
+      en: "Chaitra Navratri begins with Ghatasthapana in the local Chaitra Shukla Pratipada morning time shown above. Worship Navadurga through the nine days; Rama Navami is the principal concluding festival on Navami.",
+      hi: "चैत्र नवरात्रि ऊपर दिखाए स्थानीय चैत्र शुक्ल प्रतिपदा के प्रातः घटस्थापना से आरम्भ होती है। नौ दिनों तक नवदुर्गा पूजन करें; नवमी पर राम नवमी इसका प्रमुख समापन पर्व है।",
     },
     vidhi: [
-      { en: "Before starting, choose all nine days, the first and last days, or a family-approved shorter pattern. You do not need to promise nine full fasts unless that is your chosen sankalpa.", hi: "आरम्भ से पहले नौ दिन, प्रथम-अन्तिम दिन या कुल-मान्य छोटा क्रम चुनें। नौ पूर्ण उपवास का संकल्प तभी लें जब आपने वही रूप चुना हो।" },
-      { en: "Install the kalasha only in the displayed Ghatasthapana window and only if someone can care for the shrine safely. A simple image-and-lamp practice is valid.", hi: "कलश केवल दिखाए घटस्थापना समय में और तभी स्थापित करें जब सुरक्षित देखभाल हो; चित्र और दीप की सरल पूजा भी मान्य।" },
-      { en: "Each day worship the displayed Navadurga form, offer suitable prasad, chant or read a familiar Devi text. Keep diet and conduct satvik.", hi: "प्रतिदिन दिखाए नवदुर्गा रूप की पूजा, उचित प्रसाद, परिचित देवी-पाठ/जप; आहार-आचरण सात्त्विक रखें।" },
-      { en: "Perform Kanya Puja only if customary, with consent, dignity, equal welcome and no pressure on children. Conclude according to the selected Ashtami/Navami/Dashami tradition.", hi: "कन्या-पूजन कुल में हो तो सहमति, सम्मान, समान स्वागत और बच्चों पर बिना दबाव; चुनी अष्टमी/नवमी/दशमी परम्परा अनुसार समापन।" },
+      { en: "On Pratipada, bathe, take the nine-day sankalpa and perform Ghatasthapana in the time shown. If your family does not establish a kalasha, begin the established household Devi worship.", hi: "प्रतिपदा को स्नान, नौ-दिवसीय संकल्प और दिखाए समय में घटस्थापना करें। कुल में कलश-स्थापना न हो तो स्थापित गृह-परम्परा से देवी-पूजन आरम्भ करें।" },
+      { en: "Worship the day's Navadurga form, offer the customary prasad, and continue the family's Devi path, recitation or japa each day.", hi: "प्रतिदिन उस दिन की नवदुर्गा का पूजन, कुलानुसार भोग और देवी-पाठ या जप करें।" },
+      { en: "Observe Ashtami and Navami rites according to family practice. On Rama Navami, include Shri Rama's birth worship where this is customary.", hi: "अष्टमी और नवमी की विधि कुल-परम्परा अनुसार करें। राम नवमी पर परम्परानुसार श्रीराम जन्म-पूजन सम्मिलित करें।" },
     ],
     diet: {
-      en: "Common phalahar foods include fruit, dairy, nuts, potato, sweet potato, sabudana, singhara, kuttu, rajgira and samak where the family accepts them. Avoid meat, alcohol, grains/pulses, onion and garlic in the standard North-Indian vrat form. Regional Shakta offerings and non-fasting Durga Puja customs can differ and must not be overwritten.",
-      hi: "फल, दुग्ध, मेवे, आलू, शकरकंद, साबूदाना, सिंघाड़ा, कुट्टू, राजगीरा, सामक कुलानुसार। उत्तर भारतीय सामान्य व्रत में मांस, मद्य, अन्न-दाल, प्याज-लहसुन छोड़ते हैं। क्षेत्रीय शाक्त भोग और बिना-व्रत दुर्गापूजा परम्पराएँ अलग हो सकती हैं; उन्हें न बदलें।",
+      en: "Follow the fasting level taken in the sankalpa. Common North-Indian phalahar includes fruit, dairy, nuts, potato, sweet potato, sabudana, singhara, kuttu, rajgira and samak where accepted; grains, pulses, onion, garlic, meat and alcohol are avoided in that form. Family and regional Shakta rules may differ.",
+      hi: "संकल्प में लिया व्रत-स्तर मानें। सामान्य उत्तर भारतीय फलाहार में कुलानुसार फल, दुग्ध, मेवे, आलू, शकरकंद, साबूदाना, सिंघाड़ा, कुट्टू, राजगीरा और सामक; इस रूप में अन्न-दाल, प्याज, लहसुन, मांस और मद्य वर्जित हैं। कुल और क्षेत्रीय शाक्त नियम भिन्न हो सकते हैं।",
     },
     sankalpa: {
-      en: "“For this chosen Navratri period I honour the Divine Mother. May strength become compassion, clarity and protection—not pride or harm.”",
-      hi: "“इस चुनी नवरात्रि अवधि में मैं जगन्माता का पूजन करता/करती हूँ। शक्ति करुणा, विवेक और रक्षा बने—अहंकार या हानि नहीं।”",
+      en: "“From Chaitra Shukla Pratipada through Navami, I worship Navadurga according to my family tradition and will complete this Navratri sankalpa with steadiness.”",
+      hi: "“चैत्र शुक्ल प्रतिपदा से नवमी तक मैं कुल-परम्परा अनुसार नवदुर्गा पूजन और यह नवरात्रि संकल्प स्थिरता से पूर्ण करूँगा/करूँगी।”",
     },
     puja: {
-      en: "Lamp; Ganesha; kalasha/Devi image; daily Devi name; water, flower, kumkum where customary, fruit/sweet; reading/japa; aarti. Do not prescribe tantric mantra, nyasa, bali or homa as a beginner DIY practice.",
-      hi: "दीप, गणेश, कलश/देवी-चित्र, दैनिक देवी-नाम, जल, फूल, परम्परानुसार कुमकुम, फल/मिष्ठान्न, पाठ/जप, आरती। तांत्रिक मन्त्र, न्यास, बलि या होम को नए व्यक्ति की स्वयं-विधि न बनाएँ।",
+      en: "Ganesha remembrance; kalasha or established Devi image; lamp, water, flowers, kumkum and customary naivedya; the day's Navadurga name; family Devi path or japa; aarti. Lineage-specific mantra, nyasa, homa or other advanced rites follow that lineage's teacher.",
+      hi: "गणेश स्मरण; कलश या स्थापित देवी-चित्र; दीप, जल, फूल, कुमकुम और कुलानुसार नैवेद्य; उस दिन की नवदुर्गा; कुल का देवी-पाठ या जप; आरती। परम्परा-विशेष मन्त्र, न्यास, होम या अन्य उन्नत विधि उसी परम्परा के गुरु से लें।",
     },
     paran: {
-      en: "Valid customs differ. Formal nine-day paran is after Navami ends; many North-Indian households break after Ashtami or Navami Kanya Puja. Follow the local time for your chosen custom, and break gently rather than with a large fried meal.",
-      hi: "मान्य मत अलग हैं। औपचारिक नौ-दिवसीय पारण नवमी समाप्ति के बाद होता है; कई उत्तर भारतीय घर अष्टमी या नवमी कन्या-पूजन के बाद खोलते हैं। अपनी चुनी परम्परा का स्थानीय समय मानें और भारी तले भोजन के बजाय धीरे व्रत खोलें।",
+      en: "For the complete nine-day Chaitra fast, paran is after Navami Tithi ends and Dashami prevails; use the local time shown by the Panchang. A family sankalpa limited to selected days follows that sankalpa's own completion rite.",
+      hi: "पूर्ण नौ-दिवसीय चैत्र व्रत का पारण नवमी तिथि समाप्त होकर दशमी लगने के बाद, पंचांग के स्थानीय समय में करें। केवल चुने दिनों का कुल-संकल्प हो तो उसी संकल्प की समापन-विधि मानें।",
     },
     udyapan: {
-      en: "The concluding Kanya Puja/homa/kalasha visarjana varies by the original sankalpa. A simple observer completes prayer, distributes prasad and respectfully concludes the kalasha; elaborate homa requires guidance.",
-      hi: "कन्या-पूजन, होम, कलश-विसर्जन मूल संकल्प अनुसार बदलते हैं। सरल साधक प्रार्थना, प्रसाद और आदरपूर्वक कलश-समापन करे; विस्तृत होम मार्गदर्शन में।",
+      en: "Complete the kalasha, Kanya Puja, Rama Navami worship, havan, feeding or charity exactly as undertaken in the original sankalpa and family tradition. A formal vowed series should conclude under the family's priest or lineage guidance.",
+      hi: "कलश-समापन, कन्या-पूजन, राम नवमी पूजा, हवन, भोजन या दान मूल संकल्प और कुल-परम्परा अनुसार करें। औपचारिक संकल्पित श्रृंखला कुल-पुरोहित या परम्परा-मार्गदर्शन में पूर्ण करें।",
+    },
+  },
+  sharadNavratri: {
+    verdict: {
+      en: "Sharad Navratri begins with Ghatasthapana in the local Ashwin Shukla Pratipada morning time shown above. Worship Navadurga through the nine nights, with Durga Ashtami, Maha Navami and Vijayadashami as the principal concluding observances.",
+      hi: "शारदीय नवरात्रि ऊपर दिखाए स्थानीय आश्विन शुक्ल प्रतिपदा के प्रातः घटस्थापना से आरम्भ होती है। नौ रात नवदुर्गा पूजन करें; दुर्गाष्टमी, महानवमी और विजयादशमी इसके प्रमुख समापन पर्व हैं।",
+    },
+    vidhi: [
+      { en: "On Pratipada, bathe, take the Navratri sankalpa and perform Ghatasthapana in the displayed time according to family practice.", hi: "प्रतिपदा को स्नान, नवरात्रि संकल्प और दिखाए समय में कुल-परम्परा अनुसार घटस्थापना करें।" },
+      { en: "Worship the day's Navadurga form and continue the family's Devi path, japa, bhajan, garba or temple observance through the nine nights.", hi: "नौ रात उस दिन की नवदुर्गा का पूजन और कुलानुसार देवी-पाठ, जप, भजन, गरबा या मंदिर-अनुष्ठान करें।" },
+      { en: "Observe Durga Ashtami and the Ashtami-Navami Sandhi, Maha Navami, Kanya Puja, Ayudha/Saraswati Puja or Durga Puja according to the selected regional and family tradition.", hi: "दुर्गाष्टमी और अष्टमी-नवमी संधि, महानवमी, कन्या-पूजन, आयुध/सरस्वती पूजा या दुर्गापूजा चुनी क्षेत्रीय और कुल-परम्परा अनुसार करें।" },
+      { en: "Conclude with Navratri paran and the family's Vijayadashami or Durga Visarjan observance; these may fall at different local times.", hi: "नवरात्रि पारण और कुल की विजयादशमी या दुर्गा-विसर्जन विधि से समापन करें; इनके स्थानीय समय अलग हो सकते हैं।" },
+    ],
+    diet: {
+      en: "Follow the fasting level taken in the sankalpa. Common North-Indian phalahar avoids grains, pulses, onion, garlic, meat and alcohol and uses family-approved fruit, dairy, roots and vrat foods. Regional Shakta offerings and non-fasting Durga Puja traditions remain distinct and should be followed as practised.",
+      hi: "संकल्प में लिया व्रत-स्तर मानें। सामान्य उत्तर भारतीय फलाहार में अन्न-दाल, प्याज, लहसुन, मांस और मद्य वर्जित तथा कुल-मान्य फल, दुग्ध, कन्द और व्रत-आहार लिए जाते हैं। क्षेत्रीय शाक्त भोग और बिना-व्रत दुर्गापूजा परम्पराएँ अपनी विधि अनुसार अलग रहेंगी।",
+    },
+    sankalpa: {
+      en: "“Through Sharad Navratri I worship Navadurga according to my family tradition. May the Divine Mother's strength protect dharma and guide my conduct.”",
+      hi: "“शारदीय नवरात्रि में मैं कुल-परम्परा अनुसार नवदुर्गा पूजन करता/करती हूँ। जगन्माता की शक्ति धर्म की रक्षा करे और मेरे आचरण का मार्गदर्शन करे।”",
+    },
+    puja: {
+      en: "Ganesha remembrance; kalasha or established Devi image; lamp, water, flowers, kumkum and customary naivedya; daily Navadurga worship; family recitation or japa; aarti. Bengal Durga Puja, South-Indian Saraswati/Ayudha Puja and lineage-specific Shakta rites should retain their own procedures.",
+      hi: "गणेश स्मरण; कलश या स्थापित देवी-चित्र; दीप, जल, फूल, कुमकुम और कुलानुसार नैवेद्य; दैनिक नवदुर्गा पूजन; कुल का पाठ या जप; आरती। बंगाल दुर्गापूजा, दक्षिण भारतीय सरस्वती/आयुध पूजा और परम्परा-विशेष शाक्त विधियाँ अपने नियमों से होंगी।",
+    },
+    paran: {
+      en: "For a complete nine-night fast, follow the local Navratri paran after the required Navami observance and Tithi rule shown by the Panchang. Families concluding after Ashtami or Navami Kanya Puja should follow that declared sankalpa; Vijayadashami and Durga Visarjan remain separate concluding observances.",
+      hi: "पूर्ण नौ-रात्रि व्रत में आवश्यक नवमी पूजा और पंचांग में दिखाए तिथि-नियम के बाद स्थानीय नवरात्रि पारण करें। अष्टमी या नवमी कन्या-पूजन बाद समापन का संकल्प हो तो वही मानें; विजयादशमी और दुर्गा-विसर्जन अलग समापन पर्व हैं।",
+    },
+    udyapan: {
+      en: "Complete Kanya Puja, Navami Homa, kalasha conclusion, feeding, charity or Durga Visarjan according to the original sankalpa and selected tradition. Formal homa and lineage rites follow the family's priest or teacher.",
+      hi: "कन्या-पूजन, नवमी होम, कलश-समापन, भोजन, दान या दुर्गा-विसर्जन मूल संकल्प और चुनी परम्परा अनुसार करें। औपचारिक होम और परम्परा-विशेष विधि कुल-पुरोहित या गुरु के मार्गदर्शन में करें।",
     },
   },
   karvaChauth: {
@@ -325,15 +356,15 @@ export const VRAT_VIDHI = {
   },
   hartalikaTeej: {
     verdict: {
-      en: "Worship Shiva and Parvati in the early-morning Hartalika time shown above; some regions use Pradosh if morning puja is impossible. Nirjala is a widely practised but optional strict form.",
-      hi: "ऊपर दिखाए प्रातः हरतालिका समय में शिव-पार्वती पूजा करें; कुछ क्षेत्रों में प्रातः सम्भव न हो तो प्रदोष विकल्प है। निर्जला प्रचलित लेकिन वैकल्पिक कठोर रूप है।",
+      en: "Hartalika Teej is traditionally observed as a nirjala fast, with Shiva-Parvati worship in the early-morning Hartalika time shown above. Follow the puja and completion rule of your family tradition.",
+      hi: "हरतालिका तीज परम्परागत रूप से निर्जला व्रत है। ऊपर दिखाए प्रातः हरतालिका समय में शिव-पार्वती पूजा करें और कुल-परम्परा की पूजा व समापन-विधि मानें।",
     },
     vidhi: [
       { en: "Bathe, dress cleanly and take sankalpa; make or place simple clay/sand Shiva-Parvati forms; worship Ganesha first, then Uma-Maheshwara; hear the Hartalika katha; where customary continue bhajan/vigil and conclude next morning.", hi: "स्नान, स्वच्छ वस्त्र, संकल्प; मिट्टी/बालू के सरल शिव-पार्वती रूप; पहले गणेश, फिर उमा-महेश्वर पूजा; हरतालिका कथा; परम्परानुसार भजन/जागरण और अगली सुबह समापन।" },
     ],
     diet: {
-      en: "Nirjala (without water) is a regional strict practice, not a universal requirement. If your health needs it, a water or phalahar form chosen in advance is an accepted modified observance.",
-      hi: "निर्जला (बिना जल) क्षेत्रीय कठोर परम्परा है, सार्वभौमिक अनिवार्यता नहीं। स्वास्थ्य की आवश्यकता हो तो पहले से चुना गया जल या फलाहार रूप मान्य संशोधित व्रत है।",
+      en: "The traditional Hartalika fast is nirjala—without food or water. Observe the exact dietary and purity rules followed by your family tradition; the separate health note above does not redefine this religious rule.",
+      hi: "परम्परागत हरतालिका व्रत निर्जला—बिना अन्न और जल—होता है। अपनी कुल-परम्परा के आहार और शुद्धि नियम मानें; ऊपर की अलग स्वास्थ्य टिप्पणी इस धार्मिक नियम को नहीं बदलती।",
     },
     sankalpa: {
       en: "“I honour Parvati's resolve and Shiva-Parvati's partnership. May my relationships have consent, loyalty, courage and mutual respect.”",
@@ -439,9 +470,9 @@ export const VRAT_VIDHI = {
       hi: "वार्षिक व्रत में नहीं।",
     },
   },
-  // Sourced Chhath card; wired to the main (day 3) calendar key. The calendar
-  // separately surfaces all four sequence days so this card is not read as a
-  // one-day fast. Sources: plans/vrat-vidhis.md and phase1-content-diwali-chhath.md.
+  // Sourced Chhath card; MuhuratHub connects all four calendar days to this
+  // single four-day sequence. Sources: plans/vrat-vidhis.md and
+  // phase1-content-diwali-chhath.md.
   chhath: {
     verdict: {
       en: "Chhath is one connected four-day Surya observance: Nahay Khay, Kharna, evening arghya, then dawn arghya and paran. The Shashthi sunset is one stage, not the whole fast.",

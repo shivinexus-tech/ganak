@@ -1,19 +1,20 @@
 # Claude task — P1-VRATVIDHI verify + extend
 
 **ID:** `CLAUDE-P1-VRATVIDHI-VERIFY`  
-**Agent:** Claude Code  
-**Status:** RESERVED — ready to start  
+**Agent:** Codex (owner reassigned 2026-07-20)
+**Status:** COMPLETE — owner approved; bilingual browser smoke passed
 **Owner assigned:** 2026-07-20
 
 Read `AGENTS.md` and `.cursorrules`. Log RESERVED → ACTIVE → MERGED in
 `plans/task-log.md` before editing.
+Religious-content changes must also follow `plans/religious-content-policy.md`.
 
 ---
 
 ## Goal
 
-The **core vrat vidhi library is already wired** — `src/data/vrat-vidhis.ts` contains
-15 sourced observances matching `plans/vrat-vidhis.md` (Ekadashi through Chhath).
+The **core vrat vidhi library is already wired** — `src/data/vrat-vidhis.ts` now
+contains 16 sourced observance guides after separating Chaitra and Sharad Navratri.
 This task is **not** greenfield authoring. It is:
 
 1. **Owner verification queue** — turn `plans/vrat-vidhis.md` §Pre-publish into a
@@ -32,7 +33,7 @@ This task is **not** greenfield authoring. It is:
 
 | Module | Status |
 |---|---|
-| `src/data/vrat-vidhis.ts` | 15 keys: ekadashi, pradosh, sankashti, purnima, amavasya, masikShivaratri, mahaShivaratri, navratri, karvaChauth, ahoiAshtami, hartalikaTeej, sheetlaAshtami, ganeshChaturthi, janmashtami, chhath |
+| `src/data/vrat-vidhis.ts` | 16 keys: ekadashi, pradosh, sankashti, purnima, amavasya, masikShivaratri, mahaShivaratri, chaitraNavratri, sharadNavratri, karvaChauth, ahoiAshtami, hartalikaTeej, sheetlaAshtami, ganeshChaturthi, janmashtami, chhath |
 | `src/components/VratVidhiCard.tsx` | Wired via MuhuratHub |
 | Safety preamble | `VRAT_VIDHI_SAFETY` bilingual block |
 
@@ -43,13 +44,16 @@ This task is **not** greenfield authoring. It is:
 - `src/data/vrat-vidhis.ts` (extend keys only from sourced doc)
 - `src/components/VratVidhiCard.tsx` (bugfixes only — no restyle)
 - `src/screens/MuhuratHub.tsx` (wire card to new kinds if needed)
+- `src/engine/festivals.ts`, `src/data/festival-meta.ts` (owner-directed exact
+  `sharadNavratri` rename only; completed 2026-07-20)
+- `validation/content-dates.cjs` (Sharad date/key regression anchor)
 - `plans/vrat-vidhis.md` (verification checkmarks, owner queue)
 - `plans/claude-task-p1-vratvidhi-verify.md`, `plans/task-log.md`
 - Optional: `plans/p1-vratvidhi-owner-queue.md` (new — owner-friendly sign-off table)
 
 ## Forbidden (unless owner reassigns)
 
-- `src/engine/festivals.ts`, `src/data/festival-meta.ts` (Codex content batch)
+- Other festival-engine or metadata changes beyond the owner-directed Sharad rename
 - `src/kundli-app.tsx` (shell — only if tiny import fix; prefer not)
 - Inventing mantra/sankalpa text not in `plans/vrat-vidhis.md`
 
@@ -88,9 +92,8 @@ When `chaitraNavratri`, `vatSavitri`, etc. land:
 
 ### Step 4 — Chaitra vs Sharad Navratri
 
-Current `navratri` key is one object. If product needs separate Chaitra/Sharad copy,
-split into `chaitraNavratri` + `sharadNavratri` **only after owner confirms** —
-`vrat-vidhis.md` already has §8A and §8B drafts.
+The owner confirmed on 2026-07-20 that Chaitra and Sharad must be separate now.
+Use separate `chaitraNavratri` and `sharadNavratri` guides; do not recombine them.
 
 ---
 
@@ -111,10 +114,10 @@ npm run build
 
 ## Done when
 
-- [ ] Owner queue doc exists with all 15 wired vidhis listed
-- [ ] Browser smoke pasted (hi + en, ≥5 cards spot-checked)
-- [ ] Gap list: which top fasts still need sourced vidhi research
-- [ ] Task-log MERGED
+- [x] Owner queue doc exists with all 16 wired vidhis listed
+- [x] Browser smoke recorded (hi + en, 5 cards spot-checked; 0 console errors)
+- [x] Gap list: which top fasts still need sourced vidhi research
+- [x] Task-log MERGED
 
 ## Parallelism
 
