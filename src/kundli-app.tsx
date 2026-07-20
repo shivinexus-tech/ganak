@@ -130,10 +130,10 @@ export default function KundliApp() {
         </div>
         {/* hero */}
         <header className="rise" style={{ textAlign: "center", marginBottom: 36 }}>
-          <div style={{ fontFamily: "Eczar, serif", color: C.gold, fontSize: 15, letterSpacing: "0.18em" }}>{hero.eyebrow}</div>
           <h1 style={{ fontFamily: "Eczar, serif", fontWeight: 700, fontSize: 46, margin: "8px 0 6px", lineHeight: 1.08 }}>
             <span style={{ color: C.gold }}>Ganak</span>
           </h1>
+          <div style={{ fontFamily: "Eczar, serif", color: C.gold, fontSize: 15, letterSpacing: "0.18em" }}>{hero.eyebrow}</div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, margin: "10px 0 12px" }}>
             <span style={{ height: 1, width: 64, background: `linear-gradient(90deg, transparent, ${C.gold}99)` }} />
             <span style={{ color: C.gold, fontSize: 13 }}>ॐ</span>
