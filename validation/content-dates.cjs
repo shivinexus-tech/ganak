@@ -13,8 +13,8 @@ const DELHI = { zone: 'Asia/Kolkata', lat: 28.6139, lon: 77.2090 };
 const from = Date.UTC(2026, 0, 1) - IST * 3600000;
 const cal = app.scanPanchangCalendar(from, IST, 430, 46, DELHI);
 const fmt = (ms) => new Date(ms + IST * 3600000).toISOString().slice(0, 10);
-const SOLAR_NEW = ['thaipusam','panguniUthiram','vishu','onam','karthigaiDeepam','ayyappaMandalaBegins','ayyappaMandalaPuja'];
-const NEW = ['chaitraNavratri','gudiPadwa','ugadi','vatSavitri','vatPurnima','anantChaturdashi','kartikaPurnima','tulasiVivah','pongal','pitruPakshaBegins','sarvaPitruAmavasya','lakshmiPanchami','buddhaPurnima','guptNavratriAshadha','rathYatra','hariyaliTeej','nagPanchami','hartalikaTeej','radhaAshtami','mahaAshtami','mahaNavami','sharadPurnima','ahoiAshtami','guptNavratriMagha','vasantPanchami','sheetlaAshtami','govatsaDwadashi','dhanteras','kaliChaudas','narakChaturdashi','govardhanPuja','bhaiDooj','chhathNahayKhay','chhathKharna','chhath','chhathUshaArghya', ...SOLAR_NEW];
+const SOLAR_NEW = ['thaipusam','panguniUthiram','vishu','onam','karthigaiDeepam','vaikasiVisakam','aadiPooram','arudraDarshan','ayyappaMandalaBegins','ayyappaMandalaPuja'];
+const NEW = ['varalakshmi','mahalakshmiVrat','kaliJayanti','kalabhairavJayanti', ...['chaitraNavratri','gudiPadwa','ugadi','vatSavitri','vatPurnima','anantChaturdashi','kartikaPurnima','tulasiVivah','pongal','pitruPakshaBegins','sarvaPitruAmavasya','lakshmiPanchami','buddhaPurnima','guptNavratriAshadha','rathYatra','hariyaliTeej','nagPanchami','hartalikaTeej','radhaAshtami','mahaAshtami','mahaNavami','sharadPurnima','ahoiAshtami','guptNavratriMagha','vasantPanchami','sheetlaAshtami','govatsaDwadashi','dhanteras','kaliChaudas','narakChaturdashi','govardhanPuja','bhaiDooj','chhathNahayKhay','chhathKharna','chhath','chhathUshaArghya'], ...SOLAR_NEW];
 const KNOWN = {
   vasantPanchami: '2026-01-23', mahaShivaratri: '2026-02-15', sheetlaAshtami: '~8 days after Holi (Mar 2026)',
   buddhaPurnima: '2026-05-01', rathYatra: '2026-07-16', hariyaliTeej: '2026-08-15', nagPanchami: '2026-08-17',
@@ -38,6 +38,9 @@ const SOLAR_EXPECTED = {
   vishu: '2026-04-15',
   onam: '2026-08-26',
   karthigaiDeepam: '2026-11-24',
+  vaikasiVisakam: '2026-05-30',
+  aadiPooram: '2026-08-14',
+  arudraDarshan: '2026-12-24',
   ayyappaMandalaBegins: '2026-11-17',
   ayyappaMandalaPuja: '2026-12-27',
 };
@@ -55,7 +58,7 @@ if (solarFailures) {
   console.error(`\n✗ ${solarFailures} Tier-2 solar/nakshatra anchor(s) failed`);
   process.exitCode = 1;
 } else {
-  console.log('\n✓ 7/7 Tier-2 solar/nakshatra anchors match');
+  console.log('\n✓ 10/10 Tier-2 solar/nakshatra anchors match');
 }
 
 // Day-part anchors (hard pass/fail): boundary cases where a noon/sunrise-only
@@ -100,6 +103,13 @@ const dpAnchors = {
   pongal: '2026-01-14',
   pitruPakshaBegins: '2026-09-26',
   sarvaPitruAmavasya: '2026-10-10',
+  varalakshmi: '2026-08-28',
+  mahalakshmiVrat: '2026-10-02',
+  kaliJayanti: '2026-10-03',
+  kalabhairavJayanti: '2026-12-01',
+  vaikasiVisakam: '2026-05-30',
+  aadiPooram: '2026-08-14',
+  arudraDarshan: '2026-12-24',
 };
 let dpFailures = 0;
 for (const [key, exp] of Object.entries(dpAnchors)) {

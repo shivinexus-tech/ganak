@@ -57,6 +57,10 @@ of the North Indian year and are entirely absent:
 
 ### Remaining P1-style gaps (slice C+)
 
+**Slice C MERGED 2026-07-20** (`CURSOR-P1-CONTENT-CPLUS`): Varalakshmi (Aug 28),
+Mahalakshmi vrat culmination (Oct 2), Vaikasi Visakam, Aadi Pooram, Arudra Darshan,
+Kali Jayanti, Kalabhairav Jayanti.
+
 ## P2 — significant, add after P1
 
 Ratha Saptami (Jan 25) · Sakat Chauth (Jan 6, currently only a generic Sankashti) ·
@@ -100,8 +104,9 @@ Sankranti (Apr 14, solar new year) is the notable one.
 3. ~~Chaitra Navratri + Gudi Padwa/Ugadi~~ ✅ MERGED (`CURSOR-P1-CONTENT-02`)
 4. ~~Vat Savitri, Kartika Purnima, Tulasi Vivah, Pongal, Anant Chaturdashi~~ ✅ MERGED
 5. ~~Surface Pitru Paksha in the list~~ ✅ MERGED
-6. **Varalakshmi + Mahalakshmi culmination** — slice C (`CODEX-P1-CONTENT-02` remainder)
-7. Then P2 + Tamil/Shakta slice D; eclipses as their own feature
+6. ~~Varalakshmi + Mahalakshmi culmination~~ ✅ MERGED (`CURSOR-P1-CONTENT-CPLUS`)
+7. ~~Tamil solar-nak (Vaikasi, Aadi Pooram, Arudra) + Shakta Jayantis (Kali, Kalabhairav)~~ ✅ MERGED
+8. Then P2 + annual Skanda Shashti 6-day; eclipses as their own feature
 
 Each needs: sourced date rule + deciding day-part (per `festival-daypart-audit.md`),
 bilingual name/gloss in `src/data/festival-meta.ts`, and a 2026 regression anchor in

@@ -20,6 +20,9 @@ const SOLAR_NAK_FESTIVALS = [
   { key: "thaipusam", sunSign: 9, nak: 7 },       // Makara · Pushya
   { key: "onam", sunSign: 4, nak: 21 },           // Simha/Chingam · Shravana
   { key: "karthigaiDeepam", sunSign: 7, nak: 2 }, // Vrischika/Karthigai · Krittika
+  { key: "vaikasiVisakam", sunSign: 1, nak: 15 }, // Vrishabha/Vaikasi · Vishakha
+  { key: "aadiPooram", sunSign: 3, nak: 10, pick: "last" }, // Karka/Aadi · Purva Phalguni — last in solar month
+  { key: "arudraDarshan", sunSign: 8, nak: 5, pick: "december" }, // Dhanu/Margazhi · Ardra — winter Thiruvathirai
 ];
 function localNoon(ms, tz) {
   const d = new Date(ms + tz * 3600000);
@@ -41,7 +44,7 @@ function firstSunriseDayAfter(ingressMs, tz) {
   return rise + (ingressMs > rise ? 86400000 : 0) + 6 * 3600000;
 }
 function solarNakshatraFestivalDays(fromMs, tz, days) {
-  const DAY = 86400000, firstNoon = localNoon(fromMs, tz), limit = firstNoon + days * DAY, out = [];
+  const DAY = 86400000, firstNoon = localNoon(fromMs, tz), limit = firstNoon + days * DAY, buckets = new Map();
   for (const rule of SOLAR_NAK_FESTIVALS) {
     const startDeg = rule.nak * (360 / 27), endDeg = ((rule.nak + 1) % 27) * (360 / 27);
     let nakStart = solveCross(moonSidMs, firstNoon - 3 * DAY, startDeg, days + 6);
@@ -58,12 +61,72 @@ function solarNakshatraFestivalDays(fromMs, tz, days) {
       if (sunriseHit !== null) best = sunriseHit;
       const festivalNoon = best + 6 * 3600000;
       if (festivalNoon >= firstNoon && festivalNoon < limit && Math.floor(sunSidMs(best) / 30) === rule.sunSign) {
-        out.push({ key: rule.key, ms: festivalNoon, nakStart, nakEnd });
+        if (!buckets.has(rule.key)) buckets.set(rule.key, []);
+        buckets.get(rule.key).push({ key: rule.key, ms: festivalNoon, nakStart, nakEnd, civilMonth: new Date(festivalNoon + tz * 3600000).getUTCMonth() });
       }
       nakStart = solveCross(moonSidMs, nakEnd + 60000, startDeg, 32);
     }
   }
+  const out = [];
+  for (const rule of SOLAR_NAK_FESTIVALS) {
+    const all = buckets.get(rule.key) || [];
+    if (!all.length) continue;
+    if (rule.pick === "december") {
+      const dec = all.filter((x) => x.civilMonth === 11);
+      if (dec.length) out.push(dec[dec.length - 1]);
+      else out.push(all[all.length - 1]);
+    } else if (rule.pick === "last") {
+      out.push(all[all.length - 1]);
+    } else {
+      out.push(all[0]);
+    }
+  }
   return out;
+}
+/* Varalakshmi Vratam — last Friday of Shravan Shukla paksha on or before Purnima.
+   Matches Drik Delhi 2026 (Aug 28): when Purnima itself falls on Friday, that day
+   is the observance. Sourced: content-tier1.md; benchmark drikpanchang.com Delhi. */
+function varalakshmiDay(fromMs, tz, days, place) {
+  const DAY = 86400000;
+  const start = new Date(fromMs + tz * 3600000);
+  const sy = start.getUTCFullYear(), sm = start.getUTCMonth(), sd = start.getUTCDate();
+  let purnimaUtc = null;
+  const fridays = [];
+  for (let k = 0; k < days; k++) {
+    const civil = new Date(Date.UTC(sy, sm, sd + k));
+    const y = civil.getUTCFullYear(), m = civil.getUTCMonth() + 1, day = civil.getUTCDate();
+    const parts = scanDayParts(y, m, day, tz, place);
+    if (amantaMonthIdx(parts.rise).idx !== 4) continue; // amanta Shravan
+    const shuklaPurnima = targetTithiIndex(false, 15);
+    if (tithiKalaOverlap(parts, "udaya", shuklaPurnima)) {
+      purnimaUtc = Date.UTC(y, m - 1, day);
+    }
+    if (civil.getUTCDay() === 5 && tithiIndexAt(parts.rise) < 15) {
+      fridays.push({ y, m, day, ms: parts.noon, utc: Date.UTC(y, m - 1, day) });
+    }
+  }
+  if (purnimaUtc == null || !fridays.length) return null;
+  const eligible = fridays.filter((f) => f.utc <= purnimaUtc);
+  return eligible.length ? eligible[eligible.length - 1] : null;
+}
+/* Mahalakshmi Vrat culmination — 15th day of the vrat (inclusive) from Bhadrapada
+   Shukla Ashtami. Drik lists the end date by span, not a standalone tithi match. */
+function mahalakshmiVratDay(fromMs, tz, days, place) {
+  const DAY = 86400000;
+  const start = new Date(fromMs + tz * 3600000);
+  const sy = start.getUTCFullYear(), sm = start.getUTCMonth(), sd = start.getUTCDate();
+  for (let k = 0; k < days; k++) {
+    const civil = new Date(Date.UTC(sy, sm, sd + k));
+    const y = civil.getUTCFullYear(), m = civil.getUTCMonth() + 1, day = civil.getUTCDate();
+    const parts = scanDayParts(y, m, day, tz, place);
+    if (amantaMonthIdx(parts.rise).idx !== 5) continue;
+    const shukla8 = targetTithiIndex(false, 8);
+    if (!tithiKalaOverlap(parts, "udaya", shukla8)) continue;
+    const endMs = parts.noon + 13 * DAY;
+    const end = new Date(endMs + tz * 3600000);
+    return { y: end.getUTCFullYear(), m: end.getUTCMonth() + 1, day: end.getUTCDate(), ms: endMs };
+  }
+  return null;
 }
 function ayyappaMandalaFor(ms, tz) {
   const DAY = 86400000, civilNoon = localNoon(ms, tz), d = new Date(civilNoon + tz * 3600000), gy = d.getUTCFullYear();
@@ -158,6 +221,7 @@ const FESTIVALS = [
   { key: "janmashtami", month: 4, krishna: true, tithi: 8, kala: "nishita" },
   { key: "rakshaBandhan", month: 4, krishna: false, tithi: 15, policy: "raksha" },
   { key: "hartalikaTeej", month: 5, krishna: false, tithi: 3, kala: "udaya" },
+  { key: "kaliJayanti", month: 5, krishna: true, tithi: 8, kala: "nishita" },
   { key: "ganeshChaturthi", month: 5, krishna: false, tithi: 4, kala: "madhyahna" },
   { key: "radhaAshtami", month: 5, krishna: false, tithi: 8, kala: "madhyahna" },
   { key: "anantChaturdashi", month: 5, krishna: false, tithi: 14, kala: "aparahna" },
@@ -178,6 +242,7 @@ const FESTIVALS = [
   { key: "tulasiVivah", month: 7, krishna: false, tithi: 12, kala: "aparahna" },
   { key: "kartikaPurnima", month: 7, krishna: false, tithi: 15, kala: "udaya" },
   { key: "chhath", month: 7, krishna: false, tithi: 6, kala: "sunset" },
+  { key: "kalabhairavJayanti", month: 7, krishna: true, tithi: 8, kala: "udaya" },
   { key: "guptNavratriMagha", month: 10, krishna: false, tithi: 1, kala: "pratahkala", selection: "first" },
   { key: "vasantPanchami", month: 10, krishna: false, tithi: 5, kala: "purvahna" },
   { key: "mahaShivaratri", month: 10, krishna: true, tithi: 14, kala: "nishita" },
@@ -381,6 +446,10 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
     }
   }
   for (const f of solarNakshatraFestivalDays(fromMs, tz, days)) festivals.push(f);
+  const vara = varalakshmiDay(fromMs, tz, days, place);
+  if (vara) festivals.push({ key: "varalakshmi", ms: vara.ms, y: vara.y, m: vara.m, day: vara.day, decidingKala: "last-shravana-shukla-friday" });
+  const mlv = mahalakshmiVratDay(fromMs, tz, days, place);
+  if (mlv) festivals.push({ key: "mahalakshmiVrat", ms: mlv.ms, y: mlv.y, m: mlv.m, day: mlv.day, decidingKala: "15th-day-from-bhadrapada-shukla-8" });
   // Vishu (Mesha Sankranti under Kerala's day rule) and the two endpoints of
   // Ayyappa's inclusive 41-day Mandala Vratham.
   const firstNoon = localNoon(fromMs, tz), rangeEnd = firstNoon + days * DAY;
