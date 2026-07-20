@@ -157,7 +157,18 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       rules, repeated-question handling and calculation anchors. After owner sign-off,
       build it as a clearly labelled alternative to—not a silent replacement for—the
       existing time-based Prashna. Full brief: `plans/prashna-number-method-research.md`.
-      _(P0-PRASHNA-249-RESEARCH)_
+      _(P0-PRASHNA-249-RESEARCH — research done 2026-07-20, findings + mock at
+      `plans/prashna-249-findings.md`, awaiting owner decisions §6)_
+- [ ] **P0 pre-condition for the 249 engine — primary-text verification (KSK).**
+      Before the KP-number engine ships, verify the judgment conventions against
+      K. S. Krishnamurti's own Horary readers (number fixes the lagna at the sub's
+      start; cusp sub-lord promise/denial rules per question; significator hierarchy;
+      ruling-planet use; repeat-question doctrine). The web sources agree with each
+      other and with our first-principles computation of the 1–249 table, but for a
+      devotional audience Ganak anchors on source texts, not on calculator websites —
+      same religious-accuracy rule as festival content. Output: a short citations note
+      in `plans/` mapping each engine rule to reader/chapter, plus any corrections.
+      Blocks implementation, not research. _(P0-PRASHNA-249-KSK-VERIFY)_
 - [x] **Hide the birth-chart tab** for launch — Daily + Prashna only; Chart route falls
       back to Daily. _(P1-HIDE-DEPLOY, live at ganak.pages.dev)_
 - [x] **Deploy to a web host** — https://ganak.pages.dev (Cloudflare Pages, `main`
@@ -179,6 +190,8 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
 
 **Product polish (recommended for launch, in-place, no rewrite):**
 - [ ] Everyday-zone nav cleanup + gut MuhuratHub — see **EPIC-IA**.
+      **PARKED 2026-07-20** (owner): user feedback that IA feels broken + elder-friendly
+      requirement captured under EPIC-IA; resume after Phase 1 launch blockers.
 - [ ] Design-system pass (universal Card, spacing scale, shared primitives) —
       see **EPIC-DS**. Directly fixes the "visual inconsistency" pain.
 
@@ -258,7 +271,13 @@ ideas, deferring the premature infrastructure. Three-way convergence noted where
 Kimi, the owner's own words, and Ganak's messaging audit independently agree.
 
 ### EPIC-IA — Two-Zone information architecture + navigation cleanup
-**Status: partially in motion (Phase 1 already leads with Everyday, hides Jyotish).**
+**Status: PARKED 2026-07-20 (owner).** Feedback received: “information architecture
+feels a bit broken” + requirement that the site be **elder-friendly** (few clear
+destinations, one job per screen, large type/taps, answer-first). Discussion started
+but deferred behind Phase 1 launch blockers. Resume with Everyday-zone nav cleanup
++ gut MuhuratHub; elder-friendly is the default design constraint, not a toggle.
+
+**Prior status: partially in motion (Phase 1 already leads with Everyday, hides Jyotish).**
 The organizing insight: Ganak is two culturally-distinct zones under one brand —
 - **Everyday zone** (householders + diaspora): Panchang, Muhurat, Festivals, Hora,
   Prashnavali. Warm, plain-language, scannable.
