@@ -169,6 +169,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       same religious-accuracy rule as festival content. Output: a short citations note
       in `plans/` mapping each engine rule to reader/chapter, plus any corrections.
       Blocks implementation, not research. _(P0-PRASHNA-249-KSK-VERIFY)_
+- [ ] **P1 — Prashna ordinal bug (LIVE).** Verdict copy prints "1th / 2th / 3th house":
+      `src/screens/PrashnaScreen.tsx` lines 295/299/303 hardcode `${h}th`. Visible on
+      ganak.pages.dev now; 2nd/3rd houses are common in readings. English only —
+      Hindi forms ordinals differently. One-line fix. _(P1-PRASHNA-ORDINAL)_
 - [x] **Hide the birth-chart tab** for launch — Daily + Prashna only; Chart route falls
       back to Daily. _(P1-HIDE-DEPLOY, live at ganak.pages.dev)_
 - [x] **Deploy to a web host** — https://ganak.pages.dev (Cloudflare Pages, `main`
