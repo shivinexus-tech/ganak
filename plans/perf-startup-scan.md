@@ -104,7 +104,7 @@ the scan is off the critical path.
 |---|---|
 | (2) Off critical path | **Shipped** — `useEffect` + `setTimeout(0)`; Fasts & festivals card shows “Checking the panchang…” until fill |
 | (1) Shorter window | **Shipped** — **400 → 90 days** (cap still 46; UI still `.slice(0, 10)`) |
-| (3) Memoize `lunarMonthInfo` | Still open |
+| (3) Memoize `lunarMonthInfo` | **Shipped as `CURSOR-LUNAR-CACHE`** — see below |
 | (4) Reuse `sunEvents` | Still open |
 | (5) Investigate `sunSidMs` | Still open |
 
@@ -113,3 +113,18 @@ Expected: first paint immediate; background scan ~90/400 × 16.6 s ≈ **~3.7 s*
 **Measured after ship (Node, Delhi, same loader as gates):** 90-day scan **2.8 s**
 (17 fasts / 10 festivals); 400-day still **16.4 s** for comparison. UI no longer
 blocks on it.
+
+### `CURSOR-LUNAR-CACHE` (2026-07-19)
+
+Chip F named `lunarMonthInfo`, but that function **already** had a lunation-window
+cache. The festival calendar calls **`amantaMonthIdx`**, which duplicated the same
+new-moon + sankranti work **uncached** (~41 ms/day).
+
+Fix: shared `ensureLmWindow(nowMs)` used by both (cache key = ayanamsa +
+`[prevNM, nextNM)` — adhik months included via `sStart === sEnd`).
+
+| Metric | Before | After |
+|---|---|---|
+| `amantaMonthIdx` × 90 sequential days | ~41 ms/day | **~4 ms/day** |
+| `scanPanchangCalendar` 90d | ~4.8 s | **~0.7 s** |
+| `scanPanchangCalendar` 400d | ~16 s | **~1.1 s** |

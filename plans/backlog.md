@@ -105,9 +105,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
   - [ ] Run `server` smoke suite (Claude — was UNRUN in sandbox).
 - [x] Optional polish before launch: Muhurat window labels bilingual (E-0.7). _(CHIP-B)_
 - [x] **MuhuratHub startup perf** — kill 16.6s sync 400-day scan.
-      `CURSOR-MUHURAT-PERF` (Cursor) · async + 90-day window (2.8s bg vs 16.4s).
-      Further wins (lunarMonthInfo cache, sunEvents reuse) still open in
-      `plans/perf-startup-scan.md`.
+      `CURSOR-MUHURAT-PERF` (async + 90d) + `CURSOR-LUNAR-CACHE` (shared
+      lunation window for `amantaMonthIdx`) → scan90 ~0.7s, scan400 ~1.1s.
+      Still open: sunEvents reuse, sunSidMs investigate
+      (`plans/perf-startup-scan.md`).
 
 **Product polish (recommended for launch, in-place, no rewrite):**
 - [ ] Everyday-zone nav cleanup + gut MuhuratHub — see **EPIC-IA**.

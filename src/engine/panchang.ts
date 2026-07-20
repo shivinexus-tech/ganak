@@ -137,12 +137,14 @@ function lastNewMoonBefore(t) {
 }
 
 /* amanta lunar month bounding nowMs; Adhik when no sankranti falls inside it.
-   The new-moon window search costs ~20ms, so the last window is cached — day-by-day
-   scans (muhurat finder, 400-day festival calendar) hit the same lunation ~29 days
-   in a row. Cache is keyed on the window AND the active ayanamsa (sun-sign edges
-   shift with AYAN_MODE; the new-moon instants themselves cancel it out). */
+   The new-moon window search is expensive, so the last window is cached — day-by-day
+   scans (muhurat finder, festival calendar) hit the same lunation ~29 days in a row.
+   Cache is keyed on the window AND the active ayanamsa (sun-sign edges shift with
+   AYAN_MODE; the new-moon instants themselves cancel it out).
+   Both `lunarMonthInfo` and `amantaMonthIdx` share this cache — festivals.ts calls
+   amantaMonthIdx once per scanned day, which used to recompute the window every time. */
 let _lmCache = null;
-function lunarMonthInfo(nowMs, isKrishna) {
+function ensureLmWindow(nowMs) {
   if (!_lmCache || _lmCache.ayan !== AYAN_MODE || nowMs < _lmCache.prevNM || nowMs >= _lmCache.nextNM) {
     const prevNM = lastNewMoonBefore(nowMs);
     const nextNM = solveCross(elongMs, prevNM + 86400000, 0, 34);
@@ -150,8 +152,12 @@ function lunarMonthInfo(nowMs, isKrishna) {
     const sEnd = Math.floor(sunSidMs(nextNM - 3600000) / 30);
     _lmCache = { ayan: AYAN_MODE, prevNM, nextNM, sStart, sEnd };
   }
-  const adhik = _lmCache.sStart === _lmCache.sEnd;
-  const nameIdx = adhik ? (_lmCache.sStart + 1) % 12 : _lmCache.sEnd;
+  return _lmCache;
+}
+function lunarMonthInfo(nowMs, isKrishna) {
+  const w = ensureLmWindow(nowMs);
+  const adhik = w.sStart === w.sEnd;
+  const nameIdx = adhik ? (w.sStart + 1) % 12 : w.sEnd;
   const amanta = MONTHS_HINDU[nameIdx] + (adhik ? " (Adhik)" : "");
   const purnimanta = isKrishna && !adhik ? MONTHS_HINDU[(nameIdx + 1) % 12] : amanta;
   return { amanta, purnimanta, idx: nameIdx, adhik };
@@ -227,12 +233,9 @@ function choghaSlots(weekday, startMs, endMs, isDay) {
   return out;
 }
 function amantaMonthIdx(ms) {
-  const prevNM = lastNewMoonBefore(ms);
-  const nextNM = solveCross(elongMs, prevNM + 86400000, 0, 34);
-  const sStart = Math.floor(sunSidMs(prevNM + 3600000) / 30);
-  const sEnd = Math.floor(sunSidMs(nextNM - 3600000) / 30);
-  const adhik = sStart === sEnd;
-  return { idx: adhik ? (sStart + 1) % 12 : sEnd, adhik };
+  const w = ensureLmWindow(ms);
+  const adhik = w.sStart === w.sEnd;
+  return { idx: adhik ? (w.sStart + 1) % 12 : w.sEnd, adhik };
 }
 /* Pitru Paksha (Shraddha Paksha): Bhadrapada Purnima → Mahalaya (Sarva Pitru)
    Amavasya — the amanta Bhadrapada (idx 5) Purnima + its Krishna fortnight.
