@@ -87,6 +87,7 @@ explicit assignment in the log.
 
 ### ⚠️ Two failure modes we have actually hit
 
+- **A foreign staged index.** `git commit` writes the *whole index*, not just the paths you passed to `git add`. If another agent left files staged, your commit takes them too — this happened in `7adcda6`. Run `git status` and check for staged files you did not add before committing while someone else is active.
 - **Half-committed cross-file move.** A move that changes two files must land in *one*
   commit. `VIM_LORDS` went out of the shell in one agent's commit and into `panchang.ts`
   in another's — `main` did not build until `bb651fc`. Use targeted `git add`, never
