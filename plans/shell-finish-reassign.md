@@ -28,7 +28,7 @@ Agents stopped. This is **assigned vs delivered**, **pending**, and **who does w
 | 1 — Content (Diwali + Chhath) | **MERGED** | `6aca6b8` + `plans/phase1-content-diwali-chhath.md` |
 | 2 — Chart/Jyotish wire | **MERGED** | Shell **3,001 → 1,285**; engines/UI imports; task-log `SPLIT-UI-CHART-WIRE` |
 | 3a — Hide Chart tab | **Done locally, not cleanly finished** | Working-tree diff removes Chart from nav; task-log says gates green |
-| 3b — Deploy | **BLOCKED** | Git-write quota exhausted; browser profile blocks Vercel/Netlify/Cloudflare |
+| 3b — Deploy | **BLOCKED** | **Codex usage quota** exhausted (owner correction — not git). Browser profile also blocks Vercel/Netlify/Cloudflare. |
 
 **Codex brief: Tracks 1–2 done. Track 3 incomplete (hide uncommitted / deploy blocked).**
 
@@ -41,8 +41,8 @@ Idle since briefs; peeled engines earlier (now wired by Codex).
 
 | # | Item | Blocker |
 |---|---|---|
-| P1 | **Commit + push Chart-hide** (Daily+Prashna nav only) | Codex git quota / needs a free writer with push rights |
-| P2 | **Web deploy** (Vercel/Netlify/CF) | Owner must allow host + unstick git quota; not agent-solvable alone |
+| P1 | **Commit + push Chart-hide** (Daily+Prashna nav only) | Codex stopped on **usage quota**; Cursor can commit hide with ChartScreen |
+| P2 | **Web deploy** (Vercel/Netlify/CF) | Needs Codex (or owner) when quota resets + host allowlist; not Cursor-blocked by git |
 | P3 | **Extract `ChartScreen.tsx`** — ~1,200 lines of Chart UI still inside `KundliApp` | Needs sole shell writer (the 48h finish line) |
 | P4 | Trim shell to nav+compose (~250–400 lines) | After P3 |
 | P5 | Chip C leftover: Hindi lunar-month table | Needs sourced month names (not invent) |
@@ -75,7 +75,7 @@ Idle since briefs; peeled engines earlier (now wired by Codex).
    - e.g. `src/components/chart/ShadbalaPanel.tsx`, `YogasPanel.tsx`, `KPPanel.tsx`, `GrahasTable.tsx` (names flexible)
 2. Parse-check each; commit+push; short note in task-log.
 3. **When Cursor’s ChartScreen MERGED:** optional more **P1-CONTENT** (next festival cluster) — data files only.
-4. **Deploy:** only when owner unblocks hosting + git; then finish `P1-HIDE-DEPLOY` docs + public URL.
+4. **Deploy:** only when Codex quota resets and owner unblocks hosting; then finish `P1-HIDE-DEPLOY` docs + public URL.
 
 ### Claude — short tedious work, **zero dependency** on Cursor/Codex shell race
 **Forbidden:** `src/kundli-app.tsx`, Chart panel files Codex is peeling, festival content files Codex may extend.
