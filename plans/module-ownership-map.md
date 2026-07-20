@@ -14,62 +14,62 @@ assumed.
 
 | | Lanes |
 |---|---|
-| ✅ **Assignable now (code)** | Daily · Muhurat · Hora/Gochar · Prashna · Matching · Validation · Backend |
-| 🔒 **Reserved right now** | Chart + Jyotish (Codex Track 2 wire) · Content-data (Codex Track 1) · Daily/Prashna/Muhurat polish (Claude) |
+| ✅ **Assignable now (code)** | Daily · Muhurat · Hora/Gochar · Prashna · Matching · Validation · Backend · more content |
+| 🔒 **Reserved right now** | Shell / ChartScreen (`SHELL-FINISH-48H` → Cursor) · Claude no-dep chores (legal/server/places) · Codex Chart panels (modules-only) |
 | ♾️ **Always open** | Research/docs lanes in `plans/` — no file contention, any number of agents |
 
-The single-file bottleneck is **gone**. The shell is down to **3,001 lines** from 6,000+,
-and 29 modules are live. What limits parallelism now is reservation overlap, not extraction.
+The single-file bottleneck is **mostly gone** but not finished. The shell is
+**1,285 lines** (was 6,000+ → 3,001 after Daily → 1,285 after Chart *engine* wire).
+What remains is Chart **UI JSX** still inside `KundliApp` — extract to
+`ChartScreen.tsx` (see `plans/shell-finish-reassign.md`). Parallelism is limited
+by reservation overlap, not by “everything in one file.”
 
 ### Wired vs peeled
 
 Two different things, and confusing them causes the "I edited it but nothing changed" bug:
 
-- **Live (29 modules)** — reachable from `src/kundli-app.tsx` through the import graph.
-  Editing these changes what users see.
-- **Peeled but unwired (12 modules, 1,577 lines)** — the file exists and is committed,
-  but *nothing imports it*. Editing these changes nothing until someone wires them.
+- **Live (wired)** — reachable from `src/kundli-app.tsx` through the import graph.
+  Editing these changes what users see. Includes Daily modules **and** Chart/Jyotish
+  engines/UI modules wired in `SPLIT-UI-CHART-WIRE` (`kundli`, shadbala, BNN, Rectify,
+  ChartVault, DashaTree, etc.).
+- **Still in the shell (not a separate screen yet)** — the Chart *tab’s JSX* (~most of
+  the 1,285-line file) still lives inside `KundliApp`. That is the next extract
+  (`ChartScreen.tsx`), owned by Cursor under `SHELL-FINISH-48H`.
 
-Currently unwired (all Chart/Jyotish — **Codex Track 2 owns the wire**):
-
-`ChartVault.tsx` · `DashaTree.tsx` · `chart-divisions.ts` · `bhava.ts` · `bhrigu.ts` ·
-`classical.ts` · `houses.ts` · `kundli.ts` · `shadbala.ts` · `special-points.ts` ·
-`JyotishBnnScreen.tsx` · `RectifyScreen.tsx`
-
-> ⚠️ **Do not "fix" behaviour in an unwired module and call it done.** The app still runs
-> the shell's copy. Verify in the browser, not just in the gates.
+> ⚠️ **Do not "fix" behaviour in a file nothing imports and call it done.** After a
+> peel, verify the shell imports the module (or that ChartScreen does) and check the
+> browser — gates alone are not enough.
 
 ---
 
 ## The board
 
-Status: `MERGED` (extracted + wired) · `Peeled` (module exists, wire pending) ·
-`Open` (reservable now) · `Reserved` (someone is on it)
+Status: `MERGED` (extracted + wired) · `Open` (reservable) · `Reserved` (someone is on it)
 
 | # | Lane | Files | Status | Who may reserve next |
 |---|---|---|---|---|
-| 1 | **Daily/Panchang** | `screens/MuhuratHub.tsx` · `screens/CalendarPage.tsx` · `engine/today-panchang.ts` · `engine/search-upcoming.ts` · `data/muhurat-ui.ts` · `components/VratVidhiCard.tsx` | **MERGED** | 🔒 Claude (polish chips A–E) |
-| 2 | **Festivals/Vrats** | Data: `data/festival-meta.ts` · `data/vrat-vidhis.ts`<br>Engine: `engine/festivals.ts`<br>UI now lives in Daily's modules | **MERGED** | 🔒 Codex Track 1 (content data) |
-| 3 | **Muhurat** | `engine/muhurat.ts` · `engine/panchaka.ts`<br>UI in `screens/MuhuratHub.tsx` | **MERGED** | 🔒 Claude (chips B, C, E) |
-| 4 | **Chart** | Wired: `components/DiamondChart.tsx`<br>Peeled: `engine/kundli.ts` · `houses.ts` · `shadbala.ts` · `classical.ts` · `bhava.ts` · `special-points.ts` · `data/chart-divisions.ts` · `components/ChartVault.tsx` · `DashaTree.tsx` | **Peeled** | 🔒 Codex Track 2 (shell wire) |
-| 5 | **Matching** | `engine/matching.ts` · `screens/MatchingScreen.tsx` | **MERGED** | ✅ Open |
-| 6 | **Prashna** | `screens/PrashnaScreen.tsx` (487 lines) | **MERGED** | 🔒 Claude (chip D) |
-| 7 | **Hora/Gochar** | `engine/hora.ts` · `engine/gochar.ts` · `engine/transit-copy.ts`<br>UI in `screens/MuhuratHub.tsx` | **MERGED** | ✅ Open |
-| 8 | **Jyotish tools** | Peeled: `engine/bhrigu.ts` · `engine/dasha.ts` (live) · `screens/JyotishBnnScreen.tsx` · `screens/RectifyScreen.tsx` | **Peeled** | 🔒 Codex Track 2 |
-| 9 | **Validation** | `validation/*` | Open | ✅ Reservable per-file (name the exact gate file) |
-| 10 | **Backend/deployment** | `server/*`, hosting/monitoring config | Open | 🔒 Codex Track 3 (hide Chart + deploy) |
+| 1 | **Daily/Panchang** | MuhuratHub, CalendarPage, today-panchang, search-upcoming, muhurat-ui, VratVidhiCard | **MERGED** | ✅ Open (Claude polish complete) |
+| 2 | **Festivals/Vrats** | festival-meta, vrat-vidhis, festivals engine | **MERGED** | ✅ Open for more content (Codex did Diwali/Chhath) |
+| 3 | **Muhurat** | muhurat.ts, panchaka.ts; UI in MuhuratHub | **MERGED** | ✅ Open — **perf:** 400-day sync scan (~16.6s) documented in `plans/perf-startup-scan.md` |
+| 4 | **Chart** | Engines/UI modules **wired**; Chart tab JSX still in shell | **Partial** | 🔒 Cursor (`SHELL-FINISH-48H` → ChartScreen) |
+| 5 | **Matching** | matching.ts, MatchingScreen | **MERGED** | ✅ Open |
+| 6 | **Prashna** | PrashnaScreen | **MERGED** | ✅ Open |
+| 7 | **Hora/Gochar** | hora, gochar, transit-copy; UI in MuhuratHub | **MERGED** | ✅ Open |
+| 8 | **Jyotish tools** | bhrigu, dasha, JyotishBnnScreen, RectifyScreen | **MERGED** (wired) | ✅ Open for polish |
+| 9 | **Validation** | `validation/*` | Open | ✅ Reservable per-file |
+| 10 | **Backend/deployment** | `server/*`, hosting | Open | Deploy still BLOCKED for Codex; Claude may harden `server/` |
 
 ### Shared / integration-owned files (reserve before editing)
 
 | File | Lines | Note |
 |---|---|---|
-| `src/kundli-app.tsx` | 3,001 | The shell. **Integration-owned.** Was 6,000+ before the split. |
-| `src/i18n.ts` | 71 | Bilingual strings + `tr`/`trN`/`obsLabel`. **Add keys; never fork `L`.** |
+| `src/kundli-app.tsx` | **1,285** | Shell. **Cursor owns** until ChartScreen lands. |
+| `src/i18n.ts` | — | Bilingual strings + `tr`/`trN`/`obsLabel`. **Add keys; never fork `L`.** (`tr()` Hindi bug fixed in CHIP-B.) |
 | `src/components/tokens.ts` | 14 | Design tokens. |
-| `src/components/format.ts` | 34 | `fmtDeg`, `fmtTime`, `fmtTimeD`, `fmtDateT`. |
-| `src/engine/ephemeris.ts` | 329 | Astronomy + `ascendantAt`. Guarded by parity + calc gates. |
-| `src/engine/panchang.ts` | 291 | Tithi/nakshatra/sunrise/ayanamsa, `SIGN_LORD`, `VIM_LORDS`. |
-| `src/engine/festivals.ts` | 356 | Festival + day-part selection. |
+| `src/components/format.ts` | — | `fmtDeg`, `fmtTime`, `fmtTimeD`, `fmtDateT`. |
+| `src/engine/ephemeris.ts` | — | Astronomy + `ascendantAt`. |
+| `src/engine/panchang.ts` | — | Tithi/nakshatra/sunrise/ayanamsa, `SIGN_LORD`, `VIM_LORDS`. |
+| `src/engine/festivals.ts` | — | Festival + day-part selection. |
 
 ---
 
