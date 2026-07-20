@@ -50,7 +50,7 @@ deeplinks**.
 ```
 Done   — festival calendar (~106 keys) · vrat vidhi verify (Codex, was CLAUDE-* ID)
 Owner  — npm run smoke (one time) · contact email for legal page
-Next   — P1 festival deeplinks · error monitoring · analytics/feedback · EPIC-IA nav
+Next   — owner Sentry DSN (`plans/error-monitoring.md`) · analytics/feedback · EPIC-IA nav (parked)
 ```
 
 Agents not on the above: Chart panel peels, validation gates, `sunSidMs` perf,

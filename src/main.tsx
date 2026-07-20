@@ -14,10 +14,17 @@ import "@fontsource/spectral/400.css";
 import "@fontsource/spectral/400-italic.css";
 import "@fontsource/spectral/600.css";
 
+import AppErrorBoundary from "./components/AppErrorBoundary";
+import { installGlobalErrorReporting } from "./monitoring/error-reporter";
 import KundliApp from "./kundli-app.tsx";
+
+// Crash reports only (no analytics). No-ops until VITE_SENTRY_DSN is set at build time.
+installGlobalErrorReporting();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <KundliApp />
+    <AppErrorBoundary>
+      <KundliApp />
+    </AppErrorBoundary>
   </React.StrictMode>
 );

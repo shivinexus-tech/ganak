@@ -173,8 +173,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       back to Daily. _(P1-HIDE-DEPLOY, live at ganak.pages.dev)_
 - [x] **Deploy to a web host** — https://ganak.pages.dev (Cloudflare Pages, `main`
       auto-deploy). _(P1-HIDE-DEPLOY)_
-- [ ] **Error monitoring** — owner wants failure points logged. Phone-only means
-      crashes are invisible without this. Sentry free tier or similar.
+- [x] **Error monitoring** — privacy-safe crash reporter + React Error Boundary
+      (no Sentry SDK / no browser storage). DSN via `VITE_SENTRY_DSN` at build time.
+      Owner must add the DSN in Cloudflare Pages and redeploy — see
+      `plans/error-monitoring.md`. _(CURSOR-P1-ERROR-MONITOR)_
 - [ ] **Analytics + a feedback channel** — owner wants "immense user input."
       Privacy-friendly analytics + an in-app feedback button/form.
 - [ ] **Publish privacy/terms page** — draft at `plans/legal-privacy-terms-draft.md`;

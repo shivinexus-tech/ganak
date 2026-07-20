@@ -23,7 +23,8 @@ I traced this in the code rather than assuming. Evidence in §4.
 | Are birth details transmitted? | **No.** Name, date, time and place of birth never leave the page. |
 | Are there cookies? | **No.** No cookies, no localStorage, no IndexedDB in the web build. |
 | Analytics or ad trackers? | **None.** No analytics script, no ad SDK, no tracking pixel. |
-| What *does* leave the browser? | Two things today: **city-search queries** and **Google Fonts requests**. |
+| Crash reporting? | **Optional, errors only.** When `VITE_SENTRY_DSN` is configured at build time, failed page loads / uncaught errors may send a crash payload (message, truncated stack, path without query string) to Sentry. No birth details, places, or questions. No cookies; no browser storage. Without the DSN, nothing is sent. |
+| What *does* leave the browser? | **City-search queries** (Open-Meteo). **Optionally crash reports** when an error occurs and a DSN is configured. Fonts are self-hosted (same-origin). |
 
 ---
 
@@ -50,12 +51,16 @@ zone. Only the place name is sent — never your birth details, and never anythi
 identifying you. Ganak also carries a built-in list of common cities; the online
 lookup is used only when that list has no good match.
 
-**b. Fonts.** The page loads its typefaces from Google Fonts. As with any file your
-browser fetches from another website, Google receives your IP address and browser
-type in the process. *(See §4 — we recommend removing this before launch.)*
+**b. Crash reports (only when something fails).** If the page hits an unexpected
+error, Ganak may send a short technical report (error message, a truncated stack
+trace, and the page path without the query string) to an error-monitoring service
+(Sentry) so the maintainer can fix phone-only crashes that would otherwise stay
+invisible. Birth details, city choices and Prashna questions are not included.
+This is not advertising analytics and does not run on every page view — only on
+failures, and only when the maintainer has configured a reporting endpoint.
 
-Nothing else is transmitted. There is no telemetry, no crash reporting and no
-analytics.
+Fonts load from the same website as the app (self-hosted). There is no ad
+tracking and no product-analytics script.
 
 ### 2.3 Preferences in the web address
 Your language and current screen are kept in the page's web address (for example

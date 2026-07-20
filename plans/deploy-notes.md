@@ -16,6 +16,12 @@ Cloudflare's GitHub app is restricted to the Ganak repository. Every push to
 `main` now starts an automatic production build. Pull-request and non-production
 branches can receive preview deployments without replacing production.
 
+## Error monitoring
+
+Code is wired (`CURSOR-P1-ERROR-MONITOR`). Crash reports stay off until you set
+`VITE_SENTRY_DSN` in Cloudflare Pages and redeploy. Setup steps:
+`plans/error-monitoring.md`.
+
 ## Redeploy
 
 Normal redeployment needs no hosting command:
