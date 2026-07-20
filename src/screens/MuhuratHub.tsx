@@ -37,9 +37,9 @@ const VRAT_VIDHI_KEY = Object.freeze({
   chhathUshaArghya: "chhath",
   chaitraNavratri: "chaitraNavratri",
   sharadNavratri: "sharadNavratri",
-  skandaSashtiBegins: "skandaShashti",
-  skandaSashtiSoorasamharam: "skandaShashti",
-  skandaSashtiThirukalyanam: "skandaShashti",
+  skandaSashtiBegins: "kandaSashtiAnnual",
+  skandaSashtiSoorasamharam: "kandaSashtiAnnual",
+  skandaSashtiThirukalyanam: "kandaSashtiAnnual",
   ayyappaMandalaBegins: "ayyappaMandala",
   ayyappaMandalaPuja: "ayyappaMandala",
 });

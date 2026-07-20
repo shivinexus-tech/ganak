@@ -19,9 +19,9 @@ const expected = {
   '/festival/vat-savitri': 'vatSavitri',
   '/festival/vat-purnima': 'vatPurnima',
   '/festival/varalakshmi': 'varalakshmi',
-  '/festival/skanda-sashti-begins': 'skandaShashti',
-  '/festival/skanda-sashti-soorasamharam': 'skandaShashti',
-  '/festival/skanda-sashti-thirukalyanam': 'skandaShashti',
+  '/festival/skanda-sashti-begins': 'kandaSashtiAnnual',
+  '/festival/skanda-sashti-soorasamharam': 'kandaSashtiAnnual',
+  '/festival/skanda-sashti-thirukalyanam': 'kandaSashtiAnnual',
   '/festival/ayyappa-mandala-begins': 'ayyappaMandala',
   '/festival/ayyappa-mandala-puja': 'ayyappaMandala',
 };
@@ -35,7 +35,7 @@ for (const [urlPath, vidhiKey] of Object.entries(expected)) {
   console.log(`PASS  ${urlPath} -> ${vidhiKey}`);
 }
 
-for (const vidhiKey of ['skandaShashti', 'masikDurgashtami', 'vatSavitri', 'vatPurnima', 'varalakshmi', 'ayyappaMandala']) {
+for (const vidhiKey of ['skandaShashti', 'kandaSashtiAnnual', 'masikDurgashtami', 'vatSavitri', 'vatPurnima', 'varalakshmi', 'ayyappaMandala']) {
   const data = vidhiModule.VRAT_VIDHI[vidhiKey];
   assert(data, `${vidhiKey} must exist`);
   for (const field of ['verdict', 'diet', 'sankalpa', 'puja', 'paran', 'udyapan']) {
@@ -46,6 +46,18 @@ for (const vidhiKey of ['skandaShashti', 'masikDurgashtami', 'vatSavitri', 'vatP
 }
 assert(vidhiModule.VRAT_VIDHI.ayyappaMandala.safety?.en && vidhiModule.VRAT_VIDHI.ayyappaMandala.safety?.hi, 'Ayyappa must keep its pilgrimage-specific bilingual health guidance');
 console.log('PASS  five approved guide families are complete and bilingual');
+
+const monthlySkanda = vidhiModule.VRAT_VIDHI.skandaShashti;
+const annualSkanda = vidhiModule.VRAT_VIDHI.kandaSashtiAnnual;
+const monthlySkandaText = JSON.stringify(monthlySkanda);
+const annualSkandaText = JSON.stringify(annualSkanda);
+assert(monthlySkanda.verdict.en.includes('one-day'), 'monthly Skanda must identify itself as a one-day vrata');
+assert(!monthlySkandaText.includes('state whether'), 'monthly Skanda must not ask the user to identify an occurrence the calendar already knows');
+assert(!monthlySkandaText.includes('Traditional forms') && !monthlySkandaText.includes('One documented') && !monthlySkandaText.includes('form of vrata'), 'monthly Skanda must avoid vague research-language copy');
+assert(annualSkanda.verdict.en.includes('six-day'), 'annual Kanda Sashti must identify itself as a six-day observance');
+assert(!annualSkandaText.includes('state whether'), 'annual Kanda Sashti must not ask the user to identify the occurrence');
+assert(!annualSkandaText.includes('Traditional forms') && !annualSkandaText.includes('One documented'), 'annual Kanda Sashti must avoid vague research-language copy');
+console.log('PASS  monthly one-day and annual six-day Skanda guidance remain separate');
 
 const samples = {
   '/festival/karva-chauth': { key: 'karvaChauth', vidhiKey: 'karvaChauth' },

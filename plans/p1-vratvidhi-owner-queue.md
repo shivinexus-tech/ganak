@@ -97,6 +97,26 @@ phone layout and existing Daily-card expansion also passed with no browser error
 Cloudflare production passed the same checks on all 10 English and Hindi routes
 (20 page loads) with zero browser errors.
 
+### Skanda context correction — owner review 2026-07-20
+
+The owner found that the monthly Skanda page still spoke generically about both
+the monthly one-day vrata and the annual six-day Kanda Sashti. This was a content
+mapping defect: both occurrences shared one guide even though the calendar already
+knows which occurrence the user opened.
+
+- Monthly Skanda Shashti now opens a one-day-only guide.
+- Annual Kanda Sashti days 1, 6 and 7 now open a separate six-day guide.
+- The guide no longer asks the user to identify which occurrence it is.
+- “Traditional forms” is replaced by “Common fasting practices.”
+- “One documented Tamil practice” is replaced by direct, user-facing wording:
+  “Some Tamil families…”, with family/temple variation kept explicit.
+
+The shared-guide audit found no equivalent duration ambiguity in the approved
+Ekadashi or weekday Pradosh mappings: their selected festival name and date vary,
+but the length and core procedure do not. Chhath deliberately uses one connected
+four-day guide for its four named days. Ayyappa already separates the public
+Mandala festival span from a devotee's personal 41-day vow.
+
 ## Live production review links
 
 - [Skanda Shashti](https://ganak.pages.dev/festival/skanda-shashti?lang=en)

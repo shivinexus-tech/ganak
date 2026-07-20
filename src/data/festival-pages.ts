@@ -30,9 +30,9 @@ const LEGACY_TITLES = Object.freeze({
 });
 
 const FESTIVAL_VIDHI_KEYS = Object.freeze({
-  skandaSashtiBegins: "skandaShashti",
-  skandaSashtiSoorasamharam: "skandaShashti",
-  skandaSashtiThirukalyanam: "skandaShashti",
+  skandaSashtiBegins: "kandaSashtiAnnual",
+  skandaSashtiSoorasamharam: "kandaSashtiAnnual",
+  skandaSashtiThirukalyanam: "kandaSashtiAnnual",
   ayyappaMandalaBegins: "ayyappaMandala",
   ayyappaMandalaPuja: "ayyappaMandala",
 });

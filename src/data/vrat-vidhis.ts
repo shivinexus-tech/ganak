@@ -538,22 +538,21 @@ export const VRAT_VIDHI = {
   },
   skandaShashti: {
     verdict: {
-      en: "Monthly Skanda Shashti is a one-day Murugan vrata. The annual Tamil observance—also called Kanda Sashti (கந்த சஷ்டி)—lasts six days and culminates with Soorasamharam; Thirukalyanam follows on day seven.",
-      hi: "मासिक स्कन्द षष्ठी मुरुगन का एक-दिवसीय व्रत है। वार्षिक तमिल अनुष्ठान—जिसे कन्द षष्ठी (கந்த சஷ்டி) भी कहते हैं—छह दिन चलता है और सूरसम्हारम् पर पूर्ण होता है; सातवें दिन तिरुकल्याणम् होता है।",
+      en: "This is the monthly Shukla Shashti vrata—a one-day observance for Shri Murugan. Keep today's fast and worship rule as followed by your family or temple. The annual six-day Kanda Sashti appears separately on its own festival dates.",
+      hi: "यह मासिक शुक्ल षष्ठी व्रत है—श्री मुरुगन का एक-दिवसीय अनुष्ठान। आज अपने परिवार या मंदिर में प्रचलित उपवास और पूजा-नियम रखें। वार्षिक छह-दिवसीय कन्द षष्ठी अपनी पर्व-तिथियों पर अलग दिखाई जाती है।",
     },
     vidhi: [
-      { en: "For a monthly occurrence, take the one-day vow. For annual Kanda Sashti, continue the chosen discipline through all six days.", hi: "मासिक तिथि पर एक-दिवसीय व्रत लें। वार्षिक कन्द षष्ठी में चुना हुआ नियम सभी छह दिनों तक निभाएँ।" },
       { en: "Bathe, clean the worship place and light a lamp before Murugan or the Vel.", hi: "स्नान करके पूजा-स्थान स्वच्छ करें और मुरुगन या वेल के सामने दीप जलाएँ।" },
-      { en: "Offer flowers or fruit and state whether this is the monthly vrata or annual six-day vow.", hi: "फूल या फल अर्पित करें और स्पष्ट करें कि यह मासिक व्रत है या वार्षिक छह-दिवसीय संकल्प।" },
+      { en: "Offer flowers or fruit and state your intention to keep today's one-day Skanda Shashti vrata.", hi: "फूल या फल अर्पित करें और आज का एक-दिवसीय स्कन्द षष्ठी व्रत रखने का संकल्प करें।" },
       { en: "Pray, visit a Murugan temple if possible, and recite or listen to a familiar text such as Kanda Sashti Kavacham.", hi: "प्रार्थना करें, सम्भव हो तो मुरुगन मंदिर जाएँ और कन्द षष्ठी कवचम् जैसे परिचित पाठ का पाठ या श्रवण करें।" },
-      { en: "On annual day six, observe Soorasamharam. Treat day-seven Thirukalyanam as a separate festival milestone.", hi: "वार्षिक व्रत के छठे दिन सूरसम्हारम् मनाएँ। सातवें दिन के तिरुकल्याणम् को अलग उत्सव मानें।" },
+      { en: "Perform aarti and complete the one-day observance according to your family or temple practice.", hi: "आरती करें और पारिवारिक या मंदिर-परंपरा के अनुसार एक-दिवसीय अनुष्ठान पूरा करें।" },
     ],
     diet: {
-      en: "Traditional forms include complete fasting, fruit or milk, simple unsalted food, or one daily meal. One documented Tamil annual practice takes food at night on days 1–5, keeps a complete fast on day 6 (with milk/fruit as its permitted lighter form), and completes with food on the morning of day 7. Follow the rule received from your family or temple.",
-      hi: "परंपरा में पूर्ण उपवास, फल या दूध, सादा नमक-रहित भोजन अथवा दिन में एक भोजन मिलता है। एक प्रमाणित तमिल वार्षिक विधि में दिन 1–5 रात्रि भोजन, दिन 6 पूर्ण उपवास (अनुमत हल्के रूप में दूध/फल), और दिन 7 प्रातः भोजन से समापन होता है। परिवार या मंदिर से मिला नियम मानें।",
+      en: "Common fasting practices include a complete fast, fruit or milk, simple unsalted food, or one meal. Follow the one-day rule received from your family or temple.",
+      hi: "प्रचलित उपवास-विधियों में पूर्ण उपवास, फल या दूध, सादा नमक-रहित भोजन अथवा एक बार भोजन शामिल हैं। परिवार या मंदिर से मिला एक-दिवसीय नियम मानें।",
     },
     sankalpa: {
-      en: "“For this Skanda Shashti, I worship Shri Murugan and undertake the form of vrata followed in my family or temple, seeking courage, discipline and divine grace.” This is a plain-language intention, not a prescribed Sanskrit mantra.",
+      en: "“For this Skanda Shashti, I worship Shri Murugan and follow the one-day fasting practice of my family or temple, seeking courage, discipline and divine grace.” This is a plain-language intention, not a prescribed Sanskrit mantra.",
       hi: "“इस स्कन्द षष्ठी पर मैं श्री मुरुगन की पूजा करता/करती हूँ और साहस, अनुशासन तथा ईश-कृपा के लिए अपने परिवार या मंदिर में प्रचलित व्रत-नियम अपनाता/अपनाती हूँ।” यह सरल भाव-संकल्प है, निर्धारित संस्कृत मंत्र नहीं।",
     },
     puja: {
@@ -561,12 +560,44 @@ export const VRAT_VIDHI = {
       hi: "दीप; मुरुगन या वेल पूजन; फूल या फल; परिचित मुरुगन-नाम, स्तोत्र या कन्द षष्ठी कवचम्; सम्भव हो तो मंदिर-दर्शन; आरती। मंदिर का होम, अभिषेक, कावड़ी और सूरसम्हारम् नाट्य घर की अनिवार्य सूची नहीं हैं।",
     },
     paran: {
-      en: "For the monthly vrata, complete after the principal Murugan worship according to family or temple tradition; no universal monthly clock is established. For the annual vow, the documented Tamil form completes with food on the morning of day 7. Use that rule only when it matches your tradition.",
-      hi: "मासिक व्रत मुख्य मुरुगन पूजा के बाद पारिवारिक या मंदिर परंपरा से पूरा करें; एक सार्वभौमिक मासिक समय स्थापित नहीं है। वार्षिक व्रत की प्रमाणित तमिल विधि में दिन 7 प्रातः भोजन से समापन होता है। यही नियम तभी अपनाएँ जब आपकी परंपरा उससे मेल खाती हो।",
+      en: "Complete today's one-day vrata after the principal Murugan worship according to family or temple tradition; no universal monthly clock is established.",
+      hi: "आज का एक-दिवसीय व्रत मुख्य मुरुगन पूजा के बाद पारिवारिक या मंदिर-परंपरा से पूरा करें; मासिक व्रत के लिए एक सार्वभौमिक समय स्थापित नहीं है।",
     },
     udyapan: {
-      en: "No universal household udyapan is established. A counted, six-day or specially undertaken vow should be completed under family, Guru or temple guidance.",
-      hi: "एक सार्वभौमिक घरेलू उद्यापन स्थापित नहीं है। गिनती, छह-दिवसीय या विशेष संकल्प का व्रत परिवार, गुरु या मंदिर के मार्गदर्शन में पूरा करें।",
+      en: "No universal household udyapan is established. A counted or specially undertaken monthly vow should be completed under family, Guru or temple guidance.",
+      hi: "एक सार्वभौमिक घरेलू उद्यापन स्थापित नहीं है। गिनती या विशेष संकल्प का मासिक व्रत परिवार, गुरु या मंदिर के मार्गदर्शन में पूरा करें।",
+    },
+  },
+  kandaSashtiAnnual: {
+    verdict: {
+      en: "This page belongs to the annual Kanda Sashti (கந்த சஷ்டி), Shri Murugan's six-day Tamil observance. The vow begins on day one, culminates with Soorasamharam on day six, and is followed by Thirukalyanam on day seven.",
+      hi: "यह वार्षिक कन्द षष्ठी (கந்த சஷ்டி) है—श्री मुरुगन का छह-दिवसीय तमिल अनुष्ठान। व्रत पहले दिन आरम्भ होता है, छठे दिन सूरसम्हारम् पर चरम होता है और सातवें दिन तिरुकल्याणम् मनाया जाता है।",
+    },
+    vidhi: [
+      { en: "Begin the six-day vow on day one and keep the fasting discipline followed by your family or temple through day six.", hi: "पहले दिन छह-दिवसीय व्रत आरम्भ करें और छठे दिन तक परिवार या मंदिर में प्रचलित उपवास-नियम निभाएँ।" },
+      { en: "Bathe, clean the worship place and light a lamp before Murugan or the Vel each day.", hi: "प्रतिदिन स्नान करके पूजा-स्थान स्वच्छ करें और मुरुगन या वेल के सामने दीप जलाएँ।" },
+      { en: "Offer flowers or fruit, pray, visit a Murugan temple if possible, and recite or listen to a familiar text such as Kanda Sashti Kavacham.", hi: "फूल या फल अर्पित करें, प्रार्थना करें, सम्भव हो तो मुरुगन मंदिर जाएँ और कन्द षष्ठी कवचम् जैसे परिचित पाठ का पाठ या श्रवण करें।" },
+      { en: "Observe Soorasamharam on day six. Treat the following day's Thirukalyanam as a separate festival milestone.", hi: "छठे दिन सूरसम्हारम् मनाएँ। अगले दिन के तिरुकल्याणम् को अलग उत्सव मानें।" },
+    ],
+    diet: {
+      en: "Common six-day fasting practices include a complete fast, fruit or milk, simple unsalted food, or one meal. Some Tamil families eat once at night on days 1–5, keep a complete fast on day 6—with milk or fruit where their practice permits it—and eat on the morning of day 7. Follow your family's or temple's rule.",
+      hi: "छह-दिवसीय व्रत की प्रचलित विधियों में पूर्ण उपवास, फल या दूध, सादा नमक-रहित भोजन अथवा एक बार भोजन शामिल हैं। कुछ तमिल परिवार दिन 1–5 रात्रि में एक बार भोजन करते हैं, दिन 6 पूर्ण उपवास रखते हैं—अपनी परंपरा में अनुमति हो तो दूध या फल लेते हैं—और दिन 7 प्रातः भोजन करते हैं। अपने परिवार या मंदिर का नियम मानें।",
+    },
+    sankalpa: {
+      en: "“For this annual Kanda Sashti, I worship Shri Murugan and undertake the six-day vrata followed in my family or temple, seeking courage, discipline and divine grace.” This is a plain-language intention, not a prescribed Sanskrit mantra.",
+      hi: "“इस वार्षिक कन्द षष्ठी पर मैं श्री मुरुगन की पूजा करता/करती हूँ और साहस, अनुशासन तथा ईश-कृपा के लिए अपने परिवार या मंदिर में प्रचलित छह-दिवसीय व्रत रखता/रखती हूँ।” यह सरल भाव-संकल्प है, निर्धारित संस्कृत मंत्र नहीं।",
+    },
+    puja: {
+      en: "Daily lamp; Murugan or Vel worship; flowers or fruit; familiar Murugan names, hymn or Kanda Sashti Kavacham; temple darshan where possible; aarti. Temple homam, abhishekam, kavadi and Soorasamharam enactment are temple-led observances, not a compulsory household checklist.",
+      hi: "प्रतिदिन दीप; मुरुगन या वेल पूजन; फूल या फल; परिचित मुरुगन-नाम, स्तोत्र या कन्द षष्ठी कवचम्; सम्भव हो तो मंदिर-दर्शन; आरती। मंदिर का होम, अभिषेक, कावड़ी और सूरसम्हारम् नाट्य घर की अनिवार्य सूची नहीं हैं।",
+    },
+    paran: {
+      en: "Some Tamil families complete the six-day vow with food on the morning of day 7. Follow that timing only when it matches your family or temple; otherwise use the completion rule taught by your tradition.",
+      hi: "कुछ तमिल परिवार छह-दिवसीय व्रत को दिन 7 प्रातः भोजन से पूरा करते हैं। यह समय तभी अपनाएँ जब आपके परिवार या मंदिर की परंपरा इससे मेल खाती हो; अन्यथा अपनी परंपरा से मिला समापन-नियम रखें।",
+    },
+    udyapan: {
+      en: "No universal household udyapan is established. Complete the six-day or any specially undertaken vow under family, Guru or temple guidance.",
+      hi: "एक सार्वभौमिक घरेलू उद्यापन स्थापित नहीं है। छह-दिवसीय या विशेष संकल्प का व्रत परिवार, गुरु या मंदिर के मार्गदर्शन में पूरा करें।",
     },
   },
   masikDurgashtami: {
