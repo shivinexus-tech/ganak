@@ -52,6 +52,7 @@ const annualSkanda = vidhiModule.VRAT_VIDHI.kandaSashtiAnnual;
 const monthlySkandaText = JSON.stringify(monthlySkanda);
 const annualSkandaText = JSON.stringify(annualSkanda);
 assert(monthlySkanda.verdict.en.includes('one-day'), 'monthly Skanda must identify itself as a one-day vrata');
+assert(!monthlySkanda.verdict.en.includes('annual') && !monthlySkanda.verdict.hi.includes('वार्षिक'), 'monthly Skanda verdict must describe only the selected monthly occurrence');
 assert(!monthlySkandaText.includes('state whether'), 'monthly Skanda must not ask the user to identify an occurrence the calendar already knows');
 assert(!monthlySkandaText.includes('Traditional forms') && !monthlySkandaText.includes('One documented') && !monthlySkandaText.includes('form of vrata'), 'monthly Skanda must avoid vague research-language copy');
 assert(annualSkanda.verdict.en.includes('six-day'), 'annual Kanda Sashti must identify itself as a six-day observance');

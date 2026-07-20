@@ -538,8 +538,8 @@ export const VRAT_VIDHI = {
   },
   skandaShashti: {
     verdict: {
-      en: "This is the monthly Shukla Shashti vrata—a one-day observance for Shri Murugan. Keep today's fast and worship rule as followed by your family or temple. The annual six-day Kanda Sashti appears separately on its own festival dates.",
-      hi: "यह मासिक शुक्ल षष्ठी व्रत है—श्री मुरुगन का एक-दिवसीय अनुष्ठान। आज अपने परिवार या मंदिर में प्रचलित उपवास और पूजा-नियम रखें। वार्षिक छह-दिवसीय कन्द षष्ठी अपनी पर्व-तिथियों पर अलग दिखाई जाती है।",
+      en: "This is the monthly Shukla Shashti vrata—a one-day observance for Shri Murugan. Keep today's fast and worship rule as followed by your family or temple.",
+      hi: "यह मासिक शुक्ल षष्ठी व्रत है—श्री मुरुगन का एक-दिवसीय अनुष्ठान। आज अपने परिवार या मंदिर में प्रचलित उपवास और पूजा-नियम रखें।",
     },
     vidhi: [
       { en: "Bathe, clean the worship place and light a lamp before Murugan or the Vel.", hi: "स्नान करके पूजा-स्थान स्वच्छ करें और मुरुगन या वेल के सामने दीप जलाएँ।" },
