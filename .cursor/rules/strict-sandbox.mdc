@@ -1,0 +1,13 @@
+---
+description: Keep every Cursor agent action inside the Ganak workspace sandbox
+alwaysApply: true
+---
+
+# Strict sandbox boundary
+
+- Use the sandbox for every terminal command and child process.
+- Work only within the open Ganak workspace. Do not read or write personal files outside it.
+- Never request host execution, unrestricted execution, `required_permissions: ["all"]`, or any other sandbox escape.
+- Never request broader network access. Use only the domains permitted by `.cursor/sandbox.json`.
+- If a task cannot be completed inside this boundary, stop and report the exact blocker instead of asking the owner to approve an escape.
+- Routine inspection, edits, builds, tests, validation gates, and Git operations inside the workspace should proceed without asking for confirmation.

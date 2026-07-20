@@ -1,0 +1,15 @@
+{
+  "type": "workspace_readwrite",
+  "networkPolicy": {
+    "default": "deny",
+    "allow": [
+      "github.com",
+      "api.github.com",
+      "*.githubusercontent.com",
+      "registry.npmjs.org",
+      "*.drikpanchang.com",
+      "geocoding-api.open-meteo.com",
+      "*.open-meteo.com"
+    ]
+  }
+}

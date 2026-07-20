@@ -28,7 +28,7 @@ Agents stopped. This is **assigned vs delivered**, **pending**, and **who does w
 | 1 — Content (Diwali + Chhath) | **MERGED** | `6aca6b8` + `plans/phase1-content-diwali-chhath.md` |
 | 2 — Chart/Jyotish wire | **MERGED** | Shell **3,001 → 1,285**; engines/UI imports; task-log `SPLIT-UI-CHART-WIRE` |
 | 3a — Hide Chart tab | **Done locally, not cleanly finished** | Working-tree diff removes Chart from nav; task-log says gates green |
-| 3b — Deploy | **BLOCKED** | **Codex usage quota** exhausted (owner correction — not git). Browser profile also blocks Vercel/Netlify/Cloudflare. |
+| 3b — Deploy | **UNBLOCKED for Codex** (quota resolved). Browser may still block Vercel/Netlify/CF — use CLI deploy or owner machine. |
 
 **Codex brief: Tracks 1–2 done. Track 3 incomplete (hide uncommitted / deploy blocked).**
 
