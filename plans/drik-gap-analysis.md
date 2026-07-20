@@ -17,9 +17,8 @@ Ashtami, Navratri, Durga Ashtami, Maha Navami, Dussehra, Sharad Purnima, Karwa
 Chauth, Ahoi Ashtami, Diwali, Maha Shivaratri, Vasant Panchami, Makar Sankranti —
 all match. **The day-part/kala work paid off; the engine is sound.**
 
-**2. Coverage is the problem, not correctness.** Ganak fires **~58** named festivals in
-2026 (up from ~37 before P1-CONTENT batch 2, 2026-07-20); Drik lists roughly **100**
-observances. The gap is narrowing but P2 and regional observances remain.
+**2. Coverage is the problem, not correctness.** Ganak fires **~68** named festivals in
+2026 (up from ~37 at gap analysis start); Drik lists roughly **100** observances.
 
 **3. Ganak is genuinely ahead of Drik's Delhi page in places** — Thaipusam, Panguni
 Uthiram, Vishu, Karthigai Deepam, Ayyappa Mandala (start + Pooja), both Gupt
@@ -55,21 +54,26 @@ of the North Indian year and are entirely absent:
 | **Anant Chaturdashi / Ganesh Visarjan** | Sep 25 | ✅ |
 | **Pitru Paksha list bookends** | Sep 26 → Oct 10 | ✅ Purnima Shraddha + Sarva Pitru Amavasya |
 
-### Remaining P1-style gaps (slice C+)
+### Slice C+D MERGED 2026-07-20 (`CURSOR-P1-CONTENT-03`)
 
-**Slice C MERGED 2026-07-20** (`CURSOR-P1-CONTENT-CPLUS`): Varalakshmi (Aug 28),
-Mahalakshmi vrat culmination (Oct 2), Vaikasi Visakam, Aadi Pooram, Arudra Darshan,
-Kali Jayanti, Kalabhairav Jayanti.
+| Festival | 2026 Delhi | Notes |
+|---|---|---|
+| Varalakshmi | Aug 28 | Last Friday ≤ Shravan Purnima |
+| Mahalakshmi vrat culmination | Oct 2 | 15th day from Bhadrapada Shukla 8 |
+| Vaikasi Visakam | May 30 | Vishakha in Vaikasi |
+| Aadi Pooram | Aug 14 | Purva Phalguni in Aadi (last in solar month) |
+| Arudra Darshan | Dec 24 | Ardra in Margazhi (December pick) |
+| Kali Jayanti | Oct 3 | Distinct from Kali Puja on Diwali |
+| Kalabhairav Jayanti | Dec 1 | Kartik Krishna Ashtami (amanta) |
+| Skanda Sashti span | Nov 10 / 15 / 16 | Begins, Soorasamharam, Thirukalyanam |
 
 ## P2 — significant, add after P1
 
 Ratha Saptami (Jan 25) · Sakat Chauth (Jan 6, currently only a generic Sankashti) ·
 Mauni Amavasya (Jan 18, generic amavasya) · Gauri/Gangaur (Mar 21) · Ganga Dussehra
-(May 25) · **Varalakshmi Vrat (Aug 28)** — already researched, needs the "Friday before
-Shravana Purnima" rule · Kajari Teej (Aug 31) · Rishi Panchami (Sep 15) · Vishwakarma
+(May 25) · Kajari Teej (Aug 31) · Rishi Panchami (Sep 15) · Vishwakarma
 Puja (Sep 17) · Saraswati Avahan/Puja (Oct 16–17) · Kojagara Puja (Oct 25, same day as
-our Sharad Purnima) · **Kalabhairav Jayanti (Dec 1)** — already researched ·
-Vivah Panchami (Dec 14) · Gita Jayanti (Dec 20).
+our Sharad Purnima) · Vivah Panchami (Dec 14) · Gita Jayanti (Dec 20).
 
 **Jayantis:** Parashurama (Apr 19), Sita Navami (Apr 25), Narasimha (Apr 30), Narada
 (May 2), Shani (May 16), Balarama (Sep 16), Dattatreya (Dec 23), Swaminarayan (Mar 27).
