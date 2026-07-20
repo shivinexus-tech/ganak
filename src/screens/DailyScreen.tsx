@@ -85,7 +85,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
 
       {todayP && (
         <>
-          <div className="rise" style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 20 }}>
+          <div className="rise" style={{ position: "relative", zIndex: calOpen ? 50 : 1, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 20 }}>
             <div style={{ flex: "1 1 200px", minWidth: 180 }}><PlaceInput value={place} onPick={onPlace} C={C} lang={lang} /></div>
             {(() => {
               const [py, pm, pd] = panchDate.split("-").map(Number);
@@ -124,7 +124,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                     {calOpen && grid && (
                       <>
                         <div onClick={() => setCalOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 40 }} />
-                        <div style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, zIndex: 41, background: C.panel, border: `1px solid ${C.line}`, borderRadius: 14, boxShadow: "0 14px 36px rgba(60,40,10,.17)", padding: 14, width: 318 }}>
+                        <div style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, zIndex: 41, background: C.panel, border: `1px solid ${C.line}`, borderRadius: 14, boxShadow: "0 14px 36px rgba(60,40,10,.17)", padding: 14, width: 318, maxWidth: "calc(100vw - 40px)" }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                             <button onClick={() => shiftMonth(-1)} style={{ ...arrowBtn, padding: "4px 12px", fontSize: 18 }} aria-label="Previous month">‹</button>
                             <span style={{ fontFamily: "Eczar, serif", fontSize: 16, color: C.ivory }}>{hdr}</span>
