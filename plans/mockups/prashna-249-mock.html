@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mock — KP number Prashna (not the live app)</title>
+<style>
+  :root { --bg:#FAF5EA; --panel:#FFF; --line:#E7DDC6; --gold:#A86A12; --sindoor:#C2451E; --ink:#3B3147; --muted:#8C8173; }
+  * { box-sizing:border-box; margin:0; }
+  body { background:var(--bg); color:var(--ink); font-family:Georgia,'Noto Serif Devanagari',serif; padding:14px; max-width:420px; margin:0 auto; }
+  .banner { background:#3B3147; color:#FFF; font-size:11px; letter-spacing:.12em; text-align:center; padding:6px; border-radius:8px; margin-bottom:12px; }
+  .card { background:linear-gradient(180deg,#FFF 0%,#FFFCF3 100%); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px; box-shadow:0 2px 8px rgba(60,50,30,.06); }
+  .kicker { font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+  .toggle { display:flex; background:#F1E9D5; border:1px solid var(--line); border-radius:10px; padding:3px; margin-bottom:12px; }
+  .toggle button { flex:1; padding:9px 4px; border:none; border-radius:8px; background:transparent; color:var(--muted); font:inherit; font-size:13.5px; cursor:pointer; }
+  .toggle button.on { background:#FFF; color:var(--gold); font-weight:600; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { border:1px solid var(--line); background:#FFF; border-radius:999px; padding:7px 12px; font-size:12.5px; color:var(--muted); }
+  .chip.on { border-color:var(--gold); color:var(--gold); background:rgba(168,106,18,.08); font-weight:600; }
+  .numwrap { display:flex; align-items:center; gap:10px; }
+  .num { width:110px; font-size:30px; text-align:center; padding:10px; border:2px solid var(--gold); border-radius:12px; font-family:inherit; color:var(--ink); background:#FFF; }
+  .hint { font-size:12px; color:var(--muted); line-height:1.5; flex:1; }
+  .place { font-size:13px; color:var(--ink); } .place b { color:var(--gold); font-weight:600; }
+  .cast { width:100%; padding:14px; border:none; border-radius:12px; background:linear-gradient(180deg,#B5761A,#A86A12); color:#FFF; font:inherit; font-size:16px; font-weight:600; letter-spacing:.02em; box-shadow:0 6px 18px rgba(168,106,18,.3); }
+  .castnote { text-align:center; font-size:11px; color:var(--muted); margin-top:6px; }
+  .verdict { border-left:4px solid #1F7A4D; padding:10px 12px; background:rgba(31,122,77,.06); border-radius:8px; font-size:14px; margin-bottom:10px; }
+  .verdict b { color:#1F7A4D; }
+  .mapline { font-size:12.5px; color:var(--ink); background:rgba(168,106,18,.07); border-radius:8px; padding:9px 11px; line-height:1.55; }
+  .mapline b { color:var(--gold); }
+  .langbar { text-align:right; margin-bottom:8px; }
+  .langbar button { border:1px solid var(--line); background:#FFF; border-radius:999px; padding:4px 12px; font:inherit; font-size:12px; color:var(--muted); cursor:pointer; }
+  .langbar button.on { color:var(--gold); border-color:var(--gold); font-weight:600; }
+  [data-l] { display:none; } html[lang="en"] [data-l="en"], html[lang="hi"] [data-l="hi"] { display:block; }
+  span[data-l] { display:none; } html[lang="en"] span[data-l="en"], html[lang="hi"] span[data-l="hi"] { display:inline; }
+</style>
+</head>
+<body>
+  <div class="banner">DESIGN MOCK-UP · NOT THE LIVE APP · डिज़ाइन नमूना</div>
+  <div class="langbar">
+    <button class="on" onclick="document.documentElement.lang='hi';this.classList.add('on');this.nextElementSibling.classList.remove('on')">हिन्दी</button>
+    <button onclick="document.documentElement.lang='en';this.classList.add('on');this.previousElementSibling.classList.remove('on')">English</button>
+  </div>
+
+  <div class="toggle">
+    <button><span data-l="hi">इस क्षण से पूछें</span><span data-l="en">Ask from this moment</span></button>
+    <button class="on"><span data-l="hi">KP अंक विधि (1–249)</span><span data-l="en">KP number (1–249)</span></button>
+  </div>
+
+  <div class="card">
+    <div class="kicker"><span data-l="hi">१ · प्रश्न चुनें</span><span data-l="en">1 · Your question</span></div>
+    <div class="chips">
+      <span class="chip on"><span data-l="hi">विवाह / सम्बन्ध</span><span data-l="en">Marriage</span></span>
+      <span class="chip"><span data-l="hi">नौकरी / करियर</span><span data-l="en">Job / career</span></span>
+      <span class="chip"><span data-l="hi">धन / लाभ</span><span data-l="en">Money</span></span>
+      <span class="chip"><span data-l="hi">स्वास्थ्य</span><span data-l="en">Health</span></span>
+      <span class="chip">…</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="kicker"><span data-l="hi">२ · अपना अंक दें</span><span data-l="en">2 · Give your number</span></div>
+    <div class="numwrap">
+      <input class="num" value="108" inputmode="numeric" aria-label="KP number 1-249">
+      <div class="hint">
+        <span data-l="hi">आँखें बंद कर प्रश्न पर ध्यान रखें। 1–249 में जो <b>पहला सच्चा अंक</b> मन में आए, वही दें — यह शुभ-अंक नहीं है। इसे बदलें नहीं।</span>
+        <span data-l="en">Hold your question in mind. Give the <b>first sincere number</b> that comes to you between 1 and 249 — it is not a lucky number. Don't change it.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="kicker"><span data-l="hi">३ · स्थान</span><span data-l="en">3 · Place</span></div>
+    <div class="place"><span data-l="hi">उत्तर <b>New Delhi, India</b> के आकाश से — बदलने हेतु ऊपर शहर बदलें</span><span data-l="en">Judged from the sky over <b>New Delhi, India</b> — change city above to change it</span></div>
+  </div>
+
+  <button class="cast"><span data-l="hi">उत्तर देखें</span><span data-l="en">Cast the answer</span></button>
+  <div class="castnote"><span data-l="hi">क्षण इसी बटन को दबाने पर लिया जाता है — अपने-आप कभी नहीं</span><span data-l="en">The moment is captured only when you press — never on its own</span></div>
+
+  <div style="height:14px"></div>
+
+  <div class="card">
+    <div class="kicker"><span data-l="hi">उत्तर</span><span data-l="en">Answer</span></div>
+    <div class="verdict">
+      <span data-l="hi"><b>अनुकूल।</b> सप्तम भाव का उप-स्वामी 2, 7 व 11 भावों से जुड़ा है — विवाह के भाव। संभावित अवधि: शुक्र दशा।</span>
+      <span data-l="en"><b>Favourable.</b> The 7th-house sub lord connects to houses 2, 7 and 11 — the marriage houses. Likely period: Venus dasha windows.</span>
+    </div>
+    <div class="mapline">
+      <span data-l="hi">आपके अंक <b>108</b> ने क्या तय किया: लग्न <b>कन्या 3°00′</b> · नक्षत्र-स्वामी <b>सूर्य</b> (उत्तरा फाल्गुनी) · उप-स्वामी <b>शनि</b> । ग्रह इसी क्षण के वास्तविक आकाश से।</span>
+      <span data-l="en">What your number <b>108</b> set: ascendant <b>Virgo 3°00′</b> · star lord <b>Sun</b> (Uttara Phalguni) · sub lord <b>Saturn</b>. Planets are the real sky of this moment.</span>
+    </div>
+  </div>
+</body>
+</html>
