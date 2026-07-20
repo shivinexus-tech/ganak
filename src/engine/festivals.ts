@@ -219,8 +219,8 @@ const EKADASHI_NAMES = {
   "Bhadrapad_Shukla_11": { en: "Padma Ekadashi", hi: "पद्मा एकादशी" },
   "Ashwin_Shukla_11": { en: "Indira Ekadashi", hi: "इंदिरा एकादशी" },
   "Kartik_Shukla_11": { en: "Dev Uthani Ekadashi", hi: "देव उठनी एकादशी" },
-  "Margshirsh_Shukla_11": { en: "Utpanna Ekadashi", hi: "उत्पन्ना एकादशी" },
-  "Paush_Shukla_11": { en: "Mokshada Ekadashi", hi: "मोक्षदा एकादशी" },
+  "Margshirsh_Shukla_11": { en: "Mokshada Ekadashi", hi: "मोक्षदा एकादशी" },
+  "Paush_Shukla_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" },
   "Magh_Shukla_11": { en: "Safala Ekadashi", hi: "सफला एकादशी" },
   "Phalgun_Shukla_11": { en: "Amalaki Ekadashi", hi: "आमलकी एकादशी" },
   "Chaitra_Krishna_11": { en: "Pap Mochini Ekadashi", hi: "पाप मोचिनी एकादशी" },
@@ -231,8 +231,8 @@ const EKADASHI_NAMES = {
   "Bhadrapad_Krishna_11": { en: "Aja Ekadashi", hi: "अजा एकादशी" },
   "Ashwin_Krishna_11": { en: "Vijaya Ekadashi", hi: "विजया एकादशी" },
   "Kartik_Krishna_11": { en: "Prabodhini Ekadashi", hi: "प्रबोधिनी एकादशी" },
-  "Margshirsh_Krishna_11": { en: "Gita Jayanti", hi: "गीता जयंती" },
-  "Paush_Krishna_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" },
+  "Margshirsh_Krishna_11": { en: "Utpanna Ekadashi", hi: "उत्पन्ना एकादशी" },
+  "Paush_Krishna_11": { en: "Safala Ekadashi", hi: "सफला एकादशी" },
   "Magh_Krishna_11": { en: "Shatila Ekadashi", hi: "शतिला एकादशी" },
   "Phalgun_Krishna_11": { en: "Phalaharini Ekadashi", hi: "फलहारिणी एकादशी" }
 };
