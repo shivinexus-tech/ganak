@@ -17,8 +17,9 @@ Ashtami, Navratri, Durga Ashtami, Maha Navami, Dussehra, Sharad Purnima, Karwa
 Chauth, Ahoi Ashtami, Diwali, Maha Shivaratri, Vasant Panchami, Makar Sankranti —
 all match. **The day-part/kala work paid off; the engine is sound.**
 
-**2. Coverage is the problem, not correctness.** Ganak fires **~68** named festivals in
-2026 (up from ~37 at gap analysis start); Drik lists roughly **100** observances.
+**2. Coverage is the problem, not correctness.** Ganak fires **~107** named festivals in
+2026 (up from ~68 after Slice C+D); Drik lists roughly **100** observances — coverage
+now meets or exceeds Drik's headline count.
 
 **3. Ganak is genuinely ahead of Drik's Delhi page in places** — Thaipusam, Panguni
 Uthiram, Vishu, Karthigai Deepam, Ayyappa Mandala (start + Pooja), both Gupt
@@ -66,6 +67,15 @@ of the North Indian year and are entirely absent:
 | Kali Jayanti | Oct 3 | Distinct from Kali Puja on Diwali |
 | Kalabhairav Jayanti | Dec 1 | Kartik Krishna Ashtami (amanta) |
 | Skanda Sashti span | Nov 10 / 15 / 16 | Begins, Soorasamharam, Thirukalyanam |
+
+### Slice E+F MERGED 2026-07-20 (`CURSOR-P1-CONTENT-04`)
+
+| Group | Keys added |
+|---|---|
+| Mahavidya jayantis (9 beyond Kali) | Lalita, Tara, Matangi, Bagalamukhi, Chhinnamasta, Dhumavati, Bhuvaneshvari, Kamala, Bhairavi |
+| Shakta labels | Shakambhari Navratri span, Lalita Panchami, Kali Puja, Sandhi Puja, Ghatasthapana ×2, Annapurna |
+| Bengali Durga Puja | Mahalaya → Shashthi → Saptami → Ashtami → Navami (Bengal) → Dashami |
+| P2 regional | Ratha Saptami, Ganga Dussehra, 12 monthly sankrantis, 4 grahan (2026) |
 
 ## P2 — significant, add after P1
 

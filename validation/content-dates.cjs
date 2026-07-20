@@ -14,7 +14,7 @@ const from = Date.UTC(2026, 0, 1) - IST * 3600000;
 const cal = app.scanPanchangCalendar(from, IST, 430, 46, DELHI);
 const fmt = (ms) => new Date(ms + IST * 3600000).toISOString().slice(0, 10);
 const SOLAR_NEW = ['thaipusam','panguniUthiram','vishu','onam','karthigaiDeepam','vaikasiVisakam','aadiPooram','arudraDarshan','ayyappaMandalaBegins','ayyappaMandalaPuja'];
-const NEW = ['varalakshmi','mahalakshmiVrat','kaliJayanti','kalabhairavJayanti','skandaSashtiBegins','skandaSashtiSoorasamharam','skandaSashtiThirukalyanam', ...['chaitraNavratri','gudiPadwa','ugadi','vatSavitri','vatPurnima','anantChaturdashi','kartikaPurnima','tulasiVivah','pongal','pitruPakshaBegins','sarvaPitruAmavasya','lakshmiPanchami','buddhaPurnima','guptNavratriAshadha','rathYatra','hariyaliTeej','nagPanchami','hartalikaTeej','radhaAshtami','mahaAshtami','mahaNavami','sharadPurnima','ahoiAshtami','guptNavratriMagha','vasantPanchami','sheetlaAshtami','govatsaDwadashi','dhanteras','kaliChaudas','narakChaturdashi','govardhanPuja','bhaiDooj','chhathNahayKhay','chhathKharna','chhath','chhathUshaArghya'], ...SOLAR_NEW];
+const NEW = ['varalakshmi','mahalakshmiVrat','kaliJayanti','kalabhairavJayanti','skandaSashtiBegins','skandaSashtiSoorasamharam','skandaSashtiThirukalyanam', ...['chaitraNavratri','sharadNavratri','gudiPadwa','ugadi','vatSavitri','vatPurnima','anantChaturdashi','kartikaPurnima','tulasiVivah','pongal','pitruPakshaBegins','sarvaPitruAmavasya','lakshmiPanchami','buddhaPurnima','guptNavratriAshadha','rathYatra','hariyaliTeej','nagPanchami','hartalikaTeej','radhaAshtami','mahaAshtami','mahaNavami','sharadPurnima','ahoiAshtami','guptNavratriMagha','vasantPanchami','sheetlaAshtami','govatsaDwadashi','dhanteras','kaliChaudas','narakChaturdashi','govardhanPuja','bhaiDooj','chhathNahayKhay','chhathKharna','chhath','chhathUshaArghya'], ...SOLAR_NEW];
 const KNOWN = {
   vasantPanchami: '2026-01-23', mahaShivaratri: '2026-02-15', sheetlaAshtami: '~8 days after Holi (Mar 2026)',
   buddhaPurnima: '2026-05-01', rathYatra: '2026-07-16', hariyaliTeej: '2026-08-15', nagPanchami: '2026-08-17',
@@ -93,6 +93,7 @@ const dpAnchors = {
   guptNavratriAshadha: '2026-07-15',
   mahaShivaratri: '2026-02-15',
   chaitraNavratri: '2026-03-19',
+  sharadNavratri: '2026-10-11',
   gudiPadwa: '2026-03-19',
   ugadi: '2026-03-19',
   vatSavitri: '2026-05-16',
@@ -113,6 +114,31 @@ const dpAnchors = {
   skandaSashtiBegins: '2026-11-10',
   skandaSashtiSoorasamharam: '2026-11-15',
   skandaSashtiThirukalyanam: '2026-11-16',
+  lalitaJayanti: '2026-02-01',
+  taraJayanti: '2026-03-26',
+  matangiJayanti: '2026-04-20',
+  bagalamukhiJayanti: '2026-04-24',
+  chhinnamastaJayanti: '2026-04-30',
+  dhumavatiJayanti: '2026-06-22',
+  bhuvaneshvariJayanti: '2026-09-23',
+  kamalaJayanti: '2026-11-08',
+  bhairaviJayanti: '2026-12-23',
+  annapurnaJayanti: '2026-12-23',
+  shakambhariNavratriBegins: '2025-12-27',
+  shakambhariPurnima: '2026-01-03',
+  lalitaPanchami: '2026-10-15',
+  kaliPuja: '2026-11-08',
+  sandhiPuja: '2026-10-19',
+  chaitraGhatasthapana: '2026-03-19',
+  sharadGhatasthapana: '2026-10-11',
+  durgaPujaMahalaya: '2026-10-10',
+  durgaPujaShashthi: '2026-10-16',
+  durgaPujaSaptami: '2026-10-17',
+  durgaPujaAshtami: '2026-10-19',
+  durgaPujaNavami: '2026-10-20',
+  durgaPujaDashami: '2026-10-20',
+  rathaSaptami: '2026-01-25',
+  gangaDussehra: '2026-05-25',
 };
 let dpFailures = 0;
 for (const [key, exp] of Object.entries(dpAnchors)) {
@@ -124,6 +150,47 @@ for (const [key, exp] of Object.entries(dpAnchors)) {
 }
 if (dpFailures) { console.error(`\n✗ ${dpFailures} day-part anchor(s) failed`); process.exitCode = 1; }
 else console.log(`✓ ${Object.keys(dpAnchors).length}/${Object.keys(dpAnchors).length} festival day-part anchors match`);
+
+const SANKRANTI_EXPECTED = {
+  meshaSankranti: '2026-04-14',
+  vrishabhaSankranti: '2026-05-15',
+  mithunaSankranti: '2026-06-15',
+  karkaSankranti: '2026-07-16',
+  simhaSankranti: '2026-08-17',
+  kanyaSankranti: '2026-09-17',
+  tulaSankranti: '2026-10-17',
+  vrishchikaSankranti: '2026-11-16',
+  makarSankranti: '2026-01-14',
+  dhanuSankranti: '2026-12-16',
+  kumbhaSankranti: '2026-02-13',
+  meenaSankranti: '2026-03-15',
+};
+console.log('\nMonthly sankranti anchors (New Delhi 2026):');
+let sankFailures = 0;
+for (const [key, exp] of Object.entries(SANKRANTI_EXPECTED)) {
+  const hit = cal.festivals.find((f) => f.key === key);
+  const got = hit ? fmt(hit.ms) : 'DID NOT FIRE';
+  const ok = got === exp;
+  console.log(`  ${ok ? '✓' : '✗'} ${key}: ${got} (expected ${exp})`);
+  if (!ok) sankFailures++;
+}
+if (sankFailures) { console.error(`\n✗ ${sankFailures} sankranti anchor(s) failed`); process.exitCode = 1; }
+else console.log(`✓ ${Object.keys(SANKRANTI_EXPECTED).length}/${Object.keys(SANKRANTI_EXPECTED).length} sankranti anchors match`);
+
+const ECLIPSE_EXPECTED = ['2026-02-17', '2026-03-03', '2026-08-12', '2026-08-28'];
+console.log('\nGrahan anchors (New Delhi 2026):');
+const grahanDates = cal.festivals
+  .filter((f) => f.key === 'suryaGrahan' || f.key === 'chandraGrahan')
+  .map((f) => fmt(f.ms))
+  .filter((d) => d.startsWith('2026-'));
+let eclipseFailures = 0;
+for (const exp of ECLIPSE_EXPECTED) {
+  const ok = grahanDates.includes(exp);
+  console.log(`  ${ok ? '✓' : '✗'} ${exp} ${ok ? 'present' : 'MISSING'}`);
+  if (!ok) eclipseFailures++;
+}
+if (eclipseFailures) { console.error(`\n✗ ${eclipseFailures} grahan anchor(s) failed`); process.exitCode = 1; }
+else console.log(`✓ ${ECLIPSE_EXPECTED.length}/${ECLIPSE_EXPECTED.length} 2026 grahan dates present`);
 
 const localAnchor = (y, m, d) => Date.UTC(y, m - 1, d, 12) - IST * 3600000;
 const mandalaChecks = [
