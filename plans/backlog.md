@@ -90,12 +90,12 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       `plans/claude-task-p1-vratvidhi-verify.md`.
 
 **Plumbing:**
-- [ ] **P0 before go-live — shareable festival-guide links.** Add stable routes for
+- [x] **P0 before go-live — shareable festival-guide links.** Add stable routes for
       `/festival/hartalika-teej`, `/festival/chaitra-navratri`,
       `/festival/sharad-navratri`, and `/festival/chhath`. This is additive: keep
       the current Fasts & Festivals card click/expand behaviour exactly as it is.
       After launch, compare direct-link use with in-app card use and only reconsider
-      navigation after observing real user behaviour. _(P1-FESTIVAL-DEEPLINKS)_
+      navigation after observing real user behaviour. _(P1-FESTIVAL-DEEPLINKS — shipped)_
 - [x] **Hide the birth-chart tab** for launch — Daily + Prashna only; Chart route falls
       back to Daily. _(P1-HIDE-DEPLOY, live at ganak.pages.dev)_
 - [x] **Deploy to a web host** — https://ganak.pages.dev (Cloudflare Pages, `main`

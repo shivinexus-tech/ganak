@@ -3,6 +3,7 @@ import { T } from "./components/tokens";
 import PrashnaScreen from "./screens/PrashnaScreen";
 import ChartScreen from "./screens/ChartScreen";
 import DailyScreen from "./screens/DailyScreen";
+import FestivalGuideScreen, { festivalGuideFromPath } from "./screens/FestivalGuideScreen";
 import { FEST_NAME } from "./data/festival-meta";
 import { urlPrefGet, urlPrefSet } from "./components/url-prefs";
 import {
@@ -36,6 +37,7 @@ export default function KundliApp() {
   const chooseLang = (v) => { setLang(v); urlPrefSet("lang", v); };
   const [mode, setMode] = useState(() => { const v = urlPrefGet("screen"); return v === "prashna" || v === "daily" ? v : "daily"; });
   const chooseMode = (v) => { setMode(v); urlPrefSet("screen", v); };
+  const directFestivalGuide = festivalGuideFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
 
   // Shared place: Daily and Prashna both read it; Daily owns the picker UI.
   const [panchPlace, setPanchPlace] = useState(null);
@@ -100,23 +102,27 @@ export default function KundliApp() {
           </p>
         </header>
 
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: T.s5 }}>
+        {!directFestivalGuide && <div style={{ display: "flex", justifyContent: "center", marginBottom: T.s5 }}>
           <div style={{ display: "inline-flex", background: "#F1E9D5", borderRadius: T.rMd, padding: 3, border: `1px solid ${C.line}` }}>
             {[["daily", lang === "hi" ? "आज · पंचांग" : "Daily"], ["prashna", lang === "hi" ? "प्रश्न" : "Prashna"]].map(([mk, label]) => (
               <button key={mk} onClick={() => chooseMode(mk)} style={{ padding: "9px 26px", borderRadius: T.rSm, fontFamily: T.serif, fontSize: T.fBody, cursor: "pointer", border: "none", background: mode === mk ? C.panel : "transparent", color: mode === mk ? C.gold : C.muted, fontWeight: mode === mk ? 600 : 400, boxShadow: mode === mk ? T.e1 : "none", transition: "all .15s" }}>{label}</button>
             ))}
           </div>
-        </div>
+        </div>}
 
-        {mode === "prashna" && (
+        {directFestivalGuide && (
+          <FestivalGuideScreen guide={directFestivalGuide} lang={lang} C={C} card={card} />
+        )}
+
+        {!directFestivalGuide && mode === "prashna" && (
           <PrashnaScreen lat={panchEff?.lat} lon={panchEff?.lon} placeLabel={panchEff?.label} lang={lang} />
         )}
 
-        {mode === "daily" && (
+        {!directFestivalGuide && mode === "daily" && (
           <DailyScreen C={C} card={card} lang={lang} place={panchEff} onPlace={setPanchPlace} />
         )}
 
-        {mode === "chart" && (
+        {!directFestivalGuide && mode === "chart" && (
           <ChartScreen C={C} card={card} lang={lang} />
         )}
 

@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { T } from "./tokens";
 import { VRAT_VIDHI_LABELS, VRAT_VIDHI_SAFETY } from "../data/vrat-vidhis";
 
-function VratVidhiCard({ data, lang, C }) {
-  const [open, setOpen] = useState(false);
+function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
+  const [open, setOpen] = useState(initiallyOpen);
   if (!data) return null;
   const L = lang === "hi" ? "hi" : "en";
   const lbl = (k) => VRAT_VIDHI_LABELS[k][L];
