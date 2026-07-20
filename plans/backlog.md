@@ -90,6 +90,15 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       `plans/claude-task-p1-vratvidhi-verify.md`.
 
 **Plumbing:**
+- [ ] **P0 before go-live — route-aware page identity and metadata audit.** Every
+      screen and permanent route must identify the product area the user actually
+      opened: Panchang, Prashna, Festival/Vrat, or Jyotish. Audit the visible hero,
+      supporting line, browser title, share/preview metadata, breadcrumbs and footer
+      for stale copy inherited from another section. Add automated route-context
+      checks so a future page cannot silently show birth-chart language on a fasting
+      page or another unrelated product description. The immediate shared-header
+      leak is being corrected under `CODEX-P0-PAGE-IDENTITY-01`; the remaining
+      title/share/footer audit stays open until checked route by route.
 - [x] **P0 before go-live — shareable festival-guide links.** Add stable routes for
       `/festival/hartalika-teej`, `/festival/chaitra-navratri`,
       `/festival/sharad-navratri`, and `/festival/chhath`. This is additive: keep
@@ -157,8 +166,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       rules, repeated-question handling and calculation anchors. After owner sign-off,
       build it as a clearly labelled alternative to—not a silent replacement for—the
       existing time-based Prashna. Full brief: `plans/prashna-number-method-research.md`.
-      _(P0-PRASHNA-249-RESEARCH — research done 2026-07-20, findings + mock at
-      `plans/prashna-249-findings.md`, awaiting owner decisions §6)_
+      _(P0-PRASHNA-249-RESEARCH — research done 2026-07-20; findings
+      `plans/prashna-249-findings.md`, owner answers `plans/prashna-249-owner-answers.md`.
+      **Naming DECIDED:** "कृष्णमूर्ति पद्धति अंक विधि" / "Krishnamurti Paddhati number
+      method" — full name, no "KP" initials. Q1/Q2/Q4/Q5 still open.)_
 - [ ] **P0 pre-condition for the 249 engine — primary-text verification (KSK).**
       Before the KP-number engine ships, verify the judgment conventions against
       K. S. Krishnamurti's own Horary readers (number fixes the lagna at the sub's

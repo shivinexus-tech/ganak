@@ -216,10 +216,32 @@ natural-sounding and readable, just not a fixed technical term.
 | **C** | **कृष्णमूर्ति अंक विधि** / **Krishnamurti number method** | Full respect to the source; no jargon initials | Long on a phone tab |
 | **D** | Ganak-branded (e.g. "गणक अंक") | Distinctive | **I'd advise against it.** Branding a traditional method as your own invention is the kind of thing this project has otherwise been careful not to do, and KP users would find it odd. |
 
-**My recommendation: B on the tab, C in the explainer.** So the toggle reads
-**"KP अंक विधि (1–249)"**, and the first line beneath it says *"कृष्णमूर्ति पद्धति की
-अंक-आधारित प्रश्न विधि"* — attribution in full, once, where there's room. That keeps
-the tab short, keeps it searchable, and gives Krishnamurti his name properly.
+**My recommendation was B on the tab, C in the explainer.**
+
+### ✅ DECIDED (owner, 2026-07-20) — option C, full attribution
+
+> **कृष्णमूर्ति पद्धति अंक विधि** — *not* "KP अंक विधि".
+
+The initials are out. The name is spelled in full wherever the method is labelled.
+
+**Strings to use when the mode is built:**
+
+| Slot | Hindi | English |
+|---|---|---|
+| Mode toggle | कृष्णमूर्ति पद्धति अंक विधि | Krishnamurti Paddhati number method |
+| With range, where space allows | कृष्णमूर्ति पद्धति अंक विधि (1–249) | Krishnamurti Paddhati number method (1–249) |
+| The other mode (unchanged) | प्रश्न कुण्डली — इसी क्षण से | Prashna — ask from this moment |
+
+Owner's reasoning is consistent with how this project has treated tradition
+elsewhere: name the source properly rather than reduce it to initials. It also reads
+correctly to a devotional user who has never heard of "KP".
+
+**One layout consequence to solve at mock-up time:** the Hindi string is 27
+characters and the English 38 — too long for a two-up segmented toggle at 375px,
+where the existing Daily/Prashna control fits comfortably. Options are to stack the
+toggle vertically, use two lines per option, or show the full name as a heading with
+a shorter switch beneath it. This is a layout problem, not a naming one — the name is
+settled. I will bring a solution in the mock-up rather than quietly shortening it.
 
 ---
 
@@ -267,12 +289,13 @@ recommend seeing it.
 
 ---
 
-## Decisions still needed from you
+## Decision status
 
-1. Q1 — approve moving the three chips to tier 2, compressing the repeated lines,
-   and making house glosses question-specific?
-2. Q2 — Lahiri + disclosure (recommended), or commission the true-KP fork?
-3. Q3 — naming option **B + C** (recommended), or another?
-4. Q4 — defer ruling planets + sincerity test to v1.1? (recommended)
-5. Q5 — mock-up first? (recommended)
-6. Separately: shall I fix the **`2th` house bug** now? It is live.
+| # | Question | Status |
+|---|---|---|
+| Q3 | Naming | ✅ **DECIDED 2026-07-20** — "कृष्णमूर्ति पद्धति अंक विधि", full name, no initials |
+| Q1 | Chips to tier 2, compress repeated lines, question-specific house glosses | ⏳ open (recommended) |
+| Q2 | Lahiri + disclosure, or true-KP fork | ⏳ open (Lahiri recommended; 1-in-15 divergence measured) |
+| Q4 | Defer ruling planets + Moon-sincerity to v1.1 | ⏳ open (defer recommended) |
+| Q5 | Mock-up before code | ⏳ open (recommended) |
+| — | Fix the live **`2th` house** bug now | ⏳ open — it is on production right now |
