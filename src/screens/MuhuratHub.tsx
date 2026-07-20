@@ -37,6 +37,11 @@ const VRAT_VIDHI_KEY = Object.freeze({
   chhathUshaArghya: "chhath",
   chaitraNavratri: "chaitraNavratri",
   sharadNavratri: "sharadNavratri",
+  skandaSashtiBegins: "skandaShashti",
+  skandaSashtiSoorasamharam: "skandaShashti",
+  skandaSashtiThirukalyanam: "skandaShashti",
+  ayyappaMandalaBegins: "ayyappaMandala",
+  ayyappaMandalaPuja: "ayyappaMandala",
 });
 
 function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, onCal = () => {}, C, card }) {

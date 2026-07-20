@@ -20,6 +20,37 @@ export const VRAT_VIDHI_SAFETY = {
   en: "This health note does not change the religious rule described below. Some vrats are traditionally nirjala (without food or water). Children, older people, anyone who is pregnant or breastfeeding, unwell, taking medicines, or living with diabetes, kidney disease or an eating disorder should seek medical advice and guidance from their family or religious tradition before observing a strict fast. Seek help if you become faint, confused, severely weak, cannot keep fluids down, or have unsafe blood-sugar symptoms. Never stop or retime prescribed medicine without medical advice.",
   hi: "यह स्वास्थ्य टिप्पणी नीचे लिखे धार्मिक नियम को नहीं बदलती। कुछ व्रत परम्परागत रूप से निर्जला (बिना अन्न-जल) रखे जाते हैं। बच्चे, वृद्ध, गर्भवती या स्तनपान कराने वाली महिलाएँ, अस्वस्थ व्यक्ति, दवा लेने वाले, मधुमेह, गुर्दे की बीमारी या ईटिंग-डिसऑर्डर वाले लोग कठोर व्रत से पहले चिकित्सकीय सलाह और अपनी कुल या धार्मिक परम्परा का मार्गदर्शन लें। चक्कर, भ्रम, अत्यधिक कमजोरी, पानी न रुकना या असुरक्षित रक्त-शर्करा लक्षण हों तो सहायता लें। चिकित्सकीय सलाह के बिना दवा बन्द न करें और न उसका समय बदलें।",
 };
+
+const VAT_SAVITRI_COMMON = Object.freeze({
+  vidhi: [
+    { en: "Bathe and prepare the offerings used in your family.", hi: "स्नान करके परिवार में प्रचलित पूजन-सामग्री तैयार करें।" },
+    { en: "At a banyan tree, offer water and flowers and worship Savitri–Satyavan according to family custom.", hi: "वट-वृक्ष के पास जल और फूल अर्पित करके पारिवारिक रीति से सावित्री–सत्यवान का पूजन करें।" },
+    { en: "Tie the sacred thread while making the customary pradakshina. Use your family's count rather than assuming one fixed number.", hi: "प्रदक्षिणा करते हुए पवित्र धागा बाँधें। कोई एक संख्या मानने के बजाय अपने परिवार में प्रचलित संख्या रखें।" },
+    { en: "Read or hear the Savitri–Satyavan katha and pray for your husband's well-being and longevity and for dharma in married life.", hi: "सावित्री–सत्यवान की कथा पढ़ें या सुनें और पति के स्वास्थ्य, दीर्घायु तथा धर्ममय दाम्पत्य की प्रार्थना करें।" },
+    { en: "If no suitable banyan is accessible, join a temple observance or ask your family priest or temple for its accepted practice; do not cut a living branch.", hi: "यदि वट-वृक्ष उपलब्ध न हो तो मंदिर के सामूहिक पूजन में सम्मिलित हों या परिवार-पुरोहित/मंदिर से मान्य विधि पूछें; जीवित शाखा न काटें।" },
+  ],
+  diet: {
+    en: "The traditional observance includes a strict fast. Follow the exact food and water rule of your family or temple; the Amavasya and Purnima traditions do not share one universal menu.",
+    hi: "पारंपरिक अनुष्ठान में कठोर उपवास शामिल है। भोजन और जल का ठीक वही नियम रखें जो आपके परिवार या मंदिर में मान्य है; अमावस्या और पूर्णिमा परंपराओं का एक सार्वभौमिक आहार-नियम नहीं है।",
+  },
+  sankalpa: {
+    en: "“I remember Savitri's steadfast dharma and observe my family's vrata for my husband's well-being, longevity and a righteous married life.” This is a plain-language intention, not a prescribed Sanskrit mantra.",
+    hi: "“मैं सावित्री के अडिग धर्म को स्मरण करते हुए अपने पति के स्वास्थ्य, दीर्घायु और धर्ममय दाम्पत्य के लिए अपने परिवार में प्रचलित व्रत रखती हूँ।” यह सरल भाव-संकल्प है, निर्धारित संस्कृत मंत्र नहीं।",
+  },
+  puja: {
+    en: "Offer water and flowers at the banyan, worship Savitri–Satyavan, tie the thread with pradakshina, hear the katha and complete the family's customary prayer. A full shodashopachara puja may be done with a priest or established family procedure.",
+    hi: "वट-वृक्ष को जल-फूल अर्पित करें, सावित्री–सत्यवान का पूजन करें, प्रदक्षिणा के साथ धागा बाँधें, कथा सुनें और पारिवारिक प्रार्थना पूरी करें। पूर्ण षोडशोपचार पूजा पुरोहित या स्थापित कुल-विधि से की जा सकती है।",
+  },
+  paran: {
+    en: "Complete the fast according to the selected family or temple tradition. No single paran clock is established for both the Amavasya and Purnima forms.",
+    hi: "चुनी हुई पारिवारिक या मंदिर परंपरा के अनुसार व्रत पूरा करें। अमावस्या और पूर्णिमा—दोनों रूपों के लिए एक ही पारण-समय स्थापित नहीं है।",
+  },
+  udyapan: {
+    en: "No single universal udyapan is established. Complete a counted or specially undertaken vow with the family priest, guru or temple that gave its rules.",
+    hi: "एक सार्वभौमिक उद्यापन स्थापित नहीं है। निश्चित संख्या या विशेष संकल्प का व्रत उसी परिवार-पुरोहित, गुरु या मंदिर के मार्गदर्शन में पूरा करें जहाँ से उसके नियम मिले हैं।",
+  },
+});
+
 export const VRAT_VIDHI = {
   ekadashi: {
     verdict: {
@@ -503,6 +534,156 @@ export const VRAT_VIDHI = {
     udyapan: {
       en: "Chhath's fourth-day Usha Arghya concludes that year's observance; a separate universal udyapan is not established. A lifelong/numbered family vow ends only through that lineage's guidance.",
       hi: "चौथे दिन उषा अर्घ्य उस वर्ष का समापन; अलग सार्वभौमिक उद्यापन स्थापित नहीं। आजीवन/गिनती कुल-संकल्प उसी कुल-विधि से पूर्ण।",
+    },
+  },
+  skandaShashti: {
+    verdict: {
+      en: "Monthly Skanda Shashti is a one-day Murugan vrata. The annual Tamil observance—also called Kanda Sashti (கந்த சஷ்டி)—lasts six days and culminates with Soorasamharam; Thirukalyanam follows on day seven.",
+      hi: "मासिक स्कन्द षष्ठी मुरुगन का एक-दिवसीय व्रत है। वार्षिक तमिल अनुष्ठान—जिसे कन्द षष्ठी (கந்த சஷ்டி) भी कहते हैं—छह दिन चलता है और सूरसम्हारम् पर पूर्ण होता है; सातवें दिन तिरुकल्याणम् होता है।",
+    },
+    vidhi: [
+      { en: "For a monthly occurrence, take the one-day vow. For annual Kanda Sashti, continue the chosen discipline through all six days.", hi: "मासिक तिथि पर एक-दिवसीय व्रत लें। वार्षिक कन्द षष्ठी में चुना हुआ नियम सभी छह दिनों तक निभाएँ।" },
+      { en: "Bathe, clean the worship place and light a lamp before Murugan or the Vel.", hi: "स्नान करके पूजा-स्थान स्वच्छ करें और मुरुगन या वेल के सामने दीप जलाएँ।" },
+      { en: "Offer flowers or fruit and state whether this is the monthly vrata or annual six-day vow.", hi: "फूल या फल अर्पित करें और स्पष्ट करें कि यह मासिक व्रत है या वार्षिक छह-दिवसीय संकल्प।" },
+      { en: "Pray, visit a Murugan temple if possible, and recite or listen to a familiar text such as Kanda Sashti Kavacham.", hi: "प्रार्थना करें, सम्भव हो तो मुरुगन मंदिर जाएँ और कन्द षष्ठी कवचम् जैसे परिचित पाठ का पाठ या श्रवण करें।" },
+      { en: "On annual day six, observe Soorasamharam. Treat day-seven Thirukalyanam as a separate festival milestone.", hi: "वार्षिक व्रत के छठे दिन सूरसम्हारम् मनाएँ। सातवें दिन के तिरुकल्याणम् को अलग उत्सव मानें।" },
+    ],
+    diet: {
+      en: "Traditional forms include complete fasting, fruit or milk, simple unsalted food, or one daily meal. One documented Tamil annual practice takes food at night on days 1–5, keeps a complete fast on day 6 (with milk/fruit as its permitted lighter form), and completes with food on the morning of day 7. Follow the rule received from your family or temple.",
+      hi: "परंपरा में पूर्ण उपवास, फल या दूध, सादा नमक-रहित भोजन अथवा दिन में एक भोजन मिलता है। एक प्रमाणित तमिल वार्षिक विधि में दिन 1–5 रात्रि भोजन, दिन 6 पूर्ण उपवास (अनुमत हल्के रूप में दूध/फल), और दिन 7 प्रातः भोजन से समापन होता है। परिवार या मंदिर से मिला नियम मानें।",
+    },
+    sankalpa: {
+      en: "“For this Skanda Shashti, I worship Shri Murugan and undertake the form of vrata followed in my family or temple, seeking courage, discipline and divine grace.” This is a plain-language intention, not a prescribed Sanskrit mantra.",
+      hi: "“इस स्कन्द षष्ठी पर मैं श्री मुरुगन की पूजा करता/करती हूँ और साहस, अनुशासन तथा ईश-कृपा के लिए अपने परिवार या मंदिर में प्रचलित व्रत-नियम अपनाता/अपनाती हूँ।” यह सरल भाव-संकल्प है, निर्धारित संस्कृत मंत्र नहीं।",
+    },
+    puja: {
+      en: "Lamp; Murugan or Vel worship; flowers or fruit; familiar Murugan names, hymn or Kanda Sashti Kavacham; temple darshan where possible; aarti. Temple homam, abhishekam, kavadi and Soorasamharam enactment are temple-led observances, not a compulsory household checklist.",
+      hi: "दीप; मुरुगन या वेल पूजन; फूल या फल; परिचित मुरुगन-नाम, स्तोत्र या कन्द षष्ठी कवचम्; सम्भव हो तो मंदिर-दर्शन; आरती। मंदिर का होम, अभिषेक, कावड़ी और सूरसम्हारम् नाट्य घर की अनिवार्य सूची नहीं हैं।",
+    },
+    paran: {
+      en: "For the monthly vrata, complete after the principal Murugan worship according to family or temple tradition; no universal monthly clock is established. For the annual vow, the documented Tamil form completes with food on the morning of day 7. Use that rule only when it matches your tradition.",
+      hi: "मासिक व्रत मुख्य मुरुगन पूजा के बाद पारिवारिक या मंदिर परंपरा से पूरा करें; एक सार्वभौमिक मासिक समय स्थापित नहीं है। वार्षिक व्रत की प्रमाणित तमिल विधि में दिन 7 प्रातः भोजन से समापन होता है। यही नियम तभी अपनाएँ जब आपकी परंपरा उससे मेल खाती हो।",
+    },
+    udyapan: {
+      en: "No universal household udyapan is established. A counted, six-day or specially undertaken vow should be completed under family, Guru or temple guidance.",
+      hi: "एक सार्वभौमिक घरेलू उद्यापन स्थापित नहीं है। गिनती, छह-दिवसीय या विशेष संकल्प का व्रत परिवार, गुरु या मंदिर के मार्गदर्शन में पूरा करें।",
+    },
+  },
+  masikDurgashtami: {
+    verdict: {
+      en: "This is Maa Durga's monthly Shukla Ashtami vrata. Keep the day-long fast and worship rule followed by your family or temple. Simple household prayer is appropriate; formal Chandi or tantric rites require qualified guidance.",
+      hi: "यह माँ दुर्गा का मासिक शुक्ल अष्टमी व्रत है। अपने परिवार या मंदिर में प्रचलित दिनभर के उपवास और पूजा-नियम का पालन करें। सरल घरेलू प्रार्थना उपयुक्त है; विधिवत चण्डी या तांत्रिक अनुष्ठान योग्य मार्गदर्शन में ही करें।",
+    },
+    vidhi: [
+      { en: "Bathe and clean the household shrine.", hi: "स्नान करके घर का पूजा-स्थान स्वच्छ करें।" },
+      { en: "Light a lamp before Maa Durga and offer water, flowers and fruit or the family's usual satvik bhog.", hi: "माँ दुर्गा के सामने दीप जलाएँ और जल, फूल तथा फल या परिवार में प्रचलित सात्त्विक भोग अर्पित करें।" },
+      { en: "State the intention for the day's vrata.", hi: "आज के व्रत का अपना संकल्प स्पष्ट करें।" },
+      { en: "Recite or listen to a Durga prayer already known in your family, or pray in your own words.", hi: "परिवार में परिचित दुर्गा-प्रार्थना का पाठ या श्रवण करें, अथवा अपने शब्दों में प्रार्थना करें।" },
+      { en: "Perform evening aarti or visit a Devi temple according to your practice.", hi: "अपनी परंपरा के अनुसार सायंकाल आरती करें या देवी मंदिर जाएँ।" },
+    ],
+    diet: {
+      en: "The traditional observance is a day-long fast. Follow the exact food and water rule received from your family, Guru or temple; a strict inherited rule is not replaced by a generic menu.",
+      hi: "पारंपरिक अनुष्ठान दिनभर का व्रत है। भोजन और जल का वही नियम रखें जो आपके परिवार, गुरु या मंदिर से मिला है; कठोर पारिवारिक नियम को सामान्य सूची से नहीं बदला जाता।",
+    },
+    sankalpa: {
+      en: "“On this Masik Durgashtami, I worship Maa Durga and observe the vrata followed in my family, praying for strength, protection and right conduct.” This is a plain-language intention, not a prescribed Sanskrit mantra.",
+      hi: "“इस मासिक दुर्गाष्टमी पर मैं माँ दुर्गा की पूजा करता/करती हूँ और शक्ति, रक्षा तथा सदाचार के लिए अपने परिवार में प्रचलित व्रत रखता/रखती हूँ।” यह सरल भाव-संकल्प है, निर्धारित संस्कृत मंत्र नहीं।",
+    },
+    puja: {
+      en: "Lamp; water, flowers and satvik bhog; a familiar Durga prayer; evening aarti or Devi-temple visit. Homa, bali, nyasa, mudra, initiated mantra, yantra installation and advanced tantric sadhana are Guru- or temple-led, not do-it-yourself instructions.",
+      hi: "दीप; जल, फूल और सात्त्विक भोग; परिचित दुर्गा-प्रार्थना; सायं आरती या देवी-मंदिर दर्शन। होम, बलि, न्यास, मुद्रा, दीक्षित मंत्र, यंत्र-स्थापना और उन्नत तांत्रिक साधना गुरु या मंदिर के मार्गदर्शन में होती हैं, स्वयं करने की विधियाँ नहीं।",
+    },
+    paran: {
+      en: "Complete after the day's Durga worship according to family or temple tradition. A single universal paran clock is not established for this monthly vrata.",
+      hi: "दिन की दुर्गा-पूजा के बाद परिवार या मंदिर की परंपरा के अनुसार व्रत पूरा करें। इस मासिक व्रत के लिए एक सार्वभौमिक पारण-समय स्थापित नहीं है।",
+    },
+    udyapan: {
+      en: "No universal monthly udyapan is established. For a counted or specially undertaken vow, ask the family priest, Guru or temple that gave the observance.",
+      hi: "एक सार्वभौमिक मासिक उद्यापन स्थापित नहीं है। निश्चित संख्या या विशेष संकल्प के व्रत के लिए उसी परिवार-पुरोहित, गुरु या मंदिर से विधि लें जहाँ से व्रत मिला है।",
+    },
+  },
+  vatSavitri: {
+    ...VAT_SAVITRI_COMMON,
+    verdict: {
+      en: "This is the North Indian/Purnimanta form on Jyeshtha Amavasya. Keep your family's fast, worship Savitri–Satyavan and the banyan tree, tie the sacred thread with pradakshina, and hear the katha. Vat Purnima is the corresponding western/southern regional date.",
+      hi: "यह ज्येष्ठ अमावस्या का उत्तर भारतीय/पूर्णिमान्त रूप है। पारिवारिक व्रत रखें, सावित्री–सत्यवान और वट-वृक्ष की पूजा करें, प्रदक्षिणा के साथ धागा बाँधें और कथा सुनें। पश्चिम/दक्षिण भारत में इसी व्रत की क्षेत्रीय तिथि वट पूर्णिमा है।",
+    },
+  },
+  vatPurnima: {
+    ...VAT_SAVITRI_COMMON,
+    verdict: {
+      en: "This is the Amanta form on Jyeshtha Purnima, followed especially in Maharashtra, Gujarat and parts of southern India. Keep your family's fast, worship Savitri–Satyavan and the banyan tree, tie the sacred thread with pradakshina, and hear the katha. North Indian families commonly use Vat Savitri on Amavasya instead.",
+      hi: "यह ज्येष्ठ पूर्णिमा का अमान्त रूप है, जो विशेषतः महाराष्ट्र, गुजरात और दक्षिण भारत के कुछ भागों में प्रचलित है। पारिवारिक व्रत रखें, सावित्री–सत्यवान और वट-वृक्ष की पूजा करें, प्रदक्षिणा के साथ धागा बाँधें और कथा सुनें। उत्तर भारतीय परिवार सामान्यतः अमावस्या की वट सावित्री मानते हैं।",
+    },
+  },
+  varalakshmi: {
+    verdict: {
+      en: "Worship Shri Varalakshmi for the family's well-being and auspiciousness. Keep your family's morning fast, perform the kalasha puja in a suitable local worship window, hear the vrata story, wear the blessed thread according to family custom, and complete with prasada after the puja.",
+      hi: "परिवार के कल्याण और मंगल के लिए श्री वरलक्ष्मी की पूजा करें। परिवार में प्रचलित प्रातःकालीन उपवास रखें, स्थानीय शुभ समय में कलश-पूजा करें, व्रत-कथा सुनें, पारिवारिक रीति से पूजित धागा धारण करें और पूजा के बाद प्रसाद लेकर व्रत पूरा करें।",
+    },
+    vidhi: [
+      { en: "Clean the worship place and draw the family's kolam or rangoli where practiced.", hi: "पूजा-स्थान स्वच्छ करें और परंपरा हो तो कोलम् या रंगोली बनाएँ।" },
+      { en: "Prepare the kalasha, Lakshmi decoration, sacred thread and naivedya according to regional and family custom.", hi: "क्षेत्रीय और पारिवारिक रीति से कलश, लक्ष्मी-श्रृंगार, पवित्र धागा और नैवेद्य तैयार करें।" },
+      { en: "Bathe, light the lamp and state the vrata intention; invoke Varalakshmi in the prepared kalasha according to family practice.", hi: "स्नान करके दीप जलाएँ, व्रत-संकल्प करें और पारिवारिक विधि से तैयार कलश में वरलक्ष्मी का आवाहन करें।" },
+      { en: "Offer water, flowers and naivedya; recite familiar Lakshmi names, stotra or prayer; read or hear the Varalakshmi/Charumathi katha.", hi: "जल, फूल और नैवेद्य अर्पित करें; परिचित लक्ष्मी-नाम, स्तोत्र या प्रार्थना करें; वरलक्ष्मी/चारुमती कथा पढ़ें या सुनें।" },
+      { en: "Perform aarti, offer the sacred thread, then wear it and exchange tambulam or gifts where this belongs to family custom.", hi: "आरती करें, पवित्र धागा देवी को अर्पित करके धारण करें और परंपरा हो तो ताम्बूल या उपहार दें।" },
+    ],
+    diet: {
+      en: "Keep the fast from morning according to your family's food and water rule. Kalasha contents, naivedya and fasting level vary by region and family.",
+      hi: "प्रातः से परिवार के भोजन और जल संबंधी नियम के अनुसार व्रत रखें। कलश-सामग्री, नैवेद्य और उपवास का स्तर क्षेत्र और परिवार के अनुसार बदलता है।",
+    },
+    sankalpa: {
+      en: "“On this Varalakshmi Vratam, I worship Shri Mahalakshmi and undertake my family's vrata for auspiciousness, right prosperity and the well-being of the whole family.” This is a plain-language intention, not a prescribed Sanskrit mantra.",
+      hi: "“इस वरलक्ष्मी व्रतम् पर मैं श्री महालक्ष्मी की पूजा करता/करती हूँ और परिवार के मंगल, धर्मसम्मत समृद्धि तथा सभी सदस्यों के कल्याण के लिए अपने परिवार में प्रचलित व्रत रखता/रखती हूँ।” यह सरल भाव-संकल्प है, निर्धारित संस्कृत मंत्र नहीं।",
+    },
+    puja: {
+      en: "Simple path: lamp, prepared kalasha, water, flowers, family naivedya, familiar Lakshmi prayer, vrata katha, aarti and sacred thread. If the kalasha invocation or full 16/32-upachara procedure is unfamiliar, join a temple or ask a priest or family elder rather than guessing mantras.",
+      hi: "सरल विधि: दीप, तैयार कलश, जल, फूल, पारिवारिक नैवेद्य, परिचित लक्ष्मी-प्रार्थना, व्रत-कथा, आरती और पवित्र धागा। कलश-आवाहन या पूर्ण 16/32-उपचार विधि ज्ञात न हो तो मंत्र का अनुमान लगाने के बजाय मंदिर, पुरोहित या परिवार के बड़े से मार्गदर्शन लें।",
+    },
+    paran: {
+      en: "Complete with prasada after the Varalakshmi puja unless your sampradaya gives a stricter completion rule.",
+      hi: "वरलक्ष्मी पूजा के बाद प्रसाद लेकर व्रत पूरा करें, जब तक आपके सम्प्रदाय में इससे कठोर समापन-नियम न हो।",
+    },
+    udyapan: {
+      en: "No universal udyapan is established. A counted or specially undertaken annual vow should be completed under the family, priest or sampradaya that gave its rules.",
+      hi: "एक सार्वभौमिक उद्यापन स्थापित नहीं है। निश्चित संख्या या विशेष संकल्प के वार्षिक व्रत को उसी परिवार, पुरोहित या सम्प्रदाय के मार्गदर्शन में पूरा करें जहाँ से उसके नियम मिले हैं।",
+    },
+  },
+  ayyappaMandala: {
+    verdict: {
+      en: "The public Mandala season and a devotee's personal 41-day vow are not automatically the same. A personal vrata begins when the mala is knowingly worn; follow the Sabarimala discipline and complete the pilgrimage under Guru Swami or temple guidance.",
+      hi: "सार्वजनिक मंडल-काल और भक्त का व्यक्तिगत 41-दिवसीय व्रत अपने-आप एक नहीं हैं। व्यक्तिगत व्रत सचेत रूप से माला धारण करने पर आरम्भ होता है; सबरीमला अनुशासन रखें और गुरु स्वामी या मंदिर के मार्गदर्शन में यात्रा पूरी करें।",
+    },
+    vidhi: [
+      { en: "Receive and wear the Ayyappa mala after prayer, normally from a temple priest or Guru Swami; official guidance also permits wearing it in the home prayer place.", hi: "प्रार्थना के बाद अय्यप्पा माला धारण करें—सामान्यतः मंदिर के पुरोहित या गुरु स्वामी से; आधिकारिक मार्गदर्शन घर के पूजा-स्थान में माला धारण करने की अनुमति भी देता है।" },
+      { en: "For 41 days, worship Ayyappa regularly, maintain celibacy, eat vegetarian food, and avoid alcohol, smoking and worldly indulgence.", hi: "41 दिनों तक नियमित अय्यप्पा-पूजन, ब्रह्मचर्य और शाकाहारी आहार रखें तथा मदिरा, धूम्रपान और सांसारिक विलास से दूर रहें।" },
+      { en: "Black is the recommended clothing colour in the Sabarimala tradition. The official discipline also avoids cutting hair, shaving and trimming nails during the vrata.", hi: "सबरीमला परंपरा में काला वस्त्र अनुशंसित है। आधिकारिक अनुशासन में व्रत के दौरान बाल कटवाना, दाढ़ी बनाना और नाखून काटना भी वर्जित है।" },
+      { en: "Pray morning and evening using the Ayyappa prayer, name or bhajan taught by the family or temple group; do not assume a compulsory count.", hi: "प्रातः और सायं परिवार या मंदिर-समूह से मिला अय्यप्पा नाम, प्रार्थना या भजन करें; कोई अनिवार्य संख्या न मानें।" },
+      { en: "Prepare the pilgrimage, Kettunirakkal and Irumudi with the Guru Swami or temple group. Irumudi is not an improvised do-it-yourself packing ritual.", hi: "यात्रा, केट्टुनिरक्कल और इरुमुडी की तैयारी गुरु स्वामी या मंदिर-समूह के साथ करें। इरुमुडी अनुमान से स्वयं करने की पैकिंग-विधि नहीं है।" },
+    ],
+    diet: {
+      en: "The official core is vegetarian food, sobriety and simple living. Meal times, onion/garlic rules and other ingredient restrictions vary; follow the Guru Swami, temple or family group rather than assuming a universal menu.",
+      hi: "आधिकारिक मूल नियम शाकाहारी भोजन, नशामुक्ति और सरल जीवन है। भोजन-समय, प्याज-लहसुन और अन्य सामग्री के नियम भिन्न होते हैं; सार्वभौमिक सूची मानने के बजाय गुरु स्वामी, मंदिर या परिवार-समूह का नियम रखें।",
+    },
+    sankalpa: {
+      en: "“With Lord Ayyappa as my refuge, I begin this 41-day Mandala Vratham and will follow the discipline taught by my Guru Swami or temple with prayer, restraint and sincerity.” This does not replace the initiation or prayer used by your tradition.",
+      hi: "“भगवान अय्यप्पा की शरण लेकर मैं यह 41-दिवसीय मंडल व्रतम् आरम्भ करता/करती हूँ और प्रार्थना, संयम तथा श्रद्धा से गुरु स्वामी या मंदिर द्वारा सिखाए नियमों का पालन करूँगा/करूँगी।” यह आपकी परंपरा की दीक्षा या प्रार्थना का स्थान नहीं लेता।",
+    },
+    puja: {
+      en: "Regular home or temple Ayyappa worship and familiar prayer or bhajan. Prepare Irumudi only under Guru Swami guidance; it is required for ascending the sacred 18 steps. Neyyabhishekam, Padi Pooja, Kettunirakkal and Aazhi Pooja are temple or pilgrimage observances.",
+      hi: "नियमित घर या मंदिर में अय्यप्पा-पूजन और परिचित प्रार्थना या भजन। इरुमुडी केवल गुरु स्वामी के मार्गदर्शन में तैयार करें; पवित्र 18 सीढ़ियाँ चढ़ने के लिए यह आवश्यक है। नेय्यभिषेकम्, पड़ी पूजा, केट्टुनिरक्कल और आज़ि पूजा मंदिर या यात्रा के अनुष्ठान हैं।",
+    },
+    paran: {
+      en: "Mandala Pooja closes the public 41-day temple season. A pilgrim's mala is removed after completing the pilgrimage according to Guru Swami or temple practice—not automatically on the public day 41. Without a Sabarimala trip, ask an Ayyappa temple or Guru Swami for the accepted completion.",
+      hi: "मंडल पूजा सार्वजनिक 41-दिवसीय मंदिर-काल का समापन है। यात्री की माला गुरु स्वामी या मंदिर की विधि से यात्रा पूरी होने के बाद उतारी जाती है—सार्वजनिक दिन 41 पर अपने-आप नहीं। सबरीमला यात्रा न हो तो मान्य समापन के लिए अय्यप्पा मंदिर या गुरु स्वामी से पूछें।",
+    },
+    udyapan: {
+      en: "The accepted completion depends on the undertaken pilgrimage and Guru Swami or temple tradition. If illness or a serious event interrupts the vrata, seek that guidance and make the restart decision yourself; the calendar does not reset a personal vow.",
+      hi: "मान्य समापन आपकी यात्रा और गुरु स्वामी या मंदिर की परंपरा पर निर्भर है। बीमारी या गंभीर घटना से व्रत बाधित हो तो मार्गदर्शन लें और पुनः आरम्भ का निर्णय स्वयं करें; कैलेंडर व्यक्तिगत व्रत को रीसेट नहीं करता।",
+    },
+    safety: {
+      en: "This health guidance does not change the religious discipline. Do not stop prescribed medicine for the vrata. Prepare physically for the climb, carry required medicines and medical information, ascend at a safe pace, rest when needed and use the medical centres if unwell. Seek medical advice before fasting or a strenuous pilgrimage when you have a health condition.",
+      hi: "यह स्वास्थ्य-सूचना धार्मिक अनुशासन को नहीं बदलती। व्रत के कारण निर्धारित दवा बंद न करें। चढ़ाई के लिए शरीर को तैयार करें, आवश्यक दवा और चिकित्सकीय जानकारी साथ रखें, सुरक्षित गति से चढ़ें, आवश्यकता पर विश्राम करें और अस्वस्थ होने पर चिकित्सा-केंद्र की सहायता लें। स्वास्थ्य-स्थिति में उपवास या कठिन यात्रा से पहले चिकित्सकीय सलाह लें।",
     },
   },
 };

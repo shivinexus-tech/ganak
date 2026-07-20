@@ -14,6 +14,16 @@ const expected = {
   '/festival/chaitra-navratri': 'chaitraNavratri',
   '/festival/sharad-navratri': 'sharadNavratri',
   '/festival/chhath': 'chhath',
+  '/festival/skanda-shashti': 'skandaShashti',
+  '/festival/masik-durgashtami': 'masikDurgashtami',
+  '/festival/vat-savitri': 'vatSavitri',
+  '/festival/vat-purnima': 'vatPurnima',
+  '/festival/varalakshmi': 'varalakshmi',
+  '/festival/skanda-sashti-begins': 'skandaShashti',
+  '/festival/skanda-sashti-soorasamharam': 'skandaShashti',
+  '/festival/skanda-sashti-thirukalyanam': 'skandaShashti',
+  '/festival/ayyappa-mandala-begins': 'ayyappaMandala',
+  '/festival/ayyappa-mandala-puja': 'ayyappaMandala',
 };
 
 for (const [urlPath, vidhiKey] of Object.entries(expected)) {
@@ -24,6 +34,18 @@ for (const [urlPath, vidhiKey] of Object.entries(expected)) {
   assert.strictEqual(routeModule.festivalGuideFromPath(`${urlPath}/`), guide, `${urlPath}/ must accept a trailing slash`);
   console.log(`PASS  ${urlPath} -> ${vidhiKey}`);
 }
+
+for (const vidhiKey of ['skandaShashti', 'masikDurgashtami', 'vatSavitri', 'vatPurnima', 'varalakshmi', 'ayyappaMandala']) {
+  const data = vidhiModule.VRAT_VIDHI[vidhiKey];
+  assert(data, `${vidhiKey} must exist`);
+  for (const field of ['verdict', 'diet', 'sankalpa', 'puja', 'paran', 'udyapan']) {
+    assert(data[field]?.en && data[field]?.hi, `${vidhiKey}.${field} must be bilingual`);
+  }
+  assert(Array.isArray(data.vidhi) && data.vidhi.length >= 3, `${vidhiKey} must include a usable step-by-step vidhi`);
+  assert(data.vidhi.every((step) => step.en && step.hi), `${vidhiKey} vidhi steps must be bilingual`);
+}
+assert(vidhiModule.VRAT_VIDHI.ayyappaMandala.safety?.en && vidhiModule.VRAT_VIDHI.ayyappaMandala.safety?.hi, 'Ayyappa must keep its pilgrimage-specific bilingual health guidance');
+console.log('PASS  five approved guide families are complete and bilingual');
 
 const samples = {
   '/festival/karva-chauth': { key: 'karvaChauth', vidhiKey: 'karvaChauth' },
@@ -83,6 +105,7 @@ assert(!/Open this festival in the Daily Panchang/i.test(guideScreen), 'Daily Pa
 assert(!/दैनिक पंचांग में देखें/.test(guideScreen), 'Hindi Daily Panchang timing workaround copy must be gone');
 assert(card.includes('initiallyOpen = false'), 'normal VratVidhiCard behaviour must remain closed by default');
 assert(card.includes('useState(initiallyOpen)'), 'direct routes must be able to open the full guide immediately');
+assert(card.includes('data.safety || VRAT_VIDHI_SAFETY'), 'a guide-specific safety note must override the shared fasting note');
 
 console.log('PASS  place-aware festival page wiring present');
 console.log('PASS  normal festival cards remain closed by default');

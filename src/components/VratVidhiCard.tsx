@@ -37,7 +37,7 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
         <div style={{ padding: "10px 11px 12px", borderTop: `1px solid ${C.line}`, display: "flex", flexDirection: "column", gap: 2 }}>
           <div style={{ padding: "7px 9px", borderRadius: T.rSm, background: "rgba(194,69,30,.06)", border: "1px solid rgba(194,69,30,.18)" }}>
             <div style={{ ...T.label, color: C.sindoor, marginBottom: 3 }}>{lbl("safety")}</div>
-            <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5 }}>{txt(VRAT_VIDHI_SAFETY)}</div>
+            <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5 }}>{txt(data.safety || VRAT_VIDHI_SAFETY)}</div>
           </div>
           {section(lbl("vidhi"), (
             <ol style={{ margin: 0, paddingLeft: 18 }}>

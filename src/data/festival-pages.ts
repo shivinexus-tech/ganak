@@ -12,8 +12,6 @@ const CHHATH_SHARED_KEYS = Object.freeze([
 const DEFERRED_MULTI_DAY_KEYS = Object.freeze([
   "durgaPujaMahalaya", "durgaPujaShashthi", "durgaPujaSaptami",
   "durgaPujaAshtami", "durgaPujaNavami", "durgaPujaDashami",
-  "skandaSashtiBegins", "skandaSashtiSoorasamharam", "skandaSashtiThirukalyanam",
-  "ayyappaMandalaBegins", "ayyappaMandalaPuja",
 ]);
 
 const EXCLUDED_PAGE_KEYS = Object.freeze([...CHHATH_SHARED_KEYS, ...DEFERRED_MULTI_DAY_KEYS]);
@@ -29,6 +27,14 @@ const LEGACY_TITLES = Object.freeze({
   chaitraNavratri: { en: "Chaitra Navratri", hi: "चैत्र नवरात्रि" },
   sharadNavratri: { en: "Sharad Navratri", hi: "शारदीय नवरात्रि" },
   chhath: { en: "Chhath — four-day observance", hi: "छठ — चार-दिवसीय व्रत" },
+});
+
+const FESTIVAL_VIDHI_KEYS = Object.freeze({
+  skandaSashtiBegins: "skandaShashti",
+  skandaSashtiSoorasamharam: "skandaShashti",
+  skandaSashtiThirukalyanam: "skandaShashti",
+  ayyappaMandalaBegins: "ayyappaMandala",
+  ayyappaMandalaPuja: "ayyappaMandala",
 });
 
 const slugFromKey = (key) => String(key)
@@ -66,7 +72,7 @@ function makeFestivalEntries() {
       slug,
       path: slug ? `/festival/${slug}` : null,
       status: sharedChhath ? "shared" : (deferred ? "deferred" : "required"),
-      vidhiKey: sharedChhath ? "chhath" : (VRAT_VIDHI[key] ? key : null),
+      vidhiKey: sharedChhath ? "chhath" : (FESTIVAL_VIDHI_KEYS[key] || (VRAT_VIDHI[key] ? key : null)),
     });
   });
 }

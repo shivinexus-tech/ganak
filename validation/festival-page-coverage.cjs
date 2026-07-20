@@ -40,14 +40,14 @@ function coverageProblems(entries, routes) {
 const liveCount = Object.keys(meta.FEST_NAME).length + Object.keys(meta.OBS_NAME).length;
 assert.strictEqual(FESTIVAL_PAGE_ENTRIES.length, liveCount, 'registry must contain every live openable label');
 assert.strictEqual(liveCount, 166, 'update the reviewed inventory when the live label count changes');
-assert.strictEqual(EXCLUDED_PAGE_KEYS.length, 15, 'the owner-approved excluded-family allowlist must remain explicit');
-assert.strictEqual(REQUIRED_PAGE_ENTRIES.length, 151, '151 non-deferred labels must have dedicated routes');
+assert.strictEqual(EXCLUDED_PAGE_KEYS.length, 10, 'the owner-approved excluded-family allowlist must remain explicit');
+assert.strictEqual(REQUIRED_PAGE_ENTRIES.length, 156, '156 non-deferred labels must have dedicated routes');
 assert.strictEqual(SHARED_PAGE_ENTRIES.length, 4, 'the four Chhath labels must share the existing Chhath page');
-assert.strictEqual(DEFERRED_PAGE_ENTRIES.length, 11, 'only 11 not-yet-structured multi-day labels may lack routes');
+assert.strictEqual(DEFERRED_PAGE_ENTRIES.length, 6, 'only the six not-yet-structured Bengal Durga Puja labels may lack routes');
 
 const existingStandalone = new Set(['hartalikaTeej', 'chaitraNavratri', 'sharadNavratri']);
 const newPages = REQUIRED_PAGE_ENTRIES.filter((entry) => !existingStandalone.has(entry.key));
-assert.strictEqual(newPages.length, 148, 'this slice must ship exactly 148 new dedicated pages');
+assert.strictEqual(newPages.length, 153, 'the registry must retain 148 generated pages plus 5 approved multi-day milestone pages');
 
 const problems = coverageProblems(FESTIVAL_PAGE_ENTRIES, FESTIVAL_PAGE_ROUTES);
 assert.deepStrictEqual(problems, [], `festival page coverage problems:\n${problems.join('\n')}`);
@@ -85,7 +85,7 @@ assert(
 );
 
 console.log(`PASS  ${liveCount} live openable labels inventoried`);
-console.log(`PASS  ${REQUIRED_PAGE_ENTRIES.length} required labels covered (${newPages.length} new pages + 3 existing)`);
+console.log(`PASS  ${REQUIRED_PAGE_ENTRIES.length} required labels covered (${newPages.length} generated/milestone pages + 3 existing)`);
 console.log(`PASS  ${SHARED_PAGE_ENTRIES.length} Chhath labels use the existing shared page`);
 console.log(`PASS  ${DEFERRED_PAGE_ENTRIES.length} multi-day labels are explicitly deferred`);
 console.log(`PASS  ${Object.keys(FESTIVAL_PAGE_ROUTES).length} unique direct routes are valid`);

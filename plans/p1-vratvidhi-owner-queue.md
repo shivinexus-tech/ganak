@@ -1,8 +1,9 @@
 # P1 vrat-vidhi owner queue
 
-**Status:** OWNER APPROVED + BILINGUAL BROWSER SMOKE PASSED — 2026-07-20
-**Scope:** the 16 full bilingual guides now wired in `src/data/vrat-vidhis.ts`,
-plus the launch gaps created by newly added observances.
+**Status:** FIVE NEW GUIDE FAMILIES OWNER APPROVED; LOCAL INTEGRATION GREEN — 2026-07-20
+**Scope:** the 16 previously shipped full bilingual guides plus the five newly
+approved guide families. Vat Savitri and Vat Purnima use separate data objects so
+their regional date verdicts cannot be silently blended.
 **Owner sign-off means:** approve the clarity and tone shown to Ganak users. Source
 verification is the research team's responsibility; the owner is not being asked
 to validate ritual facts from memory.
@@ -79,17 +80,21 @@ These were corrected after owner direction on 2026-07-20.
 approved for launch on 2026-07-20. Chhath wording was unchanged; only its four
 calendar-day connections were corrected.
 
-## Full-guide gaps for launch observances
+## Five approved guide families being integrated
 
-### P0 — diversity and high-observance coverage
-
-| Guide needed | Why it is P0 | Safe next step |
+| Guide | Connection | Owner sign-off |
 |---|---|---|
-| Skanda Shashti / Murugan | Major Tamil observance; currently only a short rule | Source a temple-backed household path and distinguish monthly Shashti from the annual six-day Kanda Sashti |
-| Masik Durgashtami | Recurring Shakta observance; currently only a short rule | Source a simple devotional path; no tantric mantra or nyasa as beginner DIY content |
-| Vat Savitri + Vat Purnima | High-visibility North/West/South regional variants | One shared Savitri guide with the selected regional date clearly shown |
-| Varalakshmi Vratam | Major South-Indian Lakshmi vrat and explicitly requested | Wait for the calendar key, then source a household guide from a temple/regional authority |
-| Ayyappa Mandala Vratham | Forty-one-day practice already appears in the calendar | Source discipline, food, mala and completion under Guru Swami/temple authority; do not turn lineage rules into a universal checklist |
+| Skanda Shashti / annual Kanda Sashti sequence | Monthly Skanda Shashti plus annual days 1, 6 and 7 | **Approve — 2026-07-20** |
+| Masik Durgashtami | Monthly Durgashtami card and page | **Approve — 2026-07-20** |
+| Vat Savitri + Vat Purnima | Separate regional verdicts with shared household practice | **Approve — 2026-07-20** |
+| Varalakshmi Vratam | Location-aware calendar date and full guide | **Approve — 2026-07-20** |
+| Ayyappa Mandala Vratham | Public Mandala milestones plus personal-vow guidance | **Approve — 2026-07-20** |
+
+The five families are represented by six guide objects because Vat Savitri and
+Vat Purnima must remain distinct. All 10 relevant permanent routes passed English
+and Hindi browser smoke with the place selector and full seven-section guide;
+phone layout and existing Daily-card expansion also passed with no browser errors.
+Production links will be added here only after the Cloudflare deployment passes.
 
 ### P1 — next expansion after the credible launch baseline
 
@@ -110,5 +115,5 @@ note. No further owner decision is required to merge this correction. Blank rows
 remain available for a later whole-library copy review; they do not reopen this
 approved correction.
 
-The P0 full-guide gap order remains a separate backlog decision. No religious
-fact-checking is delegated to the owner.
+No further wording decision is required for the five guide families above unless
+the production website review reveals a change the owner wants.
