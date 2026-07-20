@@ -1,6 +1,6 @@
 # P1 vrat-vidhi owner queue
 
-**Status:** FIVE NEW GUIDE FAMILIES OWNER APPROVED; LOCAL INTEGRATION GREEN — 2026-07-20
+**Status:** FIVE NEW GUIDE FAMILIES LIVE — 2026-07-20
 **Scope:** the 16 previously shipped full bilingual guides plus the five newly
 approved guide families. Vat Savitri and Vat Purnima use separate data objects so
 their regional date verdicts cannot be silently blended.
@@ -94,7 +94,23 @@ The five families are represented by six guide objects because Vat Savitri and
 Vat Purnima must remain distinct. All 10 relevant permanent routes passed English
 and Hindi browser smoke with the place selector and full seven-section guide;
 phone layout and existing Daily-card expansion also passed with no browser errors.
-Production links will be added here only after the Cloudflare deployment passes.
+Cloudflare production passed the same checks on all 10 English and Hindi routes
+(20 page loads) with zero browser errors.
+
+## Live production review links
+
+- [Skanda Shashti](https://ganak.pages.dev/festival/skanda-shashti?lang=en)
+- [Masik Durgashtami](https://ganak.pages.dev/festival/masik-durgashtami?lang=en)
+- [Vat Savitri](https://ganak.pages.dev/festival/vat-savitri?lang=en)
+- [Vat Purnima](https://ganak.pages.dev/festival/vat-purnima?lang=en)
+- [Varalakshmi Vratam](https://ganak.pages.dev/festival/varalakshmi?lang=en)
+- [Skanda Sashti day 1](https://ganak.pages.dev/festival/skanda-sashti-begins?lang=en)
+- [Skanda Sashti day 6 — Soorasamharam](https://ganak.pages.dev/festival/skanda-sashti-soorasamharam?lang=en)
+- [Skanda Sashti day 7 — Thirukalyanam](https://ganak.pages.dev/festival/skanda-sashti-thirukalyanam?lang=en)
+- [Ayyappa Mandala begins](https://ganak.pages.dev/festival/ayyappa-mandala-begins?lang=en)
+- [Ayyappa Mandala Pooja](https://ganak.pages.dev/festival/ayyappa-mandala-puja?lang=en)
+
+Use the language switch on any page, or change `lang=en` to `lang=hi` for Hindi.
 
 ### P1 — next expansion after the credible launch baseline
 
