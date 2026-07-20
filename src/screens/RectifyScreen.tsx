@@ -1,6 +1,6 @@
 /* Birth-time rectification UI — pure extraction (SPLIT-UI-JYOTISH-03). Wire deferred. */
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { T } from "../components/tokens";
 import { fmtDateT } from "../components/format";
 import { SIGN_SHORT } from "../data/chart-divisions";

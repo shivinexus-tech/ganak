@@ -7,6 +7,29 @@ import { setAyanMode, ayanAt, zoneOffset, sunEvents, jdOf, elongMs, moonSidMs } 
 
 const PANCHAKA_TYPE = { 1: "mrityu", 2: "agni", 4: "raja", 6: "chora", 8: "roga" };
 const panchakaRem = (t30, vaara, n27, lagna12) => (t30 + vaara + n27 + lagna12) % 9;
+
+/* Two boundaries can fall inside one 60s scan step, leaving a sliver window whose
+   start and end format to the same minute — the user sees "Agni 9:31 PM–9:31 PM",
+   which reads as a bug. Absorb anything under a minute into its neighbour so the day
+   stays gap-free, then re-merge neighbours that now share a value. The underlying
+   remainder maths is untouched; this only cleans what gets displayed. */
+const SLIVER_MS = 60000;
+function collapseSlivers(list, keyOf) {
+  if (list.length < 2) return list;
+  const out = [];
+  for (const w of list) {
+    if (w.end - w.start < SLIVER_MS && out.length) { out[out.length - 1].end = w.end; continue; }
+    out.push(w);
+  }
+  // a sliver in first position has no earlier window to absorb it — push its start onto the next
+  while (out.length > 1 && out[0].end - out[0].start < SLIVER_MS) { out[1].start = out[0].start; out.shift(); }
+  const merged = [];
+  for (const w of out) {
+    const last = merged[merged.length - 1];
+    if (last && keyOf(last) === keyOf(w)) last.end = w.end; else merged.push(w);
+  }
+  return merged;
+}
 function computeLagnaPanchaka(place, ayanamsa = "lahiri", atMs) {
   setAyanMode(ayanamsa);
   const now = atMs != null ? atMs : Date.now();
@@ -55,7 +78,11 @@ function computeLagnaPanchaka(place, ayanamsa = "lahiri", atMs) {
     if (last && last.type === type) last.end = sg.end;
     else panchakaWindows.push({ start: sg.start, end: sg.end, type, shubha: !PANCHAKA_TYPE[sg.rem], rem: sg.rem });
   }
-  return { rise, nextRise, tz, lagnaSchedule, panchakaWindows };
+  return {
+    rise, nextRise, tz,
+    lagnaSchedule: collapseSlivers(lagnaSchedule, (w) => w.sign),
+    panchakaWindows: collapseSlivers(panchakaWindows, (w) => w.type),
+  };
 }
 
 export { PANCHAKA_TYPE, panchakaRem, computeLagnaPanchaka };
