@@ -1,13 +1,21 @@
 /* Shareable festival-guide entry screen. The normal Fasts & Festivals list keeps
    its existing click/expand behaviour; these routes are an additional entry path. */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { T } from "../components/tokens";
+import PlaceInput from "../components/PlaceInput";
+import { fmtTimeD } from "../components/format";
 import VratVidhiCard from "../components/VratVidhiCard";
 import { VRAT_VIDHI } from "../data/vrat-vidhis";
-import { FESTIVAL_PAGE_ROUTES, FEST_META, OBS_META } from "../data/festival-pages";
+import { CHHATH_SHARED_KEYS, FESTIVAL_PAGE_ROUTES, FEST_META, OBS_META } from "../data/festival-pages";
+import { scanPanchangCalendar } from "../engine/festivals";
+import { vratDetail } from "../engine/muhurat";
+import { zoneOffset } from "../engine/panchang";
 
 const FESTIVAL_GUIDE_ROUTES = FESTIVAL_PAGE_ROUTES;
+const DAY_MS = 86400000;
+const SCAN_DAYS = 430;
+const SCAN_FAST_DAYS = 430;
 
 function normalizedFestivalPath(pathname) {
   const clean = String(pathname || "/").replace(/\/{2,}/g, "/");
@@ -18,7 +26,48 @@ function festivalGuideFromPath(pathname) {
   return FESTIVAL_GUIDE_ROUTES[normalizedFestivalPath(pathname)] || null;
 }
 
-function FestivalGuideScreen({ guide, lang, C, card }) {
+function matchKeysForGuide(guide) {
+  if (!guide) return [];
+  if (guide.key === "chhath" || (guide.status === "shared" && guide.vidhiKey === "chhath")) {
+    return [...CHHATH_SHARED_KEYS];
+  }
+  return [guide.key];
+}
+
+function pickOccurrence(items, nowMs) {
+  if (!items || !items.length) return null;
+  const sorted = [...items].sort((a, b) => a.ms - b.ms);
+  const upcoming = sorted.find((item) => item.ms >= nowMs - 0.5 * DAY_MS);
+  return upcoming || sorted[sorted.length - 1];
+}
+
+function findLocalFestivalOccurrence(guide, place, nowMs = Date.now()) {
+  if (!guide || !place || !Number.isFinite(place.lat) || !Number.isFinite(place.lon)) {
+    throw new Error("place-required");
+  }
+  const probe = new Date(nowMs);
+  const tz = zoneOffset(place.zone, probe.getUTCFullYear(), probe.getUTCMonth() + 1, probe.getUTCDate()) ?? 5.5;
+  const fromMs = nowMs - 14 * DAY_MS;
+  const cal = scanPanchangCalendar(fromMs, tz, SCAN_DAYS, SCAN_FAST_DAYS, place);
+  const keys = new Set(matchKeysForGuide(guide));
+  const pool = guide.sourceKind === "observance" ? cal.fasts : cal.festivals;
+  const hits = pool.filter((item) => keys.has(item.key));
+  const hit = pickOccurrence(hits, nowMs);
+  if (!hit) return { hit: null, detail: null, tz };
+  const meta = guide.sourceKind === "observance" ? OBS_META[guide.metaKey] : FEST_META[guide.metaKey];
+  const timing = meta && meta.timing ? meta.timing : null;
+  const detail = vratDetail(place, "lahiri", hit.ms, timing);
+  return { hit, detail, tz, timing };
+}
+
+function formatLocalDate(ms, tz, lang) {
+  const d = new Date(ms + tz * 3600000);
+  return d.toLocaleDateString(lang === "hi" ? "hi-IN" : "en-IN", {
+    weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "UTC",
+  });
+}
+
+function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
   const L = lang === "hi" ? "hi" : "en";
   const data = guide && guide.vidhiKey ? VRAT_VIDHI[guide.vidhiKey] : null;
   const meta = guide
@@ -26,6 +75,8 @@ function FestivalGuideScreen({ guide, lang, C, card }) {
     : null;
   const title = guide ? guide.title[L] : "";
   const homeHref = `/?lang=${L}&screen=daily`;
+  const [localTiming, setLocalTiming] = useState({ status: "idle", hit: null, detail: null, tz: null, error: null });
+  const [retryTick, setRetryTick] = useState(0);
 
   useEffect(() => {
     if (!title || typeof document === "undefined") return undefined;
@@ -33,6 +84,48 @@ function FestivalGuideScreen({ guide, lang, C, card }) {
     document.title = `${title} · Ganak`;
     return () => { document.title = previousTitle; };
   }, [title]);
+
+  useEffect(() => {
+    if (!guide || !place) {
+      setLocalTiming({ status: "idle", hit: null, detail: null, tz: null, error: null });
+      return undefined;
+    }
+    let cancelled = false;
+    setLocalTiming((prev) => ({ ...prev, status: "loading", error: null }));
+    const timer = setTimeout(() => {
+      try {
+        const result = findLocalFestivalOccurrence(guide, place);
+        if (cancelled) return;
+        if (!result.hit) {
+          setLocalTiming({
+            status: "empty",
+            hit: null,
+            detail: null,
+            tz: result.tz,
+            error: null,
+          });
+          return;
+        }
+        setLocalTiming({
+          status: "ready",
+          hit: result.hit,
+          detail: result.detail,
+          tz: result.tz,
+          error: null,
+        });
+      } catch (e) {
+        if (cancelled) return;
+        setLocalTiming({
+          status: "error",
+          hit: null,
+          detail: null,
+          tz: null,
+          error: e,
+        });
+      }
+    }, 0);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [guide, place, retryTick]);
 
   if (!guide) return null;
 
@@ -47,6 +140,10 @@ function FestivalGuideScreen({ guide, lang, C, card }) {
         stars: { en: "Star sighting matters for completing this observance.", hi: "इस व्रत के समापन में तारा-दर्शन महत्वपूर्ण है।" },
       }[meta.timing] || null)
     : null;
+
+  const d = localTiming.detail;
+  const hit = localTiming.hit;
+  const tz = localTiming.tz;
 
   return (
     <main className="rise" aria-labelledby="festival-guide-title">
@@ -75,11 +172,83 @@ function FestivalGuideScreen({ guide, lang, C, card }) {
                 ? "गणक में अभी उपलब्ध पंचांग परिचय नीचे है। विस्तृत पूजा-विधि स्रोत और समीक्षा के बाद ही जोड़ी जाएगी।"
                 : "Below is the calendar description currently available in Ganak. Detailed worship guidance will be added only after it is sourced and reviewed.")}
         </p>
-        <div style={{ marginBottom: 12, padding: "9px 11px", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: "rgba(168,106,18,.06)", color: C.muted, fontSize: T.fSmall, lineHeight: 1.5 }}>
-          {L === "hi"
-            ? "शहर के अनुसार तारीख़ और पूजा-समय दिखाने वाला स्थान चयन अलग निर्धारित अपडेट में जोड़ा जा रहा है। तब तक अपने शहर का समय दैनिक पंचांग में देखें।"
-            : "Place selection for city-specific dates and puja times is tracked in a separate update. Until then, check the Daily Panchang for your city."}
+
+        <div style={{ marginBottom: 14, padding: "12px 13px", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: "rgba(168,106,18,.06)" }}>
+          <div style={{ ...T.label, color: C.gold, marginBottom: 8 }}>
+            {L === "hi" ? "आपके शहर का समय" : "LOCAL DATE & TIMING"}
+          </div>
+          <div style={{ marginBottom: 10, maxWidth: 320 }}>
+            <PlaceInput value={place} onPick={onPlace} C={C} lang={lang} />
+          </div>
+          {place && place.label && (
+            <div style={{ fontSize: T.fMicro, color: C.muted, marginBottom: 8, fontStyle: "italic" }}>
+              {L === "hi" ? `सभी समय ${place.label} के अनुसार` : `All times shown for ${place.label}`}
+            </div>
+          )}
+          {localTiming.status === "loading" && (
+            <div style={{ fontSize: T.fSmall, color: C.muted, fontStyle: "italic" }} role="status">
+              {L === "hi" ? "आपके शहर के लिए तारीख़ और समय निकाले जा रहे हैं…" : "Working out the date and timing for your city…"}
+            </div>
+          )}
+          {localTiming.status === "error" && (
+            <div style={{ display: "grid", gap: 8 }} role="alert">
+              <div style={{ fontSize: T.fSmall, color: C.sindoor, lineHeight: 1.5 }}>
+                {L === "hi"
+                  ? "इस स्थान के लिए तारीख़ निकाल नहीं सके। शहर फिर से चुनें या दोबारा कोशिश करें — मार्गदर्शिका यहीं रहेगी।"
+                  : "We couldn't work out the date for this place. Pick the city again or retry — your guide stays on this page."}
+              </div>
+              <button
+                type="button"
+                onClick={() => setRetryTick((n) => n + 1)}
+                style={{
+                  justifySelf: "start", height: T.ctrlH, padding: "0 14px", borderRadius: T.rMd,
+                  border: `1px solid ${C.gold}`, background: "rgba(168,106,18,.08)", color: C.gold,
+                  fontFamily: T.serif, fontSize: T.fSmall, cursor: "pointer",
+                }}
+              >
+                {L === "hi" ? "फिर से कोशिश करें" : "Try again"}
+              </button>
+            </div>
+          )}
+          {localTiming.status === "empty" && (
+            <div style={{ fontSize: T.fSmall, color: C.muted, lineHeight: 1.5 }}>
+              {L === "hi"
+                ? "अगले लगभग एक वर्ष में इस पर्व की तिथि इस स्थान के लिए सूची में नहीं मिली। शहर बदलकर देखें।"
+                : "No date for this observance turned up in the next year for this place. Try another city."}
+            </div>
+          )}
+          {localTiming.status === "ready" && hit && tz != null && (
+            <div style={{ display: "grid", gap: 6 }}>
+              <div style={{ fontSize: T.fBody, color: C.ivory, lineHeight: 1.45 }}>
+                <strong style={{ color: C.gold }}>{formatLocalDate(hit.ms, tz, L)}</strong>
+              </div>
+              {d && (d.parana || d.moonrise != null || d.sunset != null || d.stars) && (
+                <div style={{
+                  fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
+                  background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
+                  borderRadius: T.rSm, padding: "7px 10px", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
+                }}>
+                  {d.parana
+                    ? <>{L === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, hit.ms)}{L === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {L === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, hit.ms)}</span>}</>
+                    : d.moonrise != null
+                      ? <>{L === "hi" ? "चंद्रोदय पर व्रत खोलें: " : "Break fast after moonrise: "}{fmtTimeD(d.moonrise, d.tz, hit.ms)}</>
+                      : d.stars
+                        ? <>{L === "hi" ? "तारे दिखाई देने के बाद व्रत खोलें" : "Break the fast after the stars are visible"}</>
+                        : <>{L === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, hit.ms)}</>}
+                </div>
+              )}
+              {hit.decidingKala && !(d && (d.parana || d.moonrise != null || d.sunset != null || d.stars)) && (
+                <div style={{ fontSize: T.fMicro, color: C.muted }}>
+                  {L === "hi" ? "निर्णायक काल: " : "Deciding period: "}{hit.decidingKala}
+                </div>
+              )}
+              {timingText && (
+                <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.45 }}>{timingText[L]}</div>
+              )}
+            </div>
+          )}
         </div>
+
         {data ? (
           <VratVidhiCard data={data} lang={lang} C={C} initiallyOpen />
         ) : (
@@ -99,7 +268,7 @@ function FestivalGuideScreen({ guide, lang, C, card }) {
                 <strong style={{ color: C.ivory }}>{L === "hi" ? "परम्परा: " : "Observance: "}</strong>{meta.rules[L]}
               </div>
             )}
-            {timingText && (
+            {timingText && localTiming.status !== "ready" && (
               <div style={{ color: C.muted, fontSize: T.fSmall, lineHeight: 1.55 }}>
                 <strong style={{ color: C.ivory }}>{L === "hi" ? "समय: " : "Timing: "}</strong>{timingText[L]}
               </div>
@@ -112,4 +281,10 @@ function FestivalGuideScreen({ guide, lang, C, card }) {
 }
 
 export default FestivalGuideScreen;
-export { FESTIVAL_GUIDE_ROUTES, festivalGuideFromPath, normalizedFestivalPath };
+export {
+  FESTIVAL_GUIDE_ROUTES,
+  festivalGuideFromPath,
+  normalizedFestivalPath,
+  findLocalFestivalOccurrence,
+  matchKeysForGuide,
+};

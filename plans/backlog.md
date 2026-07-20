@@ -112,7 +112,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       rules: `plans/festival-page-link-inventory.md`. The parent remains open for
       the explicitly deferred multi-day and Navadurga page families.
       _(P0-FESTIVAL-PAGES-ALL; 148-page slice shipped 2026-07-20)_
-- [ ] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
+- [x] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
       selection box directly on every dedicated festival/vrat page. Replace “Open
       this festival in the Daily Panchang to see the local timing referred to below.”
       with the selected city, the applicable local festival date and the relevant
@@ -120,7 +120,8 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       recalculate without silently clearing the guide; provide bilingual loading,
       failure and recovery messages. Preserve the dedicated route and language while
       the place changes, and keep a Daily Panchang link as optional navigation—not as
-      a requirement for understanding the guide. _(P0-FESTIVAL-PAGE-PLACE)_
+      a requirement for understanding the guide.
+      _(P0-FESTIVAL-PAGE-PLACE — shipped 2026-07-20)_
 - [ ] **P0 before go-live — Chaitra + Sharad Navratri Navadurga pages and
       Saptashati plan.** Build nine dedicated Devi day-pages under each of Chaitra
       and Sharad Navratri (18 visible season-specific pages), with verified Goddess

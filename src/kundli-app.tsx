@@ -111,7 +111,14 @@ export default function KundliApp() {
         </div>}
 
         {directFestivalGuide && (
-          <FestivalGuideScreen guide={directFestivalGuide} lang={lang} C={C} card={card} />
+          <FestivalGuideScreen
+            guide={directFestivalGuide}
+            lang={lang}
+            C={C}
+            card={card}
+            place={panchEff}
+            onPlace={setPanchPlace}
+          />
         )}
 
         {!directFestivalGuide && mode === "prashna" && (
