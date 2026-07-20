@@ -79,7 +79,10 @@ app.use(
       callback(error);
     },
     methods: ["POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type"],
+    allowedHeaders: ["Content-Type", "x-ganak-key"],
+    // without this the browser app cannot read Retry-After on a 429 and would
+    // have no idea how long to tell the user to wait
+    exposedHeaders: ["Retry-After", "RateLimit", "RateLimit-Policy"],
     maxAge: 600,
   }),
 );

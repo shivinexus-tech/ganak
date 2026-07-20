@@ -208,8 +208,8 @@ counsel:
 
 ## 5. Owner checklist before publishing
 
-- [ ] Fix the footer claim (§4.1) — it is currently inaccurate
-- [ ] Decide on self-hosting fonts (§4.2) — recommended
+- [x] Fix the footer claim (§4.1) — **done 2026-07-19** (`CLAUDE-LAUNCH-PRIVACY`): bilingual true text live in both languages
+- [x] Self-host fonts (§4.2) — **done 2026-07-19**: Eczar + Spectral via @fontsource, bundled same-origin (35 woff2 incl. Devanagari); `dist/` has zero `fonts.googleapis`/`fonts.gstatic` references. §2.2(b) no longer applies — the only remaining egress is city search.
 - [ ] Supply a contact email (§2.8)
 - [ ] Supply operator entity + governing law (§3.8)
 - [ ] Have a lawyer review §2 and §3 — particularly §3.3 (fasting/health) and §3.7

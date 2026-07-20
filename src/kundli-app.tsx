@@ -45,7 +45,6 @@ export default function KundliApp() {
   return (
     <div style={{ minHeight: "100vh", background: `radial-gradient(1100px 700px at 85% -8%, rgba(200,122,28,.08), transparent 60%), radial-gradient(900px 700px at -12% 35%, rgba(106,90,200,.05), transparent 55%), ${C.bg}`, color: C.ivory, fontFamily: "Spectral, Georgia, serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Eczar:wght@500;600;700&family=Spectral:ital,wght@0,300;0,400;0,600;1,400&display=swap');
         html { scroll-behavior: smooth; }
         *, *::before, *::after { box-sizing: border-box; min-width: 0; }
         img, svg { max-width: 100%; height: auto; }
@@ -121,8 +120,12 @@ export default function KundliApp() {
           <ChartScreen C={C} card={card} lang={lang} />
         )}
 
+        {/* Footer must stay factually true: city search does use an online lookup
+            (open-meteo geocoder) — see plans/legal-privacy-terms-draft.md §4.1. */}
         <footer style={{ textAlign: "center", color: C.muted, fontSize: 12, marginTop: 56, letterSpacing: ".06em" }}>
-          ॐ · computed locally in your browser · nothing is stored or sent anywhere
+          {lang === "hi"
+            ? "ॐ · गणना आपके डिवाइस पर · न खाता, न ट्रैकिंग · शहर खोज हेतु ऑनलाइन सेवा"
+            : "ॐ · computed on your device · no account, no tracking · city search uses an online lookup"}
         </footer>
       </div>
     </div>
