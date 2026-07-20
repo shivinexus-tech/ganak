@@ -17,6 +17,47 @@ import {
    GANAK — shell: nav, shared prefs/place, screen compose
    ============================================================ */
 
+function pageHeroCopy(lang, mode, directFestivalGuide) {
+  const hi = lang === "hi";
+  if (directFestivalGuide) {
+    const hasFullGuide = Boolean(directFestivalGuide.vidhiKey);
+    return {
+      eyebrow: hasFullGuide
+        ? "व्रत एवं पूजा · FASTING & WORSHIP"
+        : "पर्व एवं व्रत · FESTIVAL & OBSERVANCE",
+      detail: hasFullGuide
+        ? (hi
+            ? "पर्व-तिथि · स्थानीय समय · व्रत एवं पूजा मार्गदर्शन"
+            : "Festival date · local timing · fasting and worship guidance")
+        : (hi
+            ? "पर्व-तिथि · स्थानीय समय · प्रमाणित पंचांग परिचय"
+            : "Festival date · local timing · verified calendar overview"),
+    };
+  }
+  if (mode === "prashna") {
+    return {
+      eyebrow: "प्रश्न · PRASHNA",
+      detail: hi
+        ? "प्रश्न का क्षण · चुना हुआ स्थान · स्पष्ट मार्गदर्शन"
+        : "Question moment · selected place · clear guidance",
+    };
+  }
+  if (mode === "chart") {
+    return {
+      eyebrow: "ज्योतिष · JYOTISH",
+      detail: hi
+        ? "वैदिक जन्म कुंडली · लाहिरी अयनांश · पूर्ण-राशि भाव · विंशोत्तरी दशा"
+        : "Vedic birth chart · Lahiri ayanamsa · whole-sign houses · Vimshottari dasha",
+    };
+  }
+  return {
+    eyebrow: "पञ्चाङ्ग · PANCHANG",
+    detail: hi
+      ? "तिथि · व्रत एवं त्योहार · शुभ समय"
+      : "Tithi · fasts and festivals · auspicious timings",
+  };
+}
+
 
 export default function KundliApp() {
   const C = {
@@ -38,6 +79,7 @@ export default function KundliApp() {
   const [mode, setMode] = useState(() => { const v = urlPrefGet("screen"); return v === "prashna" || v === "daily" ? v : "daily"; });
   const chooseMode = (v) => { setMode(v); urlPrefSet("screen", v); };
   const directFestivalGuide = festivalGuideFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
+  const hero = pageHeroCopy(lang, mode, directFestivalGuide);
 
   // Shared place: Daily and Prashna both read it; Daily owns the picker UI.
   const [panchPlace, setPanchPlace] = useState(null);
@@ -88,7 +130,7 @@ export default function KundliApp() {
         </div>
         {/* hero */}
         <header className="rise" style={{ textAlign: "center", marginBottom: 36 }}>
-          <div style={{ fontFamily: "Eczar, serif", color: C.gold, fontSize: 15, letterSpacing: "0.34em" }}>ज्योतिष</div>
+          <div style={{ fontFamily: "Eczar, serif", color: C.gold, fontSize: 15, letterSpacing: "0.18em" }}>{hero.eyebrow}</div>
           <h1 style={{ fontFamily: "Eczar, serif", fontWeight: 700, fontSize: 46, margin: "8px 0 6px", lineHeight: 1.08 }}>
             <span style={{ color: C.gold }}>Ganak</span>
           </h1>
@@ -98,7 +140,7 @@ export default function KundliApp() {
             <span style={{ height: 1, width: 64, background: `linear-gradient(270deg, transparent, ${C.gold}99)` }} />
           </div>
           <p style={{ color: C.muted, fontSize: 14.5, margin: 0, letterSpacing: ".02em" }}>
-            {lang === "hi" ? "वैदिक जन्म कुंडली · लाहिरी अयनांश · पूर्ण-राशि भाव · विंशोत्तरी दशा" : "Vedic birth chart · Lahiri ayanamsa · whole-sign houses · Vimshottari dasha"}
+            {hero.detail}
           </p>
         </header>
 
@@ -156,4 +198,5 @@ export {
   muhuratForDate,
   muhuratShuddhi,
   MUHURTA_RULES,
+  pageHeroCopy,
 };

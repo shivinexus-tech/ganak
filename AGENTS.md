@@ -46,6 +46,7 @@ node validation/muhurat-anchors.cjs                  # muhurat rules vs Drik 202
 node validation/panchaka-windows.cjs                 # no sub-minute/same-minute display windows or gaps
 node validation/festival-deeplinks.cjs               # permanent festival routes + existing card default
 node validation/festival-page-coverage.cjs            # every in-scope openable label has a valid page
+node validation/page-context-header.cjs               # route-specific hero; no cross-section copy leaks
 ```
 Never claim work is done without pasting the passing output. Evidence before
 assertions. If a gate fails, fix the cause — never weaken a gate to pass it
