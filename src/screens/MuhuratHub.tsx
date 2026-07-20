@@ -181,7 +181,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
             <div style={{ background: "linear-gradient(135deg, #FCF4E0, #F5E8CD)", padding: T.s4 + "px " + T.s5 + "px " + T.s3 + "px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
                 <div>
-                  <div style={{ ...T.label, color: C.muted }}>{lang === "hi" ? "आज" : "Today"}</div>
+                  <div style={{ ...T.label, color: C.muted }}>{isToday ? (lang === "hi" ? "आज" : "Today") : (lang === "hi" ? "चुनी हुई तारीख़" : "Selected date")}</div>
                   <div style={{ fontFamily: T.serif, fontSize: T.fDisplay, color: C.ivory, lineHeight: 1.1 }}>{dObj.toLocaleDateString(L2 === "hi" ? "hi-IN" : "en-IN", { weekday: "long", timeZone: "UTC" })}</div>
                   <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: 2 }}>{dObj.toLocaleDateString(L2 === "hi" ? "hi-IN" : "en-IN", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}{p.months ? " · " + p.months.amanta : ""}</div>
                 </div>
@@ -226,7 +226,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
               })()}
             </div>
             <div style={{ padding: T.s3 + "px " + T.s5 + "px", borderTop: "1px solid " + C.line }}>
-              <div style={{ ...T.label, color: C.muted, marginBottom: 7 }}>{lang === "hi" ? "आज के शुभ व अशुभ समय" : "Good & avoid times today"}</div>
+              <div style={{ ...T.label, color: C.muted, marginBottom: 7 }}>{isToday ? (lang === "hi" ? "आज के शुभ व अशुभ समय" : "Good & avoid times today") : (lang === "hi" ? "चुनी हुई तारीख़ के शुभ व अशुभ समय" : "Good & avoid times for this date")}</div>
               {goodW.map((x) => <div key={x[0]} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 0", fontVariantNumeric: "tabular-nums" }}>
                 <span style={{ color: "#1F7A4D", fontSize: T.fSmall, fontWeight: 700 }}>✓</span>
                 <span style={{ flex: 1, fontSize: T.fSmall, color: C.ivory }}>{winName[x[0]][L2]}</span>
@@ -682,7 +682,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         const rise = todayP.rise, set = todayP.set;
         const obs = observancesFor(todayP.krishna, todayP.tithiNum, null, todayP.dow);
         const note = obs.length
-          ? (lang === "hi" ? "आज " : "Today is ") + obsLabel(lang, obs[0]) + (obs[0].fasting ? (lang === "hi" ? " — व्रत का दिन" : " — a fasting day") : "")
+          ? (isToday ? (lang === "hi" ? "आज " : "Today is ") : (lang === "hi" ? "इस तारीख़ को " : "This date is ")) + obsLabel(lang, obs[0]) + (obs[0].fasting ? (lang === "hi" ? " — व्रत का दिन" : " — a fasting day") : "")
           : todayP.naks[0].name + (lang === "hi" ? " नक्षत्र · " : " nakshatra · ") + todayP.tithis[0].name;
         const E = todayP.elong != null ? todayP.elong : (todayP.tithiNum || 0) * 12;
         const k = (1 - Math.cos(E * Math.PI / 180)) / 2, waxing = E < 180, mR = 22, rx = (mR * Math.abs(2 * k - 1)).toFixed(1);

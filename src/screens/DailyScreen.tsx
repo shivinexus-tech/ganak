@@ -17,10 +17,14 @@ import { fmtDur, eventDetail } from "../engine/transit-copy";
 
 export default function DailyScreen({ C, card, lang, place, onPlace }) {
   const [ayanamsa] = useState("lahiri");
-  const [panchDate, setPanchDate] = useState(() => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  });
+  const todayISO = (() => {
+    const nowU = new Date();
+    let off = null;
+    try { off = place ? zoneOffset(place.zone, nowU.getUTCFullYear(), nowU.getUTCMonth() + 1, nowU.getUTCDate()) : null; } catch (e) { off = null; }
+    const d = off == null ? new Date(Date.now() - nowU.getTimezoneOffset() * 60000) : new Date(Date.now() + off * 3600000);
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+  })();
+  const [panchDate, setPanchDate] = useState(() => todayISO);
   const [calOpen, setCalOpen] = useState(false);
   const [calYM, setCalYM] = useState(null);
   const [calView, setCalView] = useState(null);
@@ -30,13 +34,6 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
     const id = setInterval(() => setClockTick((t) => t + 1), 60000);
     return () => clearInterval(id);
   }, []);
-  const todayISO = (() => {
-    const nowU = new Date();
-    let off = null;
-    try { off = place ? zoneOffset(place.zone, nowU.getUTCFullYear(), nowU.getUTCMonth() + 1, nowU.getUTCDate()) : null; } catch (e) { off = null; }
-    const d = off == null ? new Date(Date.now() - nowU.getTimezoneOffset() * 60000) : new Date(Date.now() + off * 3600000);
-    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
-  })();
   const prevTodayRef = React.useRef(todayISO);
   useEffect(() => {
     if (prevTodayRef.current !== todayISO) {
@@ -160,7 +157,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                       </>
                     )}
                   </div>
-                  {!isPanchToday && <button onClick={() => setPanchDate(todayISO)} style={{ height: T.ctrlH, boxSizing: "border-box", padding: "0 16px", borderRadius: T.rMd, fontFamily: T.serif, fontSize: 13.5, cursor: "pointer", border: `1px solid ${C.gold}`, background: "rgba(168,106,18,.08)", color: C.gold }}>{lang === "hi" ? "आज" : "Today"}</button>}
+                  {!isPanchToday && <button onClick={() => setPanchDate(todayISO)} style={{ height: T.ctrlH, boxSizing: "border-box", padding: "0 16px", borderRadius: T.rMd, fontFamily: T.serif, fontSize: 13.5, cursor: "pointer", border: `1px solid ${C.gold}`, background: "rgba(168,106,18,.08)", color: C.gold }}>{lang === "hi" ? "आज पर लौटें" : "Back to today"}</button>}
                 </div>
               );
             })()}
