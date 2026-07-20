@@ -33,13 +33,13 @@ Status: `MERGED` (extracted + integrated) · `Partial` (engine/data out, UI not)
 
 | # | Lane | Files | Exists? | Status | Who may reserve next |
 |---|---|---|---|---|---|
-| 1 | **Daily/Panchang** | Modules ready: `MuhuratHub.tsx`, `CalendarPage.tsx`, `today-panchang.ts`, `search-upcoming.ts`, `muhurat-ui.ts` (Cursor peels). `DailyScreen.tsx` shell still TBD | Partial | Waiting on **wire** into `kundli-app.tsx` | See `plans/cursor-handoff-daily-ready.md` |
+| 1 | **Daily/Panchang** | `src/screens/MuhuratHub.tsx` ✅, `src/screens/CalendarPage.tsx` ✅, `src/engine/today-panchang.ts` ✅, `src/engine/search-upcoming.ts` ✅, `src/data/muhurat-ui.ts` ✅, `src/components/VratVidhiCard.tsx` ✅ | ✅ | **MERGED** | ✅ **Open now** — SPLIT-UI-03 wired in `3b3b6b2` |
 | 2 | **Festivals/Vrats** | UI: `src/features/festivals/*` ❌ TBD<br>Data: `src/data/festival-meta.ts` ✅, `src/data/vrat-vidhis.ts` ✅<br>Engine: `src/engine/festivals.ts` ✅ | Partial | Partial | **Content agent may take the two `src/data/` files now.** UI waits for SPLIT-UI-04 |
 | 3 | **Muhurat** | UI: `src/features/muhurat/*` ❌ TBD<br>Engine: `src/engine/muhurat.ts` ✅ | Partial | Partial | Engine reservable for fixes; UI waits for SPLIT-UI-05 |
 | 4 | **Chart** | `src/screens/ChartScreen.tsx` + chart components | ❌ TBD | Waiting | After Daily slice |
 | 5 | **Matching** | `src/features/matching/*` | ❌ TBD | Waiting | After Chart slice |
 | 6 | **Prashna** | `src/screens/PrashnaScreen.tsx` ✅ (487 lines) | ✅ | **MERGED** | ✅ **Open now** — any agent, exclusive |
-| 7 | **Hora/Gochar** | Engine: `src/engine/hora.ts` ✅<br>UI: `src/features/hora/*`, `src/features/gochar/*` ❌ TBD | Partial | **Hora engine reservable now** (SPLIT-UI-03a). UI waits for Daily slice |
+| 7 | **Hora/Gochar** | Engine: `src/engine/hora.ts` ✅, `src/engine/gochar.ts` ✅<br>UI now lives in `src/screens/MuhuratHub.tsx` ✅ | ✅ | **Open** | ✅ **Open now** — unblocked by the Daily wire |
 | 8 | **Jyotish tools** | `src/features/jyotish-tools/*` (KP, BNN, Bhrigu, rectification) | ❌ TBD | Waiting | Last UI slice |
 | 9 | **Validation** | `validation/*` | ✅ | Open | ✅ Reservable per-file (name the exact gate file) |
 | 10 | **Backend/deployment** | `server/*`, hosting/monitoring config | ✅ | Open | ✅ **Open now** — fully independent of `src/` |
@@ -48,7 +48,7 @@ Status: `MERGED` (extracted + integrated) · `Partial` (engine/data out, UI not)
 
 | File | Lines | Note |
 |---|---|---|
-| `src/kundli-app.tsx` | 4,460 | The shell. **Integration-owned.** Every UI slice shrinks it. |
+| `src/kundli-app.tsx` | 3,001 | The shell. **Integration-owned.** Every UI slice shrinks it. |
 | `src/engine/ephemeris.ts` | 319 | Astronomy. Guarded by parity + calc gates. |
 | `src/engine/panchang.ts` | 284 | Tithi/nakshatra/sunrise/ayanamsa. |
 | `src/engine/festivals.ts` | 356 | Festival + day-part selection. |
