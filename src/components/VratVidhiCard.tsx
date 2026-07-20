@@ -1,6 +1,6 @@
 /* Vrat vidhi card — pure extraction (SPLIT-UI-CONTENT-01). Wire deferred. */
 
-import React from "react";
+import React, { useState } from "react";
 import { T } from "./tokens";
 import { VRAT_VIDHI_LABELS, VRAT_VIDHI_SAFETY } from "../data/vrat-vidhis";
 

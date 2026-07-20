@@ -1,6 +1,6 @@
 /* Calendar page — pure extraction (SPLIT-UI-03f). Wire deferred. */
 
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { T } from "../components/tokens";
 import { fmtTime } from "../components/format";
 import { tr, trN, obsLabel } from "../i18n";
