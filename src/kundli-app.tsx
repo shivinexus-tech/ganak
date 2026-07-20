@@ -78,7 +78,7 @@ export default function KundliApp() {
       `}</style>
 
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "40px 20px 80px" }}>
-        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 8, marginBottom: -18 }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 8, marginBottom: -18, position: "relative", zIndex: 2 }}>
           <span style={{ fontSize: T.fMicro, color: C.muted, letterSpacing: ".08em" }}>भाषा · Language</span>
           <span style={{ display: "inline-flex", border: `1px solid ${C.line}`, borderRadius: T.rPill, overflow: "hidden", background: C.panel }}>
             {[["hi", "हिन्दी"], ["en", "English"]].map(([v, l]) => (

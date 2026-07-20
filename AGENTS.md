@@ -45,6 +45,7 @@ node validation/prashna-calc.js                      # 24 self-tests vs Drik anc
 node validation/muhurat-anchors.cjs                  # muhurat rules vs Drik 2026 published dates
 node validation/panchaka-windows.cjs                 # no sub-minute/same-minute display windows or gaps
 node validation/festival-deeplinks.cjs               # permanent festival routes + existing card default
+node validation/festival-page-coverage.cjs            # every in-scope openable label has a valid page
 ```
 Never claim work is done without pasting the passing output. Evidence before
 assertions. If a gate fails, fix the cause — never weaken a gate to pass it

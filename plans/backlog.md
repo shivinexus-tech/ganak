@@ -101,12 +101,17 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       variant that a user can open anywhere in the website/app must also have a
       stable, shareable dedicated-page URL. This covers the **full current inventory:
       125 festival/calendar labels + 41 fasting/recurring labels = 166 openable
-      labels**, not merely P1/P2 items. The first four routes above are complete;
-      every remaining item is pending. Keep the existing in-app click/expand action
-      as well. Add a generated coverage gate that compares the live openable-item
-      registries against the route registry, so adding a future festival without a
-      page link fails validation. Full checkable snapshot and rules:
-      `plans/festival-page-link-inventory.md`. _(P0-FESTIVAL-PAGES-ALL)_
+      labels**, not merely P1/P2 items. The first four routes above are complete.
+      **Completed Codex slice:** `CODEX-P0-FESTIVAL-PAGES-148` — 148 remaining pages
+      excluding deferred multi-day families (Chhath done; Bengal Durga Puja ×6,
+      Skanda Sashti ×3, Ayyappa Mandala ×2 later). Brief:
+      `plans/codex-task-p0-festival-pages-148.md`. Keep the existing in-app
+      click/expand action as well. Add a generated coverage gate that compares the
+      live openable-item registries against the route registry, so adding a future
+      festival without a page link fails validation. Full checkable snapshot and
+      rules: `plans/festival-page-link-inventory.md`. The parent remains open for
+      the explicitly deferred multi-day and Navadurga page families.
+      _(P0-FESTIVAL-PAGES-ALL; 148-page slice shipped 2026-07-20)_
 - [ ] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
       selection box directly on every dedicated festival/vrat page. Replace “Open
       this festival in the Daily Panchang to see the local timing referred to below.”
@@ -116,6 +121,27 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       failure and recovery messages. Preserve the dedicated route and language while
       the place changes, and keep a Daily Panchang link as optional navigation—not as
       a requirement for understanding the guide. _(P0-FESTIVAL-PAGE-PLACE)_
+- [ ] **P0 before go-live — Chaitra + Sharad Navratri Navadurga pages and
+      Saptashati plan.** Build nine dedicated Devi day-pages under each of Chaitra
+      and Sharad Navratri (18 visible season-specific pages), with verified Goddess
+      image/iconography, identity, significance and sourced household puja guidance.
+      **Durga Saptashati is part of this launch requirement now, not later:** every
+      day-page must contain that day's reading section, and each season's first-day
+      page must contain the complete sourced plan for arranging the text across all
+      nine days. Keep the implementation appropriate for householders and distinguish
+      simple recitation from initiated/lineage ritual. Do not apply this Navadurga
+      structure to either Gupt Navratri. _(P0-NAVRATRI-18-SAPTASHATI)_
+- [ ] **P0 before go-live — deep research on Magha and Ashadha Gupt Navratri
+      practices.** Treat the two Gupt Navratris as their own research track, not a
+      copy of Chaitra/Sharad. Verify the four-Navratri textual basis; regional and
+      lineage differences; Ghatasthapana/fasting/public household devotion; the
+      claimed relationship to the ten Mahavidyas; whether any day-by-day assignment
+      is genuinely established; permitted public stotra/Saptashati practice; and what
+      requires diksha or a Guru and must not be presented as self-service tantric
+      instruction. Produce sourced bilingual recommendations and an explicit
+      safe-to-publish/lineage-only table for owner review before adding detailed
+      pages. Brief: `plans/gupt-navratri-deep-research.md`.
+      _(P0-GUPT-NAVRATRI-DEEP-RESEARCH)_
 - [ ] **P0 before go-live — Prashna improvement research + owner-approved number
       method.** The current screen needs a broader product and calculation audit.
       Research and prototype an additional **KP Horary Number (1–249)** mode: the

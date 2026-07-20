@@ -11,6 +11,13 @@ inline click/expand experience remains available in parallel.
   labels = 166 openable labels**.
 - Four dedicated pages currently exist: Hartalika Teej, Chaitra Navratri, Sharad
   Navratri and Chhath. Everything else below is pending.
+- **Codex slice (2026-07-20):** `CODEX-P0-FESTIVAL-PAGES-148` — **shipped** dedicated
+  pages for the **148** remaining labels after excluding deferred multi-day families
+  (Bengal Durga Puja ×6, Skanda Sashti ×3, Ayyappa Mandala ×2; Chhath already done).
+  Brief: `plans/codex-task-p0-festival-pages-148.md`. The generated registry now
+  accounts for all 166 labels: 151 required labels have dedicated routes, four
+  Chhath rows share the existing Chhath route, and 11 multi-day labels remain
+  explicitly deferred. A permanent gate fails if a new in-scope key lacks a page.
 - The implementation must derive coverage from the actual openable registries
   (`FEST_NAME` and the displayed `OBS_NAME` variants), not from a manually selected
   priority list.
@@ -227,8 +234,11 @@ not four unrelated festivals:
 - Suggest Durga Saptashati/Devi Mahatmya as an available Navratri worship text in
   appropriate plain language. Do not imply that every user must perform an advanced
   ritual recitation.
-- Add a later child item on the Chaitra/Sharad parent pages for a sourced, owner-reviewed
-  guide to arranging Durga Saptashati reading across the nine days.
+- **Durga Saptashati coverage is required now, not later.** Every Chaitra/Sharad
+  Devi day-page must contain a sourced section for that day's reading. The first-day
+  page of each Navratri must also contain the detailed, owner-reviewed plan for
+  arranging the complete text across all nine days, including clearly labelled
+  variations rather than presenting one lineage's sequence as universal.
 - This Navadurga nine-day page structure applies **only to Chaitra and Sharad
   Navratri**. Do not copy it to Magha or Ashadha Gupt Navratri.
 
@@ -239,3 +249,8 @@ Puja sequence, annual Skanda Sashti milestones, named Ekadashis, weekday Pradosh
 variants, Ayyappa Mandala and other multi-day/family observances. Shared pages are
 allowed only when the religious observance is genuinely one connected sequence; each
 calendar row must still have a stable deep link to its relevant section.
+
+Magha and Ashadha Gupt Navratri have their own deep-research launch item:
+`P0-GUPT-NAVRATRI-DEEP-RESEARCH`. Do not infer their public page structure from the
+Chaitra/Sharad Navadurga pages or publish advanced Mahavidya/tantric procedures before
+the owner reviews the sourced safe-to-publish boundary.
