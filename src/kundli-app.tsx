@@ -23,8 +23,8 @@ function pageHeroCopy(lang, mode, directFestivalGuide) {
     const hasFullGuide = Boolean(directFestivalGuide.vidhiKey);
     return {
       eyebrow: hasFullGuide
-        ? "व्रत एवं पूजा · FASTING & WORSHIP"
-        : "पर्व एवं व्रत · FESTIVAL & OBSERVANCE",
+        ? (hi ? "व्रत एवं पूजा" : "FASTING & WORSHIP")
+        : (hi ? "पर्व एवं व्रत" : "FESTIVAL & OBSERVANCE"),
       detail: hasFullGuide
         ? (hi
             ? "पर्व-तिथि · स्थानीय समय · व्रत एवं पूजा मार्गदर्शन"
@@ -36,7 +36,7 @@ function pageHeroCopy(lang, mode, directFestivalGuide) {
   }
   if (mode === "prashna") {
     return {
-      eyebrow: "प्रश्न · PRASHNA",
+      eyebrow: hi ? "प्रश्न" : "PRASHNA",
       detail: hi
         ? "प्रश्न का क्षण · चुना हुआ स्थान · स्पष्ट मार्गदर्शन"
         : "Question moment · selected place · clear guidance",
@@ -44,14 +44,14 @@ function pageHeroCopy(lang, mode, directFestivalGuide) {
   }
   if (mode === "chart") {
     return {
-      eyebrow: "ज्योतिष · JYOTISH",
+      eyebrow: hi ? "ज्योतिष" : "JYOTISH",
       detail: hi
         ? "वैदिक जन्म कुंडली · लाहिरी अयनांश · पूर्ण-राशि भाव · विंशोत्तरी दशा"
         : "Vedic birth chart · Lahiri ayanamsa · whole-sign houses · Vimshottari dasha",
     };
   }
   return {
-    eyebrow: "पञ्चाङ्ग · PANCHANG",
+    eyebrow: hi ? "पञ्चाङ्ग" : "PANCHANG",
     detail: hi
       ? "तिथि · व्रत एवं त्योहार · शुभ समय"
       : "Tithi · fasts and festivals · auspicious timings",
