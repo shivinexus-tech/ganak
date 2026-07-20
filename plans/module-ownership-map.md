@@ -4,108 +4,109 @@
 here, confirm the file exists, and reserve it in `plans/task-log.md`.
 Superseded: `plans/parallel-agent-brief.md` (historical, single-file era).
 
-Verified against the working tree on 2026-07-19 — file existence below is real,
-not aspirational.
+Verified against the working tree on 2026-07-19 **after the Daily wire (`3b3b6b2`)** —
+file existence and wire status below were computed from the actual import graph, not
+assumed.
 
 ---
 
 ## Honest status: how many lanes are actually live today
 
-Ten lanes are *planned*; **not all are assignable yet** — a lane only opens when its
-files exist. Right now:
-
 | | Lanes |
 |---|---|
-| ✅ **Assignable now (code)** | Prashna · Validation · Backend/deployment · **Content-data** |
-| 🟡 **Partially open** | Festivals/Vrats and Muhurat — their **engine/data** layers exist, but the **UI** is still inside the shell |
-| ⛔ **Waiting on extraction** | Daily · Chart · Matching · Hora/Gochar · Jyotish tools |
+| ✅ **Assignable now (code)** | Daily · Muhurat · Hora/Gochar · Prashna · Matching · Validation · Backend |
+| 🔒 **Reserved right now** | Chart + Jyotish (Codex Track 2 wire) · Content-data (Codex Track 1) · Daily/Prashna/Muhurat polish (Claude) |
 | ♾️ **Always open** | Research/docs lanes in `plans/` — no file contention, any number of agents |
 
-**So: ~4 code lanes + unlimited docs lanes today**, growing with each UI slice. The
-constraint is extraction progress, not agent availability.
+The single-file bottleneck is **gone**. The shell is down to **3,001 lines** from 6,000+,
+and 29 modules are live. What limits parallelism now is reservation overlap, not extraction.
+
+### Wired vs peeled
+
+Two different things, and confusing them causes the "I edited it but nothing changed" bug:
+
+- **Live (29 modules)** — reachable from `src/kundli-app.tsx` through the import graph.
+  Editing these changes what users see.
+- **Peeled but unwired (12 modules, 1,577 lines)** — the file exists and is committed,
+  but *nothing imports it*. Editing these changes nothing until someone wires them.
+
+Currently unwired (all Chart/Jyotish — **Codex Track 2 owns the wire**):
+
+`ChartVault.tsx` · `DashaTree.tsx` · `chart-divisions.ts` · `bhava.ts` · `bhrigu.ts` ·
+`classical.ts` · `houses.ts` · `kundli.ts` · `shadbala.ts` · `special-points.ts` ·
+`JyotishBnnScreen.tsx` · `RectifyScreen.tsx`
+
+> ⚠️ **Do not "fix" behaviour in an unwired module and call it done.** The app still runs
+> the shell's copy. Verify in the browser, not just in the gates.
 
 ---
 
 ## The board
 
-Status: `MERGED` (extracted + integrated) · `Partial` (engine/data out, UI not) ·
-`Waiting` (still inside `kundli-app.tsx`) · `Open` (exists, reservable now)
+Status: `MERGED` (extracted + wired) · `Peeled` (module exists, wire pending) ·
+`Open` (reservable now) · `Reserved` (someone is on it)
 
-| # | Lane | Files | Exists? | Status | Who may reserve next |
-|---|---|---|---|---|---|
-| 1 | **Daily/Panchang** | `src/screens/MuhuratHub.tsx` ✅, `src/screens/CalendarPage.tsx` ✅, `src/engine/today-panchang.ts` ✅, `src/engine/search-upcoming.ts` ✅, `src/data/muhurat-ui.ts` ✅, `src/components/VratVidhiCard.tsx` ✅ | ✅ | **MERGED** | ✅ **Open now** — SPLIT-UI-03 wired in `3b3b6b2` |
-| 2 | **Festivals/Vrats** | UI: `src/features/festivals/*` ❌ TBD<br>Data: `src/data/festival-meta.ts` ✅, `src/data/vrat-vidhis.ts` ✅<br>Engine: `src/engine/festivals.ts` ✅ | Partial | Partial | **Content agent may take the two `src/data/` files now.** UI waits for SPLIT-UI-04 |
-| 3 | **Muhurat** | UI: `src/features/muhurat/*` ❌ TBD<br>Engine: `src/engine/muhurat.ts` ✅ | Partial | Partial | Engine reservable for fixes; UI waits for SPLIT-UI-05 |
-| 4 | **Chart** | `src/screens/ChartScreen.tsx` + chart components | ❌ TBD | Waiting | After Daily slice |
-| 5 | **Matching** | `src/features/matching/*` | ❌ TBD | Waiting | After Chart slice |
-| 6 | **Prashna** | `src/screens/PrashnaScreen.tsx` ✅ (487 lines) | ✅ | **MERGED** | ✅ **Open now** — any agent, exclusive |
-| 7 | **Hora/Gochar** | Engine: `src/engine/hora.ts` ✅, `src/engine/gochar.ts` ✅<br>UI now lives in `src/screens/MuhuratHub.tsx` ✅ | ✅ | **Open** | ✅ **Open now** — unblocked by the Daily wire |
-| 8 | **Jyotish tools** | `src/features/jyotish-tools/*` (KP, BNN, Bhrigu, rectification) | ❌ TBD | Waiting | Last UI slice |
-| 9 | **Validation** | `validation/*` | ✅ | Open | ✅ Reservable per-file (name the exact gate file) |
-| 10 | **Backend/deployment** | `server/*`, hosting/monitoring config | ✅ | Open | ✅ **Open now** — fully independent of `src/` |
+| # | Lane | Files | Status | Who may reserve next |
+|---|---|---|---|---|
+| 1 | **Daily/Panchang** | `screens/MuhuratHub.tsx` · `screens/CalendarPage.tsx` · `engine/today-panchang.ts` · `engine/search-upcoming.ts` · `data/muhurat-ui.ts` · `components/VratVidhiCard.tsx` | **MERGED** | 🔒 Claude (polish chips A–E) |
+| 2 | **Festivals/Vrats** | Data: `data/festival-meta.ts` · `data/vrat-vidhis.ts`<br>Engine: `engine/festivals.ts`<br>UI now lives in Daily's modules | **MERGED** | 🔒 Codex Track 1 (content data) |
+| 3 | **Muhurat** | `engine/muhurat.ts` · `engine/panchaka.ts`<br>UI in `screens/MuhuratHub.tsx` | **MERGED** | 🔒 Claude (chips B, C, E) |
+| 4 | **Chart** | Wired: `components/DiamondChart.tsx`<br>Peeled: `engine/kundli.ts` · `houses.ts` · `shadbala.ts` · `classical.ts` · `bhava.ts` · `special-points.ts` · `data/chart-divisions.ts` · `components/ChartVault.tsx` · `DashaTree.tsx` | **Peeled** | 🔒 Codex Track 2 (shell wire) |
+| 5 | **Matching** | `engine/matching.ts` · `screens/MatchingScreen.tsx` | **MERGED** | ✅ Open |
+| 6 | **Prashna** | `screens/PrashnaScreen.tsx` (487 lines) | **MERGED** | 🔒 Claude (chip D) |
+| 7 | **Hora/Gochar** | `engine/hora.ts` · `engine/gochar.ts` · `engine/transit-copy.ts`<br>UI in `screens/MuhuratHub.tsx` | **MERGED** | ✅ Open |
+| 8 | **Jyotish tools** | Peeled: `engine/bhrigu.ts` · `engine/dasha.ts` (live) · `screens/JyotishBnnScreen.tsx` · `screens/RectifyScreen.tsx` | **Peeled** | 🔒 Codex Track 2 |
+| 9 | **Validation** | `validation/*` | Open | ✅ Reservable per-file (name the exact gate file) |
+| 10 | **Backend/deployment** | `server/*`, hosting/monitoring config | Open | 🔒 Codex Track 3 (hide Chart + deploy) |
 
-### Extracted shared modules (integration-owned — reserve before editing)
+### Shared / integration-owned files (reserve before editing)
 
 | File | Lines | Note |
 |---|---|---|
-| `src/kundli-app.tsx` | 3,001 | The shell. **Integration-owned.** Every UI slice shrinks it. |
-| `src/engine/ephemeris.ts` | 319 | Astronomy. Guarded by parity + calc gates. |
-| `src/engine/panchang.ts` | 284 | Tithi/nakshatra/sunrise/ayanamsa. |
+| `src/kundli-app.tsx` | 3,001 | The shell. **Integration-owned.** Was 6,000+ before the split. |
+| `src/i18n.ts` | 71 | Bilingual strings + `tr`/`trN`/`obsLabel`. **Add keys; never fork `L`.** |
+| `src/components/tokens.ts` | 14 | Design tokens. |
+| `src/components/format.ts` | 34 | `fmtDeg`, `fmtTime`, `fmtTimeD`, `fmtDateT`. |
+| `src/engine/ephemeris.ts` | 329 | Astronomy + `ascendantAt`. Guarded by parity + calc gates. |
+| `src/engine/panchang.ts` | 291 | Tithi/nakshatra/sunrise/ayanamsa, `SIGN_LORD`, `VIM_LORDS`. |
 | `src/engine/festivals.ts` | 356 | Festival + day-part selection. |
-| `src/engine/muhurat.ts` | 323 | Muhurat scoring/shuddhi. |
-| `src/engine/panchaka.ts` | 62 | Lagna schedule + Panchaka windows. Extracted SPLIT-UI-03c. |
-| `src/engine/hora.ts` | 199 | Planetary hours + hora advisor. Extracted SPLIT-UI-03a. |
-| `src/i18n.ts` | 71 | Bilingual strings + `tr`/`trN`/`obsLabel`. **Shared, integration-owned** — add strings, never fork. |
-| `src/components/tokens.ts` | 14 | Design tokens — **shared, integration-owned.** |
-| `src/components/format.ts` | 23 | `fmtDeg`, `fmtTime`, `fmtTimeD` — shared. |
-| `src/components/PlaceInput.tsx` | 72 | Shared place search UI. |
-| `src/data/places.ts` | 43 | Gazetteer. |
-
----
-
-## ⚠️ Hazard: duplicate Prashna files
-
-The working tree contains **two** Prashna files with nearly identical names:
-
-- ✅ `src/screens/PrashnaScreen.tsx` — **the live module** (487 lines, imported by the shell)
-- ⛔ `src/PrashnaScreen.jsx` — **stale**, the original 2026-07-16 handoff artifact, not imported by anything
-
-Also stale: `src/kundli-app.tsx.backup-before-prashna`.
-
-**Risk:** a Prashna-lane agent could edit the wrong file, pass its own review, and
-change nothing the app renders. Recommend the integration owner delete both stale
-files in the next `src/` slice. (Not done here — this task is forbidden from `src/`.)
 
 ---
 
 ## Reservation protocol
 
-1. Find your lane above; confirm **Exists? = ✅**. If ❌ TBD, the lane isn't open — ask
-   for the extraction slice first.
+1. Find your lane above and check the status column. `Peeled` means the wire is someone
+   else's job — don't wire it yourself without a reservation.
 2. Add a row to `plans/task-log.md` with: ID, agent, branch/worktree, **exact file
    list**, task, status `RESERVED`.
 3. Work only inside your listed files. Anything outside needs a new reservation.
 4. Finish with gate evidence + a handoff doc. `REVIEW` → integrator merges → `MERGED`.
 
-**Never** edit an integration-owned file (shell, tokens, navigation) without an
+**Never** edit an integration-owned file (shell, tokens, i18n, navigation) without an
 explicit assignment in the log.
+
+### ⚠️ Two failure modes we have actually hit
+
+- **Half-committed cross-file move.** A move that changes two files must land in *one*
+  commit. `VIM_LORDS` went out of the shell in one agent's commit and into `panchang.ts`
+  in another's — `main` did not build until `bb651fc`. Use targeted `git add`, never
+  `git add -A`, when another agent is active.
+- **Hooks that only fail at runtime.** `CalendarPage` and `VratVidhiCard` used bare
+  `useState`/`useMemo` without importing them. Parse-check passed. The build passed.
+  Only clicking the UI caught it. **Browser smoke is not optional.**
 
 ---
 
-## Dependency order (what unlocks what)
+## What unlocks what (remaining)
 
 ```
-SPLIT-UI-03 Daily/Panchang shell   ← the big unlock
-        ├── opens Lane 1 (Daily)
-        ├── opens Lane 7 (Hora/Gochar — they live in Daily today)
-        └── makes Lanes 2 & 3 UI extractable
-SPLIT-UI-04 Festivals/Vrats UI     → fully opens Lane 2
-SPLIT-UI-05 Muhurat + Hora UI      → fully opens Lane 3
-SPLIT-UI-06 Chart form + chart UI  → opens Lane 4, then 5 and 8
+Codex Track 2 — Chart/Jyotish shell wire   ← the last big wire
+        ├── makes Lane 4 (Chart) live
+        └── makes Lane 8 (Jyotish tools) live
+Codex Track 3 — hide Chart tab + deploy    → Phase-1 web launch
 ```
 
-**Daily is the highest-leverage next slice** — it's the largest remaining block in
-the shell and it gates three lanes.
+Everything Daily-side is already wired; the remaining shell work is Chart/Jyotish.
 
-Meanwhile, agents needing work *today* should take: Content-data (Lane 2 data files),
-Backend (Lane 10), Validation (Lane 9), Prashna (Lane 6), or any `plans/` research.
+Agents needing work *today* and not already reserved should take: Matching (Lane 5),
+Hora/Gochar (Lane 7), Validation (Lane 9), or any `plans/` research.
