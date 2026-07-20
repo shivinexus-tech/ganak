@@ -100,7 +100,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
               const step = (delta) => { const dt = new Date(baseUTC); dt.setUTCDate(dt.getUTCDate() + delta); setPanchDate(iso(dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate())); };
               const shiftMonth = (delta) => { const [cy, cm] = calYM.split("-").map(Number); const dt = new Date(Date.UTC(cy, cm - 1 + delta, 1)); setCalYM(`${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, "0")}`); };
               const openCal = () => { setCalYM(panchDate.slice(0, 7)); setCalOpen(true); };
-              const arrowBtn = { padding: "0 14px", height: "100%", cursor: "pointer", border: "none", background: "transparent", color: C.gold, fontSize: 20, lineHeight: 1, fontFamily: "Eczar, serif" };
+              const arrowBtn = { width: 42, padding: 0, height: "100%", cursor: "pointer", border: "none", background: "transparent", color: C.gold, fontSize: 18, fontWeight: 400, lineHeight: 1, fontFamily: T.body };
               let grid = null, hdr = "";
               if (calOpen && calYM) {
                 const [cy, cm] = calYM.split("-").map(Number);
@@ -112,11 +112,11 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
               return (
                 <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                   <div style={{ position: "relative" }}>
-                    <div style={{ display: "inline-flex", alignItems: "stretch", height: T.ctrlH, boxSizing: "border-box", border: `1px solid ${C.line}`, borderRadius: T.rMd, background: C.panel, overflow: "hidden", boxShadow: "0 1px 2px rgba(60,40,10,.05)" }}>
+                    <div style={{ display: "inline-flex", alignItems: "stretch", height: T.ctrlH, boxSizing: "border-box", border: `1px solid ${C.line}`, borderRadius: T.rMd, background: "#FFFDF7", overflow: "hidden" }}>
                       <button onClick={() => step(-1)} style={arrowBtn} aria-label={lang === "hi" ? "पिछला दिन" : "Previous day"}>‹</button>
-                      <button onClick={openCal} aria-label={lang === "hi" ? "तारीख़ चुनें" : "Choose date"} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "0 14px", borderLeft: `1px solid ${C.line}`, borderRight: `1px solid ${C.line}`, background: calOpen ? "rgba(168,106,18,.08)" : "transparent", borderTop: "none", borderBottom: "none", cursor: "pointer", height: "100%" }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="16" y1="2" x2="16" y2="6" /></svg>
-                        <span style={{ fontFamily: "Eczar, serif", fontSize: 15, color: C.ivory, whiteSpace: "nowrap" }}>{dateLabel}</span>
+                      <button onClick={openCal} aria-label={lang === "hi" ? "तारीख़ चुनें" : "Choose date"} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "0 12px", borderLeft: `1px solid ${C.line}`, borderRight: `1px solid ${C.line}`, background: calOpen ? "rgba(168,106,18,.07)" : "transparent", borderTop: "none", borderBottom: "none", cursor: "pointer", height: "100%" }}>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="1.8" strokeLinecap="round" style={{ flexShrink: 0 }}><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="16" y1="2" x2="16" y2="6" /></svg>
+                        <span style={{ fontFamily: T.body, fontSize: 13.5, fontWeight: 400, color: C.ivory, whiteSpace: "nowrap" }}>{dateLabel}</span>
                         <span style={{ color: C.gold, fontSize: 11, transform: calOpen ? "rotate(180deg)" : "none", transition: "transform .15s" }}>▾</span>
                       </button>
                       <button onClick={() => step(1)} style={arrowBtn} aria-label={lang === "hi" ? "अगला दिन" : "Next day"}>›</button>
