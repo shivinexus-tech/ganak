@@ -17,6 +17,46 @@ const DAY_MS = 86400000;
 const SCAN_DAYS = 430;
 const SCAN_FAST_DAYS = 430;
 
+const DECIDING_KALA_LABELS = Object.freeze({
+  udaya: { en: "the tithi prevailing at local sunrise", hi: "स्थानीय सूर्योदय पर प्रचलित तिथि" },
+  "udaya-fallback": { en: "the tithi prevailing at local sunrise", hi: "स्थानीय सूर्योदय पर प्रचलित तिथि" },
+  pratahkala: { en: "the local morning period", hi: "स्थानीय प्रातःकाल" },
+  "pratahkala-kshaya": { en: "the morning rule after a skipped tithi", hi: "क्षय तिथि के बाद प्रातःकाल का नियम" },
+  purvahna: { en: "the local forenoon period", hi: "स्थानीय पूर्वाह्न काल" },
+  madhyahna: { en: "the local midday period", hi: "स्थानीय मध्याह्न काल" },
+  aparahna: { en: "the local afternoon period", hi: "स्थानीय अपराह्न काल" },
+  pradosha: { en: "the local evening Pradosha period", hi: "स्थानीय सायंकालीन प्रदोष काल" },
+  nishita: { en: "the local Nishita (midnight) period", hi: "स्थानीय निषीथ (मध्यरात्रि) काल" },
+  arunodaya: { en: "the local pre-dawn period", hi: "स्थानीय अरुणोदय काल" },
+  moonrise: { en: "local moonrise", hi: "स्थानीय चन्द्रोदय" },
+  sunset: { en: "local sunset", hi: "स्थानीय सूर्यास्त" },
+  "solar-ingress": { en: "the exact moment Surya enters the next rashi", hi: "सूर्य के अगली राशि में प्रवेश का ठीक क्षण" },
+  "same-as-makar-sankranti": { en: "the same solar date as Makar Sankranti", hi: "मकर संक्रांति की वही सौर तिथि" },
+  "next-sunrise": { en: "the next local sunrise in the observance sequence", hi: "पर्व-क्रम का अगला स्थानीय सूर्योदय" },
+  "sequence-from-shashthi": { en: "the day counted from Shashthi in the festival sequence", hi: "पर्व-क्रम में षष्ठी से गिना गया दिन" },
+  "aippasi-shukla-shashti": { en: "Aippasi Shukla Shashthi", hi: "ऐप्पसी शुक्ल षष्ठी" },
+  "ashtami-navami-sandhi": { en: "the Ashtami–Navami junction", hi: "अष्टमी–नवमी संधि" },
+  "aparahna-shraddha": { en: "the local Aparahna Shraddha period", hi: "स्थानीय अपराह्न श्राद्ध काल" },
+  "day-after-holika": { en: "the day after Holika Dahan", hi: "होलिका दहन के अगले दिन" },
+  "ghatasthapana-pratipada": { en: "the Pratipada rule for Ghatasthapana", hi: "घटस्थापना का प्रतिपदा नियम" },
+  "kanya-sankranti-vishwakarma": { en: "Kanya Sankranti for Vishwakarma Puja", hi: "विश्वकर्मा पूजा के लिए कन्या संक्रांति" },
+  "kartik-amavasya-purnimanta": { en: "Kartika Amavasya in the Purnimanta calendar", hi: "पूर्णिमान्त पंचांग की कार्तिक अमावस्या" },
+  "kojagara-nishita-purnima": { en: "Purnima prevailing in the Nishita period", hi: "निषीथ काल में प्रचलित पूर्णिमा" },
+  "last-shravana-shukla-friday": { en: "the last Friday of Shravana Shukla Paksha", hi: "श्रावण शुक्ल पक्ष का अंतिम शुक्रवार" },
+  "mahalaya-amavasya": { en: "Mahalaya Amavasya", hi: "महालया अमावस्या" },
+  "paush-shukla-ashtami-span": { en: "the Pausha Shukla Ashtami observance span", hi: "पौष शुक्ल अष्टमी का पर्व-क्रम" },
+  "15th-day-from-bhadrapada-shukla-8": { en: "the fifteenth day from Bhadrapada Shukla Ashtami", hi: "भाद्रपद शुक्ल अष्टमी से पंद्रहवाँ दिन" },
+  "durga-shashthi-saraswati-avahan": { en: "the Durga Shashthi rule for Saraswati Avahan", hi: "सरस्वती आवाहन का दुर्गा षष्ठी नियम" },
+  "durga-saptami-saraswati-puja": { en: "the Durga Saptami rule for Saraswati Puja", hi: "सरस्वती पूजा का दुर्गा सप्तमी नियम" },
+  "syzygy-near-node": { en: "a Sun–Moon alignment near a lunar node", hi: "चन्द्र-पात के निकट सूर्य–चन्द्र संरेखण" },
+  vijayadashami: { en: "the Vijayadashami selection rule", hi: "विजयादशमी का तिथि-निर्णय नियम" },
+});
+
+function decidingKalaLabel(kala, lang) {
+  const label = DECIDING_KALA_LABELS[kala];
+  return label ? label[lang === "hi" ? "hi" : "en"] : null;
+}
+
 function normalizedFestivalPath(pathname) {
   const clean = String(pathname || "/").replace(/\/{2,}/g, "/");
   return clean.length > 1 ? clean.replace(/\/+$/, "") : clean;
@@ -144,6 +184,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
   const d = localTiming.detail;
   const hit = localTiming.hit;
   const tz = localTiming.tz;
+  const decidingLabel = hit ? decidingKalaLabel(hit.decidingKala, L) : null;
 
   return (
     <main className="rise" aria-labelledby="festival-guide-title">
@@ -237,9 +278,9 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                         : <>{L === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, hit.ms)}</>}
                 </div>
               )}
-              {hit.decidingKala && !(d && (d.parana || d.moonrise != null || d.sunset != null || d.stars)) && (
+              {decidingLabel && !(d && (d.parana || d.moonrise != null || d.sunset != null || d.stars)) && (
                 <div style={{ fontSize: T.fMicro, color: C.muted }}>
-                  {L === "hi" ? "निर्णायक काल: " : "Deciding period: "}{hit.decidingKala}
+                  {L === "hi" ? "तिथि तय होने का आधार: " : "Date chosen by: "}{decidingLabel}
                 </div>
               )}
               {timingText && (
@@ -287,4 +328,5 @@ export {
   normalizedFestivalPath,
   findLocalFestivalOccurrence,
   matchKeysForGuide,
+  decidingKalaLabel,
 };

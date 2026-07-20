@@ -90,6 +90,19 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       `plans/claude-task-p1-vratvidhi-verify.md`.
 
 **Plumbing:**
+- [ ] **P0 before go-live — substantive-page coverage for major festivals.** A
+      permanent URL is not complete merely because it resolves. Audit every major
+      festival currently using a metadata-only page and promote it to a sourced,
+      bilingual guide with significance, household worship, food/fasting rules,
+      stories and explicitly labelled regional variants. Never invent a ritual to
+      fill a page. Add a reviewed-major-festival inventory and a gate that prevents
+      an approved major festival from silently falling back to the thin overview.
+      Makar Sankranti is the first correction under `CODEX-P0-MAKAR-GUIDE-01`.
+- [ ] **P0 before go-live — location-aware Sankranti Punya Kala.** Calculate and
+      show the local Sankranti moment, Punya Kala and Maha Punya Kala on Makar and
+      other relevant Sankranti pages. Respect the after-sunset carry rule and do
+      not substitute sunrise or a generic all-day label. Research boundary and
+      sources are recorded in `plans/makar-sankranti-research.md`.
 - [ ] **P0 before go-live — route-aware page identity and metadata audit.** Every
       screen and permanent route must identify the product area the user actually
       opened: Panchang, Prashna, Festival/Vrat, or Jyotish. Audit the visible hero,

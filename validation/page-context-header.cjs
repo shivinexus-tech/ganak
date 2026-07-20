@@ -23,7 +23,7 @@ const cases = [
   },
   {
     label: 'overview-only festival',
-    copy: pageHeroCopy('en', 'daily', { key: 'makarSankranti', vidhiKey: null }),
+    copy: pageHeroCopy('en', 'daily', { key: 'meshaSankranti', vidhiKey: null }),
     includes: ['FESTIVAL & OBSERVANCE', 'Festival date', 'verified calendar overview'],
     excludes: ['JYOTISH', 'birth chart', 'FASTING & WORSHIP'],
   },

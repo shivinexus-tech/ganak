@@ -39,6 +39,7 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
             <div style={{ ...T.label, color: C.sindoor, marginBottom: 3 }}>{lbl("safety")}</div>
             <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5 }}>{txt(data.safety || VRAT_VIDHI_SAFETY)}</div>
           </div>
+          {data.meaning && section(lbl("meaning"), txt(data.meaning))}
           {section(lbl("vidhi"), (
             <ol style={{ margin: 0, paddingLeft: 18 }}>
               {(data.vidhi || []).map((step, i) => (
@@ -56,6 +57,16 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
           ))}
           {section(lbl("sankalpa"), <span style={{ fontStyle: "italic" }}>{txt(data.sankalpa)}</span>)}
           {section(lbl("puja"), txt(data.puja))}
+          {data.stories && section(lbl("stories"), (
+            <ul style={{ margin: 0, paddingLeft: 18 }}>
+              {data.stories.map((story, i) => <li key={i} style={{ marginBottom: 4 }}>{txt(story)}</li>)}
+            </ul>
+          ))}
+          {data.regional && section(lbl("regional"), (
+            <ul style={{ margin: 0, paddingLeft: 18 }}>
+              {data.regional.map((tradition, i) => <li key={i} style={{ marginBottom: 4 }}>{txt(tradition)}</li>)}
+            </ul>
+          ))}
           {section(lbl("paran"), txt(data.paran))}
           {section(lbl("udyapan"), txt(data.udyapan))}
         </div>

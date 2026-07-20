@@ -9,6 +9,10 @@ const { loadApp, ROOT } = require('./_load-app.cjs');
 const routeModule = loadApp('src/screens/FestivalGuideScreen.tsx');
 const vidhiModule = loadApp('src/data/vrat-vidhis.ts');
 const metaModule = loadApp('src/data/festival-meta.ts');
+assert.strictEqual(routeModule.decidingKalaLabel('solar-ingress', 'en'), 'the exact moment Surya enters the next rashi');
+assert.strictEqual(routeModule.decidingKalaLabel('solar-ingress', 'hi'), 'सूर्य के अगली राशि में प्रवेश का ठीक क्षण');
+assert.strictEqual(routeModule.decidingKalaLabel('internal-code-that-must-not-leak', 'en'), null);
+console.log('PASS  internal deciding-kala codes receive safe bilingual labels or stay hidden');
 const expected = {
   '/festival/hartalika-teej': 'hartalikaTeej',
   '/festival/chaitra-navratri': 'chaitraNavratri',
@@ -24,6 +28,7 @@ const expected = {
   '/festival/skanda-sashti-thirukalyanam': 'kandaSashtiAnnual',
   '/festival/ayyappa-mandala-begins': 'ayyappaMandala',
   '/festival/ayyappa-mandala-puja': 'ayyappaMandala',
+  '/festival/makar-sankranti': 'makarSankranti',
 };
 
 for (const [urlPath, vidhiKey] of Object.entries(expected)) {
@@ -47,6 +52,18 @@ for (const vidhiKey of ['skandaShashti', 'kandaSashtiAnnual', 'masikDurgashtami'
 assert(vidhiModule.VRAT_VIDHI.ayyappaMandala.safety?.en && vidhiModule.VRAT_VIDHI.ayyappaMandala.safety?.hi, 'Ayyappa must keep its pilgrimage-specific bilingual health guidance');
 console.log('PASS  five approved guide families are complete and bilingual');
 
+const makar = vidhiModule.VRAT_VIDHI.makarSankranti;
+for (const field of ['verdict', 'meaning', 'diet', 'sankalpa', 'puja', 'paran', 'udyapan', 'safety']) {
+  assert(makar[field]?.en && makar[field]?.hi, `makarSankranti.${field} must be bilingual`);
+}
+for (const field of ['vidhi', 'stories', 'regional']) {
+  assert(Array.isArray(makar[field]) && makar[field].length >= 3, `makarSankranti.${field} must be substantial`);
+  assert(makar[field].every((item) => item.en && item.hi), `makarSankranti.${field} must be bilingual`);
+}
+assert(makar.meaning.en.includes('winter solstice'), 'Makar guide must explain the modern Uttarayana/solstice distinction');
+assert(JSON.stringify(makar).includes('til') && JSON.stringify(makar).includes('तिल'), 'Makar guide must cover til in both languages');
+console.log('PASS  Makar Sankranti has a substantive bilingual festival guide');
+
 const monthlySkanda = vidhiModule.VRAT_VIDHI.skandaShashti;
 const annualSkanda = vidhiModule.VRAT_VIDHI.kandaSashtiAnnual;
 const monthlySkandaText = JSON.stringify(monthlySkanda);
@@ -62,7 +79,7 @@ console.log('PASS  monthly one-day and annual six-day Skanda guidance remain sep
 
 const samples = {
   '/festival/karva-chauth': { key: 'karvaChauth', vidhiKey: 'karvaChauth' },
-  '/festival/makar-sankranti': { key: 'makarSankranti', vidhiKey: null },
+  '/festival/makar-sankranti': { key: 'makarSankranti', vidhiKey: 'makarSankranti' },
   '/festival/mokshada-ekadashi': { key: 'Margshirsh_Shukla_11', vidhiKey: 'ekadashi' },
   '/festival/ravi-pradosh': { key: 'pradosh_Sunday', vidhiKey: 'pradosh' },
 };

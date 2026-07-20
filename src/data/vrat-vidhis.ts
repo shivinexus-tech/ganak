@@ -15,6 +15,9 @@ export const VRAT_VIDHI_LABELS = {
   paran: { en: "Paran", hi: "पारण" },
   udyapan: { en: "Udyapan", hi: "उद्यापन" },
   safety: { en: "Health note", hi: "स्वास्थ्य टिप्पणी" },
+  meaning: { en: "Why this day matters", hi: "इस दिन का महत्त्व" },
+  stories: { en: "Stories remembered", hi: "इस दिन से जुड़ी कथाएँ" },
+  regional: { en: "Regional traditions", hi: "क्षेत्रीय परम्पराएँ" },
 };
 export const VRAT_VIDHI_SAFETY = {
   en: "This health note does not change the religious rule described below. Some vrats are traditionally nirjala (without food or water). Children, older people, anyone who is pregnant or breastfeeding, unwell, taking medicines, or living with diabetes, kidney disease or an eating disorder should seek medical advice and guidance from their family or religious tradition before observing a strict fast. Seek help if you become faint, confused, severely weak, cannot keep fluids down, or have unsafe blood-sugar symptoms. Never stop or retime prescribed medicine without medical advice.",
@@ -52,6 +55,58 @@ const VAT_SAVITRI_COMMON = Object.freeze({
 });
 
 export const VRAT_VIDHI = {
+  makarSankranti: {
+    verdict: {
+      en: "Makar Sankranti is the major solar festival when Surya enters Makara in the sidereal Hindu calendar. The shared household observance is Surya arghya, til and jaggery or the family's seasonal food, charity and gratitude; fasting rules differ by family and region.",
+      hi: "मकर संक्रांति वह प्रमुख सौर पर्व है जब निरयण हिन्दू पंचांग में सूर्य मकर राशि में प्रवेश करते हैं। घर की सामान्य विधि सूर्य को अर्घ्य, तिल-गुड़ या पारिवारिक मौसमी भोजन, दान और कृतज्ञता है; उपवास के नियम परिवार और क्षेत्र के अनुसार बदलते हैं।",
+    },
+    meaning: {
+      en: "Religiously, this date marks Surya's transition from Dhanu to Makara and is traditionally associated with Uttarayana. Astronomically, the Sun's apparent northward turn now occurs at the December winter solstice, roughly three weeks earlier; precession has separated the two dates. The traditional observance continues to follow the Makara ingress.",
+      hi: "धार्मिक पंचांग में यह सूर्य के धनु से मकर राशि में प्रवेश का दिन है और परम्परा में उत्तरायण से जुड़ा है। खगोल-विज्ञान में सूर्य का प्रत्यक्ष उत्तर की ओर मुड़ना अब दिसंबर के शीत अयनांत पर, लगभग तीन सप्ताह पहले होता है; पृथ्वी की धुरी के अयनचलन से दोनों तिथियाँ अलग हो गई हैं। पारम्परिक पर्व मकर-संक्रमण की तिथि पर ही मनाया जाता है।",
+    },
+    vidhi: [
+      { en: "Bathe and clean the worship place. If sacred bathing belongs to your tradition, use a safe, permitted riverbank or bathe at home with the same devotional intention.", hi: "स्नान करके पूजा-स्थान स्वच्छ करें। यदि तीर्थ-स्नान आपकी परम्परा में है तो सुरक्षित, अनुमत घाट का उपयोग करें; अन्यथा उसी श्रद्धा से घर पर स्नान करें।" },
+      { en: "At sunrise, offer clean water as arghya to Surya and recite a familiar Surya name, prayer or Gayatri used by your family. Do not stare directly at the Sun.", hi: "सूर्योदय पर सूर्य को स्वच्छ जल से अर्घ्य दें और परिवार में प्रचलित सूर्य-नाम, प्रार्थना या गायत्री का पाठ करें। सूर्य को सीधे न देखें।" },
+      { en: "Offer the food customary in your home. Til and jaggery may be offered as naivedya, eaten, shared with relatives and neighbours, or included in charity; North Indian homes may prepare khichdi.", hi: "घर में प्रचलित भोजन का भोग रखें। तिल-गुड़ नैवेद्य में चढ़ाएँ, स्वयं ग्रहण करें, सम्बन्धियों-पड़ोसियों में बाँटें या दान में दें; उत्तर भारतीय घरों में खिचड़ी भी बनाई जाती है।" },
+      { en: "Give food, sesame, jaggery, warm clothing or another useful gift according to your means. Charity is a central Sankranti practice, not a competition in spending.", hi: "सामर्थ्य के अनुसार अन्न, तिल, गुड़, गर्म वस्त्र या कोई उपयोगी वस्तु दान करें। संक्रांति का दान दिखावा या खर्च की प्रतियोगिता नहीं है।" },
+      { en: "Read one of the associated stories below, remember the farmers, animals and natural forces that sustain food, share the festive meal, and close with gratitude to Surya.", hi: "नीचे दी गई किसी सम्बद्ध कथा का पाठ करें, अन्न देने वाले किसान, पशु और प्रकृति को स्मरण करें, पर्व का भोजन बाँटें और सूर्य के प्रति कृतज्ञता से पूजा पूर्ण करें।" },
+    ],
+    diet: {
+      en: "There is no single compulsory pan-Indian fast. Some families fast until Surya puja or take one simple meal; others celebrate without fasting. Til-gur, khichdi, dahi-chura, tilkut, Pongal and other foods belong to particular regions—follow your own family custom rather than treating every item as mandatory.",
+      hi: "पूरे भारत के लिए एक अनिवार्य उपवास-नियम नहीं है। कुछ परिवार सूर्य-पूजा तक व्रत या एक सरल भोजन रखते हैं, जबकि अन्य बिना उपवास पर्व मनाते हैं। तिल-गुड़, खिचड़ी, दही-चूड़ा, तिलकुट, पोंगल आदि क्षेत्र-विशेष के भोजन हैं—सबको अनिवार्य मानने के बजाय अपनी पारिवारिक रीति रखें।",
+    },
+    sankalpa: {
+      en: "“At this Makara transition I honour Surya, give thanks for light, food and livelihood, and will share what I can with others.” This is a plain-language intention, not a prescribed Sanskrit mantra.",
+      hi: "“इस मकर-संक्रमण पर मैं सूर्य का पूजन करता/करती हूँ, प्रकाश, अन्न और आजीविका के लिए कृतज्ञ हूँ और सामर्थ्य अनुसार दूसरों के साथ बाँटूँगा/बाँटूँगी।” यह सरल भाव-संकल्प है, निर्धारित संस्कृत मंत्र नहीं।",
+    },
+    puja: {
+      en: "Simple household path: lamp; Surya image or open-sky remembrance; clean-water arghya; flowers where customary; til-gur, khichdi or the family's seasonal naivedya; familiar Surya prayer; charity; aarti. A priest-led Sankranti puja may be followed where that is the family practice.",
+      hi: "सरल गृह-विधि: दीप; सूर्य-चित्र या खुले आकाश की ओर सूर्य-स्मरण; स्वच्छ जल का अर्घ्य; परम्परानुसार फूल; तिल-गुड़, खिचड़ी या पारिवारिक मौसमी नैवेद्य; परिचित सूर्य-प्रार्थना; दान; आरती। परिवार में रीति हो तो पुरोहित द्वारा संक्रांति-पूजा कराएँ।",
+    },
+    stories: [
+      { en: "Popular Surya–Shani katha: because Makara is associated with Shani, Surya's entry is remembered as a visit to his son after a strained relationship—a lesson in reconciliation. Retellings vary, so this is a popular festival tradition rather than one universal origin account.", hi: "लोकप्रिय सूर्य–शनि कथा: मकर राशि शनि से सम्बद्ध होने के कारण सूर्य का प्रवेश अपने पुत्र से तनाव के बाद मिलने के रूप में याद किया जाता है—यह मेल-मिलाप का संदेश देता है। इसके रूप अलग-अलग हैं, इसलिए यह लोकप्रिय पर्व-कथा है, एकमात्र सार्वभौमिक उत्पत्ति-कथा नहीं।" },
+      { en: "Bhishma and Uttarayana: the Mahabharata tradition remembers Bhishma waiting for the auspicious northern course before leaving his body. This explains Uttarayana's sacred importance; it does not make the modern January Sankranti the exact astronomical solstice.", hi: "भीष्म और उत्तरायण: महाभारत परम्परा में भीष्म पितामह देह-त्याग के लिए शुभ उत्तरायण की प्रतीक्षा करते हैं। यह उत्तरायण का धार्मिक महत्त्व समझाता है; इससे आज की जनवरी संक्रांति खगोलीय अयनांत की ठीक वही तिथि नहीं बनती।" },
+      { en: "Bhagiratha and Gangasagar: the story of Bhagiratha bringing Ganga to liberate King Sagara's sons is especially remembered in the Gangasagar pilgrimage and Sankranti bathing tradition. This connection is strongest in that regional tirtha tradition.", hi: "भगीरथ और गंगासागर: राजा सगर के पुत्रों की मुक्ति के लिए भगीरथ द्वारा गंगा को पृथ्वी पर लाने की कथा गंगासागर तीर्थ और संक्रांति-स्नान में विशेष रूप से स्मरण की जाती है। यह सम्बन्ध उस क्षेत्रीय तीर्थ-परम्परा में सबसे प्रमुख है।" },
+    ],
+    regional: [
+      { en: "North India: Surya arghya, sacred bathing, til-gur, charity and khichdi are prominent; Bihar also has dahi-chura and tilkut customs, while exact household menus vary.", hi: "उत्तर भारत: सूर्य-अर्घ्य, तीर्थ-स्नान, तिल-गुड़, दान और खिचड़ी प्रमुख हैं; बिहार में दही-चूड़ा और तिलकुट की परम्पराएँ भी हैं, पर घरों का भोजन अलग हो सकता है।" },
+      { en: "Maharashtra: families commonly exchange til-gul with wishes for sweet speech; haldi-kumkum belongs to communities that observe it.", hi: "महाराष्ट्र: परिवार मीठा बोलने की शुभकामना के साथ तिलगुळ बाँटते हैं; हल्दी-कुमकुम उन समुदायों की परम्परा है जहाँ यह प्रचलित है।" },
+      { en: "Gujarat and parts of Rajasthan: Uttarayan and kite flying are prominent. Use open spaces and bird-safe thread; sharp or metal-coated string can seriously injure people and animals.", hi: "गुजरात और राजस्थान के कुछ भाग: उत्तरायण और पतंगबाजी प्रमुख हैं। खुले स्थान और पक्षी-सुरक्षित डोर का उपयोग करें; धारदार या धातु-लेपित मांझा मनुष्यों और पशु-पक्षियों को गंभीर चोट पहुँचा सकता है।" },
+      { en: "Tamil Nadu's Pongal, Assam's Magh/Bhogali Bihu, Punjab–Haryana's Maghi around Lohri, and the Andhra–Telangana Sankranti sequence have their own multi-day customs. They share the season but should be followed as distinct regional observances.", hi: "तमिलनाडु का पोंगल, असम का माघ/भोगाली बिहू, लोहड़ी के आसपास पंजाब–हरियाणा की माघी और आंध्र–तेलंगाना की बहुदिवसीय संक्रांति-परम्परा की अपनी विधियाँ हैं। ऋतु-सन्दर्भ साझा है, पर इन्हें अलग क्षेत्रीय पर्व के रूप में मानें।" },
+    ],
+    paran: {
+      en: "If your family keeps a Sankranti fast, complete it after the prescribed Surya worship, charity or family rite. There is no single pan-Indian paran clock; follow the family or temple rule that defined the fast.",
+      hi: "यदि परिवार में संक्रांति-व्रत रखा जाता है तो निर्धारित सूर्य-पूजा, दान या पारिवारिक कर्म के बाद उसे पूरा करें। पूरे भारत के लिए एक पारण-समय नहीं है; जिस परिवार या मंदिर की विधि से व्रत लिया है, उसी का नियम मानें।",
+    },
+    udyapan: {
+      en: "No separate udyapan is required for the ordinary annual festival. A specially vowed or counted Sankranti observance should be completed according to the family, priest or temple that gave its rules.",
+      hi: "सामान्य वार्षिक पर्व के लिए अलग उद्यापन आवश्यक नहीं है। विशेष संकल्प या निश्चित संख्या की संक्रांति उसी परिवार, पुरोहित या मंदिर की विधि से पूर्ण करें जहाँ से उसके नियम मिले हैं।",
+    },
+    safety: {
+      en: "This note does not change the religious observance. Never stare directly at the Sun while offering arghya. Use only safe, permitted bathing places; cold water, deep currents and crowds can be dangerous. If your family fasts, keep prescribed medicines and seek medical guidance for any health condition. Avoid sharp, glass-coated or metal kite string.",
+      hi: "यह टिप्पणी धार्मिक अनुष्ठान को नहीं बदलती। अर्घ्य देते समय सूर्य को सीधे न देखें। केवल सुरक्षित और अनुमत स्नान-स्थान चुनें; ठंडा पानी, तेज धारा और भीड़ खतरनाक हो सकते हैं। परिवार में उपवास हो तो निर्धारित दवाएँ जारी रखें और स्वास्थ्य-स्थिति में चिकित्सकीय सलाह लें। धारदार, काँच-लेपित या धातु वाले मांझे से बचें।",
+    },
+  },
   ekadashi: {
     verdict: {
       en: "Keep the Vishnu fast from local sunrise on Ekadashi until the Dwadashi paran time shown for your location. Avoid all grains and cereals even if you choose a lighter fast.",
