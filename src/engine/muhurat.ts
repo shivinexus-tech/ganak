@@ -283,13 +283,13 @@ function muhuratShuddhi(info, category) {
   if (info.pitruPaksha) b.push({ en: "Pitru Paksha (Shraddha fortnight — no auspicious work)", hi: "पितृ पक्ष (श्राद्ध पक्ष — शुभ कार्य वर्जित)" });
   if (info.adhik) b.push({ en: "Adhik (leap) month", hi: "अधिक मास" });
   else if (rule.forbiddenMonths && rule.forbiddenMonths.has(info.lmonth)) b.push(CHATURMAS_MONTHS.has(info.lmonth) ? { en: "Chaturmas (" + info.lmonthName + ")", hi: "चातुर्मास (" + info.lmonthName + ")" } : { en: info.lmonthName + " (avoided)", hi: info.lmonthName + " (वर्जित)" });
-  if (rule.forbidWeekday && rule.forbidWeekday.has(info.dow)) b.push({ en: WN_SHORT[info.dow] + " (avoided)", hi: WN_SHORT[info.dow] + " (वर्जित)" });
-  if (rule.allowWeekday && !rule.allowWeekday.has(info.dow)) b.push({ en: WN_SHORT[info.dow] + " (not used)", hi: WN_SHORT[info.dow] + " (अनुपयुक्त)" });
+  if (rule.forbidWeekday && rule.forbidWeekday.has(info.dow)) b.push({ en: WN_SHORT[info.dow] + " (avoided)", hi: WN_HI[info.dow] + " (वर्जित)" });
+  if (rule.allowWeekday && !rule.allowWeekday.has(info.dow)) b.push({ en: WN_SHORT[info.dow] + " (not used)", hi: WN_HI[info.dow] + " (अनुपयुक्त)" });
   const smp = info.samples || [{ nak: info.nak, tn: info.tn, tithiNum: info.tithiNum }];
   const nakOK = (s) => !rule.auspNak || rule.auspNak.has(s.nak);
   const tithiOK = (s) => (!rule.goodTithi || rule.goodTithi.has(s.tithiNum)) && !(rule.noAmavasya && s.tn === 29);
   if (!smp.some((s) => nakOK(s) && tithiOK(s))) {
-    if (!smp.some(nakOK)) b.push({ en: info.nakName + " nakshatra (not used)", hi: info.nakName + " नक्षत्र (अनुपयुक्त)" });
+    if (!smp.some(nakOK)) b.push({ en: info.nakName + " nakshatra (not used)", hi: (NAK_HI[info.nak] || info.nakName) + " नक्षत्र (अनुपयुक्त)" });
     else if (!smp.some(tithiOK)) b.push({ en: "unsuitable tithi", hi: "अनुपयुक्त तिथि" });
     else b.push({ en: "no clean nakshatra-tithi window", hi: "नक्षत्र-तिथि का शुद्ध योग नहीं" });
   }
