@@ -105,7 +105,7 @@ the scan is off the critical path.
 | (2) Off critical path | **Shipped** — `useEffect` + `setTimeout(0)`; Fasts & festivals card shows “Checking the panchang…” until fill |
 | (1) Shorter window | **Shipped** — **400 → 90 days** (cap still 46; UI still `.slice(0, 10)`) |
 | (3) Memoize `lunarMonthInfo` | **Shipped as `CURSOR-LUNAR-CACHE`** — see below |
-| (4) Reuse `sunEvents` | Still open |
+| (4) Reuse `sunEvents` | **Shipped as `CURSOR-SUNEVENTS-01`** — rolling one-entry cache in `festivals.ts` |
 | (5) Investigate `sunSidMs` | Still open |
 
 Expected: first paint immediate; background scan ~90/400 × 16.6 s ≈ **~3.7 s** wall (non-blocking).
@@ -128,3 +128,19 @@ Fix: shared `ensureLmWindow(nowMs)` used by both (cache key = ayanamsa +
 | `amantaMonthIdx` × 90 sequential days | ~41 ms/day | **~4 ms/day** |
 | `scanPanchangCalendar` 90d | ~4.8 s | **~0.7 s** |
 | `scanPanchangCalendar` 400d | ~16 s | **~1.1 s** |
+
+### `CURSOR-SUNEVENTS-01` (2026-07-19)
+
+`scanDayParts` called `sunEvents` for today **and** tomorrow every day. In a
+sequential `scanPanchangCalendar` loop, tomorrow’s result is today’s on the next
+iteration — so half the rise/set solves were redundant.
+
+Fix: one-entry rolling cache keyed by `(y,m,day,tz,lat,lon)` in `festivals.ts`.
+
+| Metric (Delhi, after lunar cache) | After sunEvents reuse |
+|---|---|
+| `scanPanchangCalendar` 90d | **~0.43 s** |
+| `scanPanchangCalendar` 400d | **~1.7 s** |
+
+(400d wall is noisy vs the prior ~1.1 s note — same order; 90d improved.) Content
+anchors 27/27 unchanged — pure reuse, no date-rule change.

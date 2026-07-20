@@ -193,6 +193,20 @@ const FAST_KALA_RULES = [
 ];
 const tithiIndexAt = (ms) => Math.floor(rev(moonSidMs(ms) - sunSidMs(ms)) / 12);
 const targetTithiIndex = (krishna, tithi) => (krishna ? 15 : 0) + tithi - 1;
+/* Rolling one-entry cache for sequential scanDayParts calls: day k's "tomorrow"
+   sunEvents is day k+1's "today", so a multi-day calendar scan halves the work
+   (Chip F #4 / CURSOR-SUNEVENTS-01). Key includes lat/lon/tz so DST and place
+   changes never reuse a wrong rise/set. */
+let _sunEvRoll = null;
+function sunEventsRolling(y, m, day, tz, lat, lon) {
+  const hit = _sunEvRoll
+    && _sunEvRoll.y === y && _sunEvRoll.m === m && _sunEvRoll.day === day
+    && _sunEvRoll.tz === tz && _sunEvRoll.lat === lat && _sunEvRoll.lon === lon;
+  if (hit) return _sunEvRoll.ev;
+  const ev = sunEvents(y, m, day, tz, lat, lon);
+  _sunEvRoll = { y, m, day, tz, lat, lon, ev };
+  return ev;
+}
 function scanDayParts(y, m, day, fallbackTz, place) {
   const zone = place && place.zone, lat = Number(place && place.lat), lon = Number(place && place.lon);
   const tz = (zone && zoneOffset(zone, y, m, day)) ?? fallbackTz;
@@ -204,8 +218,9 @@ function scanDayParts(y, m, day, fallbackTz, place) {
   let set = Date.UTC(y, m - 1, day, 18) - tz * 3600000;
   let nextRise = Date.UTC(ny, nm - 1, nda, 6) - ntz * 3600000;
   const hasObserver = Number.isFinite(lat) && Number.isFinite(lon);
-  if (Number.isFinite(lat) && Number.isFinite(lon)) {
-    const ev = sunEvents(y, m, day, tz, lat, lon), evN = sunEvents(ny, nm, nda, ntz, lat, lon);
+  if (hasObserver) {
+    const ev = sunEventsRolling(y, m, day, tz, lat, lon);
+    const evN = sunEventsRolling(ny, nm, nda, ntz, lat, lon);
     if (ev.rise != null && ev.set != null) { rise = ev.rise; set = ev.set; }
     if (evN.rise != null) nextRise = evN.rise;
   }
