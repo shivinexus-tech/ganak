@@ -25,19 +25,23 @@ concurrently. The old single-file structure is now a delivery blocker. Replace i
 gradually with one-writer-per-module ownership; do not allow concurrent edits to the
 same file.
 
-- [ ] **EPIC-UI-SPLIT: Pure UI extraction** — move UI without changing behaviour,
+- [x] **EPIC-UI-SPLIT: Pure UI extraction** — move UI without changing behaviour,
       styling, text, state transitions or astronomy. Extract one cohesive slice at a
       time, run every gate + build + browser smoke test, then continue.
   - [x] Prashna screen (first slice; parity markers preserved and gate repointed).
   - [x] Shared place search and shared display primitives. _(SPLIT-UI-02 REVIEW — places.ts + PlaceInput; tokens/format already from UI-01)_
-  - [ ] Daily/Panchang screen shell.
-  - [ ] Fasts, festivals and vrat-vidhi UI.
-  - [ ] Muhurat finder and hora UI.
-  - [ ] Chart form and primary chart UI.
-  - [ ] Kundali matching UI.
-  - [ ] Dashas and divisional-chart UI.
-  - [ ] Rectification, KP, BNN and Bhrigu tools.
-  - [ ] Reduce `kundli-app.tsx` to navigation, shared app state and composition.
+  - [x] Daily/Panchang modules wired (`MuhuratHub`, `CalendarPage`, engines). _(SPLIT-UI-03-WIRE)_
+  - [x] **DailyScreen chrome peel** — place/date/calendar strip + gochar →
+        `src/screens/DailyScreen.tsx`. _(SPLIT-UI-DAILY-SCREEN — shell 377 → 143)_
+  - [x] Fasts, festivals and vrat-vidhi UI. _(inside MuhuratHub / VratVidhiCard)_
+  - [x] Muhurat finder and hora UI. _(MuhuratHub)_
+  - [x] Chart form and primary chart UI. _(ChartScreen — SHELL-FINISH-48H)_
+  - [x] Kundali matching UI. _(MatchingScreen)_
+  - [x] Dashas and divisional-chart UI. _(inside ChartScreen)_
+  - [x] Rectification, KP, BNN and Bhrigu tools. _(Rectify / JyotishBnn)_
+  - [x] Reduce `kundli-app.tsx` to navigation, shared app state and composition.
+        _(**143 lines** — nav, lang, shared place, compose Daily/Prashna/Chart)_
+  - [x] **EPIC-UI-SPLIT complete** for the single-file bottleneck (2026-07-19).
 - [ ] **EPIC-10-LANES: Ten concurrent implementation lanes** — after the relevant
       modules exist, give each lane an isolated Git branch + worktree and exclusive
       file ownership: Daily, Festivals/Vrats, Muhurat, Chart, Matching, Prashna,
