@@ -16,6 +16,42 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
       <div style={{ fontSize: T.fSmall, color: C.ivory, lineHeight: 1.55 }}>{body}</div>
     </div>
   );
+  const stepList = (steps) => (
+    <ol style={{ margin: "5px 0 0", paddingLeft: 20 }}>
+      {(steps || []).map((step, i) => (
+        <li key={i} style={{ marginBottom: 6 }}>{txt(step)}</li>
+      ))}
+    </ol>
+  );
+  const pujaBody = data.pujaMaterials || data.pujaPanchopachara || data.pujaShodashopachara || data.pujaCompletion ? (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div>{txt(data.puja)}</div>
+      {data.pujaMaterials && (
+        <div style={{ padding: "8px 9px", borderRadius: T.rSm, background: "rgba(168,106,18,.06)", border: `1px solid ${C.line}` }}>
+          <div style={{ ...T.label, color: C.gold, marginBottom: 3 }}>{lbl("materials")}</div>
+          <div>{txt(data.pujaMaterials)}</div>
+        </div>
+      )}
+      {data.pujaPanchopachara && (
+        <div>
+          <div style={{ fontWeight: 700, color: C.ink }}>{lbl("panchopachara")}</div>
+          {stepList(data.pujaPanchopachara)}
+        </div>
+      )}
+      {data.pujaShodashopachara && (
+        <details style={{ borderTop: `1px solid ${C.line}`, paddingTop: 8 }}>
+          <summary style={{ color: C.gold, fontWeight: 700, cursor: "pointer" }}>{lbl("shodashopachara")}</summary>
+          {stepList(data.pujaShodashopachara)}
+        </details>
+      )}
+      {data.pujaCompletion && (
+        <div>
+          <div style={{ fontWeight: 700, color: C.ink, marginBottom: 3 }}>{lbl("afterPuja")}</div>
+          <div>{txt(data.pujaCompletion)}</div>
+        </div>
+      )}
+    </div>
+  ) : txt(data.puja);
   return (
     <div
       onClick={(e) => e.stopPropagation()}
@@ -56,7 +92,7 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
             ) : txt(data.diet)
           ))}
           {section(lbl("sankalpa"), <span style={{ fontStyle: "italic" }}>{txt(data.sankalpa)}</span>)}
-          {section(lbl("puja"), txt(data.puja))}
+          {section(lbl("puja"), pujaBody)}
           {data.stories && section(lbl("stories"), (
             <ul style={{ margin: 0, paddingLeft: 18 }}>
               {data.stories.map((story, i) => <li key={i} style={{ marginBottom: 4 }}>{txt(story)}</li>)}
