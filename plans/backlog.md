@@ -232,6 +232,19 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       back to Daily. _(P1-HIDE-DEPLOY, live at ganak.pages.dev)_
 - [x] **Deploy to a web host** — https://ganak.pages.dev (Cloudflare Pages, `main`
       auto-deploy). _(P1-HIDE-DEPLOY)_
+- [ ] **P0 before go-live — branded domain and clean public URLs.** Replace the
+      Cloudflare preview address with an owner-approved Ganak domain. Before any
+      purchase, compare suitable `.com`, `.in` and `.app` candidates for availability,
+      trademark/confusion risk, prior ownership or blacklist history, matching social
+      handles, first-year price and recurring renewal cost; present the shortlist and
+      obtain owner approval before spending. Then connect the chosen domain through
+      Cloudflare with HTTPS, make it the canonical address, redirect the `pages.dev`
+      preview and all old shared links safely, and verify search/share metadata,
+      sitemap and analytics/error-reporting origins. In the same launch pass, replace
+      implementation-looking navigation such as `?screen=daily` with stable paths
+      (`/`, `/prashna`, `/festival/...`) while preserving existing links and the
+      selected language. The owner chooses whether Hindi remains `?lang=hi` or moves
+      to `/hi/...` after an SEO and usability comparison. _(P0-CUSTOM-DOMAIN)_
 - [x] **Error monitoring** — privacy-safe crash reporter + React Error Boundary
       (no Sentry SDK / no browser storage). DSN via `VITE_SENTRY_DSN` at build time.
       Owner must add the DSN in Cloudflare Pages and redeploy — see
