@@ -386,6 +386,110 @@ export const VRAT_VIDHI = {
       hi: "कन्या-पूजन, नवमी होम, कलश-समापन, भोजन, दान या दुर्गा-विसर्जन मूल संकल्प और चुनी परम्परा अनुसार करें। औपचारिक होम और परम्परा-विशेष विधि कुल-पुरोहित या गुरु के मार्गदर्शन में करें।",
     },
   },
+  guptNavratriMagha: {
+    verdict: {
+      en: "Magha Gupt Navratri begins on Magha Shukla Pratipada. For a complete nine-day vow, begin during the Ghatasthapana time shown for your city, continue the chosen fast and daily Devi worship through Navami, and perform parana in Dashami at the calculated time shown above.",
+      hi: "माघ गुप्त नवरात्रि माघ शुक्ल प्रतिपदा से आरम्भ होती है। पूर्ण नौ-दिवसीय संकल्प में अपने शहर के लिए दिखाए घटस्थापना समय में आरम्भ करें, नवमी तक चुना हुआ व्रत और दैनिक देवी-पूजन जारी रखें, और ऊपर निकाले गए समय पर दशमी में पारण करें।",
+    },
+    meaning: {
+      en: "This winter Navratri is commonly kept as a quieter, more personal period of Devi worship. The public household path below centres on sincere daily worship; any specialised mantra or rite personally received from a guru should be followed exactly as taught.",
+      hi: "यह शीतकालीन नवरात्रि प्रायः देवी की शांत और निजी उपासना के रूप में रखी जाती है। नीचे दी गृह-विधि सरल दैनिक पूजन पर केन्द्रित है; गुरु से व्यक्तिगत रूप से मिला कोई विशेष मन्त्र या अनुष्ठान उसी सिखाई विधि से करें।",
+    },
+    vidhi: [
+      { en: "Before Day 1, decide your exact sankalpa: a complete fast, one meal, phalahar, or daily worship without a food vow. Keep that same chosen rule through Navami.", hi: "पहले दिन से पूर्व अपना स्पष्ट संकल्प चुनें—पूर्ण उपवास, एक समय भोजन, फलाहार, या बिना आहार-व्रत के दैनिक पूजा। नवमी तक उसी चुने नियम का पालन करें।" },
+      { en: "On Pratipada, bathe, wear clean clothes and prepare the worship place. Establish the kalasha during the city-specific Ghatasthapana window if kalasha installation is part of your family practice; otherwise begin before a clean Devi image with a lamp.", hi: "प्रतिपदा को स्नान, स्वच्छ वस्त्र और पूजा-स्थान की तैयारी करें। कुल में कलश-स्थापना हो तो अपने शहर के घटस्थापना समय में कलश स्थापित करें; अन्यथा स्वच्छ देवी-चित्र और दीप के सामने पूजा आरम्भ करें।" },
+      { en: "State the nine-day sankalpa, then offer the simple household worship listed below. Read or recite the familiar Devi prayer, stotra or Durga Saptashati portion chosen in the sankalpa.", hi: "नौ-दिवसीय संकल्प बोलें, फिर नीचे दी सरल गृह-पूजा करें। संकल्प में चुनी परिचित देवी-प्रार्थना, स्तोत्र या दुर्गा सप्तशती के अंश का पाठ करें।" },
+      { en: "Repeat the lamp, offerings and chosen reading each day through Navami. Observe Ashtami or Navami feeding, Kumari Puja or homa only where it is already part of your family or temple practice.", hi: "नवमी तक प्रतिदिन दीप, अर्पण और चुना पाठ दोहराएँ। अष्टमी या नवमी का भोजन, कुमारी-पूजन या होम वहीं करें जहाँ वह आपकी कुल या मंदिर परम्परा में पहले से हो।" },
+      { en: "After Navami ends, complete the promised worship and reading, then perform Dashami parana at the city-specific time shown above.", hi: "नवमी समाप्त होने पर संकल्पित पूजा और पाठ पूर्ण करें, फिर ऊपर दिखाए अपने शहर के समय पर दशमी पारण करें।" },
+    ],
+    diet: {
+      en: "Keep the food rule named in your sankalpa. A complete fast and phalahar are different vows: do not change one into the other silently. Where phalahar is chosen, use only the fruit, dairy, roots or vrat foods accepted in your home; avoid grains, pulses, onion, garlic, meat and alcohol in that form.",
+      hi: "संकल्प में लिया आहार-नियम ही मानें। पूर्ण उपवास और फलाहार अलग व्रत हैं; एक को बिना बताए दूसरे में न बदलें। फलाहार लिया हो तो अपने घर में मान्य फल, दुग्ध, कन्द या व्रत-आहार लें; इस रूप में अन्न-दाल, प्याज, लहसुन, मांस और मद्य वर्जित रखें।",
+    },
+    sankalpa: {
+      en: "“From Magha Shukla Pratipada through Navami, I undertake this Gupt Navratri worship of the Divine Mother. I will keep my chosen fasting rule and daily worship, and complete the vow in Dashami according to my family tradition.”",
+      hi: "“माघ शुक्ल प्रतिपदा से नवमी तक मैं जगदम्बा की यह गुप्त नवरात्रि उपासना करता/करती हूँ। अपने चुने आहार-नियम और दैनिक पूजा का पालन कर दशमी में कुल-परम्परा अनुसार संकल्प पूर्ण करूँगा/करूँगी।”",
+    },
+    puja: {
+      en: "Use this simple household sequence each day. If your family has an established, more detailed Devi-puja method, keep that method instead of combining procedures.",
+      hi: "प्रतिदिन यह सरल गृह-विधि करें। परिवार में देवी-पूजन की स्थापित विस्तृत विधि हो तो विधियों को मिलाने के बजाय उसी का पालन करें।",
+    },
+    pujaMaterials: {
+      en: "A clean Devi image or established kalasha, lamp and oil/ghee, incense if used at home, water, kumkum or sandal, flowers, fruit or family naivedya, aarti lamp, and the prayer or text chosen for daily recitation.",
+      hi: "स्वच्छ देवी-चित्र या स्थापित कलश, दीप और तेल/घी, घर में प्रचलित हो तो धूप, जल, कुमकुम या चन्दन, फूल, फल या कुलानुसार नैवेद्य, आरती का दीप, और दैनिक पाठ के लिए चुनी प्रार्थना या ग्रन्थ।",
+    },
+    pujaPanchopachara: [
+      { en: "Remember Ganesha, then meditate on and invite the Divine Mother to accept the worship.", hi: "गणेश-स्मरण करें, फिर जगदम्बा का ध्यान और आवाहन कर पूजा स्वीकार करने की प्रार्थना करें।" },
+      { en: "Offer fragrance: sandal or kumkum according to your household custom.", hi: "गन्ध अर्पित करें—कुल-रीति अनुसार चन्दन या कुमकुम।" },
+      { en: "Offer flowers with the Devi name or familiar prayer used in your home.", hi: "घर में प्रचलित देवी-नाम या परिचित प्रार्थना के साथ पुष्प अर्पित करें।" },
+      { en: "Offer incense, then show the lit lamp.", hi: "धूप अर्पित करें, फिर प्रज्वलित दीप दिखाएँ।" },
+      { en: "Offer fruit or the family's sattvic naivedya and water.", hi: "फल या कुलानुसार सात्त्विक नैवेद्य और जल अर्पित करें।" },
+    ],
+    pujaCompletion: {
+      en: "Recite the chosen Devi prayer, stotra or Durga Saptashati portion; perform aarti, ask forgiveness for mistakes, bow, and distribute prasad. Continue the same promised practice each day.",
+      hi: "चुनी देवी-प्रार्थना, स्तोत्र या दुर्गा सप्तशती के अंश का पाठ करें; आरती, भूलों के लिए क्षमा-प्रार्थना और प्रणाम कर प्रसाद बाँटें। प्रतिदिन उसी संकल्पित साधना को जारी रखें।",
+    },
+    paran: {
+      en: "For the complete nine-day fast, keep the vow through Navami and perform parana in Dashami at the local date and time shown above. Complete the final Devi worship first, then begin with prasad and the food permitted by your sankalpa.",
+      hi: "पूर्ण नौ-दिवसीय व्रत में नवमी तक संकल्प रखें और ऊपर दिखाए स्थानीय दिन व समय पर दशमी में पारण करें। पहले अंतिम देवी-पूजा पूर्ण करें, फिर प्रसाद और संकल्प में मान्य आहार से पारण करें।",
+    },
+    udyapan: {
+      en: "For this annual nine-day observance, conclude the kalasha and final offerings according to family practice after the promised worship is complete. If you undertook a counted or repeated formal vow, conclude it by the same priest, teacher or family procedure under which it began.",
+      hi: "इस वार्षिक नौ-दिवसीय पर्व में संकल्पित पूजा पूर्ण होने पर कुल-रीति से कलश और अंतिम अर्पण का समापन करें। गिनती वाला या बार-बार करने का औपचारिक संकल्प लिया हो तो जिस पुरोहित, गुरु या कुल-विधि से आरम्भ किया था उसी से उद्यापन करें।",
+    },
+  },
+  guptNavratriAshadha: {
+    verdict: {
+      en: "Ashadha Gupt Navratri begins on Ashadha Shukla Pratipada. For a complete nine-day vow, begin during the Ghatasthapana time shown for your city, continue the chosen fast and daily Devi worship through Navami, and perform parana in Dashami at the calculated time shown above.",
+      hi: "आषाढ़ गुप्त नवरात्रि आषाढ़ शुक्ल प्रतिपदा से आरम्भ होती है। पूर्ण नौ-दिवसीय संकल्प में अपने शहर के लिए दिखाए घटस्थापना समय में आरम्भ करें, नवमी तक चुना हुआ व्रत और दैनिक देवी-पूजन जारी रखें, और ऊपर निकाले गए समय पर दशमी में पारण करें।",
+    },
+    meaning: {
+      en: "This monsoon Navratri is commonly kept as a quieter, more personal period of Devi worship. The public household path below centres on sincere daily worship; any specialised mantra or rite personally received from a guru should be followed exactly as taught.",
+      hi: "यह वर्षाकालीन नवरात्रि प्रायः देवी की शांत और निजी उपासना के रूप में रखी जाती है। नीचे दी गृह-विधि सरल दैनिक पूजन पर केन्द्रित है; गुरु से व्यक्तिगत रूप से मिला कोई विशेष मन्त्र या अनुष्ठान उसी सिखाई विधि से करें।",
+    },
+    vidhi: [
+      { en: "Before Day 1, decide your exact sankalpa: a complete fast, one meal, phalahar, or daily worship without a food vow. Keep that same chosen rule through Navami.", hi: "पहले दिन से पूर्व अपना स्पष्ट संकल्प चुनें—पूर्ण उपवास, एक समय भोजन, फलाहार, या बिना आहार-व्रत के दैनिक पूजा। नवमी तक उसी चुने नियम का पालन करें।" },
+      { en: "On Pratipada, bathe, wear clean clothes and prepare a clean, dry worship place. Establish the kalasha during the city-specific Ghatasthapana window if this is part of your family practice; otherwise begin before a clean Devi image with a lamp.", hi: "प्रतिपदा को स्नान, स्वच्छ वस्त्र और साफ-सूखा पूजा-स्थान तैयार करें। कुल में कलश-स्थापना हो तो अपने शहर के घटस्थापना समय में कलश स्थापित करें; अन्यथा स्वच्छ देवी-चित्र और दीप के सामने पूजा आरम्भ करें।" },
+      { en: "State the nine-day sankalpa, then offer the simple household worship listed below. Read or recite the familiar Devi prayer, stotra or Durga Saptashati portion chosen in the sankalpa.", hi: "नौ-दिवसीय संकल्प बोलें, फिर नीचे दी सरल गृह-पूजा करें। संकल्प में चुनी परिचित देवी-प्रार्थना, स्तोत्र या दुर्गा सप्तशती के अंश का पाठ करें।" },
+      { en: "Repeat the lamp, offerings and chosen reading each day through Navami. Observe Ashtami or Navami feeding, Kumari Puja or homa only where it is already part of your family or temple practice.", hi: "नवमी तक प्रतिदिन दीप, अर्पण और चुना पाठ दोहराएँ। अष्टमी या नवमी का भोजन, कुमारी-पूजन या होम वहीं करें जहाँ वह आपकी कुल या मंदिर परम्परा में पहले से हो।" },
+      { en: "After Navami ends, complete the promised worship and reading, then perform Dashami parana at the city-specific time shown above.", hi: "नवमी समाप्त होने पर संकल्पित पूजा और पाठ पूर्ण करें, फिर ऊपर दिखाए अपने शहर के समय पर दशमी पारण करें।" },
+    ],
+    diet: {
+      en: "Keep the food rule named in your sankalpa. A complete fast and phalahar are different vows: do not change one into the other silently. Where phalahar is chosen, use only the fruit, dairy, roots or vrat foods accepted in your home; avoid grains, pulses, onion, garlic, meat and alcohol in that form.",
+      hi: "संकल्प में लिया आहार-नियम ही मानें। पूर्ण उपवास और फलाहार अलग व्रत हैं; एक को बिना बताए दूसरे में न बदलें। फलाहार लिया हो तो अपने घर में मान्य फल, दुग्ध, कन्द या व्रत-आहार लें; इस रूप में अन्न-दाल, प्याज, लहसुन, मांस और मद्य वर्जित रखें।",
+    },
+    sankalpa: {
+      en: "“From Ashadha Shukla Pratipada through Navami, I undertake this Gupt Navratri worship of the Divine Mother. I will keep my chosen fasting rule and daily worship, and complete the vow in Dashami according to my family tradition.”",
+      hi: "“आषाढ़ शुक्ल प्रतिपदा से नवमी तक मैं जगदम्बा की यह गुप्त नवरात्रि उपासना करता/करती हूँ। अपने चुने आहार-नियम और दैनिक पूजा का पालन कर दशमी में कुल-परम्परा अनुसार संकल्प पूर्ण करूँगा/करूँगी।”",
+    },
+    puja: {
+      en: "Use this simple household sequence each day. If your family has an established, more detailed Devi-puja method, keep that method instead of combining procedures.",
+      hi: "प्रतिदिन यह सरल गृह-विधि करें। परिवार में देवी-पूजन की स्थापित विस्तृत विधि हो तो विधियों को मिलाने के बजाय उसी का पालन करें।",
+    },
+    pujaMaterials: {
+      en: "A clean Devi image or established kalasha, lamp and oil/ghee, incense if used at home, water, kumkum or sandal, flowers, fruit or family naivedya, aarti lamp, and the prayer or text chosen for daily recitation.",
+      hi: "स्वच्छ देवी-चित्र या स्थापित कलश, दीप और तेल/घी, घर में प्रचलित हो तो धूप, जल, कुमकुम या चन्दन, फूल, फल या कुलानुसार नैवेद्य, आरती का दीप, और दैनिक पाठ के लिए चुनी प्रार्थना या ग्रन्थ।",
+    },
+    pujaPanchopachara: [
+      { en: "Remember Ganesha, then meditate on and invite the Divine Mother to accept the worship.", hi: "गणेश-स्मरण करें, फिर जगदम्बा का ध्यान और आवाहन कर पूजा स्वीकार करने की प्रार्थना करें।" },
+      { en: "Offer fragrance: sandal or kumkum according to your household custom.", hi: "गन्ध अर्पित करें—कुल-रीति अनुसार चन्दन या कुमकुम।" },
+      { en: "Offer flowers with the Devi name or familiar prayer used in your home.", hi: "घर में प्रचलित देवी-नाम या परिचित प्रार्थना के साथ पुष्प अर्पित करें।" },
+      { en: "Offer incense, then show the lit lamp.", hi: "धूप अर्पित करें, फिर प्रज्वलित दीप दिखाएँ।" },
+      { en: "Offer fruit or the family's sattvic naivedya and water.", hi: "फल या कुलानुसार सात्त्विक नैवेद्य और जल अर्पित करें।" },
+    ],
+    pujaCompletion: {
+      en: "Recite the chosen Devi prayer, stotra or Durga Saptashati portion; perform aarti, ask forgiveness for mistakes, bow, and distribute prasad. Continue the same promised practice each day.",
+      hi: "चुनी देवी-प्रार्थना, स्तोत्र या दुर्गा सप्तशती के अंश का पाठ करें; आरती, भूलों के लिए क्षमा-प्रार्थना और प्रणाम कर प्रसाद बाँटें। प्रतिदिन उसी संकल्पित साधना को जारी रखें।",
+    },
+    paran: {
+      en: "For the complete nine-day fast, keep the vow through Navami and perform parana in Dashami at the local date and time shown above. Complete the final Devi worship first, then begin with prasad and the food permitted by your sankalpa.",
+      hi: "पूर्ण नौ-दिवसीय व्रत में नवमी तक संकल्प रखें और ऊपर दिखाए स्थानीय दिन व समय पर दशमी में पारण करें। पहले अंतिम देवी-पूजा पूर्ण करें, फिर प्रसाद और संकल्प में मान्य आहार से पारण करें।",
+    },
+    udyapan: {
+      en: "For this annual nine-day observance, conclude the kalasha and final offerings according to family practice after the promised worship is complete. If you undertook a counted or repeated formal vow, conclude it by the same priest, teacher or family procedure under which it began.",
+      hi: "इस वार्षिक नौ-दिवसीय पर्व में संकल्पित पूजा पूर्ण होने पर कुल-रीति से कलश और अंतिम अर्पण का समापन करें। गिनती वाला या बार-बार करने का औपचारिक संकल्प लिया हो तो जिस पुरोहित, गुरु या कुल-विधि से आरम्भ किया था उसी से उद्यापन करें।",
+    },
+  },
   karvaChauth: {
     verdict: {
       en: "A North- and West-Indian marital-wellbeing fast traditionally kept from sunrise until the local moon is seen and offered water. Nirjala is the strict form, not the only safe devotional choice.",

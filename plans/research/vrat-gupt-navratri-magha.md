@@ -1,12 +1,19 @@
 # Magha Gupt Navratri — reviewed household-guide candidate
 
-**Status:** RESEARCH COMPLETE — OWNER COPY APPROVAL REQUIRED BEFORE APP INTEGRATION
+**Status:** INTEGRATED AND VALIDATED — 2026-07-21
 
 **Reviewed:** 2026-07-21 (Codex takeover of Cursor draft)
 
 **Ganak key:** `guptNavratriMagha`
 
 ## What changed in review
+
+**Owner correction after this audit:** KBUF is not a separate tradition, Rajarshi
+Nandy is a devotee/teacher whose simple household suggestions can inform research,
+and an app is only a delivery tool. These source distinctions remain internal and
+are not shown as competing practices on Ganak's public page. The public guide now
+uses a single source-neutral household path. The sections below are retained only
+to explain the audit history; they are not approved user-facing copy.
 
 The first draft silently combined a Kamakhya-upasaka anushthana with an app-led
 Navadurga practice. It also called ordinary lamp-and-mantra worship “yagna”. That
@@ -29,7 +36,7 @@ shared across the cited sources. It does not publish advanced tantric rites.
 - Drik describes Magha Gupt Navratri as mainly observed in northern states. This
   is a regional note, not a restriction on who may worship.
 
-## User-facing verdict candidate
+## Superseded verdict candidate — do not publish
 
 ### English
 
@@ -114,7 +121,7 @@ have chosen, and complete the vow in Dashami according to my family tradition.�
 उपासना करता/करती हूँ। अपने चुने हुए आहार-नियम और दैनिक पूजा का पालन कर दशमी में
 कुल-परम्परा अनुसार संकल्प पूर्ण करूँगा/करूँगी।”
 
-## Labelled variants — never silently blend these into the common path
+## Internal source notes — not user-facing variants
 
 ### Kamakhya-upasaka/KBUF anushthana
 
@@ -138,14 +145,11 @@ practice, but no stable universal “one Mahavidya per day” order was verified
 not publish such an order. Public deity names and context are acceptable; advanced
 mantra, nyasa, yantra, bali and homa remain teacher/lineage-guided.
 
-## Integration blockers found
+## Integration blockers — resolved
 
-1. The current dedicated page calculates the local **date**, but the metadata has
-   `timing: null`; it does not yet show the exact Ghatasthapana window or Dashami
-   parana. The copy must not say “use the time shown above” until those two times
-   are actually computed.
-2. Owner must approve the verdict, the shared household path, and whether the
-   three labelled variants appear on the first release page.
+1. Resolved by `src/engine/navratri.ts` plus `validation/navratri-timings.cjs`.
+2. Owner direction applied: research-source names and unsupported Mahavidya
+   instructions do not appear on the public guide.
 
 ## Sources retained for the audit trail
 

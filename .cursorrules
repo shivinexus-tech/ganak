@@ -22,6 +22,7 @@ the non-negotiables so Cursor's AI can't miss them.
    node validation/prashna-calc.js
    node validation/muhurat-anchors.cjs
    node validation/content-dates.cjs                   # festival/day-part anchors
+   node validation/navratri-timings.cjs                # city Ghatasthapana + Dashami-parana anchors
    node validation/panchaka-windows.cjs                 # no sub-minute/same-minute Panchaka windows
    node validation/festival-deeplinks.cjs               # permanent festival routes + existing card default
    node validation/festival-page-coverage.cjs            # every in-scope openable label has a valid page

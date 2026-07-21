@@ -10,6 +10,7 @@ import { VRAT_VIDHI } from "../data/vrat-vidhis";
 import { CHHATH_SHARED_KEYS, FESTIVAL_PAGE_ROUTES, FEST_META, OBS_META } from "../data/festival-pages";
 import { scanPanchangCalendar } from "../engine/festivals";
 import { vratDetail } from "../engine/muhurat";
+import { navratriTimings } from "../engine/navratri";
 import { zoneOffset } from "../engine/panchang";
 
 const FESTIVAL_GUIDE_ROUTES = FESTIVAL_PAGE_ROUTES;
@@ -96,8 +97,10 @@ function findLocalFestivalOccurrence(guide, place, nowMs = Date.now()) {
   if (!hit) return { hit: null, detail: null, tz };
   const meta = guide.sourceKind === "observance" ? OBS_META[guide.metaKey] : FEST_META[guide.metaKey];
   const timing = meta && meta.timing ? meta.timing : null;
-  const detail = vratDetail(place, "lahiri", hit.ms, timing);
-  return { hit, detail, tz, timing };
+  const detail = timing === "navratri"
+    ? { navratri: navratriTimings(place, hit.ms) }
+    : vratDetail(place, "lahiri", hit.ms, timing);
+  return { hit, detail, tz: detail.navratri ? detail.navratri.tz : tz, timing };
 }
 
 function formatLocalDate(ms, tz, lang) {
@@ -178,13 +181,30 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
         sunset: { en: "The evening or sunset period matters for this observance.", hi: "इस व्रत में संध्या या सूर्यास्त का समय महत्वपूर्ण है।" },
         moonrise: { en: "Moonrise matters for completing this observance.", hi: "इस व्रत के समापन में चन्द्रोदय महत्वपूर्ण है।" },
         stars: { en: "Star sighting matters for completing this observance.", hi: "इस व्रत के समापन में तारा-दर्शन महत्वपूर्ण है।" },
+        navratri: { en: "The Ghatasthapana and full-fast parana times below are calculated for your city.", hi: "नीचे घटस्थापना और पूर्ण व्रत के पारण का समय आपके शहर के लिए निकाला गया है।" },
       }[meta.timing] || null)
     : null;
 
   const d = localTiming.detail;
   const hit = localTiming.hit;
   const tz = localTiming.tz;
+  const navratri = d && d.navratri;
   const decidingLabel = hit ? decidingKalaLabel(hit.decidingKala, L) : null;
+  const clock = (ms) => fmtTimeD(ms, tz, ms);
+  const paranaBasis = navratri && ({
+    "navami-end": {
+      en: "Navami ends at this time; complete the full nine-day fast afterwards.",
+      hi: "इस समय नवमी समाप्त होती है; पूर्ण नौ-दिवसीय व्रत का पारण इसके बाद करें।",
+    },
+    sunrise: {
+      en: "Navami ends before dawn, so complete the full nine-day fast after local sunrise.",
+      hi: "नवमी भोर से पहले समाप्त होती है, इसलिए पूर्ण नौ-दिवसीय व्रत का पारण स्थानीय सूर्योदय के बाद करें।",
+    },
+    "next-sunrise": {
+      en: "Navami ends after sunset, so complete the full nine-day fast after the following local sunrise.",
+      hi: "नवमी सूर्यास्त के बाद समाप्त होती है, इसलिए पूर्ण नौ-दिवसीय व्रत का पारण अगले स्थानीय सूर्योदय के बाद करें।",
+    },
+  }[navratri.parana.basis]);
 
   return (
     <main className="rise" aria-labelledby="festival-guide-title">
@@ -263,7 +283,47 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
               <div style={{ fontSize: T.fBody, color: C.ivory, lineHeight: 1.45 }}>
                 <strong style={{ color: C.gold }}>{formatLocalDate(hit.ms, tz, L)}</strong>
               </div>
-              {d && (d.parana || d.moonrise != null || d.sunset != null || d.stars) && (
+              {navratri && (
+                <div style={{
+                  display: "grid", gap: 7, fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
+                  background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
+                  borderRadius: T.rSm, padding: "9px 10px", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
+                }}>
+                  {navratri.ghatasthapana.primary ? (
+                    <div>
+                      {L === "hi" ? "घटस्थापना: " : "Ghatasthapana: "}
+                      {clock(navratri.ghatasthapana.primary.start)}–{clock(navratri.ghatasthapana.primary.end)}
+                    </div>
+                  ) : navratri.ghatasthapana.abhijit ? (
+                    <div>
+                      {L === "hi" ? "घटस्थापना का अभिजित समय: " : "Abhijit Ghatasthapana time: "}
+                      {clock(navratri.ghatasthapana.abhijit.start)}–{clock(navratri.ghatasthapana.abhijit.end)}
+                    </div>
+                  ) : (
+                    <div style={{ color: C.sindoor }}>
+                      {L === "hi" ? "इस तिथि पर वैध घटस्थापना अवधि नहीं मिली।" : "No valid Ghatasthapana window was found on this date."}
+                    </div>
+                  )}
+                  {navratri.ghatasthapana.preferred.length > 0 && (
+                    <div style={{ color: C.ivory, fontWeight: 500 }}>
+                      {L === "hi" ? "मुख्य समय के भीतर विशेष अनुकूल अवधि: " : "Especially suitable period within that window: "}
+                      {navratri.ghatasthapana.preferred.map((window) => `${clock(window.start)}–${clock(window.end)}`).join(", ")}
+                    </div>
+                  )}
+                  {navratri.ghatasthapana.primary && navratri.ghatasthapana.abhijit && (
+                    <div style={{ color: C.ivory, fontWeight: 500 }}>
+                      {L === "hi" ? "वैकल्पिक अभिजित अवधि: " : "Alternative Abhijit period: "}
+                      {clock(navratri.ghatasthapana.abhijit.start)}–{clock(navratri.ghatasthapana.abhijit.end)}
+                    </div>
+                  )}
+                  <div style={{ borderTop: `1px solid ${C.line}`, paddingTop: 7 }}>
+                    {L === "hi" ? "पूर्ण नौ-दिवसीय व्रत का पारण: " : "Full nine-day fast — parana: "}
+                    {formatLocalDate(navratri.parana.start, tz, L)}, {clock(navratri.parana.start)} {L === "hi" ? "के बाद" : "onwards"}
+                  </div>
+                  {paranaBasis && <div style={{ color: C.muted, fontSize: T.fMicro, fontWeight: 400 }}>{paranaBasis[L]}</div>}
+                </div>
+              )}
+              {d && !navratri && (d.parana || d.moonrise != null || d.sunset != null || d.stars) && (
                 <div style={{
                   fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
                   background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
@@ -278,7 +338,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                         : <>{L === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, hit.ms)}</>}
                 </div>
               )}
-              {decidingLabel && !(d && (d.parana || d.moonrise != null || d.sunset != null || d.stars)) && (
+              {decidingLabel && !(d && (navratri || d.parana || d.moonrise != null || d.sunset != null || d.stars)) && (
                 <div style={{ fontSize: T.fMicro, color: C.muted }}>
                   {L === "hi" ? "तिथि तय होने का आधार: " : "Date chosen by: "}{decidingLabel}
                 </div>

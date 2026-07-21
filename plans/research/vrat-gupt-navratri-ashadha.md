@@ -1,12 +1,20 @@
 # Ashadha Gupt Navratri — reviewed household-guide candidate
 
-**Status:** RESEARCH COMPLETE — OWNER COPY APPROVAL REQUIRED BEFORE APP INTEGRATION
+**Status:** INTEGRATED AND VALIDATED — 2026-07-21
 
 **Reviewed:** 2026-07-21 (Codex takeover of Cursor draft)
 
 **Ganak key:** `guptNavratriAshadha`
 
 ## What changed in review
+
+**Owner correction after this audit:** the Sadhana app is only a worship-guidance
+tool, KBUF is not a separate tradition, and Rajarshi Nandy's simple household
+suggestions are research input rather than a public product label. “Gayatri
+Navratri” was found only in the Drik material reviewed and did not meet the bar for
+publication. Ganak's public page therefore uses one source-neutral household Devi
+guide and none of these source names. The sections below are retained only as an
+audit trail; they are not approved user-facing copy.
 
 The initial draft copied the same blended Kamakhya/Sadhana-app method into both
 Gupt Navratris. This review restores a source-backed common household path and
@@ -28,7 +36,7 @@ default.
   but the reviewed evidence does not support making Varahi worship the universal
   household default.
 
-## User-facing verdict candidate
+## Superseded verdict candidate — do not publish
 
 ### English
 
@@ -108,7 +116,7 @@ have chosen, and complete the vow in Dashami according to my family tradition.�
 उपासना करता/करती हूँ। अपने चुने हुए आहार-नियम और दैनिक पूजा का पालन कर दशमी में
 कुल-परम्परा अनुसार संकल्प पूर्ण करूँगा/करूँगी।”
 
-## Labelled variants — never silently blend these into the common path
+## Internal source notes — not user-facing variants
 
 ### Gayatri Navratri
 
@@ -135,15 +143,13 @@ Mahavidya and Kamakhya practice is important in Gupt Navratri traditions, but no
 stable universal day-by-day Mahavidya order was verified. Public context is safe;
 advanced practice remains under the relevant teacher or lineage.
 
-## Integration blockers found
+## Integration blockers — resolved
 
-1. The current dedicated page calculates the local **date** but has
-   `timing: null`; it does not show the exact Ghatasthapana window or Dashami
-   parana. Do not publish “use the time shown above” until those computations exist.
-2. Remove the stale “2026 Adhik Maas means no Ashadha Gupt Navratri” statement from
-   internal planning: the engine and source anchor both return 15 July 2026.
-3. Owner must approve the verdict, shared household path and which labelled
-   variants appear on the first release page.
+1. Resolved by `src/engine/navratri.ts` plus `validation/navratri-timings.cjs`.
+2. The stale “no Ashadha Gupt Navratri in 2026” claim is rejected; the engine and
+   source anchor both return 15 July 2026.
+3. Owner direction applied: research-source names, the unsupported Gayatri label
+   and unverified Mahavidya procedures do not appear on the public guide.
 
 ## Sources retained for the audit trail
 

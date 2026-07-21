@@ -154,7 +154,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       nine days. Keep the implementation appropriate for householders and distinguish
       simple recitation from initiated/lineage ritual. Do not apply this Navadurga
       structure to either Gupt Navratri. _(P0-NAVRATRI-18-SAPTASHATI)_
-- [ ] **P0 before go-live — deep research on Magha and Ashadha Gupt Navratri
+- [x] **P0 before go-live — deep research on Magha and Ashadha Gupt Navratri
       practices.** Treat the two Gupt Navratris as their own research track, not a
       copy of Chaitra/Sharad. Verify the four-Navratri textual basis; regional and
       lineage differences; Ghatasthapana/fasting/public household devotion; the
@@ -164,7 +164,12 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       instruction. Produce sourced bilingual recommendations and an explicit
       safe-to-publish/lineage-only table for owner review before adding detailed
       pages. Brief: `plans/gupt-navratri-deep-research.md`.
-      _(P0-GUPT-NAVRATRI-DEEP-RESEARCH)_
+      **Shipped on branch `codex/gupt-navratri-timings`:** separate bilingual
+      Magha/Ashadha household guides, city-specific Ghatasthapana and full-fast
+      Dashami-parana calculations, and a permanent published-anchor regression
+      gate. User-facing copy contains no research-source branding and does not
+      publish an invented Mahavidya day sequence.
+      _(P0-GUPT-NAVRATRI-DEEP-RESEARCH / CODEX-P0-GUPT-TIMINGS-INTEGRATION)_
 - [ ] **P0 before go-live — Prashna improvement research + owner-approved number
       method.** The current screen needs a broader product and calculation audit.
       Research and prototype an additional **KP Horary Number (1–249)** mode: the

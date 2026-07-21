@@ -2,7 +2,15 @@
 
 Task: `P0-GUPT-NAVRATRI-DEEP-RESEARCH`
 
-Status: **TAKEOVER REVIEW COMPLETE 2026-07-21 — Cursor's two draft guides were corrected after a source/policy audit; owner copy review and exact local Ghatasthapana/parana engineering remain before app integration**
+Status: **IMPLEMENTED AND VALIDATED 2026-07-21 — separate Magha/Ashadha household guides plus city-specific Ghatasthapana and Dashami-parana calculations are complete on `codex/gupt-navratri-timings`**
+
+## Owner correction applied before publication
+
+Research sources are retained only as an internal audit trail; they are not labels
+for the devotee's practice. Ganak's public guides therefore do not mention another
+app, KBUF, Rajarshi Nandy or the weakly supported “Gayatri Navratri” alternate name.
+They present one source-neutral household Devi-puja path. No practical Mahavidya
+sequence was published because the research did not establish a universal one.
 
 ## Why this needs its own track
 
