@@ -111,6 +111,59 @@ export const VRAT_VIDHI = {
       hi: "यह टिप्पणी धार्मिक अनुष्ठान को नहीं बदलती। अर्घ्य देते समय सूर्य को सीधे न देखें। केवल सुरक्षित और अनुमत स्नान-स्थान चुनें; ठंडा पानी, तेज धारा और भीड़ खतरनाक हो सकते हैं। परिवार में उपवास हो तो निर्धारित दवाएँ जारी रखें और स्वास्थ्य-स्थिति में चिकित्सकीय सलाह लें। धारदार, काँच-लेपित या धातु वाले मांझे से बचें।",
     },
   },
+  diwali: {
+    verdict: {
+      en: "On the main Diwali night, clean and light the home, then worship Lakshmi with your family during the local evening puja period. A simple household observance needs sincere prayer, a safe lamp, flowers or another respectful offering, family naivedya, gratitude and sharing—it does not require an expensive display or a compulsory fast.",
+      hi: "मुख्य दीपावली-रात्रि पर घर स्वच्छ और प्रकाशित करके स्थानीय सायंकालीन पूजा-अवधि में परिवार सहित लक्ष्मी-पूजन करें। सरल गृह-विधि में श्रद्धापूर्ण प्रार्थना, सुरक्षित दीप, फूल या अन्य सम्मानपूर्ण अर्पण, पारिवारिक नैवेद्य, कृतज्ञता और बाँटना पर्याप्त है—महँगा प्रदर्शन या अनिवार्य उपवास आवश्यक नहीं है।",
+    },
+    meaning: {
+      en: "Diwali is the festival of rows of lights, observed on the Amavasya night at the centre of a wider festival sequence. Lamps express light over darkness and knowledge over ignorance. In many North Indian homes the main worship honours Lakshmi, often with Ganesha, while other regions centre different deities and stories; those traditions are related but not interchangeable.",
+      hi: "दीपावली दीपों की पंक्तियों का पर्व है, जो व्यापक पर्व-क्रम के मध्य अमावस्या-रात्रि पर मनाया जाता है। दीप अंधकार पर प्रकाश और अज्ञान पर ज्ञान का प्रतीक हैं। अनेक उत्तर भारतीय घरों में मुख्य पूजा लक्ष्मी की, प्रायः गणेश के साथ, होती है; अन्य क्षेत्रों में अलग देवता और कथाएँ केंद्र में रहती हैं—ये परम्पराएँ सम्बद्ध हैं पर एक-दूसरे का स्थान नहीं लेतीं।",
+    },
+    vidhi: [
+      { en: "Clean the worship space and entrance before evening. Arrange only what your household can manage: a stable lamp, Lakshmi image or murti used by the family, flowers or leaves where customary, clean water, kumkum or sandal paste, and the family's sweets, fruit or meal as naivedya.", hi: "सायंकाल से पहले पूजा-स्थान और प्रवेश-द्वार स्वच्छ करें। घर जितना सहज कर सके उतना ही रखें: स्थिर दीप, परिवार में पूजित लक्ष्मी-चित्र या मूर्ति, परम्परानुसार फूल या पत्ते, स्वच्छ जल, कुमकुम या चन्दन तथा पारिवारिक मिठाई, फल या भोजन का नैवेद्य।" },
+      { en: "Light diyas safely at the altar and suitable places in the home. Keep flame away from curtains, rangoli powder, children and animals; electric lights may be used where an open flame is unsafe.", hi: "पूजा-स्थान और घर के सुरक्षित स्थानों पर दीप जलाएँ। लौ को पर्दों, रंगोली के चूर्ण, बच्चों और पशुओं से दूर रखें; जहाँ खुली लौ सुरक्षित न हो वहाँ विद्युत-दीप उपयोग कर सकते हैं।" },
+      { en: "Begin with a brief purification and a plain-language intention. Remember Ganesha first if that is your family custom, then invite Lakshmi respectfully and offer water, scent or kumkum, flowers, lamp and naivedya one by one.", hi: "संक्षिप्त शुद्धि और सरल भाव-संकल्प से आरम्भ करें। यदि परिवार की रीति हो तो पहले गणेश का स्मरण करें, फिर लक्ष्मी का आदरपूर्वक आवाहन करके क्रम से जल, सुगन्ध या कुमकुम, फूल, दीप और नैवेद्य अर्पित करें।" },
+      { en: "Recite a familiar Lakshmi prayer, Shri Sukta, Lakshmi ashtottara, bhajan or simple names according to your capacity. A long Sanskrit sequence is optional; do not improvise mantras you do not know.", hi: "सामर्थ्य और परम्परा के अनुसार परिचित लक्ष्मी-प्रार्थना, श्रीसूक्त, लक्ष्मी अष्टोत्तर, भजन या सरल नाम-स्मरण करें। लम्बी संस्कृत-विधि वैकल्पिक है; अपरिचित मंत्र स्वयं न गढ़ें।" },
+      { en: "Offer aarti, bow, distribute prasad and share sweets or useful gifts without pressure to overspend. Leave a lamp only where it can be watched safely; otherwise extinguish it respectfully before sleeping.", hi: "आरती करके प्रणाम करें, प्रसाद बाँटें और बिना अधिक खर्च के दबाव के मिठाई या उपयोगी उपहार साझा करें। दीप केवल वहीं जलता छोड़ें जहाँ सुरक्षित निगरानी हो; अन्यथा सोने से पहले आदरपूर्वक बुझा दें।" },
+    ],
+    diet: {
+      en: "A day-long Lakshmi-puja fast is kept in some families, but it is not one compulsory rule for every Diwali household. If fasting, choose the water, fruit, milk or meal rule received from your family or temple and break it after the evening worship. Otherwise eat the family's festive vegetarian meal and prasad. Regional sweets and savouries vary widely.",
+      hi: "कुछ परिवार लक्ष्मी-पूजन तक दिनभर व्रत रखते हैं, पर यह हर दीपावली-घर के लिए एक अनिवार्य नियम नहीं है। व्रत हो तो परिवार या मंदिर से मिली जल, फल, दूध या भोजन की रीति रखें और सायंकालीन पूजा के बाद खोलें। अन्यथा पारिवारिक उत्सवी शाकाहारी भोजन और प्रसाद लें। क्षेत्रीय मिठाइयाँ और नमकीन बहुत भिन्न होते हैं।",
+    },
+    sankalpa: {
+      en: "“On this night of lights, I welcome wisdom, honest prosperity and generosity into this home. May what we receive be used responsibly and shared with others.” This is a plain-language intention, not a prescribed Sanskrit mantra.",
+      hi: "“इस दीप-रात्रि पर मैं इस घर में विवेक, ईमानदार समृद्धि और उदारता का स्वागत करता/करती हूँ। हमें जो मिले उसका सदुपयोग हो और हम दूसरों के साथ बाँटें।” यह सरल भाव-संकल्प है, निर्धारित संस्कृत मंत्र नहीं।",
+    },
+    puja: {
+      en: "Recommended household path: clean altar; safe lamp; Ganesha remembrance where customary; Lakshmi invitation; water, kumkum or sandal, flowers, lamp and naivedya; familiar prayer or Shri Sukta; aarti; prasad and charity. Elaborate Kalasha, new-murti Shodashopachara, account-book, Kubera or priest-led rites belong to households that already follow them and are not required for this simple path.",
+      hi: "अनुशंसित गृह-विधि: स्वच्छ वेदी; सुरक्षित दीप; परम्परानुसार गणेश-स्मरण; लक्ष्मी-आवाहन; जल, कुमकुम या चन्दन, फूल, दीप और नैवेद्य; परिचित प्रार्थना या श्रीसूक्त; आरती; प्रसाद और दान। विस्तृत कलश, नई मूर्ति का षोडशोपचार, बही-खाता, कुबेर या पुरोहित-विधि उन्हीं घरों के लिए है जहाँ पहले से प्रचलित हो; सरल विधि में यह अनिवार्य नहीं।",
+    },
+    stories: [
+      { en: "Rama's return: in a widely told North Indian association, lamps welcome Rama, Sita and Lakshmana back to Ayodhya after exile and Ravana's defeat. Ganak labels this as a major regional devotional memory, not the only Diwali story across India.", hi: "राम की वापसी: उत्तर भारत की व्यापक परम्परा में वनवास और रावण-वध के बाद राम, सीता और लक्ष्मण के अयोध्या लौटने पर दीपों से स्वागत स्मरण किया जाता है। गणक इसे प्रमुख क्षेत्रीय भक्ति-स्मृति कहता है, पूरे भारत की एकमात्र दीपावली-कथा नहीं।" },
+      { en: "Lakshmi on Amavasya: the main North Indian household night welcomes Lakshmi as the giver of well-being and prosperity. The ethical emphasis is clean work, gratitude, generosity and responsible use of wealth—not gambling or guaranteed financial gain.", hi: "अमावस्या पर लक्ष्मी: उत्तर भारतीय गृह-परम्परा की मुख्य रात्रि में कल्याण और समृद्धि देने वाली लक्ष्मी का स्वागत होता है। इसका नैतिक भाव स्वच्छ कर्म, कृतज्ञता, उदारता और धन का जिम्मेदार उपयोग है—जुआ या निश्चित आर्थिक लाभ नहीं।" },
+      { en: "Krishna and Narakasura belongs especially to Naraka Chaturdashi, the preceding dawn observance in many western and southern traditions. It explains Abhyanga Snan and Chhoti Diwali customs there; it should not be collapsed into the Lakshmi-puja night.", hi: "कृष्ण और नरकासुर की कथा विशेषतः नरक चतुर्दशी से जुड़ी है, जो अनेक पश्चिमी और दक्षिणी परम्पराओं में पूर्ववर्ती प्रातः का पर्व है। वहाँ यह अभ्यंग-स्नान और छोटी दीपावली की रीति समझाती है; इसे लक्ष्मी-पूजन की रात्रि में नहीं मिलाना चाहिए।" },
+    ],
+    regional: [
+      { en: "North and much of western India: evening Lakshmi-Ganesha worship, lamps, rangoli, sweets and family gatherings are prominent. Business account-book or Kubera worship is community-specific, not a requirement for every home.", hi: "उत्तर और पश्चिम भारत के बड़े भाग में सायंकालीन लक्ष्मी-गणेश पूजा, दीप, रंगोली, मिठाई और परिवार-मिलन प्रमुख हैं। व्यापारिक बही-खाता या कुबेर-पूजा समुदाय-विशेष की रीति है, हर घर के लिए अनिवार्य नहीं।" },
+      { en: "Bengal and parts of eastern India: Kali Puja or Shyama Puja is observed on the same Amavasya night with its own deity, timing and Shakta procedure. Ganak keeps that route and guidance distinct from the Lakshmi household path.", hi: "बंगाल और पूर्वी भारत के कुछ भागों में उसी अमावस्या-रात्रि पर काली पूजा या श्यामा पूजा अपनी देवी, समय और शाक्त-विधि के साथ होती है। गणक उसे लक्ष्मी की गृह-विधि से अलग मार्ग और मार्गदर्शन के रूप में रखता है।" },
+      { en: "Maharashtra's sequence commonly includes Vasubaras, Dhantrayodashi, Naraka Chaturdashi, Lakshmi Pujan, Bali Pratipada/Padwa and Bhau Beej, with faral foods and early-morning customs. Follow each named day rather than treating the whole sequence as one ritual.", hi: "महाराष्ट्र के क्रम में प्रायः वसुबारस, धनत्रयोदशी, नरक चतुर्दशी, लक्ष्मी पूजन, बलि प्रतिपदा/पाडवा और भाऊबीज, फराळ तथा प्रातःकालीन रीतियाँ आती हैं। पूरे क्रम को एक ही अनुष्ठान मानने के बजाय प्रत्येक नामित दिन की विधि अलग रखें।" },
+      { en: "Tamil Deepavali and several southern observances centre the Naraka Chaturdashi morning, oil bath, new clothes, food and family worship. The calendar relationship is close, but this is not simply the North Indian Lakshmi-puja night translated southward.", hi: "तमिल दीपावली और कई दक्षिण भारतीय परम्पराओं का केंद्र नरक चतुर्दशी की सुबह, तेल-स्नान, नए वस्त्र, भोजन और पारिवारिक पूजा है। पंचांग-सम्बन्ध निकट है, पर यह उत्तर भारतीय लक्ष्मी-पूजन रात्रि का केवल दक्षिणी रूप नहीं है।" },
+      { en: "Jain and Sikh Diwali-period observances have their own histories and theology. Ganak's Hindu household guide does not speak for those traditions; users should follow their own community sources.", hi: "जैन और सिख दीपावली-कालीन पर्वों का अपना इतिहास और धर्म-दर्शन है। गणक की हिन्दू गृह-मार्गदर्शिका उन परम्पराओं का प्रतिनिधित्व नहीं करती; उपयोगकर्ता अपने समुदाय के स्रोत मानें।" },
+    ],
+    paran: {
+      en: "If your family observes a fast, complete it after the local evening Lakshmi puja and prasad according to the rule with which the fast was undertaken. There is no single pan-Indian Diwali paran minute for every household.",
+      hi: "यदि परिवार में व्रत रखा जाता है तो जिस नियम से व्रत लिया है उसके अनुसार स्थानीय सायंकालीन लक्ष्मी-पूजन और प्रसाद के बाद पूरा करें। हर घर के लिए एक ही अखिल-भारतीय दीपावली पारण-मिनट नहीं है।",
+    },
+    udyapan: {
+      en: "The ordinary annual festival needs no separate udyapan. A specially vowed Lakshmi observance, counted lamp practice or priest-given vrata should be concluded by the same family, temple or teacher whose rules began it.",
+      hi: "सामान्य वार्षिक पर्व के लिए अलग उद्यापन आवश्यक नहीं है। विशेष संकल्पित लक्ष्मी-अनुष्ठान, निश्चित दीप-व्रत या पुरोहित से मिले व्रत का समापन उसी परिवार, मंदिर या गुरु की विधि से करें जहाँ से वह आरम्भ हुआ।",
+    },
+    safety: {
+      en: "This note does not change the religious observance. Keep every flame on a stable non-flammable surface and supervised; protect children, elders, animals and respiratory patients from smoke and loud noise. Prefer lamps, community celebration and low-pollution alternatives. Never mix fasting with missed medicines or ignore medical dietary needs.",
+      hi: "यह टिप्पणी धार्मिक अनुष्ठान को नहीं बदलती। प्रत्येक दीप स्थिर अग्निरोधी सतह पर और निगरानी में रखें; बच्चों, बुज़ुर्गों, पशुओं तथा श्वास-रोगियों को धुएँ और तेज़ शोर से बचाएँ। दीप, सामुदायिक उत्सव और कम-प्रदूषण विकल्प चुनें। व्रत के कारण दवा न छोड़ें और चिकित्सकीय आहार-आवश्यकता की उपेक्षा न करें।",
+    },
+  },
   ekadashi: {
     verdict: {
       en: "Keep the Vishnu fast from local sunrise on Ekadashi until the Dwadashi paran time shown for your location. Avoid all grains and cereals even if you choose a lighter fast.",

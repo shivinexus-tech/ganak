@@ -98,6 +98,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       fill a page. Add a reviewed-major-festival inventory and a gate that prevents
       an approved major festival from silently falling back to the thin overview.
       Makar Sankranti is the first correction under `CODEX-P0-MAKAR-GUIDE-01`.
+      **Slice 01:** Diwali now has a sourced bilingual household guide and the
+      permanent substantive-page gate covers both Makar Sankranti and Diwali.
+      The parent remains open for the remaining reviewed-major queue in
+      `plans/major-festival-page-inventory.md`.
 - [x] **P0 before go-live — location-aware Sankranti Punya Kala.** Calculate and
       show the local Sankranti moment, Punya Kala and Maha Punya Kala on Makar and
       other relevant Sankranti pages. Respect the after-sunset carry rule and do

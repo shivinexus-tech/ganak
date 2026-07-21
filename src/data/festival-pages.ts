@@ -37,6 +37,15 @@ const FESTIVAL_VIDHI_KEYS = Object.freeze({
   ayyappaMandalaPuja: "ayyappaMandala",
 });
 
+/* A key enters this list only after its permanent page has been reviewed against
+   the current substantive-major standard: bilingual answer-first guidance,
+   significance, household worship, food/fasting boundaries, stories and labelled
+   regional variation. The validation gate makes regression to metadata-only fail. */
+const REVIEWED_MAJOR_FESTIVAL_KEYS = Object.freeze([
+  "makarSankranti",
+  "diwali",
+]);
+
 const slugFromKey = (key) => String(key)
   .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
   .replace(/_/g, "-")
@@ -140,6 +149,7 @@ export {
   REQUIRED_PAGE_ENTRIES,
   DEFERRED_PAGE_ENTRIES,
   SHARED_PAGE_ENTRIES,
+  REVIEWED_MAJOR_FESTIVAL_KEYS,
   FEST_META,
   OBS_META,
   observanceBaseKey,
