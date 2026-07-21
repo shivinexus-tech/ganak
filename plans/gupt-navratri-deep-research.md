@@ -2,7 +2,7 @@
 
 Task: `P0-GUPT-NAVRATRI-DEEP-RESEARCH`
 
-Status: **before-live research; no detailed ritual page before owner review**
+Status: **TAKEOVER REVIEW COMPLETE 2026-07-21 — Cursor's two draft guides were corrected after a source/policy audit; owner copy review and exact local Ghatasthapana/parana engineering remain before app integration**
 
 ## Why this needs its own track
 
