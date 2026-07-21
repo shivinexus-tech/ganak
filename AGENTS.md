@@ -71,6 +71,13 @@ assertions. If a gate fails, fix the cause — never weaken a gate to pass it
   browser/phone smoke test.
 - Every agent assignment and handoff is recorded in `plans/task-log.md`, including
   branch/worktree, owned files, gate output and blockers.
+- **Standing Google Sheet closeout policy (owner, 2026-07-21):** after every
+  finished backlog slice, synchronize the matching row in **Ganak — Open Backlog
+  Acceptance Register**. Record current progress, remaining time, dependencies
+  and concrete closure evidence. If anything remains because of a dependency,
+  blocker, external approval or incomplete validation, name it explicitly in the
+  sheet and do **not** mark the slice Done/100%. This sync is part of completion,
+  not an optional later documentation task.
 - **Temp backups stay inside the repo:** use `.scratch/` (gitignored), never
   `/tmp` or paths outside the project.
 - **Recovery vault (agents must never touch):** `~/Ganak-Recovery/LATEST` is a
