@@ -7,6 +7,31 @@ import { setAyanMode, ayanAt, zoneOffset, sunEvents, jdOf, elongMs, moonSidMs } 
 
 const PANCHAKA_TYPE = { 1: "mrityu", 2: "agni", 4: "raja", 6: "chora", 8: "roga" };
 const panchakaRem = (t30, vaara, n27, lagna12) => (t30 + vaara + n27 + lagna12) % 9;
+
+// The tithi, nakshatra and lagna boundaries move independently, so two of them
+// can land seconds apart and leave a sliver of a segment. The UI renders windows
+// at minute precision, so anything under a minute prints with an identical start
+// and end -- "अग्नि 9:31 PM–9:31 PM" (New Delhi, 30 Jul 2026: tithi rolled 16->17
+// at 21:31:08, lagna 10->11 at 21:31:44). A sliver is also unusable as a muhurat
+// even when it does straddle a minute mark.
+//
+// So snap the near-coincident boundaries together instead of reporting the
+// sliver: its span is handed to the preceding segment (a leading sliver goes to
+// the following one), which moves a boundary by under a minute and keeps the day
+// tiled sunrise to sunrise with no gap. Applied to the segments rather than to
+// the finished lists so the lagna schedule and the panchaka windows -- and hence
+// both the Daily panchaka list and the finder's top-day panchaka -- are clean.
+const MIN_WINDOW_MS = 60000;
+function mergeShortSegs(segs) {
+  const out = [];
+  for (const sg of segs) {
+    const prev = out[out.length - 1];
+    if (prev && sg.end - sg.start < MIN_WINDOW_MS) prev.end = sg.end;
+    else out.push({ ...sg });
+  }
+  if (out.length > 1 && out[0].end - out[0].start < MIN_WINDOW_MS) { out[1].start = out[0].start; out.shift(); }
+  return out;
+}
 function computeLagnaPanchaka(place, ayanamsa = "lahiri", atMs) {
   setAyanMode(ayanamsa);
   const now = atMs != null ? atMs : Date.now();
@@ -38,8 +63,9 @@ function computeLagnaPanchaka(place, ayanamsa = "lahiri", atMs) {
     }
   }
   segs.push({ start: s0, end: nextRise, sign: cur.sign, rem: cur.rem });
+  const kept = mergeShortSegs(segs);
   const lagnaSchedule = [];
-  for (const sg of segs) {
+  for (const sg of kept) {
     const last = lagnaSchedule[lagnaSchedule.length - 1];
     if (last && last.sign === sg.sign) last.end = sg.end;
     else lagnaSchedule.push({ sign: sg.sign, start: sg.start, end: sg.end });
@@ -49,7 +75,7 @@ function computeLagnaPanchaka(place, ayanamsa = "lahiri", atMs) {
     w.rem = a.rem; w.type = PANCHAKA_TYPE[a.rem] || "shubha"; w.shubha = !PANCHAKA_TYPE[a.rem];
   }
   const panchakaWindows = [];
-  for (const sg of segs) {
+  for (const sg of kept) {
     const type = PANCHAKA_TYPE[sg.rem] || "shubha";
     const last = panchakaWindows[panchakaWindows.length - 1];
     if (last && last.type === type) last.end = sg.end;
