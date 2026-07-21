@@ -1,6 +1,8 @@
 // Vrat vidhi content — extracted from kundli-app.tsx (EPIC-SPLIT).
 // Pure data, no app logic: content agents can edit this file without touching the app.
 
+import { MAJOR_FESTIVAL_GUIDES, MAJOR_FESTIVAL_SUPPLEMENTS } from "./major-festival-guides";
+
 /* Vrat vidhi content — sourced from plans/vrat-vidhis.md. User-facing copy only;
    implementation and editorial instructions stay in plans, never in this object. */
 export const VRAT_VIDHI_LABELS = {
@@ -59,6 +61,7 @@ const VAT_SAVITRI_COMMON = Object.freeze({
 });
 
 export const VRAT_VIDHI = {
+  ...MAJOR_FESTIVAL_GUIDES,
   makarSankranti: {
     verdict: {
       en: "Makar Sankranti is the major solar festival when Surya enters Makara in the sidereal Hindu calendar. The shared household observance is Surya arghya, til and jaggery or the family's seasonal food, charity and gratitude; fasting rules differ by family and region.",
@@ -971,3 +974,15 @@ export const VRAT_VIDHI = {
     },
   },
 };
+
+for (const [key, supplement] of Object.entries(MAJOR_FESTIVAL_SUPPLEMENTS)) {
+  const existing = VRAT_VIDHI[key];
+  if (!existing) continue;
+  Object.assign(existing, {
+    meaning: supplement.meaning,
+    stories: supplement.stories,
+    regional: supplement.regional,
+    safety: supplement.safety,
+    vidhi: [...existing.vidhi, ...supplement.extraVidhi],
+  });
+}

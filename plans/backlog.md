@@ -90,7 +90,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       `plans/claude-task-p1-vratvidhi-verify.md`.
 
 **Plumbing:**
-- [ ] **P0 before go-live — substantive-page coverage for major festivals.** A
+- [x] **P0 before go-live — substantive-page coverage for major festivals.** A
       permanent URL is not complete merely because it resolves. Audit every major
       festival currently using a metadata-only page and promote it to a sourced,
       bilingual guide with significance, household worship, food/fasting rules,
@@ -98,10 +98,12 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       fill a page. Add a reviewed-major-festival inventory and a gate that prevents
       an approved major festival from silently falling back to the thin overview.
       Makar Sankranti is the first correction under `CODEX-P0-MAKAR-GUIDE-01`.
-      **Slice 01:** Diwali now has a sourced bilingual household guide and the
-      permanent substantive-page gate covers both Makar Sankranti and Diwali.
-      The parent remains open for the remaining reviewed-major queue in
-      `plans/major-festival-page-inventory.md`.
+      **Complete:** all 29 festivals in the approved major inventory now have
+      reviewed substantive bilingual pages. Seventeen former metadata-only
+      routes gained full guides; ten older guides were completed to the same
+      standard without replacing validated timing/fasting rules. The permanent
+      gate contains the exact expected registry so removing one also fails.
+      _(CODEX-P0-MAJOR-FESTIVAL-COVERAGE-ALL — completed 2026-07-21)_
 - [x] **P0 before go-live — location-aware Sankranti Punya Kala.** Calculate and
       show the local Sankranti moment, Punya Kala and Maha Punya Kala on Makar and
       other relevant Sankranti pages. Respect the after-sunset carry rule and do

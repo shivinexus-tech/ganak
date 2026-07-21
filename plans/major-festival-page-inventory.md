@@ -1,6 +1,6 @@
 # Major festival substantive-page inventory
 
-Status: active launch audit under `CODEX-P0-MAJOR-FESTIVAL-COVERAGE-01`.
+Status: complete launch inventory under `CODEX-P0-MAJOR-FESTIVAL-COVERAGE-ALL`.
 
 ## Standard
 
@@ -15,36 +15,30 @@ metadata paragraph alone do not count.
 | Key | Public page | Status |
 |---|---|---|
 | `makarSankranti` | `/festival/makar-sankranti` | Reviewed substantive guide; shipped |
-| `diwali` | `/festival/diwali` | Reviewed substantive guide; Slice 01 |
+| `diwali` | `/festival/diwali` | Reviewed substantive guide |
+| `holika`, `rangwaliHoli` | `/festival/holika`, `/festival/rangwali-holi` | Separate reviewed fire-night and colour-day guides |
+| `ramNavami`, `hanumanJ`, `akshaya` | generated permanent routes | Reviewed substantive guides |
+| `guruPurnima`, `rakshaBandhan`, `dussehra` | generated permanent routes | Reviewed substantive guides |
+| `dhanteras`, `narakChaturdashi`, `govardhanPuja`, `bhaiDooj` | generated permanent routes | Separate reviewed Diwali-sequence guides |
+| `gudiPadwa`, `ugadi` | generated permanent routes | Separate reviewed regional new-year guides |
+| `buddhaPurnima`, `rathYatra`, `kartikaPurnima` | generated permanent routes | Reviewed substantive guides |
+| `mahaShivaratri`, `chaitraNavratri`, `sharadNavratri` | existing permanent routes | Existing guides audited and completed to current standard |
+| `ganeshChaturthi`, `janmashtami`, `chhath` | existing permanent routes | Existing guides audited and completed to current standard |
+| `karvaChauth`, `ahoiAshtami`, `hartalikaTeej`, `sheetlaAshtami` | existing permanent routes | Existing guides audited and completed to current standard |
 
-These keys are mirrored in `REVIEWED_MAJOR_FESTIVAL_KEYS`; the permanent gate
-fails if either route loses its substantive bilingual guide.
+All 29 keys are mirrored in `REVIEWED_MAJOR_FESTIVAL_KEYS`; the permanent gate
+contains the complete expected set and fails if a key is removed, a route becomes
+thin, or any required bilingual section falls below the substantive standard.
 
-## Existing detailed guides needing a later current-standard audit
+## Existing detailed guides audit
 
-Maha Shivaratri; Chaitra Navratri; Sharad Navratri; Ganesh Chaturthi;
-Janmashtami; Chhath; Karva Chauth; Ahoi Ashtami; Hartalika Teej; Sheetla Ashtami.
-They are not called thin pages, but they do not enter the reviewed registry until
-their present copy is checked against every field above.
+Complete. Their validated timing, fasting, puja, paran and udyapan copy was
+preserved. Missing significance, stories, regional distinctions and safety were
+added, and one-step guides were expanded to at least three household steps.
 
-## Major metadata-only gaps — implementation queue
+## Major metadata-only gaps
 
-1. Holika Dahan and Rangwali Holi
-2. Ram Navami
-3. Hanuman Jayanti
-4. Akshaya Tritiya
-5. Guru Purnima
-6. Raksha Bandhan
-7. Dussehra / Vijayadashami
-8. Dhanteras
-9. Naraka Chaturdashi / Chhoti Diwali
-10. Govardhan Puja / Annakut
-11. Bhai Dooj
-12. Gudi Padwa
-13. Ugadi
-14. Buddha Purnima
-15. Rath Yatra
-16. Kartika Purnima / Dev Deepawali
+None remain in this approved launch inventory.
 
 The Diwali-sequence days stay separate because their deities, deciding periods
 and household rites differ. Deferred Bengal Durga Puja day pages remain governed
