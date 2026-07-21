@@ -12,6 +12,7 @@ const vidhis = loadApp('src/data/vrat-vidhis.ts');
 const {
   FESTIVAL_PAGE_ENTRIES, FESTIVAL_PAGE_ROUTES, REQUIRED_PAGE_ENTRIES,
   DEFERRED_PAGE_ENTRIES, SHARED_PAGE_ENTRIES, EXCLUDED_PAGE_KEYS,
+  NAVADURGA_PAGE_ENTRIES,
 } = pages;
 
 function coverageProblems(entries, routes) {
@@ -49,7 +50,7 @@ const existingStandalone = new Set(['hartalikaTeej', 'chaitraNavratri', 'sharadN
 const newPages = REQUIRED_PAGE_ENTRIES.filter((entry) => !existingStandalone.has(entry.key));
 assert.strictEqual(newPages.length, 153, 'the registry must retain 148 generated pages plus 5 approved multi-day milestone pages');
 
-const problems = coverageProblems(FESTIVAL_PAGE_ENTRIES, FESTIVAL_PAGE_ROUTES);
+const problems = coverageProblems([...FESTIVAL_PAGE_ENTRIES, ...NAVADURGA_PAGE_ENTRIES], FESTIVAL_PAGE_ROUTES);
 assert.deepStrictEqual(problems, [], `festival page coverage problems:\n${problems.join('\n')}`);
 
 for (const entry of REQUIRED_PAGE_ENTRIES) {
@@ -74,6 +75,13 @@ for (const entry of DEFERRED_PAGE_ENTRIES) {
   assert.strictEqual(entry.path, null, `${entry.key} must stay explicitly deferred until its page structure is researched`);
 }
 
+assert.strictEqual(NAVADURGA_PAGE_ENTRIES.length, 18, 'nine Chaitra and nine Sharad Navadurga pages must remain registered');
+for (const entry of NAVADURGA_PAGE_ENTRIES) {
+  assert.strictEqual(FESTIVAL_PAGE_ROUTES[entry.path], entry, `${entry.path} must resolve to its Navadurga page`);
+  const resolved = screen.festivalGuideFromPath(entry.path);
+  assert(resolved && resolved.key === entry.key, `${entry.path} must resolve through the screen`);
+}
+
 const injectedMissing = Object.freeze({
   sourceKind: 'festival', key: '__coverage_guard__', status: 'required',
   slug: 'coverage-guard', path: '/festival/coverage-guard',
@@ -89,5 +97,6 @@ console.log(`PASS  ${REQUIRED_PAGE_ENTRIES.length} required labels covered (${ne
 console.log(`PASS  ${SHARED_PAGE_ENTRIES.length} Chhath labels use the existing shared page`);
 console.log(`PASS  ${DEFERRED_PAGE_ENTRIES.length} multi-day labels are explicitly deferred`);
 console.log(`PASS  ${Object.keys(FESTIVAL_PAGE_ROUTES).length} unique direct routes are valid`);
+console.log(`PASS  ${NAVADURGA_PAGE_ENTRIES.length} season-specific Navadurga routes are valid`);
 console.log('PASS  guard simulation rejects a new label without a route');
 console.log('\nFESTIVAL PAGE COVERAGE PASSED');

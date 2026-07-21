@@ -156,4 +156,34 @@ function navratriTimings(place, navratriStartMs) {
   };
 }
 
-export { navratriTimings, ghatasthapanaFor, navratriParanaFor };
+/* The Navadurga form follows the Shukla tithi prevailing at local sunrise, not
+   an unconditional start-date + N offset. A vriddhi tithi can therefore give one
+   form two sunrise dates; a kshaya tithi can give it no standalone sunrise date.
+   Day 1 is the selected Navratri opening civil day because the accepted
+   Ghatasthapana rule can begin after sunrise when Pratipada starts later that day. */
+function navadurgaDatesFor(place, navratriStartMs, formDay) {
+  requirePlace(place);
+  if (!Number.isFinite(navratriStartMs)) throw new Error("start-required");
+  if (!Number.isInteger(formDay) || formDay < 1 || formDay > 9) throw new Error("form-day-required");
+  setAyanMode("lahiri");
+  const startCivil = localDateAt(navratriStartMs, place.zone);
+  const dates = [];
+  for (let offset = 0; offset < 12; offset++) {
+    const civil = shiftCivilDate(startCivil, offset);
+    const solar = solarDay(place, civil);
+    if (solar.rise == null) continue;
+    const tithiIndex = Math.floor(elongMs(solar.rise) / 12);
+    const shuklaTithi = tithiIndex < 15 ? tithiIndex + 1 : null;
+    if ((formDay === 1 && offset === 0) || (formDay > 1 && shuklaTithi === formDay)) {
+      dates.push({ y: solar.y, m: solar.m, day: solar.day, tz: solar.tz, rise: solar.rise, tithi: shuklaTithi });
+    }
+  }
+  return {
+    formDay,
+    targetTithi: formDay,
+    status: dates.length === 0 ? "skipped" : (dates.length > 1 ? "repeated" : "single"),
+    dates,
+  };
+}
+
+export { navratriTimings, navadurgaDatesFor, ghatasthapanaFor, navratriParanaFor };
