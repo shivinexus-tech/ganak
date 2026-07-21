@@ -3,6 +3,13 @@
 Rebuilt 2026-07-18 into a phased launch plan reflecting the owner's strategy.
 Status verified against `src/kundli-app.tsx`, not assumed.
 
+**Closure contract:** acceptance criteria and the definition of done for every
+consolidated open package are canonical in
+[`plans/backlog-acceptance-register.md`](backlog-acceptance-register.md). A checkbox
+must not be closed merely because code exists; the linked acceptance and evidence
+requirements must pass. Nested/duplicate checkboxes map to one package in that
+register so they cannot be counted as separate progress.
+
 ## Strategy (owner, 2026-07-18)
 
 - **Free to start.** Hook users first, gather heavy user feedback, let real usage
