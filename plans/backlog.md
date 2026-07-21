@@ -224,10 +224,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       must now also anchor the ruling-planet rules (which five, ranking, timing use)
       and the sincerity doctrine — the areas where popular KP sites vary most.
       _(P0-PRASHNA-249-KSK-VERIFY)_
-- [ ] **P1 — Prashna ordinal bug (LIVE).** Verdict copy prints "1th / 2th / 3th house":
-      `src/screens/PrashnaScreen.tsx` lines 295/299/303 hardcode `${h}th`. Visible on
-      ganak.pages.dev now; 2nd/3rd houses are common in readings. English only —
-      Hindi forms ordinals differently. One-line fix. _(P1-PRASHNA-ORDINAL)_
+- [x] **P1 — Prashna ordinal bug.** English house labels now use proper ordinals
+      (`1st`, `2nd`, `3rd`, `4th`, including `11th`/`12th`) in all three verdict
+      reason paths; Hindi copy is unchanged. A permanent copy gate prevents the
+      hard-coded `${h}th` form from returning. _(CODEX-P0-PRASHNA-ORDINAL — shipped 2026-07-21)_
 - [x] **Hide the birth-chart tab** for launch — Daily + Prashna only; Chart route falls
       back to Daily. _(P1-HIDE-DEPLOY, live at ganak.pages.dev)_
 - [x] **Deploy to a web host** — https://ganak.pages.dev (Cloudflare Pages, `main`
@@ -247,8 +247,9 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       to `/hi/...` after an SEO and usability comparison. _(P0-CUSTOM-DOMAIN)_
 - [x] **Error monitoring** — privacy-safe crash reporter + React Error Boundary
       (no Sentry SDK / no browser storage). DSN via `VITE_SENTRY_DSN` at build time.
-      Owner must add the DSN in Cloudflare Pages and redeploy — see
-      `plans/error-monitoring.md`. _(CURSOR-P1-ERROR-MONITOR)_
+      Cloudflare production injection and a controlled Sentry event were verified
+      end-to-end on 2026-07-21 — see `plans/error-monitoring.md`.
+      _(CURSOR-P1-ERROR-MONITOR + CODEX-P1-ERROR-MONITOR-FIX)_
 - [ ] **Analytics + a feedback channel** — owner wants "immense user input."
       Privacy-friendly analytics + an in-app feedback button/form.
 - [ ] **Publish privacy/terms page** — draft at `plans/legal-privacy-terms-draft.md`;
