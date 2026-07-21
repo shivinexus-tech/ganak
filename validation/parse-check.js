@@ -111,9 +111,10 @@ function walk(node, isTop) {
                               || ts.isParameter(p) || ts.isBindingElement(p) || ts.isImportSpecifier(p)
                               || ts.isImportClause(p) || ts.isNamespaceImport(p) || ts.isMethodDeclaration(p)) && p.name === node;
     const isJsxAttr     = p && ts.isJsxAttribute(p) && p.name === node;
+    const isMetaName    = p && ts.isMetaProperty(p) && p.name === node;
     const isIntrinsic   = p && (ts.isJsxOpeningElement(p) || ts.isJsxSelfClosingElement(p) || ts.isJsxClosingElement(p))
                             && p.tagName === node && /^[a-z]/.test(node.text);
-    if (!isPropName && !isObjKey && !isDeclName && !isJsxAttr && !isIntrinsic) {
+    if (!isPropName && !isObjKey && !isDeclName && !isJsxAttr && !isMetaName && !isIntrinsic) {
       if (!referenced.has(node.text)) referenced.set(node.text, []);
       referenced.get(node.text).push(lineOf(node));
     }

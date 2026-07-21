@@ -10,6 +10,7 @@
 
 const RELEASE = "ganak@0.0.1";
 const MIN_INTERVAL_MS = 8000;
+const RAW_DSN = import.meta.env.VITE_SENTRY_DSN;
 let lastSentAt = 0;
 let installed = false;
 
@@ -27,14 +28,10 @@ function parseDsn(raw) {
 }
 
 function dsnFromEnv() {
-  // Vite inlines import.meta.env at build time. Call via globalThis.Function so
-  // the validation orphan scanner does not treat `meta` as a free identifier.
-  try {
-    const env = globalThis.Function("return import.meta.env")();
-    return parseDsn(env && env.VITE_SENTRY_DSN);
-  } catch (e) {
-    return null;
-  }
+  // This direct reference is intentional: Vite can only inline build-time
+  // variables it can see statically. Hiding import.meta.env inside Function()
+  // leaves production monitoring permanently disabled.
+  return parseDsn(RAW_DSN);
 }
 
 function eventId() {

@@ -36,6 +36,19 @@ Without a DSN the reporter is a silent no-op — local `npm run dev` stays clean
    (`throw new Error("ganak-sentry-smoke")` in the console after load), confirm
    the event appears in Sentry within a minute.
 
+## Build verification
+
+The reporter must use a direct `import.meta.env.VITE_SENTRY_DSN` reference. Vite
+cannot inline the value if `import.meta.env` is hidden inside a string or dynamic
+`Function(...)` call. The regression check is:
+
+```bash
+node validation/error-monitoring-config.cjs
+```
+
+For a build-time injection check, build with a non-secret test DSN and pass the
+same value to the gate. The gate reports only pass/fail; it never prints the DSN.
+
 ## Privacy
 
 Update the published privacy note when the DSN is live: crash reports may leave
