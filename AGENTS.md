@@ -44,6 +44,7 @@ node validation/prashna-parity.js src/screens/PrashnaScreen.tsx # Prashna engine
 node validation/prashna-calc.js                      # 24 self-tests vs Drik anchors
 node validation/muhurat-anchors.cjs                  # muhurat rules vs Drik 2026 published dates
 node validation/navratri-timings.cjs                 # city Ghatasthapana + Dashami-parana anchors and page wiring
+node validation/sankranti-punya.cjs                  # Drik ingress + local Punya/Maha Punya windows
 node validation/panchaka-windows.cjs                 # no sub-minute/same-minute display windows or gaps
 node validation/festival-deeplinks.cjs               # permanent festival routes + existing card default
 node validation/festival-page-coverage.cjs            # every in-scope openable label has a valid page
