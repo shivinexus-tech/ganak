@@ -90,6 +90,61 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       `plans/claude-task-p1-vratvidhi-verify.md`.
 
 **Plumbing:**
+- [ ] **P0 before go-live — finish, polish and expose Ganak Jyotish.** The birth-chart
+      section is no longer a Phase-2 reveal. Bring the already-built engines into a
+      coherent, bilingual, phone-ready public experience; do not merely unhide the
+      current dense screen. This launch gate includes:
+  - [ ] Retrograde/direct calendar and planetary combustion, rise and set calendar.
+  - [ ] Standalone Sade Sati calculator and report.
+  - [ ] Standalone Mangal Dosha analysis from Lagna, Moon and Venus, with sourced
+        exceptions/cancellation rules and a plain-language verdict.
+  - [ ] Dedicated Kala Sarpa Dosha analysis with explicit caveats against
+        fear-based or universal claims.
+  - [ ] Papasamyam/Papa Dosham and Pitra Dosha analyses with documented conventions.
+  - [ ] Finish and validate Arudha Padas, Bhavabala presentation, and Special
+        Lagnas/Upagrahas; expose their existing engines with useful explanations.
+  - [ ] South- and East-Indian chart styles in addition to the current chart.
+  - [ ] Keep and expose multiple ayanamshas without changing Ganak's default
+        Lahiri + mean Rahu/Ketu convention.
+  - [ ] Complete the general Dosha explanation layer and finish Ruling Planets,
+        reusing existing engine work only after rule/anchor verification.
+  - [ ] Downloadable Kundli PDF and general PDF reports, with bilingual rendering,
+        chart legibility and print verification.
+      _(P0-JYOTISH-PUBLIC-LAUNCH; owner scope 2026-07-21)_
+- [ ] **P0 before go-live — matching and marriage-completion suite.** Finish
+      Dashakoota alongside the existing Ashtakoota path; add a downloadable match
+      PDF/report and a clearly qualified marriage prediction/timing view. State the
+      method and limitations; never present a match score or timing estimate as a
+      certainty. _(P0-MATCHING-LAUNCH; owner scope 2026-07-21)_
+- [ ] **P0 before go-live — approved utility-calculator catalogue.** Build public,
+      cleanly routed calculators for Moon sign/Rashi, Sun sign, Ascendant/Lagna,
+      birth Nakshatra, baby-name initials/finder, standalone Mangal Dosha, Kala
+      Sarpa, Sade Sati, Shraddha Tithi and Pancha Pakshi. Also include a Western
+      natal chart and Western synastry/composite calculators because they were not
+      excluded from the owner's approved competitor list; keep them visibly
+      separate from Ganak's Vedic defaults. Every calculator needs bilingual
+      inputs, answer-first output, sources/convention notes, validation anchors,
+      permanent URL and share metadata. Explicitly excluded: numerology
+      (Mulank/Bhagyank/Namank), birthstone, Chinese zodiac/calendar, Western
+      transit/progression, Vastu, Feng Shui, gemstone and Rudraksha calculators.
+      _(P0-UTILITY-CALCULATORS; owner scope 2026-07-21)_
+- [ ] **P0 before go-live — discoverability, publishing and public platform.** Ship
+      all of the following as launch gates rather than post-launch polish:
+  - [ ] Clean path-based routes for every public screen and calculator; preserve
+        redirects for old `?screen=` links and the selected language.
+  - [ ] Unique browser title, description, canonical URL and social/share metadata
+        per page; sitemap, robots rules and broad but substantive SEO landing pages.
+  - [ ] Editorial astrology/news publishing area with authorship, dates, corrections,
+        sources, topic/archive routes and a standard that prevents thin SEO pages.
+  - [ ] A documented, rate-limited public developer API with versioning, keys,
+        quotas, abuse controls, privacy terms and stable error contracts.
+  - [ ] Push notifications, including permission education, granular opt-in,
+        timezone/location correctness and an easy unsubscribe path.
+  - [ ] Privacy-friendly analytics plus an in-product feedback channel; update the
+        current “no tracking” claim and legal draft in the same release.
+  - [ ] Publish Privacy and Terms pages after owner contact details and legal review.
+  - [ ] Social/community channels and clear in-product links/moderation ownership.
+      _(P0-PUBLIC-PLATFORM-LAUNCH; owner scope 2026-07-21)_
 - [x] **P0 before go-live — substantive-page coverage for major festivals.** A
       permanent URL is not complete merely because it resolves. Audit every major
       festival currently using a metadata-only page and promote it to a sourced,
@@ -282,17 +337,20 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
 - [ ] Design-system pass (universal Card, spacing scale, shared primitives) —
       see **EPIC-DS**. Directly fixes the "visual inconsistency" pain.
 
-**Not needed for Phase 1:** accounts, data persistence, backend proxy, AI,
-Android, SDUI/paywalls. Deliberately out of scope to keep the launch fast.
+**Still not required by the 2026-07-21 scope change:** accounts, cross-device data
+persistence, paid AI, Android/iOS store packaging, SDUI and paywalls. The backend
+work needed for the newly required public API, push and PDF/report delivery is now
+Phase-1 infrastructure; broader account/monetization architecture remains deferred.
 
 ---
 
-## PHASE 2 — Broaden the free app, iterate on feedback
+## PHASE 2 — Broaden languages, then iterate on feedback
 
-- [ ] **Reveal the birth-chart section** once its deep sub-section glosses are
-      translated (E-0.6) and it's had a polish pass. Full Jyotish, still free.
-      Apply the Jyotish-zone hierarchy (Kundli/Dashas/Matching/Tools/Vault
-      sub-nav) at this point — see **EPIC-IA**.
+- [ ] **Regional-language calendars** — add calendar systems and region-specific
+      presentation only after the English/Hindi web launch is stable.
+- [ ] **Broader multi-language interface** — languages beyond the current Hindi and
+      English pair are explicitly post-launch. Translation must cover complete
+      journeys and errors, not only labels. _(Owner priority 2026-07-21)_
 - [ ] Prioritize new features by what Phase 1 user feedback actually asks for.
 - [ ] Cheap feature candidates: **Prashnavali** (number-pick → verse, very low
       cost). Possibly **Gemstone/Remedy** if users ask.
@@ -343,7 +401,8 @@ Owner explicitly deferred these.
 - Gemstone / Remedy suggestions (unless Phase 2 feedback pulls it forward)
 - Vastu Compass
 - Numerology (out of scope for core personas)
-- Sade Sati tracker — needs backend + push
+- Sade Sati **alerts/tracker automation** — the calculator/report is now P0; ongoing
+  proactive alerts still need backend scheduling and push
 - Proactive Gochar / transit **alerts** (push) — needs backend + accounts + push
   (NOTE: transit *display* already exists in the app)
 - Custom Tithi + Reminders — needs push
