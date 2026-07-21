@@ -8,7 +8,7 @@ import { fmtTimeD } from "../components/format";
 import VratVidhiCard from "../components/VratVidhiCard";
 import { VRAT_VIDHI } from "../data/vrat-vidhis";
 import { CHHATH_SHARED_KEYS, FESTIVAL_PAGE_ROUTES, FEST_META, OBS_META } from "../data/festival-pages";
-import { scanPanchangCalendar } from "../engine/festivals";
+import { sankrantiPunyaKala, scanPanchangCalendar } from "../engine/festivals";
 import { vratDetail } from "../engine/muhurat";
 import { navratriTimings } from "../engine/navratri";
 import { zoneOffset } from "../engine/panchang";
@@ -94,13 +94,14 @@ function findLocalFestivalOccurrence(guide, place, nowMs = Date.now()) {
   const pool = guide.sourceKind === "observance" ? cal.fasts : cal.festivals;
   const hits = pool.filter((item) => keys.has(item.key));
   const hit = pickOccurrence(hits, nowMs);
-  if (!hit) return { hit: null, detail: null, tz };
+  if (!hit) return { hit: null, detail: null, punyaKala: null, tz };
   const meta = guide.sourceKind === "observance" ? OBS_META[guide.metaKey] : FEST_META[guide.metaKey];
   const timing = meta && meta.timing ? meta.timing : null;
   const detail = timing === "navratri"
     ? { navratri: navratriTimings(place, hit.ms) }
     : vratDetail(place, "lahiri", hit.ms, timing);
-  return { hit, detail, tz: detail.navratri ? detail.navratri.tz : tz, timing };
+  const punyaKala = /Sankranti$/.test(hit.key) ? sankrantiPunyaKala(hit.ms, place, tz) : null;
+  return { hit, detail, punyaKala, tz: detail.navratri ? detail.navratri.tz : tz, timing };
 }
 
 function formatLocalDate(ms, tz, lang) {
@@ -108,6 +109,21 @@ function formatLocalDate(ms, tz, lang) {
   return d.toLocaleDateString(lang === "hi" ? "hi-IN" : "en-IN", {
     weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "UTC",
   });
+}
+
+function formatLocalClock(ms, tz, refMs, lang) {
+  const locale = lang === "hi" ? "hi-IN" : "en-IN";
+  const d = new Date(ms + tz * 3600000);
+  const ref = new Date(refMs + tz * 3600000);
+  const clock = d.toLocaleTimeString(locale, {
+    hour: "2-digit", minute: "2-digit", hour12: lang !== "hi", hourCycle: lang === "hi" ? "h23" : undefined, timeZone: "UTC",
+  });
+  const sameDay = d.getUTCFullYear() === ref.getUTCFullYear()
+    && d.getUTCMonth() === ref.getUTCMonth()
+    && d.getUTCDate() === ref.getUTCDate();
+  if (sameDay) return clock;
+  const date = d.toLocaleDateString(locale, { month: "short", day: "numeric", timeZone: "UTC" });
+  return `${clock}, ${date}`;
 }
 
 function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
@@ -118,7 +134,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
     : null;
   const title = guide ? guide.title[L] : "";
   const homeHref = `/?lang=${L}&screen=daily`;
-  const [localTiming, setLocalTiming] = useState({ status: "idle", hit: null, detail: null, tz: null, error: null });
+  const [localTiming, setLocalTiming] = useState({ status: "idle", hit: null, detail: null, punyaKala: null, tz: null, error: null });
   const [retryTick, setRetryTick] = useState(0);
 
   useEffect(() => {
@@ -130,7 +146,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
 
   useEffect(() => {
     if (!guide || !place) {
-      setLocalTiming({ status: "idle", hit: null, detail: null, tz: null, error: null });
+      setLocalTiming({ status: "idle", hit: null, detail: null, punyaKala: null, tz: null, error: null });
       return undefined;
     }
     let cancelled = false;
@@ -144,6 +160,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
             status: "empty",
             hit: null,
             detail: null,
+            punyaKala: null,
             tz: result.tz,
             error: null,
           });
@@ -153,6 +170,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
           status: "ready",
           hit: result.hit,
           detail: result.detail,
+          punyaKala: result.punyaKala,
           tz: result.tz,
           error: null,
         });
@@ -162,6 +180,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
           status: "error",
           hit: null,
           detail: null,
+          punyaKala: null,
           tz: null,
           error: e,
         });
@@ -189,6 +208,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
   const hit = localTiming.hit;
   const tz = localTiming.tz;
   const navratri = d && d.navratri;
+  const punyaKala = localTiming.punyaKala;
   const decidingLabel = hit ? decidingKalaLabel(hit.decidingKala, L) : null;
   const clock = (ms) => fmtTimeD(ms, tz, ms);
   const paranaBasis = navratri && ({
@@ -321,6 +341,14 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                     {formatLocalDate(navratri.parana.start, tz, L)}, {clock(navratri.parana.start)} {L === "hi" ? "के बाद" : "onwards"}
                   </div>
                   {paranaBasis && <div style={{ color: C.muted, fontSize: T.fMicro, fontWeight: 400 }}>{paranaBasis[L]}</div>}
+                </div>
+              )}
+              {punyaKala && (
+                <div style={{ display: "grid", gap: 5, padding: "9px 10px", borderRadius: T.rSm, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", fontSize: T.fSmall, color: "#1F7A4D", fontVariantNumeric: "tabular-nums", lineHeight: 1.45 }}>
+                  <div><strong>{L === "hi" ? "संक्रांति क्षण: " : "Sankranti moment: "}</strong>{formatLocalClock(punyaKala.ingress, tz, hit.ms, L)}</div>
+                  <div><strong>{L === "hi" ? "पुण्य काल: " : "Punya Kala: "}</strong>{formatLocalClock(punyaKala.punya.start, punyaKala.tz, hit.ms, L)}–{formatLocalClock(punyaKala.punya.end, punyaKala.tz, hit.ms, L)}</div>
+                  <div><strong>{L === "hi" ? "महा पुण्य काल: " : "Maha Punya Kala: "}</strong>{formatLocalClock(punyaKala.mahaPunya.start, punyaKala.tz, hit.ms, L)}–{formatLocalClock(punyaKala.mahaPunya.end, punyaKala.tz, hit.ms, L)}</div>
+                  {punyaKala.carriedToDaylight && <div style={{ color: C.muted, fontWeight: 400 }}>{L === "hi" ? "सूर्यास्त के बाद की संक्रांति होने से पूजा का समय अगले स्थानीय सूर्योदय से है।" : "Because ingress is outside daylight, the worship window begins at the applicable local sunrise."}</div>}
                 </div>
               )}
               {d && !navratri && (d.parana || d.moonrise != null || d.sunset != null || d.stars) && (

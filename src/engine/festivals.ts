@@ -20,6 +20,12 @@ const SANKRANTI_FESTIVALS = [
   { key: "kumbhaSankranti", deg: 300 },
   { key: "meenaSankranti", deg: 330 },
 ];
+/* Drik's published Lahiri Sankranti moments are consistently ~14 minutes later
+   than the app's general-purpose sidereal-Sun helper (verified for Delhi Makar
+   2024, 2026 and 2027). Keep this 36.36-arcsecond calibration scoped to solar
+   ingress selection so it cannot shift tithi, nakshatra, charts or Prashna. */
+const DRIK_SANKRANTI_LAHIRI_CORRECTION = 0.0101;
+const sankrantiSunSidMs = (ms) => rev(sunSidMs(ms) - DRIK_SANKRANTI_LAHIRI_CORRECTION);
 const ECLIPSE_NODE_ORB = 18; // degrees — syzygy within orb of mean Rahu/Ketu axis
 
 /* Tamil/Malayalam solar-calendar observances.
@@ -60,6 +66,45 @@ function malayalamSankrantiDay(ingressMs, tz) {
 function firstSunriseDayAfter(ingressMs, tz) {
   const rise = localPanchangDayStart(ingressMs, tz);
   return rise + (ingressMs > rise ? 86400000 : 0) + 6 * 3600000;
+}
+
+/* Sankranti observance is daylight-only. If ingress occurs during daylight, the
+   window begins at ingress; before sunrise or after sunset, it uses that day's
+   or the next day's sunrise. Maha Punya is the first five daylight ghatis
+   (one-sixth of the local sunrise-to-sunset span), matching Drik's published
+   city-specific windows. */
+function sankrantiPunyaKala(ingressMs, place, fallbackTz = 5.5) {
+  if (!Number.isFinite(ingressMs) || !place || !Number.isFinite(place.lat) || !Number.isFinite(place.lon)) return null;
+  const civilFor = (ms, tz) => {
+    const d = new Date(ms + tz * 3600000);
+    return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, day: d.getUTCDate() };
+  };
+  const eventsFor = (civil) => {
+    const tz = (place.zone && zoneOffset(place.zone, civil.y, civil.m, civil.day)) ?? fallbackTz;
+    const events = sunEvents(civil.y, civil.m, civil.day, tz, place.lat, place.lon);
+    return { ...events, tz, civil };
+  };
+
+  let day = eventsFor(civilFor(ingressMs, fallbackTz));
+  if (day.rise == null || day.set == null) return null;
+  const duringDaylight = ingressMs >= day.rise && ingressMs < day.set;
+  if (!duringDaylight && ingressMs >= day.set) {
+    const nextCivilDate = new Date(Date.UTC(day.civil.y, day.civil.m - 1, day.civil.day + 1));
+    day = eventsFor({ y: nextCivilDate.getUTCFullYear(), m: nextCivilDate.getUTCMonth() + 1, day: nextCivilDate.getUTCDate() });
+    if (day.rise == null || day.set == null) return null;
+  }
+
+  const start = duringDaylight ? ingressMs : day.rise;
+  const end = day.set;
+  if (!(start < end)) return null;
+  const mahaEnd = Math.min(end, start + (day.set - day.rise) / 6);
+  return {
+    ingress: ingressMs,
+    punya: { start, end },
+    mahaPunya: { start, end: mahaEnd },
+    carriedToDaylight: !duringDaylight,
+    tz: day.tz,
+  };
 }
 function solarNakshatraFestivalDays(fromMs, tz, days) {
   const DAY = 86400000, firstNoon = localNoon(fromMs, tz), limit = firstNoon + days * DAY, buckets = new Map();
@@ -199,7 +244,7 @@ function grahanDays(fromMs, tz, days) {
 function ayyappaMandalaFor(ms, tz) {
   const DAY = 86400000, civilNoon = localNoon(ms, tz), d = new Date(civilNoon + tz * 3600000), gy = d.getUTCFullYear();
   for (const year of [gy, gy - 1]) {
-    const ingress = solveCross(sunSidMs, Date.UTC(year, 9, 20), 210, 45);
+    const ingress = solveCross(sankrantiSunSidMs, Date.UTC(year, 9, 20), 210, 45);
     if (!ingress) continue;
     const start = malayalamSankrantiDay(ingress, tz), end = start + 40 * DAY;
     const day = Math.round((civilNoon - start) / DAY) + 1;
@@ -575,7 +620,7 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
   const firstYear = new Date(firstNoon + tz * 3600000).getUTCFullYear();
   for (let gy = firstYear - 1; gy <= firstYear + 2; gy++) {
     try {
-      const mesha = solveCross(sunSidMs, Date.UTC(gy, 2, 18), 0, 45);
+      const mesha = solveCross(sankrantiSunSidMs, Date.UTC(gy, 2, 18), 0, 45);
       if (mesha) {
         // Vishukkani is viewed at the first dawn after Mesha Sankranti. This is
         // distinct from the civil date carrying the Sankranti itself (e.g. Drik:
@@ -583,7 +628,7 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
         const vishu = firstSunriseDayAfter(mesha, tz);
         if (vishu >= firstNoon && vishu < rangeEnd) festivals.push({ key: "vishu", ms: vishu, ingress: mesha });
       }
-      const vrischika = solveCross(sunSidMs, Date.UTC(gy, 9, 20), 210, 45);
+      const vrischika = solveCross(sankrantiSunSidMs, Date.UTC(gy, 9, 20), 210, 45);
       if (vrischika) {
         const start = malayalamSankrantiDay(vrischika, tz), end = start + 40 * DAY;
         if (start >= firstNoon && start < rangeEnd) festivals.push({ key: "ayyappaMandalaBegins", ms: start, spanEnd: end });
@@ -594,7 +639,7 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
   // Twelve monthly sankrantis (solar ingress) + pongal label on Makar.
   for (const s of SANKRANTI_FESTIVALS) {
     try {
-      const ingress = solveCross(sunSidMs, fromMs, s.deg, days);
+      const ingress = solveCross(sankrantiSunSidMs, fromMs, s.deg, days);
       if (ingress && ingress < fromMs + days * DAY) {
         festivals.push({ key: s.key, ms: ingress, decidingKala: "solar-ingress" });
         if (s.key === "makarSankranti") {
@@ -659,5 +704,5 @@ const obsKind = (key) => (key === "ekadashi" || /_11$/.test(key)) ? "ekadashi" :
 export {
   SOLAR_NAK_FESTIVALS, ayyappaMandalaFor, EKADASHI_NAMES,
   PRADOSH_NAMES_BY_DAY, observancesFor, FESTIVALS, FAST_KALA_RULES,
-  scanPanchangCalendar, obsKind,
+  scanPanchangCalendar, sankrantiPunyaKala, obsKind,
 };

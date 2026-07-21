@@ -92,3 +92,23 @@ festival sequences such as Pongal, Magh Bihu and Uttarayan.
 Ganak still needs a location-aware **Sankranti Punya Kala / Maha Punya Kala**
 engine and UI. The content guide must not fabricate that interval or imply that a
 generic sunrise time is the calculated Sankranti window.
+
+### Timing rule verified for implementation (2026-07-21)
+
+- Punya Kala is daylight-only: daytime ingress starts the window; an ingress
+  outside daylight moves the practical worship window to the applicable local
+  sunrise, and the window ends at local sunset.
+- Maha Punya Kala uses the first five daylight ghatis (one-sixth of that local
+  sunrise-to-sunset span), clipped at sunset.
+- Published Delhi anchors: 2026 daytime ingress 15:13, Punya 15:13–17:45 and Maha
+  Punya 15:13–16:58; 2027 after-sunset ingress carries to 15 January sunrise,
+  with Punya 07:15–17:46 and Maha Punya 07:15–09:00.
+- Drik's explanatory paragraph says “1 Ghati” for daytime Maha Punya, but its
+  published city windows consistently equal five daylight ghatis. Ganak follows
+  the published windows and records this discrepancy rather than hiding it.
+- Ganak's general Lahiri solar helper produced Makar ingress about 14 minutes
+  earlier than Drik in each checked year. Published Delhi moments are 02:54 on
+  15 January 2024, 15:13 on 14 January 2026 and 21:14 on 14 January 2027. A
+  Sankranti-only 36.36-arcsecond correction matches all three without changing
+  Moon/tithi calculations, charts or Prashna. This is intentionally not a global
+  ayanamsa change.
