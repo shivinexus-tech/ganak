@@ -177,7 +177,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         Ashtami, Navami and Vijaya Dashami pages. **Not deferred.**
   - [ ] Separate substantive Skanda Sashti sequence and Ayyappa Mandala sequence
         pages; finish and merge the complete four-day Chhath calendar journey.
-  - [ ] Eighteen season-specific Chaitra/Sharad Navadurga pages plus the sourced
+  - [x] Eighteen season-specific Chaitra/Sharad Navadurga pages plus the sourced
         Durga Saptashati reading plan; Gupt Navratris stay distinct.
   - [ ] Location-aware eclipse visibility, Sutak start/end and safe household
         guidance; sect-specific calendar views where rules are verified.
@@ -279,7 +279,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       the place changes, and keep a Daily Panchang link as optional navigation—not as
       a requirement for understanding the guide.
       _(P0-FESTIVAL-PAGE-PLACE — shipped 2026-07-20)_
-- [ ] **P0 before go-live — Chaitra + Sharad Navratri Navadurga pages and
+- [x] **P0 before go-live — Chaitra + Sharad Navratri Navadurga pages and
       Saptashati plan.** Build nine dedicated Devi day-pages under each of Chaitra
       and Sharad Navratri (18 visible season-specific pages), with verified Goddess
       image/iconography, identity, significance and sourced household puja guidance.
@@ -288,7 +288,12 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       page must contain the complete sourced plan for arranging the text across all
       nine days. Keep the implementation appropriate for householders and distinguish
       simple recitation from initiated/lineage ritual. Do not apply this Navadurga
-      structure to either Gupt Navratri. _(P0-NAVRATRI-18-SAPTASHATI)_
+      structure to either Gupt Navratri. **Shipped 2026-07-21:** eighteen stable
+      bilingual routes, nine original iconography-checked Goddess portraits,
+      step-by-step household puja, day-specific chapters and the full nine-day plan
+      on both day-1 pages. Local tithi logic explains repeated or skipped sunrise
+      days; dedicated gate: `validation/navadurga-pages.cjs`.
+      _(P0-NAVRATRI-18-SAPTASHATI)_
 - [x] **P0 before go-live — deep research on Magha and Ashadha Gupt Navratri
       practices.** Treat the two Gupt Navratris as their own research track, not a
       copy of Chaitra/Sharad. Verify the four-Navratri textual basis; regional and

@@ -4,6 +4,7 @@
 
 import { FEST_META, FEST_NAME, OBS_META, OBS_NAME } from "./festival-meta";
 import { VRAT_VIDHI } from "./vrat-vidhis";
+import { NAVADURGA_PAGE_ENTRIES } from "./navadurga-pages";
 
 const CHHATH_SHARED_KEYS = Object.freeze([
   "chhathNahayKhay", "chhathKharna", "chhath", "chhathUshaArghya",
@@ -162,7 +163,7 @@ function makeRouteRegistry(entries) {
   return Object.freeze(routes);
 }
 
-const FESTIVAL_PAGE_ROUTES = makeRouteRegistry(FESTIVAL_PAGE_ENTRIES);
+const FESTIVAL_PAGE_ROUTES = makeRouteRegistry([...FESTIVAL_PAGE_ENTRIES, ...NAVADURGA_PAGE_ENTRIES]);
 const REQUIRED_PAGE_ENTRIES = Object.freeze(FESTIVAL_PAGE_ENTRIES.filter((entry) => entry.status === "required"));
 const DEFERRED_PAGE_ENTRIES = Object.freeze(FESTIVAL_PAGE_ENTRIES.filter((entry) => entry.status === "deferred"));
 const SHARED_PAGE_ENTRIES = Object.freeze(FESTIVAL_PAGE_ENTRIES.filter((entry) => entry.status === "shared"));
@@ -177,6 +178,7 @@ export {
   DEFERRED_PAGE_ENTRIES,
   SHARED_PAGE_ENTRIES,
   REVIEWED_MAJOR_FESTIVAL_KEYS,
+  NAVADURGA_PAGE_ENTRIES,
   FEST_META,
   OBS_META,
   observanceBaseKey,

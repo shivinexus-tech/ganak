@@ -224,6 +224,12 @@ not four unrelated festivals:
 
 ### Chaitra and Sharad Navratri — owner requirement
 
+**Shipped 2026-07-21:** all eighteen season-specific routes are generated from the
+Navadurga registry. Each page has project-owned artwork, accessible alt text,
+answer-first identity, step-by-step household puja and that day's Saptashati
+reading; both day-1 pages contain the complete nine-day plan. Parent pages link all
+nine days. Local tithi calculation preserves repeated and skipped sunrise days.
+
 - Both Chaitra and Sharad Navratri must provide a dedicated page for each of the nine
   worship days/forms: Shailaputri, Brahmacharini, Chandraghanta, Kushmanda,
   Skandamata, Katyayani, Kalaratri, Mahagauri and Siddhidatri.

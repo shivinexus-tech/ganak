@@ -6,11 +6,12 @@ import { T } from "../components/tokens";
 import PlaceInput from "../components/PlaceInput";
 import { fmtTimeD } from "../components/format";
 import VratVidhiCard from "../components/VratVidhiCard";
+import NavadurgaDayGuide, { NavadurgaSeasonLinks } from "../components/NavadurgaDayGuide";
 import { VRAT_VIDHI } from "../data/vrat-vidhis";
 import { CHHATH_SHARED_KEYS, FESTIVAL_PAGE_ROUTES, FEST_META, OBS_META } from "../data/festival-pages";
 import { sankrantiPunyaKala, scanPanchangCalendar } from "../engine/festivals";
 import { vratDetail } from "../engine/muhurat";
-import { navratriTimings } from "../engine/navratri";
+import { navratriTimings, navadurgaDatesFor } from "../engine/navratri";
 import { zoneOffset } from "../engine/panchang";
 
 const FESTIVAL_GUIDE_ROUTES = FESTIVAL_PAGE_ROUTES;
@@ -69,6 +70,7 @@ function festivalGuideFromPath(pathname) {
 
 function matchKeysForGuide(guide) {
   if (!guide) return [];
+  if (guide.sourceKind === "navadurga") return [guide.parentKey];
   if (guide.key === "chhath" || (guide.status === "shared" && guide.vidhiKey === "chhath")) {
     return [...CHHATH_SHARED_KEYS];
   }
@@ -128,7 +130,9 @@ function formatLocalClock(ms, tz, refMs, lang) {
 
 function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
   const L = lang === "hi" ? "hi" : "en";
-  const data = guide && guide.vidhiKey ? VRAT_VIDHI[guide.vidhiKey] : null;
+  const isNavadurga = guide && guide.contentKind === "navadurga";
+  const data = guide && guide.vidhiKey && !isNavadurga ? VRAT_VIDHI[guide.vidhiKey] : null;
+  const hasFullGuide = Boolean(data || isNavadurga);
   const meta = guide
     ? (guide.sourceKind === "observance" ? OBS_META[guide.metaKey] : FEST_META[guide.metaKey])
     : null;
@@ -225,6 +229,11 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
       hi: "नवमी सूर्यास्त के बाद समाप्त होती है, इसलिए पूर्ण नौ-दिवसीय व्रत का पारण अगले स्थानीय सूर्योदय के बाद करें।",
     },
   }[navratri.parana.basis]);
+  let navadurgaDateInfo = null;
+  if (isNavadurga && localTiming.status === "ready" && hit && place) {
+    try { navadurgaDateInfo = navadurgaDatesFor(place, hit.ms, guide.day); }
+    catch { navadurgaDateInfo = null; }
+  }
 
   return (
     <main className="rise" aria-labelledby="festival-guide-title">
@@ -237,7 +246,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
 
       <section style={{ ...card, padding: "20px", overflow: "hidden" }}>
         <div style={{ ...T.label, color: C.gold, marginBottom: 6 }}>
-          {data
+          {hasFullGuide
             ? (L === "hi" ? "व्रत एवं पूजा मार्गदर्शिका" : "FASTING & WORSHIP GUIDE")
             : (L === "hi" ? "पर्व एवं व्रत परिचय" : "FESTIVAL & OBSERVANCE OVERVIEW")}
         </div>
@@ -245,10 +254,10 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
           {title}
         </h2>
         <p style={{ margin: "0 0 14px", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55 }}>
-          {data
+          {hasFullGuide
             ? (L === "hi"
-                ? "पहले संक्षिप्त उत्तर, फिर व्रत, पूजा, पारण और उद्यापन की पूरी विधि।"
-                : "A clear answer first, followed by the complete fasting, puja, paran and udyapan guidance.")
+                ? (isNavadurga ? "पहले इस देवी और स्थानीय दिवस का स्पष्ट उत्तर, फिर क्रमबद्ध गृह-पूजा और आज का सप्तशती पाठ।" : "पहले संक्षिप्त उत्तर, फिर व्रत, पूजा, पारण और उद्यापन की पूरी विधि।")
+                : (isNavadurga ? "A clear Goddess and local-day answer first, followed by step-by-step household puja and today's Saptashati reading." : "A clear answer first, followed by the complete fasting, puja, paran and udyapan guidance."))
             : (L === "hi"
                 ? "गणक में अभी उपलब्ध पंचांग परिचय नीचे है। विस्तृत पूजा-विधि स्रोत और समीक्षा के बाद ही जोड़ी जाएगी।"
                 : "Below is the calendar description currently available in Ganak. Detailed worship guidance will be added only after it is sourced and reviewed.")}
@@ -298,7 +307,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                 : "No date for this observance turned up in the next year for this place. Try another city."}
             </div>
           )}
-          {localTiming.status === "ready" && hit && tz != null && (
+          {localTiming.status === "ready" && hit && tz != null && !isNavadurga && (
             <div style={{ display: "grid", gap: 6 }}>
               <div style={{ fontSize: T.fBody, color: C.ivory, lineHeight: 1.45 }}>
                 <strong style={{ color: C.gold }}>{formatLocalDate(hit.ms, tz, L)}</strong>
@@ -376,10 +385,24 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
               )}
             </div>
           )}
+          {localTiming.status === "ready" && isNavadurga && (
+            <div style={{ fontSize: T.fSmall, color: C.muted, lineHeight: 1.5 }}>
+              {L === "hi"
+                ? "इस देवी का स्थानीय दिवस नीचे दिखाया गया है। तिथि दोहरने या क्षय होने पर गणक उसे स्पष्ट रूप से बताएगा।"
+                : "This Goddess's local day is shown below. Ganak will state clearly if the tithi repeats or has no separate sunrise date."}
+            </div>
+          )}
         </div>
 
-        {data ? (
-          <VratVidhiCard data={data} lang={lang} C={C} initiallyOpen />
+        {isNavadurga ? (
+          <NavadurgaDayGuide guide={guide} dateInfo={navadurgaDateInfo} lang={lang} C={C} />
+        ) : data ? (
+          <>
+            <VratVidhiCard data={data} lang={lang} C={C} initiallyOpen />
+            {(guide.key === "chaitraNavratri" || guide.key === "sharadNavratri") && (
+              <NavadurgaSeasonLinks parentKey={guide.key} lang={lang} C={C} />
+            )}
+          </>
         ) : (
           <div style={{ display: "grid", gap: 10 }}>
             {meta && meta.gloss && (
