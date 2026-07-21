@@ -160,6 +160,9 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
   - [ ] User-controlled lunar/Gregorian presentation, Amanta/Purnimanta switch and
         regional calendar-base switch. Full regional-language calendars remain the
         explicitly post-launch item; calculation/base support is required now.
+        Implementation must follow the isolation, invariance, differential-testing,
+        staged-rollout and fallback contract in
+        `plans/regional-calendar-risk-plan.md`.
   - [ ] Printable/PDF calendar, Google Calendar/calendar-feed export, reminders and
         push integration, with selected city, timezone and language preserved.
   - [ ] Public/national holidays and the owner-reviewed scope for non-Hindu calendar
@@ -419,7 +422,10 @@ Phase-1 infrastructure; broader account/monetization architecture remains deferr
 ## PHASE 2 — Broaden languages, then iterate on feedback
 
 - [ ] **Regional-language calendars** — add calendar systems and region-specific
-      presentation only after the English/Hindi web launch is stable.
+      presentation only after the English/Hindi web launch is stable. Mandatory risk
+      and closure contract: `plans/regional-calendar-risk-plan.md`. No regional mode
+      may ship by changing the validated astronomy engine or by adding scattered
+      mode-specific conditionals.
 - [ ] **Broader multi-language interface** — languages beyond the current Hindi and
       English pair are explicitly post-launch. Translation must cover complete
       journeys and errors, not only labels. _(Owner priority 2026-07-21)_
