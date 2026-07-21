@@ -8,8 +8,9 @@ Status verified against `src/kundli-app.tsx`, not assumed.
 - **Free to start.** Hook users first, gather heavy user feedback, let real usage
   guide the roadmap.
 - **Fastest path to a web launch**, leading with Panchang.
-- **Phase 1 web scope:** Daily/Panchang + Prashna + Muhurat visible. Birth-chart
-  section hidden until it's polished + partly monetizable.
+- **Phase 1 web scope (owner-expanded 2026-07-21):** Daily/Panchang, Festivals/Vrats,
+  Prashna, Muhurat and the completed/polished Jyotish section are all visible.
+  Existing hidden engines must close the recorded competitor gaps before exposure.
 - **Web first; Android + Apple wait a little** (after web proves out).
 - **Monetize narrowly, later, and only where it costs money:** saving charts
   (needs paid storage), and possibly parts of the Jyotish section + the AI
@@ -63,11 +64,11 @@ owner, not from relying on Git to reconcile overlapping generated code.
 
 ---
 
-## PHASE 1 — Free web launch (Panchang + Prashna + Muhurat)
+## PHASE 1 — Free web launch (Panchang + Festivals/Vrats + Prashna + Muhurat + Jyotish)
 
-Small scope on the *plumbing*, but the **content is NOT ready** — the Panchang
-is the flagship and its observance coverage is ~30%. Content gates below are
-first-class launch blockers, not nice-to-haves.
+The owner expanded Phase 1 on 2026-07-21 from a narrow launch into a full
+competitor-gap launch. Panchang remains the flagship, but complete Festivals/Vrats,
+Muhurat and polished public Jyotish are now first-class launch gates too.
 
 **✅ LAUNCH TENSION RESOLVED (owner, 2026-07-18): baseline now, grow after.**
 Launch bar = Tiers 1+2 wired & verified (mostly done) + vrat vidhis for the ~15–20
@@ -103,11 +104,20 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
   - [ ] Papasamyam/Papa Dosham and Pitra Dosha analyses with documented conventions.
   - [ ] Finish and validate Arudha Padas, Bhavabala presentation, and Special
         Lagnas/Upagrahas; expose their existing engines with useful explanations.
+  - [ ] Expose and polish every already-built specialist panel: Graha/Bhava detail,
+        Bhava Chalit, D1–D60 divisional charts, Vimshottari sub-dashas,
+        Ashtakavarga, Shadbala, Yoga detection, Gochar, rectification, KP
+        sub-lords/significators, BNN, Bhrigu and the existing plain-language reading.
+        No engine counts as launched while its route/panel is hidden, untranslated,
+        visually unfinished or missing validation evidence.
   - [ ] South- and East-Indian chart styles in addition to the current chart.
   - [ ] Keep and expose multiple ayanamshas without changing Ganak's default
         Lahiri + mean Rahu/Ketu convention.
   - [ ] Complete the general Dosha explanation layer and finish Ruling Planets,
         reusing existing engine work only after rule/anchor verification.
+  - [ ] Complete the answer-before-data life interpretation layer so the public
+        Kundli is more than a collection of technical tables; qualify uncertainty
+        and keep detailed calculations available below each plain-language result.
   - [ ] Downloadable Kundli PDF and general PDF reports, with bilingual rendering,
         chart legibility and print verification.
       _(P0-JYOTISH-PUBLIC-LAUNCH; owner scope 2026-07-21)_
@@ -128,6 +138,57 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       (Mulank/Bhagyank/Namank), birthstone, Chinese zodiac/calendar, Western
       transit/progression, Vastu, Feng Shui, gemstone and Rudraksha calculators.
       _(P0-UTILITY-CALCULATORS; owner scope 2026-07-21)_
+- [ ] **P0 before go-live — exceptionally strong Panchang and calendar parity.**
+      Ganak must close every gap identified in the 2026-07-21 competitor comparison,
+      while retaining answer-before-data, Hindi/English journeys, local-time accuracy
+      and the no-ads-on-Panchang rule. “Present in the engine” is not complete until
+      it is visible, explained, validated and phone-usable. Required scope:
+  - [ ] Dedicated Bhadra/Vishti interval and warning; Dur Muhurat; Varjyam; Amrit
+        Kalam; Brahma, Nishita, Godhuli and reusable Pradosha Muhurtas.
+  - [ ] Chandrabalam, Tarabalam, Disha Shool/Vara Shula, Nalla Neram, Gowri Nalla
+        Neram and Anandadi Yoga.
+  - [ ] Dedicated Sarvartha Siddhi, Amrita Siddhi, Ravi Yoga, Ravi/Guru Pushya,
+        Dwipushkar, Tripushkar and Ganda Moola calculations/calendars.
+  - [ ] Ritu/season, solstice/equinox and Vedic/Ghati clock.
+  - [ ] User-controlled lunar/Gregorian presentation, Amanta/Purnimanta switch and
+        regional calendar-base switch. Full regional-language calendars remain the
+        explicitly post-launch item; calculation/base support is required now.
+  - [ ] Printable/PDF calendar, Google Calendar/calendar-feed export, reminders and
+        push integration, with selected city, timezone and language preserved.
+  - [ ] Public/national holidays and the owner-reviewed scope for non-Hindu calendar
+        overlays; keep them visually separate from Hindu observance calculations.
+      _(P0-PANCHANG-CALENDAR-PARITY; owner scope 2026-07-21)_
+- [ ] **P0 before go-live — exceptionally strong festival and vrat completion.**
+      Close every festival/vrat gap in the competitor comparison: complete all
+      openable-label pages, full local timing, household guidance, fasting/paran,
+      explicit regional distinctions, sect/calendar distinctions where supported,
+      printable/exportable festival calendars and opt-in reminders. Specifically:
+  - [ ] Bengal Durga Puja: separate, substantive Mahalaya, Shashthi, Saptami,
+        Ashtami, Navami and Vijaya Dashami pages. **Not deferred.**
+  - [ ] Separate substantive Skanda Sashti sequence and Ayyappa Mandala sequence
+        pages; finish and merge the complete four-day Chhath calendar journey.
+  - [ ] Eighteen season-specific Chaitra/Sharad Navadurga pages plus the sourced
+        Durga Saptashati reading plan; Gupt Navratris stay distinct.
+  - [ ] Location-aware eclipse visibility, Sutak start/end and safe household
+        guidance; sect-specific calendar views where rules are verified.
+      _(P0-FESTIVAL-VRAT-PARITY; owner scope 2026-07-21)_
+- [ ] **P0 before go-live — exceptionally strong Muhurat parity.** Complete every
+      gap from the competitor comparison and keep the verdict/explanation stronger
+      than a raw date list:
+  - [ ] Deep, separately validated engines and pages for marriage, engagement,
+        property purchase, vehicle purchase, Bhoomi Puja/construction, business,
+        travel, housewarming and document signing/registration. The existing generic
+        “purchase” category does **not** close the property or vehicle gaps.
+  - [ ] Samskara Muhurtas: Mundan/tonsure, Namakaran, Annaprashan, Vidyarambha and
+        Upanayana, with tradition and regional conventions stated.
+  - [ ] Birth-chart-personalized Muhurat only after its method is sourced and
+        validated; never silently mix natal filtering into the general finder.
+  - [ ] Save/share/export the chosen Muhurat and create calendar reminders.
+  - [ ] Surgery/medical Muhurat under the separate Claude research brief
+        `plans/claude-task-surgery-medical-muhurat.md`. It is strictly for optional
+        timing preferences around clinician-approved, non-urgent care; it must never
+        delay urgent treatment or claim to improve medical safety/outcomes.
+      _(P0-MUHURAT-FULL-PARITY; owner scope 2026-07-21)_
 - [ ] **P0 before go-live — discoverability, publishing and public platform.** Ship
       all of the following as launch gates rather than post-launch polish:
   - [ ] Clean path-based routes for every public screen and calculator; preserve
@@ -187,14 +248,16 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       125 festival/calendar labels + 41 fasting/recurring labels = 166 openable
       labels**, not merely P1/P2 items. The first four routes above are complete.
       **Completed Codex slice:** `CODEX-P0-FESTIVAL-PAGES-148` — 148 remaining pages
-      excluding deferred multi-day families (Chhath done; Bengal Durga Puja ×6,
-      Skanda Sashti ×3, Ayyappa Mandala ×2 later). Brief:
+      excluding the then-separate multi-day implementation slice (Chhath done;
+      Bengal Durga Puja ×6, Skanda Sashti ×3, Ayyappa Mandala ×2). These pages are
+      now explicit P0 requirements, not deferred. Brief:
       `plans/codex-task-p0-festival-pages-148.md`. Keep the existing in-app
       click/expand action as well. Add a generated coverage gate that compares the
       live openable-item registries against the route registry, so adding a future
       festival without a page link fails validation. Full checkable snapshot and
       rules: `plans/festival-page-link-inventory.md`. The parent remains open for
-      the explicitly deferred multi-day and Navadurga page families.
+      the remaining multi-day and Navadurga page families, all now required before
+      go-live by the owner's 2026-07-21 scope decision.
       _(P0-FESTIVAL-PAGES-ALL; 148-page slice shipped 2026-07-20)_
 - [x] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
       selection box directly on every dedicated festival/vrat page. Replace “Open
@@ -295,8 +358,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       (`1st`, `2nd`, `3rd`, `4th`, including `11th`/`12th`) in all three verdict
       reason paths; Hindi copy is unchanged. A permanent copy gate prevents the
       hard-coded `${h}th` form from returning. _(CODEX-P0-PRASHNA-ORDINAL — shipped 2026-07-21)_
-- [x] **Hide the birth-chart tab** for launch — Daily + Prashna only; Chart route falls
-      back to Daily. _(P1-HIDE-DEPLOY, live at ganak.pages.dev)_
+- [x] **Historical deployment step — hide the birth-chart tab** for the first preview;
+      Chart currently falls back to Daily. **Superseded as launch policy:** the
+      completed/polished Jyotish section must be visible before go-live under
+      `P0-JYOTISH-PUBLIC-LAUNCH`. _(P1-HIDE-DEPLOY, live preview state)_
 - [x] **Deploy to a web host** — https://ganak.pages.dev (Cloudflare Pages, `main`
       auto-deploy). _(P1-HIDE-DEPLOY)_
 - [ ] **P0 before go-live — branded domain and clean public URLs.** Replace the
@@ -423,11 +488,13 @@ destinations, one job per screen, large type/taps, answer-first). Discussion sta
 but deferred behind Phase 1 launch blockers. Resume with Everyday-zone nav cleanup
 + gut MuhuratHub; elder-friendly is the default design constraint, not a toggle.
 
-**Prior status: partially in motion (Phase 1 already leads with Everyday, hides Jyotish).**
+**Prior status: partially in motion.** The live preview still leads with Everyday
+and hides Jyotish, but the owner now requires Jyotish completion and exposure before
+go-live.
 The organizing insight: Ganak is two culturally-distinct zones under one brand —
 - **Everyday zone** (householders + diaspora): Panchang, Muhurat, Festivals, Hora,
   Prashnavali. Warm, plain-language, scannable.
-- **Jyotish zone** (serious practitioners, lower-priority persona): Kundli, Dashas,
+- **Jyotish zone** (serious practitioners): Kundli, Dashas,
   Matching, Tools (BNN/BCP/KP/Shadbala/Ashtakavarga), Vault. Dense, technical.
 
 "Jyotish" is a culturally-understood boundary (a householder checking Rahu Kalam
@@ -441,7 +508,7 @@ Work:
       **gut the overloaded MuhuratHub** (it does ~10 jobs) into dedicated screens;
       fix "too many taps" / "unclear where features live" (owner's own words,
       confirmed by messaging audit). Do in-place in the Vite app — no rewrite.
-- [ ] **Jyotish-zone hierarchy (Phase 2, with the chart reveal):** the 17 flat
+- [ ] **Jyotish-zone hierarchy (Phase 1, before the chart reveal):** the 17 flat
       chart sub-sections (messaging audit finding) need grouping — Kundli / Dashas /
       Matching / Tools / Vault sub-navigation, not one flat list.
 
