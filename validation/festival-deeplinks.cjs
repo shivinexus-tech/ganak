@@ -52,6 +52,22 @@ for (const vidhiKey of ['skandaShashti', 'kandaSashtiAnnual', 'masikDurgashtami'
 assert(vidhiModule.VRAT_VIDHI.ayyappaMandala.safety?.en && vidhiModule.VRAT_VIDHI.ayyappaMandala.safety?.hi, 'Ayyappa must keep its pilgrimage-specific bilingual health guidance');
 console.log('PASS  five approved guide families are complete and bilingual');
 
+const hartalika = vidhiModule.VRAT_VIDHI.hartalikaTeej;
+assert(hartalika.puja?.en && hartalika.puja?.hi, 'Hartalika puja introduction must be bilingual');
+assert(hartalika.pujaMaterials?.en && hartalika.pujaMaterials?.hi, 'Hartalika materials must be bilingual');
+assert(Array.isArray(hartalika.pujaPanchopachara) && hartalika.pujaPanchopachara.length >= 9, 'Hartalika must include a complete household Panchopachara path');
+assert.strictEqual(hartalika.pujaShodashopachara?.length, 16, 'Hartalika Shodashopachara must contain all 16 ordered offerings');
+for (const field of ['pujaPanchopachara', 'pujaShodashopachara']) {
+  assert(hartalika[field].every((step) => step.en && step.hi), `Hartalika ${field} steps must be bilingual`);
+}
+assert(hartalika.pujaCompletion?.en && hartalika.pujaCompletion?.hi, 'Hartalika must explain katha, aarti and respectful completion');
+const hartalikaText = JSON.stringify(hartalika);
+assert(!hartalikaText.includes('only if you know it') && !hartalikaText.includes('केवल जानकार के लिए'), 'Hartalika must not dismiss the full puja instead of explaining it');
+for (const offering of ['Gandha', 'Pushpa', 'Dhupa', 'Dipa', 'Naivedya', 'Dhyana', 'Avahana', 'Asana', 'Padya', 'Arghya', 'Achamaniya', 'Snana', 'Vastra', 'Yajnopavita', 'Tambula']) {
+  assert(hartalikaText.includes(offering), `Hartalika procedure must retain ${offering}`);
+}
+console.log('PASS  Hartalika has complete bilingual Panchopachara and 16-offering Shodashopachara paths');
+
 const makar = vidhiModule.VRAT_VIDHI.makarSankranti;
 for (const field of ['verdict', 'meaning', 'diet', 'sankalpa', 'puja', 'paran', 'udyapan', 'safety']) {
   assert(makar[field]?.en && makar[field]?.hi, `makarSankranti.${field} must be bilingual`);
