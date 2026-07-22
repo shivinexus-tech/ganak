@@ -138,7 +138,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       PDF/report and a clearly qualified marriage prediction/timing view. State the
       method and limitations; never present a match score or timing estimate as a
       certainty. _(P0-MATCHING-LAUNCH; owner scope 2026-07-21)_
-- [ ] **P0 before go-live — approved utility-calculator catalogue.** Build public,
+- [x] **P0 before go-live — approved utility-calculator catalogue.** Build public,
       cleanly routed calculators for Moon sign/Rashi, Sun sign, Ascendant/Lagna,
       birth Nakshatra, baby-name initials/finder, standalone Mangal Dosha, Kala
       Sarpa, Sade Sati, Shraddha Tithi and Pancha Pakshi. Also include a Western
@@ -149,6 +149,12 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       permanent URL and share metadata. Explicitly excluded: numerology
       (Mulank/Bhagyank/Namank), birthstone, Chinese zodiac/calendar, Western
       transit/progression, Vastu, Feng Shui, gemstone and Rudraksha calculators.
+      Shipped 2026-07-22: twelve distinct bilingual answer-first routes; Lahiri
+      Vedic and tropical Western methods visibly separated; permanent canonical
+      metadata; calculation/method source map; approved-inventory and exclusion
+      guard; canonical gates/build; EN/HI desktop and 390px phone smoke; live
+      production verification. Google Sheet row publication remains blocked by
+      the separate one-time `GOOGLE_SHEETS_CREDENTIALS` setup task.
       _(P0-UTILITY-CALCULATORS; owner scope 2026-07-21)_
 - [ ] **P0 before go-live — exceptionally strong Panchang and calendar parity.**
       Ganak must close every gap identified in the 2026-07-21 competitor comparison,
