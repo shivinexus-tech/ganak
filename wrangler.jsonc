@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ganak",
+  "compatibility_date": "2026-07-22",
+  "pages_build_output_dir": "./dist",
+  "kv_namespaces": [
+    {
+      "binding": "REGIONAL_CALENDAR_FLAGS",
+      "id": "dfa0018d851447ee929a3a9e09aade4a"
+    }
+  ]
+}
