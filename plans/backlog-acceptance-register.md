@@ -42,6 +42,22 @@ while the app was visibly broken to a human — the `useState`-not-imported cras
 browser. None of those were catchable by a gate. **Gates prove code correctness;
 only a human-style pass proves the feature works.**
 
+### Owner production review — the last step before 100% (owner, 2026-07-22)
+
+After the feature is deployed and the bug bash is done, **send the owner the live
+production URL — deep-linked to the actual feature, not the site root — and wait.**
+The row is not 100% until the owner has looked and either approved or asked for
+changes.
+
+- Deep link it (`https://ganak.pages.dev/?screen=…`) so the owner lands on the thing
+  itself, in one tap, on a phone.
+- Say what changed and what to look at, in one or two plain sentences.
+- Owner feedback is a normal outcome, not a failure — build in time for one round.
+- Only after approval does the row close.
+
+This is deliberately the final gate: gates prove the code, the bug bash proves the
+feature, and the owner proves it is the product they wanted.
+
 Percentages are rounded implementation estimates, not confidence scores. AI time is
 focused execution time and excludes external waiting.
 

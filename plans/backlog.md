@@ -10,7 +10,9 @@ must not be closed merely because code exists; the linked acceptance and evidenc
 requirements must pass. **Bug bash (owner, 2026-07-22): no item is 100%
 until at least two different agents have each spent 30+ focused minutes trying to
 break the finished feature, recorded in `plans/task-log.md`.** Gates prove the maths;
-only an adversarial human-style pass proves the feature works — see the register. Nested/duplicate checkboxes map to one package in that
+only an adversarial human-style pass proves the feature works. **Then send the owner the
+live deep-linked production URL and wait for approval — that is the final gate.** See
+the register for both rules. Nested/duplicate checkboxes map to one package in that
 register so they cannot be counted as separate progress.
 
 ## Strategy (owner, 2026-07-18)
@@ -342,7 +344,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       Lahiri/Drik conventions and becomes false. Accepted trade-off: Daily and Prashna
       will differ ~11 min on nakshatra transitions — must be disclosed on screen, not
       left to look like a bug. Tithi unaffected, so no festival content changes.
-      Q1 and Q5 still open.)_
+      **Mock-up DECIDED 2026-07-22: not needed.** Label stacks two lines — "अंक विधि"
+      normal size over "कृष्णमूर्ति पद्धति" smaller — which fits 375px without shortening
+      the name. Review happens on production instead: deploy, then send the owner the
+      deep-linked URL for feedback. Q1 still open.)_
 - [ ] **P0 — Understand users without login (research DONE, execution pending).**
       Owner blocker: "can't tell who the users are or how they navigate without
       signup." Research says login is **not** the blocker and would not solve it —

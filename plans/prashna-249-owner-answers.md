@@ -372,7 +372,27 @@ Owner's reasoning is consistent with how this project has treated tradition
 elsewhere: name the source properly rather than reduce it to initials. It also reads
 correctly to a devotional user who has never heard of "KP".
 
-**One layout consequence to solve at mock-up time:** the Hindi string is 27
+### ✅ Label layout DECIDED (owner, 2026-07-22) — stacked, two lines
+
+No mock-up needed. The toggle stacks the name over its attribution:
+
+| line | text | size |
+|---|---|---|
+| 1 | **अंक विधि** | normal |
+| 2 | कृष्णमूर्ति पद्धति | smaller |
+
+This solves the fit problem (the one-line form was 27 chars Hindi / 38 English, too
+wide for a two-up toggle at 375px) **without shortening the name or dropping the
+attribution** — which was the reason the full name was chosen in the first place.
+English mirrors it: **Number method** over **Krishnamurti Paddhati**.
+
+Build note: the smaller line is attribution, not a subtitle to be translated loosely.
+Keep "कृष्णमूर्ति पद्धति" in Devanagari in both language modes if it reads better that
+way — decide during the production review, not by guessing now.
+
+*(Superseded concern below, kept for the record.)*
+
+**One layout consequence noted at the time:** the Hindi string is 27
 characters and the English 38 — too long for a two-up segmented toggle at 375px,
 where the existing Daily/Prashna control fits comfortably. Options are to stack the
 toggle vertically, use two lines per option, or show the full name as a heading with
@@ -452,5 +472,5 @@ recommend seeing it.
 | Q4 | Ruling planets + Moon-sincerity | ✅ **DECIDED 2026-07-20** — ship **both in v1**; KSK verify scope grows to match |
 | Q2 | Ayanamsa | ✅ **DECIDED 2026-07-22** — **option C, KP ayanamsa for Prashna.** See implementation notes 1–6 above; parameterize rather than replace |
 | Q1 | Chips to tier 2, compress repeated lines, question-specific house glosses | ⏳ open (recommended) |
-| Q5 | Mock-up before code | ⏳ open (recommended) |
+| Q5 | Mock-up before code | ✅ **DECIDED 2026-07-22** — **no mock-up.** Two-line label solves the fit; review happens on production instead |
 | — | Live `2th` house bug | ✅ **FIXED** by another agent in `485ce7f` — `englishOrdinal()` helper, correct on the 11th/12th/13th edge case. No longer open. |
