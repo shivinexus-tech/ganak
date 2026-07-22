@@ -473,6 +473,6 @@ recommend seeing it.
 | Q2 | Ayanamsa | ✅ **DECIDED 2026-07-22** — **option C, KP ayanamsa for Prashna.** See implementation notes 1–6 above; parameterize rather than replace |
 | Q1a | Chips to tier 2 | ✅ **DECIDED + SHIPPED 2026-07-22** — chips moved inside the "Full Prashna chart" collapse |
 | Q1b | Compress the repeated "connects to your Nth house" lines | ⏳ open |
-| Q1c | Question-specific house glosses | ⏳ open (**the one that matters** — reads as a bug today) |
+| Q1c | Question-specific house glosses | ✅ **SHIPPED 2026-07-22** — favor side done + sourced (`plans/prashna-house-glosses.md`). Deny side ("gains … works against you") deferred to KSK verify |
 | Q5 | Mock-up before code | ✅ **DECIDED 2026-07-22** — **no mock-up.** Two-line label solves the fit; review happens on production instead |
 | — | Live `2th` house bug | ✅ **FIXED** by another agent in `485ce7f` — `englishOrdinal()` helper, correct on the 11th/12th/13th edge case. No longer open. |

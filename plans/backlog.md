@@ -385,6 +385,11 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       same religious-accuracy rule as festival content. Output: a short citations note
       in `plans/` mapping each engine rule to reader/chapter, plus any corrections.
       Blocks implementation, not research.
+      **Scope grew again 2026-07-22:** also close the Prashna **deny-side house
+      glosses** — the app currently says "your 11th house — gains & fulfilment — which
+      works against this matter", the mirror of the illness/supportive bug fixed in
+      Q1c. Rests on the "12th from" rule, so it needs primary-text backing. Plus the
+      unsourced `lost`/6th cell. See `plans/prashna-house-glosses.md`.
       **Scope grew 2026-07-20** (owner shipped ruling planets + Moon-sincerity in v1):
       must now also anchor the ruling-planet rules (which five, ranking, timing use)
       and the sincerity doctrine — the areas where popular KP sites vary most.
