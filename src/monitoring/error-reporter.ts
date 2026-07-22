@@ -71,6 +71,7 @@ export function reportClientError(err, ctx) {
   const n = normalizeError(err);
   const source = (ctx && ctx.source) || "client";
   const componentStack = ctx && ctx.componentStack;
+  const contextExtra = ctx && ctx.extra;
   const payload = {
     event_id: eventId(),
     timestamp: new Date().toISOString(),
@@ -96,8 +97,8 @@ export function reportClientError(err, ctx) {
     },
     request: { url: safePath(), headers: {} },
     tags: { source: String(source).slice(0, 40) },
-    extra: componentStack
-      ? { componentStack: String(componentStack).slice(0, 2000) }
+    extra: componentStack || contextExtra
+      ? { ...(componentStack ? { componentStack: String(componentStack).slice(0, 2000) } : {}), ...(contextExtra ? { detail: JSON.stringify(contextExtra).slice(0,2000) } : {}) }
       : undefined,
   };
 

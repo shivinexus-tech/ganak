@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { T } from "./components/tokens";
 import PrashnaScreen from "./screens/PrashnaScreen";
 import ChartScreen from "./screens/ChartScreen";
 import DailyScreen from "./screens/DailyScreen";
 import FestivalGuideScreen, { festivalGuideFromPath } from "./screens/FestivalGuideScreen";
 import { FEST_NAME } from "./data/festival-meta";
-import { urlPrefGet, urlPrefSet } from "./components/url-prefs";
+import { urlPrefGet, urlPrefSet, urlPrefsPush } from "./components/url-prefs";
 import {
   scanPanchangCalendar, ayyappaMandalaFor,
 } from "./engine/festivals";
@@ -81,9 +81,13 @@ export default function KundliApp() {
   const directFestivalGuide = festivalGuideFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const hero = pageHeroCopy(lang, mode, directFestivalGuide);
 
-  // Shared place: Daily and Prashna both read it; Daily owns the picker UI.
-  const [panchPlace, setPanchPlace] = useState(null);
   const DEFAULT_PLACE = { label: "New Delhi, India", lat: 28.61, lon: 77.21, zone: "Asia/Kolkata" };
+  const placeFromUrl=()=>{const label=urlPrefGet("city"),lat=Number(urlPrefGet("lat")),lon=Number(urlPrefGet("lon")),zone=urlPrefGet("zone");return label&&zone&&Number.isFinite(lat)&&Math.abs(lat)<=90&&Number.isFinite(lon)&&Math.abs(lon)<=180?{label,lat,lon,zone}:null;};
+  // Shared place: Daily and Prashna both read it; URL state preserves it across
+  // regional-mode changes, reload and browser Back/Forward without storage.
+  const [panchPlace, setPanchPlaceState] = useState(placeFromUrl);
+  const setPanchPlace=(next)=>{setPanchPlaceState(next);if(next)urlPrefsPush({city:next.label,lat:next.lat,lon:next.lon,zone:next.zone});};
+  useEffect(()=>{const restore=()=>setPanchPlaceState(placeFromUrl());window.addEventListener("popstate",restore);return()=>window.removeEventListener("popstate",restore);},[]);
   const panchEff = panchPlace || DEFAULT_PLACE;
 
   return (

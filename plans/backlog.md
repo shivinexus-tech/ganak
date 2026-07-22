@@ -155,20 +155,25 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       while retaining answer-before-data, Hindi/English journeys, local-time accuracy
       and the no-ads-on-Panchang rule. “Present in the engine” is not complete until
       it is visible, explained, validated and phone-usable. Required scope:
-  - [ ] Dedicated Bhadra/Vishti interval and warning; Dur Muhurat; Varjyam; Amrit
+  - [x] Dedicated Bhadra/Vishti interval and warning; Dur Muhurat; Varjyam; Amrit
         Kalam; Brahma, Nishita, Godhuli and reusable Pradosha Muhurtas.
-  - [ ] Chandrabalam, Tarabalam, Disha Shool/Vara Shula, Nalla Neram, Gowri Nalla
+  - [x] Chandrabalam, Tarabalam, Disha Shool/Vara Shula, Nalla Neram, Gowri Nalla
         Neram and Anandadi Yoga.
-  - [ ] Dedicated Sarvartha Siddhi, Amrita Siddhi, Ravi Yoga, Ravi/Guru Pushya,
+  - [x] Dedicated Sarvartha Siddhi, Amrita Siddhi, Ravi Yoga, Ravi/Guru Pushya,
         Dwipushkar, Tripushkar and Ganda Moola calculations/calendars.
   - [x] Ritu/season, solstice/equinox and Vedic/Ghati clock.
-  - [ ] User-controlled lunar/Gregorian presentation, Amanta/Purnimanta switch and
+  - [x] User-controlled lunar/Gregorian presentation, Amanta/Purnimanta switch and
         pre-launch Tamil Thirukanitha/Bengali Vishuddha Siddhanta calendar-base
         switches. Complete Tamil/Bengali-language journeys remain a separate
         post-launch item; both named calculation/base modes are required now.
         Implementation must follow the isolation, invariance, differential-testing,
         staged-rollout and fallback contract in
         `plans/regional-calendar-risk-plan.md`.
+        Shipped 2026-07-22: both named regional modes, native month labels and
+        year/day interpretation; 730 dual-published daily anchors, 5,110 full-year
+        seven-city differentials with zero unexplained mismatches, 25 observance
+        anchors, 24 native terms, URL-backed place/date/language/mode state,
+        production shadow comparison and independent edge kill switches.
   - [ ] Printable/PDF calendar, Google Calendar/calendar-feed export, reminders and
         push integration, with selected city, timezone and language preserved.
   - [x] Public/national holidays and approved calendar overlays. Shipped 2026-07-22:
@@ -201,7 +206,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         property purchase, vehicle purchase, Bhoomi Puja/construction, business,
         travel, housewarming and document signing/registration. The existing generic
         “purchase” category does **not** close the property or vehicle gaps.
-  - [ ] Samskara Muhurtas: Mundan/tonsure, Namakaran, Annaprashan, Vidyarambha and
+  - [x] Samskara Muhurtas: Mundan/tonsure, Namakaran, Annaprashan, Vidyarambha and
         Upanayana, with tradition and regional conventions stated.
   - [ ] Birth-chart-personalized Muhurat only after its method is sourced and
         validated; never silently mix natal filtering into the general finder.
