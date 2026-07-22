@@ -304,6 +304,63 @@ const HOUSE_MEANING_BY_Q = {
                 4:  { en: 'home ties & staying put',            hi: 'घर का बंधन और यहीं रुकना' } },
 };
 
+/* Plain-language life areas, for the answer a normal user reads (owner review
+   2026-07-22: "leave the house related details for astrologers ... give explanation
+   in simpler language"). House numbers and significations are astrologer vocabulary —
+   they now live only in the expanded chart. These phrases say the same thing as the
+   house, in words someone can act on, and slot into "In your favour: ___". */
+const HOUSE_PLAIN = { 1:'your own position', 2:'money and family', 3:'your own effort',
+  4:'home and stability', 5:'children and creative work', 6:'work and daily duties',
+  7:'the other person', 8:'delays and setbacks', 9:'fortune and support',
+  10:'work and standing', 11:'hopes and gains', 12:'distance and expense' };
+const HOUSE_PLAIN_HI = { 1:'आपकी अपनी स्थिति', 2:'धन और परिवार', 3:'आपका अपना प्रयास',
+  4:'घर और स्थिरता', 5:'संतान और सृजन', 6:'कार्य और दिनचर्या',
+  7:'दूसरा पक्ष', 8:'देरी और रुकावट', 9:'भाग्य और सहयोग',
+  10:'कार्य और प्रतिष्ठा', 11:'आशाएँ और लाभ', 12:'दूरी और व्यय' };
+/* Same question-specific corrections as HOUSE_MEANING_BY_Q, in plain words. */
+const HOUSE_PLAIN_BY_Q = {
+  career:     { 6:  { en: 'your job and service',      hi: 'आपकी नौकरी और सेवा' } },
+  venture:    { 6:  { en: 'your work and competition', hi: 'आपका काम और प्रतिस्पर्धा' } },
+  money:      { 6:  { en: 'earnings from work',        hi: 'कार्य से आय' } },
+  litigation: { 6:  { en: 'your side of the case',     hi: 'आपका पक्ष' } },
+  travel:     { 12: { en: 'going abroad',              hi: 'विदेश जाना' },
+                4:  { en: 'home ties',                 hi: 'घर का बंधन' } },
+};
+
+/* Tier 1: the answer, in everyday words. No house numbers, no planet names, no
+   sub-lords — that is what the expanded chart is for. */
+function buildPlain(v, lang) {
+  const hi = lang === 'hi';
+  const byQ = HOUSE_PLAIN_BY_Q[v.q.key] || {};
+  const P = hi ? HOUSE_PLAIN_HI : HOUSE_PLAIN;
+  const plain = (h) => (byQ[h] ? (hi ? byQ[h].hi : byQ[h].en) : P[h]);
+  const uniq = (hs) => [...new Set(hs.map(plain))];
+  /* Separator is " · ", not "and": the phrases contain "and" themselves, so joining
+     with a word produced "your own position and work and standing". The middot is
+     already this app's list separator (hero, footer, tithi lines) and stays readable
+     at a glance, which matters for the elder-friendly goal. */
+  const join = (a) => a.join(' · ');
+  const fav = uniq(v.hits.favor), den = uniq(v.hits.deny);
+  const lines = [];
+  if (fav.length) lines.push({ tone: 'good',
+    text: hi ? `आपके पक्ष में: ${join(fav)}।` : `In your favour: ${join(fav)}.` });
+  if (den.length) lines.push({ tone: 'bad',
+    text: hi ? `विरुद्ध जाता है: ${join(den)}।` : `Working against it: ${join(den)}.` });
+  if (!fav.length && !den.length) lines.push({ tone: 'neutral',
+    text: hi ? 'इस समय कोई पक्ष स्पष्ट रूप से भारी नहीं दिखता।'
+             : 'Nothing points strongly either way right now.' });
+  if (v.retroDrag) lines.push({ tone: 'bad',
+    text: hi ? 'देरी, दोहराव या दूसरे प्रयास की संभावना रखें।'
+             : 'Expect delay, or having to try a second time.' });
+  lines.push({ tone: v.moonLinked ? 'good' : 'neutral',
+    text: v.moonLinked
+      ? (hi ? 'आपका मन वास्तव में इसी विषय में लगा है — उत्तर अभी लागू होता है।'
+            : 'Your mind is genuinely on this — the answer applies to now.')
+      : (hi ? 'इस विषय के स्पष्ट होने में कुछ समय लग सकता है।'
+            : 'This may take some time to come to a head.') });
+  return lines;
+}
+
 function englishOrdinal(n) {
   const lastTwo = n % 100;
   if (lastTwo >= 11 && lastTwo <= 13) return `${n}th`;
@@ -430,7 +487,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               </div>
             </div>
             <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {buildReasons(v, lang).map((r, i) => (
+              {buildPlain(v, lang).map((r, i) => (
                 <div key={i} style={{ fontSize: 14, lineHeight: 1.5,
                   color: r.tone === 'good' ? TOKENS.ink : r.tone === 'bad' ? TOKENS.sindoor : TOKENS.ink,
                   fontWeight: r.tone === 'lead' ? 600 : 400 }}>
@@ -460,6 +517,21 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
           {showFull && (
             <div style={{ marginTop: 10, background: TOKENS.card, borderRadius: TOKENS.radius,
               border: `1.5px solid ${TOKENS.line}`, padding: 12 }}>
+              {/* Astrologer's reasoning: house numbers, significations, sub-lord.
+                  Tier 2 by design — tier 1 says the same thing in plain words. */}
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase',
+                  color: TOKENS.muted, marginBottom: 6 }}>
+                  {hi ? 'निर्णय कैसे हुआ' : 'How this was judged'}
+                </div>
+                {buildReasons(v, lang).map((r, i) => (
+                  <div key={i} style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 4,
+                    color: r.tone === 'bad' ? TOKENS.sindoor : TOKENS.ink,
+                    fontWeight: r.tone === 'lead' ? 600 : 400 }}>
+                    {r.text}
+                  </div>
+                ))}
+              </div>
               <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
                 <PrashnaChip label={hi ? 'लग्न' : 'Lagna'} value={`${hi ? RASHI_HI[result.chart.lagna.sign] : RASHI_EN[result.chart.lagna.sign]} ${fmtDeg(result.chart.lagna.deg)}`}
                   gloss={hi ? 'इस क्षण पूर्व में उदित राशि' : 'the sign rising in the east at this moment'} />
