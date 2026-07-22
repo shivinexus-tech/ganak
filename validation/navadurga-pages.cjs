@@ -10,6 +10,7 @@ const data = loadApp('src/data/navadurga-pages.ts');
 const pages = loadApp('src/data/festival-pages.ts');
 const navratri = loadApp('src/engine/navratri.ts');
 const festivals = loadApp('src/engine/festivals.ts');
+const guideSource = fs.readFileSync(path.join(ROOT, 'src/components/NavadurgaDayGuide.tsx'), 'utf8');
 
 const {
   NAVADURGA_FORMS, NAVADURGA_PAGE_ENTRIES, NAVRATRI_SEASONS, SAPTASHATI_PLAN,
@@ -19,6 +20,9 @@ const { FESTIVAL_PAGE_ROUTES } = pages;
 assert.equal(NAVADURGA_FORMS.length, 9, 'the canonical Navadurga list must contain nine forms');
 assert.equal(NAVADURGA_PAGE_ENTRIES.length, 18, 'nine Chaitra + nine Sharad pages are required');
 assert.equal(SAPTASHATI_PLAN.length, 9, 'the Saptashati plan must cover all nine days');
+assert(guideSource.includes('Description of this form of Goddess'), 'all Navadurga pages must use the owner-approved English description heading');
+assert(guideSource.includes('देवी के इस स्वरूप का वर्णन'), 'all Navadurga pages must use the matching Hindi description heading');
+assert(!/HOW TO RECOGNISE THIS FORM|स्वरूप की पहचान/.test(guideSource), 'the rejected recognition heading must not return');
 assert.deepEqual(
   SAPTASHATI_PLAN.map((item) => item.chapters),
   ['1', '2–4', '5–6', '7', '8', '9–10', '11', '12', '13'],

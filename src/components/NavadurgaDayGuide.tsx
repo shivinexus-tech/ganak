@@ -136,7 +136,7 @@ function NavadurgaDayGuide({ guide, dateInfo, lang, C }) {
       <LocalNavadurgaDate dateInfo={dateInfo} form={form} lang={lang} C={C} />
 
       <section style={{ padding: "13px 14px", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: C.panel }}>
-        <div style={{ ...T.label, color: C.gold, marginBottom: 7 }}>{L === "hi" ? "स्वरूप की पहचान" : "HOW TO RECOGNISE THIS FORM"}</div>
+        <div style={{ ...T.label, color: C.gold, marginBottom: 7 }}>{L === "hi" ? "देवी के इस स्वरूप का वर्णन" : "Description of this form of Goddess"}</div>
         <p style={{ margin: 0, color: C.ivory, fontSize: T.fSmall, lineHeight: 1.6 }}>{form.iconography[L]}</p>
         <p style={{ margin: "8px 0 0", color: C.muted, fontSize: T.fMicro, lineHeight: 1.5 }}>
           {L === "hi" ? "चित्र गणक के लिए बनाया गया मौलिक भक्तिपूर्ण निरूपण है; यह किसी मंदिर-मूर्ति की प्रतिलिपि नहीं है।" : "This is an original devotional illustration commissioned for Ganak, not a copy of a temple murti."}
