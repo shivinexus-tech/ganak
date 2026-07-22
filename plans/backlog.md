@@ -171,16 +171,22 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         `plans/regional-calendar-risk-plan.md`.
   - [ ] Printable/PDF calendar, Google Calendar/calendar-feed export, reminders and
         push integration, with selected city, timezone and language preserved.
-  - [ ] Public/national holidays and the owner-reviewed scope for non-Hindu calendar
-        overlays; keep them visually separate from Hindu observance calculations.
+  - [x] Public/national holidays and approved calendar overlays. Shipped 2026-07-22:
+        three national dates plus the opt-in 17-date 2026 Central Government
+        gazetted layer, explicit jurisdiction/year and moon-notification labels,
+        URL-backed toggle, blue collision-safe calendar marks, EN/HI phone/browser
+        checks and a permanent source/inventory gate. State, bank and local closures
+        remain correctly outside this Central layer rather than being guessed.
       _(P0-PANCHANG-CALENDAR-PARITY; owner scope 2026-07-21)_
 - [ ] **P0 before go-live — exceptionally strong festival and vrat completion.**
       Close every festival/vrat gap in the competitor comparison: complete all
       openable-label pages, full local timing, household guidance, fasting/paran,
       explicit regional distinctions, sect/calendar distinctions where supported,
       printable/exportable festival calendars and opt-in reminders. Specifically:
-  - [ ] Bengal Durga Puja: separate, substantive Mahalaya, Shashthi, Saptami,
-        Ashtami, Navami and Vijaya Dashami pages. **Not deferred.**
+  - [x] Bengal Durga Puja: separate, substantive Mahalaya, Shashthi, Saptami,
+        Ashtami, Navami and Vijaya Dashami pages. Shipped and production-verified
+        2026-07-22 with six exact Delhi date anchors, devotional EN/HI guidance,
+        desktop + 390px route matrix and permanent content/timing gates.
   - [ ] Separate substantive Skanda Sashti sequence and Ayyappa Mandala sequence
         pages; finish and merge the complete four-day Chhath calendar journey.
   - [x] Eighteen season-specific Chaitra/Sharad Navadurga pages plus the sourced
