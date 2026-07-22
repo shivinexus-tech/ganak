@@ -8,12 +8,19 @@ const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md
 const base = parseRegister(markdown, config, "test base");
 
 assert.equal(base.rows.size, 57);
-assert.equal(sheetRow(base.rows.get("1")).length, 15);
+assert.equal(sheetRow(base.rows.get("1")).length, 18);
+assert.equal(base.rows.get("1").quality.deliveryState, "Delivered with quality limitation");
+assert.equal(base.rows.get("1").quality.qualityRisk, "Red");
+assert.match(base.rows.get("1").quality.bugBashStatus, /Required for high-impact closure/);
+assert.equal(base.rows.get("12").quality.qualityRisk, "Green");
 assert.equal(base.rows.get("5").quality.deliveryState, "Built and tested locally — not publicly delivered");
 assert.match(base.rows.get("5").quality.limitations, /Not deployed/);
 assert.match(base.rows.get("5").quality.shortTermImpact, /External developers cannot use/);
 assert.match(base.rows.get("5").quality.longTermImpact, /quota enforcement unreliable/);
-assert.match(base.rows.get("5").quality.bugBashStatus, /Not completed/);
+assert.match(base.rows.get("5").quality.bugBashStatus, /not completed/i);
+assert.equal(base.rows.get("5").quality.qualityRisk, "Red");
+assert.match(base.rows.get("5").quality.lastVerified, /Local HTTP smoke only/);
+assert.match(base.rows.get("5").quality.sourceConfidence, /Not applicable/);
 
 const legacyConfig = structuredClone(config);
 delete legacyConfig.qualityColumns;
@@ -21,6 +28,19 @@ delete legacyConfig.qualityDefaults;
 delete legacyConfig.qualityOverrides;
 const legacyBase = parseRegister(markdown, legacyConfig, "legacy quality-free base");
 assert.equal(sheetRow(legacyBase.rows.get("1")).slice(10).every((value) => value === ""), true);
+
+const v2Config = structuredClone(config);
+v2Config.qualityColumns = v2Config.qualityColumns.slice(0, 5);
+delete v2Config.highImpactItemIds;
+delete v2Config.sourceNotApplicableItemIds;
+delete v2Config.dashboard;
+for (const override of Object.values(v2Config.qualityOverrides)) {
+  delete override.qualityRisk;
+  delete override.lastVerified;
+  delete override.sourceConfidence;
+}
+const v2Base = parseRegister(markdown, v2Config, "five-column quality base");
+assert.equal(sheetRow(v2Base.rows.get("5")).slice(15).every((value) => value === ""), true);
 
 const changedMarkdown = markdown
   .split(/(\r?\n)/)
@@ -37,7 +57,7 @@ const head = parseRegister(changedMarkdown, config, "test head");
 function makeLive(parsed) {
   const liveById = new Map();
   const liveBySection = new Map(config.tabs.map((tab) => [tab.section, [
-    ["#", "Backlog item", "Effort", "Technical / coding complexity", "Progress", "Remaining AI time", "Dependencies", "Why it may take longer", "Acceptance criteria", "Definition of done / closure evidence", "Delivery state", "Limitations / pending work", "Short-term impact", "Long-term impact", "Bug-bash status / evidence"],
+    ["#", "Backlog item", "Effort", "Technical / coding complexity", "Progress", "Remaining AI time", "Dependencies", "Why it may take longer", "Acceptance criteria", "Definition of done / closure evidence", "Delivery state", "Limitations / pending work", "Short-term impact", "Long-term impact", "Bug-bash status / evidence", "Quality risk (RAG)", "Last verified · environment", "Source confidence"],
   ]]));
   for (const tab of config.tabs) {
     let rowNumber = 2;
@@ -102,4 +122,4 @@ assert.equal(
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 
-console.log("Backlog Sheet sync gate: PASS — 57 rows; 15-column quality contract, API limitation/impact disclosure, changed-cell targeting, idempotence, conflict refusal, metadata guard and explicit bootstrap planning verified.");
+console.log("Backlog Sheet sync gate: PASS — 57 rows; 18-column quality contract, high-impact bug-bash/RAG policy, API limitation/impact disclosure, verification/source confidence, changed-cell targeting, idempotence, conflict refusal, metadata guard and explicit bootstrap planning verified.");

@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "spreadsheetId": "1ZNHtQqfLJ2smeG5QLbO46wBKYetqYuGHW0AQyGOtRSk",
   "spreadsheetTitle": "Ganak — Open Backlog Acceptance Register",
   "oauthScope": "https://www.googleapis.com/auth/spreadsheets",
@@ -23,25 +23,99 @@
     {
       "key": "bugBashStatus",
       "header": "Bug-bash status / evidence"
+    },
+    {
+      "key": "qualityRisk",
+      "header": "Quality risk (RAG)"
+    },
+    {
+      "key": "lastVerified",
+      "header": "Last verified · environment"
+    },
+    {
+      "key": "sourceConfidence",
+      "header": "Source confidence"
     }
   ],
   "qualityDefaults": {
     "deliveredLimitations": "None currently recorded.",
     "deliveredShortTermImpact": "No known delivery limitation is currently recorded.",
     "deliveredLongTermImpact": "Reopen if production monitoring, user feedback or regression gates reveal a problem.",
-    "deliveredBugBashStatus": "Not recorded — completion evidence may include verification, but no distinct bug-bash closeout is linked.",
+    "deliveredBugBashStatus": "Optional quality check — no distinct bug-bash closeout is recorded.",
     "openShortTermImpact": "This capability remains incomplete or unavailable until its acceptance criteria pass.",
     "openLongTermImpact": "If left unresolved, this capability remains unavailable and may continue blocking dependent work.",
-    "openBugBashStatus": "Not completed — bug-bash occurs after an implementation is ready to challenge."
+    "openBugBashStatus": "Optional after implementation — not completed.",
+    "defaultSourceConfidence": "Insufficiently verified / not yet classified",
+    "technicalSourceConfidence": "Not applicable — technical, operational or platform work"
   },
+  "highImpactItemIds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    15,
+    19,
+    21,
+    23,
+    24,
+    26,
+    28,
+    29,
+    38,
+    43,
+    46,
+    47,
+    48,
+    50,
+    51,
+    54,
+    55,
+    56
+  ],
+  "sourceNotApplicableItemIds": [
+    5,
+    11,
+    26,
+    28,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    45,
+    46,
+    48,
+    49,
+    50,
+    53,
+    54,
+    55,
+    56,
+    57
+  ],
   "qualityOverrides": {
     "5": {
       "deliveryState": "Built and tested locally — not publicly delivered",
       "limitations": "Not deployed; keys are stored in an environment variable and require a restart to rotate; quotas are in memory per process and reset on restart; multiple instances would each grant a full quota; engines are bundled at startup (~1 second); no datastore, key self-service, usage dashboard, SDK or developer portal.",
       "shortTermImpact": "External developers cannot use the API yet. Local and single-instance testing works, but key rotation is manual and there is no production URL or production monitoring.",
       "longTermImpact": "Public scale would make quota enforcement unreliable across instances and restarts, increase manual key-management work and weaken abuse/capacity visibility until shared storage, deployment and monitoring are added.",
-      "bugBashStatus": "Not completed — an uncommitted adversarial test exists, but there is no independent completed bug-bash record or production test evidence yet."
+      "bugBashStatus": "Required for this high-impact public platform — not completed. An uncommitted adversarial test exists, but there is no independent completed bug-bash record or production test evidence yet.",
+      "qualityRisk": "Red",
+      "lastVerified": "2026-07-22 · Local HTTP smoke only; not production-verified",
+      "sourceConfidence": "Not applicable — technical API; calculation engines retain their own source/anchor evidence"
     }
+  },
+  "dashboard": {
+    "sheetName": "Quality Dashboard"
   },
   "tabs": [
     {

@@ -38,6 +38,9 @@ const SHEET_COLUMNS = [
   "Short-term impact",
   "Long-term impact",
   "Bug-bash status / evidence",
+  "Quality risk (RAG)",
+  "Last verified · environment",
+  "Source confidence",
 ];
 
 const QUALITY_KEYS = [
@@ -46,6 +49,9 @@ const QUALITY_KEYS = [
   "shortTermImpact",
   "longTermImpact",
   "bugBashStatus",
+  "qualityRisk",
+  "lastVerified",
+  "sourceConfidence",
 ];
 
 const LOCAL_TO_SHEET_COLUMN = [0, 1, 2, 4, 5, 6, 7, 8, 9];
@@ -98,53 +104,93 @@ function resolveQuality(cells, config, id) {
   }
   const actualKeys = config.qualityColumns.map((column) => column.key);
   const actualHeaders = config.qualityColumns.map((column) => column.header);
-  if (JSON.stringify(actualKeys) !== JSON.stringify(QUALITY_KEYS)) {
-    fail(`Quality column keys are ${actualKeys.join(", ")}; expected ${QUALITY_KEYS.join(", ")}`);
+  const expectedKeys = QUALITY_KEYS.slice(0, actualKeys.length);
+  const expectedHeaders = SHEET_COLUMNS.slice(10, 10 + actualHeaders.length);
+  if (JSON.stringify(actualKeys) !== JSON.stringify(expectedKeys)) {
+    fail(`Quality column keys are ${actualKeys.join(", ")}; expected the ordered contract ${QUALITY_KEYS.join(", ")}`);
   }
-  if (JSON.stringify(actualHeaders) !== JSON.stringify(SHEET_COLUMNS.slice(10))) {
+  if (JSON.stringify(actualHeaders) !== JSON.stringify(expectedHeaders)) {
     fail("Quality column headers do not match the published Sheet contract");
   }
+  const finish = (quality) => Object.fromEntries(
+    QUALITY_KEYS.map((key) => [key, actualKeys.includes(key) ? normalizeCell(quality[key]) : ""]),
+  );
 
   const defaults = config.qualityDefaults || {};
   const override = config.qualityOverrides?.[id];
   if (override) {
-    const missing = QUALITY_KEYS.filter((key) => !normalizeCell(override[key]).trim());
+    const missing = actualKeys.filter((key) => !normalizeCell(override[key]).trim());
     if (missing.length) fail(`Quality override for ID ${id} is missing: ${missing.join(", ")}`);
-    return Object.fromEntries(QUALITY_KEYS.map((key) => [key, normalizeCell(override[key])]));
+    return finish(override);
   }
 
   const progress = normalizeCell(cells[3]);
   const remaining = normalizeCell(cells[4]);
   const dependencies = normalizeCell(cells[5]);
   const delayReason = normalizeCell(cells[6]);
+  const closureEvidence = normalizeCell(cells[8]);
   const isDelivered = progress === "100%" || remaining === "Done";
   const isBaselineOngoing = /baseline complete/i.test(progress);
   const isNotStarted = /^0(?:%|\b)/.test(progress);
-  const deliveryState = isDelivered
+  const isHighImpact = (config.highImpactItemIds || []).map(String).includes(String(id));
+  const qualityDelivered = isDelivered || isBaselineOngoing;
+  let deliveryState = isDelivered
     ? "Delivered"
     : isBaselineOngoing
       ? "Launch baseline delivered — ongoing"
       : isNotStarted
         ? "Not started"
         : "In progress";
+  const evidenceDate = closureEvidence.match(/20\d{2}-\d{2}-\d{2}/)?.[0];
+  const hasProductionEvidence = /production|cloudflare|\blive\b/i.test(closureEvidence);
+  const lastVerified = qualityDelivered
+    ? `${evidenceDate || "Date not recorded"} · ${hasProductionEvidence ? "Production/live evidence recorded" : "Repository/validation evidence only; production not separately verified"}`
+    : "Not production-verified";
+  const sourceConfidence = (config.sourceNotApplicableItemIds || []).map(String).includes(String(id))
+    ? defaults.technicalSourceConfidence
+    : defaults.defaultSourceConfidence;
+
+  if (qualityDelivered && isHighImpact) {
+    deliveryState = isBaselineOngoing
+      ? "Launch baseline delivered with quality limitation — ongoing"
+      : "Delivered with quality limitation";
+    return finish({
+      deliveryState,
+      limitations: "Mandatory high-impact bug bash has no completed evidence recorded.",
+      shortTermImpact: "A cross-cutting or high-consequence release has not yet received its required adversarial challenge pass.",
+      longTermImpact: "Undiscovered defects could affect several journeys or create safety, privacy, financial, religious-trust or operational risk.",
+      bugBashStatus: "Required for high-impact closure — not completed/recorded.",
+      qualityRisk: "Red",
+      lastVerified,
+      sourceConfidence,
+    });
+  }
 
   if (isDelivered) {
-    return {
+    return finish({
       deliveryState,
       limitations: defaults.deliveredLimitations,
       shortTermImpact: defaults.deliveredShortTermImpact,
       longTermImpact: defaults.deliveredLongTermImpact,
       bugBashStatus: defaults.deliveredBugBashStatus,
-    };
+      qualityRisk: "Green",
+      lastVerified,
+      sourceConfidence,
+    });
   }
 
-  return {
+  return finish({
     deliveryState,
     limitations: `Open: ${dependencies || "No dependency recorded"}. ${delayReason || "No delay reason recorded."}`,
     shortTermImpact: defaults.openShortTermImpact,
     longTermImpact: defaults.openLongTermImpact,
-    bugBashStatus: defaults.openBugBashStatus,
-  };
+    bugBashStatus: isHighImpact
+      ? "Required before high-impact closure — not yet completed."
+      : defaults.openBugBashStatus,
+    qualityRisk: "Amber",
+    lastVerified,
+    sourceConfidence,
+  });
 }
 
 function parseRegister(markdown, config, sourceLabel, options = {}) {
@@ -183,7 +229,8 @@ function parseRegister(markdown, config, sourceLabel, options = {}) {
     }
 
     const quality = resolveQuality(cells, config, id);
-    const missingQuality = QUALITY_KEYS.filter((key) => !normalizeCell(quality[key]).trim());
+    const requiredQualityKeys = (config.qualityColumns || []).map((column) => column.key);
+    const missingQuality = requiredQualityKeys.filter((key) => !normalizeCell(quality[key]).trim());
     if (config.qualityColumns && missingQuality.length) {
       fail(`${sourceLabel}: quality fields missing for ID ${id}: ${missingQuality.join(", ")}`);
     }
@@ -295,9 +342,12 @@ async function readLiveSheet(config) {
   for (const tab of config.tabs) {
     if (!liveTabs.has(tab.sheetName)) fail(`Live spreadsheet is missing tab “${tab.sheetName}”`);
   }
+  if (config.dashboard?.sheetName && !liveTabs.has(config.dashboard.sheetName)) {
+    fail(`Live spreadsheet is missing dashboard tab “${config.dashboard.sheetName}”`);
+  }
 
   const params = new URLSearchParams();
-  for (const tab of config.tabs) params.append("ranges", `${a1SheetName(tab.sheetName)}!A1:O1000`);
+  for (const tab of config.tabs) params.append("ranges", `${a1SheetName(tab.sheetName)}!A1:R1000`);
   params.set("majorDimension", "ROWS");
   params.set("valueRenderOption", "FORMATTED_VALUE");
   const response = await sheetsRequest(config, `/values:batchGet?${params}`);
@@ -440,7 +490,7 @@ async function applyChanges(changes, live, config) {
     const rowNumber = nextAppendRow.get(tab.section);
     nextAppendRow.set(tab.section, rowNumber + 1);
     data.push({
-      range: `${a1SheetName(tab.sheetName)}!A${rowNumber}:O${rowNumber}`,
+      range: `${a1SheetName(tab.sheetName)}!A${rowNumber}:R${rowNumber}`,
       values: [sheetRow(change.after)],
     });
   }

@@ -43,9 +43,11 @@ the non-negotiables so Cursor's AI can't miss them.
 7. **Google Sheet closeout is mandatory and automated.** After each finished
    backlog slice, update only the assigned row in
    `plans/backlog-acceptance-register.md` (and `plans/backlog-sheet-sync.json` for
-   new/renamed/moved items, complexity, delivery limitations, short/long-term impact
-   or bug-bash status). “Built locally” is not “publicly delivered”; normal gates or
-   smoke checks are not a distinct bug bash without recorded adversarial evidence. Run
+   new/renamed/moved items, complexity, delivery limitations, short/long-term impact,
+   RAG risk, last verification, source confidence or bug-bash status). “Built locally”
+   is not “publicly delivered”; normal gates or smoke checks are not a distinct bug
+   bash without recorded adversarial evidence. Bug bash is optional for ordinary
+   items and mandatory for explicitly classified high-impact items. Run
    `node scripts/sync-backlog-sheet.mjs --check`, then commit and push. The GitHub
    workflow publishes changed cells to the live Sheet; no agent needs Google
    credentials. A failed/missing sync is a blocker. See

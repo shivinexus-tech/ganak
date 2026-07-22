@@ -77,10 +77,13 @@ assertions. If a gate fails, fix the cause — never weaken a gate to pass it
   2026-07-22):** after every finished backlog slice, update the matching assigned
   row in `plans/backlog-acceptance-register.md`; update
   `plans/backlog-sheet-sync.json` as well for a new/renamed/moved item, complexity
-  change, delivery limitation, short/long-term impact or bug-bash result. Record
-  current progress, remaining time, dependencies, concrete closure evidence and any
-  limitation honestly; “built locally” is not “publicly delivered.” A smoke test or
-  normal gate is not a bug bash unless a distinct adversarial pass is recorded. Run
+  change, delivery limitation, short/long-term impact, RAG risk, last verification,
+  source confidence or bug-bash result. Record current progress, remaining time,
+  dependencies, concrete closure evidence and any limitation honestly; “built
+  locally” is not “publicly delivered.” A smoke test or normal gate is not a bug bash
+  unless a distinct adversarial pass is recorded. Bug bash is optional for ordinary
+  items but mandatory before quality closure for items explicitly classified as high
+  impact across several journeys or safety/privacy/legal/financial/platform risk. Run
   `node scripts/sync-backlog-sheet.mjs --check`, then commit
   and push. GitHub Actions publishes commit-changed cells to **Ganak — Open Backlog
   Acceptance Register**; agents do not need Google credentials. A failed/missing

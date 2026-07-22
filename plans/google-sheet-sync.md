@@ -14,7 +14,7 @@ Repository sources:
   complexity and exact title/section for every numbered item; quality-column
   defaults and evidence-backed overrides.
 
-Every live backlog row has five quality-visibility columns after the existing ten:
+Every live backlog row has eight quality-visibility columns after the existing ten:
 
 1. **Delivery state** — distinguishes delivered, in progress, not started, launch
    baseline/ongoing, and built locally but not publicly delivered.
@@ -25,12 +25,29 @@ Every live backlog row has five quality-visibility columns after the existing te
 5. **Bug-bash status / evidence** — `Not completed`, `In progress`, or `Completed`
    with a task-log/run reference. Normal gates and an implementer's smoke check do
    not silently count as a distinct bug bash.
+6. **Quality risk (RAG)** — Red, Amber or Green. Red means a high-impact release has
+   an unresolved quality limitation; Amber means open/incomplete; Green means no
+   currently recorded delivery limitation.
+7. **Last verified · environment** — exposes local-only claims and stale or missing
+   production verification.
+8. **Source confidence** — primary/textual, institutional, regional/lineage-variable,
+   insufficiently verified/not classified, or not applicable for technical work.
 
-These columns make quality visible; they do not create a universal bug-bash closure
-rule. A bug bash blocks completion only when that backlog row's acceptance criteria
-requires it. When a row has a non-default delivery condition, limitation, impact or
-bug-bash result, add/update its full entry in `qualityOverrides` rather than relying
-on a generic derived value.
+Bug bash is an optional added quality check for ordinary items. It is mandatory for
+items explicitly classified as high impact because they affect several journeys or
+carry safety, privacy, legal, financial, religious-trust or platform-wide risk. A
+delivered high-impact item without completed bug-bash evidence remains visibly Red
+and “Delivered with quality limitation”; its percentage is not silently rewritten.
+When a row has a non-default delivery condition, limitation, impact, risk,
+verification, source-confidence or bug-bash result, add/update its full entry in
+`qualityOverrides` rather than relying on a generic derived value.
+
+The live **Quality Dashboard** tab automatically stacks all six backlog tabs and
+shows counts plus filterable lists for delivered-with-limitations, publicly
+unavailable features, Red/high-impact limitations, missing bug bashes, items without
+production verification and owner-decision blockers. Hidden helper columns contain
+only formulas pointing at the source tabs; the repository remains the source of
+truth for row values.
 
 Publisher:
 
@@ -81,7 +98,8 @@ the first green workflow run.
 
 1. Edit only the assigned row in `plans/backlog-acceptance-register.md`.
 2. For a new item, renamed item, section move, complexity change, delivered-with-
-   limitations state, changed impact, or bug-bash result, also update
+   limitations state, changed impact/risk, verification evidence, source confidence,
+   or bug-bash result, also update
    `plans/backlog-sheet-sync.json`.
 3. Run:
 
