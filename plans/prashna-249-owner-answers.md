@@ -166,6 +166,46 @@ matches its validated baseline**, then re-establishing it. Doable, but it is the
 moment where a genuine regression could slip through unnoticed, so it wants care and
 a reason — not a casual toggle.
 
+### ⚠️ Two corrections to what I told you first (2026-07-20)
+
+Owner asked for a simpler explanation, which sent me back to the code. Two things I
+stated were wrong, and both change the trade-off:
+
+**Correction 1 — "everything else in Ganak is Lahiri" is false.**
+`src/screens/ChartScreen.tsx:50` has an ayanamsa selector with **both** Lahiri and KP,
+and the screen actively tells users to switch: *"You're on Lahiri ayanamsa; switch to
+KP (Krishnamurti) above for the canonical KP sub-lords"* (line 435), and similar for
+cusps (474) and significators (547). So the app **already offers this exact choice**
+wherever KP methods appear. My internal-consistency argument was weaker than I claimed —
+in fact the *consistent* thing might be to offer the choice in Prashna too.
+
+**Correction 2 — adding a KP option would NOT break the parity gate.**
+I said switching ayanamsa forces a re-baseline. True only if we change the **default**.
+`validation/prashna-parity.js:62` calls `ref.castChart(c.ms, c.lat, c.lon)` — three
+arguments. Add an **optional 4th parameter defaulting to Lahiri**, and the gate's calls
+produce byte-identical values and still pass EXACT. The re-baseline risk applies to
+*replacing* Lahiri, not to *offering* KP alongside it.
+
+### The number that actually matters: does the ANSWER change?
+
+6.55% was the *sub-lord* difference. Users don't see sub-lords; they see a verdict. So
+I ran the real engine twice — as shipped, and with the KP offset — over **48,000
+judgements** (4,000 asking-moments across 2026, five Indian cities, all 12 question
+categories):
+
+```
+cusp sub-lord differs     : 6.61%   (~1 in 15)
+VERDICT differs           : 4.49%   (~1 in 22)
+HARD reversal (fav↔unfav) : 0.80%   (~1 in 124)
+```
+
+Breakdown of the verdict changes: **82% are softenings** — something moving to or from
+"mixed" (e.g. favourable → mixed). Only **18%** are a straight yes↔no reversal.
+
+**So a user would see a flat contradiction against a KP calculator roughly once in
+124 questions, not once in 15.** The practical stake is much lower than my first
+number implied.
+
 ### My recommendation, unchanged but now quantified
 
 Keep **Lahiri**, label the mode **"KP number method — Ganak conventions"**, and keep
@@ -184,8 +224,20 @@ the disclosure line the screen already shows. Reasons:
 a KP calculator will hit a mismatch about every fifteenth question, and the label is
 what turns "this app is wrong" into "this app made a stated choice."
 
-The alternative — a true-KP fork — is legitimate and I can build it. It just costs
-the parity re-baseline plus a second set of anchors, and it is not a launch blocker.
+### The three real options, with the corrections applied
+
+| | **A — Lahiri only** | **B — Offer both, default Lahiri** ⭐ | **C — Switch to KP** |
+|---|---|---|---|
+| What the user sees | One answer. A line saying which ayanamsa. | Same as A by default; practitioners can switch, as they already can on the Chart screen. | One answer, matching KP calculators. |
+| Matches KP calculators | ~1 in 124 questions contradicts | Exactly, **when switched** | Exactly |
+| Matches the rest of Ganak | Yes | Yes (default is Lahiri) | **No** — Prashna would disagree with Daily/festivals |
+| Parity gate | Untouched | **Untouched** (optional param, Lahiri default) | **Must be re-baselined** — the risky bit |
+| Build cost | Zero | Small — thread one parameter through, one toggle | Small code, large verification |
+| Consistent with existing app? | Partly | **Yes — Chart already does exactly this** | No |
+| Risk | Practitioner says "wrong" | Extra control on screen (elder-friendliness cost) | Silent internal disagreement |
+
+**A→B is a later, cheap upgrade.** Ship A, and if practitioners actually ask, add the
+toggle without redoing anything. Nothing about A forecloses B.
 
 ---
 
