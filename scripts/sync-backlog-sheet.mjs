@@ -146,9 +146,10 @@ function resolveQuality(cells, config, id) {
   const lastVerified = qualityDelivered
     ? `${evidenceDate || "Date not recorded"} · ${hasProductionEvidence ? "Production/live evidence recorded" : "Repository/validation evidence only; production not separately verified"}`
     : "Not production-verified";
-  const sourceConfidence = (config.sourceNotApplicableItemIds || []).map(String).includes(String(id))
-    ? defaults.technicalSourceConfidence
-    : defaults.defaultSourceConfidence;
+  const sourceConfidence = config.sourceConfidenceByItem?.[id]
+    || ((config.sourceNotApplicableItemIds || []).map(String).includes(String(id))
+      ? defaults.technicalSourceConfidence
+      : defaults.defaultSourceConfidence);
 
   if (qualityDelivered && isHighImpact) {
     deliveryState = isBaselineOngoing

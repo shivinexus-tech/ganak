@@ -102,6 +102,22 @@
     56,
     57
   ],
+  "sourceConfidenceByItem": {
+    "1": "Published conventions and regression anchors; item-level source depth varies",
+    "2": "Primary/textual and institutional sources; regional and seasonal variation labelled",
+    "6": "Textual rule/source matrix and institutional calendar anchors",
+    "7": "Institutional/published calendar anchors; astronomical conventions documented",
+    "8": "Institutional/published calendar anchors; regional traditions kept separate",
+    "9": "Institutional/published calendar anchors; qualification rules regression-tested",
+    "10": "Dual published-calendar anchors, cross-city/year differential and documented regional conventions",
+    "12": "Primary government holiday source; non-religious overlay",
+    "13": "Regional and institutional Bengali sources; day practices kept distinct",
+    "14": "Regional/institutional sources partially reviewed; sequence coverage remains incomplete",
+    "29": "Mixed textual, institutional and regional sources across the published corpus; item-level confidence varies",
+    "30": "Astronomical and seasonal published anchors; calculation convention documented",
+    "44": "Regional/institutional sources partially verified; final four-day reconciliation remains",
+    "47": "Mixed textual, institutional and regional sources across the launch corpus; future batches require their own classification"
+  },
   "qualityOverrides": {
     "5": {
       "deliveryState": "Built and tested locally — not publicly delivered",

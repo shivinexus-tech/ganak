@@ -13,6 +13,8 @@ assert.equal(base.rows.get("1").quality.deliveryState, "Delivered with quality l
 assert.equal(base.rows.get("1").quality.qualityRisk, "Red");
 assert.match(base.rows.get("1").quality.bugBashStatus, /Required for high-impact closure/);
 assert.equal(base.rows.get("12").quality.qualityRisk, "Green");
+assert.match(base.rows.get("2").quality.sourceConfidence, /Primary\/textual and institutional/);
+assert.match(base.rows.get("13").quality.sourceConfidence, /Bengali sources/);
 assert.equal(base.rows.get("5").quality.deliveryState, "Built and tested locally — not publicly delivered");
 assert.match(base.rows.get("5").quality.limitations, /Not deployed/);
 assert.match(base.rows.get("5").quality.shortTermImpact, /External developers cannot use/);
