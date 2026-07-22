@@ -327,8 +327,39 @@ const HOUSE_PLAIN_BY_Q = {
                 4:  { en: 'home ties',                 hi: 'घर का बंधन' } },
 };
 
-/* Tier 1: the answer, in everyday words. No house numbers, no planet names, no
-   sub-lords — that is what the expanded chart is for. */
+/* What the deciding planet brings to the matter, in plain words (owner review
+   2026-07-22: "give a gist of the primary impact of the planet for the question
+   asked"). These are the planets' standard natures — Saturn delays and rewards
+   patience, Jupiter expands, Rahu brings sudden turns, Ketu detaches — phrased as
+   an effect on the outcome rather than as a list of significations. Consistent with
+   HORA_NATURE already shipping in the hora advisor. */
+const PLANET_EFFECT = {
+  /* No em-dashes inside these: the sentence frame already uses one, and two in a row
+     read badly ("Rahu is the deciding influence here — it brings ... — the path ..."). */
+  Su: { en: 'it brings authority and visibility, and matters here tend to move through whoever is in charge',
+        hi: 'यह अधिकार और प्रत्यक्षता लाता है, और कार्य प्रायः बड़ों या अधिकारियों के माध्यम से बनता है' },
+  Mo: { en: 'it brings movement and change, so things shift rather than stay settled',
+        hi: 'यह गति और परिवर्तन लाता है, इसलिए स्थिति स्थिर रहने के बजाय बदलती है' },
+  Ma: { en: 'it brings drive and urgency, and sometimes friction with others',
+        hi: 'यह ऊर्जा और शीघ्रता लाता है, कभी-कभी दूसरों से टकराव भी' },
+  Me: { en: 'it works through talking, paperwork and negotiation, which is quick but changeable',
+        hi: 'यह बातचीत, कागज़ी कार्य और मोल-भाव से चलता है, जो शीघ्र पर परिवर्तनशील है' },
+  Ju: { en: 'it tends to expand things and favours growth',
+        hi: 'यह विस्तार देता है और वृद्धि के अनुकूल है' },
+  Ve: { en: 'it brings ease, comfort and goodwill from others',
+        hi: 'यह सहजता, सुख और दूसरों का सद्भाव लाता है' },
+  Sa: { en: 'it works slowly, rewarding patience and steady effort rather than haste',
+        hi: 'यह धीरे चलता है, और शीघ्रता के बजाय धैर्य तथा निरंतर प्रयास का फल देता है' },
+  Ra: { en: 'it brings sudden or unconventional turns, so the path may not be the expected one',
+        hi: 'यह आकस्मिक या अप्रचलित मोड़ लाता है, इसलिए मार्ग अपेक्षित न भी हो' },
+  Ke: { en: 'it leans towards detachment and letting go rather than holding on',
+        hi: 'यह पकड़ने के बजाय विरक्ति और छोड़ने की ओर झुकाता है' },
+};
+
+/* Tier 1: the answer, in everyday words. No house numbers, no sub-lords — that is
+   what the expanded chart is for. The deciding planet IS named, because the owner
+   asked for its gist, and a planet name is common vocabulary in a way that "the
+   sub-lord of your 7th house" is not. */
 function buildPlain(v, lang) {
   const hi = lang === 'hi';
   const byQ = HOUSE_PLAIN_BY_Q[v.q.key] || {};
@@ -342,6 +373,10 @@ function buildPlain(v, lang) {
   const join = (a) => a.join(' · ');
   const fav = uniq(v.hits.favor), den = uniq(v.hits.deny);
   const lines = [];
+  const eff = PLANET_EFFECT[v.cuspSub];
+  if (eff) lines.push({ tone: 'lead',
+    text: hi ? `यहाँ निर्णायक प्रभाव ${GRAHA_HI[v.cuspSub]} का है — ${eff.hi}।`
+             : `${GRAHA_EN[v.cuspSub]} is the deciding influence here — ${eff.en}.` });
   if (fav.length) lines.push({ tone: 'good',
     text: hi ? `आपके पक्ष में: ${join(fav)}।` : `In your favour: ${join(fav)}.` });
   if (den.length) lines.push({ tone: 'bad',
@@ -352,12 +387,16 @@ function buildPlain(v, lang) {
   if (v.retroDrag) lines.push({ tone: 'bad',
     text: hi ? 'देरी, दोहराव या दूसरे प्रयास की संभावना रखें।'
              : 'Expect delay, or having to try a second time.' });
+  /* The Moon stands for the mind in this reading. Linked to the matter, the question
+     is genuinely felt and the matter is live; unlinked, it is not yet ripe. The old
+     wording ("the answer applies to now") tried to say that and meant nothing to a
+     reader — owner review 2026-07-22. */
   lines.push({ tone: v.moonLinked ? 'good' : 'neutral',
     text: v.moonLinked
-      ? (hi ? 'आपका मन वास्तव में इसी विषय में लगा है — उत्तर अभी लागू होता है।'
-            : 'Your mind is genuinely on this — the answer applies to now.')
-      : (hi ? 'इस विषय के स्पष्ट होने में कुछ समय लग सकता है।'
-            : 'This may take some time to come to a head.') });
+      ? (hi ? 'यह विषय सचमुच आपके मन पर है — संकेत है कि मामला अभी सक्रिय है।'
+            : 'This is genuinely weighing on your mind — a sign the matter is live right now.')
+      : (hi ? 'यह अभी आपके मन पर भारी नहीं है — मामला अभी कुछ दूर हो सकता है।'
+            : "This isn't pressing on your mind yet — the matter may still be some way off.") });
   return lines;
 }
 
