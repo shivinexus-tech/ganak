@@ -158,8 +158,9 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         Dwipushkar, Tripushkar and Ganda Moola calculations/calendars.
   - [ ] Ritu/season, solstice/equinox and Vedic/Ghati clock.
   - [ ] User-controlled lunar/Gregorian presentation, Amanta/Purnimanta switch and
-        regional calendar-base switch. Full regional-language calendars remain the
-        explicitly post-launch item; calculation/base support is required now.
+        pre-launch Tamil Thirukanitha/Bengali Vishuddha Siddhanta calendar-base
+        switches. Complete Tamil/Bengali-language journeys remain a separate
+        post-launch item; both named calculation/base modes are required now.
         Implementation must follow the isolation, invariance, differential-testing,
         staged-rollout and fallback contract in
         `plans/regional-calendar-risk-plan.md`.
@@ -426,9 +427,10 @@ Phase-1 infrastructure; broader account/monetization architecture remains deferr
 
 ## PHASE 2 — Broaden languages, then iterate on feedback
 
-- [ ] **Regional-language calendars** — add calendar systems and region-specific
-      presentation only after the English/Hindi web launch is stable. Mandatory risk
-      and closure contract: `plans/regional-calendar-risk-plan.md`. No regional mode
+- [ ] **Full regional-language calendar presentation** — translate complete calendar
+      journeys after the English/Hindi web launch is stable. Tamil Thirukanitha and
+      Bengali Vishuddha Siddhanta **calculation/base modes are not deferred** and are
+      P0 before launch under `plans/regional-calendar-risk-plan.md`. No regional mode
       may ship by changing the validated astronomy engine or by adding scattered
       mode-specific conditionals.
 - [ ] **Broader multi-language interface** — languages beyond the current Hindi and
