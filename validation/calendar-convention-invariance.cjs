@@ -3,7 +3,7 @@
 const { loadApp }=require('./_load-app.cjs');
 const fs=require('fs');
 const { computeTodayPanchang }=loadApp('src/engine/today-panchang.ts');
-const { CALENDAR_CONVENTIONS, calendarLabel, safeConvention }=loadApp('src/engine/calendar-conventions.ts');
+const { CALENDAR_CONVENTIONS, calendarLabel, safeConvention, resolveConvention }=loadApp('src/engine/calendar-conventions.ts');
 const DAY=86400000;
 const CITIES=[
   {label:'Delhi',lat:28.6139,lon:77.2090,zone:'Asia/Kolkata'},
@@ -25,9 +25,11 @@ for(const city of CITIES) for(let i=0;i<15;i++){
 }
 if(safeConvention('not-a-mode')!=='canonical') { console.error('FAIL unsupported-mode fallback'); failures++; }
 for(const dark of ['tamil-solar','bengali-solar']) if(safeConvention(dark)!=='canonical') { console.error(`FAIL ${dark}: unreviewed mode is exposed`); failures++; }
+for(const dark of ['tamil-solar','bengali-solar']) { const r=resolveConvention(dark); if(r.id!=='canonical'||r.recoveredFrom!==dark||r.reason!=='not-reviewed') { console.error(`FAIL ${dark}: visible safe-recovery state missing`); failures++; } }
 const enabled=CALENDAR_CONVENTIONS.filter(x=>x.enabled).map(x=>x.id);
 for(const required of ['canonical','gregorian','amanta','north-purnimanta']) if(!enabled.includes(required)) { console.error(`FAIL ${required}: supported switch missing`); failures++; }
 const daily=fs.readFileSync('src/screens/DailyScreen.tsx','utf8');
-if(!/urlPrefPush\("cal",\s*next\)/.test(daily)||!/popstate/.test(daily)||!/CALENDAR_CONVENTIONS\.filter\(x\s*=>\s*x\.enabled\)/.test(daily)) { console.error('FAIL calendar mode URL/back-forward wiring missing'); failures++; }
+if(!/urlPrefPush\("cal",\s*next\.id\)/.test(daily)||!/popstate/.test(daily)||!/CALENDAR_CONVENTIONS\.filter\(x\s*=>\s*x\.enabled\)/.test(daily)) { console.error('FAIL calendar mode URL/back-forward wiring missing'); failures++; }
+if(!daily.includes('That regional mode is not yet verified')||!daily.includes('यह क्षेत्रीय पद्धति अभी सत्यापित नहीं है')) { console.error('FAIL bilingual non-silent fallback UI missing'); failures++; }
 if(failures){ console.error(`calendar-convention-invariance FAILED: ${failures}`); process.exit(1); }
 console.log(`✓ calendar-convention-invariance PASSED (${checked} cross-mode checks; 75 place/date anchors; URL/back-forward wiring; reviewed-mode fallback)`);

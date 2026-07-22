@@ -14,15 +14,16 @@ import { MuhuratHub } from "./MuhuratHub";
 import { scanPanchangCalendar } from "../engine/festivals";
 import { planetGochar, PLANET_PERIOD_DAYS } from "../engine/gochar";
 import { fmtDur, eventDetail } from "../engine/transit-copy";
-import { CALENDAR_CONVENTIONS, calendarLabel, safeConvention } from "../engine/calendar-conventions";
+import { CALENDAR_CONVENTIONS, calendarLabel, resolveConvention } from "../engine/calendar-conventions";
 import { urlPrefGet, urlPrefPush } from "../components/url-prefs";
 
 export default function DailyScreen({ C, card, lang, place, onPlace }) {
   const [ayanamsa] = useState("lahiri");
-  const [calendarMode, setCalendarMode] = useState(() => safeConvention(urlPrefGet("cal")));
-  const chooseCalendarMode = (value) => { const next = safeConvention(value); setCalendarMode(next); urlPrefPush("cal", next); };
+  const [calendarState, setCalendarState] = useState(() => resolveConvention(urlPrefGet("cal")));
+  const calendarMode=calendarState.id;
+  const chooseCalendarMode = (value) => { const next = resolveConvention(value); setCalendarState(next); urlPrefPush("cal", next.id); };
   useEffect(() => {
-    const restore=()=>setCalendarMode(safeConvention(urlPrefGet("cal")));
+    const restore=()=>setCalendarState(resolveConvention(urlPrefGet("cal")));
     window.addEventListener("popstate",restore); return()=>window.removeEventListener("popstate",restore);
   },[]);
   const todayISO = (() => {
@@ -177,6 +178,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
             <div style={{ fontSize:T.fMicro, color:C.muted, lineHeight:1.45 }}>
               <div>{calendarLabel(calendarMode, todayP, todayP.rise, lang === "hi" ? "hi" : "en")}</div>
               <div style={{ fontStyle:"italic" }}>{lang === "hi" ? `समय ${place.label} के अनुसार · पद्धति बदलने से खगोलीय गणना नहीं बदलती` : `Times for ${place.label} · changing the convention never changes the astronomy`}</div>
+              {calendarState.recoveredFrom && <div role="status" style={{ marginTop:3,color:C.sindoor,fontStyle:"normal" }}>{calendarState.reason === "not-reviewed" ? (lang === "hi" ? "यह क्षेत्रीय पद्धति अभी सत्यापित नहीं है; गणक मानक सुरक्षित रूप से दिखाया गया है।" : "That regional mode is not yet verified; Ganak default is shown safely.") : (lang === "hi" ? "यह कैलेंडर पद्धति समर्थित नहीं है; गणक मानक दिखाया गया है।" : "That calendar mode is unsupported; Ganak default is shown.")}</div>}
             </div>
           </div>}
           <MuhuratHub todayP={todayP} place={place} lang={lang} ayanamsa={ayanamsa} isToday={isPanchToday} onCal={setCalView} C={C} card={card} />

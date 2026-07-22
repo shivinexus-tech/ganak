@@ -41,5 +41,12 @@ export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: num
 }
 
 export function safeConvention(value: string | null): CalendarConventionId {
-  return CALENDAR_CONVENTIONS.some(x => x.id === value && x.enabled) ? value as CalendarConventionId : "canonical";
+  return resolveConvention(value).id;
+}
+
+export function resolveConvention(value: string | null): { id:CalendarConventionId; recoveredFrom:string | null; reason:"unknown" | "not-reviewed" | null } {
+  if (!value || value === "canonical") return { id:"canonical", recoveredFrom:null, reason:null };
+  const match=CALENDAR_CONVENTIONS.find(x=>x.id===value);
+  if (match?.enabled) return { id:match.id, recoveredFrom:null, reason:null };
+  return { id:"canonical", recoveredFrom:value, reason:match ? "not-reviewed" : "unknown" };
 }
