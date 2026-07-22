@@ -29,6 +29,8 @@ the non-negotiables so Cursor's AI can't miss them.
    node validation/festival-deeplinks.cjs               # permanent festival routes + existing card default
    node validation/festival-page-coverage.cjs            # every in-scope openable label has a valid page
    node validation/major-festival-pages.cjs              # reviewed major festivals stay substantive and bilingual
+   node validation/durga-puja-pages.cjs                  # six Bengal Durga Puja pages stay substantive and bilingual
+   node validation/vedic-season-clock.cjs                # Ritu boundaries, ghati rollover and equinox/solstice anchors
    ```
 3. **No `localStorage` / `sessionStorage`** — banned. UI prefs go in the URL query.
 4. **Content is Hindu observances only** (Buddha Purnima excepted). Religious

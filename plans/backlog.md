@@ -156,7 +156,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         Neram and Anandadi Yoga.
   - [ ] Dedicated Sarvartha Siddhi, Amrita Siddhi, Ravi Yoga, Ravi/Guru Pushya,
         Dwipushkar, Tripushkar and Ganda Moola calculations/calendars.
-  - [ ] Ritu/season, solstice/equinox and Vedic/Ghati clock.
+  - [x] Ritu/season, solstice/equinox and Vedic/Ghati clock.
   - [ ] User-controlled lunar/Gregorian presentation, Amanta/Purnimanta switch and
         pre-launch Tamil Thirukanitha/Bengali Vishuddha Siddhanta calendar-base
         switches. Complete Tamil/Bengali-language journeys remain a separate
@@ -252,7 +252,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       the current Fasts & Festivals card click/expand behaviour exactly as it is.
       After launch, compare direct-link use with in-app card use and only reconsider
       navigation after observing real user behaviour. _(P1-FESTIVAL-DEEPLINKS — shipped)_
-- [ ] **P0 before go-live — complete festival and vrat page-link coverage (no
+- [x] **P0 before go-live — complete festival and vrat page-link coverage (no
       tier exclusions).** Every festival, vrat, fast, recurring observance and named
       variant that a user can open anywhere in the website/app must also have a
       stable, shareable dedicated-page URL. This covers the **full current inventory:
@@ -266,10 +266,9 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       click/expand action as well. Add a generated coverage gate that compares the
       live openable-item registries against the route registry, so adding a future
       festival without a page link fails validation. Full checkable snapshot and
-      rules: `plans/festival-page-link-inventory.md`. The parent remains open for
-      the remaining multi-day and Navadurga page families, all now required before
-      go-live by the owner's 2026-07-21 scope decision.
-      _(P0-FESTIVAL-PAGES-ALL; 148-page slice shipped 2026-07-20)_
+      rules: `plans/festival-page-link-inventory.md`. **Completed 2026-07-22:**
+      Bengal Durga Puja ×6 substantive guides + routes; zero deferred labels.
+      _(P0-FESTIVAL-PAGES-ALL — shipped 2026-07-22)_
 - [x] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
       selection box directly on every dedicated festival/vrat page. Replace “Open
       this festival in the Daily Panchang to see the local timing referred to below.”

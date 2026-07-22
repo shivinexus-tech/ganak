@@ -50,6 +50,8 @@ node validation/panchaka-windows.cjs                 # no sub-minute/same-minute
 node validation/festival-deeplinks.cjs               # permanent festival routes + existing card default
 node validation/festival-page-coverage.cjs            # every in-scope openable label has a valid page
 node validation/major-festival-pages.cjs              # reviewed major festivals stay substantive and bilingual
+node validation/durga-puja-pages.cjs                  # six Bengal Durga Puja pages stay substantive and bilingual
+node validation/vedic-season-clock.cjs                # Ritu boundaries, ghati rollover and equinox/solstice anchors
 node validation/page-context-header.cjs               # route-specific hero; no cross-section copy leaks
 ```
 Never claim work is done without pasting the passing output. Evidence before

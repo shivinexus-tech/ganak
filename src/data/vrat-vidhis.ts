@@ -2,6 +2,7 @@
 // Pure data, no app logic: content agents can edit this file without touching the app.
 
 import { MAJOR_FESTIVAL_GUIDES, MAJOR_FESTIVAL_SUPPLEMENTS } from "./major-festival-guides";
+import { DURGA_PUJA_GUIDES } from "./durga-puja-guides";
 
 /* Vrat vidhi content — sourced from plans/vrat-vidhis.md. User-facing copy only;
    implementation and editorial instructions stay in plans, never in this object. */
@@ -62,6 +63,7 @@ const VAT_SAVITRI_COMMON = Object.freeze({
 
 export const VRAT_VIDHI = {
   ...MAJOR_FESTIVAL_GUIDES,
+  ...DURGA_PUJA_GUIDES,
   makarSankranti: {
     verdict: {
       en: "Makar Sankranti is the major solar festival when Surya enters Makara in the sidereal Hindu calendar. The shared household observance is Surya arghya, til and jaggery or the family's seasonal food, charity and gratitude; fasting rules differ by family and region.",

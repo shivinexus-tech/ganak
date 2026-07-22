@@ -23,6 +23,7 @@ import { vaishnavaEkadashiDay } from "../engine/muhurat";
 import { VIM_LORDS } from "../engine/dasha";
 import { MUH_CATS, EVENTS, SAMSKARA_GUIDANCE, SAMSKARA_INPUTS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS } from "../data/muhurat-ui";
 import DailyWindowsCard from "../components/DailyWindowsCard";
+import SeasonClockCard from "../components/SeasonClockCard";
 import { ascendantAt } from "../engine/ephemeris";
 import { ayanAt } from "../engine/panchang";
 import { computeTodayPanchang } from "../engine/today-panchang";
@@ -702,6 +703,8 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         </div>
         {evKey === "wedding" && <div style={{ fontSize: 11.5, color: C.muted, marginTop: 12, fontStyle: "italic", lineHeight: 1.5 }}>{lang === "hi" ? "विवाह का पूर्ण मुहूर्त तिथि, नक्षत्र व लग्न पर निर्भर — यह केवल दिन के शुभ समय दिखाता है।" : "A full wedding muhurat depends on tithi, nakshatra and lagna — this shows favourable times within the day only."}</div>}
       </div>
+
+      <SeasonClockCard place={place} lang={lang} ayanamsa={ayanamsa} atMs={todayP.anchor} isToday={isToday} C={C} card={card} />
 
       <DailyWindowsCard data={todayP.dailyWindows} place={place} lang={lang} C={C} card={card} />
 

@@ -41,14 +41,14 @@ function coverageProblems(entries, routes) {
 const liveCount = Object.keys(meta.FEST_NAME).length + Object.keys(meta.OBS_NAME).length;
 assert.strictEqual(FESTIVAL_PAGE_ENTRIES.length, liveCount, 'registry must contain every live openable label');
 assert.strictEqual(liveCount, 166, 'update the reviewed inventory when the live label count changes');
-assert.strictEqual(EXCLUDED_PAGE_KEYS.length, 10, 'the owner-approved excluded-family allowlist must remain explicit');
-assert.strictEqual(REQUIRED_PAGE_ENTRIES.length, 156, '156 non-deferred labels must have dedicated routes');
+assert.strictEqual(EXCLUDED_PAGE_KEYS.length, 4, 'only the four Chhath shared labels may be excluded from standalone routes');
+assert.strictEqual(REQUIRED_PAGE_ENTRIES.length, 162, '162 non-deferred labels must have dedicated routes');
 assert.strictEqual(SHARED_PAGE_ENTRIES.length, 4, 'the four Chhath labels must share the existing Chhath page');
-assert.strictEqual(DEFERRED_PAGE_ENTRIES.length, 6, 'only the six not-yet-structured Bengal Durga Puja labels may lack routes');
+assert.strictEqual(DEFERRED_PAGE_ENTRIES.length, 0, 'no openable label may remain explicitly deferred');
 
 const existingStandalone = new Set(['hartalikaTeej', 'chaitraNavratri', 'sharadNavratri']);
 const newPages = REQUIRED_PAGE_ENTRIES.filter((entry) => !existingStandalone.has(entry.key));
-assert.strictEqual(newPages.length, 153, 'the registry must retain 148 generated pages plus 5 approved multi-day milestone pages');
+assert.strictEqual(newPages.length, 159, 'the registry must retain 154 generated pages plus 5 approved multi-day milestone pages');
 
 const problems = coverageProblems([...FESTIVAL_PAGE_ENTRIES, ...NAVADURGA_PAGE_ENTRIES], FESTIVAL_PAGE_ROUTES);
 assert.deepStrictEqual(problems, [], `festival page coverage problems:\n${problems.join('\n')}`);

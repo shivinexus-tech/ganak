@@ -113,7 +113,10 @@ for (const [urlPath, want] of Object.entries(samples)) {
 }
 
 assert.strictEqual(routeModule.festivalGuideFromPath('/festival/not-a-guide'), null, 'unknown festival paths must not resolve');
-assert.strictEqual(routeModule.festivalGuideFromPath('/festival/durga-puja-mahalaya'), null, 'deferred multi-day routes must not be invented');
+const durgaMahalaya = routeModule.festivalGuideFromPath('/festival/durga-puja-mahalaya');
+assert(durgaMahalaya && durgaMahalaya.vidhiKey === 'durgaPujaMahalaya', 'Durga Puja Mahalaya must resolve to its substantive guide');
+assert(vidhiModule.VRAT_VIDHI.durgaPujaMahalaya?.verdict?.en, 'Durga Puja Mahalaya guide must be substantive');
+console.log('PASS  /festival/durga-puja-mahalaya -> durgaPujaMahalaya');
 assert.strictEqual(routeModule.festivalGuideFromPath('/'), null, 'the home page must not resolve as a festival guide');
 
 const DELHI = { label: 'New Delhi, India', lat: 28.61, lon: 77.21, zone: 'Asia/Kolkata' };

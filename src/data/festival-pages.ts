@@ -10,12 +10,9 @@ const CHHATH_SHARED_KEYS = Object.freeze([
   "chhathNahayKhay", "chhathKharna", "chhath", "chhathUshaArghya",
 ]);
 
-const DEFERRED_MULTI_DAY_KEYS = Object.freeze([
-  "durgaPujaMahalaya", "durgaPujaShashthi", "durgaPujaSaptami",
-  "durgaPujaAshtami", "durgaPujaNavami", "durgaPujaDashami",
-]);
+const DEFERRED_MULTI_DAY_KEYS = Object.freeze([]);
 
-const EXCLUDED_PAGE_KEYS = Object.freeze([...CHHATH_SHARED_KEYS, ...DEFERRED_MULTI_DAY_KEYS]);
+const EXCLUDED_PAGE_KEYS = Object.freeze([...CHHATH_SHARED_KEYS]);
 
 const LEGACY_SLUGS = Object.freeze({
   hartalikaTeej: "hartalika-teej",
