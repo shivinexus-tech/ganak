@@ -1,4 +1,130 @@
-# Ganak backend proxy
+# Ganak server — public API and AI proxy
+
+Two separate things live here:
+
+| | What | Auth | Cost per call |
+|---|---|---|---|
+| **`/v1/*`** | **Public developer API** — panchang, festivals, muhurat, hora, panchaka | per-key `x-api-key` | none (local computation) |
+| `/api/explain` | AI explanation proxy (not wired to the app) | `x-ganak-key` shared secret | **real money** (Anthropic) |
+
+---
+
+# Public developer API (v1)
+
+Read-only calculation endpoints backed by **the same engines as ganak.pages.dev**.
+`server/api/engines.mjs` bundles `src/engine/*` at startup with esbuild rather than
+reimplementing anything, so the API cannot drift from the website — there is one
+implementation of the astronomy, not two.
+
+**No personal data.** A request carries a place and a date; a response carries a
+calculation. Nothing is stored. That keeps the API outside the privacy surface
+described in `plans/legal-privacy-terms-draft.md`.
+
+## Quick start
+
+```bash
+curl -H "x-api-key: YOUR_KEY" \
+  "http://localhost:3001/v1/panchang?date=2026-07-19&lat=28.61&lon=77.21&tz=Asia/Kolkata"
+```
+
+```json
+{
+  "version": "v1",
+  "query": { "lat": 28.61, "lon": 77.21, "tz": "Asia/Kolkata", "date": "2026-07-19", "ayanamsa": "lahiri" },
+  "panchang": {
+    "paksha": "Shukla Paksha",
+    "tithi": [{ "name": "Shashthi", "endsAt": "2026-07-19T22:00:47.983Z" }],
+    "nakshatra": [{ "name": "Uttara Phalguni", "endsAt": "2026-07-19T12:41:50.647Z" }],
+    "month": { "amanta": "Ashadha", "purnimanta": "Ashadha", "isAdhikMasa": false },
+    "sun": { "rise": "2026-07-19T00:05:27.249Z", "set": "2026-07-19T13:49:33.064Z", "sign": "Karka" },
+    "inauspicious": { "rahuKalam": { "from": "...", "to": "..." } }
+  }
+}
+```
+
+## Endpoints
+
+Full machine-readable description: **`GET /v1/openapi.json`** (public, no key needed).
+
+| Endpoint | Returns |
+|---|---|
+| `GET /v1/panchang` | Tithi, nakshatra, yoga, karana, paksha, lunar month, samvat, sun/moon timings, auspicious and inauspicious windows |
+| `GET /v1/festivals` | Fasts and festivals in a range, each with its `decidingKala` |
+| `GET /v1/muhurat` | One date, or ranked days across a range for an activity |
+| `GET /v1/hora` | The twelve daytime planetary hours |
+| `GET /v1/panchaka` | Lagna schedule and Panchaka Rahita windows |
+| `GET /v1/me` | Your key's name and remaining quota — does not consume quota |
+| `GET /v1/` | Endpoint discovery |
+
+Common parameters: `lat`, `lon` (required), `tz` (IANA, default `UTC`), `date` or
+`from`/`to` as `YYYY-MM-DD` between 1900 and 2100, `ayanamsa` (`lahiri` default, or `kp`).
+
+## Contract guarantees
+
+These are promises, enforced by `npm run smoke:api`:
+
+- **Instants are always ISO 8601 UTC strings**, never epoch milliseconds.
+- **Windows are always `{ from, to }`.**
+- **Errors are always `{ error, code }`** — match on `code`, never on the message.
+  No stack traces, file paths, upstream hostnames or key material ever appear.
+- **Responses never expose engine internals.** Everything crossing the boundary is
+  mapped in `server/api/contract.mjs`, so an internal rename breaks a test here rather
+  than someone's integration.
+- **Deterministic**: identical inputs give byte-identical output, so responses are
+  safe to cache.
+
+## Conventions and limits — stated, not implied
+
+- **Lahiri (Chitrapaksha) ayanamsa by default**, matching Drik Panchang's default and
+  the rest of Ganak. `ayanamsa=kp` selects the Krishnamurti value, 5′48″ smaller.
+- **Regional variation is real.** Hindu observance dates legitimately differ by region
+  and sampradaya. `decidingKala` is returned on every observance precisely so a
+  difference from another panchang can be explained rather than guessed at.
+- **Not a religious authority.** For an observance that matters, users should confirm
+  with their family tradition or local acharya.
+
+## Authentication and quotas
+
+Send your key as the **`x-api-key`** header.
+
+Keys come from the `API_KEYS` environment variable:
+
+```
+API_KEYS=[{"key":"...","name":"acme","quotaPerDay":1000}]
+```
+
+A bare comma-separated list also works for local use and gets `API_DEFAULT_QUOTA`.
+
+Every response carries `X-Quota-Limit`, `X-Quota-Remaining` and `X-Quota-Reset`
+(UTC midnight). Over quota returns **429 `QUOTA_EXCEEDED`** with `Retry-After`.
+There is also a per-key burst limit, `API_RATE_PER_MIN` (default 60), returning
+**429 `RATE_LIMITED`**.
+
+### ⚠️ v1 limits an operator must know
+
+- **Keys live in an env var, not a database.** Rotating a key means editing the
+  variable and restarting. Deliberate: the API has no datastore, and quietly inventing
+  one was the wrong call to make here.
+- **Quotas are counted in memory, per process.** Correct for a single instance. A
+  multi-instance deployment needs a shared store, or each instance will grant the full
+  quota independently.
+- Both are the same limitation the AI proxy's rate limiter has, and both should be
+  revisited together when a datastore exists.
+
+## Verifying it
+
+```bash
+npm run smoke:api
+```
+
+43 checks over real HTTP: auth rejection, the published shape of every endpoint,
+ISO/window conventions, no-internals-leaked, determinism, all eleven validation error
+codes, error non-leakage, JSON 404, quota enforcement and isolation between keys, and
+security headers. Needs **no** API key of any kind and costs nothing.
+
+---
+
+# AI proxy (`/api/explain`)
 
 This is a small, standalone server for Ganak's future AI explanations. It keeps the Anthropic API key on the server, where website visitors cannot read it. The web app is **not connected to this server yet**.
 

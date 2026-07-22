@@ -5,6 +5,9 @@ import rateLimit from "express-rate-limit";
 import { timingSafeEqual } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { createV1Router } from "./api/v1.mjs";
+import { parseKeys, createKeyStore, keyFingerprint } from "./api/keys.mjs";
+import { openApiSpec } from "./api/openapi.mjs";
 
 const serverDirectory = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(serverDirectory, ".env") });
@@ -221,6 +224,61 @@ function safeUpstreamError(status) {
     body: requestError("The explanation service could not complete the request.", "UPSTREAM_ERROR"),
   };
 }
+
+/* ===================== Public developer API (v1) =====================
+   Separate from /api/explain in every way that matters: its own keys, its own quota,
+   its own rate limiter, and no upstream cost — v1 is pure local computation, so a
+   burst here spends CPU, not money. */
+
+const apiKeys = parseKeys(process.env.API_KEYS, Number.parseInt(process.env.API_DEFAULT_QUOTA || "1000", 10));
+const keyStore = createKeyStore(apiKeys);
+
+const apiRateLimiter = rateLimit({
+  windowMs: 60_000,
+  limit: Number.parseInt(process.env.API_RATE_PER_MIN || "60", 10),
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  keyGenerator: (request) => request.get("x-api-key") || request.ip,
+  handler(_request, response) {
+    response.setHeader("Retry-After", "60");
+    response.status(429).json(requestError("Too many requests. Slow down and try again shortly.", "RATE_LIMITED"));
+  },
+});
+
+/* Key check plus daily quota. Both failures are 401/429 with the standard shape, and
+   neither reveals whether a key exists — a wrong key and a missing key look the same. */
+function requireApiKey(request, response, next) {
+  if (keyStore.size === 0) {
+    response.status(503).json(requestError("The API has no keys configured yet.", "API_NOT_CONFIGURED"));
+    return;
+  }
+  const record = keyStore.find(request.get("x-api-key"));
+  if (!record) {
+    response.status(401).json(requestError("Provide a valid API key in the x-api-key header.", "UNAUTHORISED"));
+    return;
+  }
+
+  const quota = keyStore.consume(record);
+  response.setHeader("X-Quota-Limit", String(quota.limit));
+  response.setHeader("X-Quota-Remaining", String(quota.remaining));
+  response.setHeader("X-Quota-Reset", quota.resetAt);
+
+  if (!quota.allowed) {
+    response.setHeader("Retry-After", String(Math.max(1, Math.ceil((Date.parse(quota.resetAt) - Date.now()) / 1000))));
+    response.status(429).json(requestError("Daily quota exhausted for this key.", "QUOTA_EXCEEDED"));
+    return;
+  }
+
+  request.apiKey = record;
+  next();
+}
+
+// Spec is public: an integrator needs it before they have a key.
+app.get("/v1/openapi.json", (_request, response) => {
+  response.json(openApiSpec({ publicUrl: process.env.PUBLIC_API_URL }));
+});
+
+app.use("/v1", apiRateLimiter, createV1Router({ keyStore, requireKey: requireApiKey }));
 
 app.post("/api/explain", explainRateLimiter, requireSharedSecret, async (request, response) => {
   const normalized = normalizeRequest(request.body);

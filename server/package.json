@@ -10,12 +10,14 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "smoke": "node smoke.js"
+    "smoke": "node smoke.js",
+    "smoke:api": "node api-smoke.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "express-rate-limit": "^7.5.0"
+    "express-rate-limit": "^7.5.0",
+    "esbuild": "^0.25.0"
   }
 }
