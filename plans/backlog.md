@@ -194,6 +194,43 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       openable-label pages, full local timing, household guidance, fasting/paran,
       explicit regional distinctions, sect/calendar distinctions where supported,
       printable/exportable festival calendars and opt-in reminders. Specifically:
+  - [ ] **P0 story-quality correction — replace significance summaries with
+        genuine devotional narratives.** The public heading **“Stories Remembered”**
+        must contain stories, not recycled significance copy, symbolism, ritual
+        instructions, regional notes, editorial caveats or one-line associations.
+        Complete the following batches strictly in this order:
+    1. **Six Bengal Durga Puja pages:** Mahalaya, Shashthi, Saptami, Ashtami,
+       Navami and Vijaya Dashami.
+    2. **Major festivals:** the five-day Diwali sequence; Holika Dahan and
+       Rangwali Holi; Chaitra and Sharad Navratri; Dussehra; Janmashtami; and
+       Ganesh Chaturthi.
+    3. **Other annual festivals** in the complete published guide inventory.
+    4. **Recurring vrats**, including Ekadashi, Pradosh, Purnima and Sankashti.
+    5. **Regional and monthly observances** in the complete published guide
+       inventory.
+
+        A qualifying story names its central figures, establishes the situation or
+        conflict, narrates what happened, gives the outcome and explains why the
+        episode is remembered for that observance. Move existing non-story material
+        to “Why this day matters”, “Regional traditions”, worship steps or an
+        appropriately labelled living-tradition/source note; do not discard accurate
+        material merely because it was in the wrong section. Each story must be a
+        concise, readable devotional narrative rather than an essay, with natural
+        independently reviewed English and Hindi versions. Record scriptural,
+        documented living-tradition or regional/oral provenance internally and label
+        differing traditions without presenting one as universal.
+
+        **Definition of done:** all five batches are complete; every published guide
+        has at least one relevant narrative with named figures and action (or an
+        explicitly justified non-narrative observance whose section is renamed);
+        no story entry is merely symbolism, practice, disclaimer or metadata; source
+        traceability exists; EN/HI desktop and phone presentation is readable; and a
+        strengthened semantic regression gate rejects short associations, misplaced
+        ritual/regional/editorial prose and duplicated generic stories. The gate must
+        be proven non-vacuous by deliberately substituting significance copy into a
+        story fixture and showing that validation fails. The slice is not complete
+        after Mahalaya or any single batch.
+        _(P0-FESTIVAL-STORY-QUALITY; owner scope 2026-07-22)_
   - [x] Bengal Durga Puja: separate, substantive Mahalaya, Shashthi, Saptami,
         Ashtami, Navami and Vijaya Dashami pages. Shipped and production-verified
         2026-07-22 with six exact Delhi date anchors, devotional EN/HI guidance,
