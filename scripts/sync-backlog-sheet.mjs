@@ -330,6 +330,36 @@ async function sheetsRequest(config, path, options = {}) {
   return response.json();
 }
 
+function validateDashboardContract(snapshot, config) {
+  if (!config.dashboard) return;
+  if (snapshot.title !== config.dashboard.title) {
+    fail(`Quality Dashboard title is “${snapshot.title || "missing"}”; expected “${config.dashboard.title}”`);
+  }
+  if (snapshot.metricFormulas.length !== config.dashboard.metricFormulaCount
+      || snapshot.metricFormulas.some((formula) => !normalizeCell(formula).startsWith("="))) {
+    fail(`Quality Dashboard must retain ${config.dashboard.metricFormulaCount} summary formulas`);
+  }
+  if (snapshot.listFormulas.length !== config.dashboard.listFormulaCount
+      || snapshot.listFormulas.some((formula) => !normalizeCell(formula).startsWith("=IFERROR(FILTER("))) {
+    fail(`Quality Dashboard must retain ${config.dashboard.listFormulaCount} filtered management lists`);
+  }
+}
+
+async function validateLiveDashboard(config) {
+  if (!config.dashboard) return;
+  const params = new URLSearchParams();
+  const sheet = a1SheetName(config.dashboard.sheetName);
+  for (const range of ["A1", "B4:B10", "A14", "L14", "A81", "L81", "A148", "L148"]) {
+    params.append("ranges", `${sheet}!${range}`);
+  }
+  params.set("valueRenderOption", "FORMULA");
+  const response = await sheetsRequest(config, `/values:batchGet?${params}`);
+  const firstValue = (index) => response.valueRanges?.[index]?.values?.[0]?.[0] || "";
+  const metricFormulas = (response.valueRanges?.[1]?.values || []).map((row) => row[0] || "");
+  const listFormulas = [2, 3, 4, 5, 6, 7].map(firstValue);
+  validateDashboardContract({ title: firstValue(0), metricFormulas, listFormulas }, config);
+}
+
 async function readLiveSheet(config) {
   const metadata = await sheetsRequest(
     config,
@@ -346,6 +376,7 @@ async function readLiveSheet(config) {
   if (config.dashboard?.sheetName && !liveTabs.has(config.dashboard.sheetName)) {
     fail(`Live spreadsheet is missing dashboard tab “${config.dashboard.sheetName}”`);
   }
+  await validateLiveDashboard(config);
 
   const params = new URLSearchParams();
   for (const tab of config.tabs) params.append("ranges", `${a1SheetName(tab.sheetName)}!A1:R1000`);
@@ -550,7 +581,7 @@ async function main() {
   await applyChanges(changes, live, config);
 }
 
-export { buildBootstrapChanges, buildChanges, parseRegister, sheetRow };
+export { buildBootstrapChanges, buildChanges, parseRegister, sheetRow, validateDashboardContract };
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((error) => {

@@ -131,7 +131,10 @@
     }
   },
   "dashboard": {
-    "sheetName": "Quality Dashboard"
+    "sheetName": "Quality Dashboard",
+    "title": "Ganak Quality Dashboard",
+    "metricFormulaCount": 7,
+    "listFormulaCount": 6
   },
   "tabs": [
     {

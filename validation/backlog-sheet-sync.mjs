@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-import { buildBootstrapChanges, buildChanges, parseRegister, sheetRow } from "../scripts/sync-backlog-sheet.mjs";
+import { buildBootstrapChanges, buildChanges, parseRegister, sheetRow, validateDashboardContract } from "../scripts/sync-backlog-sheet.mjs";
 
 const config = JSON.parse(await readFile(new URL("../plans/backlog-sheet-sync.json", import.meta.url), "utf8"));
 const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md", import.meta.url), "utf8");
@@ -23,6 +23,18 @@ assert.match(base.rows.get("5").quality.bugBashStatus, /not completed/i);
 assert.equal(base.rows.get("5").quality.qualityRisk, "Red");
 assert.match(base.rows.get("5").quality.lastVerified, /Local HTTP smoke only/);
 assert.match(base.rows.get("5").quality.sourceConfidence, /Not applicable/);
+
+const dashboardFixture = {
+  title: "Ganak Quality Dashboard",
+  metricFormulas: Array.from({ length: 7 }, (_, index) => `=COUNTIF(A:A,"${index}")`),
+  listFormulas: Array.from({ length: 6 }, () => "=IFERROR(FILTER(A:A,A:A<>\"\"),\"None\")"),
+};
+assert.doesNotThrow(() => validateDashboardContract(dashboardFixture, config));
+assert.throws(
+  () => validateDashboardContract({ ...dashboardFixture, listFormulas: dashboardFixture.listFormulas.slice(1) }, config),
+  /retain 6 filtered management lists/,
+  "a deleted dashboard list formula must fail the permanent gate",
+);
 
 const legacyConfig = structuredClone(config);
 delete legacyConfig.qualityColumns;
@@ -124,4 +136,4 @@ assert.equal(
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 
-console.log("Backlog Sheet sync gate: PASS — 57 rows; 18-column quality contract, high-impact bug-bash/RAG policy, API limitation/impact disclosure, verification/source confidence, changed-cell targeting, idempotence, conflict refusal, metadata guard and explicit bootstrap planning verified.");
+console.log("Backlog Sheet sync gate: PASS — 57 rows; 18-column quality contract, dashboard formula guard, high-impact bug-bash/RAG policy, API limitation/impact disclosure, verification/source confidence, changed-cell targeting, idempotence, conflict refusal, metadata guard and explicit bootstrap planning verified.");
