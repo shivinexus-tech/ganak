@@ -79,7 +79,7 @@ function splitMarkdownRow(line) {
   return cells;
 }
 
-function parseRegister(markdown, config, sourceLabel) {
+function parseRegister(markdown, config, sourceLabel, options = {}) {
   const tabsBySection = new Map(config.tabs.map((tab) => [tab.section, tab]));
   const rows = new Map();
   const rowsBySection = new Map(config.tabs.map((tab) => [tab.section, []]));
@@ -104,7 +104,7 @@ function parseRegister(markdown, config, sourceLabel) {
     if (rows.has(id)) fail(`${sourceLabel}: duplicate backlog ID ${id}`);
     const metadata = config.items[id];
     if (!metadata) fail(`${sourceLabel}: backlog ID ${id} is missing from plans/backlog-sheet-sync.json`);
-    if (metadata.title !== cells[1]) {
+    if (!options.allowMetadataTitleMismatch && metadata.title !== cells[1]) {
       fail(`${sourceLabel}: title mismatch for ID ${id}; register has “${cells[1]}”, sync metadata has “${metadata.title}”`);
     }
     if (metadata.section !== section) {
@@ -357,7 +357,12 @@ async function main() {
   const baseMarkdown = readGitFile(baseSha, REGISTER_PATH);
   const baseConfigText = readGitFileOptional(baseSha, "plans/backlog-sheet-sync.json");
   const baseConfig = baseConfigText ? JSON.parse(baseConfigText) : config;
-  const base = parseRegister(baseMarkdown, baseConfig, `register at ${baseSha}`);
+  const base = parseRegister(baseMarkdown, baseConfig, `register at ${baseSha}`, {
+    // The first automation commit has no historical metadata file. Its old
+    // register titles are still the authoritative base values for three-way
+    // comparison, while the new metadata supplies complexity and tab mapping.
+    allowMetadataTitleMismatch: !baseConfigText,
+  });
   const live = await readLiveSheet(config);
   const changes = buildChanges(base, head, live, config);
   await applyChanges(changes, live, config);

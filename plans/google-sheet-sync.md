@@ -23,6 +23,10 @@ trusted Git base and updates only cells changed in Git. If the same live cell wa
 changed independently, it fails with a three-way conflict instead of overwriting
 either version. Deletes and cross-tab moves also fail for explicit review.
 
+An explicitly reviewed failed batch can be replayed with the manual workflow's
+`base_sha` input. This is a recovery control, not a full-sheet overwrite: the same
+three-way conflict checks still apply to every changed cell.
+
 ## Google/GitHub connection
 
 The automation uses **Workload Identity Federation**. GitHub stores no Google

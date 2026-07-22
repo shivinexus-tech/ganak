@@ -9,6 +9,11 @@ on:
       - scripts/sync-backlog-sheet.mjs
       - .github/workflows/sync-backlog-sheet.yml
   workflow_dispatch:
+    inputs:
+      base_sha:
+        description: Trusted earlier Git revision for an explicitly reviewed recovery replay
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -49,9 +54,12 @@ jobs:
 
       - name: Select the trusted base revision
         env:
+          DISPATCH_BASE: ${{ inputs.base_sha }}
           PUSH_BEFORE: ${{ github.event.before }}
         run: |
-          if [ -n "$PUSH_BEFORE" ] && [ "$PUSH_BEFORE" != "0000000000000000000000000000000000000000" ]; then
+          if [ -n "$DISPATCH_BASE" ]; then
+            echo "BACKLOG_SYNC_BASE_SHA=$DISPATCH_BASE" >> "$GITHUB_ENV"
+          elif [ -n "$PUSH_BEFORE" ] && [ "$PUSH_BEFORE" != "0000000000000000000000000000000000000000" ]; then
             echo "BACKLOG_SYNC_BASE_SHA=$PUSH_BEFORE" >> "$GITHUB_ENV"
           else
             echo "BACKLOG_SYNC_BASE_SHA=$(git rev-parse HEAD^)" >> "$GITHUB_ENV"

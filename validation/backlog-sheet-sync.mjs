@@ -65,4 +65,20 @@ assert.throws(
   "renames must update sync metadata explicitly",
 );
 
+const preAutomationMarkdown = markdown.replace(
+  "| 57 | sunSidMs performance investigation |",
+  "| 57 | `sunSidMs` performance investigation |",
+);
+assert.notEqual(preAutomationMarkdown, markdown, "bootstrap fixture must contain the historical title");
+assert.throws(
+  () => parseRegister(preAutomationMarkdown, config, "strict historical fixture"),
+  /title mismatch for ID 57/,
+  "normal runs must continue rejecting title drift",
+);
+assert.equal(
+  parseRegister(preAutomationMarkdown, config, "bootstrap historical fixture", { allowMetadataTitleMismatch: true }).rows.size,
+  57,
+  "the first run may parse a pre-metadata base while preserving its old cell values",
+);
+
 console.log("Backlog Sheet sync gate: PASS — 57 rows; changed-cell targeting, idempotence, conflict refusal and metadata guard verified.");
