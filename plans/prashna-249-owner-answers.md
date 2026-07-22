@@ -453,4 +453,4 @@ recommend seeing it.
 | Q2 | Ayanamsa | ✅ **DECIDED 2026-07-22** — **option C, KP ayanamsa for Prashna.** See implementation notes 1–6 above; parameterize rather than replace |
 | Q1 | Chips to tier 2, compress repeated lines, question-specific house glosses | ⏳ open (recommended) |
 | Q5 | Mock-up before code | ⏳ open (recommended) |
-| — | Fix the live **`2th` house** bug now | ⏳ open — it is on production right now |
+| — | Live `2th` house bug | ✅ **FIXED** by another agent in `485ce7f` — `englishOrdinal()` helper, correct on the 11th/12th/13th edge case. No longer open. |
