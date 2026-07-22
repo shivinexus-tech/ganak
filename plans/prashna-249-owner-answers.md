@@ -471,6 +471,8 @@ recommend seeing it.
 | Q3 | Naming | ✅ **DECIDED 2026-07-20** — "कृष्णमूर्ति पद्धति अंक विधि", full name, no initials |
 | Q4 | Ruling planets + Moon-sincerity | ✅ **DECIDED 2026-07-20** — ship **both in v1**; KSK verify scope grows to match |
 | Q2 | Ayanamsa | ✅ **DECIDED 2026-07-22** — **option C, KP ayanamsa for Prashna.** See implementation notes 1–6 above; parameterize rather than replace |
-| Q1 | Chips to tier 2, compress repeated lines, question-specific house glosses | ⏳ open (recommended) |
+| Q1a | Chips to tier 2 | ✅ **DECIDED + SHIPPED 2026-07-22** — chips moved inside the "Full Prashna chart" collapse |
+| Q1b | Compress the repeated "connects to your Nth house" lines | ⏳ open |
+| Q1c | Question-specific house glosses | ⏳ open (**the one that matters** — reads as a bug today) |
 | Q5 | Mock-up before code | ✅ **DECIDED 2026-07-22** — **no mock-up.** Two-line label solves the fit; review happens on production instead |
 | — | Live `2th` house bug | ✅ **FIXED** by another agent in `485ce7f` — `englishOrdinal()` helper, correct on the 11th/12th/13th edge case. No longer open. |

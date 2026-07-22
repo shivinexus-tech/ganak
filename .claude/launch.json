@@ -8,6 +8,12 @@
       "port": 5173
     },
     {
+      "name": "kundli-verify",
+      "runtimeExecutable": "/opt/homebrew/bin/node",
+      "runtimeArgs": ["node_modules/vite/bin/vite.js", "--port", "5199", "--strictPort"],
+      "port": 5199
+    },
+    {
       "name": "ganak-proxy",
       "runtimeExecutable": "/opt/homebrew/bin/node",
       "runtimeArgs": ["server/index.js"],

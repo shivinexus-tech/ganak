@@ -416,17 +416,11 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
             </div>
           </div>
 
-          {/* Lagna chip row */}
-          <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
-            <PrashnaChip label={hi ? 'लग्न' : 'Lagna'} value={`${hi ? RASHI_HI[result.chart.lagna.sign] : RASHI_EN[result.chart.lagna.sign]} ${fmtDeg(result.chart.lagna.deg)}`}
-              gloss={hi ? 'इस क्षण पूर्व में उदित राशि' : 'the sign rising in the east at this moment'} />
-            <PrashnaChip label={hi ? 'नक्षत्र' : 'Nakshatra'} value={`${hi ? NAK_HI[result.chart.lagna.nak.idx] : result.chart.lagna.nak.en}-${result.chart.lagna.nak.pada}`}
-              gloss={hi ? 'उदित अंश जिस चन्द्र-नक्षत्र में पड़ता है' : 'the lunar mansion the rising degree falls in'} />
-            <PrashnaChip label={hi ? 'उप-स्वामी' : 'Sub-lord'} value={hi ? GRAHA_HI[v.cuspSub] : GRAHA_EN[v.cuspSub]}
-              gloss={hi ? 'निर्णायक मत देने वाला सूक्ष्म स्वामी' : 'the fine-grained ruler that casts the deciding vote'} />
-          </div>
-
-          {/* Collapsible full chart */}
+          {/* Collapsible full chart — the Lagna/Nakshatra/Sub-lord chips live INSIDE
+              this, not above it. They are expert evidence ("Krittika-3" is not
+              actionable for a lay user), so they belong with the chart on tier 2
+              rather than between the verdict and the way out. Owner-approved
+              2026-07-22 (Q1a). */}
           <button onClick={() => setShowFull(s => !s)}
             style={{ marginTop: 12, height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
               border: `1.5px solid ${TOKENS.line}`, background: TOKENS.card, color: TOKENS.ink,
@@ -437,6 +431,14 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
           {showFull && (
             <div style={{ marginTop: 10, background: TOKENS.card, borderRadius: TOKENS.radius,
               border: `1.5px solid ${TOKENS.line}`, padding: 12 }}>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+                <PrashnaChip label={hi ? 'लग्न' : 'Lagna'} value={`${hi ? RASHI_HI[result.chart.lagna.sign] : RASHI_EN[result.chart.lagna.sign]} ${fmtDeg(result.chart.lagna.deg)}`}
+                  gloss={hi ? 'इस क्षण पूर्व में उदित राशि' : 'the sign rising in the east at this moment'} />
+                <PrashnaChip label={hi ? 'नक्षत्र' : 'Nakshatra'} value={`${hi ? NAK_HI[result.chart.lagna.nak.idx] : result.chart.lagna.nak.en}-${result.chart.lagna.nak.pada}`}
+                  gloss={hi ? 'उदित अंश जिस चन्द्र-नक्षत्र में पड़ता है' : 'the lunar mansion the rising degree falls in'} />
+                <PrashnaChip label={hi ? 'उप-स्वामी' : 'Sub-lord'} value={hi ? GRAHA_HI[v.cuspSub] : GRAHA_EN[v.cuspSub]}
+                  gloss={hi ? 'निर्णायक मत देने वाला सूक्ष्म स्वामी' : 'the fine-grained ruler that casts the deciding vote'} />
+              </div>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr style={{ color: TOKENS.muted, textAlign: 'left' }}>
