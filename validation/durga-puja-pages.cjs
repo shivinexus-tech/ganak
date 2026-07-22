@@ -10,7 +10,7 @@ const DURGA_KEYS = [
   'durgaPujaMahalaya', 'durgaPujaShashthi', 'durgaPujaSaptami',
   'durgaPujaAshtami', 'durgaPujaNavami', 'durgaPujaDashami',
 ];
-const requiredObjectFields = ['verdict', 'meaning', 'diet', 'sankalpa', 'puja', 'paran', 'udyapan', 'safety'];
+const requiredObjectFields = ['verdict', 'meaning', 'diet', 'sankalpa', 'puja', 'paran', 'udyapan'];
 const requiredListFields = ['vidhi', 'stories', 'regional'];
 const routeByKey = new Map(pages.FESTIVAL_PAGE_ENTRIES.map((entry) => [entry.key, entry]));
 
@@ -27,6 +27,7 @@ for (const key of DURGA_KEYS) {
     assert(Array.isArray(guide[field]) && guide[field].length >= 2, `${key}.${field} must contain at least two items`);
     assert(guide[field].every((item) => item.en && item.hi), `${key}.${field} must be bilingual`);
   }
+  assert(!guide.safety, `${key} must not inherit a generic safety panel`);
   assert(/Bengal|बंगाल|pandal|पंडाल/i.test(guide.meaning.en + guide.meaning.hi), `${key} must stay distinct from Sharad Navratri pages`);
   console.log(`PASS  ${key} is a substantive bilingual page at ${entry.path}`);
 }

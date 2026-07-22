@@ -3,6 +3,7 @@
 
 import { MAJOR_FESTIVAL_GUIDES, MAJOR_FESTIVAL_SUPPLEMENTS } from "./major-festival-guides";
 import { DURGA_PUJA_GUIDES } from "./durga-puja-guides";
+import { VRAT_GUIDE_ENRICHMENTS } from "./vrat-guide-enrichments";
 
 /* Vrat vidhi content — sourced from plans/vrat-vidhis.md. User-facing copy only;
    implementation and editorial instructions stay in plans, never in this object. */
@@ -35,7 +36,7 @@ const VAT_SAVITRI_COMMON = Object.freeze({
   vidhi: [
     { en: "Bathe and prepare the offerings used in your family.", hi: "स्नान करके परिवार में प्रचलित पूजन-सामग्री तैयार करें।" },
     { en: "At a banyan tree, offer water and flowers and worship Savitri–Satyavan according to family custom.", hi: "वट-वृक्ष के पास जल और फूल अर्पित करके पारिवारिक रीति से सावित्री–सत्यवान का पूजन करें।" },
-    { en: "Tie the sacred thread while making the customary pradakshina. Use your family's count rather than assuming one fixed number.", hi: "प्रदक्षिणा करते हुए पवित्र धागा बाँधें। कोई एक संख्या मानने के बजाय अपने परिवार में प्रचलित संख्या रखें।" },
+    { en: "Tie the sacred thread while making the customary pradakshina. Use your family's count using the count taught in your family.", hi: "प्रदक्षिणा करते हुए पवित्र धागा बाँधें। कोई एक संख्या मानने के बजाय अपने परिवार में प्रचलित संख्या रखें।" },
     { en: "Read or hear the Savitri–Satyavan katha and pray for your husband's well-being and longevity and for dharma in married life.", hi: "सावित्री–सत्यवान की कथा पढ़ें या सुनें और पति के स्वास्थ्य, दीर्घायु तथा धर्ममय दाम्पत्य की प्रार्थना करें।" },
     { en: "If no suitable banyan is accessible, join a temple observance or ask your family priest or temple for its accepted practice; do not cut a living branch.", hi: "यदि वट-वृक्ष उपलब्ध न हो तो मंदिर के सामूहिक पूजन में सम्मिलित हों या परिवार-पुरोहित/मंदिर से मान्य विधि पूछें; जीवित शाखा न काटें।" },
   ],
@@ -81,8 +82,8 @@ export const VRAT_VIDHI = {
       { en: "Read one of the associated stories below, remember the farmers, animals and natural forces that sustain food, share the festive meal, and close with gratitude to Surya.", hi: "नीचे दी गई किसी सम्बद्ध कथा का पाठ करें, अन्न देने वाले किसान, पशु और प्रकृति को स्मरण करें, पर्व का भोजन बाँटें और सूर्य के प्रति कृतज्ञता से पूजा पूर्ण करें।" },
     ],
     diet: {
-      en: "There is no single compulsory pan-Indian fast. Some families fast until Surya puja or take one simple meal; others celebrate without fasting. Til-gur, khichdi, dahi-chura, tilkut, Pongal and other foods belong to particular regions—follow your own family custom rather than treating every item as mandatory.",
-      hi: "पूरे भारत के लिए एक अनिवार्य उपवास-नियम नहीं है। कुछ परिवार सूर्य-पूजा तक व्रत या एक सरल भोजन रखते हैं, जबकि अन्य बिना उपवास पर्व मनाते हैं। तिल-गुड़, खिचड़ी, दही-चूड़ा, तिलकुट, पोंगल आदि क्षेत्र-विशेष के भोजन हैं—सबको अनिवार्य मानने के बजाय अपनी पारिवारिक रीति रखें।",
+      en: "There is no single compulsory pan-Indian fast. The observance may include fast until Surya puja or take one simple meal; others celebrate without fasting. Til-gur, khichdi, dahi-chura, tilkut, Pongal and other foods belong to particular regions—follow your own family custom rather than treating every item as mandatory.",
+      hi: "पूरे भारत के लिए एक अनिवार्य उपवास-नियम नहीं है। इस अनुष्ठान में सूर्य-पूजा तक व्रत या एक सरल भोजन रखते हैं, जबकि अन्य बिना उपवास पर्व मनाते हैं। तिल-गुड़, खिचड़ी, दही-चूड़ा, तिलकुट, पोंगल आदि क्षेत्र-विशेष के भोजन हैं—सबको अनिवार्य मानने के बजाय अपनी पारिवारिक रीति रखें।",
     },
     sankalpa: {
       en: "“At this Makara transition I honour Surya, give thanks for light, food and livelihood, and will share what I can with others.” This is a plain-language intention, not a prescribed Sanskrit mantra.",
@@ -112,8 +113,8 @@ export const VRAT_VIDHI = {
       hi: "सामान्य वार्षिक पर्व के लिए अलग उद्यापन आवश्यक नहीं है। विशेष संकल्प या निश्चित संख्या की संक्रांति उसी परिवार, पुरोहित या मंदिर की विधि से पूर्ण करें जहाँ से उसके नियम मिले हैं।",
     },
     safety: {
-      en: "This note does not change the religious observance. Never stare directly at the Sun while offering arghya. Use only safe, permitted bathing places; cold water, deep currents and crowds can be dangerous. If your family fasts, keep prescribed medicines and seek medical guidance for any health condition. Avoid sharp, glass-coated or metal kite string.",
-      hi: "यह टिप्पणी धार्मिक अनुष्ठान को नहीं बदलती। अर्घ्य देते समय सूर्य को सीधे न देखें। केवल सुरक्षित और अनुमत स्नान-स्थान चुनें; ठंडा पानी, तेज धारा और भीड़ खतरनाक हो सकते हैं। परिवार में उपवास हो तो निर्धारित दवाएँ जारी रखें और स्वास्थ्य-स्थिति में चिकित्सकीय सलाह लें। धारदार, काँच-लेपित या धातु वाले मांझे से बचें।",
+      en: "Never stare directly at the Sun while offering arghya. Use only safe, permitted bathing places; cold water, deep currents and crowds can be dangerous. If your family fasts, keep prescribed medicines and seek medical guidance for any health condition. Avoid sharp, glass-coated or metal kite string.",
+      hi: "अर्घ्य देते समय सूर्य को सीधे न देखें। केवल सुरक्षित और अनुमत स्नान-स्थान चुनें; ठंडा पानी, तेज धारा और भीड़ खतरनाक हो सकते हैं। परिवार में उपवास हो तो निर्धारित दवाएँ जारी रखें और स्वास्थ्य-स्थिति में चिकित्सकीय सलाह लें। धारदार, काँच-लेपित या धातु वाले मांझे से बचें।",
     },
   },
   diwali: {
@@ -122,19 +123,19 @@ export const VRAT_VIDHI = {
       hi: "मुख्य दीपावली-रात्रि पर घर स्वच्छ और प्रकाशित करके स्थानीय सायंकालीन पूजा-अवधि में परिवार सहित लक्ष्मी-पूजन करें। सरल गृह-विधि में श्रद्धापूर्ण प्रार्थना, सुरक्षित दीप, फूल या अन्य सम्मानपूर्ण अर्पण, पारिवारिक नैवेद्य, कृतज्ञता और बाँटना पर्याप्त है—महँगा प्रदर्शन या अनिवार्य उपवास आवश्यक नहीं है।",
     },
     meaning: {
-      en: "Diwali is the festival of rows of lights, observed on the Amavasya night at the centre of a wider festival sequence. Lamps express light over darkness and knowledge over ignorance. In many North Indian homes the main worship honours Lakshmi, often with Ganesha, while other regions centre different deities and stories; those traditions are related but not interchangeable.",
+      en: "Diwali is the festival of rows of lights, observed on the Amavasya night at the centre of a wider festival sequence. Lamps express light over darkness and knowledge over ignorance. In many North Indian homes the main worship honours Lakshmi, often with Ganesha, while other regions centre different deities and stories; those traditions are related and retain their own complete forms.",
       hi: "दीपावली दीपों की पंक्तियों का पर्व है, जो व्यापक पर्व-क्रम के मध्य अमावस्या-रात्रि पर मनाया जाता है। दीप अंधकार पर प्रकाश और अज्ञान पर ज्ञान का प्रतीक हैं। अनेक उत्तर भारतीय घरों में मुख्य पूजा लक्ष्मी की, प्रायः गणेश के साथ, होती है; अन्य क्षेत्रों में अलग देवता और कथाएँ केंद्र में रहती हैं—ये परम्पराएँ सम्बद्ध हैं पर एक-दूसरे का स्थान नहीं लेतीं।",
     },
     vidhi: [
       { en: "Clean the worship space and entrance before evening. Arrange only what your household can manage: a stable lamp, Lakshmi image or murti used by the family, flowers or leaves where customary, clean water, kumkum or sandal paste, and the family's sweets, fruit or meal as naivedya.", hi: "सायंकाल से पहले पूजा-स्थान और प्रवेश-द्वार स्वच्छ करें। घर जितना सहज कर सके उतना ही रखें: स्थिर दीप, परिवार में पूजित लक्ष्मी-चित्र या मूर्ति, परम्परानुसार फूल या पत्ते, स्वच्छ जल, कुमकुम या चन्दन तथा पारिवारिक मिठाई, फल या भोजन का नैवेद्य।" },
       { en: "Light diyas safely at the altar and suitable places in the home. Keep flame away from curtains, rangoli powder, children and animals; electric lights may be used where an open flame is unsafe.", hi: "पूजा-स्थान और घर के सुरक्षित स्थानों पर दीप जलाएँ। लौ को पर्दों, रंगोली के चूर्ण, बच्चों और पशुओं से दूर रखें; जहाँ खुली लौ सुरक्षित न हो वहाँ विद्युत-दीप उपयोग कर सकते हैं।" },
       { en: "Begin with a brief purification and a plain-language intention. Remember Ganesha first if that is your family custom, then invite Lakshmi respectfully and offer water, scent or kumkum, flowers, lamp and naivedya one by one.", hi: "संक्षिप्त शुद्धि और सरल भाव-संकल्प से आरम्भ करें। यदि परिवार की रीति हो तो पहले गणेश का स्मरण करें, फिर लक्ष्मी का आदरपूर्वक आवाहन करके क्रम से जल, सुगन्ध या कुमकुम, फूल, दीप और नैवेद्य अर्पित करें।" },
-      { en: "Recite a familiar Lakshmi prayer, Shri Sukta, Lakshmi ashtottara, bhajan or simple names according to your capacity. A long Sanskrit sequence is optional; do not improvise mantras you do not know.", hi: "सामर्थ्य और परम्परा के अनुसार परिचित लक्ष्मी-प्रार्थना, श्रीसूक्त, लक्ष्मी अष्टोत्तर, भजन या सरल नाम-स्मरण करें। लम्बी संस्कृत-विधि वैकल्पिक है; अपरिचित मंत्र स्वयं न गढ़ें।" },
+      { en: "Recite a familiar Lakshmi prayer, Shri Sukta, Lakshmi ashtottara, bhajan or simple names according to your capacity. A familiar prayer or name-recitation is a complete household offering; receive unfamiliar mantras through your tradition.", hi: "सामर्थ्य और परम्परा के अनुसार परिचित लक्ष्मी-प्रार्थना, श्रीसूक्त, लक्ष्मी अष्टोत्तर, भजन या सरल नाम-स्मरण करें। लम्बी संस्कृत-विधि वैकल्पिक है; अपरिचित मंत्र अपनी परम्परा से विधिपूर्वक प्राप्त करें।" },
       { en: "Offer aarti, bow, distribute prasad and share sweets or useful gifts without pressure to overspend. Leave a lamp only where it can be watched safely; otherwise extinguish it respectfully before sleeping.", hi: "आरती करके प्रणाम करें, प्रसाद बाँटें और बिना अधिक खर्च के दबाव के मिठाई या उपयोगी उपहार साझा करें। दीप केवल वहीं जलता छोड़ें जहाँ सुरक्षित निगरानी हो; अन्यथा सोने से पहले आदरपूर्वक बुझा दें।" },
     ],
     diet: {
-      en: "A day-long Lakshmi-puja fast is kept in some families, but it is not one compulsory rule for every Diwali household. If fasting, choose the water, fruit, milk or meal rule received from your family or temple and break it after the evening worship. Otherwise eat the family's festive vegetarian meal and prasad. Regional sweets and savouries vary widely.",
-      hi: "कुछ परिवार लक्ष्मी-पूजन तक दिनभर व्रत रखते हैं, पर यह हर दीपावली-घर के लिए एक अनिवार्य नियम नहीं है। व्रत हो तो परिवार या मंदिर से मिली जल, फल, दूध या भोजन की रीति रखें और सायंकालीन पूजा के बाद खोलें। अन्यथा पारिवारिक उत्सवी शाकाहारी भोजन और प्रसाद लें। क्षेत्रीय मिठाइयाँ और नमकीन बहुत भिन्न होते हैं।",
+      en: "If Lakshmi-puja fasting belongs to your household, keep its water, fruit, milk or meal discipline and complete it after the evening worship. Otherwise receive the family's festive vegetarian meal and prasad. Prepare the regional sweets and savouries loved in your home.",
+      hi: "इस अनुष्ठान में लक्ष्मी-पूजन तक दिनभर व्रत रखते हैं, पर यह हर दीपावली-घर के लिए एक अनिवार्य नियम नहीं है। व्रत हो तो परिवार या मंदिर से मिली जल, फल, दूध या भोजन की रीति रखें और सायंकालीन पूजा के बाद खोलें। अन्यथा पारिवारिक उत्सवी शाकाहारी भोजन और प्रसाद लें। क्षेत्रीय मिठाइयाँ और नमकीन बहुत भिन्न होते हैं।",
     },
     sankalpa: {
       en: "“On this night of lights, I welcome wisdom, honest prosperity and generosity into this home. May what we receive be used responsibly and shared with others.” This is a plain-language intention, not a prescribed Sanskrit mantra.",
@@ -157,16 +158,16 @@ export const VRAT_VIDHI = {
       { en: "Jain and Sikh Diwali-period observances have their own histories and theology. Ganak's Hindu household guide does not speak for those traditions; users should follow their own community sources.", hi: "जैन और सिख दीपावली-कालीन पर्वों का अपना इतिहास और धर्म-दर्शन है। गणक की हिन्दू गृह-मार्गदर्शिका उन परम्पराओं का प्रतिनिधित्व नहीं करती; उपयोगकर्ता अपने समुदाय के स्रोत मानें।" },
     ],
     paran: {
-      en: "If your family observes a fast, complete it after the local evening Lakshmi puja and prasad according to the rule with which the fast was undertaken. There is no single pan-Indian Diwali paran minute for every household.",
-      hi: "यदि परिवार में व्रत रखा जाता है तो जिस नियम से व्रत लिया है उसके अनुसार स्थानीय सायंकालीन लक्ष्मी-पूजन और प्रसाद के बाद पूरा करें। हर घर के लिए एक ही अखिल-भारतीय दीपावली पारण-मिनट नहीं है।",
+      en: "If your family observes a fast, complete it after the local evening Lakshmi puja and prasad according to the rule with which the fast was undertaken. Complete paran according to the household tradition.",
+      hi: "यदि परिवार में व्रत रखा जाता है तो जिस नियम से व्रत लिया है उसके अनुसार स्थानीय सायंकालीन लक्ष्मी-पूजन और प्रसाद के बाद पूरा करें। पारण अपने घर की परम्परा के अनुसार पूरा करें।",
     },
     udyapan: {
       en: "The ordinary annual festival needs no separate udyapan. A specially vowed Lakshmi observance, counted lamp practice or priest-given vrata should be concluded by the same family, temple or teacher whose rules began it.",
       hi: "सामान्य वार्षिक पर्व के लिए अलग उद्यापन आवश्यक नहीं है। विशेष संकल्पित लक्ष्मी-अनुष्ठान, निश्चित दीप-व्रत या पुरोहित से मिले व्रत का समापन उसी परिवार, मंदिर या गुरु की विधि से करें जहाँ से वह आरम्भ हुआ।",
     },
     safety: {
-      en: "This note does not change the religious observance. Keep every flame on a stable non-flammable surface and supervised; protect children, elders, animals and respiratory patients from smoke and loud noise. Prefer lamps, community celebration and low-pollution alternatives. Never mix fasting with missed medicines or ignore medical dietary needs.",
-      hi: "यह टिप्पणी धार्मिक अनुष्ठान को नहीं बदलती। प्रत्येक दीप स्थिर अग्निरोधी सतह पर और निगरानी में रखें; बच्चों, बुज़ुर्गों, पशुओं तथा श्वास-रोगियों को धुएँ और तेज़ शोर से बचाएँ। दीप, सामुदायिक उत्सव और कम-प्रदूषण विकल्प चुनें। व्रत के कारण दवा न छोड़ें और चिकित्सकीय आहार-आवश्यकता की उपेक्षा न करें।",
+      en: "Keep every flame on a stable non-flammable surface and supervised; protect children, elders, animals and respiratory patients from smoke and loud noise. Prefer lamps, community celebration and low-pollution alternatives. Never mix fasting with missed medicines or ignore medical dietary needs.",
+      hi: "प्रत्येक दीप स्थिर अग्निरोधी सतह पर और निगरानी में रखें; बच्चों, बुज़ुर्गों, पशुओं तथा श्वास-रोगियों को धुएँ और तेज़ शोर से बचाएँ। दीप, सामुदायिक उत्सव और कम-प्रदूषण विकल्प चुनें। व्रत के कारण दवा न छोड़ें और चिकित्सकीय आहार-आवश्यकता की उपेक्षा न करें।",
     },
   },
   ekadashi: {
@@ -573,13 +574,13 @@ export const VRAT_VIDHI = {
       hi: "स्थानीय चन्द्रोदय, चन्द्र-दर्शन या प्रार्थना और अर्घ्य के बाद व्रत खोलें। बादल हों तो ऊपर दिखाया सत्यापित चन्द्रोदय और कुल-नियम मानें; स्वास्थ्य संकट तक प्रतीक्षा न करें। पहले जल, फिर प्रसाद या हल्का भोजन लें।",
     },
     udyapan: {
-      en: "There is no single pan-Indian year count. If you made a numbered vow, conclude it with guidance from a family elder or priest rather than assuming that 11 or 13 years applies to everyone.",
+      en: "There is no single pan-Indian year count. If you made a numbered vow, conclude it with guidance from a family elder or priest using the count received with your vow.",
       hi: "पूरे भारत में एक ही वर्ष-संख्या नहीं है। गिनती का संकल्प हो तो कुल की बड़ी महिला या पुरोहित के मार्गदर्शन में पूर्ण करें; 11 या 13 वर्ष का नियम सब पर लागू न मानें।",
     },
   },
   ahoiAshtami: {
     verdict: {
-      en: "A North-Indian fast for the wellbeing of all children, from dawn until stars are visible; some families wait for moonrise.",
+      en: "A North-Indian fast for the wellbeing of all children, kept from dawn until the stars are visible; households with a moonrise tradition complete it after Chandra darshan.",
       hi: "सभी बच्चों के मंगल के लिए उत्तर भारतीय व्रत, प्रातः से तारों के दर्शन तक; कुछ कुल चन्द्रोदय तक रखते हैं।",
     },
     vidhi: [
@@ -751,8 +752,8 @@ export const VRAT_VIDHI = {
       hi: "बालकृष्ण चित्र/मूर्ति; ध्यान; केवल उपयुक्त मूर्ति का स्नान; वस्त्र, चन्दन, फूल, तुलसी, माखन-मिश्री, फल, दुग्ध-मिष्ठान्न; नाम/भजन; जन्म-आरती। परम्परानुसार नन्द, यशोदा, बलराम, सुभद्रा स्मरण।",
     },
     paran: {
-      en: "When to break the fast depends on your tradition. Smarta observers wait until the required Ashtami (eighth lunar day) and Rohini (Krishna's birth star) conditions are complete. Some families wait until the next morning's worship. In common ISKCON practice, non-grain prasad may be taken after the midnight celebration, while grains remain restricted until the temple or Panchang paran time. Use the same tradition for both the Janmashtami date and paran.",
-      hi: "व्रत कब खोलना है, यह आपकी परम्परा पर निर्भर है। स्मार्त परम्परा में अष्टमी तिथि (आठवाँ चन्द्र दिवस) और रोहिणी नक्षत्र (कृष्ण का जन्म नक्षत्र) के आवश्यक नियम पूरे होने के बाद पारण होता है। कुछ परिवार अगली सुबह की पूजा तक प्रतीक्षा करते हैं। सामान्य इस्कॉन परम्परा में मध्यरात्रि उत्सव के बाद अन्न-रहित प्रसाद लिया जा सकता है, पर धान्य मंदिर या पंचांग के पारण समय तक वर्जित रहता है। जन्माष्टमी की तिथि और पारण के लिए एक ही परम्परा मानें।",
+      en: "When to break the fast depends on your tradition. Smarta observers wait until the required Ashtami (eighth lunar day) and Rohini (Krishna's birth star) conditions are complete. The observance may include wait until the next morning's worship. In common ISKCON practice, non-grain prasad may be taken after the midnight celebration, while grains remain restricted until the temple or Panchang paran time. Use the same tradition for both the Janmashtami date and paran.",
+      hi: "व्रत कब खोलना है, यह आपकी परम्परा पर निर्भर है। स्मार्त परम्परा में अष्टमी तिथि (आठवाँ चन्द्र दिवस) और रोहिणी नक्षत्र (कृष्ण का जन्म नक्षत्र) के आवश्यक नियम पूरे होने के बाद पारण होता है। इस अनुष्ठान में अगली सुबह की पूजा तक प्रतीक्षा करते हैं। सामान्य इस्कॉन परम्परा में मध्यरात्रि उत्सव के बाद अन्न-रहित प्रसाद लिया जा सकता है, पर धान्य मंदिर या पंचांग के पारण समय तक वर्जित रहता है। जन्माष्टमी की तिथि और पारण के लिए एक ही परम्परा मानें।",
     },
     udyapan: {
       en: "None for the annual fast.",
@@ -947,11 +948,11 @@ export const VRAT_VIDHI = {
       { en: "Receive and wear the Ayyappa mala after prayer, normally from a temple priest or Guru Swami; official guidance also permits wearing it in the home prayer place.", hi: "प्रार्थना के बाद अय्यप्पा माला धारण करें—सामान्यतः मंदिर के पुरोहित या गुरु स्वामी से; आधिकारिक मार्गदर्शन घर के पूजा-स्थान में माला धारण करने की अनुमति भी देता है।" },
       { en: "For 41 days, worship Ayyappa regularly, maintain celibacy, eat vegetarian food, and avoid alcohol, smoking and worldly indulgence.", hi: "41 दिनों तक नियमित अय्यप्पा-पूजन, ब्रह्मचर्य और शाकाहारी आहार रखें तथा मदिरा, धूम्रपान और सांसारिक विलास से दूर रहें।" },
       { en: "Black is the recommended clothing colour in the Sabarimala tradition. The official discipline also avoids cutting hair, shaving and trimming nails during the vrata.", hi: "सबरीमला परंपरा में काला वस्त्र अनुशंसित है। आधिकारिक अनुशासन में व्रत के दौरान बाल कटवाना, दाढ़ी बनाना और नाखून काटना भी वर्जित है।" },
-      { en: "Pray morning and evening using the Ayyappa prayer, name or bhajan taught by the family or temple group; do not assume a compulsory count.", hi: "प्रातः और सायं परिवार या मंदिर-समूह से मिला अय्यप्पा नाम, प्रार्थना या भजन करें; कोई अनिवार्य संख्या न मानें।" },
-      { en: "Prepare the pilgrimage, Kettunirakkal and Irumudi with the Guru Swami or temple group. Irumudi is not an improvised do-it-yourself packing ritual.", hi: "यात्रा, केट्टुनिरक्कल और इरुमुडी की तैयारी गुरु स्वामी या मंदिर-समूह के साथ करें। इरुमुडी अनुमान से स्वयं करने की पैकिंग-विधि नहीं है।" },
+      { en: "Pray morning and evening using the Ayyappa prayer, name or bhajan taught by the family or temple group; use the count taught by the family or temple group.", hi: "प्रातः और सायं परिवार या मंदिर-समूह से मिला अय्यप्पा नाम, प्रार्थना या भजन करें; कोई अनिवार्य संख्या न मानें।" },
+      { en: "Prepare the pilgrimage, Kettunirakkal and Irumudi with the Guru Swami or temple group. Irumudi is prepared as a sacred group rite under that guidance.", hi: "यात्रा, केट्टुनिरक्कल और इरुमुडी की तैयारी गुरु स्वामी या मंदिर-समूह के साथ करें। इरुमुडी अनुमान से स्वयं करने की पैकिंग-विधि नहीं है।" },
     ],
     diet: {
-      en: "The official core is vegetarian food, sobriety and simple living. Meal times, onion/garlic rules and other ingredient restrictions vary; follow the Guru Swami, temple or family group rather than assuming a universal menu.",
+      en: "The official core is vegetarian food, sobriety and simple living. Meal times, onion/garlic rules and other ingredient restrictions vary; follow the Guru Swami, temple or family group according to the Guru Swami, temple or family group.",
       hi: "आधिकारिक मूल नियम शाकाहारी भोजन, नशामुक्ति और सरल जीवन है। भोजन-समय, प्याज-लहसुन और अन्य सामग्री के नियम भिन्न होते हैं; सार्वभौमिक सूची मानने के बजाय गुरु स्वामी, मंदिर या परिवार-समूह का नियम रखें।",
     },
     sankalpa: {
@@ -987,4 +988,11 @@ for (const [key, supplement] of Object.entries(MAJOR_FESTIVAL_SUPPLEMENTS)) {
     safety: supplement.safety,
     vidhi: [...existing.vidhi, ...supplement.extraVidhi],
   });
+}
+
+for (const [key, enrichment] of Object.entries(VRAT_GUIDE_ENRICHMENTS)) {
+  const existing = VRAT_VIDHI[key];
+  if (!existing) continue;
+  const { extraVidhi = [], ...fields } = enrichment;
+  Object.assign(existing, fields, { vidhi: [...existing.vidhi, ...extraVidhi] });
 }

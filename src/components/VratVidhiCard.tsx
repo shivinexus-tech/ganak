@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { T } from "./tokens";
-import { VRAT_VIDHI_LABELS, VRAT_VIDHI_SAFETY } from "../data/vrat-vidhis";
+import { VRAT_VIDHI_LABELS } from "../data/vrat-vidhis";
 
 function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
   const [open, setOpen] = useState(initiallyOpen);
@@ -71,10 +71,6 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
       </button>
       {open && (
         <div style={{ padding: "10px 11px 12px", borderTop: `1px solid ${C.line}`, display: "flex", flexDirection: "column", gap: 2 }}>
-          <div style={{ padding: "7px 9px", borderRadius: T.rSm, background: "rgba(194,69,30,.06)", border: "1px solid rgba(194,69,30,.18)" }}>
-            <div style={{ ...T.label, color: C.sindoor, marginBottom: 3 }}>{lbl("safety")}</div>
-            <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5 }}>{txt(data.safety || VRAT_VIDHI_SAFETY)}</div>
-          </div>
           {data.meaning && section(lbl("meaning"), txt(data.meaning))}
           {section(lbl("vidhi"), (
             <ol style={{ margin: 0, paddingLeft: 18 }}>
@@ -105,6 +101,12 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
           ))}
           {section(lbl("paran"), txt(data.paran))}
           {section(lbl("udyapan"), txt(data.udyapan))}
+          {data.safety && (
+            <div style={{ marginTop: 9, padding: "7px 9px", borderRadius: T.rSm, background: "rgba(168,106,18,.05)", border: `1px solid ${C.line}` }}>
+              <div style={{ ...T.label, color: C.gold, marginBottom: 3 }}>{lbl("safety")}</div>
+              <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5 }}>{txt(data.safety)}</div>
+            </div>
+          )}
         </div>
       )}
     </div>

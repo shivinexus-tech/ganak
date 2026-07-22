@@ -154,7 +154,8 @@ assert(!/Open this festival in the Daily Panchang/i.test(guideScreen), 'Daily Pa
 assert(!/दैनिक पंचांग में देखें/.test(guideScreen), 'Hindi Daily Panchang timing workaround copy must be gone');
 assert(card.includes('initiallyOpen = false'), 'normal VratVidhiCard behaviour must remain closed by default');
 assert(card.includes('useState(initiallyOpen)'), 'direct routes must be able to open the full guide immediately');
-assert(card.includes('data.safety || VRAT_VIDHI_SAFETY'), 'a guide-specific safety note must override the shared fasting note');
+assert(card.includes('data.safety &&'), 'risk-specific safety must render only when the guide supplies it');
+assert(!card.includes('VRAT_VIDHI_SAFETY'), 'festival pages must not inject a generic fasting warning');
 
 console.log('PASS  place-aware festival page wiring present');
 console.log('PASS  normal festival cards remain closed by default');
