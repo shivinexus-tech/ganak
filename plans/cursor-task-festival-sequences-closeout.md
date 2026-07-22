@@ -7,9 +7,10 @@
 Skanda/Ayyappa.
 
 Read `AGENTS.md`, `.cursorrules`, `plans/task-log.md` and
-`plans/module-ownership-map.md` before editing. Preserve unrelated user/agent work
-and stage only the explicit files for each commit. Never describe a local-only or
-unverified change as production-complete.
+`plans/module-ownership-map.md`, `plans/religious-content-policy.md` and
+`plans/festival-devotional-guide-audit.md` before editing. Preserve unrelated
+user/agent work and stage only the explicit files for each commit. Never describe a
+local-only or unverified change as production-complete.
 
 ## Current truth
 
@@ -42,7 +43,14 @@ unverified change as production-complete.
 Each page must remain distinct from the generic Sharad Navratri/Navadurga pages.
 Each must render only the selected language and contain an answer-first verdict,
 meaning, household/visitor guidance, food or fasting boundary, worship boundary,
-stories, Bengal/regional distinctions, completion guidance and safety.
+stories, Bengal/regional distinctions, completion guidance and—only when a
+specific material risk exists—a brief separate safety note.
+
+Apply the owner's 2026-07-22 devotional-guide correction throughout: remove
+research commentary, generic warnings, authority/committee language and negative
+“do not / not interchangeable / no universal” framing. Lead with sacred meaning and
+a complete positive household worship path. Safety is optional and appears only for
+a specific material risk.
 
 ### Timing requirements
 
