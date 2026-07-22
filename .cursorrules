@@ -40,10 +40,14 @@ the non-negotiables so Cursor's AI can't miss them.
 6. **Autonomous inside the sandbox.** Do not pause for Allow/Run on routine
    shells. Temp files → `.scratch/` only. Never touch `~/Ganak-Recovery/`.
    Owner steers via `plans/backlog.md` and `plans/task-log.md`.
-7. **Google Sheet closeout is mandatory.** After each finished backlog slice,
-   synchronize its row in **Ganak — Open Backlog Acceptance Register**. If any
-   dependency, blocker, approval or validation remains, record it there and do
-   not mark the work Done/100%.
+7. **Google Sheet closeout is mandatory and automated.** After each finished
+   backlog slice, update only the assigned row in
+   `plans/backlog-acceptance-register.md` (and `plans/backlog-sheet-sync.json` for
+   new/renamed/moved items or complexity changes), run
+   `node scripts/sync-backlog-sheet.mjs --check`, then commit and push. The GitHub
+   workflow publishes changed cells to the live Sheet; no agent needs Google
+   credentials. A failed/missing sync is a blocker. See
+   `plans/google-sheet-sync.md`.
 
 ## How to run the app
 Dev server: `npm run dev` (Node is at /opt/homebrew/bin). Node/npm not on PATH by

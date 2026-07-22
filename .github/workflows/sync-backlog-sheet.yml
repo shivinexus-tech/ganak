@@ -1,0 +1,63 @@
+name: Sync backlog acceptance register
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - plans/backlog-acceptance-register.md
+      - plans/backlog-sheet-sync.json
+      - scripts/sync-backlog-sheet.mjs
+      - .github/workflows/sync-backlog-sheet.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: ganak-backlog-sheet-sync
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out the complete history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate the repository register
+        run: |
+          node scripts/sync-backlog-sheet.mjs --check
+          node validation/backlog-sheet-sync.mjs
+
+      - name: Authenticate to Google Sheets
+        id: google-auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/59361883151/locations/global/workloadIdentityPools/ganak-github/providers/ganak-main
+          service_account: api-service-details@ganak-automation.iam.gserviceaccount.com
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/spreadsheets
+
+      - name: Select the trusted base revision
+        env:
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          if [ -n "$PUSH_BEFORE" ] && [ "$PUSH_BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            echo "BACKLOG_SYNC_BASE_SHA=$PUSH_BEFORE" >> "$GITHUB_ENV"
+          else
+            echo "BACKLOG_SYNC_BASE_SHA=$(git rev-parse HEAD^)" >> "$GITHUB_ENV"
+          fi
+
+      - name: Publish commit-changed cells
+        env:
+          GOOGLE_SHEETS_ACCESS_TOKEN: ${{ steps.google-auth.outputs.access_token }}
+        run: node scripts/sync-backlog-sheet.mjs --sync

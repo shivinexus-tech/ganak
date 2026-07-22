@@ -1,0 +1,388 @@
+{
+  "version": 1,
+  "spreadsheetId": "1ZNHtQqfLJ2smeG5QLbO46wBKYetqYuGHW0AQyGOtRSk",
+  "spreadsheetTitle": "Ganak — Open Backlog Acceptance Register",
+  "oauthScope": "https://www.googleapis.com/auth/spreadsheets",
+  "tabs": [
+    {
+      "section": "P0",
+      "sheetName": "P0 Before Go-Live",
+      "itemIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45
+      ]
+    },
+    {
+      "section": "P1",
+      "sheetName": "P1 Launch Polish",
+      "itemIds": [
+        46,
+        47,
+        48,
+        49
+      ]
+    },
+    {
+      "section": "P2",
+      "sheetName": "P2 Post-Launch",
+      "itemIds": [
+        50,
+        51,
+        52,
+        53
+      ]
+    },
+    {
+      "section": "P3",
+      "sheetName": "P3 Mobile",
+      "itemIds": [
+        54
+      ]
+    },
+    {
+      "section": "P4",
+      "sheetName": "P4 Platform",
+      "itemIds": [
+        55,
+        56
+      ]
+    },
+    {
+      "section": "Optional",
+      "sheetName": "Optional",
+      "itemIds": [
+        57
+      ]
+    }
+  ],
+  "items": {
+    "1": {
+      "section": "P0",
+      "title": "Approved utility-calculator catalogue",
+      "technicalComplexity": "High"
+    },
+    "2": {
+      "section": "P0",
+      "title": "Navadurga 18 pages + Saptashati plan",
+      "technicalComplexity": "Medium"
+    },
+    "3": {
+      "section": "P0",
+      "title": "Expose and polish all built Jyotish panels",
+      "technicalComplexity": "High"
+    },
+    "4": {
+      "section": "P0",
+      "title": "Answer-first Kundli life interpretation",
+      "technicalComplexity": "High"
+    },
+    "5": {
+      "section": "P0",
+      "title": "Public developer API",
+      "technicalComplexity": "Very high"
+    },
+    "6": {
+      "section": "P0",
+      "title": "Samskara Muhurats",
+      "technicalComplexity": "High"
+    },
+    "7": {
+      "section": "P0",
+      "title": "Panchang intervals: Bhadra, Dur, Varjyam, Amrit, Brahma, Nishita, Godhuli, Pradosha",
+      "technicalComplexity": "High"
+    },
+    "8": {
+      "section": "P0",
+      "title": "Bala, Disha and regional daily timings",
+      "technicalComplexity": "High"
+    },
+    "9": {
+      "section": "P0",
+      "title": "Siddhi and special-yoga calendars",
+      "technicalComplexity": "High"
+    },
+    "10": {
+      "section": "P0",
+      "title": "Calendar modes and regional bases",
+      "technicalComplexity": "Very high"
+    },
+    "11": {
+      "section": "P0",
+      "title": "Calendar PDF, feed/export and reminders",
+      "technicalComplexity": "Very high"
+    },
+    "12": {
+      "section": "P0",
+      "title": "Public/national holidays + approved overlays",
+      "technicalComplexity": "Medium"
+    },
+    "13": {
+      "section": "P0",
+      "title": "Bengal Durga Puja six-page set",
+      "technicalComplexity": "Medium"
+    },
+    "14": {
+      "section": "P0",
+      "title": "Skanda Sashti + Ayyappa sequences",
+      "technicalComplexity": "Medium"
+    },
+    "15": {
+      "section": "P0",
+      "title": "Eclipse visibility and Sutak",
+      "technicalComplexity": "Very high"
+    },
+    "16": {
+      "section": "P0",
+      "title": "Deep marriage/engagement/housewarming Muhurat",
+      "technicalComplexity": "High"
+    },
+    "17": {
+      "section": "P0",
+      "title": "Bhoomi/construction/business/travel/document Muhurat",
+      "technicalComplexity": "High"
+    },
+    "18": {
+      "section": "P0",
+      "title": "Birth-chart-personalised Muhurat",
+      "technicalComplexity": "High"
+    },
+    "19": {
+      "section": "P0",
+      "title": "Surgery/medical Muhurat",
+      "technicalComplexity": "Medium"
+    },
+    "20": {
+      "section": "P0",
+      "title": "Retrograde/direct, combustion and rise/set calendars",
+      "technicalComplexity": "High"
+    },
+    "21": {
+      "section": "P0",
+      "title": "Kala Sarpa, Pitra Dosha and Papasamyam",
+      "technicalComplexity": "High"
+    },
+    "22": {
+      "section": "P0",
+      "title": "South/East chart styles + ayanamshas",
+      "technicalComplexity": "High"
+    },
+    "23": {
+      "section": "P0",
+      "title": "Kundli, Match and general PDF reports",
+      "technicalComplexity": "High"
+    },
+    "24": {
+      "section": "P0",
+      "title": "Dashakoota + matching explanations + marriage timing",
+      "technicalComplexity": "High"
+    },
+    "25": {
+      "section": "P0",
+      "title": "Prashna 1–249 method",
+      "technicalComplexity": "High"
+    },
+    "26": {
+      "section": "P0",
+      "title": "Clean routes, metadata, sitemap and SEO pages",
+      "technicalComplexity": "High"
+    },
+    "27": {
+      "section": "P0",
+      "title": "Editorial astrology/news publishing",
+      "technicalComplexity": "High"
+    },
+    "28": {
+      "section": "P0",
+      "title": "Push notifications",
+      "technicalComplexity": "Very high"
+    },
+    "29": {
+      "section": "P0",
+      "title": "Complete festival/vrat direct-page coverage",
+      "technicalComplexity": "Medium"
+    },
+    "30": {
+      "section": "P0",
+      "title": "Ritu, solstice/equinox and Vedic clock",
+      "technicalComplexity": "Medium"
+    },
+    "31": {
+      "section": "P0",
+      "title": "Property-purchase Muhurat",
+      "technicalComplexity": "Medium"
+    },
+    "32": {
+      "section": "P0",
+      "title": "Vehicle-purchase Muhurat",
+      "technicalComplexity": "Medium"
+    },
+    "33": {
+      "section": "P0",
+      "title": "Sade Sati calculator/report",
+      "technicalComplexity": "Medium"
+    },
+    "34": {
+      "section": "P0",
+      "title": "Mangal Dosha three-reference analysis",
+      "technicalComplexity": "Medium"
+    },
+    "35": {
+      "section": "P0",
+      "title": "Arudha, Bhavabala, Special Lagnas/Upagrahas",
+      "technicalComplexity": "Medium"
+    },
+    "36": {
+      "section": "P0",
+      "title": "Ruling Planets",
+      "technicalComplexity": "Medium"
+    },
+    "37": {
+      "section": "P0",
+      "title": "Save/share/export Muhurat",
+      "technicalComplexity": "High"
+    },
+    "38": {
+      "section": "P0",
+      "title": "Analytics + feedback",
+      "technicalComplexity": "Medium"
+    },
+    "39": {
+      "section": "P0",
+      "title": "Branded domain and canonical deployment",
+      "technicalComplexity": "Low"
+    },
+    "40": {
+      "section": "P0",
+      "title": "Route-aware identity/metadata audit",
+      "technicalComplexity": "Medium"
+    },
+    "41": {
+      "section": "P0",
+      "title": "Understand users without login",
+      "technicalComplexity": "Low"
+    },
+    "42": {
+      "section": "P0",
+      "title": "Social/community channels",
+      "technicalComplexity": "Low"
+    },
+    "43": {
+      "section": "P0",
+      "title": "Privacy and Terms publication",
+      "technicalComplexity": "Low"
+    },
+    "44": {
+      "section": "P0",
+      "title": "Chhath four-day final verification",
+      "technicalComplexity": "Low"
+    },
+    "45": {
+      "section": "P0",
+      "title": "Backend smoke check",
+      "technicalComplexity": "Low"
+    },
+    "46": {
+      "section": "P1",
+      "title": "Design-system pass",
+      "technicalComplexity": "High"
+    },
+    "47": {
+      "section": "P1",
+      "title": "Long-tail festival content",
+      "technicalComplexity": "Medium"
+    },
+    "48": {
+      "section": "P1",
+      "title": "Everyday navigation + MuhuratHub cleanup",
+      "technicalComplexity": "High"
+    },
+    "49": {
+      "section": "P1",
+      "title": "Ten-lane + integration governance",
+      "technicalComplexity": "Low"
+    },
+    "50": {
+      "section": "P2",
+      "title": "Broader multi-language interface",
+      "technicalComplexity": "High"
+    },
+    "51": {
+      "section": "P2",
+      "title": "Full regional-language calendar presentation",
+      "technicalComplexity": "Very high"
+    },
+    "52": {
+      "section": "P2",
+      "title": "Prashnavali candidate",
+      "technicalComplexity": "Medium"
+    },
+    "53": {
+      "section": "P2",
+      "title": "Prioritise through feedback",
+      "technicalComplexity": "Low"
+    },
+    "54": {
+      "section": "P3",
+      "title": "Android/iOS route and store delivery",
+      "technicalComplexity": "Very high"
+    },
+    "55": {
+      "section": "P4",
+      "title": "Accounts, persistence and cloud sync",
+      "technicalComplexity": "Very high"
+    },
+    "56": {
+      "section": "P4",
+      "title": "Saved charts, paid AI, subscriptions and paywalls",
+      "technicalComplexity": "Very high"
+    },
+    "57": {
+      "section": "Optional",
+      "title": "sunSidMs performance investigation",
+      "technicalComplexity": "Medium"
+    }
+  }
+}
