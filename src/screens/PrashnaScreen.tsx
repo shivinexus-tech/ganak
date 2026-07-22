@@ -317,7 +317,7 @@ const HOUSE_PLAIN_HI = { 1:'आपकी अपनी स्थिति', 2:'�
   4:'घर और स्थिरता', 5:'संतान और सृजन', 6:'कार्य और दिनचर्या',
   7:'दूसरा पक्ष', 8:'देरी और रुकावट', 9:'भाग्य और सहयोग',
   10:'कार्य और प्रतिष्ठा', 11:'आशाएँ और लाभ', 12:'दूरी और व्यय' };
-/* Same question-specific corrections as HOUSE_MEANING_BY_Q, in plain words. */
+/* Question-specific favour glosses — same corrections as HOUSE_MEANING_BY_Q. */
 const HOUSE_PLAIN_BY_Q = {
   career:     { 6:  { en: 'your job and service',      hi: 'आपकी नौकरी और सेवा' } },
   venture:    { 6:  { en: 'your work and competition', hi: 'आपका काम और प्रतिस्पर्धा' } },
@@ -325,6 +325,29 @@ const HOUSE_PLAIN_BY_Q = {
   litigation: { 6:  { en: 'your side of the case',     hi: 'आपका पक्ष' } },
   travel:     { 12: { en: 'going abroad',              hi: 'विदेश जाना' },
                 4:  { en: 'home ties',                 hi: 'घर का बंधन' } },
+};
+
+/* Deny-side plain phrases. Favour labels like "fortune and support" read as bugs when
+   they appear under "Working against it" — mirror tier-2's "for this question … counts
+   against" framing, but without house numbers. Generic entries cover any question; BY_Q
+   entries match sourced travel/4 and career/9 overrides in plans/prashna-house-glosses.md. */
+const HOUSE_PLAIN_DENY = {
+  1:  { en: 'your own position is not strong enough', hi: 'आपकी अपनी स्थिति पर्याप्त मज़बूत नहीं' },
+  2:  { en: 'family and savings are not helping',     hi: 'परिवार और बचत सहायक नहीं' },
+  3:  { en: 'effort alone may not be enough',         hi: 'केवल प्रयास पर्याप्त नहीं' },
+  9:  { en: 'fortune is not helping here',            hi: 'भाग्य यहाँ सहायक नहीं' },
+  10: { en: 'career standing is a hurdle',            hi: 'करियर की प्रतिष्ठा बाधा बन रही है' },
+  11: { en: 'hopes and gains are blocked',            hi: 'आशाएँ और लाभ रुकावट में हैं' },
+};
+const HOUSE_PLAIN_DENY_BY_Q = {
+  travel: {
+    2:  { en: 'family ties and savings hold you back', hi: 'परिवार का बंधन और बचत पीछे खींचती है' },
+    4:  { en: 'home ties keep you here',               hi: 'घर का बंधन यहीं रोकता है' },
+    11: { en: 'hopes and plans for the move stall',    hi: 'यात्रा की आशाएँ और योजना अटकी हैं' },
+  },
+  career: {
+    9:  { en: 'luck is not behind this career step',   hi: 'भाग्य इस करियर कदम के पीछे नहीं' },
+  },
 };
 
 /* What the deciding planet brings to the matter, in plain words (owner review
@@ -362,16 +385,23 @@ const PLANET_EFFECT = {
    sub-lord of your 7th house" is not. */
 function buildPlain(v, lang) {
   const hi = lang === 'hi';
-  const byQ = HOUSE_PLAIN_BY_Q[v.q.key] || {};
+  const byQFav = HOUSE_PLAIN_BY_Q[v.q.key] || {};
+  const byQDeny = HOUSE_PLAIN_DENY_BY_Q[v.q.key] || {};
   const P = hi ? HOUSE_PLAIN_HI : HOUSE_PLAIN;
-  const plain = (h) => (byQ[h] ? (hi ? byQ[h].hi : byQ[h].en) : P[h]);
-  const uniq = (hs) => [...new Set(hs.map(plain))];
+  const plainFav = (h) => (byQFav[h] ? (hi ? byQFav[h].hi : byQFav[h].en) : P[h]);
+  const plainDeny = (h) => {
+    if (byQDeny[h]) return hi ? byQDeny[h].hi : byQDeny[h].en;
+    const d = HOUSE_PLAIN_DENY[h];
+    if (d) return hi ? d.hi : d.en;
+    return P[h];
+  };
+  const uniq = (hs, plain) => [...new Set(hs.map(plain))];
   /* Separator is " · ", not "and": the phrases contain "and" themselves, so joining
      with a word produced "your own position and work and standing". The middot is
      already this app's list separator (hero, footer, tithi lines) and stays readable
      at a glance, which matters for the elder-friendly goal. */
   const join = (a) => a.join(' · ');
-  const fav = uniq(v.hits.favor), den = uniq(v.hits.deny);
+  const fav = uniq(v.hits.favor, plainFav), den = uniq(v.hits.deny, plainDeny);
   const lines = [];
   const eff = PLANET_EFFECT[v.cuspSub];
   if (eff) lines.push({ tone: 'lead',
@@ -519,8 +549,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
           <div style={{ background: TOKENS.card, borderRadius: TOKENS.radius,
             border: `1.5px solid ${vs.color}`, overflow: 'hidden' }}>
             <div style={{ background: vs.soft, padding: '14px 16px' }}>
-              <div style={{ fontFamily: TOKENS.devanagari, fontSize: 28, color: vs.color, lineHeight: 1.1 }}>{hi ? vs.hi : vs.en}</div>
-              <div style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: vs.color }}>{hi ? vs.en : vs.hi}</div>
+              <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: 28, color: vs.color, lineHeight: 1.1 }}>{hi ? vs.hi : vs.en}</div>
               <div style={{ fontSize: 13, color: TOKENS.muted, marginTop: 6 }}>
                 {hi ? v.q.hi : v.q.en}
               </div>

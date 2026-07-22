@@ -13,6 +13,15 @@ if (/\$\{(?:h|v\.q\.cusp)\}th/.test(source)) {
 if (!source.includes('englishOrdinal(v.q.cusp)')) {
   failures.push('deciding-house reason does not use englishOrdinal');
 }
+if (!source.includes('plainDeny')) {
+  failures.push('tier-1 deny lines must use plainDeny, not favour plain labels');
+}
+if (!source.includes('HOUSE_PLAIN_DENY')) {
+  failures.push('HOUSE_PLAIN_DENY map is missing');
+}
+if (/Working against it:.*fortune and support/.test(source)) {
+  failures.push('forbidden deny phrase "fortune and support" remains in source');
+}
 if ((source.match(/englishOrdinal\(h\)/g) || []).length !== 2) {
   failures.push('supporting and denying house reasons must both use englishOrdinal');
 }
