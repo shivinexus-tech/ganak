@@ -46,25 +46,45 @@ career wording does not leak into it.
 
 ---
 
+## The deny side — fixed 2026-07-22 without inventing anything
+
+The mirror bug was: *"your 11th house — gains & fulfilment — which works against
+this matter."* The reader takes the gloss as the **reason**, so "gains works against
+you" reads as broken, exactly like "illness supports you" did.
+
+Two sourced facts made this fixable:
+
+1. **The "12th to" rule is standard, documented KP** — the 12th house from any house
+   negates that house's event. So a denying house is **not bad in itself**; it
+   opposes *this particular matter*.
+2. **For travel the opposing group 2/4/11 is documented**, with **4 = home**, matching
+   our `deny:[2,4,11]` exactly.
+
+So the fix was wording, not new meanings — put the framing first:
+
+| | |
+|---|---|
+| Before | your 11th house — gains & fulfilment — **which works against this matter** |
+| After | **For this question,** your 11th house — gains & fulfilment — **counts against the outcome** |
+
+Leading with "for this question" removes the false implication that the gloss causes
+the opposition. Nothing was redefined. Hindi mirrors it: *इस प्रश्न में आपके ... का
+प्रभाव विपरीत जाता है।*
+
+Plus one sourced deny-side gloss: **travel / 4th → "home ties & staying put"**, which
+now reads exactly right — a travel question opposed by home ties.
+
+
 ## ⚠️ Deliberately incomplete — for KSK verification
 
 Two gaps remain. Both are known, neither is a regression, and both should be closed
 by `P0-PRASHNA-249-KSK-VERIFY` rather than by guesswork.
 
-**1. The deny side has the mirror problem.** Observed live during this work, on a
-travel question:
-
-> It also touches your 11th house — **gains & fulfilment** — **which works against
-> this matter.**
-
-"Gains works against you" reads exactly as oddly as "illness supports you". The KP
-logic is sound — the 11th is the 12th from the 12th, so it undercuts a journey — but
-the wording needs the same question-specific treatment. The same applies to *career*
-denying on the 9th ("fortune & grace… works against this matter"), where the 9th is
-the 12th from the 10th.
-
-This is a bigger job than the favor side because it rests on the "12th from" rule
-rather than on plain significations, so it wants primary-text backing.
+**1. Deny-side glosses beyond travel/4.** The sentence framing above fixes the
+contradiction everywhere, but most denying houses still show their generic label.
+Where a question-specific meaning is sourceable (as travel/4 was), it should be added.
+Career denying on the 9th is the clearest remaining candidate — the 9th is the 12th
+from the 10th.
 
 **2. Unsourced favor cells left generic.** `lost` has house 6 in its favor list and
 I could not find a clean source for what the 6th means for a lost-object question, so

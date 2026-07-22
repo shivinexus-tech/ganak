@@ -300,7 +300,8 @@ const HOUSE_MEANING_BY_Q = {
   venture:    { 6:  { en: 'service & competition',              hi: 'सेवा और प्रतिस्पर्धा' } },
   money:      { 6:  { en: 'earnings from work',                 hi: 'कार्य से आय' } },
   litigation: { 6:  { en: 'your side & victory over opponents', hi: 'आपका पक्ष और विरोधी पर विजय' } },
-  travel:     { 12: { en: 'foreign lands & new surroundings',   hi: 'विदेश और नया परिवेश' } },
+  travel:     { 12: { en: 'foreign lands & new surroundings',   hi: 'विदेश और नया परिवेश' },
+                4:  { en: 'home ties & staying put',            hi: 'घर का बंधन और यहीं रुकना' } },
 };
 
 function englishOrdinal(n) {
@@ -325,10 +326,17 @@ function buildReasons(v, lang) {
     lines.push({ tone: 'good', text: hi
       ? `यह आपके ${h}वें भाव — ${gloss(h)} — से जुड़ता है, जो एक अनुकूल संकेत है।`
       : `It connects to your ${englishOrdinal(h)} house — ${gloss(h)} — a supportive signal.` });
+  /* Deny lines lead with "for this question" on purpose. Written the other way round
+     ("your 11th house — gains & fulfilment — which works against this matter") the
+     reader takes the gloss as the REASON it counts against, and "gains works against
+     you" reads as a bug — the mirror of the illness/supportive problem fixed in Q1c.
+     A denying house is not bad in itself; it opposes THIS matter, because in KP the
+     12th house from any house negates that house's event. Framing first, house
+     second, removes the false implication without inventing a new signification. */
   for (const h of v.hits.deny)
     lines.push({ tone: 'bad', text: hi
-      ? `यह आपके ${h}वें भाव — ${gloss(h)} — को भी छूता है, जो इस कार्य के विरुद्ध जाता है।`
-      : `It also touches your ${englishOrdinal(h)} house — ${gloss(h)} — which works against this matter.` });
+      ? `इस प्रश्न में आपके ${h}वें भाव — ${gloss(h)} — का प्रभाव विपरीत जाता है।`
+      : `For this question, your ${englishOrdinal(h)} house — ${gloss(h)} — counts against the outcome.` });
   if (v.retroDrag)
     lines.push({ tone: 'bad', text: hi
       ? `${GRAHA_HI[v.cuspSub]} वक्री है — आकाश में पीछे की ओर चलता प्रतीत होता है। विलम्ब, दोहराव या दूसरे प्रयास की संभावना रखें।`
