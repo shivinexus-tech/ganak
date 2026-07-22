@@ -236,6 +236,34 @@ what turns "this app is wrong" into "this app made a stated choice."
 | Consistent with existing app? | Partly | **Yes — Chart already does exactly this** | No |
 | Risk | Practitioner says "wrong" | Extra control on screen (elder-friendliness cost) | Silent internal disagreement |
 
+### What "internal disagreement" means, concretely (measured 2026-07-20)
+
+Not an abstraction — it is two screens of the same app printing different numbers for
+the same sky at the same moment. Under option C (Prashna on KP, everything else on
+Lahiri):
+
+| What the user compares | Difference |
+|---|---|
+| **Nakshatra end time** — Daily shows it, the Prashna chart implies it | **~11 minutes** |
+| Planet/Moon sign placement near a boundary | can differ outright |
+| **Tithi** | **exactly zero** — ayanamsa cancels in the Moon−Sun difference |
+
+The lived version: Daily says *"Uttara Phalguni till 7:09 PM"*. You open Prashna at
+7:05 PM and its chart already puts the Moon in the next nakshatra. Same app, same
+minute, two answers. Nothing is broken — the two screens are simply measuring from
+different zero points — but no user will read it that way, and it is the kind of
+thing that quietly costs trust in a religious tool.
+
+**"Then why not switch the whole app to KP, so it agrees with itself?"** Because
+Sankranti — the Sun entering a new sign — moves by **~2.33 hours** (measured across
+six 2026 ingresses). That is enough to push a solar festival across a day boundary if
+it lands near the cutoff. Solar festivals (Makar Sankranti, Pongal) are exactly the
+content Ganak is being built to get right.
+
+The good news in that table: **tithi is unaffected to zero decimal places**, so the
+great majority of festival dates are safe under any of these choices. The exposure is
+nakshatra times and solar ingresses only.
+
 **A→B is a later, cheap upgrade.** Ship A, and if practitioners actually ask, add the
 toggle without redoing anything. Nothing about A forecloses B.
 
