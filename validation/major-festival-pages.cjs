@@ -6,7 +6,7 @@ const { loadApp } = require('./_load-app.cjs');
 const pages = loadApp('src/data/festival-pages.ts');
 const content = loadApp('src/data/vrat-vidhis.ts');
 
-const requiredObjectFields = ['verdict', 'meaning', 'diet', 'sankalpa', 'puja', 'paran', 'udyapan', 'safety'];
+const requiredObjectFields = ['verdict', 'meaning', 'diet', 'sankalpa', 'puja', 'paran', 'udyapan'];
 const requiredListFields = ['vidhi', 'stories', 'regional'];
 const routeByKey = new Map(pages.FESTIVAL_PAGE_ENTRIES.map((entry) => [entry.key, entry]));
 const expectedReviewedKeys = [
@@ -38,6 +38,7 @@ for (const key of pages.REVIEWED_MAJOR_FESTIVAL_KEYS) {
     assert(Array.isArray(guide[field]) && guide[field].length >= 3, `${key}.${field} must contain at least three items`);
     assert(guide[field].every((item) => item.en && item.hi), `${key}.${field} must be bilingual`);
   }
+  if (guide.safety) assert(guide.safety.en && guide.safety.hi, `${key}.safety must be bilingual when a guide-specific material risk exists`);
   console.log(`PASS  ${key} is a substantive bilingual page at ${entry.path}`);
 }
 

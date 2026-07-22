@@ -16,14 +16,18 @@ import { planetGochar, PLANET_PERIOD_DAYS } from "../engine/gochar";
 import { fmtDur, eventDetail } from "../engine/transit-copy";
 import { CALENDAR_CONVENTIONS, calendarLabel, resolveConvention } from "../engine/calendar-conventions";
 import { urlPrefGet, urlPrefPush } from "../components/url-prefs";
+import HolidayOverlayCard from "../components/HolidayOverlayCard";
+import { holidayDatesForYear, resolveHolidayMode } from "../data/india-holidays";
 
 export default function DailyScreen({ C, card, lang, place, onPlace }) {
   const [ayanamsa] = useState("lahiri");
   const [calendarState, setCalendarState] = useState(() => resolveConvention(urlPrefGet("cal")));
   const calendarMode=calendarState.id;
+  const [holidayMode, setHolidayMode] = useState(() => resolveHolidayMode(urlPrefGet("hol")));
   const chooseCalendarMode = (value) => { const next = resolveConvention(value); setCalendarState(next); urlPrefPush("cal", next.id); };
+  const chooseHolidayMode = (value) => { const next = resolveHolidayMode(value); setHolidayMode(next); urlPrefPush("hol", next); };
   useEffect(() => {
-    const restore=()=>setCalendarState(resolveConvention(urlPrefGet("cal")));
+    const restore=()=>{ setCalendarState(resolveConvention(urlPrefGet("cal"))); setHolidayMode(resolveHolidayMode(urlPrefGet("hol"))); };
     window.addEventListener("popstate",restore); return()=>window.removeEventListener("popstate",restore);
   },[]);
   const todayISO = (() => {
@@ -61,7 +65,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
     } catch { return null; }
   }, [place, ayanamsa, panchDate, isPanchToday]);
   const calMarks = useMemo(() => {
-    if (!calYM || !place) return { fest: new Set(), fast: new Set() };
+    if (!calYM || !place) return { fest: new Set(), fast: new Set(), holiday: new Set() };
     try {
       const [cy, cm] = calYM.split("-").map(Number);
       const ctz = (zoneOffset(place.zone, cy, cm, 1)) ?? 5.5;
@@ -70,9 +74,9 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
       const fromMs = Date.UTC(gs.getUTCFullYear(), gs.getUTCMonth(), gs.getUTCDate(), 12) - ctz * 3600000;
       const r = scanPanchangCalendar(fromMs, ctz, 42, 46, place);
       const toISO = (ms) => { const d = new Date(ms + ctz * 3600000); return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`; };
-      return { fest: new Set(r.festivals.map((f) => toISO(f.ms))), fast: new Set(r.fasts.map((f) => toISO(f.ms))) };
-    } catch (e) { return { fest: new Set(), fast: new Set() }; }
-  }, [calYM, place, ayanamsa]);
+      return { fest: new Set(r.festivals.map((f) => toISO(f.ms))), fast: new Set(r.fasts.map((f) => toISO(f.ms))), holiday: holidayDatesForYear(cy, holidayMode) };
+    } catch (e) { return { fest: new Set(), fast: new Set(), holiday: new Set() }; }
+  }, [calYM, place, ayanamsa, holidayMode]);
 
   return (
     <>
@@ -146,13 +150,14 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                             {grid.map((c, i) => {
                               const cIso = iso(c.y, c.m, c.d);
                               const isT = cIso === todayISO, isSel = cIso === panchDate;
-                              const hasFest = calMarks.fest.has(cIso), hasFast = calMarks.fast.has(cIso);
+                              const hasFest = calMarks.fest.has(cIso), hasFast = calMarks.fast.has(cIso), hasHoliday = calMarks.holiday.has(cIso);
                               return (
                                 <button key={i} onClick={() => { setPanchDate(cIso); setCalOpen(false); }} style={{ position: "relative", aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", border: isT && !isSel ? `1.5px solid ${C.gold}` : "1.5px solid transparent", borderRadius: T.rSm, cursor: "pointer", background: isSel ? C.gold : "transparent", color: isSel ? "#FFF8EC" : c.inMonth ? C.ivory : "#C9BFA8", fontFamily: "Eczar, serif", fontSize: 14.5, padding: 0 }}>
                                   {c.d}
                                   {(hasFest || hasFast) && <span style={{ position: "absolute", bottom: 3, display: "flex", gap: 2 }}>
                                     {hasFest && <span style={{ width: 4, height: 4, borderRadius: "50%", background: isSel ? "#FFF8EC" : C.gold }} />}
                                     {hasFast && <span style={{ width: 4, height: 4, borderRadius: "50%", background: isSel ? "#FFF8EC" : C.sindoor }} />}
+                                    {hasHoliday && <span style={{ width: 4, height: 4, borderRadius: "50%", background: isSel ? "#FFF8EC" : "#315B7D" }} />}
                                   </span>}
                                 </button>
                               );
@@ -161,6 +166,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                           <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 10, fontSize: 10.5, color: C.muted }}>
                             <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: C.gold }} /> {lang === "hi" ? "पर्व" : "Festival"}</span>
                             <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: C.sindoor }} /> {lang === "hi" ? "व्रत" : "Fast"}</span>
+                            {holidayMode !== "off" && <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: "#315B7D" }} /> {lang === "hi" ? "सरकारी अवकाश" : "Government holiday"}</span>}
                           </div>
                         </div>
                       </>
@@ -181,6 +187,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
               {calendarState.recoveredFrom && <div role="status" style={{ marginTop:3,color:C.sindoor,fontStyle:"normal" }}>{calendarState.reason === "not-reviewed" ? (lang === "hi" ? "यह क्षेत्रीय पद्धति अभी सत्यापित नहीं है; गणक मानक सुरक्षित रूप से दिखाया गया है।" : "That regional mode is not yet verified; Ganak default is shown safely.") : (lang === "hi" ? "यह कैलेंडर पद्धति समर्थित नहीं है; गणक मानक दिखाया गया है।" : "That calendar mode is unsupported; Ganak default is shown.")}</div>}
             </div>
           </div>}
+          <HolidayOverlayCard isoDate={panchDate} mode={holidayMode} onMode={chooseHolidayMode} lang={lang} C={C} card={card} />
           <MuhuratHub todayP={todayP} place={place} lang={lang} ayanamsa={ayanamsa} isToday={isPanchToday} onCal={setCalView} C={C} card={card} />
 
           <div className="rise2" style={{ ...card, padding: "16px 20px", marginTop: 12 }}>
