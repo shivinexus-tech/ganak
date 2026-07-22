@@ -1,203 +1,195 @@
 # Cursor task — close Bengal Durga Puja, Skanda Sashti and Ayyappa sequences
 
 **Priority:** P0 before go-live  
-**Assigned agent:** Cursor  
-**Owner decision:** all named sequence pages are required before launch; none may be
-deferred or represented by a generic shared page.  
-**Important current state:** Cursor already has uncommitted Bengal Durga Puja and
-Ritu-clock changes in the shared worktree. Preserve them. Do not start by restoring,
-resetting, rebasing or overwriting files.
+**Owner decision:** 2026-07-22
+**Agent:** Cursor
+**Work order:** finish Bengal first, then Skanda/Ayyappa; do not combine either
+commit with the unrelated Ritu/Vedic-clock work currently present in the shared
+worktree.
 
-## Pre-flight and ownership
+Read `AGENTS.md`, `.cursorrules`, `plans/task-log.md` and
+`plans/module-ownership-map.md` before editing. The current worktree contains
+uncommitted user/agent work. Preserve it and stage only the explicit files for each
+commit. Never describe an uncommitted change as merged.
 
-1. Read `AGENTS.md`, `plans/task-log.md`, `plans/module-ownership-map.md` and this
-   brief completely.
-2. Inspect `git status` and `git diff` before editing. The task-log currently says
-   the Bengal slice is merged, but its guide and validation files are actually
-   uncommitted. Correct that record only after the commit really exists.
-3. Reserve this assignment in `plans/task-log.md` before further coding. If the
-   current Cursor session already owns the uncommitted files, update its own row to
-   `ACTIVE`; do not create a duplicate writer.
-4. Do not touch Codex's active calendar-mode work or Claude's medical-Muhurat work.
-5. Complete and commit the existing Ritu-clock slice separately before mixing it
-   with these festival changes. This task's festival commit must remain reviewable.
+## Current truth
 
-## Allowed festival files
+- Cursor's earlier date-engine work is already merged:
+  - Bengal sequence anchors: Mahalaya, Shashthi, Saptami, Ashtami, Bengal Navami
+    and Dashami.
+  - Annual Skanda sequence anchors: day 1, Soorasamharam day 6 and
+    Thirukalyanam day 7.
+  - Ayyappa anchors: Mandala begins and public Mandala Pooja/day 41.
+- Six Bengal guide objects, route wiring and `validation/durga-puja-pages.cjs`
+  currently exist only as uncommitted shared-worktree changes. The focused Durga,
+  route-coverage and deeplink gates pass, but this is not merged or deployed.
+- Skanda's three routes currently share `kandaSashtiAnnual`; Ayyappa's two routes
+  share `ayyappaMandala`. Shared overview copy is useful, but it does not satisfy
+  the owner's requirement for milestone-specific guidance.
+
+## Scope A — finish Bengal Durga Puja ×6
+
+### Required pages
+
+1. `/festival/durga-puja-mahalaya`
+2. `/festival/durga-puja-shashthi`
+3. `/festival/durga-puja-saptami`
+4. `/festival/durga-puja-ashtami`
+5. `/festival/durga-puja-navami`
+6. `/festival/durga-puja-dashami`
+
+Each page must remain distinct from the generic Sharad Navratri/Navadurga pages.
+Each must render only the selected language and contain an answer-first verdict,
+meaning, household/visitor guidance, food or fasting boundary, worship boundary,
+stories, Bengal/regional distinctions, completion guidance and safety.
+
+### Timing requirements
+
+- Show the selected city's local civil date and relevant tithi/day identity.
+- Ashtami must calculate and display the local Sandhi Puja interval: the last
+  24 minutes of Ashtami plus the first 24 minutes of Navami. Do not hard-code a
+  Kolkata time or present a national average.
+- Mahalaya must remain tied to Mahalaya/Sarva Pitru Amavasya and clearly separate
+  ancestor observance from the later public Puja days.
+- Navami must use the documented Bengal selection rule rather than silently
+  reusing a generic Udaya Navami label.
+- Shashthi/Saptami/Dashami must show the local selected date. Where a temple or
+  committee event has no universal clock, say so plainly instead of inventing one.
+
+### Bengal evidence required
+
+- Keep at least the existing six 2026 date anchors and add boundary assertions for
+  local Sandhi start/end.
+- Add at least Kolkata plus one Indian non-Kolkata city and one diaspora-city
+  comparison for local date/timing behavior.
+- Record the published sources and retrieval date in a source note. Do not claim
+  native-human certification unless it actually occurred.
+- Prove the six routes use six separate substantive guide keys.
+
+## Scope B — finish Skanda Sashti ×3 and Ayyappa ×2
+
+Create milestone-specific guide keys; do not route all pages to one shared guide.
+Shared fact blocks may be extracted and reused internally, but each route needs its
+own verdict, meaning and day-appropriate steps.
+
+### Skanda pages
+
+1. `/festival/skanda-sashti-begins`
+   - Day 1: beginning the six-day vow, safe fasting choices, daily practice and
+     distinction from monthly one-day Skanda Shashti.
+2. `/festival/skanda-sashti-soorasamharam`
+   - Day 6: culmination, temple enactment versus household worship, fasting
+     continuation/completion boundary and crowd safety.
+3. `/festival/skanda-sashti-thirukalyanam`
+   - Day 7: divine marriage celebration, separate identity from Soorasamharam,
+     and accurately qualified family/temple completion practice.
+
+The page must show the selected city's local date, sequence day and span. If an
+enactment or temple ceremony has no universal time, display that fact and direct the
+user to the chosen temple schedule; never fabricate an exact muhurta.
+
+### Ayyappa pages
+
+1. `/festival/ayyappa-mandala-begins`
+   - Public Mandala season day 1; explicitly distinguish it from the day a person
+     chooses to wear mala and begin a personal vow.
+2. `/festival/ayyappa-mandala-puja`
+   - Public day 41/Mandala Pooja; explicitly state that a personal vow, mala removal
+     or pilgrimage does not automatically conclude on this date.
+
+Both pages must show the local public-season date and complete 41-day span. Keep the
+existing medicine, fasting, strenuous-climb and Guru Swami/temple safety boundaries.
+Do not give DIY Irumudi or priest-only instructions.
+
+### Sequence evidence required
+
+- Permanent exact-set gate for all five route → milestone-specific guide mappings.
+- Keep 2026 anchors:
+  - Skanda: 10 Nov, 15 Nov and 16 Nov 2026 under the current validated convention.
+  - Ayyappa: 17 Nov and 27 Dec 2026 under the current validated convention.
+- Add previous-year and following-year sequence/boundary anchors so the gate is not
+  a single-year lookup table.
+- Prove Skanda days are ordered 1 → 6 → 7 and Ayyappa is 41 inclusive civil days.
+- Prove monthly Skanda Shashti still uses its one-day guide and can never resolve to
+  the annual six-day sequence.
+- Verify English/Hindi terminology against the recorded published references.
+
+## Allowed implementation files
+
+Cursor is the only writer for these files until handoff:
 
 - `src/data/durga-puja-guides.ts`
+- a new sequence data module under `src/data/` for milestone-specific
+  Skanda/Ayyappa guides
 - `src/data/festival-pages.ts`
 - `src/data/vrat-vidhis.ts`
-- `src/data/festival-meta.ts` only for the named sequence labels
-- `src/engine/festivals.ts` only when a proven date/timing defect requires it
-- `src/screens/FestivalGuideScreen.tsx` only for sequence-specific presentation
-- `src/screens/MuhuratHub.tsx` only for the named sequence wiring
-- new sequence data/components under `src/data/` or `src/components/`
+- `src/data/festival-meta.ts` only where milestone copy/timing metadata requires it
+- `src/screens/FestivalGuideScreen.tsx` only for a reusable local timing/sequence
+  presentation needed by these pages
+- `src/engine/festivals.ts` only if a failing multi-year anchor proves an engine
+  defect; do not redesign the festival engine
 - `validation/durga-puja-pages.cjs`
-- `validation/festival-page-coverage.cjs`
+- a new `validation/skanda-ayyappa-pages.cjs`
 - `validation/festival-deeplinks.cjs`
-- new dedicated Skanda/Ayyappa sequence gate
-- relevant canonical gate lists in `AGENTS.md` and `.cursorrules`
-- `plans/backlog.md`, `plans/backlog-acceptance-register.md`, and Cursor's own row
-  in `plans/task-log.md`
+- `validation/festival-page-coverage.cjs`
+- `validation/content-dates.cjs` for the new multi-year anchors
+- `plans/festival-page-link-inventory.md`
+- `plans/backlog.md`, `plans/backlog-acceptance-register.md` and Cursor's own row in
+  `plans/task-log.md` only after all evidence exists
 
-If another active agent owns one of these files, stop and resolve ownership before
-editing it. One writer per file remains mandatory.
+Do not touch calendar-mode work, Samskara/Panchang modules, shared design tokens,
+navigation, medical Muhurat work, `.worktrees/`, `validation/.fest-test.ts`, or the
+recovery vault. Do not stage the unrelated Ritu/Vedic-clock changes in these commits.
 
-## Slice A — finish Bengal Durga Puja ×6
+## Mandatory gates
 
-Keep six separate permanent bilingual pages:
-
-1. Mahalaya
-2. Shashthi
-3. Saptami
-4. Maha Ashtami
-5. Maha Navami
-6. Vijaya Dashami
-
-Each page must have its own answer-first verdict, meaning, household/public-pandal
-guidance, fasting or food boundary, worship steps, regional distinction, safety and
-completion guidance. Do not merge these pages with generic Sharad Navratri or the
-18 Navadurga day pages.
-
-### Calculation and timing requirements
-
-- Mahalaya: correct local Mahalaya Amavasya identity and Pitru Paksha relationship.
-- Shashthi: local Shashthi identity and Bodhan/Kalparambha context; do not invent a
-  universal priestly clock when only a local pandal schedule is authoritative.
-- Saptami: local Saptami date and Nabapatrika/Kolabou context.
-- Ashtami: calculate and display the local Sandhi Puja interval as the last 24
-  minutes of Ashtami plus the first 24 minutes of Navami. It must not be presented
-  as a generic evening aarti.
-- Navami: use the documented Bengal day-selection convention and show the local
-  tithi context clearly when it differs from another regional calendar.
-- Dashami: correct Vijaya Dashami date and local visarjan context without pretending
-  that a municipality's procession schedule is astronomically calculated.
-- Preserve city, civil date, timezone, language and route through reload and
-  Back/Forward navigation.
-
-### Bengal evidence
-
-- Keep the six-page exact-set regression gate.
-- Add dated Kolkata anchors for every page and at least one second published source
-  for date/timing corroboration.
-- Add at least one non-Kolkata or diaspora location check to prove that timings are
-  local and no Kolkata clock is hard-coded.
-- Store source URL/title, convention, location and retrieval date in a source note
-  or fixture file.
-- Explain genuine source/convention differences instead of forcing false agreement.
-
-## Slice B — make Skanda Sashti pages genuinely day-specific
-
-Keep these three permanent routes, but stop mapping all three to one undifferentiated
-`kandaSashtiAnnual` experience:
-
-1. **Kanda Sashti begins — day 1:** sankalpa, six-day discipline, daily household
-   worship and what starts today.
-2. **Soorasamharam — day 6:** culmination identity, local temple/event timing where
-   a published schedule exists, fasting completion boundary and clear separation
-   from a compulsory household dramatic reenactment.
-3. **Thirukalyanam — day 7:** distinct following-day celebration, meaning, suitable
-   household worship and food/fasting transition.
-
-Retain the existing monthly one-day `skandaShashti` page separately. The monthly
-vrata must never acquire the annual six-day copy.
-
-### Skanda evidence
-
-- Verify all three 2026 dates against two published Tamil/temple calendars.
-- Include Chennai plus one additional supported city/date calculation check.
-- Add a regression assertion that the three pages have different verdicts and
-  day-specific steps, not merely different titles pointing to the same guide.
-- Verify Tamil terms against two published references; Hindi and English remain the
-  current interface languages.
-
-## Slice C — make Ayyappa pages genuinely milestone-specific
-
-Keep these two permanent routes, but stop mapping both to one undifferentiated
-`ayyappaMandala` experience:
-
-1. **Mandala Vratham begins:** public season start, distinction between the public
-   calendar and a devotee's personal mala-started 41-day vow, preparation and safe
-   first-day guidance.
-2. **Mandala Pooja:** public 41-day endpoint, local date, worship context and the
-   explicit warning that personal mala removal/pilgrimage completion is not
-   automatically triggered by the public calendar date.
-
-Keep the existing inclusive day counter and URL-safe Daily progress display.
-
-### Ayyappa evidence
-
-- Verify season start, inclusive day 41 and Mandala Pooja using two independent
-  published Kerala/Sabarimala references.
-- Add boundary anchors for day 1, day 2, day 40, day 41 and outside the span.
-- Add a regression assertion that the start and Pooja routes have different
-  verdicts and steps.
-- Preserve the current medical, pilgrimage, crowd and Guru Swami safety boundaries.
-
-## Required UX
-
-- Answer before technical data.
-- English and Hindi must follow the language toggle everywhere; do not render both
-  languages together.
-- Every page must visibly identify the selected sequence day and its position in
-  the sequence.
-- Display the selected city's calculated date/timing or clearly say when a time is
-  determined by the local temple/pandal rather than Ganak.
-- No silent fallback, generic placeholder or internal research/developer wording.
-- Phone-first layout with no horizontal overflow at 390 × 844.
-- Existing inline festival-card behaviour and permanent links must both continue to
-  work.
-
-## Dedicated acceptance gate
-
-Create a Skanda/Ayyappa sequence gate that proves:
-
-- exact required routes: three Skanda and two Ayyappa;
-- all five pages are bilingual and substantive;
-- each milestone has a distinct guide identity, verdict and steps;
-- monthly Skanda remains separate from annual Kanda Sashti;
-- all published date/boundary anchors pass;
-- Ayyappa day counter is inclusive and stable;
-- no route is deferred or mapped to a thin generic placeholder;
-- a deliberate missing route or duplicated guide identity makes the gate fail.
-
-Do not weaken existing gates to accommodate the implementation.
-
-## Mandatory completion checks
-
-Run and record all canonical gates from `AGENTS.md`, plus:
+Run after the implementation is structurally complete and paste the full passing
+output into Cursor's task-log row:
 
 ```bash
-node validation/durga-puja-pages.cjs
-node validation/content-dates.cjs
+node validation/parse-check.js src/kundli-app.tsx
+node validation/prashna-parity.js src/screens/PrashnaScreen.tsx
+node validation/prashna-calc.js
+node validation/muhurat-anchors.cjs
+node validation/panchaka-windows.cjs
 node validation/festival-deeplinks.cjs
 node validation/festival-page-coverage.cjs
-node validation/navadurga-pages.cjs
-node validation/<new-skanda-ayyappa-sequence-gate>.cjs
+node validation/page-context-header.cjs
+node validation/content-dates.cjs
+node validation/durga-puja-pages.cjs
+node validation/skanda-ayyappa-pages.cjs
 npm run build
 ```
 
-Browser-test all eleven pages/milestones represented by this assignment: six
-Bengal, three Skanda and two Ayyappa. Test English and Hindi on desktop, and at
-least one page from each family at 390 × 844. Verify direct URL, reload,
-Back/Forward, language preservation, selected-city timing, no overflow and zero
-browser errors.
+Do not weaken an existing gate or convert a genuine required page back into a
+deferred/excluded label.
+
+## Browser and production matrix
+
+Before closure:
+
+- Open all 11 routes in English and Hindi.
+- Verify correct route title, selected date/place, local timing or an honest
+  no-universal-clock message, milestone-specific verdict and substantive guide.
+- Test language switch, city switch, reload and Back/Forward without losing route.
+- Test representative Bengal, Skanda and Ayyappa pages at 390×844 and desktop.
+- Require zero horizontal overflow and zero console errors.
+- Commit Scope A and Scope B separately with intentional file lists; push `main`
+  under the standing policy.
+- Wait for Cloudflare production, then verify representative pages from all three
+  families on `https://ganak.pages.dev` in both languages and at phone width.
+- Update the Google backlog Sheet and local backlog only after production evidence.
 
 ## Definition of done
 
-This assignment is complete only when:
+### Bengal Durga Puja
 
-- all six Bengal pages and all five Skanda/Ayyappa milestone pages satisfy the
-  requirements above;
-- every required validation and production build passes;
-- browser/phone evidence is recorded;
-- the changes are committed and pushed to `main` under the standing git policy;
-- Cloudflare production deployment succeeds;
-- all eleven live routes are smoke-tested on `ganak.pages.dev`;
-- backlog rows 13 and 14 and the live Google Sheet are updated to 100% with commit,
-  gate, browser and production evidence;
-- Cursor changes its task-log row to `MERGED` only after the commit is present on
-  `origin/main`.
+100% only when six separate bilingual substantive pages, local timing/date rules,
+dedicated gates, full canonical gates, browser matrix, commit/push, production and
+backlog/Sheet evidence all pass. The current uncommitted local state is not done.
 
-If any requirement remains incomplete, leave the task `ACTIVE` and record the
-exact remaining work. Do not mark it merged based only on local passing gates.
+### Skanda Sashti + Ayyappa
+
+100% only when all five routes resolve to milestone-specific guidance, the sequence
+and multi-year anchors pass, monthly Skanda remains separate, browser/phone checks
+pass, and the result is committed, pushed and verified in production.
