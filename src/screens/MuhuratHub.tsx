@@ -21,7 +21,8 @@ import { computeLagnaPanchaka, panchakaRem, PANCHAKA_TYPE } from "../engine/panc
 import { obsKind } from "../engine/festivals";
 import { vaishnavaEkadashiDay } from "../engine/muhurat";
 import { VIM_LORDS } from "../engine/dasha";
-import { MUH_CATS, EVENTS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS } from "../data/muhurat-ui";
+import { MUH_CATS, EVENTS, SAMSKARA_GUIDANCE, SAMSKARA_INPUTS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS } from "../data/muhurat-ui";
+import DailyWindowsCard from "../components/DailyWindowsCard";
 import { ascendantAt } from "../engine/ephemeris";
 import { ayanAt } from "../engine/panchang";
 import { computeTodayPanchang } from "../engine/today-panchang";
@@ -29,6 +30,7 @@ import { searchUpcoming } from "../engine/search-upcoming";
 import { planetGochar } from "../engine/gochar";
 import { fmtDur, eventDetail } from "../engine/transit-copy";
 import { observancesFor, scanPanchangCalendar, EKADASHI_NAMES, PRADOSH_NAMES_BY_DAY } from "../engine/festivals";
+import { urlPrefGet, urlPrefPush } from "../components/url-prefs";
 
 const VRAT_VIDHI_KEY = Object.freeze({
   chhathNahayKhay: "chhath",
@@ -43,6 +45,7 @@ const VRAT_VIDHI_KEY = Object.freeze({
   ayyappaMandalaBegins: "ayyappaMandala",
   ayyappaMandalaPuja: "ayyappaMandala",
 });
+const SIGN_HI = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
 
 function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, onCal = () => {}, C, card }) {
   const tz = todayP.tz;
@@ -62,13 +65,17 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   const [showPanch, setShowPanch] = useState(false);
   const [dragMs, setDragMs] = useState(null);  // dragged time on arc
   const isoAtOffset = (days) => new Date(Date.now() + tz * 3600000 + days * 86400000).toISOString().slice(0, 10);
-  const [mfCat, setMfCat] = useState(null);
+  const validMuhuratKey=(value)=>MUH_CATS.some(c=>c.key===value) ? value : null;
+  const [mfCat, setMfCat] = useState(() => validMuhuratKey(urlPrefGet("muhurat")));
   const [mfFrom, setMfFrom] = useState(isoAtOffset(0));
   const [mfTo, setMfTo] = useState(isoAtOffset(90));
   const [mfPreset, setMfPreset] = useState("90");
   const [mfErr, setMfErr] = useState(null);
   const [mfBusy, setMfBusy] = useState(false);
+  const [samskaraProfiles, setSamskaraProfiles] = useState({});
   const [ans, setAns] = useState(null);
+  const chooseMfCat=(key)=>{ const next=validMuhuratKey(key); setMfCat(next); setMfErr(null); if(next) urlPrefPush("muhurat",next); if(ans&&next) findDays(null,null,next); };
+  useEffect(()=>{ const restore=()=>setMfCat(validMuhuratKey(urlPrefGet("muhurat"))); window.addEventListener("popstate",restore); return()=>window.removeEventListener("popstate",restore); },[]);
   const finderTopPanchaka = useMemo(() => { try { if (!ans || !ans.days) return null; const top = ans.days.filter((d) => d.valid)[0]; return top ? computeLagnaPanchaka(place, "lahiri", top.rise) : null; } catch (e) { return null; } }, [ans, place]);
   const mfYmd = (iso) => { const [y, m, d] = iso.split("-").map(Number); return { y, m, d }; };
   // Previous results stay on screen until the new ones replace them — the app
@@ -86,7 +93,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
     setTimeout(() => {
       try {
         const dd = muhuratScanRange(place, "lahiri", from, to, cat);
-        setAns({ category: cat, days: dd, from: fromIso || mfFrom, to: toIso || mfTo });
+        setAns({ category: cat, days: dd, from: fromIso || mfFrom, to: toIso || mfTo, profile: SAMSKARA_INPUTS[cat] ? { ...(samskaraProfiles[cat] || {}) } : null });
       } catch (e) {
         if (typeof console !== "undefined") console.error("muhurat scan failed:", e);
         setMfErr(lang === "hi" ? "गणना नहीं हो सकी — कृपया छोटी अवधि आज़माएँ या पुनः प्रयास करें।" : "Couldn't complete the search — try a shorter date range or try again.");
@@ -482,14 +489,14 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       </div>
       {/* muhurat finder */}
       <SecHead deva="मुहूर्त खोज" en="Muhurat finder" />
-      <div style={{ ...card, padding: T.s4 }}>
+      <div id="muhurat-finder" style={{ ...card, padding: T.s4 }}>
         <div style={{ marginBottom: 16 }}>
           <div style={{ fontSize: 12.5, color: C.muted, marginBottom: 8, fontStyle: "italic" }}>
             {lang === "hi" ? "क्या करने जा रहे हैं और कब तक — चुनें, सर्वोत्तम दिन क्रमानुसार मिलेंगे।" : "Pick what you're planning and when — get the best days, ranked."}
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
             {MUH_CATS.map((c) => { const on = mfCat === c.key; return (
-              <button key={c.key} onClick={() => { setMfCat(c.key); setMfErr(null); if (ans) findDays(null, null, c.key); }}
+              <button key={c.key} onClick={() => chooseMfCat(c.key)}
                 style={{ height: T.ctrlH, boxSizing: "border-box", padding: "0 13px", borderRadius: T.rMd, cursor: "pointer", fontFamily: T.body, fontSize: 13,
                   border: `1.5px solid ${on ? C.gold : C.line}`, background: on ? "rgba(168,106,18,.1)" : "#FFFDF7", color: on ? C.gold : C.ivory }}>
                 {lang === "hi" ? c.hi : c.en}
@@ -520,6 +527,16 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
               );
             })}
           </div>
+          {SAMSKARA_GUIDANCE[mfCat] && <div style={{ margin:"10px 0", padding:"11px 12px", borderRadius:T.rMd, background:"#FBF5E7", border:`1px solid ${C.line}`, color:C.ivory, fontSize:12.5, lineHeight:1.55 }}>{SAMSKARA_GUIDANCE[mfCat][lang === "hi" ? "hi" : "en"]}</div>}
+          {SAMSKARA_INPUTS[mfCat] && (() => {
+            const spec=SAMSKARA_INPUTS[mfCat], profile=samskaraProfiles[mfCat] || {};
+            const setProfile=(key,value)=>setSamskaraProfiles(prev=>({ ...prev, [mfCat]:{ ...(prev[mfCat]||{}), [key]:value } }));
+            return <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))", gap:8, margin:"10px 0" }}>
+              <label style={{ ...T.label,color:C.muted }}>{lang === "hi" ? "शिशु की जन्म-तिथि" : "Child's birth date"}<input type="date" value={profile.birthDate || ""} onChange={e=>setProfile("birthDate",e.target.value)} style={{ display:"block",width:"100%",height:T.ctrlH,boxSizing:"border-box",marginTop:4,padding:"0 9px",borderRadius:T.rMd,border:`1px solid ${C.line}`,background:"#FFFDF7",color:C.ivory,fontFamily:T.body }} /></label>
+              <label style={{ ...T.label,color:C.muted }}>{spec.secondaryLabel[lang === "hi" ? "hi" : "en"]}<select value={profile[spec.secondary] || ""} onChange={e=>setProfile(spec.secondary,e.target.value)} style={{ display:"block",width:"100%",height:T.ctrlH,boxSizing:"border-box",marginTop:4,padding:"0 9px",borderRadius:T.rMd,border:`1px solid ${C.line}`,background:"#FFFDF7",color:C.ivory,fontFamily:T.body }}><option value="">{lang === "hi" ? "चुनें" : "Choose"}</option>{(spec.options || NAKSHATRAS.map((en,i)=>({value:String(i),en,hi:NAK_HI[i]}))).map(o=><option key={o.value} value={o.value}>{lang === "hi" ? o.hi : o.en}</option>)}</select></label>
+              <div style={{ gridColumn:"1 / -1",fontSize:11.5,color:C.muted,lineHeight:1.45 }}>{lang === "hi" ? "ये विवरण संस्कार-सन्दर्भ स्पष्ट करते हैं; परिणाम सामान्य पंचांग और संस्कार-विशिष्ट लग्न-शुद्धि है, पूर्ण जन्म-कुण्डली मुहूर्त नहीं।" : "These details clarify the ceremony context; results use general Panchang plus ceremony-specific lagna screening, not a full personalized natal election."}</div>
+            </div>;
+          })()}
           <button onClick={() => findDays()} disabled={!mfCat || mfBusy}
             style={{ width: "100%", height: T.ctrlH, boxSizing: "border-box", borderRadius: T.rMd, fontFamily: T.serif, fontSize: 14, cursor: mfCat && !mfBusy ? "pointer" : "default", border: "none", background: mfCat && !mfBusy ? "linear-gradient(180deg, #E08A22, #C9711A)" : C.line, color: mfCat && !mfBusy ? "#FFF8E9" : C.muted, fontWeight: 600 }}>
             {mfBusy ? (lang === "hi" ? "पंचांग देखा जा रहा है…" : "Checking the panchang…")
@@ -543,6 +560,8 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
             const dlFull = (r) => new Date(r.rise + r.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
             const fmtIso = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
             const top = days[0];
+            const samskaraSpec=SAMSKARA_INPUTS[ans.category], profile=ans.profile || {};
+            const profileReady=!samskaraSpec || Boolean(profile.birthDate && profile[samskaraSpec.secondary] !== undefined && profile[samskaraSpec.secondary] !== "");
             // tally the reasons the excluded days were skipped, most-common first
             const blockerTally = (() => {
               const m = new Map();
@@ -555,6 +574,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                 <div style={{ fontFamily: "Eczar, serif", fontSize: 15.5, color: C.ivory }}>
                   {(lang === "hi" ? "शुभ दिन · " : "Best days · ")}{lang === "hi" ? catInfo.hi : catInfo.en} <span style={{ color: C.muted, fontSize: 13 }}>· {fmtIso(ans.from || mfFrom)} – {fmtIso(ans.to || mfTo)}</span>
                 </div>
+                {samskaraSpec && <div style={{ marginTop:8,padding:"9px 11px",borderRadius:T.rSm,background:profileReady?"rgba(31,122,77,.07)":"rgba(168,106,18,.08)",border:`1px solid ${profileReady?"rgba(31,122,77,.22)":C.line}`,fontSize:12.5,lineHeight:1.5,color:profileReady?"#1F7A4D":C.gold }}>{profileReady ? (lang === "hi" ? "संस्कार-सन्दर्भ दर्ज है। नीचे का निर्णय पंचांग व संस्कार-विशिष्ट निषेध/लग्न-काल पर आधारित है।" : "Ceremony context recorded. The verdict below applies the Panchang and ceremony-specific exclusions/lagna windows.") : (lang === "hi" ? "सन्दर्भ अधूरा है। दिन देख सकते हैं, पर शिशु की जन्म-तिथि और संस्कार-विशिष्ट विकल्प भरकर कुलाचार से पुष्टि करें।" : "Context is incomplete. You can review dates, but add the birth date and ceremony-specific choice, then confirm family custom.")}</div>}
                 {days.length === 0 ? (
                   <div style={{ fontSize: 12.5, color: C.muted, marginTop: 10, lineHeight: 1.6 }}>
                     <span style={{ color: C.sindoor, fontWeight: 600 }}>{lang === "hi" ? "इस अवधि में कोई शुभ मुहूर्त नहीं।" : "No auspicious muhurat in this range."}</span>
@@ -572,7 +592,15 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                           <span style={{ marginLeft: 8, fontSize: 11, padding: "1px 9px", borderRadius: 10, background: qual(top.score).c + "20", color: qual(top.score).c }}>{qual(top.score).t}</span>
                         </div>
                         <div style={{ fontSize: 12.5, color: C.ivory, marginBottom: 10, lineHeight: 1.5 }}>{(lang === "hi" ? "क्यों यह दिन: " : "Why this day: ") + (top.factors.filter((f) => f.g).map((f) => lang === "hi" ? f.hi : f.en).join(lang === "hi" ? ", " : ", ") || "—")}</div>
-                        {finderTopPanchaka && (finderTopPanchaka.panchakaWindows || []).length ? (() => {
+                        {(top.samskaraWindows || []).length ? (
+                          <>
+                            <div style={{ ...T.label, color:"#1F7A4D", marginBottom:5 }}>{lang === "hi" ? "संस्कार के अनुकूल लग्न-काल" : "Ceremony-specific lagna windows"}</div>
+                            <div style={{ display:"flex", flexDirection:"column", gap:4, marginBottom:8 }}>
+                              {top.samskaraWindows.slice(0,6).map((w,i)=><div key={i} style={{ display:"flex", justifyContent:"space-between", gap:10, fontSize:12.5 }}><span style={{ color:"#1F7A4D" }}>✓ {lang === "hi" ? SIGN_HI[w.sign] : SIGNS[w.sign]} {lang === "hi" ? "लग्न" : "Lagna"}</span><span style={{ color:C.ivory, fontVariantNumeric:"tabular-nums" }}>{fmtTime(w.start,top.tz)} – {fmtTime(w.end,top.tz)}</span></div>)}
+                            </div>
+                            <div style={{ fontSize:11.5, color:C.muted, lineHeight:1.45 }}>{lang === "hi" ? "तिथि, नक्षत्र, वार और इस संस्कार के लग्न/कुण्डली नियम लागू हैं। पञ्चक दोष नीचे द्वितीयक सावधानी है।" : "Tithi, nakshatra, weekday and this Samskara's lagna/chart rules are applied. Panchaka dosha remains a secondary caution."}</div>
+                          </>
+                        ) : finderTopPanchaka && (finderTopPanchaka.panchakaWindows || []).length ? (() => {
                           const ptz = finderTopPanchaka.tz;
                           const shubha = finderTopPanchaka.panchakaWindows.filter((w) => w.shubha);
                           const dosha = finderTopPanchaka.panchakaWindows.filter((w) => !w.shubha);
@@ -622,7 +650,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                         ); })}
                       </div>
                     )}
-                    <div style={{ fontSize: 11, color: C.muted, marginTop: 8, fontStyle: "italic" }}>{lang === "hi" ? "केवल मास, तिथि, नक्षत्र व वार शुद्धि पर खरे दिन दिखाए गए हैं।" : "Only dates passing month, tithi, nakshatra & weekday shuddhi are shown."}</div>
+                    <div style={{ fontSize: 11, color: C.muted, marginTop: 8, fontStyle: "italic" }}>{SAMSKARA_GUIDANCE[ans.category] ? (lang === "hi" ? "केवल मास, तिथि, नक्षत्र, वार और संस्कार-विशिष्ट लग्न/कुण्डली शुद्धि पर खरे दिन दिखाए गए हैं।" : "Only dates passing month, tithi, nakshatra, weekday and Samskara-specific lagna/chart screening are shown.") : (lang === "hi" ? "केवल मास, तिथि, नक्षत्र व वार शुद्धि पर खरे दिन दिखाए गए हैं।" : "Only dates passing month, tithi, nakshatra & weekday shuddhi are shown.")}</div>
                     {whyList && (
                       <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: T.rMd, background: "#FBF5E7", border: `1px solid ${C.line}` }}>
                         <div style={{ ...T.label, color: C.muted, marginBottom: 4 }}>{lang === "hi" ? "अन्य दिन क्यों शामिल नहीं" : "Why other days weren't included"}</div>
@@ -674,6 +702,8 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         </div>
         {evKey === "wedding" && <div style={{ fontSize: 11.5, color: C.muted, marginTop: 12, fontStyle: "italic", lineHeight: 1.5 }}>{lang === "hi" ? "विवाह का पूर्ण मुहूर्त तिथि, नक्षत्र व लग्न पर निर्भर — यह केवल दिन के शुभ समय दिखाता है।" : "A full wedding muhurat depends on tithi, nakshatra and lagna — this shows favourable times within the day only."}</div>}
       </div>
+
+      <DailyWindowsCard data={todayP.dailyWindows} place={place} lang={lang} C={C} card={card} />
 
       {/* hora timeline (secondary) */}
       <SecHead deva="होरा" en="Planetary hours" />

@@ -8,6 +8,7 @@ import {
 } from "./panchang";
 import { rev } from "./ephemeris";
 import { ayyappaMandalaFor } from "./festivals";
+import { computeDailyWindows } from "./daily-windows";
 
 function computeTodayPanchang(place, ayanamsa = "lahiri", atMs) {
   setAyanMode(ayanamsa);
@@ -75,6 +76,7 @@ function computeTodayPanchang(place, ayanamsa = "lahiri", atMs) {
     abhijit = dow === 3 ? null : { start: ev.transit - dayLen / 30, end: ev.transit + dayLen / 30 };
   }
 
+  const dailyWindows = computeDailyWindows(place, anchor);
   return {
     tz, anchor,
     dateLabel: local.toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }),
@@ -91,6 +93,7 @@ function computeTodayPanchang(place, ayanamsa = "lahiri", atMs) {
     choghaDay: ev.rise !== null ? choghaSlots(dow, ev.rise, ev.set, true) : null,
     choghaNight: ev.rise !== null ? choghaSlots(dow, ev.set, ev.rise + 86400000, false) : null,
     events: upcomingEvents(now),
+    dailyWindows,
   };
 }
 

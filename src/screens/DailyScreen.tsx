@@ -14,9 +14,17 @@ import { MuhuratHub } from "./MuhuratHub";
 import { scanPanchangCalendar } from "../engine/festivals";
 import { planetGochar, PLANET_PERIOD_DAYS } from "../engine/gochar";
 import { fmtDur, eventDetail } from "../engine/transit-copy";
+import { CALENDAR_CONVENTIONS, calendarLabel, safeConvention } from "../engine/calendar-conventions";
+import { urlPrefGet, urlPrefPush } from "../components/url-prefs";
 
 export default function DailyScreen({ C, card, lang, place, onPlace }) {
   const [ayanamsa] = useState("lahiri");
+  const [calendarMode, setCalendarMode] = useState(() => safeConvention(urlPrefGet("cal")));
+  const chooseCalendarMode = (value) => { const next = safeConvention(value); setCalendarMode(next); urlPrefPush("cal", next); };
+  useEffect(() => {
+    const restore=()=>setCalendarMode(safeConvention(urlPrefGet("cal")));
+    window.addEventListener("popstate",restore); return()=>window.removeEventListener("popstate",restore);
+  },[]);
   const todayISO = (() => {
     const nowU = new Date();
     let off = null;
@@ -162,7 +170,15 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
               );
             })()}
           </div>
-          {place && <div style={{ fontSize: T.fMicro, color: C.muted, margin: "-12px 0 16px", fontStyle: "italic" }}>{lang === "hi" ? `सभी समय ${place.label} के अनुसार` : `All times shown for ${place.label}`}</div>}
+          {place && <div style={{ margin:"-12px 0 16px", display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
+            <select value={calendarMode} onChange={(e) => chooseCalendarMode(e.target.value)} aria-label={lang === "hi" ? "कैलेंडर पद्धति" : "Calendar convention"} style={{ height:T.ctrlH, borderRadius:T.rMd, border:`1px solid ${C.line}`, background:"#FFFDF7", color:C.ivory, padding:"0 10px", fontFamily:T.body }}>
+              {CALENDAR_CONVENTIONS.filter(x => x.enabled).map(x => <option key={x.id} value={x.id}>{lang === "hi" ? x.hi : x.en}</option>)}
+            </select>
+            <div style={{ fontSize:T.fMicro, color:C.muted, lineHeight:1.45 }}>
+              <div>{calendarLabel(calendarMode, todayP, todayP.rise, lang === "hi" ? "hi" : "en")}</div>
+              <div style={{ fontStyle:"italic" }}>{lang === "hi" ? `समय ${place.label} के अनुसार · पद्धति बदलने से खगोलीय गणना नहीं बदलती` : `Times for ${place.label} · changing the convention never changes the astronomy`}</div>
+            </div>
+          </div>}
           <MuhuratHub todayP={todayP} place={place} lang={lang} ayanamsa={ayanamsa} isToday={isPanchToday} onCal={setCalView} C={C} card={card} />
 
           <div className="rise2" style={{ ...card, padding: "16px 20px", marginTop: 12 }}>

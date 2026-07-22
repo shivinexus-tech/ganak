@@ -6,6 +6,7 @@ import {
   lunarMonthInfo, choghaSlots, pitruPakshaDay, zoneOffset,
 } from "./panchang";
 import { ayyappaMandalaFor } from "./festivals";
+import { computeLagnaPanchaka } from "./panchaka";
 
 const NAK_HI = ['अश्विनी','भरणी','कृत्तिका','रोहिणी','मृगशिरा','आर्द्रा','पुनर्वसु','पुष्य','आश्लेषा','मघा','पूर्वाफाल्गुनी','उत्तराफाल्गुनी','हस्त','चित्रा','स्वाति','विशाखा','अनुराधा','ज्येष्ठा','मूल','पूर्वाषाढ़ा','उत्तराषाढ़ा','श्रवण','धनिष्ठा','शतभिषा','पूर्वाभाद्रपदा','उत्तराभाद्रपदा','रेवती'];
 
@@ -269,8 +270,14 @@ const MUHURTA_RULES = {
     monthsLabel: { en: "Any month — Thursdays and Fridays only, on the fixed set of registration nakshatras", hi: "कोई भी मास — केवल गुरुवार व शुक्रवार, निर्धारित नक्षत्रों में" } },
   mundan: { forbiddenMonths: new Set([4, 5, 6, 9]), auspNak: new Set([0, 4, 6, 7, 12, 13, 14, 17, 21, 22, 23, 26]), goodTithi: new Set([2, 3, 5, 7, 10, 11, 13]), allowWeekday: new Set([1, 3, 4, 5]),
     monthsLabel: { en: "Traditionally Chaitra to Ashadha and the winter months — not during Chaturmas or Pausha; Monday, Wednesday, Thursday, Friday", hi: "चैत्र से आषाढ़ व शीत मास — चातुर्मास व पौष वर्जित; सोम, बुध, गुरु, शुक्रवार" } },
-  naming: { auspNak: new Set([0, 3, 4, 6, 7, 11, 12, 13, 14, 16, 20, 21, 22, 23, 25, 26]), goodTithi: new Set([1, 2, 3, 5, 6, 7, 10, 11, 12, 13, 15]), noAmavasya: true, forbidWeekday: new Set([2, 6]),
-    monthsLabel: { en: "Any month — an auspicious nakshatra and clean tithi; Tuesday and Saturday avoided", hi: "कोई भी मास — शुभ नक्षत्र व शुद्ध तिथि; मंगल व शनि वर्जित" } },
+  naming: { auspNak: new Set([0, 3, 4, 6, 7, 11, 12, 13, 14, 16, 20, 21, 22, 23, 25, 26]), goodTithi: new Set([1, 2, 3, 5, 7, 10, 11, 12, 13]), noAmavasya: true, allowWeekday: new Set([1, 3, 4, 5]),
+    monthsLabel: { en: "Any month — Monday, Wednesday, Thursday or Friday with an auspicious nakshatra and clean tithi", hi: "कोई भी मास — सोम, बुध, गुरु या शुक्रवार तथा शुभ नक्षत्र व शुद्ध तिथि" } },
+  annaprashana: { auspNak: new Set([0, 3, 4, 6, 7, 11, 12, 13, 14, 16, 20, 21, 22, 23, 25, 26]), goodTithi: new Set([2, 3, 5, 7, 10, 13, 15]), noAmavasya: true, allowWeekday: new Set([1, 3, 4, 5]),
+    monthsLabel: { en: "Usually in the child's sixth or later suitable month; Monday, Wednesday, Thursday or Friday with a clean tithi and nakshatra. Family custom decides the child's age.", hi: "सामान्यतः शिशु के छठे या बाद के उपयुक्त मास में; सोम, बुध, गुरु या शुक्रवार तथा शुद्ध तिथि-नक्षत्र। आयु का निर्णय कुल-परम्परा से करें।" } },
+  vidyarambha: { auspNak: new Set([0, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26]), goodTithi: new Set([2, 3, 5, 6, 10, 11, 12]), noAmavasya: true, allowWeekday: new Set([0, 3, 4, 5]),
+    monthsLabel: { en: "Sunday, Wednesday, Thursday or Friday with a clean learning-oriented tithi and nakshatra. Vijayadashami remains a distinct regional exception.", hi: "रवि, बुध, गुरु या शुक्रवार तथा विद्या के अनुकूल शुद्ध तिथि-नक्षत्र। विजयादशमी की क्षेत्रीय परम्परा अलग अपवाद है।" } },
+  upanayana: { forbiddenMonths: new Set([4, 5, 6, 9]), auspNak: new Set([3, 4, 6, 7, 11, 12, 13, 14, 16, 20, 21, 22, 23, 25, 26]), goodTithi: new Set([2, 3, 5, 7, 10, 11, 12, 13]), noAmavasya: true, allowWeekday: new Set([1, 3, 4, 5]),
+    monthsLabel: { en: "Traditionally performed outside Chaturmas and Pausha, on Monday, Wednesday, Thursday or Friday. Age, Vedic branch and family custom need an acharya's confirmation.", hi: "परम्परागत रूप से चातुर्मास और पौष के बाहर, सोम, बुध, गुरु या शुक्रवार। आयु, वेद-शाखा और कुलाचार की पुष्टि आचार्य से करें।" } },
   venture: { auspNak: new Set([0, 3, 4, 6, 7, 11, 12, 13, 14, 16, 20, 21, 22, 23, 25, 26]), goodTithi: new Set([1, 2, 3, 5, 7, 10, 11, 13, 15]), noAmavasya: true, forbidWeekday: new Set([2]),
     monthsLabel: { en: "Any month — an auspicious nakshatra and growing tithi; Tuesday avoided", hi: "कोई भी मास — शुभ नक्षत्र व वृद्धि तिथि; मंगलवार वर्जित" } },
 };
@@ -299,6 +306,47 @@ function muhuratShuddhi(info, category) {
   if (rule.asta && info.guruAsta) b.push({ en: "Guru asta (Jupiter combust)", hi: "गुरु अस्त" });
   return { valid: b.length === 0, blockers: b };
 }
+
+const SAMSKARA_CATEGORIES = new Set(["mundan","naming","annaprashana","vidyarambha","upanayana"]);
+const SAMSKARA_LAGNA_AVOID = {
+  naming:new Set([0,3,6,9]),
+  annaprashana:new Set([0,7,11]),
+  vidyarambha:new Set([1,4,7,10]),
+};
+const GRAHAS = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
+const MALEFICS = new Set(["Sun","Mars","Saturn","Rahu","Ketu"]);
+function grahaSigns(ms) { return Object.fromEntries(GRAHAS.map(p=>[p,Math.floor(planetSidMs(p,ms)/30)])); }
+function houseOf(sign,lagna) { return ((sign-lagna+12)%12)+1; }
+function maleficAspectsLagna(signs,lagna) {
+  for (const p of MALEFICS) {
+    const h=houseOf(signs[p],lagna);
+    if (h===1||h===7||(p==="Mars"&&(h===4||h===8))||(p==="Saturn"&&(h===3||h===10))||((p==="Rahu"||p==="Ketu")&&(h===5||h===9))) return true;
+  }
+  return false;
+}
+/* Ceremony-specific intraday chart screening. This is intentionally separate
+   from the day-level tithi/nakshatra rules so a clean date cannot be presented
+   as usable when every lagna interval fails the Samskara's own conditions. */
+function samskaraWindows(place, ayanamsa, info, category) {
+  if (!SAMSKARA_CATEGORIES.has(category)) return [];
+  const schedule=computeLagnaPanchaka(place,ayanamsa,info.rise).lagnaSchedule||[];
+  const cutoff=(category==="naming"||category==="annaprashana") ? info.rise+(info.set-info.rise)/2 : info.rise+86400000;
+  const out=[];
+  for (const w of schedule) {
+    const end=Math.min(w.end,cutoff);
+    // Samskara shuddhi uses its own lagna/chart rules. Panchaka Rahita remains
+    // visible as a secondary caution, but is not a classical hard veto here.
+    if (end<=w.start) continue;
+    if (SAMSKARA_LAGNA_AVOID[category]?.has(w.sign)) continue;
+    const mid=(w.start+end)/2, signs=grahaSigns(mid);
+    const occupied=(house)=>GRAHAS.some(p=>houseOf(signs[p],w.sign)===house);
+    if ((category==="naming"||category==="vidyarambha") && occupied(8)) continue;
+    if (category==="naming" && maleficAspectsLagna(signs,w.sign)) continue;
+    if (category==="annaprashana" && (occupied(10)||[1,6,8].includes(houseOf(signs.Moon,w.sign)))) continue;
+    out.push({start:w.start,end,sign:w.sign});
+  }
+  return out;
+}
 /* scan an arbitrary from→to day range (inclusive), capped at 400 days */
 function muhuratScanRange(place, ayanamsa, fromYmd, toYmd, category) {
   const out = [];
@@ -310,7 +358,10 @@ function muhuratScanRange(place, ayanamsa, fromYmd, toYmd, category) {
     if (!info) continue;
     const sc = dayScore(info, category);
     const sh = muhuratShuddhi(info, category);
-    out.push({ ...info, ...sc, valid: sh.valid, blockers: sh.blockers });
+    const windows=sh.valid && SAMSKARA_CATEGORIES.has(category) ? samskaraWindows(place,ayanamsa,info,category) : [];
+    const noWindow=sh.valid && SAMSKARA_CATEGORIES.has(category) && windows.length===0;
+    const blockers=noWindow ? [...sh.blockers,{en:"no ceremony-specific lagna/chart window",hi:"संस्कार के अनुकूल लग्न/कुण्डली काल नहीं"}] : sh.blockers;
+    out.push({ ...info, ...sc, valid: sh.valid&&!noWindow, blockers, samskaraWindows:windows });
   }
   out.sort((a, b) => b.score - a.score || a.rise - b.rise);
   return out;
@@ -319,5 +370,5 @@ function muhuratScanRange(place, ayanamsa, fromYmd, toYmd, category) {
 export {
   NAK_HI, NAK_GOOD, tithiScore, dayMuhurat, findMuhurat,
   muhuratForDate, dayScore, vaishnavaEkadashi, vratDetail,
-  vaishnavaEkadashiDay, MUHURTA_RULES, muhuratShuddhi, muhuratScanRange,
+  vaishnavaEkadashiDay, MUHURTA_RULES, muhuratShuddhi, samskaraWindows, muhuratScanRange,
 };
