@@ -3,14 +3,13 @@
 **Priority:** P0 before go-live  
 **Owner decision:** 2026-07-22
 **Agent:** Cursor
-**Work order:** finish Bengal first, then Skanda/Ayyappa; do not combine either
-commit with the unrelated Ritu/Vedic-clock work currently present in the shared
-worktree.
+**Work order:** finish Bengal's remaining timing/release evidence first, then
+Skanda/Ayyappa.
 
 Read `AGENTS.md`, `.cursorrules`, `plans/task-log.md` and
-`plans/module-ownership-map.md` before editing. The current worktree contains
-uncommitted user/agent work. Preserve it and stage only the explicit files for each
-commit. Never describe an uncommitted change as merged.
+`plans/module-ownership-map.md` before editing. Preserve unrelated user/agent work
+and stage only the explicit files for each commit. Never describe a local-only or
+unverified change as production-complete.
 
 ## Current truth
 
@@ -20,9 +19,11 @@ commit. Never describe an uncommitted change as merged.
   - Annual Skanda sequence anchors: day 1, Soorasamharam day 6 and
     Thirukalyanam day 7.
   - Ayyappa anchors: Mandala begins and public Mandala Pooja/day 41.
-- Six Bengal guide objects, route wiring and `validation/durga-puja-pages.cjs`
-  currently exist only as uncommitted shared-worktree changes. The focused Durga,
-  route-coverage and deeplink gates pass, but this is not merged or deployed.
+- Six Bengal guide objects, route wiring and `validation/durga-puja-pages.cjs` were
+  committed in `853026c` and pushed with this brief. The focused Durga,
+  route-coverage and deeplink gates pass. The backlog's 40% value is stale, but the
+  item is not 100% until local Sandhi/date evidence, browser checks and production
+  verification below are complete.
 - Skanda's three routes currently share `kandaSashtiAnnual`; Ayyappa's two routes
   share `ayyappaMandala`. Shared overview copy is useful, but it does not satisfy
   the owner's requirement for milestone-specific guidance.
@@ -139,7 +140,7 @@ Cursor is the only writer for these files until handoff:
 
 Do not touch calendar-mode work, Samskara/Panchang modules, shared design tokens,
 navigation, medical Muhurat work, `.worktrees/`, `validation/.fest-test.ts`, or the
-recovery vault. Do not stage the unrelated Ritu/Vedic-clock changes in these commits.
+recovery vault.
 
 ## Mandatory gates
 
@@ -186,7 +187,8 @@ Before closure:
 
 100% only when six separate bilingual substantive pages, local timing/date rules,
 dedicated gates, full canonical gates, browser matrix, commit/push, production and
-backlog/Sheet evidence all pass. The current uncommitted local state is not done.
+backlog/Sheet evidence all pass. Commit `853026c` establishes the page/content base;
+it does not by itself close the remaining timing and release evidence.
 
 ### Skanda Sashti + Ayyappa
 
