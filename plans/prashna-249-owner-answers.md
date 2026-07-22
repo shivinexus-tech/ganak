@@ -264,7 +264,63 @@ The good news in that table: **tithi is unaffected to zero decimal places**, so 
 great majority of festival dates are safe under any of these choices. The exposure is
 nakshatra times and solar ingresses only.
 
-**A→B is a later, cheap upgrade.** Ship A, and if practitioners actually ask, add the
+### ✅ DECIDED (owner, 2026-07-22) — **option C: Prashna runs on KP ayanamsa**
+
+Taken with the trade-offs above in view, including the measured ~11-minute
+Daily↔Prashna nakshatra disagreement. **The decision is made; this section is now
+implementation notes, not further argument.**
+
+Reading of scope: the **Prashna engine** moves to KP — both the existing
+time-based mode and the new number method — because they share one judgment engine.
+Running two ayanamsas inside one screen would be worse than the cross-screen
+difference we are accepting. *(If the intent was KP for the number method only, say
+so before build starts — it changes items 1–3 below.)*
+
+#### What must happen for C to be done safely
+
+**1. Parameterize; do not replace.** The naive version of C edits the ayanamsa
+constant and regenerates the 198 parity values — which deletes the proof that the
+engine still matches its validated baseline. Do it this way instead:
+
+- Give the engine an ayanamsa mode. **Default KP** (the decision), Lahiri retained.
+- Keep the existing 198-value baseline locked to the **Lahiri path**, unchanged and
+  still EXACT. It keeps working as the regression net it has always been.
+- Add a **second locked baseline for the KP path**.
+- The gate then proves both paths. Nothing is lost, and a genuine regression still
+  cannot slip through — which was the whole risk in switching.
+
+**2. The 24 self-tests are Drik-anchored, i.e. Lahiri.** `validation/prashna-calc.js`
+line 354 asserts the ayanamsa is `24°13.3' ±2'`. Under KP it is ~`24°7.5'` — outside
+tolerance, so that test **fails by design**. Do not "fix" it by widening the
+tolerance. Keep the Drik anchors validating the Lahiri path, and source **separate KP
+anchors from a KP authority** for the KP path. This folds naturally into
+`P0-PRASHNA-249-KSK-VERIFY`, which is already sourcing KP primary material.
+
+**3. Screen copy is now wrong.** `src/screens/PrashnaScreen.tsx:472` currently tells
+users: *"Positions: Lahiri ayanamsa, mean Rahu/Ketu — the same conventions as Drik
+Panchang defaults."* That becomes false the moment C ships. Replace with the KP
+statement, in both languages.
+
+**4. Disclose the cross-screen difference rather than hoping nobody notices.** Users
+will see Daily and Prashna differ by ~11 minutes on nakshatra transitions. One plain
+line on the Prashna screen — that it uses the Krishnamurti ayanamsa as the method
+requires, so its timings differ slightly from the Panchang screen — converts a
+"bug" into a stated convention. This is the mitigation that makes C safe to ship.
+
+**5. Existing users' answers change.** 4.49% of verdicts differ from what the live
+app returns today, and 0.80% are outright reversals. Nobody has saved Prashna
+results (no storage), so there is no stored-data migration — but a user who re-asks
+a question they asked last week may get a different answer. Worth a line in the
+release note.
+
+**6. Tithi is unaffected**, so no festival or panchang content changes. Confirmed to
+zero decimal places above.
+
+---
+
+*(Options A and B below are retained as the record of what was weighed. C was chosen.)*
+
+**A→B would have been a later, cheap upgrade.** Ship A, and if practitioners actually ask, add the
 toggle without redoing anything. Nothing about A forecloses B.
 
 ---
@@ -394,7 +450,7 @@ recommend seeing it.
 |---|---|---|
 | Q3 | Naming | ✅ **DECIDED 2026-07-20** — "कृष्णमूर्ति पद्धति अंक विधि", full name, no initials |
 | Q4 | Ruling planets + Moon-sincerity | ✅ **DECIDED 2026-07-20** — ship **both in v1**; KSK verify scope grows to match |
+| Q2 | Ayanamsa | ✅ **DECIDED 2026-07-22** — **option C, KP ayanamsa for Prashna.** See implementation notes 1–6 above; parameterize rather than replace |
 | Q1 | Chips to tier 2, compress repeated lines, question-specific house glosses | ⏳ open (recommended) |
-| Q2 | Lahiri + disclosure, or true-KP fork | ⏳ open (Lahiri recommended; 1-in-15 divergence measured) |
 | Q5 | Mock-up before code | ⏳ open (recommended) |
 | — | Fix the live **`2th` house** bug now | ⏳ open — it is on production right now |

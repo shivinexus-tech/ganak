@@ -7,7 +7,10 @@ Status verified against `src/kundli-app.tsx`, not assumed.
 consolidated open package are canonical in
 [`plans/backlog-acceptance-register.md`](backlog-acceptance-register.md). A checkbox
 must not be closed merely because code exists; the linked acceptance and evidence
-requirements must pass. Nested/duplicate checkboxes map to one package in that
+requirements must pass. **Bug bash (owner, 2026-07-22): no item is 100%
+until at least two different agents have each spent 30+ focused minutes trying to
+break the finished feature, recorded in `plans/task-log.md`.** Gates prove the maths;
+only an adversarial human-style pass proves the feature works — see the register. Nested/duplicate checkboxes map to one package in that
 register so they cannot be counted as separate progress.
 
 ## Strategy (owner, 2026-07-18)
@@ -327,7 +330,19 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       _(P0-PRASHNA-249-RESEARCH — research done 2026-07-20; findings
       `plans/prashna-249-findings.md`, owner answers `plans/prashna-249-owner-answers.md`.
       **Naming DECIDED:** "कृष्णमूर्ति पद्धति अंक विधि" / "Krishnamurti Paddhati number
-      method" — full name, no "KP" initials. Q1/Q2/Q4/Q5 still open.)_
+      method" — full name, no "KP" initials.
+      **Ruling planets + Moon-sincerity DECIDED:** ship both in v1, not deferred.
+      **Ayanamsa DECIDED 2026-07-22: option C — Prashna runs on KP ayanamsa.**
+      Implementation must **parameterize, not replace**: default KP, keep the Lahiri
+      path and its existing 198-value EXACT baseline locked, add a second locked KP
+      baseline, so the regression net survives the switch. The 24 self-tests are
+      Drik/Lahiri-anchored (`prashna-calc.js:354` asserts 24°13.3′ ±2′) and will fail
+      under KP **by design** — do not widen the tolerance; source separate KP anchors
+      via P0-PRASHNA-249-KSK-VERIFY. Screen copy at `PrashnaScreen.tsx:472` claims
+      Lahiri/Drik conventions and becomes false. Accepted trade-off: Daily and Prashna
+      will differ ~11 min on nakshatra transitions — must be disclosed on screen, not
+      left to look like a bug. Tithi unaffected, so no festival content changes.
+      Q1 and Q5 still open.)_
 - [ ] **P0 — Understand users without login (research DONE, execution pending).**
       Owner blocker: "can't tell who the users are or how they navigate without
       signup." Research says login is **not** the blocker and would not solve it —

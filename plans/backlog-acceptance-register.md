@@ -17,6 +17,31 @@ task-log and backlog evidence are updated; changes are reviewed, committed, push
 and, for a go-live item, verified on production. Religious, predictive, legal and
 medical claims also require cited sources and clearly stated conventions/limits.
 
+### Bug bash — required before any row is marked 100% (owner, 2026-07-22)
+
+**No row reaches 100% until at least two different agents have each spent a minimum
+of 30 focused minutes trying to break the finished feature**, independently, after
+the gates are green.
+
+- **At least two agents, working separately.** Not one agent twice. Different agents
+  probe differently, and the second pass consistently finds what the first missed.
+- **30 minutes minimum each**, of adversarial use — not a re-run of the gates.
+- **Break it, don't confirm it.** Wrong/edge locations and dates, both languages,
+  phone and desktop, empty and extreme inputs, rapid taps, reload mid-flow, back
+  button, direct URLs, stale URL state, high latitudes, DST boundaries, month/year
+  ends, leap and adhik months.
+- **Record it** in `plans/task-log.md`: who, how long, what was tried, what was
+  found. A bug bash that found nothing must say what was attempted, or it is not
+  evidence.
+- **Anything found is fixed or explicitly logged and accepted by the owner** before
+  the row closes.
+
+Rationale: our gates prove the maths and the wiring, and they have repeatedly passed
+while the app was visibly broken to a human — the `useState`-not-imported crash, the
+`2th house` copy, the CORS header that made the shared secret unusable from a
+browser. None of those were catchable by a gate. **Gates prove code correctness;
+only a human-style pass proves the feature works.**
+
 Percentages are rounded implementation estimates, not confidence scores. AI time is
 focused execution time and excludes external waiting.
 
