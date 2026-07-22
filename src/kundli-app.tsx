@@ -4,6 +4,8 @@ import PrashnaScreen from "./screens/PrashnaScreen";
 import ChartScreen from "./screens/ChartScreen";
 import DailyScreen from "./screens/DailyScreen";
 import FestivalGuideScreen, { festivalGuideFromPath } from "./screens/FestivalGuideScreen";
+import UtilityCalculatorScreen from "./screens/UtilityCalculatorScreen";
+import { utilityFromPath } from "./data/utility-calculators";
 import { FEST_NAME } from "./data/festival-meta";
 import { urlPrefGet, urlPrefSet, urlPrefsPush } from "./components/url-prefs";
 import {
@@ -17,8 +19,9 @@ import {
    GANAK — shell: nav, shared prefs/place, screen compose
    ============================================================ */
 
-function pageHeroCopy(lang, mode, directFestivalGuide) {
+function pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute = null) {
   const hi = lang === "hi";
+  if (utilityRoute) return { eyebrow: hi ? "ज्योतिष कैलकुलेटर" : "ASTROLOGY CALCULATORS", detail: hi ? "स्पष्ट उत्तर · पारदर्शी पद्धति · स्थायी लिंक" : "Clear answers · transparent methods · permanent links" };
   if (directFestivalGuide) {
     const hasFullGuide = Boolean(directFestivalGuide.vidhiKey);
     return {
@@ -79,7 +82,8 @@ export default function KundliApp() {
   const [mode, setMode] = useState(() => { const v = urlPrefGet("screen"); return v === "prashna" || v === "daily" ? v : "daily"; });
   const chooseMode = (v) => { setMode(v); urlPrefSet("screen", v); };
   const directFestivalGuide = festivalGuideFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
-  const hero = pageHeroCopy(lang, mode, directFestivalGuide);
+  const utilityRoute = utilityFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
+  const hero = pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute);
 
   const DEFAULT_PLACE = { label: "New Delhi, India", lat: 28.61, lon: 77.21, zone: "Asia/Kolkata" };
   const placeFromUrl=()=>{const label=urlPrefGet("city"),lat=Number(urlPrefGet("lat")),lon=Number(urlPrefGet("lon")),zone=urlPrefGet("zone");return label&&zone&&Number.isFinite(lat)&&Math.abs(lat)<=90&&Number.isFinite(lon)&&Math.abs(lon)<=180?{label,lat,lon,zone}:null;};
@@ -148,7 +152,7 @@ export default function KundliApp() {
           </p>
         </header>
 
-        {!directFestivalGuide && <div style={{ display: "flex", justifyContent: "center", marginBottom: T.s5 }}>
+        {!directFestivalGuide && !utilityRoute && <div style={{ display: "flex", justifyContent: "center", marginBottom: T.s5 }}>
           <div style={{ display: "inline-flex", background: "#F1E9D5", borderRadius: T.rMd, padding: 3, border: `1px solid ${C.line}` }}>
             {[["daily", lang === "hi" ? "आज · पंचांग" : "Daily"], ["prashna", lang === "hi" ? "प्रश्न" : "Prashna"]].map(([mk, label]) => (
               <button key={mk} onClick={() => chooseMode(mk)} style={{ padding: "9px 26px", borderRadius: T.rSm, fontFamily: T.serif, fontSize: T.fBody, cursor: "pointer", border: "none", background: mode === mk ? C.panel : "transparent", color: mode === mk ? C.gold : C.muted, fontWeight: mode === mk ? 600 : 400, boxShadow: mode === mk ? T.e1 : "none", transition: "all .15s" }}>{label}</button>
@@ -167,15 +171,17 @@ export default function KundliApp() {
           />
         )}
 
-        {!directFestivalGuide && mode === "prashna" && (
+        {utilityRoute && <UtilityCalculatorScreen route={utilityRoute} lang={lang} C={C} card={card} place={panchEff} onPlace={setPanchPlace} />}
+
+        {!directFestivalGuide && !utilityRoute && mode === "prashna" && (
           <PrashnaScreen lat={panchEff?.lat} lon={panchEff?.lon} placeLabel={panchEff?.label} lang={lang} />
         )}
 
-        {!directFestivalGuide && mode === "daily" && (
+        {!directFestivalGuide && !utilityRoute && mode === "daily" && (
           <DailyScreen C={C} card={card} lang={lang} place={panchEff} onPlace={setPanchPlace} />
         )}
 
-        {!directFestivalGuide && mode === "chart" && (
+        {!directFestivalGuide && !utilityRoute && mode === "chart" && (
           <ChartScreen C={C} card={card} lang={lang} />
         )}
 
