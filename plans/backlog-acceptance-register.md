@@ -19,12 +19,19 @@ medical claims also require cited sources and clearly stated conventions/limits.
 
 ### Bug bash — required before any row is marked 100% (owner, 2026-07-22)
 
-**No row reaches 100% until at least two different agents have each spent a minimum
-of 30 focused minutes trying to break the finished feature**, independently, after
-the gates are green.
+**No row reaches 100% until the finished feature has been attacked for at least 30
+focused minutes by an agent who did not build it**, after the gates are green.
 
-- **At least two agents, working separately.** Not one agent twice. Different agents
-  probe differently, and the second pass consistently finds what the first missed.
+> **Amended 2026-07-22 (owner):** the original rule said *two* agents. The owner
+> reduced it to **the implementing agent's own verification plus one independent
+> agent**. Note the asymmetry that makes this work: the implementer tests that their
+> change did what they intended, which is verification; the independent agent tests
+> what the implementer did not think of, which is the bug bash. **The independent
+> pass is the one that counts** — so if only one agent is available, it must be the
+> one who did *not* write the code.
+
+- **The independent agent must not be the author.** Different agents probe
+  differently, and the second pass consistently finds what the first missed.
 - **30 minutes minimum each**, of adversarial use — not a re-run of the gates.
 - **Break it, don't confirm it.** Wrong/edge locations and dates, both languages,
   phone and desktop, empty and extreme inputs, rapid taps, reload mid-flow, back
