@@ -11,7 +11,26 @@ Repository sources:
 - `plans/backlog-acceptance-register.md` — status, time, dependencies, acceptance
   criteria and closure evidence.
 - `plans/backlog-sheet-sync.json` — spreadsheet/tab identity plus the technical
-  complexity and exact title/section for every numbered item.
+  complexity and exact title/section for every numbered item; quality-column
+  defaults and evidence-backed overrides.
+
+Every live backlog row has five quality-visibility columns after the existing ten:
+
+1. **Delivery state** — distinguishes delivered, in progress, not started, launch
+   baseline/ongoing, and built locally but not publicly delivered.
+2. **Limitations / pending work** — never hide a known constraint behind “Done.”
+3. **Short-term impact** — what the limitation means for users or operations now.
+4. **Long-term impact** — scaling, reliability, maintenance or dependency cost if
+   it remains unresolved.
+5. **Bug-bash status / evidence** — `Not completed`, `In progress`, or `Completed`
+   with a task-log/run reference. Normal gates and an implementer's smoke check do
+   not silently count as a distinct bug bash.
+
+These columns make quality visible; they do not create a universal bug-bash closure
+rule. A bug bash blocks completion only when that backlog row's acceptance criteria
+requires it. When a row has a non-default delivery condition, limitation, impact or
+bug-bash result, add/update its full entry in `qualityOverrides` rather than relying
+on a generic derived value.
 
 Publisher:
 
@@ -61,7 +80,8 @@ the first green workflow run.
 ## Agent closeout procedure
 
 1. Edit only the assigned row in `plans/backlog-acceptance-register.md`.
-2. For a new item, renamed item, section move or complexity change, also update
+2. For a new item, renamed item, section move, complexity change, delivered-with-
+   limitations state, changed impact, or bug-bash result, also update
    `plans/backlog-sheet-sync.json`.
 3. Run:
 

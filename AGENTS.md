@@ -76,9 +76,12 @@ assertions. If a gate fails, fix the cause — never weaken a gate to pass it
 - **Standing Google Sheet closeout policy (owner, 2026-07-21; automated
   2026-07-22):** after every finished backlog slice, update the matching assigned
   row in `plans/backlog-acceptance-register.md`; update
-  `plans/backlog-sheet-sync.json` as well for a new/renamed/moved item or complexity
-  change. Record current progress, remaining time, dependencies and concrete
-  closure evidence. Run `node scripts/sync-backlog-sheet.mjs --check`, then commit
+  `plans/backlog-sheet-sync.json` as well for a new/renamed/moved item, complexity
+  change, delivery limitation, short/long-term impact or bug-bash result. Record
+  current progress, remaining time, dependencies, concrete closure evidence and any
+  limitation honestly; “built locally” is not “publicly delivered.” A smoke test or
+  normal gate is not a bug bash unless a distinct adversarial pass is recorded. Run
+  `node scripts/sync-backlog-sheet.mjs --check`, then commit
   and push. GitHub Actions publishes commit-changed cells to **Ganak — Open Backlog
   Acceptance Register**; agents do not need Google credentials. A failed/missing
   sync is a closeout blocker. If anything remains, name it and do **not** mark the

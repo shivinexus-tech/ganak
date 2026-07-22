@@ -8,24 +8,36 @@ const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md
 const base = parseRegister(markdown, config, "test base");
 
 assert.equal(base.rows.size, 57);
-assert.equal(sheetRow(base.rows.get("1")).length, 10);
+assert.equal(sheetRow(base.rows.get("1")).length, 15);
+assert.equal(base.rows.get("5").quality.deliveryState, "Built and tested locally — not publicly delivered");
+assert.match(base.rows.get("5").quality.limitations, /Not deployed/);
+assert.match(base.rows.get("5").quality.shortTermImpact, /External developers cannot use/);
+assert.match(base.rows.get("5").quality.longTermImpact, /quota enforcement unreliable/);
+assert.match(base.rows.get("5").quality.bugBashStatus, /Not completed/);
+
+const legacyConfig = structuredClone(config);
+delete legacyConfig.qualityColumns;
+delete legacyConfig.qualityDefaults;
+delete legacyConfig.qualityOverrides;
+const legacyBase = parseRegister(markdown, legacyConfig, "legacy quality-free base");
+assert.equal(sheetRow(legacyBase.rows.get("1")).slice(10).every((value) => value === ""), true);
 
 const changedMarkdown = markdown
   .split(/(\r?\n)/)
   .map((part) => {
-    if (!part.startsWith("| 1 | Approved utility-calculator catalogue |")) return part;
+    if (!part.startsWith("| 3 | Expose and polish all built Jyotish panels |")) return part;
     const cells = part.split("|");
-    cells[4] = " 21% ";
+    cells[4] = " 61% ";
     return cells.join("|");
   })
   .join("");
-assert.notEqual(changedMarkdown, markdown, "test fixture must change backlog item 1");
+assert.notEqual(changedMarkdown, markdown, "test fixture must change backlog item 3");
 const head = parseRegister(changedMarkdown, config, "test head");
 
 function makeLive(parsed) {
   const liveById = new Map();
   const liveBySection = new Map(config.tabs.map((tab) => [tab.section, [
-    ["#", "Backlog item", "Effort", "Technical / coding complexity", "Progress", "Remaining AI time", "Dependencies", "Why it may take longer", "Acceptance criteria", "Definition of done / closure evidence"],
+    ["#", "Backlog item", "Effort", "Technical / coding complexity", "Progress", "Remaining AI time", "Dependencies", "Why it may take longer", "Acceptance criteria", "Definition of done / closure evidence", "Delivery state", "Limitations / pending work", "Short-term impact", "Long-term impact", "Bug-bash status / evidence"],
   ]]));
   for (const tab of config.tabs) {
     let rowNumber = 2;
@@ -43,7 +55,7 @@ const live = makeLive(base);
 const changes = buildChanges(base, head, live, config);
 assert.deepEqual(
   changes.map(({ kind, sheetIndex, value }) => ({ kind, sheetIndex, value })),
-  [{ kind: "cell", sheetIndex: 4, value: "21%" }],
+  [{ kind: "cell", sheetIndex: 4, value: "61%" }],
   "a progress edit must target only Sheet column E",
 );
 
@@ -54,16 +66,16 @@ const staleBaseline = makeLive(head);
 staleBaseline.liveById.get("1").cells[4] = "20%";
 assert.deepEqual(
   buildBootstrapChanges(head, staleBaseline).map(({ kind, liveRow, sheetIndex, value }) => ({ kind, id: liveRow.id, sheetIndex, value })),
-  [{ kind: "cell", id: "1", sheetIndex: 4, value: "21%" }],
+  [{ kind: "cell", id: "1", sheetIndex: 4, value: "100%" }],
   "an explicitly requested bootstrap must identify every stale live cell against the repository",
 );
 assert.deepEqual(buildBootstrapChanges(head, alreadyPublished), [], "bootstrap must be idempotent after alignment");
 
 const conflicted = makeLive(base);
-conflicted.liveById.get("1").cells[4] = "19%";
+conflicted.liveById.get("3").cells[4] = "59%";
 assert.throws(
   () => buildChanges(base, head, conflicted, config),
-  /Conflict for ID 1, Progress/,
+  /Conflict for ID 3, Progress/,
   "a third live value must fail rather than be overwritten",
 );
 
@@ -90,4 +102,4 @@ assert.equal(
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 
-console.log("Backlog Sheet sync gate: PASS — 57 rows; changed-cell targeting, idempotence, conflict refusal, metadata guard and explicit bootstrap planning verified.");
+console.log("Backlog Sheet sync gate: PASS — 57 rows; 15-column quality contract, API limitation/impact disclosure, changed-cell targeting, idempotence, conflict refusal, metadata guard and explicit bootstrap planning verified.");

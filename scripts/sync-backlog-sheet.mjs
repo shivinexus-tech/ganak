@@ -33,6 +33,19 @@ const SHEET_COLUMNS = [
   "Why it may take longer",
   "Acceptance criteria",
   "Definition of done / closure evidence",
+  "Delivery state",
+  "Limitations / pending work",
+  "Short-term impact",
+  "Long-term impact",
+  "Bug-bash status / evidence",
+];
+
+const QUALITY_KEYS = [
+  "deliveryState",
+  "limitations",
+  "shortTermImpact",
+  "longTermImpact",
+  "bugBashStatus",
 ];
 
 const LOCAL_TO_SHEET_COLUMN = [0, 1, 2, 4, 5, 6, 7, 8, 9];
@@ -79,6 +92,61 @@ function splitMarkdownRow(line) {
   return cells;
 }
 
+function resolveQuality(cells, config, id) {
+  if (!config.qualityColumns) {
+    return Object.fromEntries(QUALITY_KEYS.map((key) => [key, ""]));
+  }
+  const actualKeys = config.qualityColumns.map((column) => column.key);
+  const actualHeaders = config.qualityColumns.map((column) => column.header);
+  if (JSON.stringify(actualKeys) !== JSON.stringify(QUALITY_KEYS)) {
+    fail(`Quality column keys are ${actualKeys.join(", ")}; expected ${QUALITY_KEYS.join(", ")}`);
+  }
+  if (JSON.stringify(actualHeaders) !== JSON.stringify(SHEET_COLUMNS.slice(10))) {
+    fail("Quality column headers do not match the published Sheet contract");
+  }
+
+  const defaults = config.qualityDefaults || {};
+  const override = config.qualityOverrides?.[id];
+  if (override) {
+    const missing = QUALITY_KEYS.filter((key) => !normalizeCell(override[key]).trim());
+    if (missing.length) fail(`Quality override for ID ${id} is missing: ${missing.join(", ")}`);
+    return Object.fromEntries(QUALITY_KEYS.map((key) => [key, normalizeCell(override[key])]));
+  }
+
+  const progress = normalizeCell(cells[3]);
+  const remaining = normalizeCell(cells[4]);
+  const dependencies = normalizeCell(cells[5]);
+  const delayReason = normalizeCell(cells[6]);
+  const isDelivered = progress === "100%" || remaining === "Done";
+  const isBaselineOngoing = /baseline complete/i.test(progress);
+  const isNotStarted = /^0(?:%|\b)/.test(progress);
+  const deliveryState = isDelivered
+    ? "Delivered"
+    : isBaselineOngoing
+      ? "Launch baseline delivered — ongoing"
+      : isNotStarted
+        ? "Not started"
+        : "In progress";
+
+  if (isDelivered) {
+    return {
+      deliveryState,
+      limitations: defaults.deliveredLimitations,
+      shortTermImpact: defaults.deliveredShortTermImpact,
+      longTermImpact: defaults.deliveredLongTermImpact,
+      bugBashStatus: defaults.deliveredBugBashStatus,
+    };
+  }
+
+  return {
+    deliveryState,
+    limitations: `Open: ${dependencies || "No dependency recorded"}. ${delayReason || "No delay reason recorded."}`,
+    shortTermImpact: defaults.openShortTermImpact,
+    longTermImpact: defaults.openLongTermImpact,
+    bugBashStatus: defaults.openBugBashStatus,
+  };
+}
+
 function parseRegister(markdown, config, sourceLabel, options = {}) {
   const tabsBySection = new Map(config.tabs.map((tab) => [tab.section, tab]));
   const rows = new Map();
@@ -114,7 +182,12 @@ function parseRegister(markdown, config, sourceLabel, options = {}) {
       fail(`${sourceLabel}: ID ${id} has no technical complexity`);
     }
 
-    const row = { id, section, localCells: cells, metadata };
+    const quality = resolveQuality(cells, config, id);
+    const missingQuality = QUALITY_KEYS.filter((key) => !normalizeCell(quality[key]).trim());
+    if (config.qualityColumns && missingQuality.length) {
+      fail(`${sourceLabel}: quality fields missing for ID ${id}: ${missingQuality.join(", ")}`);
+    }
+    const row = { id, section, localCells: cells, metadata, quality };
     rows.set(id, row);
     rowsBySection.get(section).push(row);
   }
@@ -144,6 +217,7 @@ function sheetRow(row) {
     row.localCells[2],
     row.metadata.technicalComplexity,
     ...row.localCells.slice(3),
+    ...QUALITY_KEYS.map((key) => row.quality[key]),
   ];
 }
 
@@ -223,7 +297,7 @@ async function readLiveSheet(config) {
   }
 
   const params = new URLSearchParams();
-  for (const tab of config.tabs) params.append("ranges", `${a1SheetName(tab.sheetName)}!A1:J1000`);
+  for (const tab of config.tabs) params.append("ranges", `${a1SheetName(tab.sheetName)}!A1:O1000`);
   params.set("majorDimension", "ROWS");
   params.set("valueRenderOption", "FORMATTED_VALUE");
   const response = await sheetsRequest(config, `/values:batchGet?${params}`);
@@ -302,6 +376,19 @@ function buildChanges(base, head, live, config) {
         changes.push({ kind: "cell", liveRow, sheetIndex: 3, value: newComplexity });
       }
     }
+
+    QUALITY_KEYS.forEach((key, qualityIndex) => {
+      const sheetIndex = 10 + qualityIndex;
+      const oldValue = normalizeCell(before.quality[key]);
+      const newValue = normalizeCell(after.quality[key]);
+      if (oldValue === newValue) return;
+      const liveValue = liveRow.cells[sheetIndex];
+      if (liveValue === newValue) return;
+      if (liveValue !== oldValue) {
+        fail(`Conflict for ID ${id}, ${SHEET_COLUMNS[sheetIndex]}: Git base is “${oldValue}”, Git head is “${newValue}”, live Sheet is “${liveValue}”`);
+      }
+      changes.push({ kind: "cell", liveRow, sheetIndex, value: newValue });
+    });
   }
   return changes;
 }
@@ -353,7 +440,7 @@ async function applyChanges(changes, live, config) {
     const rowNumber = nextAppendRow.get(tab.section);
     nextAppendRow.set(tab.section, rowNumber + 1);
     data.push({
-      range: `${a1SheetName(tab.sheetName)}!A${rowNumber}:J${rowNumber}`,
+      range: `${a1SheetName(tab.sheetName)}!A${rowNumber}:O${rowNumber}`,
       values: [sheetRow(change.after)],
     });
   }

@@ -1,8 +1,48 @@
 {
-  "version": 1,
+  "version": 2,
   "spreadsheetId": "1ZNHtQqfLJ2smeG5QLbO46wBKYetqYuGHW0AQyGOtRSk",
   "spreadsheetTitle": "Ganak — Open Backlog Acceptance Register",
   "oauthScope": "https://www.googleapis.com/auth/spreadsheets",
+  "qualityColumns": [
+    {
+      "key": "deliveryState",
+      "header": "Delivery state"
+    },
+    {
+      "key": "limitations",
+      "header": "Limitations / pending work"
+    },
+    {
+      "key": "shortTermImpact",
+      "header": "Short-term impact"
+    },
+    {
+      "key": "longTermImpact",
+      "header": "Long-term impact"
+    },
+    {
+      "key": "bugBashStatus",
+      "header": "Bug-bash status / evidence"
+    }
+  ],
+  "qualityDefaults": {
+    "deliveredLimitations": "None currently recorded.",
+    "deliveredShortTermImpact": "No known delivery limitation is currently recorded.",
+    "deliveredLongTermImpact": "Reopen if production monitoring, user feedback or regression gates reveal a problem.",
+    "deliveredBugBashStatus": "Not recorded — completion evidence may include verification, but no distinct bug-bash closeout is linked.",
+    "openShortTermImpact": "This capability remains incomplete or unavailable until its acceptance criteria pass.",
+    "openLongTermImpact": "If left unresolved, this capability remains unavailable and may continue blocking dependent work.",
+    "openBugBashStatus": "Not completed — bug-bash occurs after an implementation is ready to challenge."
+  },
+  "qualityOverrides": {
+    "5": {
+      "deliveryState": "Built and tested locally — not publicly delivered",
+      "limitations": "Not deployed; keys are stored in an environment variable and require a restart to rotate; quotas are in memory per process and reset on restart; multiple instances would each grant a full quota; engines are bundled at startup (~1 second); no datastore, key self-service, usage dashboard, SDK or developer portal.",
+      "shortTermImpact": "External developers cannot use the API yet. Local and single-instance testing works, but key rotation is manual and there is no production URL or production monitoring.",
+      "longTermImpact": "Public scale would make quota enforcement unreliable across instances and restarts, increase manual key-management work and weaken abuse/capacity visibility until shared storage, deployment and monitoring are added.",
+      "bugBashStatus": "Not completed — an uncommitted adversarial test exists, but there is no independent completed bug-bash record or production test evidence yet."
+    }
+  },
   "tabs": [
     {
       "section": "P0",
