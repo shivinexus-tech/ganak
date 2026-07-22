@@ -10,6 +10,15 @@ on:
       - .github/workflows/sync-backlog-sheet.yml
   workflow_dispatch:
     inputs:
+      operation:
+        description: Incremental sync, inspect stale baseline cells, or explicitly align the initial baseline
+        required: true
+        default: incremental
+        type: choice
+        options:
+          - incremental
+          - bootstrap-plan
+          - bootstrap-apply
       base_sha:
         description: Trusted earlier Git revision for an explicitly reviewed recovery replay
         required: false
@@ -65,7 +74,13 @@ jobs:
             echo "BACKLOG_SYNC_BASE_SHA=$(git rev-parse HEAD^)" >> "$GITHUB_ENV"
           fi
 
-      - name: Publish commit-changed cells
+      - name: Publish or inspect backlog cells
         env:
           GOOGLE_SHEETS_ACCESS_TOKEN: ${{ steps.google-auth.outputs.access_token }}
-        run: node scripts/sync-backlog-sheet.mjs --sync
+          OPERATION: ${{ inputs.operation }}
+        run: |
+          case "$OPERATION" in
+            bootstrap-plan) node scripts/sync-backlog-sheet.mjs --bootstrap-plan ;;
+            bootstrap-apply) node scripts/sync-backlog-sheet.mjs --bootstrap-sync ;;
+            *) node scripts/sync-backlog-sheet.mjs --sync ;;
+          esac

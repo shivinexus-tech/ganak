@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-import { buildChanges, parseRegister, sheetRow } from "../scripts/sync-backlog-sheet.mjs";
+import { buildBootstrapChanges, buildChanges, parseRegister, sheetRow } from "../scripts/sync-backlog-sheet.mjs";
 
 const config = JSON.parse(await readFile(new URL("../plans/backlog-sheet-sync.json", import.meta.url), "utf8"));
 const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md", import.meta.url), "utf8");
@@ -50,6 +50,15 @@ assert.deepEqual(
 const alreadyPublished = makeLive(head);
 assert.deepEqual(buildChanges(base, head, alreadyPublished, config), [], "an already-published change must be idempotent");
 
+const staleBaseline = makeLive(head);
+staleBaseline.liveById.get("1").cells[4] = "20%";
+assert.deepEqual(
+  buildBootstrapChanges(head, staleBaseline).map(({ kind, liveRow, sheetIndex, value }) => ({ kind, id: liveRow.id, sheetIndex, value })),
+  [{ kind: "cell", id: "1", sheetIndex: 4, value: "21%" }],
+  "an explicitly requested bootstrap must identify every stale live cell against the repository",
+);
+assert.deepEqual(buildBootstrapChanges(head, alreadyPublished), [], "bootstrap must be idempotent after alignment");
+
 const conflicted = makeLive(base);
 conflicted.liveById.get("1").cells[4] = "19%";
 assert.throws(
@@ -81,4 +90,4 @@ assert.equal(
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 
-console.log("Backlog Sheet sync gate: PASS — 57 rows; changed-cell targeting, idempotence, conflict refusal and metadata guard verified.");
+console.log("Backlog Sheet sync gate: PASS — 57 rows; changed-cell targeting, idempotence, conflict refusal, metadata guard and explicit bootstrap planning verified.");

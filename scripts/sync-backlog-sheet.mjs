@@ -306,6 +306,37 @@ function buildChanges(base, head, live, config) {
   return changes;
 }
 
+function buildBootstrapChanges(head, live) {
+  const changes = [];
+
+  for (const id of live.liveById.keys()) {
+    if (!head.rows.has(id)) fail(`Live Sheet contains unexpected backlog ID ${id}; reconcile it explicitly before bootstrapping`);
+  }
+
+  for (const [id, row] of head.rows) {
+    const liveRow = live.liveById.get(id);
+    if (!liveRow) fail(`Live Sheet is missing backlog ID ${id}; bootstrap will not guess row placement`);
+    if (liveRow.section !== row.section) {
+      fail(`Backlog ID ${id} is in ${liveRow.section} live but ${row.section} in Git; bootstrap will not move rows`);
+    }
+    const wanted = sheetRow(row);
+    wanted.forEach((value, sheetIndex) => {
+      const normalized = normalizeCell(value);
+      if (liveRow.cells[sheetIndex] === normalized) return;
+      changes.push({ kind: "cell", liveRow, sheetIndex, value: normalized });
+    });
+  }
+
+  return changes;
+}
+
+function printBootstrapPlan(changes) {
+  console.log(`Backlog Sheet bootstrap plan: ${changes.length} stale cell${changes.length === 1 ? "" : "s"} would be aligned to the repository register.`);
+  for (const change of changes) {
+    console.log(`- ID ${change.liveRow.id} · ${SHEET_COLUMNS[change.sheetIndex]} · ${change.liveRow.sheetName}!${columnLetter(change.sheetIndex)}${change.liveRow.rowNumber}`);
+  }
+}
+
 async function applyChanges(changes, live, config) {
   const data = [];
   const nextAppendRow = new Map(
@@ -341,7 +372,13 @@ async function applyChanges(changes, live, config) {
 
 async function main() {
   const args = new Set(process.argv.slice(2));
-  const mode = args.has("--sync") ? "sync" : "check";
+  const mode = args.has("--bootstrap-sync")
+    ? "bootstrap-sync"
+    : args.has("--bootstrap-plan")
+      ? "bootstrap-plan"
+      : args.has("--sync")
+        ? "sync"
+        : "check";
   const config = JSON.parse(await readFile(CONFIG_URL, "utf8"));
   const headMarkdown = await readFile(REGISTER_URL, "utf8");
   const head = parseRegister(headMarkdown, config, "working register");
@@ -349,6 +386,14 @@ async function main() {
   if (config.oauthScope !== SHEETS_SCOPE) fail(`Unexpected OAuth scope in config: ${config.oauthScope}`);
   console.log(`Backlog register check: ${head.rows.size} rows across ${config.tabs.length} tabs; IDs, titles, sections and technical complexities are complete.`);
   if (mode === "check") return;
+
+  const live = await readLiveSheet(config);
+  if (mode === "bootstrap-plan" || mode === "bootstrap-sync") {
+    const changes = buildBootstrapChanges(head, live);
+    printBootstrapPlan(changes);
+    if (mode === "bootstrap-sync") await applyChanges(changes, live, config);
+    return;
+  }
 
   const baseSha = process.env.BACKLOG_SYNC_BASE_SHA;
   if (!baseSha || !/^[0-9a-f]{7,40}$/i.test(baseSha)) {
@@ -363,12 +408,11 @@ async function main() {
     // comparison, while the new metadata supplies complexity and tab mapping.
     allowMetadataTitleMismatch: !baseConfigText,
   });
-  const live = await readLiveSheet(config);
   const changes = buildChanges(base, head, live, config);
   await applyChanges(changes, live, config);
 }
 
-export { buildChanges, parseRegister, sheetRow };
+export { buildBootstrapChanges, buildChanges, parseRegister, sheetRow };
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((error) => {

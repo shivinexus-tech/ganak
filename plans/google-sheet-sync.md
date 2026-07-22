@@ -27,6 +27,12 @@ An explicitly reviewed failed batch can be replayed with the manual workflow's
 `base_sha` input. This is a recovery control, not a full-sheet overwrite: the same
 three-way conflict checks still apply to every changed cell.
 
+The manual workflow also has `bootstrap-plan` and `bootstrap-apply` operations for
+the one-time initial baseline only. Plan lists every stale cell without writing;
+apply aligns those listed cells to the reviewed repository register. It refuses
+unknown IDs, missing rows and tab moves. Routine agent runs must use the default
+incremental operation, which retains three-way conflict protection.
+
 ## Google/GitHub connection
 
 The automation uses **Workload Identity Federation**. GitHub stores no Google
