@@ -17,13 +17,19 @@ export type CalendarConvention = {
 
 export const DEFAULT_REGIONAL_CALENDAR_FLAGS: RegionalCalendarFlags = { tamilSolar:true, bengaliSolar:true };
 
+/* Retired convention ids that still resolve, so old links keep working.
+   "amanta" was a separate switch that produced output identical to the default
+   (both read months.amanta and render the same string), so it was merged away
+   2026-07-22 rather than left as a duplicate choice. It maps SILENTLY — no
+   "unsupported mode" warning — because the user sees exactly what they asked for. */
+const CONVENTION_ALIASES: Record<string, CalendarConventionId> = { amanta: "canonical" };
+
 export const CALENDAR_CONVENTIONS: CalendarConvention[] = [
   /* "Ganak default" alone told users nothing — it named the app, not the reckoning.
      The default IS the amanta lunar month, so the label now says so and keeps the
      "(Ganak default)" tag to mark which option is selected out of the box. */
   { id:"canonical", en:"Amanta lunar (Ganak default)", hi:"अमान्त चान्द्र (गणक मानक)", region:"Pan-Indian", enabled:true },
   { id:"gregorian", en:"Gregorian", hi:"ग्रेगोरियन", region:"Civil calendar", enabled:true },
-  { id:"amanta", en:"Amanta lunar", hi:"अमान्त चान्द्र", region:"Western & Southern India", enabled:true },
   { id:"north-purnimanta", en:"Purnimanta lunar", hi:"पूर्णिमान्त चान्द्र", region:"Northern India", enabled:true },
   { id:"tamil-solar", en:"Tamil solar · Thirukanitha", hi:"तमिल सौर · तिरुकणित", native:"தமிழ் சூரிய · திருக்கணிதம்", region:"Tamil Nadu", enabled:true, flag:"tamilSolar", policy:"Lahiri sidereal ingress; Tamil sunset rule" },
   { id:"bengali-solar", en:"Bengali solar · Vishuddha Siddhanta", hi:"बंगाली सौर · विशुद्ध सिद्धान्त", native:"বাংলা সৌর · বিশুদ্ধ সিদ্ধান্ত", region:"West Bengal", enabled:true, flag:"bengaliSolar", policy:"Lahiri sidereal ingress; Bengal next-sunrise rule" },
@@ -113,7 +119,6 @@ export function conventionIsEnabled(id:CalendarConventionId,flags:RegionalCalend
 export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: number, lang: "hi" | "en", place?:Place) {
   if (id === "gregorian") return new Date(atMs+(panchang.tz||0)*3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-IN", { day:"numeric", month:"long", year:"numeric", timeZone:"UTC" });
   const lunarDay=`${panchang.paksha} ${panchang.tithiNum}`;
-  if (id === "amanta") return lang === "hi" ? `अमान्त · ${panchang.months.amanta} · ${lunarDay}` : `Amanta · ${panchang.months.amanta} · ${lunarDay}`;
   if (id === "north-purnimanta") return lang === "hi" ? `पूर्णिमान्त · ${panchang.months.purnimanta} · ${lunarDay}` : `Purnimanta · ${panchang.months.purnimanta} · ${lunarDay}`;
   if((id==="tamil-solar"||id==="bengali-solar")&&place){
     const d=regionalCalendarDate(id,panchang,atMs,place);
@@ -121,17 +126,19 @@ export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: num
     const suffix=id==="tamil-solar"?(lang==="hi"?"तिरुकणित तमिल सौर":"Tamil solar · Thirukanitha"):(lang==="hi"?"विशुद्ध सिद्धान्त बंगाली सौर":"Bengali solar · Vishuddha Siddhanta");
     return `${d.monthNative} · ${month} ${d.day}, ${d.year} · ${suffix}`;
   }
-  /* Default renders the full amanta form (month + paksha + tithi), same as the
-     explicit "amanta" mode. The old short form said "Ganak default · Ashadha",
-     which led with branding and dropped the lunar day. */
+  /* Default = amanta (month + paksha + tithi). The old short form said
+     "Ganak default · Ashadha", which led with branding and dropped the lunar day.
+     The separate "amanta" switch rendered this identical string and was merged
+     into the default; its id still resolves here via CONVENTION_ALIASES. */
   return lang === "hi" ? `अमान्त · ${panchang.months.amanta} · ${lunarDay}` : `Amanta · ${panchang.months.amanta} · ${lunarDay}`;
 }
 
 export function safeConvention(value: string | null,flags:RegionalCalendarFlags=DEFAULT_REGIONAL_CALENDAR_FLAGS): CalendarConventionId { return resolveConvention(value,flags).id; }
 
 export function resolveConvention(value: string | null,flags:RegionalCalendarFlags=DEFAULT_REGIONAL_CALENDAR_FLAGS): { id:CalendarConventionId; recoveredFrom:string | null; reason:"unknown" | "disabled" | null } {
-  if (!value || value === "canonical") return { id:"canonical", recoveredFrom:null, reason:null };
-  const match=CALENDAR_CONVENTIONS.find(x=>x.id===value);
+  const resolved = value && CONVENTION_ALIASES[value] ? CONVENTION_ALIASES[value] : value;
+  if (!resolved || resolved === "canonical") return { id:"canonical", recoveredFrom:null, reason:null };
+  const match=CALENDAR_CONVENTIONS.find(x=>x.id===resolved);
   if (match && conventionIsEnabled(match.id,flags)) return { id:match.id, recoveredFrom:null, reason:null };
   return { id:"canonical", recoveredFrom:value, reason:match ? "disabled" : "unknown" };
 }

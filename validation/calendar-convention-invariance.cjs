@@ -25,7 +25,28 @@ for(const city of CITIES) for(let i=0;i<15;i++){
 }
 if(safeConvention('not-a-mode')!=='canonical') { console.error('FAIL unsupported-mode fallback'); failures++; }
 const enabled=CALENDAR_CONVENTIONS.filter(x=>x.enabled).map(x=>x.id);
-for(const required of ['canonical','gregorian','amanta','north-purnimanta','tamil-solar','bengali-solar']) if(!enabled.includes(required)) { console.error(`FAIL ${required}: supported switch missing`); failures++; }
+/* The visible switch list. "amanta" was merged into the default 2026-07-22 — it
+   produced a byte-identical label, so offering both was a duplicate choice. */
+for(const required of ['canonical','gregorian','north-purnimanta','tamil-solar','bengali-solar']) if(!enabled.includes(required)) { console.error(`FAIL ${required}: supported switch missing`); failures++; }
+if(enabled.includes('amanta')) { console.error('FAIL amanta: merged into the default, must not reappear as a separate switch'); failures++; }
+/* Retired ids must still resolve SILENTLY so shared/bookmarked links keep working
+   and never show an "unsupported mode" warning for output we still produce. */
+for(const [retired,expect] of [['amanta','canonical']]){
+  const r=resolveConvention(retired);
+  if(r.id!==expect||r.recoveredFrom!==null||r.reason!==null) { console.error(`FAIL ${retired}: retired id must resolve silently to ${expect} (got ${JSON.stringify(r)})`); failures++; }
+}
+/* Duplicate guard: no two offered conventions may render the same label. This is
+   the check that would have caught the canonical/amanta duplicate before a user
+   did — two switches that produce an identical string are one switch. */
+for(const city of CITIES) for(const lang of ['en','hi']){
+  const p=computeTodayPanchang(city,'lahiri',Date.UTC(2026,6,23,6,30));
+  const seen=new Map();
+  for(const mode of CALENDAR_CONVENTIONS){
+    const label=calendarLabel(mode.id,p,p.rise,lang,city);
+    if(seen.has(label)) { console.error(`FAIL ${city.label}/${lang}: "${mode.id}" and "${seen.get(label)}" render the identical label ${JSON.stringify(label)}`); failures++; }
+    seen.set(label,mode.id);
+  }
+}
 for(const [dark,flags] of [['tamil-solar',{tamilSolar:false,bengaliSolar:true}],['bengali-solar',{tamilSolar:true,bengaliSolar:false}]]) { const r=resolveConvention(dark,flags); if(r.id!=='canonical'||r.recoveredFrom!==dark||r.reason!=='disabled') { console.error(`FAIL ${dark}: independent runtime recovery missing`); failures++; } }
 const daily=fs.readFileSync('src/screens/DailyScreen.tsx','utf8');
 if(!/urlPrefPush\("cal",\s*next\.id\)/.test(daily)||!/popstate/.test(daily)||!daily.includes('conventionIsEnabled')) { console.error('FAIL calendar mode URL/back-forward wiring missing'); failures++; }
