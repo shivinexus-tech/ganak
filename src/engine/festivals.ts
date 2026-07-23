@@ -163,6 +163,10 @@ const FESTIVALS = [
   { key: "ahoiAshtami", month: 6, krishna: true, tithi: 8, kala: "pradosha" },
   { key: "karvaChauth", month: 6, krishna: true, tithi: 4, kala: "moonrise" },
   { key: "diwali", month: 6, krishna: true, tithi: 15, kala: "pradosha" },
+  // Chhath: only the Sandhya Arghya day is resolved from the panchang (Kartika
+  // Shukla Shashthi prevailing at sunset). The other three days are derived from
+  // it below — see the four-day expansion in scanPanchangCalendar.
+  { key: "chhathSandhyaArghya", month: 7, krishna: false, tithi: 6, kala: "sandhya" },
   { key: "guptNavratriMagha", month: 10, krishna: false, tithi: 1, kala: "pratahkala", selection: "first" },
   { key: "vasantPanchami", month: 10, krishna: false, tithi: 5, kala: "purvahna" },
   { key: "mahaShivaratri", month: 10, krishna: true, tithi: 14, kala: "nishita" },
@@ -206,6 +210,10 @@ function scanDayParts(y, m, day, fallbackTz, place) {
   return {
     y, m, day, tz, noon, rise, set, nextRise, moonrise: undefined, observer: hasObserver ? { lat, lon } : null,
     udaya: [rise, rise + 60000],
+    // Sandhya is the sunset instant, mirroring how udaya is the sunrise instant.
+    // Distinct from pradosha, which is a window straddling sunset: rituals offered
+    // *to the setting Sun* (Chhath's Sandhya Arghya) are decided at sunset itself.
+    sandhya: [set - 60000, set],
     pratahkala: [rise, rise + dayLen / 5],
     purvahna: [rise, rise + 2 * dayLen / 5],
     madhyahna: [rise + 2 * dayLen / 5, rise + 3 * dayLen / 5],
@@ -315,6 +323,21 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
     const ny = nd.getUTCFullYear(), nm = nd.getUTCMonth() + 1, nda = nd.getUTCDate();
     const ntz = (place && place.zone && zoneOffset(place.zone, ny, nm, nda)) ?? tz;
     festivals.push({ key: "rangwaliHoli", ms: Date.UTC(ny, nm - 1, nda, 12) - ntz * 3600000, decidingKala: "day-after-holika" });
+  }
+  // Chhath is one connected four-day observance: Nahay Khay, Kharna, Sandhya
+  // Arghya, Usha Arghya. Only day 3 is resolved from the panchang; the rest are
+  // the adjacent civil days. Deriving them by offset rather than giving each its
+  // own tithi rule is deliberate — in a year with tithi kshaya an independent
+  // Panchami rule can resolve to no day at all and would silently drop Kharna,
+  // while the fast itself is always four unbroken days.
+  const chhath = festivals.find((f) => f.key === "chhathSandhyaArghya");
+  if (chhath) {
+    for (const [delta, key] of [[-2, "chhathNahayKhay"], [-1, "chhathKharna"], [1, "chhathUshaArghya"]]) {
+      const cd = new Date(Date.UTC(chhath.y, chhath.m - 1, chhath.day + delta));
+      const cy = cd.getUTCFullYear(), cm = cd.getUTCMonth() + 1, cda = cd.getUTCDate();
+      const ctz = (place && place.zone && zoneOffset(place.zone, cy, cm, cda)) ?? tz;
+      festivals.push({ key, ms: Date.UTC(cy, cm - 1, cda, 12) - ctz * 3600000, decidingKala: "chhath-day-offset" });
+    }
   }
   for (const f of solarNakshatraFestivalDays(fromMs, tz, days)) festivals.push(f);
   // Vishu (Mesha Sankranti under Kerala's day rule) and the two endpoints of

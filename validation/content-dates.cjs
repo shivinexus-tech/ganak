@@ -79,6 +79,14 @@ const dpAnchors = {
   diwali: '2026-11-08',
   guptNavratriAshadha: '2026-07-15',
   mahaShivaratri: '2026-02-15',
+  // Chhath's four connected days. Day 3 (Sandhya Arghya) is the one resolved from
+  // the panchang — Kartika Shukla Shashthi at sunset, which is the date Drik
+  // publishes as "Chhath Puja". The other three are derived civil-day offsets, so
+  // anchoring all four also guards the expansion against ever going non-contiguous.
+  chhathNahayKhay: '2026-11-13',
+  chhathKharna: '2026-11-14',
+  chhathSandhyaArghya: '2026-11-15',
+  chhathUshaArghya: '2026-11-16',
 };
 let dpFailures = 0;
 for (const [key, exp] of Object.entries(dpAnchors)) {

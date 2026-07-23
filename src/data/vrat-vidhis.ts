@@ -439,7 +439,6 @@ export const VRAT_VIDHI = {
       hi: "वार्षिक व्रत में नहीं।",
     },
   },
-  // TODO: source — Chhath has no calendar festival key yet; data is ready for later wiring.
   chhath: {
     verdict: {
       en: "Chhath is one connected four-day Surya observance: Nahay Khay, Kharna, evening arghya, then dawn arghya and paran. The Shashthi sunset is one stage, not the whole fast.",
@@ -473,3 +472,10 @@ export const VRAT_VIDHI = {
     },
   },
 };
+
+// Chhath appears in the calendar as four dated keys, but it is one connected
+// observance with one vidhi: whichever of the four days a reader opens, they get
+// the whole four-day method, which is exactly what the vidhi text insists on
+// ("the Shashthi sunset is one stage, not the whole fast"). Aliasing here keeps
+// the lookup in the data layer, so no screen needs a Chhath special case.
+for (const k of ["chhathNahayKhay", "chhathKharna", "chhathSandhyaArghya", "chhathUshaArghya"]) VRAT_VIDHI[k] = VRAT_VIDHI.chhath;
