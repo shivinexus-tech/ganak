@@ -131,12 +131,12 @@
     },
     "12": {
       "deliveryState": "Core overlay delivered; UI placement decision open",
-      "limitations": "Empty holiday cards are removed. The off/national/gazetted control still needs an owner-approved discoverable location outside the Daily answer area; final phone/desktop, EN/HI and production verification remain.",
+      "limitations": "Empty holiday cards are removed and live-verified. The off/national/gazetted control still needs an owner-approved discoverable location outside the Daily answer area; its final phone/desktop and EN/HI bug bash remains.",
       "shortTermImpact": "Daily dates without a selected holiday no longer show a distracting empty card. Until placement is decided, users may not discover the overlay control from an empty Daily date.",
       "longTermImpact": "A poor control location could either clutter the primary Panchang answer or make optional government overlays hard to discover.",
       "bugBashStatus": "Required before re-closing this high-impact calendar journey — pending after owner-approved placement is implemented.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-23 · Local code/regression validation; placement and production verification pending",
+      "lastVerified": "2026-07-23 · Production: ordinary date hides empty card; Republic Day still renders",
       "sourceConfidence": "Primary government holiday source; non-religious overlay"
     }
   },
