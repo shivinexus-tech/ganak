@@ -173,7 +173,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       {(() => {
         const p = todayP, DAY = 86400000, dayStart = p.anchor;
         const L2 = lang === "hi" ? "hi" : "en";
-        const obs = observancesFor(p.krishna, p.tithiNum, null, p.dow);
+        const obs = observancesFor(p.krishna, p.tithiDay, null, p.dow);
         const OBS_GLOSS = { ekadashi: { en: "Fasting day for Vishnu", hi: "विष्णु का व्रत" }, purnima: { en: "Full moon", hi: "पूर्ण चंद्र" }, amavasya: { en: "New moon", hi: "नवचंद्र" }, pradosh: { en: "Evening fast for Shiva", hi: "शिव संध्या व्रत" }, sankashti: { en: "Fast for Ganesha", hi: "गणेश व्रत" }, masikShivaratri: { en: "Monthly Shivaratri", hi: "मासिक शिवरात्रि" }, kalashtami: { en: "Kala Bhairava day", hi: "काल भैरव दिवस" } };
         const fastObs = obs.find((o) => o.fasting) || obs[0];
         const nkIdx = NAKSHATRAS.indexOf(p.naks[0].name), nkLord = nkIdx >= 0 ? VIM_LORDS[nkIdx % 9] : null;
@@ -201,7 +201,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                 <span style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.gold }}>{p.tithis[0].name}</span>
                 <span style={{ fontSize: T.fMicro, color: C.muted, fontVariantNumeric: "tabular-nums" }}>{p.tithis[0].end ? (lang === "hi" ? "तक " : "till ") + fmtT(p.tithis[0].end) : ""}</span>
               </div>
-              <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: 2 }}>{p.paksha} · {lang === "hi" ? (p.krishna ? "कृष्ण (क्षीयमान)" : "शुक्ल (वर्धमान)") : (p.krishna ? "waning moon" : "waxing moon")} · {lang === "hi" ? "चंद्र दिवस " + p.tithiNum : "lunar day " + p.tithiNum}</div>
+              <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: 2 }}>{p.paksha} · {lang === "hi" ? (p.krishna ? "कृष्ण (क्षीयमान)" : "शुक्ल (वर्धमान)") : (p.krishna ? "waning moon" : "waxing moon")} · {lang === "hi" ? "चंद्र दिवस " + p.tithiDay : "lunar day " + p.tithiDay}</div>
               {obs.length > 0 && <div style={{ marginTop: 8, display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 11px", borderRadius: T.rMd, background: fastObs.fasting ? "rgba(194,69,30,.08)" : "rgba(168,106,18,.08)", border: "1px solid " + (fastObs.fasting ? C.sindoor : C.gold) + "33" }}>
                 <span style={{ fontSize: T.fSmall, fontWeight: 600, color: fastObs.fasting ? C.sindoor : C.gold }}>{obsLabel(lang, fastObs)}</span>
                 {OBS_GLOSS[fastObs.baseKey || fastObs.key] && <span style={{ fontSize: T.fMicro, color: C.muted }}>· {OBS_GLOSS[fastObs.baseKey || fastObs.key][L2]}</span>}
@@ -713,7 +713,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       {/* today — hero */}
       {(() => {
         const rise = todayP.rise, set = todayP.set;
-        const obs = observancesFor(todayP.krishna, todayP.tithiNum, null, todayP.dow);
+        const obs = observancesFor(todayP.krishna, todayP.tithiDay, null, todayP.dow);
         const note = obs.length
           ? (isToday ? (lang === "hi" ? "आज " : "Today is ") : (lang === "hi" ? "इस तारीख़ को " : "This date is ")) + obsLabel(lang, obs[0]) + (obs[0].fasting ? (lang === "hi" ? " — व्रत का दिन" : " — a fasting day") : "")
           : todayP.naks[0].name + (lang === "hi" ? " नक्षत्र · " : " nakshatra · ") + todayP.tithis[0].name;

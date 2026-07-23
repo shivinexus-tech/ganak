@@ -32,6 +32,8 @@ assert(screen.includes('urlPrefGet("hol")') && screen.includes('urlPrefPush("hol
 assert(screen.includes('holidayDatesForYear(cy, holidayMode)'), 'calendar grid must mark the selected holiday layer');
 assert(card.includes('This never changes the Hindu Panchang calculation'), 'overlay separation must be explicit');
 assert(card.includes('State, bank and local holidays can differ'), 'jurisdiction warning must remain visible');
+assert(card.includes('if (mode === "off" || (yearSupported && holidays.length === 0)) return null;'), 'empty holiday overlays must not render a card');
+assert(!card.includes('No holiday in the selected overlay on this date.'), 'empty holiday copy must not return');
 assert(!/localStorage|sessionStorage/.test(screen + card), 'holiday overlay must not use browser storage');
 
 console.log('HOLIDAY OVERLAY PASSED (3 national + 17 Central gazetted bilingual dates; URL toggle and jurisdiction separation)');

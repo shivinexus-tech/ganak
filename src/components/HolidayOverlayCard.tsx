@@ -8,6 +8,7 @@ export default function HolidayOverlayCard({ isoDate, mode, onMode, lang, C, car
   const L = lang === "hi" ? "hi" : "en";
   const holidays = holidaysForDate(isoDate, mode);
   const yearSupported = Number(isoDate.slice(0, 4)) === INDIA_HOLIDAY_DATASET.year;
+  if (mode === "off" || (yearSupported && holidays.length === 0)) return null;
   return (
     <section aria-label={L === "hi" ? "सरकारी अवकाश ओवरले" : "Government holiday overlay"} style={{ ...card, padding: "14px 16px", marginBottom: 12, borderLeft: "4px solid #315B7D" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -20,7 +21,6 @@ export default function HolidayOverlayCard({ isoDate, mode, onMode, lang, C, car
         </select>
       </div>
       {mode !== "off" && !yearSupported && <div role="status" style={{ marginTop: 10, color: C.muted, fontSize: T.fSmall }}>{L === "hi" ? "इस वर्ष की आधिकारिक सूची अभी गणक में सत्यापित नहीं है। पंचांग की गणना उपलब्ध रहती है।" : "The official list for this year is not yet verified in Ganak. Panchang calculations remain available."}</div>}
-      {yearSupported && mode !== "off" && holidays.length === 0 && <div style={{ marginTop: 10, color: C.muted, fontSize: T.fSmall }}>{L === "hi" ? "इस तारीख़ पर चुने गए ओवरले में कोई अवकाश नहीं है।" : "No holiday in the selected overlay on this date."}</div>}
       {holidays.map((holiday) => <div key={holiday.date + holiday.name.en} style={{ marginTop: 10, padding: "10px 11px", borderRadius: T.rSm, background: "#F2F7FA", border: "1px solid #D4E0E8" }}>
         <div style={{ color: "#284B66", fontFamily: T.serif, fontSize: 15, fontWeight: 600 }}>{holiday.name[L]}</div>
         <div style={{ color: C.muted, fontSize: T.fMicro, marginTop: 3 }}>{holiday.kind === "national" ? (L === "hi" ? "भारत का राष्ट्रीय अवकाश" : "National holiday of India") : (L === "hi" ? "2026 केंद्रीय सरकार राजपत्रित सूची · दिल्ली/नई दिल्ली कार्यालय" : "2026 Central Government gazetted list · Delhi/New Delhi offices")}</div>

@@ -182,12 +182,18 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         production shadow comparison and independent edge kill switches.
   - [ ] Printable/PDF calendar, Google Calendar/calendar-feed export, reminders and
         push integration, with selected city, timezone and language preserved.
-  - [x] Public/national holidays and approved calendar overlays. Shipped 2026-07-22:
+  - [ ] Public/national holidays and approved calendar overlays. Core data and
+        calculation separation shipped 2026-07-22:
         three national dates plus the opt-in 17-date 2026 Central Government
         gazetted layer, explicit jurisdiction/year and moon-notification labels,
         URL-backed toggle, blue collision-safe calendar marks, EN/HI phone/browser
         checks and a permanent source/inventory gate. State, bank and local closures
         remain correctly outside this Central layer rather than being guessed.
+        **UI placement decision parked 2026-07-23:** empty holiday cards are removed.
+        Decide where the off/national/gazetted control belongs so it stays discoverable
+        without occupying the Daily answer area on dates with no selected holiday.
+        Re-test desktop/phone, EN/HI, URL restoration and calendar-marker discovery
+        after that owner-approved placement is implemented.
       _(P0-PANCHANG-CALENDAR-PARITY; owner scope 2026-07-21)_
 - [ ] **P0 before go-live — exceptionally strong festival and vrat completion.**
       Close every festival/vrat gap in the competitor comparison: complete all

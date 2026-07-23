@@ -82,7 +82,9 @@ function computeTodayPanchang(place, ayanamsa = "lahiri", atMs) {
     dateLabel: local.toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }),
     vara: ["Ravivara", "Somavara", "Mangalavara", "Budhavara", "Guruvara", "Shukravara", "Shanivara"][dow],
     tithis, naks, yogasP, karanas, paksha: paksha + " Paksha",
-    elong, tithiNum: tn, krishna: tn >= 15,
+    // `tithiNum` is the zero-based 0..29 astronomy index. UI and observance
+    // rules must use the human-facing 1..15 day within the current paksha.
+    elong, tithiNum: tn, tithiDay: (tn % 15) + 1, krishna: tn >= 15,
     months, samvat, pravishte,
     moonSign: SIGNS[msIdx].split(" ")[0], moonSignEnd: msEnd < dayEnd ? msEnd : null,
     sunSign: SIGNS[Math.floor(sun / 30)].split(" ")[0],
