@@ -18,7 +18,10 @@ export type CalendarConvention = {
 export const DEFAULT_REGIONAL_CALENDAR_FLAGS: RegionalCalendarFlags = { tamilSolar:true, bengaliSolar:true };
 
 export const CALENDAR_CONVENTIONS: CalendarConvention[] = [
-  { id:"canonical", en:"Ganak default", hi:"गणक मानक", region:"Pan-Indian", enabled:true },
+  /* "Ganak default" alone told users nothing — it named the app, not the reckoning.
+     The default IS the amanta lunar month, so the label now says so and keeps the
+     "(Ganak default)" tag to mark which option is selected out of the box. */
+  { id:"canonical", en:"Amanta lunar (Ganak default)", hi:"अमान्त चान्द्र (गणक मानक)", region:"Pan-Indian", enabled:true },
   { id:"gregorian", en:"Gregorian", hi:"ग्रेगोरियन", region:"Civil calendar", enabled:true },
   { id:"amanta", en:"Amanta lunar", hi:"अमान्त चान्द्र", region:"Western & Southern India", enabled:true },
   { id:"north-purnimanta", en:"Purnimanta lunar", hi:"पूर्णिमान्त चान्द्र", region:"Northern India", enabled:true },
@@ -118,7 +121,10 @@ export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: num
     const suffix=id==="tamil-solar"?(lang==="hi"?"तिरुकणित तमिल सौर":"Tamil solar · Thirukanitha"):(lang==="hi"?"विशुद्ध सिद्धान्त बंगाली सौर":"Bengali solar · Vishuddha Siddhanta");
     return `${d.monthNative} · ${month} ${d.day}, ${d.year} · ${suffix}`;
   }
-  return lang === "hi" ? `गणक मानक · ${panchang.months.amanta}` : `Ganak default · ${panchang.months.amanta}`;
+  /* Default renders the full amanta form (month + paksha + tithi), same as the
+     explicit "amanta" mode. The old short form said "Ganak default · Ashadha",
+     which led with branding and dropped the lunar day. */
+  return lang === "hi" ? `अमान्त · ${panchang.months.amanta} · ${lunarDay}` : `Amanta · ${panchang.months.amanta} · ${lunarDay}`;
 }
 
 export function safeConvention(value: string | null,flags:RegionalCalendarFlags=DEFAULT_REGIONAL_CALENDAR_FLAGS): CalendarConventionId { return resolveConvention(value,flags).id; }
