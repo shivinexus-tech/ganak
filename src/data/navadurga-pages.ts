@@ -52,11 +52,11 @@ const NAVADURGA_FORMS = Object.freeze([
     },
     iconography: {
       en: "Barefoot and two-armed, walking with a japa mala in her right hand and a kamandalu in her left.",
-      hi: "नंगे पाँव, दो भुजाएँ—दाहिने हाथ में जपमाला और बाएँ में कमण्डलु।",
+      hi: "बिना जूते के, दो भुजाएँ—दाहिने हाथ में जपमाला और बाएँ में कमण्डलु।",
     },
     alt: {
       en: "Original devotional illustration of barefoot Maa Brahmacharini holding a japa mala and kamandalu",
-      hi: "जपमाला और कमण्डलु धारण किए नंगे पाँव माँ ब्रह्मचारिणी का मौलिक भक्तिपूर्ण चित्र",
+      hi: "जपमाला और कमण्डलु धारण किए, बिना जूते के, माँ ब्रह्मचारिणी का मौलिक भक्तिपूर्ण चित्र",
     },
     focus: {
       en: "Keep today's offering simple—water, fruit or a family customary sweet—and give a few quiet minutes to japa, study or listening without rushing.",
