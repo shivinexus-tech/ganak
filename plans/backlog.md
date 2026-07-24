@@ -411,7 +411,9 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       **Mock-up DECIDED 2026-07-22: not needed.** Label stacks two lines — "अंक विधि"
       normal size over "कृष्णमूर्ति पद्धति" smaller — which fits 375px without shortening
       the name. Review happens on production instead: deploy, then send the owner the
-      deep-linked URL for feedback. Q1 still open.)_
+      deep-linked URL for feedback. **Q1 closed 2026-07-22** after owner production
+      approval and independent bug bash `CURSOR-BUGBASH-PRASHNA` (F1–F4 fixed in
+      `fc82a52`). 249 number engine remains blocked on `P0-PRASHNA-249-KSK-VERIFY`.)_
 - [ ] **P0 — Understand users without login (research DONE, execution pending).**
       Owner blocker: "can't tell who the users are or how they navigate without
       signup." Research says login is **not** the blocker and would not solve it —
