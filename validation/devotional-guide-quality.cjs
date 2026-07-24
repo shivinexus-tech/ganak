@@ -43,7 +43,15 @@ const BANNED = [
 
 const REQUIRED_OBJECTS = ['verdict', 'meaning', 'diet', 'sankalpa', 'puja', 'paran', 'udyapan'];
 const REQUIRED_LISTS = { vidhi: 2, stories: 2, regional: 2 };
+const MIN_KATHA_WORDS = 140;
+const MIN_KATHA_PARAS = 3;
 const problems = [];
+
+function parseKathaBody(text) {
+  const sep = ' — ';
+  const i = String(text || '').indexOf(sep);
+  return i < 0 ? String(text || '') : text.slice(i + sep.length).trim();
+}
 
 const keys = Object.keys(VRAT_VIDHI).sort();
 if (JSON.stringify(keys) !== JSON.stringify(EXPECTED_KEYS)) {
@@ -64,6 +72,22 @@ for (const key of keys) {
       continue;
     }
     if (guide[field].some((item) => !item?.en || !item?.hi)) problems.push(`${key}.${field} has a non-bilingual item`);
+  }
+
+  if (Array.isArray(guide.stories)) {
+    guide.stories.forEach((story, idx) => {
+      for (const lang of ['en', 'hi']) {
+        const body = parseKathaBody(story[lang]);
+        const paras = body.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
+        const words = body.split(/\s+/).filter(Boolean).length;
+        if (words < MIN_KATHA_WORDS) {
+          problems.push(`${key}.stories[${idx}].${lang} is too short (${words} words; need ${MIN_KATHA_WORDS}+)`);
+        }
+        if (paras.length < MIN_KATHA_PARAS) {
+          problems.push(`${key}.stories[${idx}].${lang} needs ${MIN_KATHA_PARAS}+ paragraphs`);
+        }
+      }
+    });
   }
 
   const publicText = JSON.stringify(guide);

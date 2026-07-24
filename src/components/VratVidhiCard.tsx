@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { T } from "./tokens";
 import { VRAT_VIDHI_LABELS } from "../data/vrat-vidhis";
-import { parseKathaLine } from "../data/guide-katha-format";
+import { kathaParagraphs, parseKathaLine } from "../data/guide-katha-format";
 
 function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
   const [open, setOpen] = useState(initiallyOpen);
@@ -108,7 +108,11 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
                     {region && (
                       <div style={{ ...T.label, color: C.gold, marginBottom: 5, lineHeight: 1.4 }}>{region}</div>
                     )}
-                    <div style={{ fontSize: T.fSmall, color: C.ivory, lineHeight: 1.65 }}>{body}</div>
+                    <div style={{ fontSize: T.fSmall, color: C.ivory, lineHeight: 1.65 }}>
+                      {kathaParagraphs(body).map((para, j) => (
+                        <p key={j} style={{ margin: j ? "0.7em 0 0" : 0 }}>{para}</p>
+                      ))}
+                    </div>
                   </div>
                 );
               })}
