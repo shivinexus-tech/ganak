@@ -5,6 +5,19 @@ prioritize by epic, write user stories, and decompose into tasks that **multiple
 agents can run simultaneously**. The central enabler is fixing the single-file
 bottleneck — covered first because everything else's parallelism depends on it.
 
+> **Status refresh 2026-07-20 — read this before trusting the sections below.**
+> This is a planning snapshot from 2026-07-18; two of its premises have since
+> been overtaken by events:
+> - **The site is live** at https://ganak.pages.dev (since 2026-07-19,
+>   auto-deploying `main`). §3 EPIC-LAUNCH is updated; the deploy task is done.
+> - **The single-file bottleneck in §0 is largely resolved.** The shell is down
+>   from ~6,200 lines to ~4,200 and the engine/data/screens/components modules
+>   described there now exist. Treat §0 as history, and
+>   `plans/module-ownership-map.md` + `plans/task-log.md` as the live position.
+>
+> Unticked boxes below are not proof something is undone — check the code and the
+> live site first.
+
 ---
 
 ## 0. THE ENABLER — split the single file into modules
@@ -75,7 +88,8 @@ lower priority per owner).
 2. **EPIC-SPLIT** — modularize the file (enables all parallel work below).
 3. **EPIC-IA** — two-zone nav + gut MuhuratHub (launch polish).
 4. **EPIC-DS** — design-system consistency (launch polish).
-5. **EPIC-LAUNCH** — deploy + monitoring + analytics + feedback (Phase 1 ship).
+5. **EPIC-LAUNCH** — deploy ✅ *(live 2026-07-19)* + monitoring, analytics,
+   feedback still open (Phase 1 ship).
 6. **EPIC-PLATFORM** — backend proxy → AI features (foundation started now).
 7. **EPIC-MOBILE** — PWA → Capacitor (Phase 3).
 
@@ -122,9 +136,20 @@ non-overlapping tasks in parallel.
   - T: universal Card + rigid spacing scale + shared primitives → `src/components/*`
 
 ### EPIC-LAUNCH
-- **A3.** As any user, I want to reach Ganak at a real web address on my phone.
-  - T: deploy to a free host → new config; T: error monitoring; T: analytics +
-    feedback button → `src/components/Feedback`; T: privacy note.
+- **A3. SHIPPED 2026-07-19.** As any user, I want to reach Ganak at a real web
+  address on my phone.
+  - [x] deploy to a free host — **live at https://ganak.pages.dev**, Cloudflare
+        Pages connected to GitHub `shivinexus-tech/ganak` via the Cloudflare
+        dashboard, auto-deploying `main`. There is deliberately **no deploy config
+        in this repo** (no `wrangler.toml`, no `.github/workflows`) — the wiring
+        lives in the Cloudflare account, so do not read its absence as "not
+        deployed". Verified live 2026-07-20.
+  - [ ] error monitoring; [ ] analytics + feedback button →
+        `src/components/Feedback`; [ ] privacy note.
+
+  **Every push to `main` goes straight to production.** Work on a branch is not
+  live until it merges — check the live site, not the branch, before claiming a
+  fix has shipped.
 
 ### EPIC-PLATFORM
 - **C2.** As a user, I want to ask questions about my chart in plain language.
@@ -165,6 +190,7 @@ That is the speed you want — but it depends on the split landing first.
 1. **Now (parallel):** Cursor→vidhis, Codex→proxy, Claude→this doc + reviews. *(running)*
 2. **Next (single-writer, Claude):** EPIC-SPLIT — modularize the file, gates green.
 3. **Then (full parallel):** content, DS, IA, AI features across modules at once.
-4. **Then:** EPIC-LAUNCH — deploy the website.
+4. ~~**Then:** EPIC-LAUNCH — deploy the website.~~ **Done 2026-07-19** — the site
+   is live and auto-deploys `main`; only monitoring/analytics/feedback remain.
 
 The split is the hinge. Everything after it goes faster.
