@@ -13,9 +13,6 @@ the non-negotiables so Cursor's AI can't miss them.
    Concurrent code work is allowed only in isolated branches/worktrees with explicit,
    non-overlapping file ownership recorded in `plans/task-log.md`. The app shell,
    shared navigation and shared tokens remain integration-owned.
-   Backlog work must be committed to that feature branch, pushed, and opened as a
-   draft PR against `main`. Never commit or push backlog implementation directly
-   to `main`; merge only after required PR checks pass.
 2. **Run the validation gates after any structural edit** and paste the passing
    output — never claim "done" without it:
    ```
