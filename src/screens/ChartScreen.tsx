@@ -15,6 +15,7 @@ import { KP_PLANETS, vimSub } from "../engine/dasha";
 import { computeKundli } from "../engine/kundli";
 import { DashaTree } from "../components/DashaTree";
 import { ChartVault } from "../components/ChartVault";
+import { JyotishPanelNav } from "../components/JyotishPanelNav";
 import { BNNModule, BhriguModule } from "./JyotishBnnScreen";
 import { RectifyModule } from "./RectifyScreen";
 import { SIGNS, NAKSHATRAS, AYANAMSA, zoneOffset, PLANET_DEVA } from "../engine/panchang";
@@ -38,6 +39,7 @@ const DASHA_NOTE = {
 const PLANET_COLOR = { Sun: "#C05A0C", Moon: "#4E6E96", Mars: "#BB3A2A", Mercury: "#2C7D4F", Jupiter: "#9A7000", Venus: "#B3537F", Saturn: "#46588F", Rahu: "#6E5C82", Ketu: "#8A5A36" };
 
 export default function ChartScreen({ C, card, lang }) {
+  const hi = lang === "hi";
   const [form, setForm] = useState({ name: "", date: "1995-08-15", time: "06:30" });
   const [place, setPlace] = useState({ label: "New Delhi, India", lat: 28.61, lon: 77.21, zone: "Asia/Kolkata" });
   const [query, setQuery] = useState("New Delhi, India");
@@ -45,6 +47,7 @@ export default function ChartScreen({ C, card, lang }) {
   const [searching, setSearching] = useState(false);
   const [tzOverride, setTzOverride] = useState("");
   const [result, setResult] = useState(null);
+  const [chartContext, setChartContext] = useState(null);
   const [varga, setVarga] = useState("D1");
   const [refPt, setRefPt] = useState("lagna");
   const [ayanamsa, setAyanamsa] = useState("lahiri");
@@ -114,6 +117,7 @@ export default function ChartScreen({ C, card, lang }) {
       const [hh, mi] = (c.form.time || "").split(":").map(Number);
       const tz = c.tzOverride !== "" && c.tzOverride != null ? parseFloat(c.tzOverride) : zoneOffset(c.place.zone, y, m, day);
       setResult(computeKundli({ y, m, day, hh, mi, tz, lat: c.place.lat, lon: c.place.lon, ayanamsa: c.ayanamsa || "lahiri" }));
+      setChartContext({ form: { ...c.form }, place: { ...c.place }, ayanamsa: c.ayanamsa || "lahiri" });
       setTimeout(() => { const el = document.getElementById("summary"); if (el) el.scrollIntoView({ behavior: "smooth" }); }, 150);
     } catch (e) { setErr(lang === "hi" ? "यह सहेजी हुई कुंडली नहीं खुल सकी — शायद यह ख़राब है। कोई और सहेजी कुंडली आज़माएँ या विवरण फिर से भरें।" : "This saved chart couldn't be loaded — it may be corrupted. Try another saved chart, or re-enter the details."); }
   };
@@ -134,6 +138,7 @@ export default function ChartScreen({ C, card, lang }) {
     const tz = tzOverride !== "" ? parseFloat(tzOverride) : zoneOffset(effPlace.zone, y, m, day);
     if (tz === null || isNaN(tz)) { setErr(lang === "hi" ? "इस स्थान का समय-क्षेत्र नहीं मिला — कृपया नीचे UTC ऑफ़सेट स्वयं भरें।" : "Couldn't resolve the timezone for this place — enter the UTC offset manually below."); return; }
     setResult(computeKundli({ y, m, day, hh, mi, tz, lat: effPlace.lat, lon: effPlace.lon, ayanamsa }));
+    setChartContext({ form: { ...form }, place: { ...effPlace }, ayanamsa });
     setTimeout(() => { const el = document.getElementById("summary"); if (el) el.scrollIntoView({ behavior: "smooth" }); }, 150);
   };
 
@@ -146,8 +151,7 @@ export default function ChartScreen({ C, card, lang }) {
 
   const Eyebrow = ({ deva, en, id }) => (
     <div id={id} style={{ display: "flex", alignItems: "baseline", gap: T.s3, margin: `${T.s8}px 0 ${T.s4}px`, borderBottom: `1px solid ${C.line}`, paddingBottom: T.s3, scrollMarginTop: 64 }}>
-      <span style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fHeading }}>{deva}</span>
-      <span style={{ ...T.label, color: C.muted }}>{en}</span>
+      <span style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fHeading }}>{lang === "hi" ? deva : en}</span>
     </div>
   );
 
@@ -166,9 +170,9 @@ export default function ChartScreen({ C, card, lang }) {
     : refPt === "chandra" ? vargaSign(r.moon.lon, varga)
     : vargaSign(r.ascSid, varga);
   const refNote = !r ? "" :
-    refPt === "surya" ? "houses counted from the Sun — Surya kundli" :
-    refPt === "chandra" ? "houses counted from the Moon — Chandra kundli" :
-    refPt === "karakamsa" ? `houses counted from ${r.ak}'s navamsa sign — Karakamsa` : "";
+    refPt === "surya" ? (hi ? "सूर्य से भावों की गणना — सूर्य कुंडली" : "houses counted from the Sun — Surya kundli") :
+    refPt === "chandra" ? (hi ? "चन्द्र से भावों की गणना — चन्द्र कुंडली" : "houses counted from the Moon — Chandra kundli") :
+    refPt === "karakamsa" ? (hi ? `${r.ak} के नवांश से भावों की गणना — कारकांश` : `houses counted from ${r.ak}'s navamsa sign — Karakamsa`) : "";
   const vPlanets = r
     ? r.rows.map((p) => {
         const vs = vargaSign(p.lon, varga);
@@ -180,11 +184,7 @@ export default function ChartScreen({ C, card, lang }) {
   return (
     <>
       {r && (
-          <nav className="rise hscroll" style={{ position: "sticky", top: 8, zIndex: 30, display: "flex", gap: 6, overflowX: "auto", padding: "8px 10px", margin: "0 -4px 4px", background: "rgba(250,245,234,.92)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: `1px solid ${C.line}`, borderRadius: 12, boxShadow: "0 4px 14px rgba(110,82,24,.08)" }}>
-            {[["#chart", "Kundli"], ["#yogas", "Yogas"], ["#planets", "Grahas"], ["#kp", "KP sub-lords"], ["#ksig", "KP significators"], ["#match", "Matching"], ["#karakas", "Karakas"], ["#shadbala", "Shadbala"], ["#special", "Special"], ["#chalit", "Bhava Chalit"], ["#av", "Ashtakavarga"], ["#arudha", "Arudha"], ["#rectify", "Rectify"], ["#bnn", "BNN"], ["#bhrigu", "Bhrigu"], ["#dasha", "Dasha"], ["#reading", "Reading"]].map(([href, label]) => (
-              <a key={href} href={href} className="chip" style={{ whiteSpace: "nowrap", textDecoration: "none", fontSize: 12.5, padding: "6px 12px", borderRadius: 8, border: `1px solid ${C.line}`, color: C.muted, background: "#FBF5E7", fontFamily: "Spectral, serif" }}>{label}</a>
-            ))}
-          </nav>
+          <JyotishPanelNav lang={lang} C={C} />
       )}
           <>
         {/* birth details */}
@@ -281,11 +281,13 @@ export default function ChartScreen({ C, card, lang }) {
           </p>
         </section>
 
-        <ChartVault snapshot={{ form, place, tzOverride, ayanamsa }} result={result} onLoad={loadChart} C={C} card={card} lang={lang} />
+        <div id="vault" style={{ scrollMarginTop: 72 }}>
+          <ChartVault snapshot={{ form, place, tzOverride, ayanamsa }} result={result} onLoad={loadChart} C={C} card={card} lang={lang} />
+        </div>
 
         {/* kundali matching */}
         <Eyebrow id="match" deva="कुण्डली मिलान" en="Kundali matching · Guna Milan" />
-        <MatchMaker C={C} card={card} computeKundli={computeKundli} />
+        <MatchMaker C={C} card={card} computeKundli={computeKundli} lang={lang} />
           </>
 
       {r && (
@@ -294,10 +296,10 @@ export default function ChartScreen({ C, card, lang }) {
             <Eyebrow id="summary" deva="जन्म विवरण" en="Birth summary" />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
               {[
-                ["Lagna (Ascendant)", `${SIGNS[r.ascSign].split(" ")[0]} ${fmtDeg(r.ascDeg)}`],
-                ["Rashi (Moon sign)", SIGNS[r.moon.sign].split(" ")[0]],
-                ["Janma Nakshatra", `${NAKSHATRAS[r.moon.nak]} · pada ${r.moon.pada}`],
-                ["Surya (Sun sign)", SIGNS[r.sun.sign].split(" ")[0]],
+                [hi ? "लग्न" : "Lagna (Ascendant)", `${SIGNS[r.ascSign].split(" ")[0]} ${fmtDeg(r.ascDeg)}`],
+                [hi ? "राशि (चन्द्र राशि)" : "Rashi (Moon sign)", SIGNS[r.moon.sign].split(" ")[0]],
+                [hi ? "जन्म नक्षत्र" : "Janma Nakshatra", `${NAKSHATRAS[r.moon.nak]} · ${hi ? "पाद" : "pada"} ${r.moon.pada}`],
+                [hi ? "सूर्य राशि" : "Surya (Sun sign)", SIGNS[r.sun.sign].split(" ")[0]],
               ].map(([k, v]) => (
                 <div key={k} style={{ ...card, padding: "14px 16px" }}>
                   <div style={{ ...T.label, color: C.muted, marginBottom: 6 }}>{k}</div>
@@ -311,13 +313,13 @@ export default function ChartScreen({ C, card, lang }) {
             <div className="rise" style={{ ...card, padding: "20px 14px 18px" }}>
               {/* reference lagna: contained segmented control, wraps 4→2×2 on narrow screens */}
               <div style={{ margin: "0 4px 12px" }}>
-                <div style={{ ...T.label, color: C.muted, marginBottom: 7, textAlign: "center" }}>Houses counted from</div>
+                <div style={{ ...T.label, color: C.muted, marginBottom: 7, textAlign: "center" }}>{hi ? "भावों की गणना यहाँ से" : "Houses counted from"}</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 4, background: "#F4ECD9", border: `1px solid ${C.line}`, borderRadius: 12, padding: 4 }}>
                   {REFS.map((rf) => (
                     <button key={rf.k} onClick={() => setRefPt(rf.k)}
                       style={{ padding: "8px 4px", borderRadius: 9, cursor: "pointer", fontFamily: "Spectral, serif", fontSize: 12.5, lineHeight: 1.25, border: rf.k === refPt ? `1px solid ${C.gold}55` : "1px solid transparent", background: rf.k === refPt ? "#FFFFFF" : "transparent", color: rf.k === refPt ? C.gold : C.muted, boxShadow: rf.k === refPt ? "0 2px 8px rgba(110,82,24,.12)" : "none", fontWeight: rf.k === refPt ? 600 : 400 }}>
                       <span style={{ fontFamily: "Eczar, serif", display: "block", fontSize: 13 }}>{rf.deva}</span>
-                      {rf.en}
+                      {hi ? rf.deva : rf.en}
                     </button>
                   ))}
                 </div>
@@ -328,7 +330,7 @@ export default function ChartScreen({ C, card, lang }) {
               {/* varga strip: single horizontally-scrollable row, never overflows the card */}
               <div className="hscroll" style={{ display: "flex", gap: 6, overflowX: "auto", padding: "2px 4px 8px", margin: "0 0 4px", WebkitOverflowScrolling: "touch" }}>
                 {VARGAS.map((v) => (
-                  <button key={v.k} className="chip" title={`${v.name} — ${v.theme}`}
+                  <button key={v.k} className="chip" title={hi ? `${v.k} विभागीय कुंडली` : `${v.name} — ${v.theme}`}
                     onClick={(e) => { setVarga(v.k); try { e.currentTarget.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }); } catch {} }}
                     style={{ flexShrink: 0, padding: "7px 14px", borderRadius: 18, cursor: "pointer", fontFamily: "Spectral, serif", fontSize: 13, letterSpacing: ".03em", border: `1px solid ${v.k === varga ? C.gold : C.line}`, background: v.k === varga ? "rgba(168,106,18,.12)" : "#FFFFFF", color: v.k === varga ? C.gold : C.muted, fontWeight: v.k === varga ? 600 : 400 }}>
                     {v.k}
@@ -336,13 +338,13 @@ export default function ChartScreen({ C, card, lang }) {
                 ))}
               </div>
               <p style={{ textAlign: "center", color: C.gold, fontSize: 13, margin: "8px 0 2px", fontFamily: "Eczar, serif", letterSpacing: ".04em" }}>
-                {curVarga.name} — {curVarga.theme}
+                {hi ? `${curVarga.k} विभागीय कुंडली — जीवन के इस क्षेत्र का सूक्ष्म अध्ययन` : `${curVarga.name} — ${curVarga.theme}`}
               </p>
               {refNote && <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "2px 0 10px" }}>{refNote}</p>}
               {!refNote && <div style={{ height: 10 }} />}
               <DiamondChart
                 key={varga + refPt}
-                title={form.name ? `${form.name} · ${(place && place.label) || ""}` : (place && place.label) || "Birth chart"}
+                title={form.name ? `${form.name} · ${(place && place.label) || ""}` : (place && place.label) || (hi ? "जन्म कुंडली" : "Birth chart")}
                 ascSign={vAscSign}
                 houseOfPlanet={vPlanets}
                 showDeg={varga === "D1"}
@@ -350,8 +352,8 @@ export default function ChartScreen({ C, card, lang }) {
                 gold={C.gold} ivory={C.ivory} muted={C.muted} sindoor={C.sindoor}
               />
               <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "8px 0 0" }}>
-                Numbers mark the rashi in each house · <span style={{ color: C.sindoor }}>℞</span> retrograde
-                {varga === "D2" && " · the Hora chart uses only Cancer (Moon) and Leo (Sun)"}
+                {hi ? "हर भाव की संख्या उसकी राशि दिखाती है" : "Numbers mark the rashi in each house"} · <span style={{ color: C.sindoor }}>℞</span> {hi ? "वक्री" : "retrograde"}
+                {varga === "D2" && (hi ? " · होरा कुंडली में केवल कर्क (चन्द्र) और सिंह (सूर्य) राशियाँ होती हैं" : " · the Hora chart uses only Cancer (Moon) and Leo (Sun)")}
               </p>
             </div>
 
@@ -365,9 +367,9 @@ export default function ChartScreen({ C, card, lang }) {
                   <div key={yg.name} className="rise" style={{ ...card, padding: "14px 16px", borderLeft: `3px solid ${yg.kind === "good" ? C.gold : C.sindoor}` }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
                       <span style={{ fontFamily: "Eczar, serif", fontSize: 15.5, color: yg.kind === "good" ? C.gold : C.sindoor }}>{yg.name}</span>
-                      <span style={{ fontSize: 9.5, letterSpacing: ".12em", textTransform: "uppercase", color: C.muted, whiteSpace: "nowrap" }}>{yg.kind === "good" ? "auspicious" : "challenging"}</span>
+                      <span style={{ fontSize: 9.5, letterSpacing: ".12em", textTransform: "uppercase", color: C.muted, whiteSpace: "nowrap" }}>{yg.kind === "good" ? (hi ? "शुभ" : "auspicious") : (hi ? "चुनौतीपूर्ण" : "challenging")}</span>
                     </div>
-                    <div style={{ fontSize: 13.5, lineHeight: 1.55 }}>{yg.text}</div>
+                    <div style={{ fontSize: 13.5, lineHeight: 1.55 }}>{hi ? "यह योग ग्रहों और भावों के एक विशेष संबंध से बनता है। इसका फल ग्रहबल, दशा और पूरी कुंडली के संदर्भ में देखें।" : yg.text}</div>
                   </div>
                 ))}
               </div>
@@ -397,7 +399,7 @@ export default function ChartScreen({ C, card, lang }) {
                 ))}
               </div>
               <div style={{ textAlign: "center", color: C.muted, fontSize: 11, paddingTop: 10, borderTop: `1px solid ${C.line}` }}>
-                Ayanamsa (Lahiri): <span style={{ color: C.ivory, fontVariantNumeric: "tabular-nums" }}>{fmtDeg(r.ayan)}</span> · Retrograde ℞ shown in <span style={{ color: C.sindoor }}>vermillion</span>
+                {hi ? "अयनांश (लाहिरी)" : "Ayanamsa (Lahiri)"}: <span style={{ color: C.ivory, fontVariantNumeric: "tabular-nums" }}>{fmtDeg(r.ayan)}</span> · {hi ? "वक्री ग्रह" : "Retrograde"} ℞ <span style={{ color: C.sindoor }}>{hi ? "सिंदूरी रंग में" : "shown in vermillion"}</span>
               </div>
             </div>
 
@@ -407,12 +409,12 @@ export default function ChartScreen({ C, card, lang }) {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 360 }}>
                 <thead>
                   <tr style={{ color: C.muted, textAlign: "left", fontSize: 11, letterSpacing: ".05em", textTransform: "uppercase" }}>
-                    <th style={{ padding: "6px 10px" }}>Graha</th>
-                    <th style={{ padding: "6px 10px" }}>Sign</th>
-                    <th style={{ padding: "6px 10px" }}>Nakshatra</th>
-                    <th style={{ padding: "6px 10px" }}>Star lord</th>
-                    <th style={{ padding: "6px 10px" }}>Sub lord</th>
-                    <th style={{ padding: "6px 10px" }}>Sub-sub</th>
+                    <th style={{ padding: "6px 10px" }}>{hi ? "ग्रह" : "Graha"}</th>
+                    <th style={{ padding: "6px 10px" }}>{hi ? "राशि" : "Sign"}</th>
+                    <th style={{ padding: "6px 10px" }}>{hi ? "नक्षत्र" : "Nakshatra"}</th>
+                    <th style={{ padding: "6px 10px" }}>{hi ? "नक्षत्र स्वामी" : "Star lord"}</th>
+                    <th style={{ padding: "6px 10px" }}>{hi ? "उप-स्वामी" : "Sub lord"}</th>
+                    <th style={{ padding: "6px 10px" }}>{hi ? "उप-उप स्वामी" : "Sub-sub"}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -432,22 +434,22 @@ export default function ChartScreen({ C, card, lang }) {
               </table>
             </div>
             <p style={{ color: C.muted, fontSize: 11.5, margin: "10px 0 0", lineHeight: 1.5 }}>
-              Each nakshatra (13°20′) is split into nine Vimshottari-proportioned <em>subs</em>, starting from the star lord — the 249-division scheme. The <span style={{ color: C.gold }}>sub lord</span> is the deciding factor in KP. {ayanamsa === "lahiri" ? "You're on Lahiri ayanamsa; switch to KP (Krishnamurti) above for the canonical KP sub-lords." : "Computed on the KP (Krishnamurti) ayanamsa."}
+              {hi ? <>हर नक्षत्र (13°20′) को विंशोत्तरी अनुपात के नौ उप-भागों में बाँटा जाता है। KP में <span style={{ color: C.gold }}>उप-स्वामी</span> निर्णायक माना जाता है। {ayanamsa === "lahiri" ? "मानक KP उप-स्वामी देखने के लिए ऊपर कृष्णमूर्ति अयनांश चुनें।" : "गणना कृष्णमूर्ति अयनांश पर है।"}</> : <>Each nakshatra (13°20′) is split into nine Vimshottari-proportioned <em>subs</em>, starting from the star lord — the 249-division scheme. The <span style={{ color: C.gold }}>sub lord</span> is the deciding factor in KP. {ayanamsa === "lahiri" ? "You're on Lahiri ayanamsa; switch to KP (Krishnamurti) above for the canonical KP sub-lords." : "Computed on the KP (Krishnamurti) ayanamsa."}</>}
             </p>
 
             <div style={{ ...T.label, color: C.muted, margin: "18px 0 8px" }}>
-              Cuspal sub-lords · {r.kpData.houseSystem} houses
+              {hi ? "भाव-संधि उप-स्वामी" : "Cuspal sub-lords"} · {r.kpData.houseSystem}
             </div>
             <div className="rise" style={{ ...card, padding: "8px 4px", overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 360 }}>
                 <thead>
                   <tr style={{ color: C.muted, textAlign: "left", fontSize: 11, letterSpacing: ".05em", textTransform: "uppercase" }}>
-                    <th style={{ padding: "6px 10px" }}>Bhava</th>
-                    <th style={{ padding: "6px 10px" }}>Cusp</th>
-                    <th style={{ padding: "6px 10px" }}>Nakshatra</th>
-                    <th style={{ padding: "6px 10px" }}>Star</th>
-                    <th style={{ padding: "6px 10px" }}>Sub</th>
-                    <th style={{ padding: "6px 10px" }}>Sub-sub</th>
+                    <th style={{ padding: "6px 10px" }}>{hi ? "भाव" : "Bhava"}</th>
+                    <th style={{ padding: "6px 10px" }}>{hi ? "संधि" : "Cusp"}</th>
+                    <th style={{ padding: "6px 10px" }}>{hi ? "नक्षत्र" : "Nakshatra"}</th>
+                    <th style={{ padding: "6px 10px" }}>{hi ? "नक्षत्र स्वामी" : "Star"}</th>
+                    <th style={{ padding: "6px 10px" }}>{hi ? "उप-स्वामी" : "Sub"}</th>
+                    <th style={{ padding: "6px 10px" }}>{hi ? "उप-उप" : "Sub-sub"}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -471,7 +473,7 @@ export default function ChartScreen({ C, card, lang }) {
               </table>
             </div>
             <p style={{ color: C.muted, fontSize: 11.5, margin: "10px 0 0", lineHeight: 1.5 }}>
-              Cusps use {r.kpData.houseSystem === "Placidus" ? "the Placidus system (semi-arcs trisected in time) — the KP standard" : "a Porphyry fallback because Placidus is undefined at this latitude"}. The <span style={{ color: C.gold }}>cuspal sub-lord</span> is the cornerstone of KP analysis — it signifies whether the matters of that house will fructify. {ayanamsa === "lahiri" ? "Switch to KP ayanamsa above for canonical KP cusps." : ""}
+              {hi ? <>भाव-संधियाँ {r.kpData.houseSystem === "Placidus" ? "KP के मानक प्लासिडस भाव-पद्धति" : "इस अक्षांश के लिए पॉर्फ़िरी विकल्प"} से निकली हैं। <span style={{ color: C.gold }}>भाव-संधि उप-स्वामी</span> बताता है कि उस भाव के विषय फलित होने की क्षमता रखते हैं। {ayanamsa === "lahiri" ? "मानक KP फल हेतु ऊपर कृष्णमूर्ति अयनांश चुनें।" : ""}</> : <>Cusps use {r.kpData.houseSystem === "Placidus" ? "the Placidus system (semi-arcs trisected in time) — the KP standard" : "a Porphyry fallback because Placidus is undefined at this latitude"}. The <span style={{ color: C.gold }}>cuspal sub-lord</span> is the cornerstone of KP analysis — it signifies whether the matters of that house will fructify. {ayanamsa === "lahiri" ? "Switch to KP ayanamsa above for canonical KP cusps." : ""}</>}
             </p>
 
             {/* KP significators */}
@@ -493,29 +495,29 @@ export default function ChartScreen({ C, card, lang }) {
               return (
                 <div>
                   <div className="rise" style={{ ...card, padding: "14px 16px", borderLeft: "3px solid #A86A12", marginBottom: 14 }}>
-                    <div style={{ ...T.label, color: C.gold, marginBottom: 8 }}>Ruling Planets · birth moment</div>
+                    <div style={{ ...T.label, color: C.gold, marginBottom: 8 }}>{hi ? "शासक ग्रह · जन्म क्षण" : "Ruling Planets · birth moment"}</div>
                     <div style={{ display: "flex", flexWrap: "wrap", rowGap: 4 }}>
-                      <RPItem label="Asc lord" pl={RP.ascSignLord} />
-                      <RPItem label="Asc star" pl={RP.ascStarLord} />
-                      <RPItem label="Asc sub" pl={RP.ascSubLord} />
-                      <RPItem label="Moon lord" pl={RP.moonSignLord} />
-                      <RPItem label="Moon star" pl={RP.moonStarLord} />
-                      <RPItem label="Moon sub" pl={RP.moonSubLord} />
-                      <RPItem label="Day lord" pl={RP.dayLord} />
+                      <RPItem label={hi ? "लग्न स्वामी" : "Asc lord"} pl={RP.ascSignLord} />
+                      <RPItem label={hi ? "लग्न नक्षत्र" : "Asc star"} pl={RP.ascStarLord} />
+                      <RPItem label={hi ? "लग्न उप" : "Asc sub"} pl={RP.ascSubLord} />
+                      <RPItem label={hi ? "चन्द्र स्वामी" : "Moon lord"} pl={RP.moonSignLord} />
+                      <RPItem label={hi ? "चन्द्र नक्षत्र" : "Moon star"} pl={RP.moonStarLord} />
+                      <RPItem label={hi ? "चन्द्र उप" : "Moon sub"} pl={RP.moonSubLord} />
+                      <RPItem label={hi ? "वार स्वामी" : "Day lord"} pl={RP.dayLord} />
                     </div>
                   </div>
 
                   <div style={{ ...T.label, color: C.muted, margin: "4px 0 8px" }}>
-                    House significators (strongest first)
+                    {hi ? "भाव सूचक (सबसे प्रबल पहले)" : "House significators (strongest first)"}
                   </div>
                   <div className="rise" style={{ ...card, padding: "8px 4px", overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 380 }}>
                       <thead>
                         <tr style={{ color: C.muted, textAlign: "left", fontSize: 11, letterSpacing: ".05em", textTransform: "uppercase" }}>
-                          <th style={{ padding: "6px 10px" }}>Bhava</th>
-                          <th style={{ padding: "6px 10px" }}>Occupants</th>
-                          <th style={{ padding: "6px 10px" }}>Owner</th>
-                          <th style={{ padding: "6px 10px" }}>Significators</th>
+                          <th style={{ padding: "6px 10px" }}>{hi ? "भाव" : "Bhava"}</th>
+                          <th style={{ padding: "6px 10px" }}>{hi ? "स्थित ग्रह" : "Occupants"}</th>
+                          <th style={{ padding: "6px 10px" }}>{hi ? "स्वामी" : "Owner"}</th>
+                          <th style={{ padding: "6px 10px" }}>{hi ? "सूचक ग्रह" : "Significators"}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -533,7 +535,7 @@ export default function ChartScreen({ C, card, lang }) {
                   <div style={{ fontSize: 11, color: C.muted, marginTop: 6, fontStyle: "italic" }}>{lang === "hi" ? "— का अर्थ है कोई नहीं" : "— means none"}</div>
 
                   <div style={{ ...T.label, color: C.muted, margin: "18px 0 8px" }}>
-                    Houses signified by each planet
+                    {hi ? "हर ग्रह द्वारा सूचित भाव" : "Houses signified by each planet"}
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8 }}>
                     {KP_PLANETS.map((pl) => (
@@ -544,7 +546,7 @@ export default function ChartScreen({ C, card, lang }) {
                     ))}
                   </div>
                   <p style={{ color: C.muted, fontSize: 11.5, margin: "12px 0 0", lineHeight: 1.5 }}>
-                    A planet promises the matters of every house it signifies; during its dasha/bhukti — especially when it is also a Ruling Planet — those houses fructify. Rahu and Ketu also act as agents of their star and sign lords (apply that nuance when judging the nodes). {ayanamsa === "lahiri" ? "Switch to KP ayanamsa above for canonical KP significators." : "Computed on the KP ayanamsa."}
+                    {hi ? <>ग्रह जिन भावों का सूचक है, अपनी दशा-भुक्ति में उनके विषय सक्रिय कर सकता है—विशेषतः जब वह शासक ग्रह भी हो। राहु-केतु अपने नक्षत्र और राशि स्वामियों के प्रतिनिधि की तरह भी फल देते हैं। {ayanamsa === "lahiri" ? "मानक KP सूचक हेतु कृष्णमूर्ति अयनांश चुनें।" : "गणना KP अयनांश पर है।"}</> : <>A planet promises the matters of every house it signifies; during its dasha/bhukti — especially when it is also a Ruling Planet — those houses fructify. Rahu and Ketu also act as agents of their star and sign lords (apply that nuance when judging the nodes). {ayanamsa === "lahiri" ? "Switch to KP ayanamsa above for canonical KP significators." : "Computed on the KP ayanamsa."}</>}
                   </p>
                 </div>
               );
@@ -561,7 +563,7 @@ export default function ChartScreen({ C, card, lang }) {
                     {kk.planet}
                     <span style={{ color: C.muted, fontSize: 12.5, fontVariantNumeric: "tabular-nums" }}>{fmtDeg(kk.deg)} {SIGNS[kk.sign].split(" ")[0]}</span>
                   </div>
-                  <div style={{ color: C.muted, fontSize: 12, marginTop: 5 }}>{kk.meaning}</div>
+                  <div style={{ color: C.muted, fontSize: 12, marginTop: 5 }}>{hi ? "यह चर कारक जीवन के इस प्रमुख विषय और उससे जुड़ी सीख को दर्शाता है।" : kk.meaning}</div>
                 </div>
               ))}
             </div>
@@ -579,7 +581,7 @@ export default function ChartScreen({ C, card, lang }) {
               {BALA_PARTS.map((b) => (
                 <span key={b.k} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11.5, color: C.muted }}>
                   <span style={{ width: 10, height: 10, borderRadius: 3, background: b.color }} />
-                  {b.label} <span style={{ opacity: 0.7 }}>({b.note})</span>
+                  {hi ? ({ sthana: "स्थान", dig: "दिग्", kala: "काल", cheshta: "चेष्टा", naisargika: "नैसर्गिक", drik: "दृक्" }[b.k] || b.label) : b.label} <span style={{ opacity: 0.7 }}>({hi ? ({ sthana: "स्थिति", dig: "दिशा", kala: "समय", cheshta: "गति", naisargika: "प्राकृतिक", drik: "दृष्टि" }[b.k] || b.note) : b.note})</span>
                 </span>
               ))}
             </div>
@@ -596,11 +598,11 @@ export default function ChartScreen({ C, card, lang }) {
                           <span style={{ width: 9, height: 9, borderRadius: 5, background: PLANET_COLOR[p], flexShrink: 0 }} />
                           <span style={{ fontFamily: "Eczar, serif", fontSize: 16, color: C.ivory }}>{PLANET_DEVA[p]} <span style={{ fontFamily: "Spectral, serif", fontSize: 14 }}>{p}</span></span>
                           <span style={{ marginLeft: "auto", fontSize: 11, color: C.muted }}>#{rank + 1}</span>
-                          <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase", padding: "3px 8px", borderRadius: 10, color: strong ? "#3F7E2E" : C.sindoor, background: strong ? "rgba(63,126,46,.1)" : "rgba(194,69,30,.08)" }}>{strong ? "strong" : "weak"}</span>
+                          <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase", padding: "3px 8px", borderRadius: 10, color: strong ? "#3F7E2E" : C.sindoor, background: strong ? "rgba(63,126,46,.1)" : "rgba(194,69,30,.08)" }}>{strong ? (hi ? "प्रबल" : "strong") : (hi ? "निर्बल" : "weak")}</span>
                         </div>
                         <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 10 }}>
                           <span style={{ fontFamily: "Eczar, serif", fontSize: 26, color: C.gold, lineHeight: 1 }}>{x.totalR.toFixed(2)}</span>
-                          <span style={{ fontSize: 11.5, color: C.muted }}>Rupas · needs {x.required} · {(x.ratio * 100).toFixed(0)}%</span>
+                          <span style={{ fontSize: 11.5, color: C.muted }}>{hi ? "रूप · अपेक्षित" : "Rupas · needs"} {x.required} · {(x.ratio * 100).toFixed(0)}%</span>
                         </div>
                         <div style={{ display: "flex", height: 10, borderRadius: 5, overflow: "hidden", background: "#F1E9D5", marginBottom: 8 }}>
                           {BALA_PARTS.map((b) => {
@@ -623,7 +625,7 @@ export default function ChartScreen({ C, card, lang }) {
               );
             })()}
             <p style={{ color: C.muted, fontSize: 11.5, margin: "12px 0 0", lineHeight: 1.5 }}>
-              Strength in Rupas (1 Rupa = 60 Virupas). A planet clearing its required minimum is well-placed to deliver its significations. Strongest: <span style={{ color: C.gold }}>{r.shadbala.ranked[0]}</span> · weakest: <span style={{ color: C.sindoor }}>{r.shadbala.ranked[6]}</span>. Cheshta and some Kala sub-balas are modelled and may differ slightly from other software.
+              {hi ? <>बल रूप में है (1 रूप = 60 विरूप)। अपेक्षित न्यूनतम से ऊपर का ग्रह अपने कारकत्व देने में अधिक समर्थ माना जाता है। सबसे प्रबल: <span style={{ color: C.gold }}>{PLANET_DEVA[r.shadbala.ranked[0]]}</span> · सबसे निर्बल: <span style={{ color: C.sindoor }}>{PLANET_DEVA[r.shadbala.ranked[6]]}</span>। चेष्टा और कुछ काल उप-बल अन्य सॉफ़्टवेयर से थोड़ा भिन्न हो सकते हैं।</> : <>Strength in Rupas (1 Rupa = 60 Virupas). A planet clearing its required minimum is well-placed to deliver its significations. Strongest: <span style={{ color: C.gold }}>{r.shadbala.ranked[0]}</span> · weakest: <span style={{ color: C.sindoor }}>{r.shadbala.ranked[6]}</span>. Cheshta and some Kala sub-balas are modelled and may differ slightly from other software.</>}
             </p>
 
             {/* special lagnas & points */}
@@ -639,7 +641,7 @@ export default function ChartScreen({ C, card, lang }) {
                     <span style={{ fontSize: 11, color: C.gold }}>H{hOf(item.v)}</span>
                     {item.pl && <span style={{ fontSize: 12, color: PLANET_COLOR[item.pl] }}>· {item.pl}</span>}
                   </div>
-                  <div style={{ color: C.muted, fontSize: 11.5, marginTop: 4 }}>{item.note}</div>
+                  <div style={{ color: C.muted, fontSize: 11.5, marginTop: 4 }}>{hi ? "यह विशेष बिंदु कुंडली के एक सूक्ष्म जीवन-विषय को दर्शाता है।" : item.note}</div>
                 </div>
               );
               const Group = ({ title, items, accent }) => (
@@ -652,15 +654,15 @@ export default function ChartScreen({ C, card, lang }) {
               );
               return (
                 <div>
-                  <Group title="Special Lagnas" items={SP.lagnas} accent={C.gold} />
-                  <Group title="Sensitive Points" items={SP.points} accent="#6E5C82" />
+                  <Group title={hi ? "विशेष लग्न" : "Special Lagnas"} items={SP.lagnas} accent={C.gold} />
+                  <Group title={hi ? "संवेदनशील बिंदु" : "Sensitive Points"} items={SP.points} accent="#6E5C82" />
                   <div style={{ ...card, padding: "12px 14px", marginTop: 10, borderLeft: `3px solid #2C7D4F`, display: "inline-block" }}>
-                    <span style={{ ...T.label, color: C.muted, marginRight: 8 }}>Indu Lagna (wealth)</span>
+                    <span style={{ ...T.label, color: C.muted, marginRight: 8 }}>{hi ? "इन्दु लग्न (धन)" : "Indu Lagna (wealth)"}</span>
                     <span style={{ fontFamily: "Eczar, serif", fontSize: 15.5, color: "#2C7D4F" }}>{SIGNS[SP.induSign].split(" ")[0]}</span>
                   </div>
-                  <Group title="Upagrahas · shadow sub-planets" items={SP.upagrahas} accent="#C2451E" />
+                  <Group title={hi ? "उपग्रह · छाया बिंदु" : "Upagrahas · shadow sub-planets"} items={SP.upagrahas} accent="#C2451E" />
                   <p style={{ color: C.muted, fontSize: 11.5, margin: "12px 0 0", lineHeight: 1.5 }}>
-                    Bhava / Hora / Ghati lagnas advance from sunrise (1 sign per 5 / 2.5 / 1 ghatis). Gulika is the lagna rising during Saturn's eighth of the day. Some points (Sree Lagna especially) follow formulas that vary slightly between traditions.
+                    {hi ? "भाव, होरा और घटी लग्न सूर्योदय से आगे बढ़ते हैं। गुलिक दिन के शनि-शासित आठवें भाग में उदित लग्न है। श्री लग्न जैसे कुछ बिंदुओं के सूत्र परम्पराओं में थोड़ा बदलते हैं।" : "Bhava / Hora / Ghati lagnas advance from sunrise (1 sign per 5 / 2.5 / 1 ghatis). Gulika is the lagna rising during Saturn's eighth of the day. Some points (Sree Lagna especially) follow formulas that vary slightly between traditions."}
                   </p>
                 </div>
               );
@@ -670,7 +672,7 @@ export default function ChartScreen({ C, card, lang }) {
             <Eyebrow id="chalit" deva="भाव चलित" en="Bhava Chalit & Bhava Bala" />
             <div className="rise" style={{ ...card, padding: "20px 14px 12px" }}>
               <DiamondChart
-                title="Bhava Chalit — planets by true house cusp"
+                title={hi ? "भाव चलित — वास्तविक भाव-संधि के अनुसार ग्रह" : "Bhava Chalit — planets by true house cusp"}
                 ascSign={r.ascSign}
                 houseOfPlanet={r.rows.map((p) => ({ label: PLANET_GLYPH[p.name], house: r.bhava.chalit[p.name], retro: p.retro }))}
                 gold={C.gold} ivory={C.ivory} muted={C.muted} sindoor={C.sindoor}
@@ -679,7 +681,7 @@ export default function ChartScreen({ C, card, lang }) {
                 const shifts = r.rows.filter((p) => p.house !== r.bhava.chalit[p.name]);
                 return shifts.length ? (
                   <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "4px 0 0", lineHeight: 1.6 }}>
-                    Shifted from the rasi chart:{" "}
+                    {hi ? "राशि कुंडली से भाव बदला: " : "Shifted from the rasi chart: "}
                     {shifts.map((p, i) => (
                       <span key={p.name}>
                         {i > 0 && ", "}
@@ -688,13 +690,13 @@ export default function ChartScreen({ C, card, lang }) {
                     ))}
                   </p>
                 ) : (
-                  <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "4px 0 0" }}>No planets shift house — cusps align closely with the signs.</p>
+                  <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "4px 0 0" }}>{hi ? "किसी ग्रह का भाव नहीं बदला—भाव-संधियाँ राशियों के निकट हैं।" : "No planets shift house — cusps align closely with the signs."}</p>
                 );
               })()}
             </div>
 
             <div style={{ ...T.label, color: C.muted, margin: "18px 0 10px" }}>
-              Bhava Bala · house strength (Rupas)
+              {hi ? "भाव बल · भावों की शक्ति (रूप)" : "Bhava Bala · house strength (Rupas)"}
             </div>
             {(() => {
               const maxB = Math.max(...r.bhava.bhavaBala.map((b) => b.total));
@@ -717,14 +719,14 @@ export default function ChartScreen({ C, card, lang }) {
               );
             })()}
             <p style={{ color: C.muted, fontSize: 11.5, margin: "12px 0 0", lineHeight: 1.5 }}>
-              Cusps use the Sripati method (Lagna and Midheaven as 1st & 10th bhava-madhya, intermediate cusps trisected). Bhava Bala is led by each house lord's Shadbala, adjusted for the bhava's directional fitness and the aspects it receives. Strongest house: <span style={{ color: C.gold }}>H{r.bhava.strongest}</span> · weakest: <span style={{ color: C.sindoor }}>H{r.bhava.weakest}</span>.
+              {hi ? <>भाव-संधियाँ श्रीपति पद्धति से निकली हैं। भाव बल में भाव-स्वामी का षड्बल, दिशा और प्राप्त दृष्टियाँ शामिल हैं। सबसे प्रबल भाव: <span style={{ color: C.gold }}>H{r.bhava.strongest}</span> · सबसे निर्बल: <span style={{ color: C.sindoor }}>H{r.bhava.weakest}</span>।</> : <>Cusps use the Sripati method (Lagna and Midheaven as 1st & 10th bhava-madhya, intermediate cusps trisected). Bhava Bala is led by each house lord's Shadbala, adjusted for the bhava's directional fitness and the aspects it receives. Strongest house: <span style={{ color: C.gold }}>H{r.bhava.strongest}</span> · weakest: <span style={{ color: C.sindoor }}>H{r.bhava.weakest}</span>.</>}
             </p>
 
             {/* ashtakavarga */}
             <Eyebrow id="av" deva="अष्टकवर्ग" en="Ashtakavarga" />
             <div className="rise" style={{ ...card, padding: "20px 14px 16px" }}>
               <DiamondChart
-                title="Sarvashtakavarga · bindus by house"
+                title={hi ? "सर्वाष्टकवर्ग · भाववार बिंदु" : "Sarvashtakavarga · bindus by house"}
                 ascSign={r.ascSign}
                 houseOfPlanet={Array.from({ length: 12 }, (_, h) => {
                   const v = r.av.sav[(r.ascSign + h) % 12];
@@ -733,7 +735,7 @@ export default function ChartScreen({ C, card, lang }) {
                 gold={C.gold} ivory={C.ivory} muted={C.muted} sindoor={C.sindoor}
               />
               <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "8px 0 0" }}>
-                <span style={{ color: "#3F7E2E" }}>30+</span> strong · 25–29 average · <span style={{ color: "#B25425" }}>≤24</span> needs support · 337 total — transits through high-bindu houses tend to give better results
+                <span style={{ color: "#3F7E2E" }}>30+</span> {hi ? "प्रबल" : "strong"} · 25–29 {hi ? "औसत" : "average"} · <span style={{ color: "#B25425" }}>≤24</span> {hi ? "सहयोग अपेक्षित · कुल 337 — अधिक बिंदु वाले भावों में गोचर सामान्यतः बेहतर फल देते हैं" : "needs support · 337 total — transits through high-bindu houses tend to give better results"}
               </p>
             </div>
             <div className="rise2" style={{ ...card, padding: "8px 18px 12px", overflowX: "auto", marginTop: 12 }}>
@@ -760,20 +762,20 @@ export default function ChartScreen({ C, card, lang }) {
                   </tr>
                 </tbody>
               </table>
-              <p style={{ color: C.muted, fontSize: 12, margin: "10px 0 4px" }}>Gold cell marks each graha's own sign. Bhinnashtakavarga rows show every planet's bindus per sign.</p>
+              <p style={{ color: C.muted, fontSize: 12, margin: "10px 0 4px" }}>{hi ? "सुनहरा खाना ग्रह की अपनी राशि दर्शाता है। भिन्नाष्टकवर्ग की हर पंक्ति राशि अनुसार उस ग्रह के बिंदु दिखाती है।" : "Gold cell marks each graha's own sign. Bhinnashtakavarga rows show every planet's bindus per sign."}</p>
             </div>
 
             {/* arudha padas */}
             <Eyebrow id="arudha" deva="आरूढ पद" en="Arudha padas" />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12 }}>
               {r.arudhas.map((a, i) => {
-                const ARUDHA_MEAN = ["perceived image & status", "wealth & speech", "siblings & courage", "home & comforts", "children & creativity", "service & conflicts", "partnerships", "longevity & change", "dharma & fortune", "career & status", "gains & networks", "marriage & spouse"];
+                const ARUDHA_MEAN = hi ? ["दिखाई देने वाली छवि और प्रतिष्ठा", "धन और वाणी", "भाई-बहन और साहस", "घर और सुख", "संतान और सृजन", "सेवा और संघर्ष", "साझेदारी", "आयु और परिवर्तन", "धर्म और भाग्य", "कर्म और प्रतिष्ठा", "लाभ और संबंध-जाल", "विवाह और जीवनसाथी"] : ["perceived image & status", "wealth & speech", "siblings & courage", "home & comforts", "children & creativity", "service & conflicts", "partnerships", "longevity & change", "dharma & fortune", "career & status", "gains & networks", "marriage & spouse"];
                 const special = a.h === 1 ? "AL" : a.h === 12 ? "UL" : a.h === 7 ? "A7" : null;
                 const hot = a.h === 1 || a.h === 12;
                 return (
                   <div key={a.h} className="rise" style={{ ...card, padding: "12px 14px", border: `1px solid ${hot ? C.gold : C.line}` }}>
                     <div style={{ ...T.label, color: hot ? C.gold : C.muted, marginBottom: 5 }}>
-                      {a.h === 1 ? "Arudha Lagna" : a.h === 12 ? "Upapada" : `A${a.h}`}{special && a.h !== 1 && a.h !== 12 ? "" : ""}
+                      {a.h === 1 ? (hi ? "आरूढ़ लग्न" : "Arudha Lagna") : a.h === 12 ? (hi ? "उपपद" : "Upapada") : `A${a.h}`}{special && a.h !== 1 && a.h !== 12 ? "" : ""}
                     </div>
                     <div style={{ fontFamily: "Eczar, serif", fontSize: 16, color: hot ? C.gold : C.ivory }}>{SIGNS[a.sign].split(" ")[0]}</div>
                     <div style={{ color: C.muted, fontSize: 11.5, marginTop: 4 }}>{ARUDHA_MEAN[i]}</div>
@@ -784,25 +786,25 @@ export default function ChartScreen({ C, card, lang }) {
 
             {/* dasha */}
             <Eyebrow id="rectify" deva="जन्म समय शोधन" en="Birth-time rectification" />
-            <RectifyModule form={form} place={place} ayanamsa={ayanamsa} C={C} card={card} />
+            <RectifyModule form={chartContext?.form || form} place={chartContext?.place || place} ayanamsa={chartContext?.ayanamsa || ayanamsa} C={C} card={card} lang={lang} />
 
             <Eyebrow id="bnn" deva="भृगु नन्दी नाडी" en="Bhrigu Nandi Nadi · lagneless" />
-            <BNNModule bnn={r.bnn} rows={r.rows} tz={r.tz} C={C} card={card} />
+            <BNNModule bnn={r.bnn} rows={r.rows} tz={r.tz} C={C} card={card} lang={lang} />
 
             <Eyebrow id="bhrigu" deva="भृगु चक्र · सरल पद्धति" en="Bhrigu Chakra & Saral Paddhati" />
-            <BhriguModule rows={r.rows} ascSign={r.ascSign} birthMs={r.birthMs} tz={r.tz} C={C} card={card} />
+            <BhriguModule rows={r.rows} ascSign={r.ascSign} birthMs={r.birthMs} tz={r.tz} C={C} card={card} lang={lang} />
 
             <Eyebrow id="dasha" deva="विंशोत्तरी दशा" en="Vimshottari dasha · maha to prana" />
             <div className="rise" style={{ ...card, padding: "8px 18px 16px", overflowX: "auto" }}>
               <table>
-                <thead><tr><th>Lord</th><th>From</th><th>To</th><th>Years</th></tr></thead>
+                <thead><tr><th>{hi ? "स्वामी" : "Lord"}</th><th>{hi ? "आरम्भ" : "From"}</th><th>{hi ? "अंत" : "To"}</th><th>{hi ? "वर्ष" : "Years"}</th></tr></thead>
                 <tbody>
                   {r.dashas.map((dsh) => {
                     const isNow = r.current && dsh.lord === r.current.lord && dsh.start === r.current.start;
                     return (
                       <tr key={dsh.start} style={isNow ? { background: "rgba(168,106,18,.08)" } : null}>
                         <td style={{ color: isNow ? C.gold : C.ivory, fontWeight: isNow ? 600 : 400 }}>
-                          {dsh.lord}{isNow && " · current"}
+                          {dsh.lord}{isNow && (hi ? " · वर्तमान" : " · current")}
                         </td>
                         <td>{fmtDateT(dsh.start, r.tz, false)}</td>
                         <td>{fmtDateT(dsh.end, r.tz, false)}</td>
@@ -819,8 +821,8 @@ export default function ChartScreen({ C, card, lang }) {
                     return (
                       <div style={{ margin: "16px 2px 4px" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: C.muted, letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 7 }}>
-                          <span>{r.current.lord} mahadasha</span>
-                          <span style={{ color: C.gold }}>{pct.toFixed(0)}% elapsed</span>
+                          <span>{r.current.lord} {hi ? "महादशा" : "mahadasha"}</span>
+                          <span style={{ color: C.gold }}>{pct.toFixed(0)}% {hi ? "पूर्ण" : "elapsed"}</span>
                         </div>
                         <div style={{ height: 6, background: "#F1E9D5", borderRadius: 3, overflow: "hidden", border: `1px solid ${C.line}` }}>
                           <div style={{ width: `${pct}%`, height: "100%", background: `linear-gradient(90deg, ${C.gold}, #7E520C)`, borderRadius: 3 }} />
@@ -829,14 +831,13 @@ export default function ChartScreen({ C, card, lang }) {
                     );
                   })()}
                   <p style={{ fontSize: 14, lineHeight: 1.6, color: C.ivory, margin: "16px 0 10px" }}>
-                    The native runs <span style={{ color: C.gold }}>{r.current.lord} mahadasha</span> — a period
-                    classically associated with {DASHA_NOTE[r.current.lord]}.
+                    {hi ? <>अभी <span style={{ color: C.gold }}>{r.current.lord} महादशा</span> चल रही है—यह अवधि उस ग्रह के कारकत्व, स्थिति और स्वामित्व वाले भावों को प्रमुख बनाती है।</> : <>The native runs <span style={{ color: C.gold }}>{r.current.lord} mahadasha</span> — a period classically associated with {DASHA_NOTE[r.current.lord]}.</>}
                   </p>
                   {r.curAntar && (
                     <div style={{ margin: "18px 0 6px", padding: "13px 14px", borderRadius: 10, background: "rgba(168,106,18,.05)", border: `1px solid ${C.line}` }}>
-                      <div style={{ ...T.label, color: C.muted, marginBottom: 9 }}>Running now · all five levels</div>
+                      <div style={{ ...T.label, color: C.muted, marginBottom: 9 }}>{hi ? "अभी चल रहा क्रम · पाँचों स्तर" : "Running now · all five levels"}</div>
                       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "4px 6px" }}>
-                        {[["Maha", r.current.lord], ["Antar", r.curAntar.lord], ["Pratyantar", r.curPratya && r.curPratya.lord], ["Sookshma", r.curSookshma && r.curSookshma.lord], ["Prana", r.curPrana && r.curPrana.lord]].map(([lvl, lord], i) =>
+                        {[[hi ? "महा" : "Maha", r.current.lord], [hi ? "अंतर" : "Antar", r.curAntar.lord], [hi ? "प्रत्यंतर" : "Pratyantar", r.curPratya && r.curPratya.lord], [hi ? "सूक्ष्म" : "Sookshma", r.curSookshma && r.curSookshma.lord], [hi ? "प्राण" : "Prana", r.curPrana && r.curPrana.lord]].map(([lvl, lord], i) =>
                           lord ? (
                             <React.Fragment key={lvl}>
                               {i > 0 && <span style={{ color: C.line, fontSize: 13 }}>›</span>}
@@ -850,15 +851,15 @@ export default function ChartScreen({ C, card, lang }) {
                       </div>
                       {r.curPrana && (
                         <div style={{ fontSize: 11.5, color: C.muted, marginTop: 9 }}>
-                          Current prana: {r.curPrana.lord} · {fmtDateT(r.curPrana.start, r.tz, true)} – {fmtDateT(r.curPrana.end, r.tz, true)}
+                          {hi ? "वर्तमान प्राण" : "Current prana"}: {r.curPrana.lord} · {fmtDateT(r.curPrana.start, r.tz, true)} – {fmtDateT(r.curPrana.end, r.tz, true)}
                         </div>
                       )}
                     </div>
                   )}
                   <div style={{ ...T.label, color: C.muted, margin: "16px 0 4px" }}>
-                    Antardashas within {r.current.lord} — tap any period to drill down
+                    {r.current.lord} {hi ? "के भीतर अंतरदशाएँ — आगे के स्तर खोलने के लिए किसी अवधि को दबाएँ" : "Antardashas — tap any period to drill down"}
                   </div>
-                  <DashaTree periods={r.antars} level={0} now={Date.now()} openD={openD} toggle={toggleD} C={C} tz={r.tz} />
+                  <DashaTree periods={r.antars} level={0} now={Date.now()} openD={openD} toggle={toggleD} C={C} tz={r.tz} lang={lang} />
                 </>
               )}
             </div>
@@ -867,11 +868,11 @@ export default function ChartScreen({ C, card, lang }) {
             <Eyebrow deva="पञ्चाङ्ग" en="Birth panchang" />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12 }}>
               {[
-                ["Vara", r.panchang.weekday],
-                ["Tithi", `${r.panchang.paksha} ${r.panchang.tithiName}`],
-                ["Nakshatra", r.panchang.nak],
-                ["Yoga", r.panchang.yoga],
-                ["Karana", r.panchang.karana],
+                [hi ? "वार" : "Vara", r.panchang.weekday],
+                [hi ? "तिथि" : "Tithi", `${r.panchang.paksha} ${r.panchang.tithiName}`],
+                [hi ? "नक्षत्र" : "Nakshatra", r.panchang.nak],
+                [hi ? "योग" : "Yoga", r.panchang.yoga],
+                [hi ? "करण" : "Karana", r.panchang.karana],
               ].map(([k, v]) => (
                 <div key={k} style={{ ...card, padding: "14px 16px" }}>
                   <div style={{ ...T.label, color: C.muted, marginBottom: 6 }}>{k}</div>
@@ -884,16 +885,15 @@ export default function ChartScreen({ C, card, lang }) {
             <Eyebrow id="reading" deva="फलादेश" en="A short reading" />
             <div className="rise" style={{ ...card, padding: "22px 24px", fontSize: 15.5, lineHeight: 1.75 }}>
               <p style={{ margin: "0 0 14px" }}>
-                <span style={{ color: C.gold, fontFamily: "Eczar, serif" }}>Lagna · </span>
-                With <strong>{SIGNS[r.ascSign]}</strong> rising, the outer temperament carries {SIGN_NOTE[r.ascSign]}.
+                <span style={{ color: C.gold, fontFamily: "Eczar, serif" }}>{hi ? "लग्न" : "Lagna"} · </span>
+                {hi ? <><strong>{SIGNS[r.ascSign]}</strong> लग्न बाहरी व्यक्तित्व, जीवन की दिशा और परिस्थितियों से मिलने के ढंग को आकार देता है।</> : <>With <strong>{SIGNS[r.ascSign]}</strong> rising, the outer temperament carries {SIGN_NOTE[r.ascSign]}.</>}
               </p>
               <p style={{ margin: "0 0 14px" }}>
-                <span style={{ color: C.gold, fontFamily: "Eczar, serif" }}>Chandra · </span>
-                The Moon in <strong>{SIGNS[r.moon.sign]}</strong>, under <strong>{NAKSHATRAS[r.moon.nak]}</strong> nakshatra
-                (pada {r.moon.pada}), shapes the inner life: {NAK_NOTE[r.moon.nak]}
+                <span style={{ color: C.gold, fontFamily: "Eczar, serif" }}>{hi ? "चन्द्र" : "Chandra"} · </span>
+                {hi ? <><strong>{SIGNS[r.moon.sign]}</strong> राशि में <strong>{NAKSHATRAS[r.moon.nak]}</strong> नक्षत्र (पाद {r.moon.pada}) का चन्द्र मन, भावनात्मक आदतों और भीतर की प्रतिक्रिया-शैली को आकार देता है।</> : <>The Moon in <strong>{SIGNS[r.moon.sign]}</strong>, under <strong>{NAKSHATRAS[r.moon.nak]}</strong> nakshatra (pada {r.moon.pada}), shapes the inner life: {NAK_NOTE[r.moon.nak]}</>}
               </p>
               <p style={{ margin: 0, color: C.muted, fontSize: 13 }}>
-                Offered in the spirit of the tradition, for reflection and curiosity — not as a substitute for your own judgment or a qualified jyotishi's reading.
+                {hi ? "यह परम्परा की भावना में आत्मचिंतन और जिज्ञासा के लिए है—अपने विवेक या योग्य ज्योतिषी के परामर्श का विकल्प नहीं।" : "Offered in the spirit of the tradition, for reflection and curiosity — not as a substitute for your own judgment or a qualified jyotishi's reading."}
               </p>
             </div>
           </>

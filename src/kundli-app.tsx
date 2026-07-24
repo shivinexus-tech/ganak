@@ -79,7 +79,7 @@ export default function KundliApp() {
   // browser storage is banned in this project, but the address bar is not storage.
   const [lang, setLang] = useState(() => { const v = urlPrefGet("lang"); return v === "hi" || v === "en" ? v : detectLang(); });
   const chooseLang = (v) => { setLang(v); urlPrefSet("lang", v); };
-  const [mode, setMode] = useState(() => { const v = urlPrefGet("screen"); return v === "prashna" || v === "daily" ? v : "daily"; });
+  const [mode, setMode] = useState(() => { const v = urlPrefGet("screen"); return v === "prashna" || v === "daily" || v === "chart" ? v : "daily"; });
   const chooseMode = (v) => { setMode(v); urlPrefSet("screen", v); };
   const directFestivalGuide = festivalGuideFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const utilityRoute = utilityFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
@@ -154,7 +154,7 @@ export default function KundliApp() {
 
         {!directFestivalGuide && !utilityRoute && <div style={{ display: "flex", justifyContent: "center", marginBottom: T.s5 }}>
           <div style={{ display: "inline-flex", background: "#F1E9D5", borderRadius: T.rMd, padding: 3, border: `1px solid ${C.line}` }}>
-            {[["daily", lang === "hi" ? "आज · पंचांग" : "Daily"], ["prashna", lang === "hi" ? "प्रश्न" : "Prashna"]].map(([mk, label]) => (
+            {[["daily", lang === "hi" ? "आज · पंचांग" : "Daily"], ["prashna", lang === "hi" ? "प्रश्न" : "Prashna"], ["chart", lang === "hi" ? "ज्योतिष" : "Jyotish"]].map(([mk, label]) => (
               <button key={mk} onClick={() => chooseMode(mk)} style={{ padding: "9px 26px", borderRadius: T.rSm, fontFamily: T.serif, fontSize: T.fBody, cursor: "pointer", border: "none", background: mode === mk ? C.panel : "transparent", color: mode === mk ? C.gold : C.muted, fontWeight: mode === mk ? 600 : 400, boxShadow: mode === mk ? T.e1 : "none", transition: "all .15s" }}>{label}</button>
             ))}
           </div>
