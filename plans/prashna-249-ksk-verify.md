@@ -179,6 +179,35 @@ this fixes the disclosure's structure and voice only.
 
 ---
 
+## 2026-07-24 — Slice 2 build + reference cross-check (engine shipped to branch)
+
+- **Method validated against the KP primary casting rule.** The horary casting
+  instruction — *"take the commencing position of the Sub of the horary number as the
+  NIRAYANA ASCENDANT; for the other cusps take only the LATITUDE, prepared per the
+  PLACIDUS system"* — matches the implementation point-for-point: `kpNumberToLagna`
+  returns the segment **start** ("commencing position"), and `PR_castNumber` derives the
+  house frame from **ascendant + latitude** via the parity-validated Placidus. This
+  upgrades **rule 1** (number→lagna) and the **house-derivation method** from web-only to
+  primary-casting-rule confirmed.
+- **Ayanamsa → KP-New IMPLEMENTED (owner chose the fork 2026-07-24).** `PR_kpNewAyan`
+  (Balachandran 2003: 22°22′15.7″ @1900 + Newcomb precession) is pinned by a gate against
+  the published **23°46′04″ @ 1 Feb 2000** (matches to ~1″). The number mode runs KP-New;
+  the frozen Lahiri engine and its parity gate are untouched (KP-New applied only in the
+  new code below the markers). Real vs published Lahiri delta is **~5.1′**, not the ~22′ a
+  secondary web source claimed — corrected here.
+- **What's built (branch `claude/prashna-249-engine`):** `src/engine/kp-horary.ts`
+  (pure map), `PR_castNumber`/`PR_kpNewAyan`/`PR_ramcForAsc` below the frozen slice, the
+  named UI mode (toggle, 1–249 input + validation, approved verdict voice, glossed "what
+  your number set" box, KP-New/web-corroboration disclaimer). Gates: parity **EXACT
+  198/6**, prashna-calc 24/24, prashna-249 **33/33**, prashna-249-chart **14/14**
+  (ayanamsa constant, ascendant round-trip, real-sky uniform shift, personalisation,
+  high-lat fallback), parse-check, build — all green.
+- **Still open before "done":** (1) **live-render check** — blocked in this environment
+  (preview serves the main repo root; the sandbox blocks binding a worktree port), so it
+  must run post-merge; (2) a numeric **house-cusp cross-check** against a KP-New calculator
+  for a fixed number+time+place; (3) the standing **two-agent bug bash** + owner live-URL
+  approval (backlog closure contract); (4) the Reader II/VI page-pin still outstanding.
+
 ## Sources consulted
 
 - Reader VI full text — Internet Archive `kp-readers` collection
