@@ -133,6 +133,7 @@ for (const [name, lines] of topLevel)
 // ------------------------------------------------------ 3. ORPHANED REFS
 const GLOBALS = new Set(['console','window','document','navigator','Math','Date','JSON','Object','Array','String',
 'Number','Boolean','Set','Map','WeakMap','WeakSet','Symbol','Promise','RegExp','Error','TypeError','Intl','BigInt',
+'Float64Array','Float32Array','Int32Array','Uint8Array','ArrayBuffer','DataView',
 'parseInt','parseFloat','isNaN','isFinite','encodeURIComponent','decodeURIComponent','setTimeout','clearTimeout',
 'setInterval','clearInterval','requestAnimationFrame','cancelAnimationFrame','fetch','structuredClone','queueMicrotask',
 'undefined','NaN','Infinity','globalThis','module','require','process','exports','__dirname','arguments',

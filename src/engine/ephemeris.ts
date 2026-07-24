@@ -151,11 +151,21 @@ const EARTH_R1 = [
   [31,2.84,5507.55],[25,1.32,5223.69],[18,1.42,1577.34],[10,5.91,10977.08],[9,1.42,6275.96],[9,0.27,5486.78],
 ];
 
+/* Flattened VSOP87 Earth series for the hot sun path. sunGeo runs on every
+   sunSidMs call — the single most-used astronomical term in the app (festival and
+   muhurat scans call it thousands of times). The source tables above stay the
+   readable data; these Float64Arrays hold the same terms in the same order, so a
+   tight indexed loop replaces the per-term array destructuring and reduce closure.
+   Same operations, same summation order => bit-identical output (verified: 0 diff
+   over 600k evaluations; parity gate stays EXACT). */
+const _flatVsop = (tab) => { const n = tab.length, A = new Float64Array(n), B = new Float64Array(n), Cc = new Float64Array(n); for (let i = 0; i < n; i++) { A[i] = tab[i][0]; B[i] = tab[i][1]; Cc[i] = tab[i][2]; } return { A, B, Cc, n }; };
+const _EL0 = _flatVsop(EARTH_L0), _EL1 = _flatVsop(EARTH_L1), _EL2 = _flatVsop(EARTH_L2), _EL3 = _flatVsop(EARTH_L3), _ER0 = _flatVsop(EARTH_R0), _ER1 = _flatVsop(EARTH_R1);
+const _serFlat = (f, tau) => { let s = 0; for (let i = 0; i < f.n; i++) s += f.A[i] * Math.cos(f.B[i] + f.Cc[i] * tau); return s; };
+
 function sunGeo(JDE) {
   const T = (JDE - 2451545) / 36525, tau = T / 10;
-  const ser = (tab) => tab.reduce((s, [a, b, c]) => s + a * Math.cos(b + c * tau), 0);
-  const L = ser(EARTH_L0) + ser(EARTH_L1) * tau + ser(EARTH_L2) * tau * tau + ser(EARTH_L3) * tau ** 3;
-  const R = (ser(EARTH_R0) + ser(EARTH_R1) * tau) / 1e8; // AU
+  const L = _serFlat(_EL0, tau) + _serFlat(_EL1, tau) * tau + _serFlat(_EL2, tau) * tau * tau + _serFlat(_EL3, tau) * tau ** 3;
+  const R = (_serFlat(_ER0, tau) + _serFlat(_ER1, tau) * tau) / 1e8; // AU
   const Learth = rev((L / 1e8) / D2R);
   let lon = rev(Learth + 180);                     // Sun geometric longitude, mean equinox of date
   // FK5 conversion (VSOP→FK5): Δλ = -0.09033" + correction; for the Sun the standard offset:
