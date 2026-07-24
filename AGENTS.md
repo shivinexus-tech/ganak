@@ -47,6 +47,9 @@ node validation/navratri-timings.cjs                 # city Ghatasthapana + Dash
 node validation/navadurga-pages.cjs                  # 18 day-pages, owned artwork, Saptashati plan and local tithi dates
 node validation/sankranti-punya.cjs                  # Drik ingress + local Punya/Maha Punya windows
 node validation/panchaka-windows.cjs                 # no sub-minute/same-minute display windows or gaps
+node validation/hindi-devotional-language.cjs        # no vulgar/disrespectful Hindi in user-facing copy
+node validation/hindi-worship-glossary.cjs         # canonical संकल्प/पारण/नैवेद्य terms + UI labels
+node validation/hindi-worship-glossary.cjs         # canonical संकल्प/पारण/नैवेद्य terms + UI labels
 node validation/festival-deeplinks.cjs               # permanent festival routes + existing card default
 node validation/festival-page-coverage.cjs            # every in-scope openable label has a valid page
 node validation/major-festival-pages.cjs              # reviewed major festivals stay substantive and bilingual

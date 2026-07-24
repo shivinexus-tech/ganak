@@ -1,24 +1,69 @@
 ---
 name: hindi-devotional-language
 description: >-
-  Write and review Ganak user-facing Hindi for festivals, vrats, kathas, and
-  worship guides. Use when translating or drafting Hindi devotional copy, or
-  when the owner reports disrespectful or vulgar Hindi phrasing.
+  Write and review Ganak user-facing Hindi for festivals, vrats, kathas, puja
+  steps, verdicts, and diet guidance. Use when translating English worship
+  guides, fixing Hindi copy, or when the owner reports disrespectful phrasing.
 ---
 
 # Hindi devotional language (Ganak)
 
 Read `plans/hindi-devotional-language.md` and `plans/religious-content-policy.md` first.
 
-## Before shipping Hindi copy
+## Core rule
 
-1. Never translate *bare*, *barefoot*, or *naked* with `नंगा/नंगी/नंगे`.
-2. Use respectful words for offerings (`साधारण`, `विनम्र`) — not `तुच्छ`.
-3. Avoid `घृणा` in kathas; use `विकर्षण` or `अरुचि`.
-4. Run `node validation/hindi-devotional-language.cjs` and fix every hit.
+**Hindi is a devotional rewrite, not a translation.** English is the draft; Hindi must sound like a respectful household worship guide a Hindi-speaking elder would read aloud without embarrassment.
 
-## Quick reference
+## Workflow
 
-- barefoot → **बिना जूते के**
-- slept on bare stone → **शिला या वन-भूमि पर शयन की**
-- meagre gift → **साधारण भेंट** or **विनम्र भेंट**
+1. Understand the **religious action** (fast type, deity, offering, story beat).
+2. Write Hindi in **plain शुद्ध हिन्दी** — avoid English calques and bureaucratic Sanskritized jargon unless it is the traditional term (e.g. संकल्प, नैवेद्य).
+3. For kathas: use **named figures, scene, devotion, divine grace** — respectful throughout.
+4. For puja steps: use **आदरपूर्वक, श्रद्धापूर्वक, कुल-परम्परानुसार** — not lecturing tone.
+5. Run `node validation/hindi-devotional-language.cjs` and fix every hit before claiming done.
+
+## High-risk English → Hindi traps
+
+| English | Never write | Write instead |
+|---------|-------------|---------------|
+| bare / barefoot | नंगा, नंगी, नंगे पाँव | बिना जूते के; शिला या वन-भूमि पर |
+| meagre offering | तुच्छ भेंट | साधारण या विनम्र भेंट |
+| revulsion | घृणा | विकर्षण, अरुचि |
+| humiliation | अपमान | अपकार, दुर्व्यवहार |
+| lighter observance | से हल्का | की अपेक्षा संक्षिप्त / सरल रूप |
+| ease the fast | व्रत हल्का करना | व्रत समाप्त करना / व्रत खोलना |
+
+## Safe uses of हल्का
+
+OK when describing **observance type**, not ranking one festival below another:
+- हल्का व्रत, हल्का भोजन, हल्के सात्त्विक व्यंजन, हल्की मालिश (अभ्यंग स्नान)
+
+## Files that carry Hindi worship copy
+
+- `src/data/vrat-vidhis.ts` — base guide fields
+- `src/data/major-festival-guides.ts`, `durga-puja-guides.ts`, `vrat-guide-enrichments.ts`
+- `src/data/regional-kathas/**` — kathas (merged last into guides)
+- `src/data/navadurga-pages.ts`, `festival-meta.ts`
+- `src/screens/FestivalGuideScreen.tsx`, `VratVidhiCard.tsx` labels via `VRAT_VIDHI_LABELS`
+
+## Validation
+
+```bash
+export PATH="/opt/homebrew/bin:$PATH"
+node validation/hindi-devotional-language.cjs
+node validation/hindi-worship-glossary.cjs
+```
+
+## Release (owner + agents)
+
+Before a major Hindi content deploy, follow `plans/hindi-release-checklist.md`:
+- Agents: both gates above + no machine translation
+- Owner: spot-check four URLs (`hartalika-teej`, `chhath`, `karva-chauth`, `diwali`) with `?lang=hi`
+
+## Glossary
+
+Use spellings from `plans/hindi-worship-glossary.md` for संकल्प, नैवेद्य, पारण, निर्जला, उद्यापन, and UI labels.
+
+## No machine translation
+
+Never paste Google Translate (or other MT) into repo Hindi. Rewrite devotionally using this skill.
