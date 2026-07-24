@@ -108,7 +108,7 @@
     57
   ],
   "sourceConfidenceByItem": {
-    "1": "Published conventions and regression anchors; item-level source depth varies",
+    "1": "Drik Panchang 108-pada table plus a second published table; variant English aliases require one documented Ganak convention",
     "2": "Primary/textual and institutional sources; regional and seasonal variation labelled",
     "6": "Textual rule/source matrix and institutional calendar anchors",
     "7": "Institutional/published calendar anchors; astronomical conventions documented",
@@ -125,15 +125,15 @@
   },
   "qualityOverrides": {
     "1": {
-      "deliveryState": "Delivered; independent quality re-check pending",
-      "limitations": "F1–F5 are fixed with regression coverage. A fresh independent 60-minute post-fix bug bash is not yet recorded, so permanent-quality closure remains open.",
-      "shortTermImpact": "The known calculator defects are resolved, but the corrected release has not yet completed its required independent adversarial re-check.",
-      "longTermImpact": "Without the independent post-fix pass, an undiscovered regression could remain in a high-impact calculation journey.",
-      "bugBashStatus": "Required for high-impact closure — original 2026-07-24 pass found F1–F5; fixes and regressions are complete; fresh independent 60-minute post-fix pass pending.",
-      "qualityRisk": "Red",
-      "lastVerified": "2026-07-24 · Production bundle index-DwmjFApB.js; EN/HI phone matrix after F1–F5 fixes",
-      "sourceConfidence": "Published conventions and regression anchors; Hindi naming uses Drik Panchang's published 108-pada Devanagari table",
-      "recommendedAction": "Commission a fresh independent 60-minute adversarial pass across all 12 calculators; close only if it records no P0/P1 findings."
+      "deliveryState": "Delivered with a minor bilingual naming-source limitation",
+      "limitations": "The fresh independent post-fix bug bash found no P0/P1 defect. F7 P2 remains: a few English baby-name aliases do not transparently transliterate the sourced Devanagari output after switching language.",
+      "shortTermImpact": "All calculator journeys work, but a user may see a variant English sound change to a non-obvious Devanagari equivalent when switching language.",
+      "longTermImpact": "Leaving mixed naming conventions undocumented would weaken bilingual trust and make future source updates harder to audit.",
+      "bugBashStatus": "Completed 2026-07-24 — fresh independent 60-focused-minute pass across all 12 calculators; no P0/P1 findings; F7 P2 bilingual naming-source consistency recorded.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-24 · Production all-12 EN/HI adversarial matrix plus port 5199 reproduction and full validation/build gates",
+      "sourceConfidence": "Drik Panchang 108-pada table plus a second published table; variant English aliases require one documented Ganak convention",
+      "recommendedAction": "Choose and document one published naming-syllable convention; align the English aliases with each Devanagari pada, add 108-pada bilingual parity assertions, then production-check the affected results."
     },
     "5": {
       "deliveryState": "Built and tested locally — not publicly delivered",

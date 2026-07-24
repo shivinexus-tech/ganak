@@ -9,9 +9,9 @@ const base = parseRegister(markdown, config, "test base");
 
 assert.equal(base.rows.size, 57);
 assert.equal(sheetRow(base.rows.get("1")).length, 19);
-assert.equal(base.rows.get("1").quality.deliveryState, "Delivered; independent quality re-check pending");
-assert.equal(base.rows.get("1").quality.qualityRisk, "Red");
-assert.match(base.rows.get("1").quality.bugBashStatus, /Required for high-impact closure/);
+assert.equal(base.rows.get("1").quality.deliveryState, "Delivered with a minor bilingual naming-source limitation");
+assert.equal(base.rows.get("1").quality.qualityRisk, "Amber");
+assert.match(base.rows.get("1").quality.bugBashStatus, /no P0\/P1 findings/);
 assert.equal(base.rows.get("12").quality.qualityRisk, "Amber");
 assert.equal(base.rows.get("12").quality.deliveryState, "Core overlay delivered; UI placement decision open");
 assert.match(base.rows.get("12").quality.limitations, /owner-approved discoverable location/);
@@ -25,7 +25,7 @@ assert.match(base.rows.get("5").quality.bugBashStatus, /not completed/i);
 assert.equal(base.rows.get("5").quality.qualityRisk, "Red");
 assert.match(base.rows.get("5").quality.lastVerified, /Local HTTP smoke only/);
 assert.match(base.rows.get("5").quality.sourceConfidence, /Not applicable/);
-assert.match(base.rows.get("1").quality.recommendedAction, /fresh independent 60-minute adversarial pass/);
+assert.match(base.rows.get("1").quality.recommendedAction, /108-pada bilingual parity assertions/);
 assert.match(base.rows.get("5").quality.recommendedAction, /Deploy the API/);
 assert.match(base.rows.get("12").quality.recommendedAction, /holiday-overlay control/);
 assert.match(base.rows.get("2").quality.recommendedAction, /bug bash/);
@@ -107,7 +107,7 @@ const staleBaseline = makeLive(head);
 staleBaseline.liveById.get("1").cells[4] = "20%";
 assert.deepEqual(
   buildBootstrapChanges(head, staleBaseline).map(({ kind, liveRow, sheetIndex, value }) => ({ kind, id: liveRow.id, sheetIndex, value })),
-  [{ kind: "cell", id: "1", sheetIndex: 4, value: "95%" }],
+  [{ kind: "cell", id: "1", sheetIndex: 4, value: "98%" }],
   "an explicitly requested bootstrap must identify every stale live cell against the repository",
 );
 assert.deepEqual(buildBootstrapChanges(head, alreadyPublished), [], "bootstrap must be idempotent after alignment");
