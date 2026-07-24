@@ -510,10 +510,9 @@ Punjabi and some North-Indian family custom, not a universal prerequisite. / HI:
 सरल सात्त्विक भोजन लिया जा सकता है। सरगी पंजाबी/कुछ उत्तर भारतीय कुल-परम्परा है,
 सर्वत्र अनिवार्य नहीं।
 
-**Sankalpa / संकल्प:** EN: “I observe Karva Chauth for love, mutual wellbeing and
-the long, ethical partnership of our family. May care flow both ways.” / HI: “मैं
-प्रेम, परस्पर मंगल और हमारे परिवार के दीर्घ, धर्मपूर्ण साथ के लिए करवा चौथ रखती/रखता
-हूँ। देखभाल दोनों ओर से हो।”
+**Sankalpa / संकल्प:** EN: “I observe Karva Chauth for my husband's long life,
+wellbeing and the prosperity of our family.” / HI: “मैं पति की दीर्घायु, सौभाग्य और
+कुटुम्ब कल्याण के लिए करवा चतुर्थी का व्रत रखती/रखता हूँ।”
 
 **Puja / पूजा:** Ganesha remembrance; Shiva, Parvati/Gauri, Kartikeya and Ganesha;
 karva with water, lamp, roli/rice, flowers, fruit/sweet; family katha and thali-

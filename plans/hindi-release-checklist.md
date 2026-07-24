@@ -8,6 +8,7 @@ Use this when shipping **festival/vrat content** or any wide Hindi copy change. 
 export PATH="/opt/homebrew/bin:$PATH"
 node validation/hindi-devotional-language.cjs
 node validation/hindi-worship-glossary.cjs
+node validation/devotional-voice-english.cjs
 node validation/devotional-guide-quality.cjs
 ```
 
@@ -31,6 +32,8 @@ Open each URL on **phone width**, language **हिन्दी**, expand the fu
 | Diwali | https://ganak.pages.dev/festival/diwali?lang=hi |
 
 **Owner checks:**
+- [ ] Hindi **makes sense** when read aloud — not just grammatically OK.
+- [ ] English does not sound like an essay, therapy talk, or product disclaimer.
 - [ ] No word sounds crude, insulting, or embarrassingly literal (e.g. नंगी, तुच्छ, अपमान).
 - [ ] Tone feels respectful and devotional — like a household puja guide, not an essay or lecture.
 - [ ] Core terms match `plans/hindi-worship-glossary.md` (संकल्प, पारण, नैवेद्य, निर्जला where relevant).

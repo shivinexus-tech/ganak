@@ -139,24 +139,24 @@ export const VRAT_VIDHI = {
       hi: "इस अनुष्ठान में लक्ष्मी-पूजन तक दिनभर व्रत रखते हैं, पर यह हर दीपावली-घर के लिए एक अनिवार्य नियम नहीं है। व्रत हो तो परिवार या मंदिर से मिली जल, फल, दूध या भोजन की रीति रखें और सायंकालीन पूजा के बाद खोलें। अन्यथा पारिवारिक उत्सवी शाकाहारी भोजन और प्रसाद लें। क्षेत्रीय मिठाइयाँ और नमकीन बहुत भिन्न होते हैं।",
     },
     sankalpa: {
-      en: "“On this night of lights, I welcome wisdom, honest prosperity and generosity into this home. May what we receive be used responsibly and shared with others.” This is a plain-language intention, not a prescribed Sanskrit mantra.",
-      hi: "“इस दीप-रात्रि पर मैं इस घर में विवेक, ईमानदार समृद्धि और उदारता का स्वागत करता/करती हूँ। हमें जो मिले उसका सदुपयोग हो और हम दूसरों के साथ बाँटें।” यह सरल भाव-संकल्प है, निर्धारित संस्कृत मंत्र नहीं।",
+      en: "“On this night of lights I perform Lakshmi puja at home and pray for peace, prosperity and wellbeing in our household. This is a simple household intention, not a prescribed Sanskrit mantra.”",
+      hi: "“इस दीप-रात्रि पर मैं घर में लक्ष्मी-पूजन करूँगा/करूँगी और घर में शांति, समृद्धि तथा कल्याण की कामना करूँगा/करूँगी। यह सरल गृह-संकल्प है, निर्धारित संस्कृत मंत्र नहीं।”",
     },
     puja: {
       en: "Recommended household path: clean altar; safe lamp; Ganesha remembrance where customary; Lakshmi invitation; water, kumkum or sandal, flowers, lamp and naivedya; familiar prayer or Shri Sukta; aarti; prasad and charity. Elaborate Kalasha, new-murti Shodashopachara, account-book, Kubera or priest-led rites belong to households that already follow them and are not required for this simple path.",
       hi: "अनुशंसित गृह-विधि: स्वच्छ वेदी; सुरक्षित दीप; परम्परानुसार गणेश-स्मरण; लक्ष्मी-आवाहन; जल, कुमकुम या चन्दन, फूल, दीप और नैवेद्य; परिचित प्रार्थना या श्रीसूक्त; आरती; प्रसाद और दान। विस्तृत कलश, नई मूर्ति का षोडशोपचार, बही-खाता, कुबेर या पुरोहित-विधि उन्हीं घरों के लिए है जहाँ पहले से प्रचलित हो; सरल विधि में यह अनिवार्य नहीं।",
     },
     stories: [
-      { en: "Rama's return: in a widely told North Indian association, lamps welcome Rama, Sita and Lakshmana back to Ayodhya after exile and Ravana's defeat. Ganak labels this as a major regional devotional memory, not the only Diwali story across India.", hi: "राम की वापसी: उत्तर भारत की व्यापक परम्परा में वनवास और रावण-वध के बाद राम, सीता और लक्ष्मण के अयोध्या लौटने पर दीपों से स्वागत स्मरण किया जाता है। गणक इसे प्रमुख क्षेत्रीय भक्ति-स्मृति कहता है, पूरे भारत की एकमात्र दीपावली-कथा नहीं।" },
+      { en: "Rama's return: in much of North India, lamps welcome Rama, Sita and Lakshmana back to Ayodhya after exile and Ravana's defeat. Other regions centre different deities and stories on the same night.", hi: "राम की वापसी: उत्तर भारत की व्यापक परम्परा में वनवास और रावण-वध के बाद राम, सीता और लक्ष्मण के अयोध्या लौटने पर दीपों से स्वागत स्मरण किया जाता है। अन्य क्षेत्रों में उसी रात्रि पर अलग देवता और कथाएँ केंद्र में रहती हैं।" },
       { en: "Lakshmi on Amavasya: the main North Indian household night welcomes Lakshmi as the giver of well-being and prosperity. The ethical emphasis is clean work, gratitude, generosity and responsible use of wealth—not gambling or guaranteed financial gain.", hi: "अमावस्या पर लक्ष्मी: उत्तर भारतीय गृह-परम्परा की मुख्य रात्रि में कल्याण और समृद्धि देने वाली लक्ष्मी का स्वागत होता है। इसका नैतिक भाव स्वच्छ कर्म, कृतज्ञता, उदारता और धन का जिम्मेदार उपयोग है—जुआ या निश्चित आर्थिक लाभ नहीं।" },
       { en: "Krishna and Narakasura belongs especially to Naraka Chaturdashi, the preceding dawn observance in many western and southern traditions. It explains Abhyanga Snan and Chhoti Diwali customs there; it should not be collapsed into the Lakshmi-puja night.", hi: "कृष्ण और नरकासुर की कथा विशेषतः नरक चतुर्दशी से जुड़ी है, जो अनेक पश्चिमी और दक्षिणी परम्पराओं में पूर्ववर्ती प्रातः का पर्व है। वहाँ यह अभ्यंग-स्नान और छोटी दीपावली की रीति समझाती है; इसे लक्ष्मी-पूजन की रात्रि में नहीं मिलाना चाहिए।" },
     ],
     regional: [
       { en: "North and much of western India: evening Lakshmi-Ganesha worship, lamps, rangoli, sweets and family gatherings are prominent. Business account-book or Kubera worship is community-specific, not a requirement for every home.", hi: "उत्तर और पश्चिम भारत के बड़े भाग में सायंकालीन लक्ष्मी-गणेश पूजा, दीप, रंगोली, मिठाई और परिवार-मिलन प्रमुख हैं। व्यापारिक बही-खाता या कुबेर-पूजा समुदाय-विशेष की रीति है, हर घर के लिए अनिवार्य नहीं।" },
-      { en: "Bengal and parts of eastern India: Kali Puja or Shyama Puja is observed on the same Amavasya night with its own deity, timing and Shakta procedure. Ganak keeps that route and guidance distinct from the Lakshmi household path.", hi: "बंगाल और पूर्वी भारत के कुछ भागों में उसी अमावस्या-रात्रि पर काली पूजा या श्यामा पूजा अपनी देवी, समय और शाक्त-विधि के साथ होती है। गणक उसे लक्ष्मी की गृह-विधि से अलग मार्ग और मार्गदर्शन के रूप में रखता है।" },
+      { en: "Bengal and parts of eastern India: Kali Puja or Shyama Puja is observed on the same Amavasya night with its own deity, timing and Shakta procedure. That path is distinct from the Lakshmi household guide above.", hi: "बंगाल और पूर्वी भारत के कुछ भागों में उसी अमावस्या-रात्रि पर काली पूजा या श्यामा पूजा अपनी देवी, समय और शाक्त-विधि के साथ होती है। वह मार्ग ऊपर दी गई लक्ष्मी की गृह-विधि से अलग है।" },
       { en: "Maharashtra's sequence commonly includes Vasubaras, Dhantrayodashi, Naraka Chaturdashi, Lakshmi Pujan, Bali Pratipada/Padwa and Bhau Beej, with faral foods and early-morning customs. Follow each named day rather than treating the whole sequence as one ritual.", hi: "महाराष्ट्र के क्रम में प्रायः वसुबारस, धनत्रयोदशी, नरक चतुर्दशी, लक्ष्मी पूजन, बलि प्रतिपदा/पाडवा और भाऊबीज, फराळ तथा प्रातःकालीन रीतियाँ आती हैं। पूरे क्रम को एक ही अनुष्ठान मानने के बजाय प्रत्येक नामित दिन की विधि अलग रखें।" },
       { en: "Tamil Deepavali and several southern observances centre the Naraka Chaturdashi morning, oil bath, new clothes, food and family worship. The calendar relationship is close, but this is not simply the North Indian Lakshmi-puja night translated southward.", hi: "तमिल दीपावली और कई दक्षिण भारतीय परम्पराओं का केंद्र नरक चतुर्दशी की सुबह, तेल-स्नान, नए वस्त्र, भोजन और पारिवारिक पूजा है। पंचांग-सम्बन्ध निकट है, पर यह उत्तर भारतीय लक्ष्मी-पूजन रात्रि का केवल दक्षिणी रूप नहीं है।" },
-      { en: "Jain and Sikh Diwali-period observances have their own histories and theology. Ganak's Hindu household guide does not speak for those traditions; users should follow their own community sources.", hi: "जैन और सिख दीपावली-कालीन पर्वों का अपना इतिहास और धर्म-दर्शन है। गणक की हिन्दू गृह-मार्गदर्शिका उन परम्पराओं का प्रतिनिधित्व नहीं करती; उपयोगकर्ता अपने समुदाय के स्रोत मानें।" },
+      { en: "Jain and Sikh Diwali-period observances have their own histories and theology. This guide covers the Hindu household path only; follow your own community sources for those traditions.", hi: "जैन और सिख दीपावली-कालीन पर्वों का अपना इतिहास और धर्म-दर्शन है। यह मार्गदर्शिका केवल हिन्दू गृह-पूजा के लिए है; उन परम्पराओं के लिए अपने समुदाय के स्रोत मानें।" },
     ],
     paran: {
       en: "If your family observes a fast, complete it after the local evening Lakshmi puja and prasad according to the rule with which the fast was undertaken. Complete paran according to the household tradition.",
@@ -552,19 +552,19 @@ export const VRAT_VIDHI = {
   },
   karvaChauth: {
     verdict: {
-      en: "A North- and West-Indian marital-wellbeing fast traditionally kept from sunrise until the local moon is seen and offered water. Nirjala is the strict form, not the only safe devotional choice.",
-      hi: "उत्तर और पश्चिम भारत का दाम्पत्य-मंगल व्रत, परम्परागत रूप से सूर्योदय से स्थानीय चन्द्र-दर्शन और अर्घ्य तक। निर्जला कठोर रूप है, भक्ति का एकमात्र सुरक्षित रूप नहीं।",
+      en: "Karva Chauth is a festival where women fast for their husband's wellbeing, from sunrise until moonrise.",
+      hi: "करवा चौथ वह पर्व है जिसमें महिलाएँ पति के मंगल के लिए सूर्योदय से चन्द्रोदय तक व्रत रखती हैं।",
     },
     vidhi: [
-      { en: "Where customary, eat Sargi before sunrise; after bathing, state the chosen fast; prepare karva, lamp and puja plate; gather in the evening for Gauri/Parvati and Shiva-family worship and katha; at actual local moonrise, sight the moon directly or through the family-used sieve/cloth, offer water, pray for mutual wellbeing, then break.", hi: "परम्परा हो तो सूर्योदय से पहले सरगी लें; स्नान बाद चुना व्रत बोलें; करवा, दीप, थाली तैयार करें; शाम गौरी/पार्वती व शिव-परिवार पूजन और कथा; वास्तविक स्थानीय चन्द्रोदय पर कुलानुसार सीधे या छलनी/वस्त्र से चन्द्र-दर्शन, जल-अर्घ्य, परस्पर मंगल की प्रार्थना और पारण।" },
+      { en: "Where customary, eat Sargi before sunrise; after bathing, state the chosen fast; prepare karva, lamp and puja plate; gather in the evening for Gauri/Parvati and Shiva-family worship and katha; at actual local moonrise, sight the moon directly or through the family-used sieve/cloth, offer water, pray for your husband's long life and the family's wellbeing, then break.", hi: "परम्परा हो तो सूर्योदय से पहले सरगी लें; स्नान बाद चुना व्रत बोलें; करवा, दीप, थाली तैयार करें; शाम गौरी/पार्वती व शिव-परिवार पूजन और कथा; वास्तविक स्थानीय चन्द्रोदय पर कुलानुसार सीधे या छलनी/वस्त्र से चन्द्र-दर्शन, जल-अर्घ्य, पति की दीर्घायु और कुटुम्ब कल्याण की प्रार्थना और पारण।" },
     ],
     diet: {
       en: "Strict form is no food/water after sunrise. A health-modified form may use water, fruit or a simple satvik meal by prior sankalpa. Sargi is a Punjabi and some North-Indian family custom, not a universal prerequisite.",
       hi: "कठोर रूप में सूर्योदय बाद अन्न-जल नहीं। स्वास्थ्य अनुसार पहले संकल्प लेकर जल, फल या सरल सात्त्विक भोजन लिया जा सकता है। सरगी पंजाबी/कुछ उत्तर भारतीय कुल-परम्परा है, सर्वत्र अनिवार्य नहीं।",
     },
     sankalpa: {
-      en: "“I observe Karva Chauth for love, mutual wellbeing and the long, ethical partnership of our family. May care flow both ways.”",
-      hi: "“मैं प्रेम, परस्पर मंगल और हमारे परिवार के दीर्घ, धर्मपूर्ण साथ के लिए करवा चौथ रखती/रखता हूँ। देखभाल दोनों ओर से हो।”",
+      en: "“I observe Karva Chauth for my husband's long life, wellbeing and the prosperity of our family.”",
+      hi: "“मैं पति की दीर्घायु, सौभाग्य और कुटुम्ब कल्याण के लिए करवा चतुर्थी का व्रत रखती/रखता हूँ।”",
     },
     puja: {
       en: "Ganesha remembrance; Shiva, Parvati/Gauri, Kartikeya and Ganesha; karva with water, lamp, roli/rice, flowers, fruit/sweet; family katha and thali-rotation where customary; moon arghya.",
@@ -621,8 +621,8 @@ export const VRAT_VIDHI = {
       hi: "परम्परागत हरतालिका व्रत निर्जला—बिना अन्न और जल—होता है। अपनी कुल या मंदिर परम्परा के आहार और शुद्धि नियम मानें।",
     },
     sankalpa: {
-      en: "“I observe Hartalika Teej, remembering Parvati's tapas and worshipping Uma-Maheshwara. May Shiva and Parvati bless my household with steadfast devotion and a righteous married life.”",
-      hi: "“मैं पार्वती के तप का स्मरण करते हुए हरतालिका तीज का व्रत रखती/रखता हूँ और उमा-महेश्वर की पूजा करती/करता हूँ। शिव-पार्वती मेरे घर में दृढ़ भक्ति और धर्ममय दाम्पत्य का आशीर्वाद दें।”",
+      en: "“I observe Hartalika Teej, remembering Parvati's tapas and worshipping Uma-Maheshwara. May Shiva and Parvati bless my household with steadfast devotion and a happy married life.”",
+      hi: "“मैं पार्वती के तप का स्मरण करते हुए हरतालिका तीज का व्रत रखती/रखता हूँ और उमा-महेश्वर की पूजा करती/करता हूँ। शिव-पार्वती मेरे घर में दृढ़ भक्ति और सुखी गृहस्थ जीवन का आशीर्वाद दें।”",
     },
     puja: {
       en: "Choose one complete path below. Panchopachara is the recommended household method: it is a full, orderly puja with five principal offerings. Use Shodashopachara when your family follows the expanded sixteen-offering method. The names of the offerings are given so you can follow the order; use your family's mantras, or make each offering with a simple respectful prayer.",
@@ -780,8 +780,8 @@ export const VRAT_VIDHI = {
       hi: "यह अत्यन्त कठोर व्रतों में है, इसलिए ऊपर की स्वास्थ्य टिप्पणी पढ़ें और आवश्यकता हो तो सहायक या संशोधित रूप चुनें। प्याज, लहसुन, साधारण नमक और प्रसंस्कृत या मिश्रित भोजन प्रायः छोड़े जाते हैं, पर सामग्री और रसोई-शुद्धि कुलानुसार बदलती है।",
     },
     sankalpa: {
-      en: "“Across these four days I honour Surya and Chhathi Maiya with gratitude for life, health and family. May I complete only the level safe for my body and keep every riverbank and public place clean.”",
-      hi: "“इन चार दिनों में मैं जीवन, स्वास्थ्य और परिवार के लिए सूर्य और छठी मैया का कृतज्ञ पूजन करती/करता हूँ। शरीर के लिए सुरक्षित स्तर ही पूरा करूँ और हर घाट व सार्वजनिक स्थान स्वच्छ रखूँ।”",
+      en: "“Across these four days I worship Surya and Chhathi Maiya with devotion and pray for my family's health and wellbeing.”",
+      hi: "“इन चार दिनों में मैं छठी मैया और सूर्य देव की श्रद्धापूर्वक पूजा करूँगी/करूँगा और परिवार के स्वास्थ्य व कल्याण की कामना करूँगी/करूँगा।”",
     },
     puja: {
       en: "Use arghya water, seasonal fruit, sugarcane and family-prepared prasad such as thekua or kheer according to tradition; use lamps only where fire rules and crowd safety allow. Never enter deep, polluted or restricted water.",

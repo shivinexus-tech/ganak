@@ -4,7 +4,8 @@ English devotional copy often uses neutral words (*bare*, *meagre*, *barefoot*, 
 
 ## Non-negotiables
 
-1. **Write Hindi devotionally, do not translate word-for-word.** If the English draft says *bare stone*, the Hindi should say **शिला पर शयन**, not **नंगी शिला**.
+1. **English first must sound like a puja guide, not an essay.** Banned: “May care flow both ways”, “ethical partnership”, “mutual wellbeing”, product meta (“Ganak labels…”). See `plans/festival-vrat-voice-research.md`.
+2. **Write Hindi devotionally, do not translate word-for-word.** If the English draft says *bare stone*, the Hindi should say **शिला पर शयन**, not **नंगी शिला**.
 2. **Never use undressing vocabulary** (`नंगा`, `नंगी`, `नंगे`) for deities, devotees, stones, floors, or pilgrimage.
 3. **Never insult offerings or devotees** (`तुच्छ भेंट`, `घृणा`, slurs).
 4. **Do not dismiss an observance** with `से हल्का` — use **की अपेक्षा संक्षिप्त** or **सरल रूप**.
@@ -27,11 +28,12 @@ English devotional copy often uses neutral words (*bare*, *meagre*, *barefoot*, 
 
 ## Agent workflow (mandatory for Hindi religious copy)
 
-1. Draft or revise **English** worship guide text first (verdict → meaning → diet → sankalpa → puja → paran).
-2. **Rewrite in Hindi** as a household pujari would speak — not as a dictionary translation.
-3. Read the Hindi aloud mentally: would a grandmother find any word crude or belittling?
+1. Read `plans/festival-vrat-voice-research.md` and `plans/hindi-worship-glossary.md`.
+2. Draft or revise **English** worship guide text first (verdict → meaning → diet → sankalpa → puja → paran). English must pass the grandmother / puja-article test.
+3. **Rewrite in Hindi** as a household pujari would speak — not as a dictionary translation.
+3. Read the Hindi aloud mentally: would a grandmother find any word crude, belittling, **or nonsensical**?
 4. Use spellings from `plans/hindi-worship-glossary.md` for संकल्प, नैवेद्य, पारण, निर्जला, उद्यापन.
-5. Run `node validation/hindi-devotional-language.cjs` and `node validation/hindi-worship-glossary.cjs`.
+5. Run `node validation/hindi-devotional-language.cjs`, `node validation/hindi-worship-glossary.cjs`, and `node validation/devotional-voice-english.cjs`.
 6. For release-bound work, follow `plans/hindi-release-checklist.md` (owner spot-check on four high-traffic pages).
 
 ## Regression gate
@@ -39,6 +41,7 @@ English devotional copy often uses neutral words (*bare*, *meagre*, *barefoot*, 
 ```bash
 node validation/hindi-devotional-language.cjs
 node validation/hindi-worship-glossary.cjs
+node validation/devotional-voice-english.cjs
 ```
 
 Scans `src/data`, `src/screens`, `src/components`, and all merged `VRAT_VIDHI` Hindi fields.

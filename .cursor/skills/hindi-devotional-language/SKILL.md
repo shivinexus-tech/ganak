@@ -8,7 +8,7 @@ description: >-
 
 # Hindi devotional language (Ganak)
 
-Read `plans/hindi-devotional-language.md` and `plans/religious-content-policy.md` first.
+Read `plans/festival-vrat-voice-research.md`, `plans/hindi-devotional-language.md`, and `plans/religious-content-policy.md` first.
 
 ## Core rule
 
@@ -16,11 +16,12 @@ Read `plans/hindi-devotional-language.md` and `plans/religious-content-policy.md
 
 ## Workflow
 
-1. Understand the **religious action** (fast type, deity, offering, story beat).
+1. Understand the **religious action** (fast type, deity, offering, story beat). Check how Bhaskar/NBT/Drik frame the same festival in `plans/festival-vrat-voice-research.md`.
+2. Fix **English** if it sounds like an essay (*May care flow both ways*, *ethical partnership*) before writing Hindi.
 2. Write Hindi in **plain शुद्ध हिन्दी** — avoid English calques and bureaucratic Sanskritized jargon unless it is the traditional term (e.g. संकल्प, नैवेद्य).
 3. For kathas: use **named figures, scene, devotion, divine grace** — respectful throughout.
 4. For puja steps: use **आदरपूर्वक, श्रद्धापूर्वक, कुल-परम्परानुसार** — not lecturing tone.
-5. Run `node validation/hindi-devotional-language.cjs` and fix every hit before claiming done.
+5. Run `node validation/hindi-devotional-language.cjs`, `node validation/hindi-worship-glossary.cjs`, and `node validation/devotional-voice-english.cjs` before claiming done.
 
 ## High-risk English → Hindi traps
 
