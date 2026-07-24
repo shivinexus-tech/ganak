@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240" role="img" aria-label="Murugan with vel on monthly Shashti" data-subject="murugan">
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240" role="img" aria-label="Murugan victory on Soorasamharam" data-subject="murugan">
   <defs>
     <linearGradient id="mur" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#1A2048"/><stop offset="100%" stop-color="#C2451E"/>
@@ -16,6 +16,6 @@
     <circle cx="0" cy="-22" r="5" fill="#D4AF37"/>
   </g>
   
-  <text x="28" y="36" font-family="Georgia, 'Noto Serif Devanagari', serif" font-size="22" fill="#FAF5EA" opacity="0.92">Skanda Shashti</text>
-  <text x="28" y="58" font-family="'Noto Sans Devanagari', sans-serif" font-size="12" fill="#C9B896" letter-spacing="0.08em" opacity="0.78">स्कंद षष्ठी</text>
+  <text x="28" y="36" font-family="Georgia, 'Noto Serif Devanagari', serif" font-size="22" fill="#FAF5EA" opacity="0.92">Skanda Sashti — Soorasamharam (Day 6)</text>
+  <text x="28" y="58" font-family="'Noto Sans Devanagari', sans-serif" font-size="12" fill="#C9B896" letter-spacing="0.08em" opacity="0.78">स्कंद षष्ठी — सूरसम्हारम (दिन 6)</text>
 </svg>

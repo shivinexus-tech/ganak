@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240" role="img" aria-label="Kartika Purnima lamps on the water" data-subject="diya-river">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FAF5EA"/>
-      <stop offset="100%" stop-color="#E7DDC6"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="200" fill="url(#g)"/>
-  <circle cx="520" cy="48" r="36" fill="none" stroke="#A86A12" stroke-width="3" opacity="0.55"/>
-  <path d="M48 150 Q160 60 280 150 T520 150" fill="none" stroke="#C2451E" stroke-width="2.5" opacity="0.35"/>
-  <text x="32" y="118" font-family="Georgia, serif" font-size="26" fill="#3B3147">Kartika Purnima (Dev Deepa…</text>
-  <text x="32" y="148" font-family="sans-serif" font-size="13" fill="#8C8173" letter-spacing="0.12em">GANAK FESTIVAL GUIDE</text>
+    <linearGradient id="river" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0A1828"/><stop offset="100%" stop-color="#1A4868"/>
+    </linearGradient></defs>
+  
+  <rect width="640" height="240" fill="url(#river)"/>
+  <path d="M0 160 Q160 140 320 165 T640 150 L640 240 L0 240Z" fill="#0A3048" opacity="0.7"/>
+  <g transform="translate(160,175)"><ellipse cx="0" cy="8" rx="8" ry="12" fill="#FFD86B" opacity="0.9"/><ellipse cx="0" cy="20" rx="6" ry="3" fill="#FFD86B" opacity="0.3"/></g>
+  <g transform="translate(280,170)"><ellipse cx="0" cy="8" rx="8" ry="12" fill="#FFD86B" opacity="0.85"/><ellipse cx="0" cy="20" rx="6" ry="3" fill="#FFD86B" opacity="0.25"/></g>
+  <g transform="translate(400,178)"><ellipse cx="0" cy="8" rx="8" ry="12" fill="#FFD86B" opacity="0.9"/><ellipse cx="0" cy="20" rx="6" ry="3" fill="#FFD86B" opacity="0.3"/></g>
+  <g transform="translate(520,172)"><ellipse cx="0" cy="8" rx="8" ry="12" fill="#FFD86B" opacity="0.88"/><ellipse cx="0" cy="20" rx="6" ry="3" fill="#FFD86B" opacity="0.28"/></g>
+  <circle cx="540" cy="55" r="22" fill="#F0E8D0" opacity="0.7"/>
+  
+  <text x="28" y="36" font-family="Georgia, 'Noto Serif Devanagari', serif" font-size="22" fill="#FAF5EA" opacity="0.92">Kartika Purnima (Dev Deepawali)</text>
+  <text x="28" y="58" font-family="'Noto Sans Devanagari', sans-serif" font-size="12" fill="#C9B896" letter-spacing="0.08em" opacity="0.78">कार्तिक पूर्णिमा (देव दीपावली)</text>
 </svg>

@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240" role="img" aria-label="Hanuman with mace and devotion" data-subject="hanuman">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FAF5EA"/>
-      <stop offset="100%" stop-color="#E7DDC6"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="200" fill="url(#g)"/>
-  <circle cx="520" cy="48" r="36" fill="none" stroke="#A86A12" stroke-width="3" opacity="0.55"/>
-  <path d="M48 150 Q160 60 280 150 T520 150" fill="none" stroke="#C2451E" stroke-width="2.5" opacity="0.35"/>
-  <text x="32" y="118" font-family="Georgia, serif" font-size="26" fill="#3B3147">Hanuman Jayanti</text>
-  <text x="32" y="148" font-family="sans-serif" font-size="13" fill="#8C8173" letter-spacing="0.12em">GANAK FESTIVAL GUIDE</text>
+    <linearGradient id="skyH" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2A1830"/><stop offset="100%" stop-color="#C2451E"/>
+    </linearGradient></defs>
+  
+  <rect width="640" height="240" fill="url(#skyH)"/>
+  <path d="M480 200 L560 80 L600 200Z" fill="#4A3828" opacity="0.5"/>
+  <path d="M520 200 L580 100 L620 200Z" fill="#3A2818" opacity="0.45"/>
+  <g transform="translate(300,95)">
+    <ellipse cx="0" cy="68" rx="40" ry="11" fill="#000" opacity="0.22"/>
+    <ellipse cx="0" cy="-4" rx="20" ry="22" fill="#E87840"/>
+    <path d="M-8 -22 Q0 -32 8 -22 L6 -14 Q0 -18 -6 -14Z" fill="#8B3010"/>
+    <path d="M-24 8 Q0 -2 24 8 L20 62 Q0 72 -20 62Z" fill="#D45020" opacity="0.95"/>
+    <path d="M28 0 L68 -20" stroke="#6B3410" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="68" cy="-20" r="10" fill="#8B4513"/>
+    <path d="M-30 14 L-50 40" stroke="#E87840" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  
+  <text x="28" y="36" font-family="Georgia, 'Noto Serif Devanagari', serif" font-size="22" fill="#FAF5EA" opacity="0.92">Hanuman Jayanti</text>
+  <text x="28" y="58" font-family="'Noto Sans Devanagari', sans-serif" font-size="12" fill="#C9B896" letter-spacing="0.08em" opacity="0.78">हनुमान जयंती</text>
 </svg>

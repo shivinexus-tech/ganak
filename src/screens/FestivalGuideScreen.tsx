@@ -16,6 +16,7 @@ import { skandaSashtiSequence, ayyappaMandalaSequence } from "../engine/skanda-a
 import { vratDetail } from "../engine/muhurat";
 import { navratriTimings, navadurgaDatesFor } from "../engine/navratri";
 import { zoneOffset } from "../engine/panchang";
+import { eclipseDetail } from "../engine/eclipse";
 
 const FESTIVAL_GUIDE_ROUTES = FESTIVAL_PAGE_ROUTES;
 const SKANDA_SEQUENCE_KEYS = new Set(["skandaSashtiBegins", "skandaSashtiSoorasamharam", "skandaSashtiThirukalyanam"]);
@@ -48,6 +49,7 @@ const DECIDING_KALA_LABELS = Object.freeze({
   "ghatasthapana-pratipada": { en: "the Pratipada rule for Ghatasthapana", hi: "घटस्थापना का प्रतिपदा नियम" },
   "kanya-sankranti-vishwakarma": { en: "Kanya Sankranti for Vishwakarma Puja", hi: "विश्वकर्मा पूजा के लिए कन्या संक्रांति" },
   "kartik-amavasya-purnimanta": { en: "Kartika Amavasya in the Purnimanta calendar", hi: "पूर्णिमान्त पंचांग की कार्तिक अमावस्या" },
+  "syzygy-near-node": { en: "syzygy near Rahu or Ketu (maximum eclipse)", hi: "राहु/केतु के निकट संयोग (अधिकतम ग्रहण)" },
   "kojagara-nishita-purnima": { en: "Purnima prevailing in the Nishita period", hi: "निषीथ काल में प्रचलित पूर्णिमा" },
   "last-shravana-shukla-friday": { en: "the last Friday of Shravana Shukla Paksha", hi: "श्रावण शुक्ल पक्ष का अंतिम शुक्रवार" },
   "mahalaya-amavasya": { en: "Mahalaya Amavasya", hi: "महालया अमावस्या" },
@@ -107,6 +109,7 @@ function findLocalFestivalOccurrence(guide, place, nowMs = Date.now()) {
   const isChhathSequence = guide.vidhiKey === "chhath" || timing === "chhath-sequence";
   const isSkandaSequence = SKANDA_SEQUENCE_KEYS.has(guide.key);
   const isAyyappaSequence = AYYAPPA_SEQUENCE_KEYS.has(guide.key);
+  const isGrahan = hit.key === "suryaGrahan" || hit.key === "chandraGrahan";
   const detail = timing === "navratri"
     ? { navratri: navratriTimings(place, hit.ms) }
     : isChhathSequence
@@ -115,13 +118,15 @@ function findLocalFestivalOccurrence(guide, place, nowMs = Date.now()) {
         ? { skanda: skandaSashtiSequence(place, hit.ms) }
         : isAyyappaSequence
           ? { ayyappa: ayyappaMandalaSequence(place, hit.ms) }
-          : vratDetail(place, "lahiri", hit.ms, timing);
+          : isGrahan && hit.eclipseMs
+            ? { grahan: eclipseDetail(place, hit.eclipseMs, hit.key) }
+            : vratDetail(place, "lahiri", hit.ms, timing);
   const punyaKala = /Sankranti$/.test(hit.key) ? sankrantiPunyaKala(hit.ms, place, tz) : null;
   return {
     hit,
     detail,
     punyaKala,
-    tz: detail.navratri ? detail.navratri.tz : detail.chhath ? detail.chhath.tz : detail.skanda ? detail.skanda.tz : detail.ayyappa ? detail.ayyappa.tz : detail.tz,
+    tz: detail.navratri ? detail.navratri.tz : detail.chhath ? detail.chhath.tz : detail.skanda ? detail.skanda.tz : detail.ayyappa ? detail.ayyappa.tz : detail.grahan ? detail.grahan.tz : detail.tz,
     timing,
   };
 }
@@ -227,6 +232,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
         navratri: { en: "The Ghatasthapana and full-fast parana times below are calculated for your city.", hi: "नीचे घटस्थापना और पूर्ण व्रत के पारण का समय आपके शहर के लिए निकाला गया है।" },
         "lakshmi-puja": { en: "Lakshmi Puja muhurat and Pradosh Kaal below are calculated for your city.", hi: "नीचे लक्ष्मी पूजा का मुहूर्त और प्रदोष काल आपके शहर के अनुसार हैं।" },
         "chhath-sequence": { en: "The four-day Chhath sequence and arghya times below are for your city.", hi: "नीचे चार-दिवसीय छठ क्रम और अर्घ्य के समय आपके शहर के अनुसार हैं।" },
+        grahan: { en: "Eclipse visibility and Sutak windows below are calculated for your city.", hi: "नीचे ग्रहण की दृश्यता और सूतक के समय आपके शहर के अनुसार हैं।" },
       }[meta.timing] || null)
     : null;
 
@@ -238,6 +244,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
   const chhathSeq = d && d.chhath;
   const skandaSeq = d && d.skanda;
   const ayyappaSeq = d && d.ayyappa;
+  const grahan = d && d.grahan;
   const punyaKala = localTiming.punyaKala;
   const decidingLabel = hit ? decidingKalaLabel(hit.decidingKala, L) : null;
   const clock = (ms) => fmtTimeD(ms, tz, ms);
@@ -436,6 +443,40 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                   ))}
                 </div>
               )}
+              {grahan && (
+                <div style={{
+                  display: "grid", gap: 7, fontSize: T.fSmall, fontWeight: 600,
+                  background: grahan.visible ? "rgba(31,122,77,.07)" : "rgba(194,69,30,.06)",
+                  border: `1px solid ${grahan.visible ? "rgba(31,122,77,.22)" : "rgba(194,69,30,.25)"}`,
+                  color: grahan.visible ? "#1F7A4D" : C.sindoor,
+                  borderRadius: T.rSm, padding: "9px 10px", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
+                }}>
+                  <div style={{ color: C.ivory, fontWeight: 600 }}>
+                    {grahan.visible
+                      ? (L === "hi" ? "आपके शहर में ग्रहण दिखाई देगा" : "Eclipse visible at your city")
+                      : (L === "hi" ? "आपके शहर में ग्रहण दिखाई नहीं देगा" : "Eclipse not visible at your city")}
+                  </div>
+                  <div>
+                    {L === "hi" ? "अधिकतम ग्रहण: " : "Maximum eclipse: "}
+                    {formatLocalClock(grahan.eclipseMs, tz, hit.ms, L)}
+                  </div>
+                  {grahan.visible && (
+                    <>
+                      <div>
+                        {L === "hi" ? `सूतक (${grahan.sutakHours} घंटे पहले): ` : `Sutak (${grahan.sutakHours}h before): `}
+                        {formatLocalClock(grahan.sutakStart, tz, hit.ms, L)}
+                      </div>
+                      <div>
+                        {L === "hi" ? "मोक्ष (ग्रहण समाप्ति): " : "Moksha (eclipse ends): "}
+                        {formatLocalClock(grahan.moksha, tz, hit.ms, L)}
+                      </div>
+                    </>
+                  )}
+                  <div style={{ color: C.muted, fontWeight: 400, fontSize: T.fMicro }}>
+                    {grahan.conventionNote[L]}
+                  </div>
+                </div>
+              )}
               {lakshmiPuja && (
                 <div style={{
                   display: "grid", gap: 7, fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
@@ -476,7 +517,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                   {punyaKala.carriedToDaylight && <div style={{ color: C.muted, fontWeight: 400 }}>{L === "hi" ? "सूर्यास्त के बाद की संक्रांति होने से पूजा का समय अगले स्थानीय सूर्योदय से है।" : "Because ingress is outside daylight, the worship window begins at the applicable local sunrise."}</div>}
                 </div>
               )}
-              {d && !navratri && !lakshmiPuja && !chhathSeq && !skandaSeq && !ayyappaSeq && (d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars) && (
+              {d && !navratri && !lakshmiPuja && !chhathSeq && !skandaSeq && !ayyappaSeq && !grahan && (d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars) && (
                 <div style={{
                   fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
                   background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",

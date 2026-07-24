@@ -147,15 +147,15 @@
       "recommendedAction": "No corrective action required; retain the Jyotish exposure/translation gate and phone smoke matrix for future panel changes."
     },
     "4": {
-      "deliveryState": "Modules complete on draft PR — public hookup pending",
-      "limitations": "The bilingual interpretation data, six-area builder, presentational card and copy/safety gate exist on draft PR #1, but ChartScreen hookup was reverted to avoid a past ownership collision. The branch now needs a current-main rebase, owner content review, integration, merge and production verification.",
-      "shortTermImpact": "Users still see the existing chart experience; the new answer-first life reading is not publicly rendered.",
-      "longTermImpact": "Until the integration and review close, Ganak's public Kundli remains more technical than the approved answer-before-data design.",
-      "bugBashStatus": "Required before this high-impact interpretation journey closes — not started because the feature is not yet wired.",
+      "deliveryState": "Integrated on main — release gated pending owner review",
+      "limitations": "The answer-first card and navigation hookup are complete, but all 12 sign entries still need owner review. The public Jyotish route therefore hides both the card and Reading link until every sign is owner-verified. EN/HI phone visual QA, release and production verification remain open; the local browser could not start in this pass because the approval service hit its usage limit.",
+      "shortTermImpact": "The implementation is ready behind an enforceable content-review gate, while current users remain protected from unreviewed interpretation copy.",
+      "longTermImpact": "Once owner review and visual QA clear, Ganak can release a qualified six-area answer before the technical chart without another integration pass.",
+      "bugBashStatus": "Required before this high-impact interpretation journey closes — deterministic copy/safety/release tests pass, but the independent EN/HI phone/desktop visual pass remains open.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-24 · Draft PR #1 modules: life-interpretation gate, canonical gates and build recorded; no production evidence",
+      "lastVerified": "2026-07-24 · PR #1 merged as 1326ab8; ChartScreen hookup complete; interpretation release gate, all canonical gates and production build pass; no released-card production evidence",
       "sourceConfidence": "BPHS and Phaladeepika attribution framework recorded in the feature plan; owner high-risk content review remains required",
-      "recommendedAction": "Rebase draft PR #1 onto current main, complete the ChartScreen answer-first hookup, run the owner high-risk content review, then execute full gates plus an independent EN/HI phone/desktop bug bash and production verification."
+      "recommendedAction": "Complete the 12-sign owner checklist, mark approved sign entries owner-verified, run the independent EN/HI phone/desktop bug bash, then release and verify production."
     },
     "5": {
       "deliveryState": "Built and tested locally — not publicly delivered",

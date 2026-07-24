@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240" role="img" aria-label="Sun worship at Makar Sankranti" data-subject="surya">
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240" role="img" aria-label="Pongal harvest offering to Surya" data-subject="surya">
   <defs>
     <radialGradient id="sun" cx="50%" cy="45%" r="40%">
       <stop offset="0%" stop-color="#FFF8D0"/><stop offset="40%" stop-color="#F5C842"/><stop offset="100%" stop-color="#C2451E" stop-opacity="0"/>
@@ -22,6 +22,6 @@
     <ellipse cx="30" cy="20" rx="28" ry="8" fill="#D4A050" opacity="0.6"/>
   </g>
   
-  <text x="28" y="36" font-family="Georgia, 'Noto Serif Devanagari', serif" font-size="22" fill="#FAF5EA" opacity="0.92">Makar Sankranti</text>
-  <text x="28" y="58" font-family="'Noto Sans Devanagari', sans-serif" font-size="12" fill="#C9B896" letter-spacing="0.08em" opacity="0.78">मकर संक्रांति</text>
+  <text x="28" y="36" font-family="Georgia, 'Noto Serif Devanagari', serif" font-size="22" fill="#FAF5EA" opacity="0.92">Pongal</text>
+  <text x="28" y="58" font-family="'Noto Sans Devanagari', sans-serif" font-size="12" fill="#C9B896" letter-spacing="0.08em" opacity="0.78">पोंगल</text>
 </svg>

@@ -4,6 +4,26 @@ import {
   HOLIDAY_OVERLAY_MODES, INDIA_HOLIDAY_DATASET, holidaysForDate,
 } from "../data/india-holidays";
 
+export function HolidayOverlaySelect({ mode, onMode, lang }) {
+  const L = lang === "hi" ? "hi" : "en";
+  return (
+    <label style={{ display: "inline-flex", flexDirection: "column", gap: 4 }}>
+      <span style={{ ...T.label, color: "#315B7D", fontSize: T.fMicro }}>{L === "hi" ? "सरकारी अवकाश ओवरले" : "Government holidays"}</span>
+      <select
+        value={mode}
+        onChange={(event) => onMode(event.target.value)}
+        aria-label={L === "hi" ? "अवकाश ओवरले चुनें" : "Choose holiday overlay"}
+        style={{
+          height: T.ctrlH, borderRadius: T.rMd, border: "1px solid #A9BDCD",
+          background: "#F6FAFD", color: "#284B66", padding: "0 10px", fontFamily: T.body, minWidth: 168,
+        }}
+      >
+        {HOLIDAY_OVERLAY_MODES.map((item) => <option key={item.id} value={item.id}>{item[L]}</option>)}
+      </select>
+    </label>
+  );
+}
+
 export default function HolidayOverlayCard({ isoDate, mode, onMode, lang, C, card }) {
   const L = lang === "hi" ? "hi" : "en";
   const holidays = holidaysForDate(isoDate, mode);
@@ -11,14 +31,9 @@ export default function HolidayOverlayCard({ isoDate, mode, onMode, lang, C, car
   if (mode === "off" || (yearSupported && holidays.length === 0)) return null;
   return (
     <section aria-label={L === "hi" ? "सरकारी अवकाश ओवरले" : "Government holiday overlay"} style={{ ...card, padding: "14px 16px", marginBottom: 12, borderLeft: "4px solid #315B7D" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-        <div>
-          <div style={{ ...T.label, color: "#315B7D" }}>{L === "hi" ? "सरकारी अवकाश · अलग ओवरले" : "Government holidays · separate overlay"}</div>
-          <div style={{ color: C.muted, fontSize: T.fMicro, marginTop: 3 }}>{L === "hi" ? "यह हिंदू पंचांग की गणना नहीं बदलता" : "This never changes the Hindu Panchang calculation"}</div>
-        </div>
-        <select value={mode} onChange={(event) => onMode(event.target.value)} aria-label={L === "hi" ? "अवकाश ओवरले चुनें" : "Choose holiday overlay"} style={{ height: T.ctrlH, borderRadius: T.rMd, border: "1px solid #A9BDCD", background: "#F6FAFD", color: "#284B66", padding: "0 10px", fontFamily: T.body }}>
-          {HOLIDAY_OVERLAY_MODES.map((item) => <option key={item.id} value={item.id}>{item[L]}</option>)}
-        </select>
+      <div style={{ marginBottom: holidays.length ? 8 : 0 }}>
+        <div style={{ ...T.label, color: "#315B7D" }}>{L === "hi" ? "सरकारी अवकाश · अलग ओवरले" : "Government holidays · separate overlay"}</div>
+        <div style={{ color: C.muted, fontSize: T.fMicro, marginTop: 3 }}>{L === "hi" ? "यह हिंदू पंचांग की गणना नहीं बदलता" : "This never changes the Hindu Panchang calculation"}</div>
       </div>
       {mode !== "off" && !yearSupported && <div role="status" style={{ marginTop: 10, color: C.muted, fontSize: T.fSmall }}>{L === "hi" ? "इस वर्ष की आधिकारिक सूची अभी गणक में सत्यापित नहीं है। पंचांग की गणना उपलब्ध रहती है।" : "The official list for this year is not yet verified in Ganak. Panchang calculations remain available."}</div>}
       {holidays.map((holiday) => <div key={holiday.date + holiday.name.en} style={{ marginTop: 10, padding: "10px 11px", borderRadius: T.rSm, background: "#F2F7FA", border: "1px solid #D4E0E8" }}>

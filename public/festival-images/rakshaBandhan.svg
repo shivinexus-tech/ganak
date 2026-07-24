@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240" role="img" aria-label="Sacred rakhi thread on Raksha Bandhan" data-subject="rakhi">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FAF5EA"/>
-      <stop offset="100%" stop-color="#E7DDC6"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="200" fill="url(#g)"/>
-  <circle cx="520" cy="48" r="36" fill="none" stroke="#A86A12" stroke-width="3" opacity="0.55"/>
-  <path d="M48 150 Q160 60 280 150 T520 150" fill="none" stroke="#C2451E" stroke-width="2.5" opacity="0.35"/>
-  <text x="32" y="118" font-family="Georgia, serif" font-size="26" fill="#3B3147">Raksha Bandhan</text>
-  <text x="32" y="148" font-family="sans-serif" font-size="13" fill="#8C8173" letter-spacing="0.12em">GANAK FESTIVAL GUIDE</text>
+    <linearGradient id="rakhi" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FAF5EA"/><stop offset="100%" stop-color="#E8A0C8"/>
+    </linearGradient></defs>
+  
+  <rect width="640" height="240" fill="url(#rakhi)"/>
+  <g transform="translate(320,125)">
+    <circle cx="0" cy="0" r="28" fill="none" stroke="#C2451E" stroke-width="4"/>
+    <circle cx="0" cy="0" r="18" fill="#D4AF37" opacity="0.5"/>
+    <path d="M-8 -8 L0 -20 L8 -8 L6 0 L-6 0Z" fill="#C2457E"/>
+    <path d="M-30 20 Q-15 0 0 15" fill="none" stroke="#E8C090" stroke-width="8" stroke-linecap="round" opacity="0.7"/>
+    <path d="M30 20 Q15 0 0 15" fill="none" stroke="#E8C090" stroke-width="8" stroke-linecap="round" opacity="0.7"/>
+  </g>
+  
+  <text x="28" y="36" font-family="Georgia, 'Noto Serif Devanagari', serif" font-size="22" fill="#FAF5EA" opacity="0.92">Raksha Bandhan</text>
+  <text x="28" y="58" font-family="'Noto Sans Devanagari', sans-serif" font-size="12" fill="#C9B896" letter-spacing="0.08em" opacity="0.78">रक्षाबंधन</text>
 </svg>

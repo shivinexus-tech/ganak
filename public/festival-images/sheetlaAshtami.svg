@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240" role="img" aria-label="Sheetla Mata and cooling foods" data-subject="sheetla">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FAF5EA"/>
-      <stop offset="100%" stop-color="#E7DDC6"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="200" fill="url(#g)"/>
-  <circle cx="520" cy="48" r="36" fill="none" stroke="#A86A12" stroke-width="3" opacity="0.55"/>
-  <path d="M48 150 Q160 60 280 150 T520 150" fill="none" stroke="#C2451E" stroke-width="2.5" opacity="0.35"/>
-  <text x="32" y="118" font-family="Georgia, serif" font-size="26" fill="#3B3147">Sheetla Ashtami (Basoda)</text>
-  <text x="32" y="148" font-family="sans-serif" font-size="13" fill="#8C8173" letter-spacing="0.12em">GANAK FESTIVAL GUIDE</text>
+    <linearGradient id="cool" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#D8E8F0"/><stop offset="100%" stop-color="#88A8B8"/>
+    </linearGradient></defs>
+  
+  <rect width="640" height="240" fill="url(#cool)"/>
+  <g transform="translate(340,115)">
+    <ellipse cx="0" cy="58" rx="30" ry="9" fill="#8C8173" opacity="0.2"/>
+    <ellipse cx="0" cy="-4" rx="15" ry="17" fill="#E8C8D8"/>
+    <path d="M-18 4 Q0 -6 18 4 L14 50 Q0 58 -14 50Z" fill="#4A9E9E" opacity="0.85"/>
+    <circle cx="0" cy="-22" r="8" fill="#6B8FD4" opacity="0.5"/>
+  </g>
+  <g transform="translate(200,155)">
+    <ellipse cx="0" cy="25" rx="28" ry="8" fill="#6B9098" opacity="0.6"/>
+    <path d="M-18 25 Q-18 0 0 -10 Q18 0 18 25Z" fill="#8BA8B0" opacity="0.75"/>
+    <ellipse cx="0" cy="5" rx="10" ry="5" fill="#D4E8F0" opacity="0.8"/>
+  </g>
+  <ellipse cx="500" cy="90" rx="18" ry="28" fill="#2A5838" opacity="0.4" transform="rotate(20 500 90)"/>
+  
+  <text x="28" y="36" font-family="Georgia, 'Noto Serif Devanagari', serif" font-size="22" fill="#FAF5EA" opacity="0.92">Sheetla Ashtami (Basoda)</text>
+  <text x="28" y="58" font-family="'Noto Sans Devanagari', sans-serif" font-size="12" fill="#C9B896" letter-spacing="0.08em" opacity="0.78">शीतला अष्टमी (बसोड़ा)</text>
 </svg>
