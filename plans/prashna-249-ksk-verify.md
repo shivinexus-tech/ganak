@@ -163,8 +163,19 @@ allowed in v1 (e.g. `शुक्र की दशा में संभाव�
 phrased as a *possibility*, never a fixed date. This is a deliberately small subset — the
 **full** ruling-planets/timing panel remains **v1.1** per the findings.
 
-**Still open (not blocking):** whether to add a collapsible "full working" section
-(significators, deny-houses) *below* the clean card for curious users. Owner to decide.
+**Collapsible "full working" — APPROVED (owner, 2026-07-24).** Below the clean card, a
+collapsed `पूरा विश्लेषण · Show the full working` disclosure opens four labelled
+sub-sections, each glossed and each ending with one plain sentence on *why it points to
+the verdict*:
+1. **निर्णायक शृंखला · Deciding chain** — the primary cusp's sub lord → the star it sits
+   in → the houses that star-lord signifies (the actual KP judgment path).
+2. **कारक · Significators** — the planets speaking for the favour houses.
+3. **पुष्टि करने वाले ग्रह · Ruling planets** — the RP set (day lord; asc. sign & star
+   lord; Moon sign & star lord), shown as an *independent confirmation* of the verdict.
+4. **विरोधी भाव · Opposing houses** — the deny group, with the plain "12th-from"
+   explanation of why they oppose *this* matter.
+Default view stays the clean card; the working is opt-in. The engine fills all values;
+this fixes the disclosure's structure and voice only.
 
 ---
 
