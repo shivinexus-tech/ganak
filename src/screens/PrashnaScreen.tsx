@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { T } from "../components/tokens";
 import { fmtDeg } from "../components/format";
 import { NAK_HI } from "../engine/muhurat";
+import { kpNumberToLagna, kpNumberInfo, KP_NUMBER_MIN, KP_NUMBER_MAX } from "../engine/kp-horary";
 
 // ------------------------------------------------- PRASHNA TOKENS (app palette)
 const TOKENS = {
@@ -261,6 +262,63 @@ function PR_judge(chart, q) {
 }
 // ============================ END ENGINE ====================================
 
+// ===================== KP HORARY NUMBER METHOD (1–249) ======================
+// Sits BELOW the parity-frozen engine on purpose: it reuses the exact same
+// Placidus + ephemeris the time mode uses, so the sky is identical and only the
+// houses are framed by the number. Pure number→lagna map is src/engine/
+// kp-horary.ts; sourcing + disclaimer live in plans/prashna-249-ksk-verify.md.
+
+/* Invert the ascendant equation: find the RAMC (local sidereal time angle) that
+   makes the ascendant fall at targetAscTrop (tropical°) at latitude `lat`. The
+   ascendant increases monotonically with RAMC over a full turn, so a plain
+   bisection converges exactly and never gets stuck. */
+function PR_ramcForAsc(targetAscTrop, eps, lat) {
+  const ascOf = ramc => norm360(Math.atan2(cosD(ramc), -(sinD(ramc) * cosD(eps) + tanD(lat) * sinD(eps))) * R2D);
+  let lo = 0, hi = 360;
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    if (norm360(ascOf(mid) - targetAscTrop) < 180) hi = mid; else lo = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+/* Cast a KP horary NUMBER chart: real planets for the moment/place of judgment,
+   but the 12 houses framed by the number's ascendant. Same output shape as
+   PR_cast so PR_judge and the chart UI work unchanged. Returns null for a number
+   outside 1–249 (KP_NUMBER_MIN..KP_NUMBER_MAX). */
+function PR_castNumber(ms, lat, lonE, number) {
+  const ascSid = kpNumberToLagna(number);
+  if (ascSid === null) return null;
+  const { sid, T, Tut } = PR_sidAll(ms);           // real sky for this moment
+  const eps = PR_obliquity(Tut);
+  const ascTrop = norm360(ascSid + PR_ayanamsa(T)); // number ascendant, tropical
+  const ramc = PR_ramcForAsc(ascTrop, eps, lat);
+  const mc = norm360(Math.atan2(sinD(ramc), cosD(ramc) * cosD(eps)) * R2D);
+  const p = PR_placidus(ramc, eps, lat);
+  const trop = new Array(13).fill(0);
+  trop[1] = ascTrop; trop[10] = mc;
+  if (p) { trop[11] = p.c11; trop[12] = p.c12; trop[2] = p.c2; trop[3] = p.c3; }
+  else for (const [h, off] of [[11, 300], [12, 330], [2, 30], [3, 60]]) trop[h] = norm360(ascTrop + off);
+  for (const h of [4, 5, 6, 7, 8, 9]) trop[h] = norm360(trop[((h + 5) % 12) + 1] + 180);
+  const cusps = trop.map((v, i) => i === 0 ? 0 : PR_toSid(v, T));
+  const inHouse = lon => {
+    for (let h = 1; h <= 12; h++) {
+      const a = cusps[h], b = cusps[h === 12 ? 1 : h + 1];
+      if (a <= b ? (lon >= a && lon < b) : (lon >= a || lon < b)) return h;
+    }
+    return 1;
+  };
+  const planets = ['Su', 'Mo', 'Ma', 'Me', 'Ju', 'Ve', 'Sa', 'Ra', 'Ke'].map(k => {
+    const lon = sid[k], sl = PR_subOf(lon);
+    const retro = (k === 'Ra' || k === 'Ke') ? true : (k === 'Su' || k === 'Mo') ? false : PR_speed(k, ms) < 0;
+    return { key: k, lon, sign: Math.floor(lon / 30), deg: lon % 30,
+      nak: PR_nakOf(lon), star: sl.star, sub: sl.sub, retro, house: inHouse(lon) };
+  });
+  const lagna = { lon: cusps[1], sign: Math.floor(cusps[1] / 30), deg: cusps[1] % 30,
+    nak: PR_nakOf(cusps[1]), star: PR_subOf(cusps[1]).star, sub: PR_subOf(cusps[1]).sub };
+  return { ms, number, lagna, planets, cusps, system: p ? 'placidus' : 'equal' };
+}
+
 // ------------------------------------------------------------ UI PIECES
 function PrashnaSecHead({ hi, en }) {
   return (
@@ -279,6 +337,16 @@ const VERDICT_STYLE = {
   unfavourable: { hi: 'प्रतिकूल',           en: 'Not favourable',  color: TOKENS.sindoor, soft: TOKENS.sindoorSoft },
   mixed:        { hi: 'मिश्रित — प्रतीक्षा', en: 'Mixed — wait', color: TOKENS.amber,   soft: TOKENS.amberSoft },
 };
+
+/* Number-method verdict voice — owner-approved 2026-07-24 (plans/prashna-249-
+   ksk-verify.md): warm and respectful, never over-promising an outcome. Badges
+   "Favourable / Not yet / Mixed" are gentler than the time mode's labels. */
+const NUM_VERDICT = {
+  favourable:   { hi: 'हाँ — ग्रह-योग आपके अनुकूल है।',                en: 'Favourable — the chart stands behind what you asked.',   badge: { hi: 'अनुकूल', en: 'Favourable' }, color: TOKENS.gold,    soft: TOKENS.goldSoft },
+  unfavourable: { hi: 'अभी अनुकूल नहीं — थोड़ा ठहरें।',                 en: 'Not the right moment — better to hold than to force it.', badge: { hi: 'अभी नहीं', en: 'Not yet' },  color: TOKENS.sindoor, soft: TOKENS.sindoorSoft },
+  mixed:        { hi: 'मिश्रित — कुछ पक्ष अनुकूल, कुछ नहीं; धैर्य रखें।', en: 'Mixed — some support, some resistance; give it time.',   badge: { hi: 'मिश्रित', en: 'Mixed' },     color: TOKENS.amber,   soft: TOKENS.amberSoft },
+};
+const GRAHA_FULL_HI = { Ketu: 'केतु', Venus: 'शुक्र', Sun: 'सूर्य', Moon: 'चन्द्र', Mars: 'मंगल', Rahu: 'राहु', Jupiter: 'गुरु', Saturn: 'शनि', Mercury: 'बुध' };
 
 const HOUSE_MEANING_HI = { 1:'आप स्वयं', 2:'धन और परिवार', 3:'साहस और प्रयास',
   4:'घर और सुख', 5:'संतान और सृजन', 6:'बाधा, रोग और ऋण',
@@ -479,18 +547,35 @@ function buildReasons(v, lang) {
 // ------------------------------------------------------------ MAIN SCREEN
 function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', lang = 'en' }) {
   const hi = lang === 'hi';
+  const [mode, setMode] = useState('time'); // 'time' | 'number'
   const [selected, setSelected] = useState(null);
+  const [numberInput, setNumberInput] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [showFull, setShowFull] = useState(false);
+
+  const clearResult = () => { setResult(null); setError(null); };
+  const switchMode = (m) => { if (m !== mode) { setMode(m); clearResult(); } };
 
   const ask = () => {
     setError(null);
     try {
       const q = QUESTIONS.find(x => x.key === selected) || QUESTIONS[QUESTIONS.length - 1];
       const ms = Date.now();
-      const chart = PR_cast(ms, lat, lon);
-      setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms) });
+      if (mode === 'number') {
+        const n = Number(numberInput.trim());
+        if (!Number.isInteger(n) || n < KP_NUMBER_MIN || n > KP_NUMBER_MAX) {
+          setError(hi
+            ? `कृपया ${KP_NUMBER_MIN} से ${KP_NUMBER_MAX} के बीच एक पूर्ण अंक दें — परम्परा यही निर्धारित करती है।`
+            : `Please enter a whole number between ${KP_NUMBER_MIN} and ${KP_NUMBER_MAX} — that is what the tradition prescribes.`);
+          return;
+        }
+        const chart = PR_castNumber(ms, lat, lon, n);
+        setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'number', number: n, info: kpNumberInfo(n) });
+      } else {
+        const chart = PR_cast(ms, lat, lon);
+        setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'time' });
+      }
       setShowFull(false);
     } catch (e) {
       if (typeof console !== "undefined") console.error("prashna cast failed:", e);
@@ -499,16 +584,42 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   };
 
   const v = result && result.verdict;
-  const vs = v && VERDICT_STYLE[v.verdict];
+  const isNum = result && result.mode === 'number';
+  const vs = v && (isNum ? NUM_VERDICT[v.verdict] : VERDICT_STYLE[v.verdict]);
+  const canAsk = selected && (mode === 'time' || numberInput.trim() !== '');
 
   return (
     <div style={{ background: TOKENS.bg, minHeight: '100%', padding: 16, color: TOKENS.ink,
       fontFamily: "-apple-system, 'Segoe UI', sans-serif" }}>
       <PrashnaSecHead hi="प्रश्न कुण्डली" en="Prashna · ask the moment" />
+
+      {/* Method toggle — two named methods, never mixed (owner-approved) */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        {[
+          { key: 'time',   hi: 'इस क्षण से पूछें',       en: 'Ask from this moment' },
+          { key: 'number', hi: 'KP अंक विधि (1–249)', en: 'KP number method' },
+        ].map(m => {
+          const on = mode === m.key;
+          return (
+            <button key={m.key} onClick={() => switchMode(m.key)}
+              style={{ flex: 1, minHeight: TOKENS.ctrlH, padding: '7px 10px', borderRadius: TOKENS.radius,
+                border: `1.5px solid ${on ? TOKENS.gold : TOKENS.line}`,
+                background: on ? TOKENS.goldSoft : TOKENS.card, color: TOKENS.ink, cursor: 'pointer', lineHeight: 1.25 }}>
+              <div style={{ fontFamily: TOKENS.devanagari, fontSize: 15 }}>{m.hi}</div>
+              <div style={{ fontSize: 10.5, letterSpacing: '0.08em', textTransform: 'uppercase', color: TOKENS.muted }}>{m.en}</div>
+            </button>
+          );
+        })}
+      </div>
+
       <Gloss>
-        {hi
-          ? 'अभी प्रश्न पूछें — इसी क्षण का आकाश उत्तर देता है। यह प्रश्न कुण्डली (होरारी ज्योतिष) है: जन्म विवरण की आवश्यकता नहीं, केवल पूछने का क्षण और स्थान।'
-          : 'Ask a question now — the sky at this very moment answers it. This is Prashna (horary astrology): no birth details needed, only the moment and place of asking.'}
+        {mode === 'number'
+          ? (hi
+            ? 'एक सच्चे प्रश्न पर ध्यान रखें और 1 से 249 के बीच जो पहला अंक मन में आए वही दें। वही अंक इस क्षण की कुण्डली का लग्न तय करता है — आकाश वास्तविक रहता है, केवल भाव आपके अंक से बनते हैं।'
+            : 'Hold one sincere question and give the first number between 1 and 249 that comes to you. That number fixes the ascendant of this moment’s chart — the sky stays real, only the houses are framed by your number.')
+          : (hi
+            ? 'अभी प्रश्न पूछें — इसी क्षण का आकाश उत्तर देता है। यह प्रश्न कुण्डली (होरारी ज्योतिष) है: जन्म विवरण की आवश्यकता नहीं, केवल पूछने का क्षण और स्थान।'
+            : 'Ask a question now — the sky at this very moment answers it. This is Prashna (horary astrology): no birth details needed, only the moment and place of asking.')}
       </Gloss>
 
       {/* Question chips */}
@@ -516,7 +627,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         {QUESTIONS.map(q => {
           const on = selected === q.key;
           return (
-            <button key={q.key} onClick={() => { setSelected(q.key); setResult(null); setError(null); }}
+            <button key={q.key} onClick={() => { setSelected(q.key); clearResult(); }}
               style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, padding: '0 14px',
                 border: `1.5px solid ${on ? TOKENS.gold : TOKENS.line}`,
                 background: on ? TOKENS.goldSoft : TOKENS.card,
@@ -529,12 +640,30 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         })}
       </div>
 
-      <button onClick={ask} disabled={!selected}
+      {/* Number entry — only in KP number mode */}
+      {mode === 'number' && (
+        <div style={{ marginBottom: 10 }}>
+          <input inputMode="numeric" value={numberInput}
+            onChange={e => { setNumberInput(e.target.value.replace(/[^0-9]/g, '').slice(0, 3)); clearResult(); }}
+            placeholder={hi ? '1 से 249 के बीच अंक' : 'a number from 1 to 249'}
+            aria-label={hi ? 'KP अंक (1 से 249)' : 'KP number (1 to 249)'}
+            style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%', boxSizing: 'border-box',
+              border: `1.5px solid ${TOKENS.line}`, background: TOKENS.card, color: TOKENS.ink,
+              fontSize: 18, textAlign: 'center', letterSpacing: '0.05em' }} />
+          <Gloss>
+            {hi
+              ? 'यह शुभ-अंक नहीं है — पहला सच्चा अंक ही मान्य है, उसे बदलें नहीं। एक समय एक ही प्रश्न।'
+              : 'This is not a lucky number — the first sincere number is the one; don’t change it. One question at a time.'}
+          </Gloss>
+        </div>
+      )}
+
+      <button onClick={ask} disabled={!canAsk}
         style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
-          border: 'none', background: selected ? TOKENS.ink : TOKENS.line,
-          color: selected ? TOKENS.bg : TOKENS.muted, fontSize: 15, fontWeight: 600,
-          cursor: selected ? 'pointer' : 'default' }}>
-        {hi ? 'अभी पूछें' : 'Ask now'}
+          border: 'none', background: canAsk ? TOKENS.ink : TOKENS.line,
+          color: canAsk ? TOKENS.bg : TOKENS.muted, fontSize: 15, fontWeight: 600,
+          cursor: canAsk ? 'pointer' : 'default' }}>
+        {mode === 'number' ? (hi ? 'उत्तर देखें' : 'Cast the answer') : (hi ? 'अभी पूछें' : 'Ask now')}
       </button>
 
       {error && (
@@ -549,11 +678,22 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
           <div style={{ background: TOKENS.card, borderRadius: TOKENS.radius,
             border: `1.5px solid ${vs.color}`, overflow: 'hidden' }}>
             <div style={{ background: vs.soft, padding: '14px 16px' }}>
-              <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: 28, color: vs.color, lineHeight: 1.1 }}>{hi ? vs.hi : vs.en}</div>
+              {isNum ? (
+                <>
+                  <span style={{ display: 'inline-block', background: vs.color, color: TOKENS.card,
+                    fontSize: 11.5, fontWeight: 600, padding: '2px 10px', borderRadius: 20, marginBottom: 8 }}>
+                    {hi ? vs.badge.hi : vs.badge.en}
+                  </span>
+                  <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: 18, fontWeight: 600, color: TOKENS.ink, lineHeight: 1.3 }}>{hi ? vs.hi : vs.en}</div>
+                </>
+              ) : (
+                <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: 28, color: vs.color, lineHeight: 1.1 }}>{hi ? vs.hi : vs.en}</div>
+              )}
               <div style={{ fontSize: 13, color: TOKENS.muted, marginTop: 6 }}>
-                {hi ? v.q.hi : v.q.en}
+                {hi ? v.q.hi : v.q.en}{isNum ? ` · ${hi ? 'अंक' : 'number'} ${result.number}` : ''}
               </div>
             </div>
+            {isNum && <NumberSetBox info={result.info} favor={v.q.favor} hi={hi} />}
             <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
               {buildPlain(v, lang).map((r, i) => (
                 <div key={i} style={{ fontSize: 14, lineHeight: 1.5,
@@ -567,6 +707,14 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                   ? `${result.askedAt.toLocaleString('hi-IN')} को ${placeLabel} से पूछा गया। प्रश्न का निर्णय उसी क्षण और स्थान के लिए होता है, जब और जहाँ से आप पूछते हैं।`
                   : `Cast for ${result.askedAt.toLocaleString()} at ${placeLabel}. Prashna is judged for the moment you ask, at the place you ask from.`}
               </Gloss>
+              {isNum && (
+                <div style={{ marginTop: 4, padding: '9px 11px', background: TOKENS.amberSoft,
+                  borderRadius: TOKENS.radius, border: `1px solid ${TOKENS.line}`, fontSize: 11.5, color: TOKENS.muted, lineHeight: 1.5 }}>
+                  {hi
+                    ? 'यह KP अंक विधि है, KP-New अयनांश पर — गणक की सामान्य लाहिरी परिपाटी से भिन्न। निर्णय के नियम प्रचलित KP पद्धति पर आधारित हैं; कृष्णमूर्ति के मूल ग्रंथों से सत्यापन प्रगति पर है।'
+                    : 'This is the KP number method on the KP-New ayanamsa — distinct from Ganak’s usual Lahiri convention. The judgment rules follow widely-published KP practice; verification against Krishnamurti’s primary texts is in progress.'}
+                </div>
+              )}
             </div>
           </div>
 
@@ -662,4 +810,46 @@ function PrashnaChip({ label, value, gloss }) {
   );
 }
 
+function NumRow({ label, value, gloss }) {
+  return (
+    <div style={{ padding: '3px 0' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
+        <span style={{ fontSize: 13, color: TOKENS.muted }}>{label}</span>
+        <span style={{ fontSize: 13, textAlign: 'right' }}>{value}</span>
+      </div>
+      {gloss && <div style={{ fontSize: 11, color: TOKENS.muted, fontStyle: 'italic' }}>{gloss}</div>}
+    </div>
+  );
+}
+
+/* "What your number set" — the owner-approved answer-card detail box. Every
+   jargon term carries a plain-language gloss (plans/prashna-249-ksk-verify.md). */
+function NumberSetBox({ info, favor, hi }) {
+  const signName = hi ? RASHI_HI[info.sign] : RASHI_EN[info.sign];
+  const nak = hi ? NAK_HI[info.nakshatra] : NAK_EN[info.nakshatra];
+  const star = hi ? GRAHA_FULL_HI[info.starLord] : info.starLord;
+  const sub = hi ? GRAHA_FULL_HI[info.subLord] : info.subLord;
+  return (
+    <div style={{ margin: '0 16px', padding: '10px 12px', background: TOKENS.bg,
+      borderRadius: TOKENS.radius, border: `1px solid ${TOKENS.line}` }}>
+      <div style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: TOKENS.muted, marginBottom: 4 }}>
+        {hi ? 'आपके अंक ने क्या तय किया' : 'What your number set'}
+      </div>
+      <NumRow label={hi ? 'राशि · Sign' : 'Sign'} value={signName} />
+      <NumRow label={hi ? 'नक्षत्र · Star' : 'Star'} value={`${nak} · ${star}`}
+        gloss={hi ? 'जिस नक्षत्र में अंक गिरा' : 'the star your number fell into'} />
+      <NumRow label={hi ? 'उप-स्वामी · Sub lord' : 'Sub lord'} value={sub}
+        gloss={hi ? 'जो अंतिम निर्णय देता है (हाँ या नहीं)' : 'the planet that gives the final yes or no'} />
+      <NumRow label={hi ? 'लग्न · Ascendant' : 'Ascendant'} value={`${signName} ${fmtDeg(info.signDeg)}`}
+        gloss={hi ? 'जहाँ अंक ने कुण्डली स्थिर की' : 'where the number fixed your chart'} />
+      <div style={{ borderTop: `1px solid ${TOKENS.line}`, marginTop: 4, paddingTop: 3 }}>
+        <NumRow label={hi ? 'विचारित भाव · Houses judged' : 'Houses judged'} value={favor.join(' · ')} />
+      </div>
+    </div>
+  );
+}
+
 export default PrashnaScreen;
+// Named exports for the validation gates (parity + number-mode chart). The
+// parity gate slices only the marked engine region, so these do not affect it.
+export { PR_cast, PR_castNumber, PR_judge, QUESTIONS };
