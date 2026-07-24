@@ -463,12 +463,20 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                       <div style={{ padding: "0 12px 10px", marginTop: -2, paddingTop: 8, borderTop: "1px dashed #EBDFC6", display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-start" }}>
                         {meta && meta.gloss && <div style={{ fontSize: T.fSmall, color: C.ivory }}>{meta.gloss[LL]}{meta.deity && <span style={{ color: C.muted }}> · {meta.deity[LL]}</span>}</div>}
                         {d && d.info && <div style={{ fontSize: T.fMicro, color: C.muted }}>{d.info.lmonthName} · {d.info.krishna ? (lang === "hi" ? "कृष्ण पक्ष" : "Krishna Paksha") : (lang === "hi" ? "शुक्ल पक्ष" : "Shukla Paksha")} · {(lang === "hi" ? (NAK_HI[d.info.nak] || d.info.nakName) : d.info.nakName)}</div>}
-                        {d && (d.parana || d.moonrise != null || d.sunset != null || d.stars) && (
+                        {d && (d.parana || d.moonrise != null || d.sunset != null || d.stars || d.lakshmiPuja) && (
                           <div style={{ fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
-                            {d.parana ? <>{lang === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, it.ms)}{lang === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {lang === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, it.ms)}</span>}</>
+                            {d.lakshmiPuja && d.lakshmiPuja.primary
+                              ? <>{lang === "hi" ? "लक्ष्मी पूजा मुहूर्त: " : "Lakshmi Puja muhurat: "}{fmtTimeD(d.lakshmiPuja.primary.start, d.tz, it.ms)}–{fmtTimeD(d.lakshmiPuja.primary.end, d.tz, it.ms)}</>
+                              : d.parana ? <>{lang === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, it.ms)}{lang === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {lang === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, it.ms)}</span>}</>
                               : d.moonrise != null ? <>{lang === "hi" ? "चंद्रोदय पर व्रत खोलें: " : "Break fast after moonrise: "}{fmtTimeD(d.moonrise, d.tz, it.ms)}</>
                               : d.stars ? <>{lang === "hi" ? "तारे दिखाई देने के बाद व्रत खोलें" : "Break the fast after the stars are visible"}</>
                               : <>{lang === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, it.ms)}</>}
+                            {d.lakshmiPuja && d.lakshmiPuja.pradosh && (
+                              <div style={{ color: C.ivory, fontWeight: 500, marginTop: 4 }}>
+                                {lang === "hi" ? "प्रदोष काल: " : "Pradosh Kaal: "}
+                                {fmtTimeD(d.lakshmiPuja.pradosh.start, d.tz, it.ms)}–{fmtTimeD(d.lakshmiPuja.pradosh.end, d.tz, it.ms)}
+                              </div>
+                            )}
                           </div>
                         )}
                         {fexp && fexp.shifted && <div style={{ color: C.gold, fontSize: T.fMicro }}>{fexp.reason === "spans" ? (lang === "hi" ? "वैष्णव तिथि — दो अरुणोदय पर एकादशी; दूसरे दिन व्रत" : "Vaishnava date — Ekadashi at two dawns; observed on the second") : (lang === "hi" ? "वैष्णव तिथि — अरुणोदय पर दशमी होने से व्रत एक दिन आगे" : "Vaishnava date — Dashami touched arunodaya (dawn), so the fast shifts one day")}</div>}

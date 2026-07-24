@@ -9,15 +9,13 @@ Tell the user **when** to perform Lakshmi-Ganesha puja at their city tonight, th
 ## Must-show on page (UI contract)
 
 - [x] Local civil date (Amavasya during Pradosh)
-- [ ] **Pradosh Kaal** — start/end clock for selected city
-- [ ] **Lakshmi Puja muhurat** — primary window (Drik: sthir Vrishabha lagna ∩ Pradosh on Amavasya)
+- [x] **Pradosh Kaal** — start/end clock for selected city
+- [x] **Lakshmi Puja muhurat** — primary window (Drik: sthir Vrishabha lagna ∩ Pradosh on Amavasya)
 - [ ] Optional secondary: Vrishabha Kaal span, Mahanishita (label as optional / lineage-specific)
-- [ ] Amavasya tithi begin/end (collapsed detail — expander OK)
+- [x] Amavasya tithi begin/end (collapsed detail — expander OK)
 - [x] Full household vidhi (VratVidhiCard)
 
-**Current bug:** `FEST_META.diwali.timing` is `null`. Dhanteras uses `timing: "sunset"` and shows “संध्या पूजा सूर्यास्त से”. Diwali shows only date + deciding-kala footnote.
-
-**Engine target:** new timing kind `lakshmi-puja` (or reuse computed windows from Drik anchors in `validation/muhurat-anchors.cjs`).
+**Engine:** `timing: "lakshmi-puja"` in `FEST_META.diwali`; `src/engine/lakshmi-puja.ts`; gate `validation/lakshmi-puja-timings.cjs` (Delhi + Mumbai 2026 anchors).
 
 ## Timing kind
 
