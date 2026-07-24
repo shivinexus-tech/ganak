@@ -40,12 +40,22 @@ export function sadeSati(input:BirthInput, asOfMs:number) {
   return { active, phase, moonSign:SIGNS[moon.sign], saturnSign:SIGNS[saturnSign], relation };
 }
 
-export function shraddhaTithi(input:BirthInput) {
+export function shraddhaTithi(input:BirthInput, nowMs:number = Date.now()) {
   const { chart }=quickBirth(input), t=chart.panchang.tithiNum, fortnight=t<15?"Shukla":"Krishna";
-  const month=lunarMonthInfo(chart.birthMs, fortnight==="Krishna");
+  // The supplied moment is the time of passing. An observance for someone who has
+  // not passed is meaningless and disrespectful, so reject a future death outright.
+  const deathMs=chart.birthMs;
+  if(deathMs>nowMs) return { future:true, tithi:chart.panchang.tithiName, number:(t%15)+1, fortnight };
+  const month=lunarMonthInfo(deathMs, fortnight==="Krishna");
   const occurrence=(year:number)=>{for(let n=0;n<370;n++){const d=new Date(Date.UTC(year,0,1+n)),y=d.getUTCFullYear(),m=d.getUTCMonth()+1,day=d.getUTCDate();if(y!==year)break;const ev=sunEvents(y,m,day,input.tz,input.lat,input.lon);if(ev.rise==null||ev.set==null)continue;const ap=ev.rise+.7*(ev.set-ev.rise),el=((planetSidMs("Moon",ap)-planetSidMs("Sun",ap))%360+360)%360,tn=Math.floor(el/12),lm=lunarMonthInfo(ap,tn>=15);if(lm.idx===month.idx&&(tn<15?"Shukla":"Krishna")===fortnight&&(tn%15)===(t%15))return {year,month:m,day,apMid:ap};}return null;};
-  const nowYear=new Date().getUTCFullYear();
-  return { tithi:chart.panchang.tithiName, number:(t%15)+1, fortnight, amanta:month.amanta, purnimanta:month.purnimanta, adhik:month.adhik, annual:[occurrence(nowYear),occurrence(nowYear+1)].filter(Boolean) };
+  // The next upcoming anniversaries: scan from this year forward, keep only
+  // occurrences on/after now (so a passed current-year tithi rolls to next year) and
+  // never before the death itself (guaranteed since now >= death here).
+  const floor=Math.max(deathMs, nowMs);
+  const nowYear=new Date(nowMs).getUTCFullYear();
+  const annual:any[]=[];
+  for(let year=nowYear; annual.length<2 && year<=nowYear+3; year++){const occ=occurrence(year);if(occ&&occ.apMid>=floor)annual.push(occ);}
+  return { future:false, tithi:chart.panchang.tithiName, number:(t%15)+1, fortnight, amanta:month.amanta, purnimanta:month.purnimanta, adhik:month.adhik, annual };
 }
 
 export function panchaPakshi(input:BirthInput) {

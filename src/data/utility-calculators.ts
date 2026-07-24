@@ -32,5 +32,12 @@ export function utilityFromPath(pathname: string) {
   if (pathname === "/calculators" || pathname === "/calculators/") return { kind: "catalogue" as const };
   const match = pathname.match(/^\/calculator\/([a-z-]+)\/?$/);
   const calculator = match && UTILITY_CALCULATORS.find((item) => item.slug === match[1]);
-  return calculator ? { kind: "calculator" as const, calculator } : null;
+  if (calculator) return { kind: "calculator" as const, calculator };
+  // Any other path inside the /calculator(s) namespace is an unknown or unsupported
+  // calculator: an excluded family (numerology, gemstone…), a typo (rashii), wrong
+  // case (RASHI), a stray /calculators/foo, or bare /calculator/. Return a not-found
+  // route so the screen shows a graceful state — never let Daily render silently
+  // under an invalid calculator URL. Paths outside this namespace still return null.
+  if (/^\/calculators?(\/|$)/.test(pathname)) return { kind: "notfound" as const, requested: pathname };
+  return null;
 }

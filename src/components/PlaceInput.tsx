@@ -3,7 +3,14 @@ import { T } from "./tokens";
 import { searchOffline, searchOnline } from "../data/places";
 
 /* ---------------- compact reusable place search ---------------- */
-function PlaceInput({ value, onPick, C, lang = "en" }) {
+/* onConfirmed (optional) turns on "strict" mode for callers that must not calculate
+   with a stale place (the utility calculators): the parent is told, on every change,
+   whether the visible text still matches the selected place. In strict mode the field
+   also does NOT auto-snap typed text back to the last place on blur — a user who
+   typed garbage keeps seeing their garbage, so the parent can block and explain,
+   instead of silently reusing the old coordinates. Callers without onConfirmed
+   (Daily, Prashna) keep the original behaviour untouched. */
+function PlaceInput({ value, onPick, C, lang = "en", onConfirmed }) {
   const [q, setQ] = useState(value ? value.label : "");
   const [sugs, setSugs] = useState([]);
   const [open, setOpen] = useState(false);
@@ -12,8 +19,14 @@ function PlaceInput({ value, onPick, C, lang = "en" }) {
   const seq = React.useRef(0);
 
   React.useEffect(() => {
+    if (onConfirmed) return; // strict mode: never resync silently; keep typed text visible
     if (!open && value) setQ(value.label);
-  }, [value, open]);
+  }, [value, open, onConfirmed]);
+
+  const confirmed = !!value && q.trim().length > 0 && q.trim().toLowerCase() === String(value.label || "").toLowerCase();
+  React.useEffect(() => {
+    if (onConfirmed) onConfirmed(confirmed);
+  }, [confirmed, onConfirmed]);
 
   const onChange = (text) => {
     setQ(text);
