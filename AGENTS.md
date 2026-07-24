@@ -25,12 +25,9 @@ tell what the app is doing. UI must follow the language toggle (hi/en) everywher
 - **ONE WRITER PER FILE.** Agents may work concurrently only when their file scopes
   do not overlap. `src/kundli-app.tsx`, shared design tokens and shared navigation are
   integration-owned: reserve them in `plans/task-log.md` before editing.
-- **Feature branch + PR is mandatory for backlog work.** Never implement or commit
-  backlog work directly on `main`. Each task gets an isolated branch/worktree and
-  an explicit allowed-file list. Push the branch and open a draft PR against
-  `main`; run the required gates there. Merge only through the PR after required
-  checks pass. Direct pushes to `main` are reserved for an owner-authorized
-  emergency recovery and must be documented in `plans/task-log.md`.
+- **Isolated branches/worktrees for concurrent code.** Each coding agent gets an
+  exclusive branch + worktree and an explicit allowed-file list. One integrator
+  reviews and merges branches sequentially, running all gates after every merge.
 - **No orphans.** After replacing anything, grep the old name; zero orphaned
   references is the standard. Diagnose structurally, don't patch the surface.
 - **No browser storage.** `localStorage` / `sessionStorage` are banned outright.
@@ -101,11 +98,9 @@ assertions. If a gate fails, fix the cause — never weaken a gate to pass it
 - The owner is non-technical: explain in plain language, one step at a time, and
   ask before anything irreversible or scope-changing *as a product decision*
   (new feature, monetization, launch), not for routine shell/tool calls.
-- **Standing git policy (owner, updated 2026-07-24):** after a finished backlog
-  slice or docs sync with green gates (or docs-only), commit to the assigned
-  feature branch, push it and open/update a draft PR without asking. Never push
-  backlog implementation directly to `main`. Merge only after required PR checks
-  pass; ask only for risky/unstable work or when the owner said “don’t push.”
+- **Standing git policy (owner, 2026-07-19):** after a finished backlog slice or
+  docs sync with green gates (or docs-only), **commit and push without asking**.
+  Ask only for risky/unstable work, or when the owner said “don’t push.”
   See `plans/how-you-steer.md`.
 - Complete fixes only. If a fix is partial, say so explicitly.
 
