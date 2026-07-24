@@ -17,7 +17,7 @@ const { loadApp } = require('./_load-app.cjs');
 
 const scr = loadApp('src/screens/PrashnaScreen.tsx');
 const eng = loadApp('src/engine/kp-horary.ts');
-const { PR_cast, PR_castNumber, PR_judge, QUESTIONS } = scr;
+const { PR_cast, PR_castNumber, PR_judge, QUESTIONS, PR_kpNewAyan } = scr;
 const { kpNumberToLagna } = eng;
 
 let pass = 0, fail = 0;
@@ -26,6 +26,15 @@ const ok = (c, m) => { c ? pass++ : fail++; console.log(`${c ? 'PASS' : 'FAIL'} 
 const IST = (y, mo, d, h, mi) => Date.UTC(y, mo - 1, d, h, mi) - 330 * 60000;
 const DELHI = { lat: 28.6139, lon: 77.2090 };
 const ms = IST(2026, 7, 24, 15, 30);
+
+// 0. KP-New ayanamsa constant matches the published value --------------------
+console.log('--- KP-New ayanamsa constant (Balachandran 2003) ---');
+{
+  const T = 31 / 36525; // 1 Feb 2000 12:00 TT ≈ JD 2451576.0
+  const val = PR_kpNewAyan(T);
+  const published = 23 + 46 / 60 + 4 / 3600; // 23°46'04"
+  ok(Math.abs(val - published) < 0.002, `KP-New = ${val.toFixed(5)}° at 1 Feb 2000 vs published 23°46'04" (${(Math.abs(val - published) * 3600).toFixed(1)}" off)`);
+}
 
 // 1. ascendant round-trip: cusps[1] must equal the number's sidereal lagna ----
 console.log('--- ascendant = number degree (round-trip) ---');
@@ -36,17 +45,18 @@ for (const n of [1, 45, 108, 200, 249]) {
   ok(d < 1e-6, `#${n}: cusp 1 = ${chart.cusps[1].toFixed(4)}° vs number ${want.toFixed(4)}°  (Δ ${d.toExponential(1)}°)`);
 }
 
-// 2. planets are the REAL sky (identical to the time chart for the same ms) ---
-console.log('--- planets unchanged (real sky) ---');
+// 2. planets are the REAL sky in KP-New sidereal: a UNIFORM shift from the
+//    Lahiri time chart (same tropical sky, only the ayanamsa differs) --------
+console.log('--- planets = real sky, uniformly shifted Lahiri→KP-New ---');
 {
-  const timeChart = PR_cast(ms, DELHI.lat, DELHI.lon);
-  const numChart = PR_castNumber(ms, DELHI.lat, DELHI.lon, 108);
-  let worst = 0;
-  for (let k = 0; k < 9; k++) {
-    let d = Math.abs(timeChart.planets[k].lon - numChart.planets[k].lon); if (d > 180) d = 360 - d;
-    worst = Math.max(worst, d);
-  }
-  ok(worst < 1e-9, `planet longitudes identical to the time chart  (worst Δ ${worst.toExponential(1)}°)`);
+  const timeChart = PR_cast(ms, DELHI.lat, DELHI.lon);           // Lahiri
+  const numChart = PR_castNumber(ms, DELHI.lat, DELHI.lon, 108); // KP-New
+  const signed = (a, b) => { let d = a - b; if (d > 180) d -= 360; if (d < -180) d += 360; return d; };
+  const deltas = [];
+  for (let k = 0; k < 9; k++) deltas.push(signed(numChart.planets[k].lon, timeChart.planets[k].lon));
+  const d0 = deltas[0];
+  ok(deltas.every(d => Math.abs(d - d0) < 1e-9), `every planet shifted by the SAME amount (real sky preserved; ${(d0 * 60).toFixed(2)}′)`);
+  ok(Math.abs(d0) > 0.02 && Math.abs(d0) < 0.20, `shift is the KP-New offset (not zero, not Lahiri): ${(d0 * 60).toFixed(2)}′`);
 }
 
 // 3. personalisation: different numbers → different frames / verdicts ---------

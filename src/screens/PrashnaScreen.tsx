@@ -282,16 +282,31 @@ function PR_ramcForAsc(targetAscTrop, eps, lat) {
   return (lo + hi) / 2;
 }
 
-/* Cast a KP horary NUMBER chart: real planets for the moment/place of judgment,
-   but the 12 houses framed by the number's ascendant. Same output shape as
-   PR_cast so PR_judge and the chart UI work unchanged. Returns null for a number
-   outside 1–249 (KP_NUMBER_MIN..KP_NUMBER_MAX). */
+/* KP-New ayanamsa (Prof. K. Balachandran, KP & Astrology Year Book 2003) — the
+   modern KP standard, owner-chosen 2026-07-24 for this mode (an ayanamsa fork
+   from Ganak's Lahiri default). Formula: 22°22′15.7″ at 1 Jan 1900 + Newcomb
+   precession (50.2388475″/yr, +0.000111″/yr² adjustment). Verified: this returns
+   23°46′05″ for 1 Feb 2000 vs the published 23°46′04″. T = frozen engine's TT
+   Julian centuries from J2000, so Ty = years since 1900 = 100 + 100·T. */
+function PR_kpNewAyan(T) {
+  const Ty = 100 + 100 * T;
+  return 22 + 1335.7 / 3600 + (Ty * 50.2388475 + Ty * Ty * 0.000111) / 3600;
+}
+
+/* Cast a KP horary NUMBER chart on the KP-New ayanamsa: real planets for the
+   moment/place of judgment, houses framed by the number's ascendant. Same output
+   shape as PR_cast so PR_judge and the chart UI work unchanged. The number's
+   nirayana ascendant is ayanamsa-independent (fixed by the 249 table), so only
+   the tropical↔sidereal conversions and the planet shift use KP-New. Returns
+   null for a number outside 1–249 (KP_NUMBER_MIN..KP_NUMBER_MAX). */
 function PR_castNumber(ms, lat, lonE, number) {
   const ascSid = kpNumberToLagna(number);
   if (ascSid === null) return null;
-  const { sid, T, Tut } = PR_sidAll(ms);           // real sky for this moment
+  const { sid, T, Tut } = PR_sidAll(ms);            // real sky (Lahiri sidereal)
   const eps = PR_obliquity(Tut);
-  const ascTrop = norm360(ascSid + PR_ayanamsa(T)); // number ascendant, tropical
+  const ayan = PR_kpNewAyan(T);                     // KP-New for this mode
+  const delta = PR_ayanamsa(T) - ayan;             // Lahiri → KP-New shift for planets
+  const ascTrop = norm360(ascSid + ayan);          // number ascendant, tropical (KP-New)
   const ramc = PR_ramcForAsc(ascTrop, eps, lat);
   const mc = norm360(Math.atan2(sinD(ramc), cosD(ramc) * cosD(eps)) * R2D);
   const p = PR_placidus(ramc, eps, lat);
@@ -300,7 +315,7 @@ function PR_castNumber(ms, lat, lonE, number) {
   if (p) { trop[11] = p.c11; trop[12] = p.c12; trop[2] = p.c2; trop[3] = p.c3; }
   else for (const [h, off] of [[11, 300], [12, 330], [2, 30], [3, 60]]) trop[h] = norm360(ascTrop + off);
   for (const h of [4, 5, 6, 7, 8, 9]) trop[h] = norm360(trop[((h + 5) % 12) + 1] + 180);
-  const cusps = trop.map((v, i) => i === 0 ? 0 : PR_toSid(v, T));
+  const cusps = trop.map((v, i) => i === 0 ? 0 : norm360(v - ayan)); // KP-New sidereal cusps
   const inHouse = lon => {
     for (let h = 1; h <= 12; h++) {
       const a = cusps[h], b = cusps[h === 12 ? 1 : h + 1];
@@ -309,14 +324,14 @@ function PR_castNumber(ms, lat, lonE, number) {
     return 1;
   };
   const planets = ['Su', 'Mo', 'Ma', 'Me', 'Ju', 'Ve', 'Sa', 'Ra', 'Ke'].map(k => {
-    const lon = sid[k], sl = PR_subOf(lon);
+    const lon = norm360(sid[k] + delta), sl = PR_subOf(lon); // real sky in KP-New sidereal
     const retro = (k === 'Ra' || k === 'Ke') ? true : (k === 'Su' || k === 'Mo') ? false : PR_speed(k, ms) < 0;
     return { key: k, lon, sign: Math.floor(lon / 30), deg: lon % 30,
       nak: PR_nakOf(lon), star: sl.star, sub: sl.sub, retro, house: inHouse(lon) };
   });
   const lagna = { lon: cusps[1], sign: Math.floor(cusps[1] / 30), deg: cusps[1] % 30,
     nak: PR_nakOf(cusps[1]), star: PR_subOf(cusps[1]).star, sub: PR_subOf(cusps[1]).sub };
-  return { ms, number, lagna, planets, cusps, system: p ? 'placidus' : 'equal' };
+  return { ms, number, ayanamsa: 'kp-new', lagna, planets, cusps, system: p ? 'placidus' : 'equal' };
 }
 
 // ------------------------------------------------------------ UI PIECES
@@ -852,4 +867,4 @@ function NumberSetBox({ info, favor, hi }) {
 export default PrashnaScreen;
 // Named exports for the validation gates (parity + number-mode chart). The
 // parity gate slices only the marked engine region, so these do not affect it.
-export { PR_cast, PR_castNumber, PR_judge, QUESTIONS };
+export { PR_cast, PR_castNumber, PR_judge, QUESTIONS, PR_kpNewAyan };
