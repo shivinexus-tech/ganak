@@ -132,6 +132,42 @@ to the public as "sourced," per the project's religious-accuracy rule.
 
 ---
 
+## Approved answer-card copy spec (owner-reviewed 2026-07-24)
+
+Owner reviewed three worked verdict cards (favourable / unfavourable / mixed) and
+approved this template for the engine copy. **Illustrative planetary layout only** — the
+real engine produces the values; this fixes the *shape and voice*, not the astrology.
+
+**Voice — warm, respectful, never over-promising.** A verdict encourages or cautions;
+it does **not** guarantee an outcome (religious-accuracy boundary). Badges: **Favourable
+/ Not yet / Mixed** (not "Not favourable" — "Not yet" is gentler and truer to horary).
+
+Approved bilingual verdict lines (the register the engine copy should match):
+- **Favourable:** `हाँ — ग्रह-योग आपके अनुकूल है।` · "Favourable — the chart stands behind
+  what you asked." _(owner chose this Hindi register 2026-07-24; rejected the calque
+  "आपके प्रश्न को ग्रहों का साथ है" as unnatural Hindi.)_
+- **Unfavourable:** `अभी अनुकूल नहीं — थोड़ा ठहरें।` · "Not the right moment — better to
+  hold than to force it."
+- **Mixed:** `सुधार होगा — पर धीरे-धीरे। धैर्य रखें।` · "Recovery is coming — but gradually.
+  Stay patient."
+
+**Detail box — "आपके अंक ने क्या तय किया / what your number set" (elaborated, owner-approved).**
+One muted top line explaining what the number did (`आपका अंक ... फिर ... भाव देखे जाते हैं`),
+then rows: **Sign · Star (nakshatra + lord) · Sub lord · Ascendant · Houses judged**.
+Every jargon term carries a one-line plain gloss (e.g. sub lord → "the planet that gives
+the final yes or no"), per the app's jargon-gloss rule. Devanagari uses natural phrasing
+(`भाव देखे जाते हैं`, not the clinical `जाँचे जाते हैं`).
+
+**Gentle timing hint — KEEP IN v1 (owner, 2026-07-24).** A soft, muted one-liner is
+allowed in v1 (e.g. `शुक्र की दशा में संभावना प्रबल` · "Most likely in a Venus period"),
+phrased as a *possibility*, never a fixed date. This is a deliberately small subset — the
+**full** ruling-planets/timing panel remains **v1.1** per the findings.
+
+**Still open (not blocking):** whether to add a collapsible "full working" section
+(significators, deny-houses) *below* the clean card for curious users. Owner to decide.
+
+---
+
 ## Sources consulted
 
 - Reader VI full text — Internet Archive `kp-readers` collection
