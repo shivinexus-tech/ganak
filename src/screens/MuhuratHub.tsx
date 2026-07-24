@@ -33,6 +33,7 @@ import { fmtDur, eventDetail } from "../engine/transit-copy";
 import { observancesFor, scanPanchangCalendar, EKADASHI_NAMES, PRADOSH_NAMES_BY_DAY } from "../engine/festivals";
 import { chhathTimings } from "../engine/chhath";
 import { navratriTimings } from "../engine/navratri";
+import { eclipseDetail } from "../engine/eclipse";
 import { urlPrefGet, urlPrefPush } from "../components/url-prefs";
 
 const VRAT_VIDHI_KEY = Object.freeze({
@@ -65,6 +66,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
     try {
       if (fexp.timing === "navratri") return { navratri: navratriTimings(place, fexp.ms) };
       if (fexp.timing === "chhath-sequence") return { chhath: chhathTimings(place, fexp.ms) };
+      if (fexp.timing === "grahan" && fexp.eclipseMs && fexp.key) return { grahan: eclipseDetail(place, fexp.eclipseMs, fexp.key) };
       return vratDetail(place, ayanamsa, fexp.ms, fexp.timing);
     } catch (e) { return null; }
   }, [fexp, place, ayanamsa]);
@@ -452,6 +454,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
             lastMonth = mLbl;
             const id = tab + ":" + it.key + ":" + it.ms;
             const open = fexp && fexp.id === id;
+            const nextFexp = { id, key: it.key, ms: it.ms, eclipseMs: it.eclipseMs || null, timing: meta ? meta.timing : null, shifted: it.shifted, reason: it.reason };
             return (
               <div key={id}>
                 {header}
@@ -459,8 +462,8 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                   <div
                     role="button"
                     tabIndex={0}
-                    onClick={() => setFexp(open ? null : { id, ms: it.ms, timing: meta ? meta.timing : null, shifted: it.shifted, reason: it.reason })}
-                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFexp(open ? null : { id, ms: it.ms, timing: meta ? meta.timing : null, shifted: it.shifted, reason: it.reason }); } }}
+                    onClick={() => setFexp(open ? null : nextFexp)}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFexp(open ? null : nextFexp); } }}
                     style={{ cursor: "pointer", padding: "10px 12px", display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}
                   >
                     <span style={{ fontSize: 14, color: C.ivory, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
@@ -492,6 +495,26 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                           <div style={{ fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
                             {lang === "hi" ? "घटस्थापना: " : "Ghatasthapana: "}
                             {fmtTimeD(d.navratri.ghatasthapana.primary.start, d.navratri.tz, it.ms)}–{fmtTimeD(d.navratri.ghatasthapana.primary.end, d.navratri.tz, it.ms)}
+                          </div>
+                        )}
+                        {d && d.grahan && (
+                          <div style={{ fontSize: T.fSmall, color: d.grahan.visible ? "#1F7A4D" : C.sindoor, fontWeight: 600, background: d.grahan.visible ? "rgba(31,122,77,.07)" : "rgba(194,69,30,.06)", border: `1px solid ${d.grahan.visible ? "rgba(31,122,77,.22)" : "rgba(194,69,30,.25)"}`, borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
+                            <div>{d.grahan.visible ? (lang === "hi" ? "आपके शहर में दृश्य" : "Visible at your city") : (lang === "hi" ? "आपके शहर में दृश्य नहीं" : "Not visible at your city")}</div>
+                            {d.grahan.visibility && (
+                              <div style={{ color: C.ivory, fontWeight: 500, marginTop: 4 }}>
+                                {lang === "hi" ? "दृश्य अवधि: " : "Visible: "}
+                                {fmtTimeD(d.grahan.visibility.start, d.grahan.tz, it.ms)}–{fmtTimeD(d.grahan.visibility.end, d.grahan.tz, it.ms)}
+                              </div>
+                            )}
+                            {d.grahan.visible && d.grahan.sutakStart && d.grahan.moksha && (
+                              <div style={{ color: C.ivory, fontWeight: 500, marginTop: 4 }}>
+                                {lang === "hi" ? "सूतक: " : "Sutak: "}
+                                {fmtTimeD(d.grahan.sutakStart, d.grahan.tz, it.ms)}
+                                {" · "}
+                                {lang === "hi" ? "मोक्ष " : "Moksha "}
+                                {fmtTimeD(d.grahan.moksha, d.grahan.tz, it.ms)}
+                              </div>
+                            )}
                           </div>
                         )}
                         {d && (d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars || d.lakshmiPuja) && (

@@ -15,7 +15,13 @@ const app = loadApp();
 const GRAHAN_KEYS = ['suryaGrahan', 'chandraGrahan'];
 const IST = 5.5;
 const DELHI = { zone: 'Asia/Kolkata', lat: 28.6139, lon: 77.2090, label: 'Delhi' };
+const CAPE_TOWN = { zone: 'Africa/Johannesburg', lat: -33.9249, lon: 18.4241, label: 'Cape Town' };
 const fmt = (ms) => new Date(ms + IST * 3600000).toISOString().slice(0, 10);
+const minutes = (ms) => Math.round(ms / 60000);
+const withinMinutes = (actual, expected, tolerance, label) => {
+  const diff = Math.abs(minutes(actual - expected));
+  assert(diff <= tolerance, `${label}: got ${new Date(actual + IST * 3600000).toISOString()} diff ${diff}m > ${tolerance}m`);
+};
 
 const routeByKey = new Map(pages.FESTIVAL_PAGE_ENTRIES.map((entry) => [entry.key, entry]));
 const requiredObjectFields = ['verdict', 'meaning', 'diet', 'sankalpa', 'puja', 'paran', 'udyapan'];
@@ -54,16 +60,32 @@ console.log(`PASS  ${grahan.length} grahan events in 2026 scan window`);
 const febSolar = grahan.find((g) => g.key === 'suryaGrahan' && fmt(g.ms).startsWith('2026-02'));
 assert(febSolar && febSolar.eclipseMs, 'Feb 2026 solar grahan must carry eclipseMs');
 const solarDetail = eclipseDetail(DELHI, febSolar.eclipseMs, 'suryaGrahan');
-assert(solarDetail.visible, 'Feb 2026 solar grahan visible in Delhi');
+assert.strictEqual(solarDetail.visible, false, 'Feb 2026 solar grahan is not visible in Delhi');
 assert.strictEqual(solarDetail.sutakHours, 12);
-console.log('PASS  Feb 2026 solar visible Delhi, 12h Sutak');
+assert.strictEqual(solarDetail.sutakStart, null, 'non-visible solar grahan should not show Sutak start');
+assert.strictEqual(solarDetail.moksha, null, 'non-visible solar grahan should not show Moksha');
+console.log('PASS  Feb 2026 solar not visible in Delhi; no Sutak shown');
+
+const capeSolar = eclipseDetail(CAPE_TOWN, febSolar.eclipseMs, 'suryaGrahan');
+assert(capeSolar.visible, 'Feb 2026 solar grahan should be visible in Cape Town');
+assert(capeSolar.contacts && capeSolar.contacts.start < capeSolar.contacts.end, 'visible solar grahan must have contacts');
+assert(capeSolar.visibility && capeSolar.visibility.start < capeSolar.visibility.end, 'visible solar grahan must have local visibility window');
+assert.strictEqual(capeSolar.sutakStart, capeSolar.visibility.start - 12 * 3600000);
+assert.strictEqual(capeSolar.moksha, capeSolar.contacts.end);
+console.log('PASS  Feb 2026 solar visible in Cape Town with contact-based Sutak/Moksha');
 
 const marLunar = grahan.find((g) => g.key === 'chandraGrahan' && fmt(g.ms).startsWith('2026-03'));
 assert(marLunar && marLunar.eclipseMs, 'Mar 2026 lunar grahan must carry eclipseMs');
 const lunarDetail = eclipseDetail(DELHI, marLunar.eclipseMs, 'chandraGrahan');
-assert.strictEqual(lunarDetail.visible, false, 'Mar 2026 lunar max is before moonrise in Delhi');
+assert.strictEqual(lunarDetail.visible, true, 'Mar 2026 lunar grahan should be visible after moonrise in Delhi');
 assert.strictEqual(lunarDetail.sutakHours, 9);
-console.log('PASS  Mar 2026 lunar not visible at max in Delhi (moonrise after peak), 9h Sutak rule');
+assert(lunarDetail.contacts && lunarDetail.visibility, 'visible lunar grahan must include contacts and visibility');
+withinMinutes(lunarDetail.contacts.start, Date.UTC(2026, 2, 3, 9, 51), 12, 'Mar lunar first umbral contact');
+withinMinutes(lunarDetail.contacts.end, Date.UTC(2026, 2, 3, 13, 16), 12, 'Mar lunar Moksha');
+withinMinutes(lunarDetail.visibility.start, Date.UTC(2026, 2, 3, 12, 52), 12, 'Mar lunar Delhi moonrise visibility start');
+assert.strictEqual(lunarDetail.sutakStart, lunarDetail.visibility.start - 9 * 3600000);
+assert.strictEqual(lunarDetail.moksha, lunarDetail.contacts.end);
+console.log('PASS  Mar 2026 lunar visible at Delhi after moonrise; contact-based 9h Sutak/Moksha');
 
 const occ = routeModule.findLocalFestivalOccurrence(
   routeByKey.get('suryaGrahan'),

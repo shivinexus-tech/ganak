@@ -211,6 +211,17 @@
       "lastVerified": "2026-07-24 · Local gates incl. skanda-ayyappa-pages.cjs; production build pending push",
       "sourceConfidence": "Drik Panchang festival dates plus Tamil/Kerala regional practice notes; Sabarimala pilgrimage guidance for Ayyappa safety boundaries",
       "recommendedAction": "No corrective action required; owner spot-check the two climax routes in both languages after deploy."
+    },
+    "15": {
+      "deliveryState": "Delivered — production verification pending",
+      "limitations": "None in the approved eclipse/Sutak scope. Sect-specific variants are not exposed because no verified sect-specific eclipse rule set was adopted; the delivered convention is explicitly labelled as the Drik household rule.",
+      "shortTermImpact": "Users get a city-specific answer for solar and lunar grahan pages: visible or not visible, contact window, local visible window, Sutak applicability/start and Moksha.",
+      "longTermImpact": "Topocentric solar checks and lunar moonrise-overlap anchors prevent the previous false-visible/no-contact regression while preserving Drik-style no-Sutak handling for non-visible cities.",
+      "bugBashStatus": "Automated adversarial anchors completed 2026-07-24: Delhi Feb 2026 solar non-visible/no Sutak, Cape Town Feb 2026 solar visible, Delhi Mar 2026 lunar visible after moonrise. Production live smoke remains recommended after deploy.",
+      "qualityRisk": "Green",
+      "lastVerified": "2026-07-24 · Local `eclipse-sutak-pages.cjs` plus production build; full canonical gates in closeout",
+      "sourceConfidence": "Drik Panchang/public Drik-citing 2026 eclipse date and Sutak rule anchors; Ganak topocentric geometry for city visibility",
+      "recommendedAction": "No corrective action required; spot-check `/festival/surya-grahan` and `/festival/chandra-grahan` in EN/HI after deploy."
     }
   },
   "dashboard": {

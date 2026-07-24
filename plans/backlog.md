@@ -256,8 +256,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         multi-year anchors). Chhath four-day journey closed under row #29.
   - [x] Eighteen season-specific Chaitra/Sharad Navadurga pages plus the sourced
         Durga Saptashati reading plan; Gupt Navratris stay distinct.
-  - [ ] Location-aware eclipse visibility, Sutak start/end and safe household
-        guidance; sect-specific calendar views where rules are verified.
+  - [x] Location-aware eclipse visibility, contact windows, Sutak start/end and
+        safe household guidance. Shipped 2026-07-24 with topocentric solar
+        visibility, lunar moonrise overlap, no-Sutak handling for non-visible
+        cities and EN/HI festival + MuhuratHub wiring.
       _(P0-FESTIVAL-VRAT-PARITY; owner scope 2026-07-21)_
 - [ ] **P0 before go-live — exceptionally strong Muhurat parity.** Complete every
       gap from the competitor comparison and keep the verdict/explanation stronger

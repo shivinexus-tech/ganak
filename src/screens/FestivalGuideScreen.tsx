@@ -49,7 +49,6 @@ const DECIDING_KALA_LABELS = Object.freeze({
   "ghatasthapana-pratipada": { en: "the Pratipada rule for Ghatasthapana", hi: "घटस्थापना का प्रतिपदा नियम" },
   "kanya-sankranti-vishwakarma": { en: "Kanya Sankranti for Vishwakarma Puja", hi: "विश्वकर्मा पूजा के लिए कन्या संक्रांति" },
   "kartik-amavasya-purnimanta": { en: "Kartika Amavasya in the Purnimanta calendar", hi: "पूर्णिमान्त पंचांग की कार्तिक अमावस्या" },
-  "syzygy-near-node": { en: "syzygy near Rahu or Ketu (maximum eclipse)", hi: "राहु/केतु के निकट संयोग (अधिकतम ग्रहण)" },
   "kojagara-nishita-purnima": { en: "Purnima prevailing in the Nishita period", hi: "निषीथ काल में प्रचलित पूर्णिमा" },
   "last-shravana-shukla-friday": { en: "the last Friday of Shravana Shukla Paksha", hi: "श्रावण शुक्ल पक्ष का अंतिम शुक्रवार" },
   "mahalaya-amavasya": { en: "Mahalaya Amavasya", hi: "महालया अमावस्या" },
@@ -286,7 +285,19 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
         <h2 id="festival-guide-title" style={{ margin: "0 0 5px", color: C.ivory, fontFamily: T.serif, fontSize: T.fHeading, lineHeight: 1.2 }}>
           {title}
         </h2>
-        {guide.vidhiKey && <FestivalHeroImage imageKey={guide.vidhiKey} lang={lang} C={C} />}
+        {isNavadurga && guide.form?.image ? (
+          <img
+            src={guide.form.image}
+            alt={guide.form.alt?.[L] || title}
+            width="900"
+            height="900"
+            loading="eager"
+            decoding="async"
+            style={{ display: "block", width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: C.panel, marginBottom: 14 }}
+          />
+        ) : (
+          guide.vidhiKey && <FestivalHeroImage imageKey={guide.vidhiKey} lang={lang} C={C} />
+        )}
         <p style={{ margin: "0 0 14px", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55 }}>
           {hasFullGuide
             ? (L === "hi"
@@ -460,8 +471,24 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                     {L === "hi" ? "अधिकतम ग्रहण: " : "Maximum eclipse: "}
                     {formatLocalClock(grahan.eclipseMs, tz, hit.ms, L)}
                   </div>
+                  {grahan.contacts && (
+                    <div style={{ color: C.ivory, fontWeight: 500 }}>
+                      {L === "hi" ? "ग्रहण स्पर्श: " : "Eclipse contacts: "}
+                      {formatLocalClock(grahan.contacts.start, tz, hit.ms, L)}
+                      {" – "}
+                      {formatLocalClock(grahan.contacts.end, tz, hit.ms, L)}
+                    </div>
+                  )}
                   {grahan.visible && (
                     <>
+                      {grahan.visibility && (
+                        <div style={{ color: C.ivory, fontWeight: 500 }}>
+                          {L === "hi" ? "स्थानीय दृश्य अवधि: " : "Visible locally: "}
+                          {formatLocalClock(grahan.visibility.start, tz, hit.ms, L)}
+                          {" – "}
+                          {formatLocalClock(grahan.visibility.end, tz, hit.ms, L)}
+                        </div>
+                      )}
                       <div>
                         {L === "hi" ? `सूतक (${grahan.sutakHours} घंटे पहले): ` : `Sutak (${grahan.sutakHours}h before): `}
                         {formatLocalClock(grahan.sutakStart, tz, hit.ms, L)}
@@ -471,6 +498,13 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                         {formatLocalClock(grahan.moksha, tz, hit.ms, L)}
                       </div>
                     </>
+                  )}
+                  {!grahan.visible && (
+                    <div style={{ color: C.muted, fontWeight: 400 }}>
+                      {L === "hi"
+                        ? "यह ग्रहण इस स्थान पर दृश्य नहीं है, इसलिए सामान्य गृह-परम्परा में सूतक लागू नहीं माना जाता।"
+                        : "This eclipse is not visible at this place, so Sutak is normally not observed for this city."}
+                    </div>
                   )}
                   <div style={{ color: C.muted, fontWeight: 400, fontSize: T.fMicro }}>
                     {grahan.conventionNote[L]}
