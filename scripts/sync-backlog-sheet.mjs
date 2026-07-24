@@ -41,6 +41,7 @@ const SHEET_COLUMNS = [
   "Quality risk (RAG)",
   "Last verified · environment",
   "Source confidence",
+  "Recommendation / action items",
 ];
 
 const QUALITY_KEYS = [
@@ -52,6 +53,7 @@ const QUALITY_KEYS = [
   "qualityRisk",
   "lastVerified",
   "sourceConfidence",
+  "recommendedAction",
 ];
 
 const LOCAL_TO_SHEET_COLUMN = [0, 1, 2, 4, 5, 6, 7, 8, 9];
@@ -164,6 +166,7 @@ function resolveQuality(cells, config, id) {
       qualityRisk: "Red",
       lastVerified,
       sourceConfidence,
+      recommendedAction: "Run and record the required independent bug bash, resolve every blocking finding, rerun the full acceptance matrix and verify the corrected release in production.",
     });
   }
 
@@ -177,6 +180,7 @@ function resolveQuality(cells, config, id) {
       qualityRisk: "Green",
       lastVerified,
       sourceConfidence,
+      recommendedAction: defaults.deliveredRecommendedAction,
     });
   }
 
@@ -191,6 +195,9 @@ function resolveQuality(cells, config, id) {
     qualityRisk: "Amber",
     lastVerified,
     sourceConfidence,
+    recommendedAction: dependencies && dependencies !== "None" && dependencies !== "No open dependency"
+      ? `Resolve the recorded dependency: ${dependencies}. Then satisfy the definition of done and attach production verification evidence.`
+      : `Complete the remaining acceptance criteria, satisfy the definition of done and attach production verification evidence.`,
   });
 }
 
@@ -379,19 +386,31 @@ async function readLiveSheet(config) {
   await validateLiveDashboard(config);
 
   const params = new URLSearchParams();
-  for (const tab of config.tabs) params.append("ranges", `${a1SheetName(tab.sheetName)}!A1:R1000`);
+  const lastColumn = columnLetter(SHEET_COLUMNS.length - 1);
+  for (const tab of config.tabs) params.append("ranges", `${a1SheetName(tab.sheetName)}!A1:${lastColumn}1000`);
   params.set("majorDimension", "ROWS");
   params.set("valueRenderOption", "FORMATTED_VALUE");
   const response = await sheetsRequest(config, `/values:batchGet?${params}`);
 
   const liveBySection = new Map();
   const liveById = new Map();
+  const headerMigrations = [];
   response.valueRanges.forEach((valueRange, index) => {
     const tab = config.tabs[index];
     const values = valueRange.values || [];
     const header = (values[0] || []).map(normalizeCell);
-    if (JSON.stringify(header) !== JSON.stringify(SHEET_COLUMNS)) {
+    const legacyHeader = SHEET_COLUMNS.slice(0, -1);
+    const needsHeaderMigration = JSON.stringify(header) === JSON.stringify(legacyHeader);
+    if (!needsHeaderMigration && JSON.stringify(header) !== JSON.stringify(SHEET_COLUMNS)) {
       fail(`Header mismatch in “${tab.sheetName}”; refusing to guess column positions`);
+    }
+    if (needsHeaderMigration) {
+      headerMigrations.push({
+        kind: "header",
+        sheetName: tab.sheetName,
+        sheetIndex: SHEET_COLUMNS.length - 1,
+        value: SHEET_COLUMNS.at(-1),
+      });
     }
     liveBySection.set(tab.section, values);
     values.slice(1).forEach((cells, rowOffset) => {
@@ -407,11 +426,11 @@ async function readLiveSheet(config) {
       });
     });
   });
-  return { liveBySection, liveById };
+  return { liveBySection, liveById, headerMigrations };
 }
 
 function buildChanges(base, head, live, config) {
-  const changes = [];
+  const changes = [...(live.headerMigrations || [])];
   const allIds = new Set([...base.rows.keys(), ...head.rows.keys()]);
 
   for (const id of live.liveById.keys()) {
@@ -476,7 +495,7 @@ function buildChanges(base, head, live, config) {
 }
 
 function buildBootstrapChanges(head, live) {
-  const changes = [];
+  const changes = [...(live.headerMigrations || [])];
 
   for (const id of live.liveById.keys()) {
     if (!head.rows.has(id)) fail(`Live Sheet contains unexpected backlog ID ${id}; reconcile it explicitly before bootstrapping`);
@@ -502,6 +521,10 @@ function buildBootstrapChanges(head, live) {
 function printBootstrapPlan(changes) {
   console.log(`Backlog Sheet bootstrap plan: ${changes.length} stale cell${changes.length === 1 ? "" : "s"} would be aligned to the repository register.`);
   for (const change of changes) {
+    if (change.kind === "header") {
+      console.log(`- Sheet header · ${change.sheetName}!${columnLetter(change.sheetIndex)}1 · ${change.value}`);
+      continue;
+    }
     console.log(`- ID ${change.liveRow.id} · ${SHEET_COLUMNS[change.sheetIndex]} · ${change.liveRow.sheetName}!${columnLetter(change.sheetIndex)}${change.liveRow.rowNumber}`);
   }
 }
@@ -512,6 +535,13 @@ async function applyChanges(changes, live, config) {
     config.tabs.map((tab) => [tab.section, Math.max(2, (live.liveBySection.get(tab.section) || []).length + 1)]),
   );
   for (const change of changes) {
+    if (change.kind === "header") {
+      data.push({
+        range: `${a1SheetName(change.sheetName)}!${columnLetter(change.sheetIndex)}1`,
+        values: [[change.value]],
+      });
+      continue;
+    }
     if (change.kind === "cell") {
       const cell = `${columnLetter(change.sheetIndex)}${change.liveRow.rowNumber}`;
       data.push({ range: `${a1SheetName(change.liveRow.sheetName)}!${cell}`, values: [[change.value]] });
@@ -522,7 +552,7 @@ async function applyChanges(changes, live, config) {
     const rowNumber = nextAppendRow.get(tab.section);
     nextAppendRow.set(tab.section, rowNumber + 1);
     data.push({
-      range: `${a1SheetName(tab.sheetName)}!A${rowNumber}:R${rowNumber}`,
+      range: `${a1SheetName(tab.sheetName)}!A${rowNumber}:${columnLetter(SHEET_COLUMNS.length - 1)}${rowNumber}`,
       values: [sheetRow(change.after)],
     });
   }

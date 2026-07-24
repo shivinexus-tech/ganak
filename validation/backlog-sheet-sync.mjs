@@ -8,7 +8,7 @@ const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md
 const base = parseRegister(markdown, config, "test base");
 
 assert.equal(base.rows.size, 57);
-assert.equal(sheetRow(base.rows.get("1")).length, 18);
+assert.equal(sheetRow(base.rows.get("1")).length, 19);
 assert.equal(base.rows.get("1").quality.deliveryState, "Delivered with quality limitation");
 assert.equal(base.rows.get("1").quality.qualityRisk, "Red");
 assert.match(base.rows.get("1").quality.bugBashStatus, /Required for high-impact closure/);
@@ -25,6 +25,11 @@ assert.match(base.rows.get("5").quality.bugBashStatus, /not completed/i);
 assert.equal(base.rows.get("5").quality.qualityRisk, "Red");
 assert.match(base.rows.get("5").quality.lastVerified, /Local HTTP smoke only/);
 assert.match(base.rows.get("5").quality.sourceConfidence, /Not applicable/);
+assert.match(base.rows.get("1").quality.recommendedAction, /independent A\/B birthplaces/);
+assert.match(base.rows.get("5").quality.recommendedAction, /Deploy the API/);
+assert.match(base.rows.get("12").quality.recommendedAction, /holiday-overlay control/);
+assert.match(base.rows.get("2").quality.recommendedAction, /bug bash/);
+assert.match(base.rows.get("13").quality.recommendedAction, /No corrective action/);
 
 const dashboardFixture = {
   title: "Ganak Quality Dashboard",
@@ -73,7 +78,7 @@ const head = parseRegister(changedMarkdown, config, "test head");
 function makeLive(parsed) {
   const liveById = new Map();
   const liveBySection = new Map(config.tabs.map((tab) => [tab.section, [
-    ["#", "Backlog item", "Effort", "Technical / coding complexity", "Progress", "Remaining AI time", "Dependencies", "Why it may take longer", "Acceptance criteria", "Definition of done / closure evidence", "Delivery state", "Limitations / pending work", "Short-term impact", "Long-term impact", "Bug-bash status / evidence", "Quality risk (RAG)", "Last verified · environment", "Source confidence"],
+    ["#", "Backlog item", "Effort", "Technical / coding complexity", "Progress", "Remaining AI time", "Dependencies", "Why it may take longer", "Acceptance criteria", "Definition of done / closure evidence", "Delivery state", "Limitations / pending work", "Short-term impact", "Long-term impact", "Bug-bash status / evidence", "Quality risk (RAG)", "Last verified · environment", "Source confidence", "Recommendation / action items"],
   ]]));
   for (const tab of config.tabs) {
     let rowNumber = 2;
@@ -84,7 +89,7 @@ function makeLive(parsed) {
       rowNumber += 1;
     }
   }
-  return { liveById, liveBySection };
+  return { liveById, liveBySection, headerMigrations: [] };
 }
 
 const live = makeLive(base);
@@ -106,6 +111,19 @@ assert.deepEqual(
   "an explicitly requested bootstrap must identify every stale live cell against the repository",
 );
 assert.deepEqual(buildBootstrapChanges(head, alreadyPublished), [], "bootstrap must be idempotent after alignment");
+
+const legacyHeaderLive = makeLive(base);
+legacyHeaderLive.headerMigrations.push({
+  kind: "header",
+  sheetName: "P0 Before Go-Live",
+  sheetIndex: 18,
+  value: "Recommendation / action items",
+});
+assert.deepEqual(
+  buildChanges(base, base, legacyHeaderLive, config),
+  legacyHeaderLive.headerMigrations,
+  "the publisher must migrate the old 18-column header without rewriting existing cells",
+);
 
 const conflicted = makeLive(base);
 conflicted.liveById.get("3").cells[4] = "59%";
@@ -138,4 +156,4 @@ assert.equal(
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 
-console.log("Backlog Sheet sync gate: PASS — 57 rows; 18-column quality contract, dashboard formula guard, high-impact bug-bash/RAG policy, API limitation/impact disclosure, verification/source confidence, changed-cell targeting, idempotence, conflict refusal, metadata guard and explicit bootstrap planning verified.");
+console.log("Backlog Sheet sync gate: PASS — 57 rows; 19-column quality/action contract, legacy-header migration, dashboard formula guard, high-impact bug-bash/RAG policy, API limitation/impact disclosure, verification/source confidence, changed-cell targeting, idempotence, conflict refusal, metadata guard and explicit bootstrap planning verified.");

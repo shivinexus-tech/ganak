@@ -14,7 +14,7 @@ Repository sources:
   complexity and exact title/section for every numbered item; quality-column
   defaults and evidence-backed overrides.
 
-Every live backlog row has eight quality-visibility columns after the existing ten:
+Every live backlog row has nine quality-visibility columns after the existing ten:
 
 1. **Delivery state** — distinguishes delivered, in progress, not started, launch
    baseline/ongoing, and built locally but not publicly delivered.
@@ -32,6 +32,9 @@ Every live backlog row has eight quality-visibility columns after the existing t
    production verification.
 8. **Source confidence** — primary/textual, institutional, regional/lineage-variable,
    insufficiently verified/not classified, or not applicable for technical work.
+9. **Recommendation / action items** — the concrete next action needed to clear a
+   Red or limitation-bearing row. Amber rows name the dependency/closure step;
+   Green rows state that no corrective work is currently required.
 
 Bug bash is an optional added quality check for ordinary items. It is mandatory for
 items explicitly classified as high impact because they affect several journeys or
@@ -39,7 +42,7 @@ carry safety, privacy, legal, financial, religious-trust or platform-wide risk. 
 delivered high-impact item without completed bug-bash evidence remains visibly Red
 and “Delivered with quality limitation”; its percentage is not silently rewritten.
 When a row has a non-default delivery condition, limitation, impact, risk,
-verification, source-confidence or bug-bash result, add/update its full entry in
+verification, source-confidence, recommendation or bug-bash result, add/update its full entry in
 `qualityOverrides` rather than relying on a generic derived value.
 
 The live **Quality Dashboard** tab automatically stacks all six backlog tabs and
@@ -122,7 +125,8 @@ which value is current.
 sections, ordering and technical-complexity values.
 
 The GitHub publisher verifies the spreadsheet title, all six tab names and the
-ten-column header before writing. Common failures are intentionally explicit:
+full 19-column header before writing. It safely upgrades the previous 18-column
+header by adding the recommendation/action column. Common failures are intentionally explicit:
 
 - **OIDC permission denied** — verify the pool/provider condition, repository ID,
   `main` ref and the service account's Workload Identity User binding.
