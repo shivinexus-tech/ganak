@@ -18,10 +18,8 @@ import { ChartVault } from "../components/ChartVault";
 import { BNNModule, BhriguModule } from "./JyotishBnnScreen";
 import { RectifyModule } from "./RectifyScreen";
 import { SIGNS, NAKSHATRAS, AYANAMSA, zoneOffset, PLANET_DEVA } from "../engine/panchang";
-
-const NAK_NOTE = ["Swift, pioneering, healing instincts; restless until in motion.", "Intense, creative, carries burdens with discipline and will.", "Sharp, purifying, cuts through illusion; natural critic and cook.", "Magnetic, fertile, drawn to beauty, comfort and growth.", "Curious seeker, gentle wanderer, always tracing a scent.", "Stormy depth; transformation through upheaval and inquiry.", "Renewal and return; optimistic, philosophical, expansive.", "Nourishing, dutiful, deeply caring; the nurturer's star.", "Penetrating insight, hypnotic charm, guards its inner world.", "Regal, ancestral pride, seeks honor and a throne of its own.", "Pleasure-loving, artistic, generous in love and leisure.", "Steady patron, kind contracts, friendship as dharma.", "Skilled hands, wit, craft; mastery through dexterity.", "Brilliant architect of beauty; dazzling, design-minded.", "Independent as wind; flexible, restless, self-made.", "Goal-locked ambition; triumph after sustained effort.", "Devoted friend, disciplined heart, success in foreign lands.", "Eldest's burden; protective, intense, occult-leaning.", "Root-cutter; radical truth-seeking, destroys to rebuild.", "Invincible declarations; early victories, proud spirit.", "Later victory; enduring, ethical, universally respected.", "The listener; learned, fame through knowledge and word.", "Wealthy rhythm; music, abundance, marches to its own drum.", "Hundred healers; secretive, mystical, vast like the void.", "Fierce ascetic fire; intensity hidden under calm.", "Deep wisdom of the serpent; compassion, slow sure progress.", "The nourishing fish; gentle completion, protector of travelers."];
-
-const SIGN_NOTE = ["fiery initiative, courage, a head-first approach to life", "steadfast patience, sensuality, devotion to comfort and worth", "quicksilver intellect, duality, endless curiosity", "tidal emotion, deep memory, fierce protectiveness of home", "solar dignity, generosity, a need to shine and lead", "discerning precision, service, the healer-analyst's eye", "harmonizing grace, diplomacy, life measured in relationships", "penetrating intensity, secrecy, the power to transform", "dharmic optimism, far horizons, the philosopher-archer", "mountain ambition, discipline, slow unstoppable ascent", "humanitarian vision, detachment, the reformer's mind", "boundless compassion, imagination, dissolving of edges"];
+import LifeInterpretationCard from "../components/LifeInterpretationCard";
+import { buildLifeReading } from "../data/life-interpretation";
 
 const DASHA_NOTE = {
   Ketu: "detachment, spiritual turning points, sudden severances that liberate",
@@ -181,7 +179,7 @@ export default function ChartScreen({ C, card, lang }) {
     <>
       {r && (
           <nav className="rise hscroll" style={{ position: "sticky", top: 8, zIndex: 30, display: "flex", gap: 6, overflowX: "auto", padding: "8px 10px", margin: "0 -4px 4px", background: "rgba(250,245,234,.92)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: `1px solid ${C.line}`, borderRadius: 12, boxShadow: "0 4px 14px rgba(110,82,24,.08)" }}>
-            {[["#chart", "Kundli"], ["#yogas", "Yogas"], ["#planets", "Grahas"], ["#kp", "KP sub-lords"], ["#ksig", "KP significators"], ["#match", "Matching"], ["#karakas", "Karakas"], ["#shadbala", "Shadbala"], ["#special", "Special"], ["#chalit", "Bhava Chalit"], ["#av", "Ashtakavarga"], ["#arudha", "Arudha"], ["#rectify", "Rectify"], ["#bnn", "BNN"], ["#bhrigu", "Bhrigu"], ["#dasha", "Dasha"], ["#reading", "Reading"]].map(([href, label]) => (
+            {[["#reading", "Reading"], ["#chart", "Kundli"], ["#yogas", "Yogas"], ["#planets", "Grahas"], ["#kp", "KP sub-lords"], ["#ksig", "KP significators"], ["#match", "Matching"], ["#karakas", "Karakas"], ["#shadbala", "Shadbala"], ["#special", "Special"], ["#chalit", "Bhava Chalit"], ["#av", "Ashtakavarga"], ["#arudha", "Arudha"], ["#rectify", "Rectify"], ["#bnn", "BNN"], ["#bhrigu", "Bhrigu"], ["#dasha", "Dasha"]].map(([href, label]) => (
               <a key={href} href={href} className="chip" style={{ whiteSpace: "nowrap", textDecoration: "none", fontSize: 12.5, padding: "6px 12px", borderRadius: 8, border: `1px solid ${C.line}`, color: C.muted, background: "#FBF5E7", fontFamily: "Spectral, serif" }}>{label}</a>
             ))}
           </nav>
@@ -305,6 +303,11 @@ export default function ChartScreen({ C, card, lang }) {
                 </div>
               ))}
             </div>
+
+            {/* answer-first reading */}
+            <Eyebrow deva="फलादेश" en="Your reading" id="reading" />
+            <LifeInterpretationCard C={C} card={card} lang={lang}
+              reading={buildLifeReading({ nak: r.moon.nak, moonSign: r.moon.sign, ascSign: r.ascSign })} />
 
             {/* chart */}
             <Eyebrow id="chart" deva="षोडशवर्ग" en={`${curVarga.k} · ${curVarga.name}`} />
@@ -878,23 +881,6 @@ export default function ChartScreen({ C, card, lang }) {
                   <div style={{ fontSize: 15 }}>{v}</div>
                 </div>
               ))}
-            </div>
-
-            {/* reading */}
-            <Eyebrow id="reading" deva="फलादेश" en="A short reading" />
-            <div className="rise" style={{ ...card, padding: "22px 24px", fontSize: 15.5, lineHeight: 1.75 }}>
-              <p style={{ margin: "0 0 14px" }}>
-                <span style={{ color: C.gold, fontFamily: "Eczar, serif" }}>Lagna · </span>
-                With <strong>{SIGNS[r.ascSign]}</strong> rising, the outer temperament carries {SIGN_NOTE[r.ascSign]}.
-              </p>
-              <p style={{ margin: "0 0 14px" }}>
-                <span style={{ color: C.gold, fontFamily: "Eczar, serif" }}>Chandra · </span>
-                The Moon in <strong>{SIGNS[r.moon.sign]}</strong>, under <strong>{NAKSHATRAS[r.moon.nak]}</strong> nakshatra
-                (pada {r.moon.pada}), shapes the inner life: {NAK_NOTE[r.moon.nak]}
-              </p>
-              <p style={{ margin: 0, color: C.muted, fontSize: 13 }}>
-                Offered in the spirit of the tradition, for reflection and curiosity — not as a substitute for your own judgment or a qualified jyotishi's reading.
-              </p>
             </div>
           </>
       )}
