@@ -9,6 +9,10 @@ type Status = "sourced" | "owner-verified";
 export type NakTrait = { nature: Bi; strengths: Bi; source: string; status: Status };
 export type SignTrait = { mind: Bi; relating: Bi; work: Bi; outward: Bi; source: string; status: Status };
 
+// `source` is a shared-corpus attribution to these two canonical texts, not a
+// per-claim page citation; `status: "sourced"` means "grounded in the tradition",
+// upgraded to "owner-verified" per entry after the owner review
+// (plans/kundli-interpretation-review.md). Both are what the spec §4 intends.
 const SRC = "Brihat Parashara Hora Shastra; Phaladeepika";
 
 // 27 entries, index 0 = Ashwini … 26 = Revati.
