@@ -437,7 +437,13 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           if (calBusy) {
             return <div style={{ padding: "12px", fontSize: 12.5, color: C.muted, fontStyle: "italic" }}>{lang === "hi" ? "पंचांग देखा जा रहा है…" : "Checking the panchang…"}</div>;
           }
-          const items = (tab === "fasting" ? effFasts : cal.festivals).slice(0, 10);
+          const source = tab === "fasting" ? effFasts : cal.festivals;
+          // Cap the upcoming list, but never let a grahan (Sutak-bearing, high-value)
+          // fall off the end: local-time date shifts can reshuffle the window and push
+          // it past the cap in far-west timezones. Always re-include any within-window grahan.
+          const capped = source.slice(0, 10);
+          const grahanExtra = source.filter((f) => (f.key === "suryaGrahan" || f.key === "chandraGrahan") && !capped.includes(f));
+          const items = grahanExtra.length ? [...capped, ...grahanExtra].sort((a, b) => a.ms - b.ms) : capped;
           if (!items.length) return <div style={{ padding: "12px", fontSize: 12.5, color: C.muted, fontStyle: "italic" }}>{tr(lang, "noneToday")}</div>;
           const LL = lang === "hi" ? "hi" : "en";
           const DAY = 86400000;
@@ -480,13 +486,13 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                             {d.chhath.sandhya && (
                               <div>
                                 {lang === "hi" ? "संध्या अर्घ्य: " : "Sandhya arghya: "}
-                                {fmtTimeD(d.chhath.sandhya.start, d.chhath.tz, it.ms)}–{fmtTimeD(d.chhath.sandhya.end, d.chhath.tz, it.ms)}
+                                {fmtTimeD(d.chhath.sandhya.start, d.chhath.tz, it.ms, lang)}–{fmtTimeD(d.chhath.sandhya.end, d.chhath.tz, it.ms, lang)}
                               </div>
                             )}
                             {d.chhath.usha && (
                               <div style={{ marginTop: d.chhath.sandhya ? 4 : 0 }}>
                                 {lang === "hi" ? "उषा अर्घ्य: " : "Usha arghya: "}
-                                {fmtTimeD(d.chhath.usha.start, d.chhath.tz, it.ms)}–{fmtTimeD(d.chhath.usha.end, d.chhath.tz, it.ms)}
+                                {fmtTimeD(d.chhath.usha.start, d.chhath.tz, it.ms, lang)}–{fmtTimeD(d.chhath.usha.end, d.chhath.tz, it.ms, lang)}
                               </div>
                             )}
                           </div>
@@ -494,7 +500,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                         {d && d.navratri && d.navratri.ghatasthapana?.primary && (
                           <div style={{ fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
                             {lang === "hi" ? "घटस्थापना: " : "Ghatasthapana: "}
-                            {fmtTimeD(d.navratri.ghatasthapana.primary.start, d.navratri.tz, it.ms)}–{fmtTimeD(d.navratri.ghatasthapana.primary.end, d.navratri.tz, it.ms)}
+                            {fmtTimeD(d.navratri.ghatasthapana.primary.start, d.navratri.tz, it.ms, lang)}–{fmtTimeD(d.navratri.ghatasthapana.primary.end, d.navratri.tz, it.ms, lang)}
                           </div>
                         )}
                         {d && d.grahan && (
@@ -503,16 +509,16 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                             {d.grahan.visibility && (
                               <div style={{ color: C.ivory, fontWeight: 500, marginTop: 4 }}>
                                 {lang === "hi" ? "दृश्य अवधि: " : "Visible: "}
-                                {fmtTimeD(d.grahan.visibility.start, d.grahan.tz, it.ms)}–{fmtTimeD(d.grahan.visibility.end, d.grahan.tz, it.ms)}
+                                {fmtTimeD(d.grahan.visibility.start, d.grahan.tz, it.ms, lang)}–{fmtTimeD(d.grahan.visibility.end, d.grahan.tz, it.ms, lang)}
                               </div>
                             )}
                             {d.grahan.visible && d.grahan.sutakStart && d.grahan.moksha && (
                               <div style={{ color: C.ivory, fontWeight: 500, marginTop: 4 }}>
                                 {lang === "hi" ? "सूतक: " : "Sutak: "}
-                                {fmtTimeD(d.grahan.sutakStart, d.grahan.tz, it.ms)}
+                                {fmtTimeD(d.grahan.sutakStart, d.grahan.tz, it.ms, lang)}
                                 {" · "}
                                 {lang === "hi" ? "मोक्ष " : "Moksha "}
-                                {fmtTimeD(d.grahan.moksha, d.grahan.tz, it.ms)}
+                                {fmtTimeD(d.grahan.moksha, d.grahan.tz, it.ms, lang)}
                               </div>
                             )}
                           </div>
@@ -520,18 +526,18 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                         {d && (d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars || d.lakshmiPuja) && (
                           <div style={{ fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
                             {d.lakshmiPuja && d.lakshmiPuja.primary
-                              ? <>{lang === "hi" ? "लक्ष्मी पूजा मुहूर्त: " : "Lakshmi Puja muhurat: "}{fmtTimeD(d.lakshmiPuja.primary.start, d.tz, it.ms)}–{fmtTimeD(d.lakshmiPuja.primary.end, d.tz, it.ms)}</>
-                              : d.parana ? <>{lang === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, it.ms)}{lang === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {lang === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, it.ms)}</span>}</>
-                              : d.moonrise != null ? <>{lang === "hi" ? "चंद्रोदय पर व्रत खोलें: " : "Break fast after moonrise: "}{fmtTimeD(d.moonrise, d.tz, it.ms)}</>
-                              : d.nishita ? <>{lang === "hi" ? "निषीथ काल: " : "Nishita period: "}{fmtTimeD(d.nishita.start, d.tz, it.ms)}–{fmtTimeD(d.nishita.end, d.tz, it.ms)}</>
-                              : d.morning ? <>{lang === "hi" ? "प्रातः पूजा: " : "Morning puja: "}{fmtTimeD(d.morning.start, d.tz, it.ms)}–{fmtTimeD(d.morning.end, d.tz, it.ms)}</>
-                              : d.sunrise != null ? <>{lang === "hi" ? "प्रातः / सूर्योदय: " : "Morning — from sunrise: "}{fmtTimeD(d.sunrise, d.tz, it.ms)}</>
+                              ? <>{lang === "hi" ? "लक्ष्मी पूजा मुहूर्त: " : "Lakshmi Puja muhurat: "}{fmtTimeD(d.lakshmiPuja.primary.start, d.tz, it.ms, lang)}–{fmtTimeD(d.lakshmiPuja.primary.end, d.tz, it.ms, lang)}</>
+                              : d.parana ? <>{lang === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, it.ms, lang)}{lang === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {lang === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, it.ms, lang)}</span>}</>
+                              : d.moonrise != null ? <>{lang === "hi" ? "चंद्रोदय पर व्रत खोलें: " : "Break fast after moonrise: "}{fmtTimeD(d.moonrise, d.tz, it.ms, lang)}</>
+                              : d.nishita ? <>{lang === "hi" ? "निषीथ काल: " : "Nishita period: "}{fmtTimeD(d.nishita.start, d.tz, it.ms, lang)}–{fmtTimeD(d.nishita.end, d.tz, it.ms, lang)}</>
+                              : d.morning ? <>{lang === "hi" ? "प्रातः पूजा: " : "Morning puja: "}{fmtTimeD(d.morning.start, d.tz, it.ms, lang)}–{fmtTimeD(d.morning.end, d.tz, it.ms, lang)}</>
+                              : d.sunrise != null ? <>{lang === "hi" ? "प्रातः / सूर्योदय: " : "Morning — from sunrise: "}{fmtTimeD(d.sunrise, d.tz, it.ms, lang)}</>
                               : d.stars ? <>{lang === "hi" ? "तारे दिखाई देने के बाद व्रत खोलें" : "Break the fast after the stars are visible"}</>
-                              : <>{lang === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, it.ms)}</>}
+                              : <>{lang === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, it.ms, lang)}</>}
                             {d.lakshmiPuja && d.lakshmiPuja.pradosh && (
                               <div style={{ color: C.ivory, fontWeight: 500, marginTop: 4 }}>
                                 {lang === "hi" ? "प्रदोष काल: " : "Pradosh Kaal: "}
-                                {fmtTimeD(d.lakshmiPuja.pradosh.start, d.tz, it.ms)}–{fmtTimeD(d.lakshmiPuja.pradosh.end, d.tz, it.ms)}
+                                {fmtTimeD(d.lakshmiPuja.pradosh.start, d.tz, it.ms, lang)}–{fmtTimeD(d.lakshmiPuja.pradosh.end, d.tz, it.ms, lang)}
                               </div>
                             )}
                           </div>

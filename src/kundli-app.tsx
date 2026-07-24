@@ -7,7 +7,7 @@ import FestivalGuideScreen, { festivalGuideFromPath } from "./screens/FestivalGu
 import UtilityCalculatorScreen from "./screens/UtilityCalculatorScreen";
 import { utilityFromPath } from "./data/utility-calculators";
 import { FEST_NAME } from "./data/festival-meta";
-import { urlPrefGet, urlPrefSet, urlPrefsPush } from "./components/url-prefs";
+import { urlPrefGet, urlPrefSet, urlPrefsSet } from "./components/url-prefs";
 import {
   scanPanchangCalendar, ayyappaMandalaFor,
 } from "./engine/festivals";
@@ -90,7 +90,7 @@ export default function KundliApp() {
   // Shared place: Daily and Prashna both read it; URL state preserves it across
   // regional-mode changes, reload and browser Back/Forward without storage.
   const [panchPlace, setPanchPlaceState] = useState(placeFromUrl);
-  const setPanchPlace=(next)=>{setPanchPlaceState(next);if(next)urlPrefsPush({city:next.label,lat:next.lat,lon:next.lon,zone:next.zone});};
+  const setPanchPlace=(next)=>{setPanchPlaceState(next);if(next)urlPrefsSet({city:next.label,lat:next.lat,lon:next.lon,zone:next.zone});};
   useEffect(()=>{const restore=()=>setPanchPlaceState(placeFromUrl());window.addEventListener("popstate",restore);return()=>window.removeEventListener("popstate",restore);},[]);
   const panchEff = panchPlace || DEFAULT_PLACE;
 

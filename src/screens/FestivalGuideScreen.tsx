@@ -468,7 +468,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                     {L === "hi" ? "अधिकतम ग्रहण: " : "Maximum eclipse: "}
                     {formatLocalClock(grahan.eclipseMs, tz, hit.ms, L)}
                   </div>
-                  {grahan.contacts && (
+                  {grahan.visible && grahan.contacts && (
                     <div style={{ color: C.ivory, fontWeight: 500 }}>
                       {L === "hi" ? "ग्रहण स्पर्श: " : "Eclipse contacts: "}
                       {formatLocalClock(grahan.contacts.start, tz, hit.ms, L)}

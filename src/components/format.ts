@@ -4,10 +4,16 @@ const fmtDeg = (x) => {
   return `${dDeg}°${String(mIn).padStart(2, "0")}′`;
 };
 
-const fmtTimeD = (ms, tz, refMs) => {
+const fmtTimeD = (ms, tz, refMs, lang) => {
   if (ms === null || ms === undefined) return "—";
   const t = new Date(ms + tz * 3600000), r = new Date(refMs + tz * 3600000);
   const sameDay = t.getUTCDate() === r.getUTCDate() && t.getUTCMonth() === r.getUTCMonth();
+  // Hindi renders on a 24-hour clock with Hindi month names, matching the festival
+  // pages (formatLocalClock). Omitting lang keeps the original English 12h output.
+  if (lang === "hi") {
+    const clock = t.toLocaleTimeString("hi-IN", { hour: "2-digit", minute: "2-digit", hour12: false, hourCycle: "h23", timeZone: "UTC" });
+    return sameDay ? clock : clock + ", " + t.toLocaleDateString("hi-IN", { month: "short", day: "numeric", timeZone: "UTC" });
+  }
   let h = t.getUTCHours(); const mi = t.getUTCMinutes();
   const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
   const base = `${h}:${String(mi).padStart(2, "0")} ${ap}`;

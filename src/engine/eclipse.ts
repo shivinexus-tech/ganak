@@ -192,7 +192,11 @@ function eclipseDetail(place, eclipseMs, key) {
   const visible = Boolean(visibility);
   const sutakHours = solar ? 12 : 9;
   const sutakStart = visible ? visibility.start - sutakHours * HOUR : null;
-  const moksha = visible && contacts ? contacts.end : null;
+  // Moksha for the place is the end of the locally *visible* eclipse. When the
+  // luminary sets/rises mid-eclipse (grast-asta / grast-udaya) the visible end is
+  // clamped at moonset/sunset, so Moksha must not fall after the Moon/Sun is gone.
+  // For eclipses seen whole, visibility.end == contacts.end (unchanged behaviour).
+  const moksha = visible ? visibility.end : null;
   return {
     tz,
     key,

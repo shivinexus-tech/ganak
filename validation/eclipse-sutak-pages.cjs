@@ -16,6 +16,7 @@ const GRAHAN_KEYS = ['suryaGrahan', 'chandraGrahan'];
 const IST = 5.5;
 const DELHI = { zone: 'Asia/Kolkata', lat: 28.6139, lon: 77.2090, label: 'Delhi' };
 const CAPE_TOWN = { zone: 'Africa/Johannesburg', lat: -33.9249, lon: 18.4241, label: 'Cape Town' };
+const LONDON = { zone: 'Europe/London', lat: 51.5072, lon: -0.1276, label: 'London' };
 const fmt = (ms) => new Date(ms + IST * 3600000).toISOString().slice(0, 10);
 const minutes = (ms) => Math.round(ms / 60000);
 const withinMinutes = (actual, expected, tolerance, label) => {
@@ -84,8 +85,20 @@ withinMinutes(lunarDetail.contacts.start, Date.UTC(2026, 2, 3, 9, 51), 12, 'Mar 
 withinMinutes(lunarDetail.contacts.end, Date.UTC(2026, 2, 3, 13, 16), 12, 'Mar lunar Moksha');
 withinMinutes(lunarDetail.visibility.start, Date.UTC(2026, 2, 3, 12, 52), 12, 'Mar lunar Delhi moonrise visibility start');
 assert.strictEqual(lunarDetail.sutakStart, lunarDetail.visibility.start - 9 * 3600000);
-assert.strictEqual(lunarDetail.moksha, lunarDetail.contacts.end);
-console.log('PASS  Mar 2026 lunar visible at Delhi after moonrise; contact-based 9h Sutak/Moksha');
+assert.strictEqual(lunarDetail.moksha, lunarDetail.visibility.end);
+console.log('PASS  Mar 2026 lunar visible at Delhi after moonrise; visible-window Sutak/Moksha');
+
+// Grast-asta (Moon sets mid-eclipse): Moksha must clamp to local moonset, not the
+// global umbral contact end. Aug 28 2026 lunar sets before totality ends over London.
+const augLunar = grahan.find((g) => g.key === 'chandraGrahan' && fmt(g.ms).startsWith('2026-08'));
+assert(augLunar && augLunar.eclipseMs, 'Aug 2026 lunar grahan must carry eclipseMs');
+const londonLunar = eclipseDetail(LONDON, augLunar.eclipseMs, 'chandraGrahan');
+assert.strictEqual(londonLunar.visible, true, 'Aug 2026 lunar should be visible in London');
+assert(londonLunar.contacts && londonLunar.visibility, 'visible lunar grahan must include contacts and visibility');
+assert(londonLunar.visibility.end < londonLunar.contacts.end, 'London Moon sets before umbral contact end (grast-asta)');
+assert.strictEqual(londonLunar.moksha, londonLunar.visibility.end, 'Moksha must clamp to local moonset, not the global contact end');
+assert(londonLunar.moksha < londonLunar.contacts.end, 'clamped Moksha is earlier than the global contact end');
+console.log('PASS  Aug 2026 lunar grast-asta at London; Moksha clamped to moonset');
 
 const occ = routeModule.findLocalFestivalOccurrence(
   routeByKey.get('suryaGrahan'),

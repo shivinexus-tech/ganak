@@ -4,5 +4,9 @@ function urlPrefGet(k) { try { return new URLSearchParams(window.location.search
 function urlPrefSet(k, v) { try { const q = new URLSearchParams(window.location.search); q.set(k, v); window.history.replaceState(null, "", "?" + q.toString() + window.location.hash); } catch (e) {} }
 function urlPrefPush(k, v) { try { const q = new URLSearchParams(window.location.search); q.set(k, v); window.history.pushState(null, "", "?" + q.toString() + window.location.hash); } catch (e) {} }
 function urlPrefsPush(values) { try { const q = new URLSearchParams(window.location.search); Object.entries(values).forEach(([k,v])=>{ if(v==null||v==="")q.delete(k);else q.set(k,String(v)); }); window.history.pushState(null,"","?"+q.toString()+window.location.hash); } catch(e){} }
+/* Replace-in-place variant: updates the URL (so reload still restores the value)
+   without adding a history entry — use for preference-style changes like city so the
+   Back button returns to the previous screen instead of stepping through prior cities. */
+function urlPrefsSet(values) { try { const q = new URLSearchParams(window.location.search); Object.entries(values).forEach(([k,v])=>{ if(v==null||v==="")q.delete(k);else q.set(k,String(v)); }); window.history.replaceState(null,"","?"+q.toString()+window.location.hash); } catch(e){} }
 
-export { urlPrefGet, urlPrefSet, urlPrefPush, urlPrefsPush };
+export { urlPrefGet, urlPrefSet, urlPrefPush, urlPrefsPush, urlPrefsSet };
