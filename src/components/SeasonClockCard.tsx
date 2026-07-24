@@ -30,6 +30,7 @@ export default function SeasonClockCard({ place, lang, ayanamsa = "lahiri", atMs
   }
   const fmtDate = (ms) => new Date(ms + data.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   const fmtTime = (ms) => new Date(ms + data.tz * 3600000).toLocaleTimeString(lang === "hi" ? "hi-IN" : "en-IN", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "UTC" });
+  const placeLabel = place?.label || (lang === "hi" ? "चुने हुए स्थान" : "the selected place");
   const g = data.ghati;
   const tropical = data.tropicalNext;
   const tropicalMeta = tropical ? TROPICAL_EVENTS.find((e) => e.key === tropical.key) : null;
@@ -43,21 +44,24 @@ export default function SeasonClockCard({ place, lang, ayanamsa = "lahiri", atMs
       </div>
       <div style={{ fontSize: 12.5, color: C.muted, marginTop: 6, lineHeight: 1.55 }}>
         {lang === "hi"
-          ? `ऋतु सूर्य की निरयण राशि से गिनी जाती है। अगली ऋतु ${data.ritu.next.hi} ${fmtDate(data.ritu.nextMs)} को शुरू होगी।`
-          : `Ritu follows the sidereal Sun sign. Next season ${data.ritu.next.en} begins ${fmtDate(data.ritu.nextMs)}.`}
+          ? `ऋतु सूर्य की निरयण राशि से गिनी गई वैश्विक खगोलीय स्थिति है। अगली ऋतु ${data.ritu.next.hi} ${fmtDate(data.ritu.nextMs)} को शुरू होगी — तारीख़ ${placeLabel} के स्थानीय समय में।`
+          : `Ritu is a global astronomical calculation from the sidereal Sun sign. Next season ${data.ritu.next.en} begins ${fmtDate(data.ritu.nextMs)} — dated in ${placeLabel} local time.`}
       </div>
       {g && (
         <div style={{ marginTop: 8, fontSize: 12.5, color: C.ivory, lineHeight: 1.5 }}>
           {lang === "hi"
-            ? `घटी-घड़ी आज के सूर्योदय (${fmtTime(g.sunrise)}) से अगले सूर्योदय (${fmtTime(g.nextSunrise)}) तक की ६० घटी में गिनी जाती है — स्थानीय समय।`
-            : `The Ghati clock counts 60 ghatis from today's sunrise (${fmtTime(g.sunrise)}) to the next sunrise (${fmtTime(g.nextSunrise)}) — local time.`}
+            ? `${placeLabel} की घटी-घड़ी वहाँ के आज के सूर्योदय (${fmtTime(g.sunrise)}) से अगले सूर्योदय (${fmtTime(g.nextSunrise)}) तक की ६० घटी में गिनी जाती है।`
+            : `Ghati clock for ${placeLabel}: 60 ghatis from its local sunrise today (${fmtTime(g.sunrise)}) to its next sunrise (${fmtTime(g.nextSunrise)}).`}
         </div>
       )}
       {tropical && tropicalMeta && (
         <div style={{ marginTop: 10, padding: "10px 12px", borderRadius: T.rSm, background: "#FBF5E7", fontSize: 12.5, lineHeight: 1.55 }}>
-          <div style={{ color: C.gold, marginBottom: 3 }}>{lang === "hi" ? "अगला खगोलीय बिंदु" : "Next astronomical point"}</div>
+          <div style={{ color: C.gold, marginBottom: 3 }}>{lang === "hi" ? "अगला वैश्विक खगोलीय बिंदु" : "Next global astronomical point"}</div>
           <div style={{ color: C.ivory }}>{lang === "hi" ? tropical.hi : tropical.en} · {fmtDate(tropical.ms)}</div>
           <div style={{ color: C.muted, marginTop: 4 }}>{lang === "hi" ? tropicalMeta.glossHi : tropicalMeta.glossEn}</div>
+          <div style={{ color: C.muted, marginTop: 4 }}>
+            {lang === "hi" ? `यह घटना पूरी पृथ्वी के लिए एक ही क्षण पर होती है; ऊपर की तारीख़ ${placeLabel} के स्थानीय समय में है।` : `This occurs at one instant worldwide; the date above is shown in ${placeLabel} local time.`}
+          </div>
           <div style={{ color: C.muted, marginTop: 6, fontStyle: "italic" }}>
             {lang === "hi"
               ? "यह खगोलीय विषुव/अयन है — मकर संक्रांति जैसे धार्मिक पर्व अलग नियम से गिने जाते हैं।"

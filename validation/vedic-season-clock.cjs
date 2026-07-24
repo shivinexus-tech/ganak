@@ -2,6 +2,7 @@
 'use strict';
 
 const assert = require('node:assert');
+const fs = require('node:fs');
 const { loadApp } = require('./_load-app.cjs');
 const clock = loadApp('src/engine/vedic-season-clock.ts');
 
@@ -49,5 +50,13 @@ assert(nycData.ghati && nycData.ghati.nextSunrise > nycData.ghati.sunrise, 'NYC 
 const ritu = clock.computeVedicSeasonClock(DELHI, 'lahiri', Date.UTC(2026, 6, 21, 6) - IST * 3600000).ritu;
 assert(ritu.nextMs > Date.UTC(2026, 6, 21, 6) - IST * 3600000, 'next ritu boundary must be after probe time');
 assert(ritu.startMs < Date.UTC(2026, 6, 21, 6) - IST * 3600000, 'current ritu start must be before probe time');
+
+// UI copy must distinguish selected-place sunrise/Ghati values from global events.
+const cardSource = fs.readFileSync('src/components/SeasonClockCard.tsx', 'utf8');
+assert(cardSource.includes('Ghati clock for ${placeLabel}'), 'Ghati copy must name the selected place');
+assert(cardSource.includes('Ritu is a global astronomical calculation'), 'Ritu copy must identify the calculation as global');
+assert(cardSource.includes('Next global astronomical point'), 'equinox/solstice heading must identify the event as global');
+assert(cardSource.includes('one instant worldwide'), 'global event copy must explain that location changes only the displayed local date');
+assert(cardSource.includes('घटी-घड़ी'), 'location explanation must remain bilingual');
 
 console.log('VEDIC SEASON CLOCK REGRESSION PASSED');
