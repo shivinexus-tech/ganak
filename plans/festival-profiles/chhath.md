@@ -9,9 +9,9 @@ Four-day Surya + Chhathi Maiya vrata with **exact sandhya and usha arghya** time
 ## Must-show on page
 
 - [x] Four-day vidhi (Nahay Khay → Usha Arghya)
-- [ ] **Sandhya arghya** — sunset / Shashthi evening window prominent
-- [ ] **Usha arghya** — sunrise on day 4 prominent
-- [ ] Link or list all four calendar days in hub (MuhuratHub cluster)
+- [x] **Sandhya arghya** — sunset / Shashthi evening window prominent
+- [x] **Usha arghya** — sunrise on day 4 prominent
+- [x] Link or list all four calendar days in hub (MuhuratHub cluster)
 
 ## Timing kind
 

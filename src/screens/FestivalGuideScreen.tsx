@@ -7,9 +7,11 @@ import PlaceInput from "../components/PlaceInput";
 import { fmtTimeD } from "../components/format";
 import VratVidhiCard from "../components/VratVidhiCard";
 import NavadurgaDayGuide, { NavadurgaSeasonLinks } from "../components/NavadurgaDayGuide";
+import FestivalHeroImage from "../components/FestivalHeroImage";
 import { VRAT_VIDHI } from "../data/vrat-vidhis";
 import { CHHATH_SHARED_KEYS, FESTIVAL_PAGE_ROUTES, FEST_META, OBS_META } from "../data/festival-pages";
 import { sankrantiPunyaKala, scanPanchangCalendar } from "../engine/festivals";
+import { chhathTimings } from "../engine/chhath";
 import { vratDetail } from "../engine/muhurat";
 import { navratriTimings, navadurgaDatesFor } from "../engine/navratri";
 import { zoneOffset } from "../engine/panchang";
@@ -99,11 +101,20 @@ function findLocalFestivalOccurrence(guide, place, nowMs = Date.now()) {
   if (!hit) return { hit: null, detail: null, punyaKala: null, tz };
   const meta = guide.sourceKind === "observance" ? OBS_META[guide.metaKey] : FEST_META[guide.metaKey];
   const timing = meta && meta.timing ? meta.timing : null;
+  const isChhathSequence = guide.vidhiKey === "chhath" || timing === "chhath-sequence";
   const detail = timing === "navratri"
     ? { navratri: navratriTimings(place, hit.ms) }
-    : vratDetail(place, "lahiri", hit.ms, timing);
+    : isChhathSequence
+      ? { chhath: chhathTimings(place, hit.ms) }
+      : vratDetail(place, "lahiri", hit.ms, timing);
   const punyaKala = /Sankranti$/.test(hit.key) ? sankrantiPunyaKala(hit.ms, place, tz) : null;
-  return { hit, detail, punyaKala, tz: detail.navratri ? detail.navratri.tz : tz, timing };
+  return {
+    hit,
+    detail,
+    punyaKala,
+    tz: detail.navratri ? detail.navratri.tz : detail.chhath ? detail.chhath.tz : detail.tz,
+    timing,
+  };
 }
 
 function formatLocalDate(ms, tz, lang) {
@@ -206,6 +217,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
         stars: { en: "Star sighting matters for completing this observance.", hi: "इस व्रत के समापन में तारा-दर्शन महत्वपूर्ण है।" },
         navratri: { en: "The Ghatasthapana and full-fast parana times below are calculated for your city.", hi: "नीचे घटस्थापना और पूर्ण व्रत के पारण का समय आपके शहर के लिए निकाला गया है।" },
         "lakshmi-puja": { en: "Lakshmi Puja muhurat and Pradosh Kaal below are calculated for your city.", hi: "नीचे लक्ष्मी पूजा का मुहूर्त और प्रदोष काल आपके शहर के अनुसार हैं।" },
+        "chhath-sequence": { en: "The four-day Chhath sequence and arghya times below are for your city.", hi: "नीचे चार-दिवसीय छठ क्रम और अर्घ्य के समय आपके शहर के अनुसार हैं।" },
       }[meta.timing] || null)
     : null;
 
@@ -214,6 +226,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
   const tz = localTiming.tz;
   const navratri = d && d.navratri;
   const lakshmiPuja = d && d.lakshmiPuja;
+  const chhathSeq = d && d.chhath;
   const punyaKala = localTiming.punyaKala;
   const decidingLabel = hit ? decidingKalaLabel(hit.decidingKala, L) : null;
   const clock = (ms) => fmtTimeD(ms, tz, ms);
@@ -255,6 +268,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
         <h2 id="festival-guide-title" style={{ margin: "0 0 5px", color: C.ivory, fontFamily: T.serif, fontSize: T.fHeading, lineHeight: 1.2 }}>
           {title}
         </h2>
+        {guide.vidhiKey && <FestivalHeroImage imageKey={guide.vidhiKey} lang={lang} C={C} />}
         <p style={{ margin: "0 0 14px", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55 }}>
           {hasFullGuide
             ? (L === "hi"
@@ -354,6 +368,31 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                   {paranaBasis && <div style={{ color: C.muted, fontSize: T.fMicro, fontWeight: 400 }}>{paranaBasis[L]}</div>}
                 </div>
               )}
+              {chhathSeq && (
+                <div style={{
+                  display: "grid", gap: 7, fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
+                  background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
+                  borderRadius: T.rSm, padding: "9px 10px", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
+                }}>
+                  {chhathSeq.days.map((day) => (
+                    <div key={day.key} style={{ color: C.ivory, fontWeight: 500 }}>
+                      {day.label[L]}: {formatLocalDate(day.ms, tz, L)}
+                    </div>
+                  ))}
+                  {chhathSeq.sandhya && (
+                    <div>
+                      {L === "hi" ? "संध्या अर्घ्य (सूर्यास्त): " : "Sandhya arghya (sunset): "}
+                      {clock(chhathSeq.sandhya.start)}–{clock(chhathSeq.sandhya.end)}
+                    </div>
+                  )}
+                  {chhathSeq.usha && (
+                    <div>
+                      {L === "hi" ? "उषा अर्घ्य (सूर्योदय): " : "Usha arghya (sunrise): "}
+                      {clock(chhathSeq.usha.start)}–{clock(chhathSeq.usha.end)}
+                    </div>
+                  )}
+                </div>
+              )}
               {lakshmiPuja && (
                 <div style={{
                   display: "grid", gap: 7, fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
@@ -394,7 +433,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                   {punyaKala.carriedToDaylight && <div style={{ color: C.muted, fontWeight: 400 }}>{L === "hi" ? "सूर्यास्त के बाद की संक्रांति होने से पूजा का समय अगले स्थानीय सूर्योदय से है।" : "Because ingress is outside daylight, the worship window begins at the applicable local sunrise."}</div>}
                 </div>
               )}
-              {d && !navratri && !lakshmiPuja && (d.parana || d.moonrise != null || d.sunset != null || d.stars) && (
+              {d && !navratri && !lakshmiPuja && !chhathSeq && (d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars) && (
                 <div style={{
                   fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
                   background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
@@ -404,12 +443,18 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                     ? <>{L === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, hit.ms)}{L === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {L === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, hit.ms)}</span>}</>
                     : d.moonrise != null
                       ? <>{L === "hi" ? "चंद्रोदय पर व्रत खोलें: " : "Break fast after moonrise: "}{fmtTimeD(d.moonrise, d.tz, hit.ms)}</>
-                      : d.stars
-                        ? <>{L === "hi" ? "तारे दिखाई देने के बाद व्रत खोलें" : "Break the fast after the stars are visible"}</>
-                        : <>{L === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, hit.ms)}</>}
+                      : d.nishita
+                        ? <>{L === "hi" ? "निषीथ काल (मुख्य पूजा): " : "Nishita period (main puja): "}{clock(d.nishita.start)}–{clock(d.nishita.end)}</>
+                        : d.morning
+                          ? <>{L === "hi" ? "प्रातः पूजा: " : "Morning puja: "}{clock(d.morning.start)}–{clock(d.morning.end)}</>
+                          : d.sunrise != null
+                            ? <>{L === "hi" ? "प्रातः / सूर्योदय: " : "Morning — from sunrise: "}{fmtTimeD(d.sunrise, d.tz, hit.ms)}</>
+                            : d.stars
+                              ? <>{L === "hi" ? "तारे दिखाई देने के बाद व्रत खोलें" : "Break the fast after the stars are visible"}</>
+                              : <>{L === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, hit.ms)}</>}
                 </div>
               )}
-              {decidingLabel && !(d && (navratri || lakshmiPuja || d.parana || d.moonrise != null || d.sunset != null || d.stars)) && (
+              {decidingLabel && !(d && (navratri || lakshmiPuja || chhathSeq || d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars)) && (
                 <div style={{ fontSize: T.fMicro, color: C.muted }}>
                   {L === "hi" ? "तिथि तय होने का आधार: " : "Date chosen by: "}{decidingLabel}
                 </div>

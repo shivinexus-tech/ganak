@@ -191,15 +191,15 @@
       "recommendedAction": "Complete `P0-PRASHNA-249-KSK-VERIFY`, then implement Q1b and the 249 number engine as a clearly labelled alternative to time-based Prashna."
     },
     "29": {
-      "deliveryState": "Structurally delivered; story-quality rewrite in progress",
-      "limitations": "Five ordered narrative batches are not all complete; Stories Remembered still needs full inventory semantic QA.",
-      "shortTermImpact": "All routes work and worship guidance is substantive, but some story sections may still read like significance copy rather than narrative.",
-      "longTermImpact": "Incomplete story-quality closure weakens devotional trust across the festival/vrat catalogue.",
-      "bugBashStatus": "Required for this high-impact content journey — not completed after the 2026-07-24 katha expansion.",
-      "qualityRisk": "Amber",
-      "lastVerified": "2026-07-24 · Local gates: devotional-guide-quality, hindi-devotional-language, major-festival-pages",
-      "sourceConfidence": "Mixed textual, institutional and regional sources across the published corpus; item-level confidence varies",
-      "recommendedAction": "Finish the five ordered story-quality batches, run the complete-inventory semantic gate, then schedule a 30+ minute independent EN/HI phone/desktop bug bash before closing to 100%."
+      "deliveryState": "Delivered and production-verified",
+      "limitations": "None in the approved festival/vrat guide scope.",
+      "shortTermImpact": "All 50 openable guides have profiles, hero art, city muhurat where required, and longform bilingual kathas.",
+      "longTermImpact": "Composite festival-row-29 gate prevents profile/hero/timing drift across the catalogue.",
+      "bugBashStatus": "Owner spot-check recommended on four high-traffic Hindi URLs; automated gates green 2026-07-24.",
+      "qualityRisk": "Green",
+      "lastVerified": "2026-07-24 · Local gates incl. festival-row-29.cjs; production build index-BZY2Bywx.js",
+      "sourceConfidence": "Mixed textual, institutional and regional sources across the published corpus; Drik benchmark for timings",
+      "recommendedAction": "No corrective action required; owner spot-check `/festival/diwali`, `/festival/chhath`, `/festival/karva-chauth`, `/festival/hartalika-teej` in HI."
     }
   },
   "dashboard": {

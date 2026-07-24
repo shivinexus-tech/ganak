@@ -223,6 +223,17 @@ function vratDetail(place, ayanamsa, ms, timing) {
       out.stars = true;
     } else if (timing === "sunset") {
       out.sunset = info.set;
+    } else if (timing === "sunrise") {
+      out.sunrise = info.rise;
+    } else if (timing === "morning") {
+      out.morning = { start: info.rise, end: info.rise + (info.set - info.rise) / 3 };
+    } else if (timing === "midnight") {
+      const evN = sunEvents(y, m, day + 1, tz, place.lat, place.lon);
+      if (info.set != null && evN.rise != null) {
+        const nightLen = evN.rise - info.set;
+        const nightMid = info.set + nightLen / 2;
+        out.nishita = { start: nightMid - nightLen / 30, end: nightMid + nightLen / 30 };
+      }
     } else if (timing === "lakshmi-puja") {
       out.lakshmiPuja = lakshmiPujaTimings(place, ayanamsa, ms);
     }

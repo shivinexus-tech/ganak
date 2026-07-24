@@ -31,6 +31,8 @@ import { searchUpcoming } from "../engine/search-upcoming";
 import { planetGochar } from "../engine/gochar";
 import { fmtDur, eventDetail } from "../engine/transit-copy";
 import { observancesFor, scanPanchangCalendar, EKADASHI_NAMES, PRADOSH_NAMES_BY_DAY } from "../engine/festivals";
+import { chhathTimings } from "../engine/chhath";
+import { navratriTimings } from "../engine/navratri";
 import { urlPrefGet, urlPrefPush } from "../components/url-prefs";
 
 const VRAT_VIDHI_KEY = Object.freeze({
@@ -58,7 +60,14 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   const [tab, setTab] = useState("fasting");
   const [fq, setFq] = useState("");
   const [fexp, setFexp] = useState(null);
-  const fexpDetail = useMemo(() => { if (!fexp) return null; try { return vratDetail(place, ayanamsa, fexp.ms, fexp.timing); } catch (e) { return null; } }, [fexp, place, ayanamsa]);
+  const fexpDetail = useMemo(() => {
+    if (!fexp) return null;
+    try {
+      if (fexp.timing === "navratri") return { navratri: navratriTimings(place, fexp.ms) };
+      if (fexp.timing === "chhath-sequence") return { chhath: chhathTimings(place, fexp.ms) };
+      return vratDetail(place, ayanamsa, fexp.ms, fexp.timing);
+    } catch (e) { return null; }
+  }, [fexp, place, ayanamsa]);
   const [horaQuestion, setHoraQuestion] = useState("");
   const [horaResult, setHoraResult] = useState(null);
   const [horaAsc, setHoraAsc] = useState(null);
@@ -463,12 +472,37 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                       <div style={{ padding: "0 12px 10px", marginTop: -2, paddingTop: 8, borderTop: "1px dashed #EBDFC6", display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-start" }}>
                         {meta && meta.gloss && <div style={{ fontSize: T.fSmall, color: C.ivory }}>{meta.gloss[LL]}{meta.deity && <span style={{ color: C.muted }}> · {meta.deity[LL]}</span>}</div>}
                         {d && d.info && <div style={{ fontSize: T.fMicro, color: C.muted }}>{d.info.lmonthName} · {d.info.krishna ? (lang === "hi" ? "कृष्ण पक्ष" : "Krishna Paksha") : (lang === "hi" ? "शुक्ल पक्ष" : "Shukla Paksha")} · {(lang === "hi" ? (NAK_HI[d.info.nak] || d.info.nakName) : d.info.nakName)}</div>}
-                        {d && (d.parana || d.moonrise != null || d.sunset != null || d.stars || d.lakshmiPuja) && (
+                        {d && d.chhath && (
+                          <div style={{ fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
+                            {d.chhath.sandhya && (
+                              <div>
+                                {lang === "hi" ? "संध्या अर्घ्य: " : "Sandhya arghya: "}
+                                {fmtTimeD(d.chhath.sandhya.start, d.chhath.tz, it.ms)}–{fmtTimeD(d.chhath.sandhya.end, d.chhath.tz, it.ms)}
+                              </div>
+                            )}
+                            {d.chhath.usha && (
+                              <div style={{ marginTop: d.chhath.sandhya ? 4 : 0 }}>
+                                {lang === "hi" ? "उषा अर्घ्य: " : "Usha arghya: "}
+                                {fmtTimeD(d.chhath.usha.start, d.chhath.tz, it.ms)}–{fmtTimeD(d.chhath.usha.end, d.chhath.tz, it.ms)}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {d && d.navratri && d.navratri.ghatasthapana?.primary && (
+                          <div style={{ fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
+                            {lang === "hi" ? "घटस्थापना: " : "Ghatasthapana: "}
+                            {fmtTimeD(d.navratri.ghatasthapana.primary.start, d.navratri.tz, it.ms)}–{fmtTimeD(d.navratri.ghatasthapana.primary.end, d.navratri.tz, it.ms)}
+                          </div>
+                        )}
+                        {d && (d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars || d.lakshmiPuja) && (
                           <div style={{ fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
                             {d.lakshmiPuja && d.lakshmiPuja.primary
                               ? <>{lang === "hi" ? "लक्ष्मी पूजा मुहूर्त: " : "Lakshmi Puja muhurat: "}{fmtTimeD(d.lakshmiPuja.primary.start, d.tz, it.ms)}–{fmtTimeD(d.lakshmiPuja.primary.end, d.tz, it.ms)}</>
                               : d.parana ? <>{lang === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, it.ms)}{lang === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {lang === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, it.ms)}</span>}</>
                               : d.moonrise != null ? <>{lang === "hi" ? "चंद्रोदय पर व्रत खोलें: " : "Break fast after moonrise: "}{fmtTimeD(d.moonrise, d.tz, it.ms)}</>
+                              : d.nishita ? <>{lang === "hi" ? "निषीथ काल: " : "Nishita period: "}{fmtTimeD(d.nishita.start, d.tz, it.ms)}–{fmtTimeD(d.nishita.end, d.tz, it.ms)}</>
+                              : d.morning ? <>{lang === "hi" ? "प्रातः पूजा: " : "Morning puja: "}{fmtTimeD(d.morning.start, d.tz, it.ms)}–{fmtTimeD(d.morning.end, d.tz, it.ms)}</>
+                              : d.sunrise != null ? <>{lang === "hi" ? "प्रातः / सूर्योदय: " : "Morning — from sunrise: "}{fmtTimeD(d.sunrise, d.tz, it.ms)}</>
                               : d.stars ? <>{lang === "hi" ? "तारे दिखाई देने के बाद व्रत खोलें" : "Break the fast after the stars are visible"}</>
                               : <>{lang === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, it.ms)}</>}
                             {d.lakshmiPuja && d.lakshmiPuja.pradosh && (

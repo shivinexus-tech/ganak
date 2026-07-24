@@ -1,6 +1,6 @@
 # Diwali (Lakshmi Puja night) — content profile
 
-**Key:** `diwali` · **Route:** `/festival/diwali` · **Status:** P0 — muhurat UI **missing** (2026-07-24 owner review)
+**Key:** `diwali` · **Route:** `/festival/diwali` · **Status:** P0 — muhurat UI complete (2026-07-24)
 
 ## One-line purpose
 
