@@ -1,6 +1,6 @@
 # Answer-first Kundli life interpretation — design
 
-**Status:** design, awaiting owner review
+**Status:** design approved — ready for implementation plan
 **Author:** Claude, 2026-07-23
 **Branch:** `claude/kundli-life-interpretation` (off `main` @ `a3d1100`)
 **Backlog:** Phase 2 chart reveal; the deferred "Classic life-areas" mode is logged in `plans/backlog.md`.
@@ -79,9 +79,9 @@ buildLifeReading({ nak, moonSign, ascSign }): { areaKey; label: Bilingual; text:
 
 - **Voice (B):** every string is attribution — "Classical texts associate
   Rohini with charm and an eye for beauty", never "You are charming."
-- **Sourcing (A):** `source` cites a classical text. Default corpus: *Brihat
-  Parashara Hora Shastra* and *Phaladeepika* (owner to confirm/override); where
-  they diverge, the entry says so or stays at the shared level.
+- **Sourcing (A):** `source` cites a classical text. Corpus (owner-confirmed
+  2026-07-23): *Brihat Parashara Hora Shastra* and *Phaladeepika*; where they
+  diverge, the entry says so or stays at the shared level.
 - **Status (D):** every entry starts `"sourced"`; owner review flips high-risk
   ones to `"owner-verified"`. The field is internal (not shown to users) and lets
   us track review progress in the data itself.
@@ -174,10 +174,12 @@ correctness is also checked deterministically via a node harness calling
 - All content committed as `status: "sourced"`; flips to `"owner-verified"` as the
   owner clears them.
 
-## 10. Open items for owner
+## 10. Owner decisions (all resolved 2026-07-23)
 
-1. **Sources** — default to *BPHS* + *Phaladeepika*, or name preferred texts?
-2. **Safety-register list (§7.2)** — any categories to add or soften?
-
-*(Resolved 2026-07-23: Lagna is kept as the sixth area, "How others see you",
-driven by `ascSign`.)*
+1. **Sources** — *Brihat Parashara Hora Shastra* + *Phaladeepika* (confirmed).
+2. **Safety register (§7.2)** — confirmed as listed; all six categories retained,
+   **health/medical included**.
+3. **Lagna** — kept as the sixth area, "How others see you", driven by `ascSign`.
+4. **Engine work** — none. The six areas read only `r.moon.nak`, `r.moon.sign` and
+   `r.ascSign`, already computed and displayed by `ChartScreen`. No astronomy
+   change, so the parity/calc/anchor gates are unaffected.
