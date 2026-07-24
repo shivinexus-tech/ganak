@@ -95,14 +95,14 @@ Cite URL + second source in task evidence when you change copy. Do not invent ri
 4. Run gates: `hindi-devotional-language.cjs`, `hindi-worship-glossary.cjs`, `devotional-voice-english.cjs`.
 5. Owner spot-check: “does this make sense?” not only “is it crude?”
 
-## Rewrite backlog (phased)
+## Rewrite backlog (all P0 — sheet row #29)
 
-| Phase | Scope | Status |
+| Order | Scope | Status |
 |-------|-------|--------|
-| P0 | karva-chauth, hartalika-teej, chhath, diwali — verdict, sankalpa, vidhi one-liners | **OPEN** — owner flagged 2026-07-24 |
-| P1 | Remaining 46 guides — sankalpa + verdict pass | OPEN |
-| P2 | **Hindi tone pass** on regional kathas + guide fields — devotional rewrite, no calques; **do not shorten katha length** (owner 2026-07-24: length OK for now, revisit later) | OPEN |
+| 1 | karva-chauth, hartalika-teej, chhath, diwali — verdict, sankalpa, vidhi one-liners; Diwali muhurat UI | **OPEN** — owner flagged 2026-07-24 |
+| 2 | Remaining 46 guides — sankalpa + verdict pass | OPEN |
+| 3 | **Hindi tone pass** on regional kathas + guide fields — devotional rewrite, no calques; **do not shorten katha length** (owner 2026-07-24: length OK for now, revisit later) | OPEN |
 
-**Owner 2026-07-24:** Katha paragraph count and word count stay as-is. P2 is tone only — read aloud, fix nonsensical or essay-like Hindi; keep `devotional-guide-quality` min-length gate unchanged unless owner reopens length.
+**Owner 2026-07-24:** Katha paragraph count and word count stay as-is. Order 3 is tone only — read aloud, fix nonsensical or essay-like Hindi; keep `devotional-guide-quality` min-length gate unchanged unless owner reopens length.
 
 Track in `plans/task-log.md` when a slice starts. One writer per file batch.

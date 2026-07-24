@@ -80,16 +80,34 @@ Each `plans/festival-profiles/<key>.md` contains:
 
 ---
 
-## Rollout phases
+## P0 scope (Google Sheets #29)
 
-| Phase | Festivals | Work |
-|-------|-----------|------|
-| **P0** | diwali, karvaChauth, chhath, hartalikaTeej | Profiles + **fix missing muhurat UI** (Diwali first) |
-| **P1** | Dhanteras, Navratri, Janmashtami, Maha Shivaratri, Ekadashi | Profiles + timing kinds already partial |
-| **P2** | Remaining ~40 guides | Profile per key; Hindi **tone** pass (not katha shortening) |
-| **P3** | All festival/vrat pages | Hero images per profile (`public/festival-images/`) |
+All festival/vrat content work is **P0** — one backlog row, no sub-phases.
 
-Track in `plans/task-log.md`. One agent owns `festival-profiles/` + engine timing; another owns `vrat-vidhis` copy — no overlap.
+| Sheet | Row | Title |
+|-------|-----|-------|
+| **P0 Before Go-Live** | **#29** | **Complete festival/vrat direct-page coverage** |
+
+Backlog IDs: `P0-FESTIVAL-PAGES-ALL`, `P0-FESTIVAL-STORY-QUALITY`. Track slices in `plans/task-log.md`.
+
+**Done when every openable page has:**
+
+1. A **profile** (`plans/festival-profiles/<key>.md`) with Must-show checkboxes satisfied or explicitly deferred.
+2. **Engine + UI** — city-specific muhurat where the profile requires it (Diwali Lakshmi puja is the urgent gap).
+3. **Copy** — household vidhi + kathas in devotional voice (`vrat-vidhis.ts`, regional kathas).
+4. **Hero image** — `public/festival-images/<key>.webp` + bilingual alt (same P0 bar, not a later phase).
+5. **Hindi tone** — read-aloud pass; do **not** shorten katha length unless owner reopens.
+
+**Suggested work order** (all still P0):
+
+| Order | Festivals / scope | Notes |
+|-------|-------------------|-------|
+| 1 | diwali, karvaChauth, chhath, hartalikaTeej | Fix missing muhurat UI first (Diwali) |
+| 2 | Dhanteras, Navratri, Janmashtami, Maha Shivaratri, Ekadashi | Timing kinds + label anchors |
+| 3 | Remaining ~40 guides | Profile per key + Hindi tone |
+| 4 | All pages | Hero images |
+
+One agent owns `festival-profiles/` + engine timing; another owns `vrat-vidhis` copy — no overlap.
 
 ---
 
