@@ -131,9 +131,9 @@
       "longTermImpact": "Without the independent post-fix pass, an undiscovered regression could remain in a high-impact calculation journey.",
       "bugBashStatus": "Required for high-impact closure — original 2026-07-24 pass found F1–F5; fixes and regressions are complete; fresh independent 60-minute post-fix pass pending.",
       "qualityRisk": "Red",
-      "lastVerified": "2026-07-24 · Local port 5199 after F1–F5 fixes; production verification pending final F5 deploy",
+      "lastVerified": "2026-07-24 · Production bundle index-DwmjFApB.js; EN/HI phone matrix after F1–F5 fixes",
       "sourceConfidence": "Published conventions and regression anchors; Hindi naming uses Drik Panchang's published 108-pada Devanagari table",
-      "recommendedAction": "Deploy and production-verify the final Hindi naming-sound fix, then commission a fresh independent 60-minute adversarial pass; close only with no P0/P1 findings."
+      "recommendedAction": "Commission a fresh independent 60-minute adversarial pass across all 12 calculators; close only if it records no P0/P1 findings."
     },
     "5": {
       "deliveryState": "Built and tested locally — not publicly delivered",
