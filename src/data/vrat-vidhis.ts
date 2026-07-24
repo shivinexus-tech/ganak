@@ -4,6 +4,7 @@
 import { MAJOR_FESTIVAL_GUIDES, MAJOR_FESTIVAL_SUPPLEMENTS } from "./major-festival-guides";
 import { DURGA_PUJA_GUIDES } from "./durga-puja-guides";
 import { VRAT_GUIDE_ENRICHMENTS } from "./vrat-guide-enrichments";
+import { REGIONAL_KATHAS } from "./regional-kathas";
 
 /* Vrat vidhi content — sourced from plans/vrat-vidhis.md. User-facing copy only;
    implementation and editorial instructions stay in plans, never in this object. */
@@ -24,7 +25,7 @@ export const VRAT_VIDHI_LABELS = {
   udyapan: { en: "Udyapan", hi: "उद्यापन" },
   safety: { en: "Health note", hi: "स्वास्थ्य टिप्पणी" },
   meaning: { en: "Why this day matters", hi: "इस दिन का महत्त्व" },
-  stories: { en: "Stories remembered", hi: "इस दिन से जुड़ी कथाएँ" },
+  stories: { en: "Regional kathas to read or hear", hi: "पढ़ने या सुनने योग्य क्षेत्रीय कथाएँ" },
   regional: { en: "Regional traditions", hi: "क्षेत्रीय परम्पराएँ" },
 };
 export const VRAT_VIDHI_SAFETY = {
@@ -616,12 +617,12 @@ export const VRAT_VIDHI = {
       { en: "Bathe, dress cleanly and take sankalpa; make or place simple clay/sand Shiva-Parvati forms; worship Ganesha first, then Uma-Maheshwara; hear the Hartalika katha; where customary continue bhajan/vigil and conclude next morning.", hi: "स्नान, स्वच्छ वस्त्र, संकल्प; मिट्टी/बालू के सरल शिव-पार्वती रूप; पहले गणेश, फिर उमा-महेश्वर पूजा; हरतालिका कथा; परम्परानुसार भजन/जागरण और अगली सुबह समापन।" },
     ],
     diet: {
-      en: "The traditional Hartalika fast is nirjala—without food or water. Observe the exact dietary and purity rules followed by your family tradition; the separate health note above does not redefine this religious rule.",
-      hi: "परम्परागत हरतालिका व्रत निर्जला—बिना अन्न और जल—होता है। अपनी कुल-परम्परा के आहार और शुद्धि नियम मानें; ऊपर की अलग स्वास्थ्य टिप्पणी इस धार्मिक नियम को नहीं बदलती।",
+      en: "The traditional Hartalika fast is nirjala—without food or water. Follow the dietary and purity rules of your family or temple tradition.",
+      hi: "परम्परागत हरतालिका व्रत निर्जला—बिना अन्न और जल—होता है। अपनी कुल या मंदिर परम्परा के आहार और शुद्धि नियम मानें।",
     },
     sankalpa: {
-      en: "“I honour Parvati's resolve and Shiva-Parvati's partnership. May my relationships have consent, loyalty, courage and mutual respect.”",
-      hi: "“मैं पार्वती के संकल्प और शिव-पार्वती के साथ का सम्मान करती/करता हूँ। मेरे सम्बन्ध सहमति, निष्ठा, साहस और परस्पर आदर पर टिकें।”",
+      en: "“I observe Hartalika Teej, remembering Parvati's tapas and worshipping Uma-Maheshwara. May Shiva and Parvati bless my household with steadfast devotion and a righteous married life.”",
+      hi: "“मैं पार्वती के तप का स्मरण करते हुए हरतालिका तीज का व्रत रखती/रखता हूँ और उमा-महेश्वर की पूजा करती/करता हूँ। शिव-पार्वती मेरे घर में दृढ़ भक्ति और धर्ममय दाम्पत्य का आशीर्वाद दें।”",
     },
     puja: {
       en: "Choose one complete path below. Panchopachara is the recommended household method: it is a full, orderly puja with five principal offerings. Use Shodashopachara when your family follows the expanded sixteen-offering method. The names of the offerings are given so you can follow the order; use your family's mantras, or make each offering with a simple respectful prayer.",
@@ -995,4 +996,12 @@ for (const [key, enrichment] of Object.entries(VRAT_GUIDE_ENRICHMENTS)) {
   if (!existing) continue;
   const { extraVidhi = [], ...fields } = enrichment;
   Object.assign(existing, fields, { vidhi: [...existing.vidhi, ...extraVidhi] });
+}
+
+// Authoritative regional kathas — merged last so every guide gets detailed,
+// geography-labelled narratives suitable for reading or hearing during worship.
+for (const [key, stories] of Object.entries(REGIONAL_KATHAS)) {
+  const existing = VRAT_VIDHI[key];
+  if (!existing) continue;
+  existing.stories = stories;
 }

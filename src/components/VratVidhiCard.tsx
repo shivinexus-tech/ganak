@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { T } from "./tokens";
 import { VRAT_VIDHI_LABELS } from "../data/vrat-vidhis";
+import { parseKathaLine } from "../data/guide-katha-format";
 
 function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
   const [open, setOpen] = useState(initiallyOpen);
@@ -90,9 +91,28 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
           {section(lbl("sankalpa"), <span style={{ fontStyle: "italic" }}>{txt(data.sankalpa)}</span>)}
           {section(lbl("puja"), pujaBody)}
           {data.stories && section(lbl("stories"), (
-            <ul style={{ margin: 0, paddingLeft: 18 }}>
-              {data.stories.map((story, i) => <li key={i} style={{ marginBottom: 4 }}>{txt(story)}</li>)}
-            </ul>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {data.stories.map((story, i) => {
+                const raw = txt(story);
+                const { region, body } = parseKathaLine(raw);
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      padding: "9px 10px",
+                      borderRadius: T.rSm,
+                      background: "rgba(168,106,18,.04)",
+                      border: `1px solid ${C.line}`,
+                    }}
+                  >
+                    {region && (
+                      <div style={{ ...T.label, color: C.gold, marginBottom: 5, lineHeight: 1.4 }}>{region}</div>
+                    )}
+                    <div style={{ fontSize: T.fSmall, color: C.ivory, lineHeight: 1.65 }}>{body}</div>
+                  </div>
+                );
+              })}
+            </div>
           ))}
           {data.regional && section(lbl("regional"), (
             <ul style={{ margin: 0, paddingLeft: 18 }}>
