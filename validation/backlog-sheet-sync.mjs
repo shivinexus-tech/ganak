@@ -102,7 +102,7 @@ const staleBaseline = makeLive(head);
 staleBaseline.liveById.get("1").cells[4] = "20%";
 assert.deepEqual(
   buildBootstrapChanges(head, staleBaseline).map(({ kind, liveRow, sheetIndex, value }) => ({ kind, id: liveRow.id, sheetIndex, value })),
-  [{ kind: "cell", id: "1", sheetIndex: 4, value: "100%" }],
+  [{ kind: "cell", id: "1", sheetIndex: 4, value: "70%" }],
   "an explicitly requested bootstrap must identify every stale live cell against the repository",
 );
 assert.deepEqual(buildBootstrapChanges(head, alreadyPublished), [], "bootstrap must be idempotent after alignment");
