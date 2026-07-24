@@ -12,11 +12,14 @@ import { VRAT_VIDHI } from "../data/vrat-vidhis";
 import { CHHATH_SHARED_KEYS, FESTIVAL_PAGE_ROUTES, FEST_META, OBS_META } from "../data/festival-pages";
 import { sankrantiPunyaKala, scanPanchangCalendar } from "../engine/festivals";
 import { chhathTimings } from "../engine/chhath";
+import { skandaSashtiSequence, ayyappaMandalaSequence } from "../engine/skanda-ayyappa";
 import { vratDetail } from "../engine/muhurat";
 import { navratriTimings, navadurgaDatesFor } from "../engine/navratri";
 import { zoneOffset } from "../engine/panchang";
 
 const FESTIVAL_GUIDE_ROUTES = FESTIVAL_PAGE_ROUTES;
+const SKANDA_SEQUENCE_KEYS = new Set(["skandaSashtiBegins", "skandaSashtiSoorasamharam", "skandaSashtiThirukalyanam"]);
+const AYYAPPA_SEQUENCE_KEYS = new Set(["ayyappaMandalaBegins", "ayyappaMandalaPuja"]);
 const DAY_MS = 86400000;
 const SCAN_DAYS = 430;
 const SCAN_FAST_DAYS = 430;
@@ -102,17 +105,23 @@ function findLocalFestivalOccurrence(guide, place, nowMs = Date.now()) {
   const meta = guide.sourceKind === "observance" ? OBS_META[guide.metaKey] : FEST_META[guide.metaKey];
   const timing = meta && meta.timing ? meta.timing : null;
   const isChhathSequence = guide.vidhiKey === "chhath" || timing === "chhath-sequence";
+  const isSkandaSequence = SKANDA_SEQUENCE_KEYS.has(guide.key);
+  const isAyyappaSequence = AYYAPPA_SEQUENCE_KEYS.has(guide.key);
   const detail = timing === "navratri"
     ? { navratri: navratriTimings(place, hit.ms) }
     : isChhathSequence
       ? { chhath: chhathTimings(place, hit.ms) }
-      : vratDetail(place, "lahiri", hit.ms, timing);
+      : isSkandaSequence
+        ? { skanda: skandaSashtiSequence(place, hit.ms) }
+        : isAyyappaSequence
+          ? { ayyappa: ayyappaMandalaSequence(place, hit.ms) }
+          : vratDetail(place, "lahiri", hit.ms, timing);
   const punyaKala = /Sankranti$/.test(hit.key) ? sankrantiPunyaKala(hit.ms, place, tz) : null;
   return {
     hit,
     detail,
     punyaKala,
-    tz: detail.navratri ? detail.navratri.tz : detail.chhath ? detail.chhath.tz : detail.tz,
+    tz: detail.navratri ? detail.navratri.tz : detail.chhath ? detail.chhath.tz : detail.skanda ? detail.skanda.tz : detail.ayyappa ? detail.ayyappa.tz : detail.tz,
     timing,
   };
 }
@@ -227,6 +236,8 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
   const navratri = d && d.navratri;
   const lakshmiPuja = d && d.lakshmiPuja;
   const chhathSeq = d && d.chhath;
+  const skandaSeq = d && d.skanda;
+  const ayyappaSeq = d && d.ayyappa;
   const punyaKala = localTiming.punyaKala;
   const decidingLabel = hit ? decidingKalaLabel(hit.decidingKala, L) : null;
   const clock = (ms) => fmtTimeD(ms, tz, ms);
@@ -393,6 +404,38 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                   )}
                 </div>
               )}
+              {skandaSeq && (
+                <div style={{
+                  display: "grid", gap: 7, fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
+                  background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
+                  borderRadius: T.rSm, padding: "9px 10px", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
+                }}>
+                  <div style={{ color: C.muted, fontWeight: 500, fontSize: T.fMicro }}>
+                    {L === "hi" ? "छह-दिवसीय कन्द षष्ठी क्रम" : "Six-day Kanda Sashti sequence"}
+                  </div>
+                  {skandaSeq.days.map((day) => (
+                    <div key={day.key} style={{ color: C.ivory, fontWeight: 500 }}>
+                      {day.label[L]}: {formatLocalDate(day.ms, tz, L)}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {ayyappaSeq && (
+                <div style={{
+                  display: "grid", gap: 7, fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
+                  background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
+                  borderRadius: T.rSm, padding: "9px 10px", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
+                }}>
+                  <div style={{ color: C.muted, fontWeight: 500, fontSize: T.fMicro }}>
+                    {L === "hi" ? `41-दिवसीय मंडल-काल (${ayyappaSeq.spanDays} दिन)` : `41-day Mandala season (${ayyappaSeq.spanDays} days)`}
+                  </div>
+                  {ayyappaSeq.milestones.map((day) => (
+                    <div key={day.key} style={{ color: C.ivory, fontWeight: 500 }}>
+                      {day.label[L]}: {formatLocalDate(day.ms, tz, L)}
+                    </div>
+                  ))}
+                </div>
+              )}
               {lakshmiPuja && (
                 <div style={{
                   display: "grid", gap: 7, fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
@@ -433,7 +476,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                   {punyaKala.carriedToDaylight && <div style={{ color: C.muted, fontWeight: 400 }}>{L === "hi" ? "सूर्यास्त के बाद की संक्रांति होने से पूजा का समय अगले स्थानीय सूर्योदय से है।" : "Because ingress is outside daylight, the worship window begins at the applicable local sunrise."}</div>}
                 </div>
               )}
-              {d && !navratri && !lakshmiPuja && !chhathSeq && (d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars) && (
+              {d && !navratri && !lakshmiPuja && !chhathSeq && !skandaSeq && !ayyappaSeq && (d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars) && (
                 <div style={{
                   fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
                   background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
@@ -454,7 +497,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                               : <>{L === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, hit.ms)}</>}
                 </div>
               )}
-              {decidingLabel && !(d && (navratri || lakshmiPuja || chhathSeq || d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars)) && (
+              {decidingLabel && !(d && (navratri || lakshmiPuja || chhathSeq || skandaSeq || ayyappaSeq || d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars)) && (
                 <div style={{ fontSize: T.fMicro, color: C.muted }}>
                   {L === "hi" ? "तिथि तय होने का आधार: " : "Date chosen by: "}{decidingLabel}
                 </div>

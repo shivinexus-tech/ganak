@@ -28,11 +28,11 @@ const LEGACY_TITLES = Object.freeze({
 });
 
 const FESTIVAL_VIDHI_KEYS = Object.freeze({
-  skandaSashtiBegins: "kandaSashtiAnnual",
-  skandaSashtiSoorasamharam: "kandaSashtiAnnual",
-  skandaSashtiThirukalyanam: "kandaSashtiAnnual",
-  ayyappaMandalaBegins: "ayyappaMandala",
-  ayyappaMandalaPuja: "ayyappaMandala",
+  skandaSashtiBegins: "skandaSashtiBegins",
+  skandaSashtiSoorasamharam: "skandaSashtiSoorasamharam",
+  skandaSashtiThirukalyanam: "skandaSashtiThirukalyanam",
+  ayyappaMandalaBegins: "ayyappaMandalaBegins",
+  ayyappaMandalaPuja: "ayyappaMandalaPuja",
 });
 
 /* A key enters this list only after its permanent page has been reviewed against

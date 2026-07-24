@@ -39,6 +39,10 @@ const BANNED = [
   /not a public photo opportunity/i,
   /do not (?:copy|improvise|assume)/i,
   /न गढ़ें/,
+  /Jain and Sikh/i,
+  /follow your own community sources/i,
+  /जैन और सिख दीपावली/,
+  /केवल हिन्दू गृह-पूजा के लिए है; उन परम्पराओं के लिए/,
 ];
 
 const REQUIRED_OBJECTS = ['verdict', 'meaning', 'diet', 'sankalpa', 'puja', 'paran', 'udyapan'];

@@ -249,8 +249,9 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         Ashtami, Navami and Vijaya Dashami pages. Shipped and production-verified
         2026-07-22 with six exact Delhi date anchors, devotional EN/HI guidance,
         desktop + 390px route matrix and permanent content/timing gates.
-  - [ ] Separate substantive Skanda Sashti sequence and Ayyappa Mandala sequence
-        pages; finish and merge the complete four-day Chhath calendar journey.
+  - [x] Separate substantive Skanda Sashti sequence and Ayyappa Mandala sequence
+        pages (five milestone routes with distinct guides, sequence UI and
+        multi-year anchors). Chhath four-day journey closed under row #29.
   - [x] Eighteen season-specific Chaitra/Sharad Navadurga pages plus the sourced
         Durga Saptashati reading plan; Gupt Navratris stay distinct.
   - [ ] Location-aware eclipse visibility, Sutak start/end and safe household

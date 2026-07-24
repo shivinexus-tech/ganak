@@ -231,3 +231,39 @@ if (afterSpan !== null) mandalaFailures++;
 console.log(`  ${afterSpan === null ? '✓' : '✗'} Mandala 2026-12-28: outside span`);
 if (mandalaFailures) process.exitCode = 1;
 else console.log('✓ Ayyappa day counter and boundary checks match');
+
+const sequenceYears = [
+  [2025, {
+    skandaSashtiBegins: '2025-10-22',
+    skandaSashtiSoorasamharam: '2025-10-27',
+    skandaSashtiThirukalyanam: '2025-10-28',
+    ayyappaMandalaBegins: '2025-11-17',
+    ayyappaMandalaPuja: '2025-12-27',
+  }],
+  [2027, {
+    skandaSashtiBegins: '2027-10-30',
+    skandaSashtiSoorasamharam: '2027-11-04',
+    skandaSashtiThirukalyanam: '2027-11-05',
+    ayyappaMandalaBegins: '2027-11-17',
+    ayyappaMandalaPuja: '2027-12-27',
+  }],
+];
+console.log('\nSkanda + Ayyappa multi-year anchors (New Delhi):');
+let sequenceFailures = 0;
+for (const [year, expected] of sequenceYears) {
+  const from = Date.UTC(year, 0, 1) - IST * 3600000;
+  const yearCal = app.scanPanchangCalendar(from, IST, 430, 46, DELHI);
+  for (const [key, exp] of Object.entries(expected)) {
+    const hit = yearCal.festivals.find((f) => f.key === key);
+    const got = hit ? fmt(hit.ms) : 'DID NOT FIRE';
+    const ok = got === exp;
+    console.log(`  ${ok ? '✓' : '✗'} ${key} ${year}: ${got} (expected ${exp})`);
+    if (!ok) sequenceFailures++;
+  }
+}
+if (sequenceFailures) {
+  console.error(`\n✗ ${sequenceFailures} Skanda/Ayyappa multi-year anchor(s) failed`);
+  process.exitCode = 1;
+} else {
+  console.log('✓ Skanda + Ayyappa multi-year anchors match');
+}

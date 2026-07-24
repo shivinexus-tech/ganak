@@ -117,7 +117,7 @@
     "10": "Dual published-calendar anchors, cross-city/year differential and documented regional conventions",
     "12": "Primary government holiday source; non-religious overlay",
     "13": "Regional and institutional Bengali sources; day practices kept distinct",
-    "14": "Regional/institutional sources partially reviewed; sequence coverage remains incomplete",
+    "14": "Drik Panchang festival dates plus Tamil/Kerala regional practice notes; Sabarimala pilgrimage guidance for Ayyappa safety boundaries",
     "29": "Mixed textual, institutional and regional sources across the published corpus; item-level confidence varies",
     "30": "Astronomical and seasonal published anchors; calculation convention documented",
     "44": "Regional/institutional sources partially verified; final four-day reconciliation remains",
@@ -200,6 +200,17 @@
       "lastVerified": "2026-07-24 · Local gates incl. festival-row-29.cjs; production build index-BZY2Bywx.js",
       "sourceConfidence": "Mixed textual, institutional and regional sources across the published corpus; Drik benchmark for timings",
       "recommendedAction": "No corrective action required; owner spot-check `/festival/diwali`, `/festival/chhath`, `/festival/karva-chauth`, `/festival/hartalika-teej` in HI."
+    },
+    "14": {
+      "deliveryState": "Delivered — production verification pending",
+      "limitations": "None in the five milestone sequence pages.",
+      "shortTermImpact": "Skanda Sashti days 1/6/7 and Ayyappa Mandala days 1/41 each have distinct bilingual guides with local sequence dates.",
+      "longTermImpact": "skanda-ayyappa-pages.cjs and multi-year content-dates anchors prevent shared-guide regression.",
+      "bugBashStatus": "Owner spot-check recommended on `/festival/skanda-sashti-soorasamharam` and `/festival/ayyappa-mandala-puja` in EN and HI.",
+      "qualityRisk": "Green",
+      "lastVerified": "2026-07-24 · Local gates incl. skanda-ayyappa-pages.cjs; production build pending push",
+      "sourceConfidence": "Drik Panchang festival dates plus Tamil/Kerala regional practice notes; Sabarimala pilgrimage guidance for Ayyappa safety boundaries",
+      "recommendedAction": "No corrective action required; owner spot-check the two climax routes in both languages after deploy."
     }
   },
   "dashboard": {

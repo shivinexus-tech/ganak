@@ -1,14 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200" role="img" aria-label="Rows of lit diyas for Diwali">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FAF5EA"/>
-      <stop offset="100%" stop-color="#E7DDC6"/>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2A2233"/>
+      <stop offset="100%" stop-color="#4A3520"/>
     </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="80%" r="40%">
+      <stop offset="0%" stop-color="#F5C842" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#F5C842" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <rect width="640" height="200" fill="url(#g)"/>
-  <circle cx="520" cy="48" r="36" fill="none" stroke="#A86A12" stroke-width="3" opacity="0.55"/>
-  <path d="M48 150 Q160 60 280 150 T520 150" fill="none" stroke="#C2451E" stroke-width="2.5" opacity="0.35"/>
-  <text x="32" y="118" font-family="Georgia, serif" font-size="26" fill="#3B3147">Diwali</text>
-  <text x="32" y="148" font-family="sans-serif" font-size="13" fill="#8C8173" letter-spacing="0.12em">GANAK FESTIVAL GUIDE</text>
+  <rect width="640" height="200" fill="url(#sky)"/>
+  <rect width="640" height="200" fill="url(#glow)"/>
+  <g fill="#A86A12" opacity="0.25">
+    <circle cx="80" cy="42" r="2"/><circle cx="140" cy="28" r="1.5"/><circle cx="220" cy="36" r="2"/>
+    <circle cx="400" cy="24" r="1.5"/><circle cx="480" cy="38" r="2"/><circle cx="560" cy="30" r="1.5"/>
+  </g>
+  <!-- diyas -->
+  <g transform="translate(90,118)">
+    <path d="M0 36h48c-4-10-2-22 8-30 6-5 14-6 16-6s10 1 16 6c10 8 12 20 8 30H0z" fill="#8B4518"/>
+    <ellipse cx="24" cy="36" rx="24" ry="5" fill="#6B3410"/>
+    <path d="M18 8c0-6 4-10 6-12 2 2 6 6 6 12" fill="#F5C842"/>
+    <ellipse cx="24" cy="6" rx="10" ry="14" fill="#FFD86B" opacity="0.9"/>
+  </g>
+  <g transform="translate(200,108)">
+    <path d="M0 46h56c-5-12-2-28 10-36 7-6 16-7 18-7s11 1 18 7c12 8 15 24 10 36H0z" fill="#8B4518"/>
+    <ellipse cx="28" cy="46" rx="28" ry="6" fill="#6B3410"/>
+    <path d="M20 10c0-7 5-12 8-14 3 2 8 7 8 14" fill="#F5C842"/>
+    <ellipse cx="28" cy="8" rx="12" ry="16" fill="#FFD86B" opacity="0.95"/>
+  </g>
+  <g transform="translate(330,112)">
+    <path d="M0 42h52c-4-11-2-25 9-33 6-5 15-7 17-7s11 2 17 7c11 8 13 22 9 33H0z" fill="#8B4518"/>
+    <ellipse cx="26" cy="42" rx="26" ry="5.5" fill="#6B3410"/>
+    <path d="M19 9c0-6 4-11 7-13 3 2 7 7 7 13" fill="#F5C842"/>
+    <ellipse cx="26" cy="7" rx="11" ry="15" fill="#FFD86B" opacity="0.92"/>
+  </g>
+  <g transform="translate(450,118)">
+    <path d="M0 36h48c-4-10-2-22 8-30 6-5 14-6 16-6s10 1 16 6c10 8 12 20 8 30H0z" fill="#8B4518"/>
+    <ellipse cx="24" cy="36" rx="24" ry="5" fill="#6B3410"/>
+    <path d="M18 8c0-6 4-10 6-12 2 2 6 6 6 12" fill="#F5C842"/>
+    <ellipse cx="24" cy="6" rx="10" ry="14" fill="#FFD86B" opacity="0.9"/>
+  </g>
+  <text x="32" y="52" font-family="Georgia, serif" font-size="28" fill="#FAF5EA">Diwali</text>
+  <text x="32" y="78" font-family="sans-serif" font-size="13" fill="#C9B896" letter-spacing="0.14em">लक्ष्मी पूजा · दीपावली</text>
 </svg>

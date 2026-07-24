@@ -23,11 +23,11 @@ const expected = {
   '/festival/vat-savitri': 'vatSavitri',
   '/festival/vat-purnima': 'vatPurnima',
   '/festival/varalakshmi': 'varalakshmi',
-  '/festival/skanda-sashti-begins': 'kandaSashtiAnnual',
-  '/festival/skanda-sashti-soorasamharam': 'kandaSashtiAnnual',
-  '/festival/skanda-sashti-thirukalyanam': 'kandaSashtiAnnual',
-  '/festival/ayyappa-mandala-begins': 'ayyappaMandala',
-  '/festival/ayyappa-mandala-puja': 'ayyappaMandala',
+  '/festival/skanda-sashti-begins': 'skandaSashtiBegins',
+  '/festival/skanda-sashti-soorasamharam': 'skandaSashtiSoorasamharam',
+  '/festival/skanda-sashti-thirukalyanam': 'skandaSashtiThirukalyanam',
+  '/festival/ayyappa-mandala-begins': 'ayyappaMandalaBegins',
+  '/festival/ayyappa-mandala-puja': 'ayyappaMandalaPuja',
   '/festival/makar-sankranti': 'makarSankranti',
 };
 

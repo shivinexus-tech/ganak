@@ -42,11 +42,11 @@ const VRAT_VIDHI_KEY = Object.freeze({
   chhathUshaArghya: "chhath",
   chaitraNavratri: "chaitraNavratri",
   sharadNavratri: "sharadNavratri",
-  skandaSashtiBegins: "kandaSashtiAnnual",
-  skandaSashtiSoorasamharam: "kandaSashtiAnnual",
-  skandaSashtiThirukalyanam: "kandaSashtiAnnual",
-  ayyappaMandalaBegins: "ayyappaMandala",
-  ayyappaMandalaPuja: "ayyappaMandala",
+  skandaSashtiBegins: "skandaSashtiBegins",
+  skandaSashtiSoorasamharam: "skandaSashtiSoorasamharam",
+  skandaSashtiThirukalyanam: "skandaSashtiThirukalyanam",
+  ayyappaMandalaBegins: "ayyappaMandalaBegins",
+  ayyappaMandalaPuja: "ayyappaMandalaPuja",
 });
 const SIGN_HI = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
 

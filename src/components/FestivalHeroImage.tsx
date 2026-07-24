@@ -19,15 +19,17 @@ function FestivalHeroImage({ imageKey, lang, C }) {
       borderRadius: T.rMd,
       overflow: "hidden",
       border: `1px solid ${C.line}`,
-      background: "#FAF5EA",
+      background: "#2A2233",
+      minHeight: 120,
     }}>
       <img
         src={src}
         alt={alt}
         width={640}
         height={200}
-        style={{ display: "block", width: "100%", height: "auto", maxHeight: 200, objectFit: "cover" }}
-        loading="lazy"
+        style={{ display: "block", width: "100%", height: "auto", minHeight: 120, maxHeight: 200, objectFit: "cover" }}
+        loading="eager"
+        decoding="async"
       />
     </div>
   );

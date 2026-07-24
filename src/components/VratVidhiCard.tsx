@@ -119,9 +119,33 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
             </div>
           ))}
           {data.regional && section(lbl("regional"), (
-            <ul style={{ margin: 0, paddingLeft: 18 }}>
-              {data.regional.map((tradition, i) => <li key={i} style={{ marginBottom: 4 }}>{txt(tradition)}</li>)}
-            </ul>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {data.regional.map((tradition, i) => {
+                const raw = txt(tradition);
+                const paras = kathaParagraphs(raw);
+                const [head, ...body] = paras.length > 1 ? paras : [raw];
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      padding: "9px 10px",
+                      borderRadius: T.rSm,
+                      background: "rgba(168,106,18,.04)",
+                      border: `1px solid ${C.line}`,
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, color: C.ink, marginBottom: body.length ? 6 : 0, lineHeight: 1.45 }}>
+                      {head}
+                    </div>
+                    {body.map((para, j) => (
+                      <p key={j} style={{ margin: j ? "0.65em 0 0" : 0, fontSize: T.fSmall, color: C.ivory, lineHeight: 1.65 }}>
+                        {para}
+                      </p>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
           ))}
           {section(lbl("paran"), txt(data.paran))}
           {section(lbl("udyapan"), txt(data.udyapan))}
