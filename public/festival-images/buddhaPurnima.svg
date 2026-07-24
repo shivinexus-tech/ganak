@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240" role="img" aria-label="Buddha Purnima full moon remembrance" data-subject="buddha">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FAF5EA"/>
-      <stop offset="100%" stop-color="#E7DDC6"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="200" fill="url(#g)"/>
-  <circle cx="520" cy="48" r="36" fill="none" stroke="#A86A12" stroke-width="3" opacity="0.55"/>
-  <path d="M48 150 Q160 60 280 150 T520 150" fill="none" stroke="#C2451E" stroke-width="2.5" opacity="0.35"/>
-  <text x="32" y="118" font-family="Georgia, serif" font-size="26" fill="#3B3147">Buddha Purnima</text>
-  <text x="32" y="148" font-family="sans-serif" font-size="13" fill="#8C8173" letter-spacing="0.12em">GANAK FESTIVAL GUIDE</text>
+    <linearGradient id="bodhi" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1A3048"/><stop offset="100%" stop-color="#4A7858"/>
+    </linearGradient></defs>
+  
+  <rect width="640" height="240" fill="url(#bodhi)"/>
+  <circle cx="520" cy="60" r="28" fill="#F0E8D0" opacity="0.8"/>
+  <g transform="translate(340,130)">
+    <ellipse cx="0" cy="40" rx="50" ry="12" fill="#2A4838" opacity="0.5"/>
+    <ellipse cx="0" cy="8" rx="22" ry="26" fill="#D4AF37" opacity="0.9"/>
+    <circle cx="0" cy="-18" r="14" fill="#E8C090"/>
+    <path d="M-18 10 Q0 0 18 10 L14 36 Q0 42 -14 36Z" fill="#8B6914"/>
+    <path d="M-30 20 Q0 8 30 20" fill="none" stroke="#6B5838" stroke-width="4"/>
+  </g>
+  <circle cx="180" cy="90" r="50" fill="#2A5838" opacity="0.35"/>
+  <circle cx="200" cy="80" r="40" fill="#3A6848" opacity="0.3"/>
+  
+  <text x="28" y="36" font-family="Georgia, 'Noto Serif Devanagari', serif" font-size="22" fill="#FAF5EA" opacity="0.92">Buddha Purnima</text>
+  <text x="28" y="58" font-family="'Noto Sans Devanagari', sans-serif" font-size="12" fill="#C9B896" letter-spacing="0.08em" opacity="0.78">बुद्ध पूर्णिमा</text>
 </svg>

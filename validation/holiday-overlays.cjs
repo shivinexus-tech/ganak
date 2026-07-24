@@ -28,6 +28,7 @@ for (const date of ['2026-03-21', '2026-05-27', '2026-06-26', '2026-08-26']) {
 
 const screen = fs.readFileSync(path.join(ROOT, 'src/screens/DailyScreen.tsx'), 'utf8');
 const card = fs.readFileSync(path.join(ROOT, 'src/components/HolidayOverlayCard.tsx'), 'utf8');
+assert(screen.includes('HolidayOverlaySelect'), 'Daily must expose the holiday overlay control beside calendar convention');
 assert(screen.includes('urlPrefGet("hol")') && screen.includes('urlPrefPush("hol", next)'), 'holiday preference must use URL state');
 assert(screen.includes('holidayDatesForYear(cy, holidayMode)'), 'calendar grid must mark the selected holiday layer');
 assert(card.includes('This never changes the Hindu Panchang calculation'), 'overlay separation must be explicit');

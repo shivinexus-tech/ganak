@@ -18,7 +18,7 @@ import { CALENDAR_CONVENTIONS, DEFAULT_REGIONAL_CALENDAR_FLAGS, calendarLabel, c
 import { loadRegionalCalendarFlags } from "../engine/regional-calendar-flags";
 import { runRegionalCalendarShadow } from "../monitoring/regional-calendar-shadow";
 import { urlPrefGet, urlPrefPush, urlPrefSet } from "../components/url-prefs";
-import HolidayOverlayCard from "../components/HolidayOverlayCard";
+import HolidayOverlayCard, { HolidayOverlaySelect } from "../components/HolidayOverlayCard";
 import { holidayDatesForYear, resolveHolidayMode } from "../data/india-holidays";
 
 export default function DailyScreen({ C, card, lang, place, onPlace }) {
@@ -184,11 +184,12 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
               );
             })()}
           </div>
-          {place && <div style={{ margin:"-12px 0 16px", display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
+          {place && <div style={{ margin:"-12px 0 16px", display:"flex", alignItems:"flex-end", gap:10, flexWrap:"wrap" }}>
             <select value={calendarMode} onChange={(e) => chooseCalendarMode(e.target.value)} aria-label={lang === "hi" ? "कैलेंडर पद्धति" : "Calendar convention"} style={{ height:T.ctrlH, borderRadius:T.rMd, border:`1px solid ${C.line}`, background:"#FFFDF7", color:C.ivory, padding:"0 10px", fontFamily:T.body }}>
               {CALENDAR_CONVENTIONS.filter(x => conventionIsEnabled(x.id,regionalFlags)).map(x => <option key={x.id} value={x.id}>{lang === "hi" ? x.hi : x.en}</option>)}
             </select>
-            <div style={{ fontSize:T.fMicro, color:C.muted, lineHeight:1.45 }}>
+            <HolidayOverlaySelect mode={holidayMode} onMode={chooseHolidayMode} lang={lang} />
+            <div style={{ fontSize:T.fMicro, color:C.muted, lineHeight:1.45, flex:"1 1 220px" }}>
               <div>{calendarLabel(calendarMode, todayP, todayP.rise, lang === "hi" ? "hi" : "en", place)}</div>
               <div style={{ fontStyle:"italic" }}>{lang === "hi" ? `समय ${place.label} के अनुसार · दूसरा कैलेंडर चुनने से केवल तारीख़ का नाम बदलता है, समय वही रहता है` : `Times shown for ${place.label} · choosing a different calendar only changes how the date is named, the timings stay the same`}</div>
               {(calendarMode==="tamil-solar"||calendarMode==="bengali-solar")&&<div style={{marginTop:3,fontStyle:"normal"}}>{calendarMode==="tamil-solar"?(lang==="hi"?"तिरुकणित · सूर्य का निरयण राशि-प्रवेश और तमिल सूर्यास्त नियम":"Thirukanitha · sidereal solar ingress with the Tamil sunset rule"):(lang==="hi"?"विशुद्ध सिद्धान्त · सूर्य का निरयण राशि-प्रवेश और बंगाल सूर्योदय नियम":"Vishuddha Siddhanta · sidereal solar ingress with the Bengal sunrise rule")}</div>}

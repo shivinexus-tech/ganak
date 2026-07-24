@@ -130,10 +130,12 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
   - [ ] Complete the answer-before-data life interpretation layer so the public
         Kundli is more than a collection of technical tables; qualify uncertainty
         and keep detailed calculations available below each plain-language result.
-        _(Modules complete on draft PR #1: bilingual 27-nakshatra/12-sign data,
-        six-area builder, card and non-vacuous copy/safety gate. Still open:
-        current-main rebase, ChartScreen hookup, owner high-risk content review,
-        browser/phone QA, merge and production verification.)_
+        _(Modules and current-main hookup complete: bilingual 27-nakshatra/12-sign
+        data, six-area builder, answer-first card, release guard and non-vacuous
+        copy/safety gate. Because Jyotish is already public, the card and its nav
+        link remain hidden until all sign entries are owner-verified. Still open:
+        owner high-risk content review, EN/HI phone visual QA, release and
+        production verification.)_
   - [ ] Downloadable Kundli PDF and general PDF reports, with bilingual rendering,
         chart legibility and print verification.
       _(P0-JYOTISH-PUBLIC-LAUNCH; owner scope 2026-07-21)_
@@ -254,8 +256,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         multi-year anchors). Chhath four-day journey closed under row #29.
   - [x] Eighteen season-specific Chaitra/Sharad Navadurga pages plus the sourced
         Durga Saptashati reading plan; Gupt Navratris stay distinct.
-  - [ ] Location-aware eclipse visibility, Sutak start/end and safe household
-        guidance; sect-specific calendar views where rules are verified.
+  - [x] Location-aware eclipse visibility, contact windows, Sutak start/end and
+        safe household guidance. Shipped 2026-07-24 with topocentric solar
+        visibility, lunar moonrise overlap, no-Sutak handling for non-visible
+        cities and EN/HI festival + MuhuratHub wiring.
       _(P0-FESTIVAL-VRAT-PARITY; owner scope 2026-07-21)_
 - [ ] **P0 before go-live — exceptionally strong Muhurat parity.** Complete every
       gap from the competitor comparison and keep the verdict/explanation stronger

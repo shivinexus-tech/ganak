@@ -1,14 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240" role="img" aria-label="Krishna lifting Govardhan hill" data-subject="krishna-govardhan">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FAF5EA"/>
-      <stop offset="100%" stop-color="#E7DDC6"/>
+    <linearGradient id="dusk" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1A2848"/><stop offset="50%" stop-color="#3A5898"/><stop offset="100%" stop-color="#F5A642"/>
     </linearGradient>
-  </defs>
-  <rect width="640" height="200" fill="url(#g)"/>
-  <circle cx="520" cy="48" r="36" fill="none" stroke="#A86A12" stroke-width="3" opacity="0.55"/>
-  <path d="M48 150 Q160 60 280 150 T520 150" fill="none" stroke="#C2451E" stroke-width="2.5" opacity="0.35"/>
-  <text x="32" y="118" font-family="Georgia, serif" font-size="26" fill="#3B3147">Govardhan Puja (Annakut)</text>
-  <text x="32" y="148" font-family="sans-serif" font-size="13" fill="#8C8173" letter-spacing="0.12em">GANAK FESTIVAL GUIDE</text>
+    <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6B8FD4"/><stop offset="100%" stop-color="#3A5898"/>
+    </linearGradient></defs>
+  
+  <rect width="640" height="240" fill="url(#dusk)"/>
+  <circle cx="560" cy="70" r="48" fill="#F5C842" opacity="0.25"/>
+  <path d="M0 170 Q200 130 400 165 T640 155 L640 240 L0 240Z" fill="#2A4828" opacity="0.7"/>
+  <g transform="translate(340,108)">
+    <ellipse cx="0" cy="58" rx="34" ry="9" fill="#000" opacity="0.18"/>
+    <path d="M-6 -42 L0 -58 L6 -42 L4 -36 L-4 -36Z" fill="#F5C842"/>
+    <circle cx="0" cy="-48" r="5" fill="#4A9E4A"/>
+    <ellipse cx="0" cy="-8" rx="18" ry="20" fill="url(#skin)"/>
+    <path d="M-20 8 Q0 -2 20 8 L16 56 Q0 66 -16 56Z" fill="#C2451E" opacity="0.9"/>
+    <path d="M8 -4 L58 -18" stroke="#D4AF37" stroke-width="3" stroke-linecap="round"/>
+    <rect x="52" y="-24" width="8" height="32" rx="2" fill="#8B6914"/>
+    <circle cx="0" cy="-6" r="3" fill="#1A2848" opacity="0.5"/>
+  </g>
+  <g fill="#FAF5EA" opacity="0.35"><circle cx="100" cy="90" r="2"/><circle cx="140" cy="70" r="1.5"/></g>
+  
+  <text x="28" y="36" font-family="Georgia, 'Noto Serif Devanagari', serif" font-size="22" fill="#FAF5EA" opacity="0.92">Govardhan Puja (Annakut)</text>
+  <text x="28" y="58" font-family="'Noto Sans Devanagari', sans-serif" font-size="12" fill="#C9B896" letter-spacing="0.08em" opacity="0.78">गोवर्धन पूजा (अन्नकूट)</text>
 </svg>

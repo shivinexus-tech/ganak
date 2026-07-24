@@ -147,15 +147,15 @@
       "recommendedAction": "No corrective action required; retain the Jyotish exposure/translation gate and phone smoke matrix for future panel changes."
     },
     "4": {
-      "deliveryState": "Modules complete on draft PR — public hookup pending",
-      "limitations": "The bilingual interpretation data, six-area builder, presentational card and copy/safety gate exist on draft PR #1, but ChartScreen hookup was reverted to avoid a past ownership collision. The branch now needs a current-main rebase, owner content review, integration, merge and production verification.",
-      "shortTermImpact": "Users still see the existing chart experience; the new answer-first life reading is not publicly rendered.",
-      "longTermImpact": "Until the integration and review close, Ganak's public Kundli remains more technical than the approved answer-before-data design.",
-      "bugBashStatus": "Required before this high-impact interpretation journey closes — not started because the feature is not yet wired.",
+      "deliveryState": "Integrated on main — release gated pending owner review",
+      "limitations": "The answer-first card and navigation hookup are complete, but all 12 sign entries still need owner review. The public Jyotish route therefore hides both the card and Reading link until every sign is owner-verified. EN/HI phone visual QA, release and production verification remain open; the local browser could not start in this pass because the approval service hit its usage limit.",
+      "shortTermImpact": "The implementation is ready behind an enforceable content-review gate, while current users remain protected from unreviewed interpretation copy.",
+      "longTermImpact": "Once owner review and visual QA clear, Ganak can release a qualified six-area answer before the technical chart without another integration pass.",
+      "bugBashStatus": "Required before this high-impact interpretation journey closes — deterministic copy/safety/release tests pass, but the independent EN/HI phone/desktop visual pass remains open.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-24 · Draft PR #1 modules: life-interpretation gate, canonical gates and build recorded; no production evidence",
+      "lastVerified": "2026-07-24 · PR #1 merged as 1326ab8; ChartScreen hookup complete; interpretation release gate, all canonical gates and production build pass; no released-card production evidence",
       "sourceConfidence": "BPHS and Phaladeepika attribution framework recorded in the feature plan; owner high-risk content review remains required",
-      "recommendedAction": "Rebase draft PR #1 onto current main, complete the ChartScreen answer-first hookup, run the owner high-risk content review, then execute full gates plus an independent EN/HI phone/desktop bug bash and production verification."
+      "recommendedAction": "Complete the 12-sign owner checklist, mark approved sign entries owner-verified, run the independent EN/HI phone/desktop bug bash, then release and verify production."
     },
     "5": {
       "deliveryState": "Built and tested locally — not publicly delivered",
@@ -211,6 +211,17 @@
       "lastVerified": "2026-07-24 · Local gates incl. skanda-ayyappa-pages.cjs; production build pending push",
       "sourceConfidence": "Drik Panchang festival dates plus Tamil/Kerala regional practice notes; Sabarimala pilgrimage guidance for Ayyappa safety boundaries",
       "recommendedAction": "No corrective action required; owner spot-check the two climax routes in both languages after deploy."
+    },
+    "15": {
+      "deliveryState": "Delivered — production verification pending",
+      "limitations": "None in the approved eclipse/Sutak scope. Sect-specific variants are not exposed because no verified sect-specific eclipse rule set was adopted; the delivered convention is explicitly labelled as the Drik household rule.",
+      "shortTermImpact": "Users get a city-specific answer for solar and lunar grahan pages: visible or not visible, contact window, local visible window, Sutak applicability/start and Moksha.",
+      "longTermImpact": "Topocentric solar checks and lunar moonrise-overlap anchors prevent the previous false-visible/no-contact regression while preserving Drik-style no-Sutak handling for non-visible cities.",
+      "bugBashStatus": "Automated adversarial anchors completed 2026-07-24: Delhi Feb 2026 solar non-visible/no Sutak, Cape Town Feb 2026 solar visible, Delhi Mar 2026 lunar visible after moonrise. Production live smoke remains recommended after deploy.",
+      "qualityRisk": "Green",
+      "lastVerified": "2026-07-24 · Local `eclipse-sutak-pages.cjs` plus production build; full canonical gates in closeout",
+      "sourceConfidence": "Drik Panchang/public Drik-citing 2026 eclipse date and Sutak rule anchors; Ganak topocentric geometry for city visibility",
+      "recommendedAction": "No corrective action required; spot-check `/festival/surya-grahan` and `/festival/chandra-grahan` in EN/HI after deploy."
     }
   },
   "dashboard": {

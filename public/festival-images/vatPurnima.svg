@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240" role="img" aria-label="Vat Purnima under the sacred tree" data-subject="banyan">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FAF5EA"/>
-      <stop offset="100%" stop-color="#E7DDC6"/>
-    </linearGradient>
-  </defs>
-  <rect width="640" height="200" fill="url(#g)"/>
-  <circle cx="520" cy="48" r="36" fill="none" stroke="#A86A12" stroke-width="3" opacity="0.55"/>
-  <path d="M48 150 Q160 60 280 150 T520 150" fill="none" stroke="#C2451E" stroke-width="2.5" opacity="0.35"/>
-  <text x="32" y="118" font-family="Georgia, serif" font-size="26" fill="#3B3147">Vat Purnima</text>
-  <text x="32" y="148" font-family="sans-serif" font-size="13" fill="#8C8173" letter-spacing="0.12em">GANAK FESTIVAL GUIDE</text>
+    <linearGradient id="vat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2A4838"/><stop offset="100%" stop-color="#688858"/>
+    </linearGradient></defs>
+  
+  <rect width="640" height="240" fill="url(#vat)"/>
+  <g transform="translate(200,80)">
+    <rect x="-8" y="0" width="16" height="120" rx="4" fill="#4A3018"/>
+    <circle cx="0" cy="-10" r="55" fill="#2A5838" opacity="0.65"/>
+    <circle cx="-30" cy="10" r="35" fill="#3A6848" opacity="0.5"/>
+    <circle cx="35" cy="5" r="40" fill="#3A6848" opacity="0.5"/>
+    <path d="M-40 40 Q0 20 40 40" fill="none" stroke="#6B4420" stroke-width="2" opacity="0.5"/>
+  </g>
+  <g transform="translate(400,125)">
+    <ellipse cx="0" cy="50" rx="20" ry="7" fill="#000" opacity="0.15"/>
+    <ellipse cx="0" cy="0" rx="12" ry="14" fill="#E8C8D8"/>
+    <path d="M-14 4 Q0 -4 14 4 L10 44 Q0 50 -10 44Z" fill="#C2457E" opacity="0.85"/>
+    <path d="M-20 20 Q0 10 20 20" fill="none" stroke="#D4AF37" stroke-width="2"/>
+  </g>
+  
+  <text x="28" y="36" font-family="Georgia, 'Noto Serif Devanagari', serif" font-size="22" fill="#FAF5EA" opacity="0.92">Vat Purnima</text>
+  <text x="28" y="58" font-family="'Noto Sans Devanagari', sans-serif" font-size="12" fill="#C9B896" letter-spacing="0.08em" opacity="0.78">वट पूर्णिमा</text>
 </svg>

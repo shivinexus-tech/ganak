@@ -4,6 +4,7 @@
 import { MAJOR_FESTIVAL_GUIDES, MAJOR_FESTIVAL_SUPPLEMENTS } from "./major-festival-guides";
 import { DURGA_PUJA_GUIDES } from "./durga-puja-guides";
 import { SEQUENCE_GUIDES } from "./sequence-guides";
+import { GRAHAN_GUIDES } from "./grahan-guides";
 import { VRAT_GUIDE_ENRICHMENTS } from "./vrat-guide-enrichments";
 import { REGIONAL_KATHAS } from "./regional-kathas";
 
@@ -68,6 +69,7 @@ export const VRAT_VIDHI = {
   ...MAJOR_FESTIVAL_GUIDES,
   ...DURGA_PUJA_GUIDES,
   ...SEQUENCE_GUIDES,
+  ...GRAHAN_GUIDES,
   makarSankranti: {
     verdict: {
       en: "Makar Sankranti is the major solar festival when Surya enters Makara in the sidereal Hindu calendar. The shared household observance is Surya arghya, til and jaggery or the family's seasonal food, charity and gratitude; fasting rules differ by family and region.",
