@@ -23,6 +23,20 @@ export const NAMING_SYLLABLES = [
   ["Se","So","Da","Di"],["Du","Tha","Jha","Na"],["De","Do","Cha","Chi"],
 ] as const;
 
+// Drik Panchang's published Hindi 27-nakshatra / 108-pada naming table,
+// verified 2026-07-24. Keep parallel to NAMING_SYLLABLES so Hindi answers
+// render the traditional Devanagari akshara rather than Latin transliteration.
+// https://www.drikpanchang.com/swar-siddhanta/nakshatra/nakshatra-pada-swar-siddhanta.html?lang=hi
+export const NAMING_SYLLABLES_HI = [
+  ["चु","चे","चो","ला"],["ली","लू","ले","लो"],["अ","ई","उ","ए"],["ओ","वा","वी","वु"],
+  ["वे","वो","का","की"],["कु","घ","ङ","छ"],["के","को","हा","ही"],["हु","हे","हो","डा"],
+  ["डी","डू","डे","डो"],["मा","मी","मू","मे"],["मो","टा","टी","टू"],["टे","टो","पा","पी"],
+  ["पू","ष","ण","ठ"],["पे","पो","रा","री"],["रू","रे","रो","ता"],["ती","तू","ते","तो"],
+  ["ना","नी","नू","ने"],["नो","या","यी","यू"],["ये","यो","भा","भी"],["भू","धा","फा","ढ"],
+  ["भे","भो","जा","जी"],["खी","खू","खे","खो"],["गा","गी","गु","गे"],["गो","सा","सी","सू"],
+  ["से","सो","दा","दी"],["दू","थ","झ","ञ"],["दे","दो","च","ची"],
+] as const;
+
 export const EXCLUDED_CALCULATOR_FAMILIES = [
   "numerology", "birthstone", "chinese-zodiac", "western-transit", "western-progression",
   "vastu", "feng-shui", "gemstone", "rudraksha",

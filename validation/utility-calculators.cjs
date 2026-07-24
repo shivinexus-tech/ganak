@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 const assert = require('node:assert');
+const fs = require('node:fs');
 const { loadApp } = require('./_load-app.cjs');
 const data = loadApp('src/data/utility-calculators.ts');
 const calc = loadApp('src/engine/utility-calculators.ts');
@@ -19,6 +20,9 @@ assert.strictEqual(q.sunSign, 'Dhanu (Sagittarius)', 'sidereal Sun anchor');
 assert.strictEqual(q.nakshatra, 'Dhanishta', 'nakshatra anchor');
 assert.strictEqual(q.pada, 4, 'nakshatra pada anchor');
 assert.strictEqual(q.syllable, 'Ge', 'name-sound anchor');
+assert.strictEqual(q.syllableHi, 'गे', 'Hindi name-sound anchor');
+assert.strictEqual(data.NAMING_SYLLABLES_HI.length, 27, 'Hindi naming table must cover 27 nakshatras');
+assert(data.NAMING_SYLLABLES_HI.every(row=>row.length===4&&row.every(x=>/[\u0900-\u097F]/.test(x))), 'Hindi naming table must contain 108 Devanagari sounds');
 const mangal=calc.mangalDosha(delhi);
 assert.strictEqual(mangal.refs.length,3,'Mangal must check Lagna, Moon and Venus separately');
 assert(mangal.refs.every(x=>[1,2,4,7,8,12].includes(x.house)===x.counted),'Mangal house rule drift');
@@ -66,4 +70,12 @@ const tropSun = calc.westernNatal(delhi).planets.find(p=>p.name==='Sun').lon;
 const sep = ((tropSun - sidSun) % 360 + 360) % 360;
 assert(sep > 20 && sep < 28, `Vedic/Western Sun must differ by the ayanamsa (~24°), got ${sep.toFixed(2)}°`);
 
-console.log(`UTILITY CALCULATORS PASSED (${expected.length} bilingual permanent journeys; exclusions guarded; F1/F3/F4/F6 regressions)`);
+// Source guards complement the browser matrix for stateful UI defects.
+const screenSource=fs.readFileSync('src/screens/UtilityCalculatorScreen.tsx','utf8');
+const placeSource=fs.readFileSync('src/components/PlaceInput.tsx','utf8');
+assert(screenSource.includes('place={placeB} onPlace={setPlaceB} onConfirmed={setConfirmedB}'), 'person B must retain an independent confirmed place');
+assert(screenSource.includes('if(!confirmedA||!place)')&&screenSource.includes('if(item.slug==="western-relationship"&&(!confirmedB||!placeB))'), 'calculation must reject unconfirmed A/B places');
+assert(placeSource.includes('onConfirmed(confirmed)')&&placeSource.includes('if (onConfirmed) return'), 'strict PlaceInput mode must report divergence and avoid stale snap-back');
+assert(screenSource.includes('hi?q.syllableHi:q.syllable'), 'Hindi baby-name answer must use the sourced Devanagari sound');
+
+console.log(`UTILITY CALCULATORS PASSED (${expected.length} bilingual permanent journeys; 108 sourced Hindi sounds; F1-F6 regressions)`);

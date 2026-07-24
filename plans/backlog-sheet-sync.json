@@ -125,15 +125,15 @@
   },
   "qualityOverrides": {
     "1": {
-      "deliveryState": "Delivered with quality limitation",
-      "limitations": "Independent 2026-07-24 bug bash found three P0 correctness defects: relationship people cannot retain different birthplaces; cleared/unselected place text silently calculates with stale coordinates; future Shraddha dates can return annual observances before death. Unknown-route UX and Hindi naming-sound localization also remain.",
-      "shortTermImpact": "Some calculator answers can be based on a different place or invalid death-date context than the user sees, so the catalogue is not ready for permanent-quality closure.",
-      "longTermImpact": "If unresolved, shareable calculator URLs can publish confidently worded but input-invalid results and erode trust in Ganak's calculation layer.",
-      "bugBashStatus": "Required for high-impact closure — completed 2026-07-24 and failed closure with F1–F3 P0 plus F4–F5 P2; repeat after fixes.",
+      "deliveryState": "Delivered; independent quality re-check pending",
+      "limitations": "F1–F5 are fixed with regression coverage. A fresh independent 60-minute post-fix bug bash is not yet recorded, so permanent-quality closure remains open.",
+      "shortTermImpact": "The known calculator defects are resolved, but the corrected release has not yet completed its required independent adversarial re-check.",
+      "longTermImpact": "Without the independent post-fix pass, an undiscovered regression could remain in a high-impact calculation journey.",
+      "bugBashStatus": "Required for high-impact closure — original 2026-07-24 pass found F1–F5; fixes and regressions are complete; fresh independent 60-minute post-fix pass pending.",
       "qualityRisk": "Red",
-      "lastVerified": "2026-07-24 · Production adversarial pass; UI findings reproduced on local port 5199",
-      "sourceConfidence": "Published conventions and regression anchors; naming syllables spot-checked against two published tables",
-      "recommendedAction": "Fix independent A/B birthplaces, reject stale or unselected places, reject future death dates and chronologically filter Shraddha occurrences; then resolve route/Hindi polish, add regressions, deploy and commission a fresh independent 60-minute bug bash."
+      "lastVerified": "2026-07-24 · Local port 5199 after F1–F5 fixes; production verification pending final F5 deploy",
+      "sourceConfidence": "Published conventions and regression anchors; Hindi naming uses Drik Panchang's published 108-pada Devanagari table",
+      "recommendedAction": "Deploy and production-verify the final Hindi naming-sound fix, then commission a fresh independent 60-minute adversarial pass; close only with no P0/P1 findings."
     },
     "5": {
       "deliveryState": "Built and tested locally — not publicly delivered",

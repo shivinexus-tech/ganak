@@ -1,7 +1,7 @@
 import { computeKundli } from "./kundli";
 import { NAKSHATRAS, SIGNS, lunarMonthInfo, planetSidMs, sunEvents } from "./panchang";
 import { rev } from "./ephemeris";
-import { NAMING_SYLLABLES } from "../data/utility-calculators";
+import { NAMING_SYLLABLES, NAMING_SYLLABLES_HI } from "../data/utility-calculators";
 
 export type BirthInput = { y:number; m:number; day:number; hh:number; mi:number; tz:number; lat:number; lon:number };
 const WESTERN_SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
@@ -12,7 +12,7 @@ export function quickBirth(input:BirthInput) {
   const chart = computeKundli({ ...input, ayanamsa:"lahiri" });
   const moon = chart.rows.find((p:any)=>p.name === "Moon")!;
   const sun = chart.rows.find((p:any)=>p.name === "Sun")!;
-  return { chart, moon, sun, rashi:SIGNS[moon.sign], sunSign:SIGNS[sun.sign], lagna:SIGNS[chart.ascSign], nakshatra:NAKSHATRAS[moon.nak], pada:moon.pada, syllable:NAMING_SYLLABLES[moon.nak][moon.pada-1] };
+  return { chart, moon, sun, rashi:SIGNS[moon.sign], sunSign:SIGNS[sun.sign], lagna:SIGNS[chart.ascSign], nakshatra:NAKSHATRAS[moon.nak], pada:moon.pada, syllable:NAMING_SYLLABLES[moon.nak][moon.pada-1], syllableHi:NAMING_SYLLABLES_HI[moon.nak][moon.pada-1] };
 }
 
 export function mangalDosha(input:BirthInput) {
