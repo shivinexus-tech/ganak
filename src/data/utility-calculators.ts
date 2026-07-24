@@ -14,18 +14,21 @@ export const UTILITY_CALCULATORS = [
 ] as const;
 
 export const NAMING_SYLLABLES = [
-  ["Chu","Che","Cho","La"],["Li","Lu","Le","Lo"],["A","I","U","E"],["O","Va","Vi","Vu"],
-  ["Ve","Vo","Ka","Ki"],["Ku","Gha","Na","Chha"],["Ke","Ko","Ha","Hi"],["Hu","He","Ho","Da"],
-  ["Di","Du","De","Do"],["Ma","Mi","Mu","Me"],["Mo","Ta","Ti","Tu"],["Te","To","Pa","Pi"],
-  ["Pu","Sha","Na","Tha"],["Pe","Po","Ra","Ri"],["Ru","Re","Ro","Ta"],["Ti","Tu","Te","To"],
-  ["Na","Ni","Nu","Ne"],["No","Ya","Yi","Yu"],["Ye","Yo","Bha","Bhi"],["Bhu","Dha","Pha","Dha"],
-  ["Bhe","Bho","Ja","Ji"],["Ju","Je","Jo","Gha"],["Ga","Gi","Gu","Ge"],["Go","Sa","Si","Su"],
-  ["Se","So","Da","Di"],["Du","Tha","Jha","Na"],["De","Do","Cha","Chi"],
+  ["Chu","Che","Cho","Laa"],["Lee","Loo","Le","Lo"],["A","Ee","U","E"],["O","Vaa","Vee","Vu"],
+  ["Ve","Vo","Kaa","Kee"],["Ku","Gha","Ing","Chha"],["Ke","Ko","Haa","Hee"],["Hu","He","Ho","Daa"],
+  ["Dee","Doo","De","Do"],["Maa","Mee","Moo","Me"],["Mo","Taa","Tee","Too"],["Te","To","Paa","Pee"],
+  ["Poo","Sha","Na","Tha"],["Pe","Po","Raa","Ree"],["Roo","Re","Ro","Taa"],["Tee","Too","Te","To"],
+  ["Naa","Nee","Noo","Ne"],["No","Yaa","Yee","Yoo"],["Ye","Yo","Bhaa","Bhee"],["Bhoo","Dhaa","Phaa","Dha"],
+  ["Bhe","Bho","Jaa","Jee"],["Khee","Khoo","Khe","Kho"],["Gaa","Gee","Gu","Ge"],["Go","Saa","See","Soo"],
+  ["Se","So","Daa","Dee"],["Doo","Tha","Jha","Yna"],["De","Do","Cha","Chee"],
 ] as const;
 
-// Drik Panchang's published Hindi 27-nakshatra / 108-pada naming table,
-// verified 2026-07-24. Keep parallel to NAMING_SYLLABLES so Hindi answers
-// render the traditional Devanagari akshara rather than Latin transliteration.
+// Drik Panchang's parallel English/Hindi 27-nakshatra / 108-pada naming
+// tables, verified 2026-07-24. Keep both arrays positionally identical:
+// NAMING_SYLLABLES is Drik's displayed Latin rendering of the corresponding
+// NAMING_SYLLABLES_HI akshara, not a mixture of alternate published aliases.
+// Family-language spelling may still vary after this recommended starting sound.
+// https://www.drikpanchang.com/swar-siddhanta/nakshatra/nakshatra-pada-swar-siddhanta.html
 // https://www.drikpanchang.com/swar-siddhanta/nakshatra/nakshatra-pada-swar-siddhanta.html?lang=hi
 export const NAMING_SYLLABLES_HI = [
   ["चु","चे","चो","ला"],["ली","लू","ले","लो"],["अ","ई","उ","ए"],["ओ","वा","वी","वु"],

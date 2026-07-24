@@ -21,6 +21,28 @@ assert.strictEqual(q.nakshatra, 'Dhanishta', 'nakshatra anchor');
 assert.strictEqual(q.pada, 4, 'nakshatra pada anchor');
 assert.strictEqual(q.syllable, 'Ge', 'name-sound anchor');
 assert.strictEqual(q.syllableHi, 'गे', 'Hindi name-sound anchor');
+const drikNamingPairs = [
+  ['Chu','चु'],['Che','चे'],['Cho','चो'],['Laa','ला'],['Lee','ली'],['Loo','लू'],['Le','ले'],['Lo','लो'],
+  ['A','अ'],['Ee','ई'],['U','उ'],['E','ए'],['O','ओ'],['Vaa','वा'],['Vee','वी'],['Vu','वु'],
+  ['Ve','वे'],['Vo','वो'],['Kaa','का'],['Kee','की'],['Ku','कु'],['Gha','घ'],['Ing','ङ'],['Chha','छ'],
+  ['Ke','के'],['Ko','को'],['Haa','हा'],['Hee','ही'],['Hu','हु'],['He','हे'],['Ho','हो'],['Daa','डा'],
+  ['Dee','डी'],['Doo','डू'],['De','डे'],['Do','डो'],['Maa','मा'],['Mee','मी'],['Moo','मू'],['Me','मे'],
+  ['Mo','मो'],['Taa','टा'],['Tee','टी'],['Too','टू'],['Te','टे'],['To','टो'],['Paa','पा'],['Pee','पी'],
+  ['Poo','पू'],['Sha','ष'],['Na','ण'],['Tha','ठ'],['Pe','पे'],['Po','पो'],['Raa','रा'],['Ree','री'],
+  ['Roo','रू'],['Re','रे'],['Ro','रो'],['Taa','ता'],['Tee','ती'],['Too','तू'],['Te','ते'],['To','तो'],
+  ['Naa','ना'],['Nee','नी'],['Noo','नू'],['Ne','ने'],['No','नो'],['Yaa','या'],['Yee','यी'],['Yoo','यू'],
+  ['Ye','ये'],['Yo','यो'],['Bhaa','भा'],['Bhee','भी'],['Bhoo','भू'],['Dhaa','धा'],['Phaa','फा'],['Dha','ढ'],
+  ['Bhe','भे'],['Bho','भो'],['Jaa','जा'],['Jee','जी'],['Khee','खी'],['Khoo','खू'],['Khe','खे'],['Kho','खो'],
+  ['Gaa','गा'],['Gee','गी'],['Gu','गु'],['Ge','गे'],['Go','गो'],['Saa','सा'],['See','सी'],['Soo','सू'],
+  ['Se','से'],['So','सो'],['Daa','दा'],['Dee','दी'],['Doo','दू'],['Tha','थ'],['Jha','झ'],['Yna','ञ'],
+  ['De','दे'],['Do','दो'],['Cha','च'],['Chee','ची'],
+];
+assert.strictEqual(drikNamingPairs.length, 108, 'Drik bilingual naming fixture must cover all 108 padas');
+assert.deepStrictEqual(
+  data.NAMING_SYLLABLES.flat().map((en,index)=>[en,data.NAMING_SYLLABLES_HI.flat()[index]]),
+  drikNamingPairs,
+  'all 108 English/Hindi naming sounds must remain positionally aligned to the declared Drik convention',
+);
 assert.strictEqual(data.NAMING_SYLLABLES_HI.length, 27, 'Hindi naming table must cover 27 nakshatras');
 assert(data.NAMING_SYLLABLES_HI.every(row=>row.length===4&&row.every(x=>/[\u0900-\u097F]/.test(x))), 'Hindi naming table must contain 108 Devanagari sounds');
 const mangal=calc.mangalDosha(delhi);
@@ -78,4 +100,4 @@ assert(screenSource.includes('if(!confirmedA||!place)')&&screenSource.includes('
 assert(placeSource.includes('onConfirmed(confirmed)')&&placeSource.includes('if (onConfirmed) return'), 'strict PlaceInput mode must report divergence and avoid stale snap-back');
 assert(screenSource.includes('hi?q.syllableHi:q.syllable'), 'Hindi baby-name answer must use the sourced Devanagari sound');
 
-console.log(`UTILITY CALCULATORS PASSED (${expected.length} bilingual permanent journeys; 108 sourced Hindi sounds; F1-F6 regressions)`);
+console.log(`UTILITY CALCULATORS PASSED (${expected.length} bilingual permanent journeys; 108 Drik-aligned English/Hindi pairs; F1-F7 regressions)`);
