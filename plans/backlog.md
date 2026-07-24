@@ -527,6 +527,16 @@ Phase-1 infrastructure; broader account/monetization architecture remains deferr
 - [ ] Prioritize new features by what Phase 1 user feedback actually asks for.
 - [ ] Cheap feature candidates: **Prashnavali** (number-pick → verse, very low
       cost). Possibly **Gemstone/Remedy** if users ask.
+- [ ] **Kundli life interpretation — "Classic life-areas" mode (TO BE DECIDED LATER).**
+      The v1 interpretation card ships the low-risk **Character & aptitude** set
+      (Nature · Mind · Strengths · How you relate · Work leanings — see
+      `docs/superpowers/specs/2026-07-23-kundli-life-interpretation-design.md`).
+      A second **Classic life-areas** set (Personality · Career & wealth · Marriage
+      & family · Health · Fortune) was explicitly deferred by the owner 2026-07-23,
+      NOT dropped. It is gated on (a) the engine gaining house-lord / D-9 logic those
+      areas honestly require — nakshatra + Moon sign alone can't derive them — and
+      (b) an owner decision on the fatalism/health/wealth-claim risk. Revisit once
+      Phase-1 feedback shows whether users actually ask for predictive life-areas.
 - Still free. Still no ads on Panchang.
 
 ---
