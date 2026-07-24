@@ -76,17 +76,42 @@ and the existing screen logic (`src/screens/PrashnaScreen.tsx`).
 
 ---
 
-## Ayanamsa note (affects an owner decision already made)
+## Ayanamsa note — RESOLVED to KP-New (owner, 2026-07-24)
 
-The owner **decided KP ayanamsa (option C, 2026-07-22)** for the number mode. That
-decision stands. Two honest caveats from the primary text:
+The owner **decided KP ayanamsa (option C, 2026-07-22)**; on 2026-07-24 the specific
+constant is set to **KP-New (KPNA)**. Rationale, recorded:
 
 - Reader VI does **not** name a numeric "KP ayanamsa"; it uses Sayana/Nirayana framing.
-  The engine must therefore pin a **specific published KP ayanamsa** (KP-Old vs KP-New
-  differ by minutes and can flip a planet's sub) and record which — that choice is an
-  implementation constant to confirm, not something Reader VI dictates.
-- This is the only rule where the owner's decision and the primary text need an
-  explicit reconciliation line on-screen (Ganak already discloses ayanamsa bilingually).
+  So the numeric constant is an implementation choice, not something the book dictates.
+- **KP-New is the modern KP standard** (Prof. K. Balachandran, published in the KP &
+  Astrology Year Book 2003; endorsed by the k_p_system community and used by mainstream
+  KP software). It is computed to the **second** for the exact date via formula; KP-Old
+  used a flat per-year table to the minute. For a method that decides on **sub**
+  boundaries (arc-minute level), the more precise value is the right default.
+- **Reconciliation the engine must make explicit:** KP-Old differs from Lahiri by only
+  ~6′, but **KP-New differs from Lahiri by ~22′**. Ganak's existing time-based Prashna
+  runs on **Lahiri**. So the number mode is a genuine **ayanamsa fork** from the rest of
+  the app — it must (a) compute on KP-New, (b) keep the Lahiri parity gate on the old
+  mode byte-exact, and (c) disclose bilingually on the result card that the KP number
+  method uses the KP-New ayanamsa, distinct from Ganak's Lahiri default.
+
+## 2026-07-24 update — Reader II check + owner ratification
+
+- **Attempted to page-verify the four ⚠️ rules in Reader II** (*Fundamental Principles*)
+  from the same Internet Archive scan. The document-reader could only process an
+  introductory portion of that volume's large OCR file — it surfaced the **table of
+  contents** (e.g. "the twelve houses and their significance", p. 272) but not the
+  chapter bodies. So I **could not machine-extract** the exact passages this pass.
+  This is a **tooling/OCR limit, not evidence the rules are absent.**
+- **Honest status of the core "sub-lord decides" rule (rule 3):** its attribution to
+  Krishnamurti is effectively certain — the entire system is *named* Krishnamurti
+  Paddhati **for this thesis**, and Reader II's TOC carries the relevant chapters. What
+  is missing is a clean, machine-readable passage + page from my current access. It is
+  therefore stronger than ordinary web-corroboration but not yet a clean page-pin.
+- **Owner ratification (2026-07-24):** the four ✅ Reader VI rules (1, 4, 5, 6) **stay
+  marked verified** with a standing **page-pending disclaimer** — they were located in
+  the Reader VI text; only the exact page numbers await an owned copy. The disclaimer
+  travels with the note; it is not a reason to demote them.
 
 ---
 
@@ -99,7 +124,8 @@ decision stands. Two honest caveats from the primary text:
    - Rule 8 → confirm the 12th-from rule in **Reader II/III**.
    - Rule 7 → **cannot** become Tier 1 (it is a Ganak self-service adaptation); keep it
      labelled as a product decision, not KSK doctrine.
-3. **Pin the KP ayanamsa constant** (Old vs New) and its on-screen disclosure line.
+3. ~~Pin the KP ayanamsa constant~~ **DONE 2026-07-24: KP-New (KPNA).** Remaining: wire
+   the ~22′-from-Lahiri fork + its bilingual on-screen disclosure line when engine code starts.
 
 Until steps 1–3 are done, the engine may be **prototyped and reviewed** but not shipped
 to the public as "sourced," per the project's religious-accuracy rule.
