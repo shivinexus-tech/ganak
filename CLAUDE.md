@@ -19,3 +19,6 @@ Claude-specific notes:
   `plans/task-log.md`.
 - **Pre-flight:** before code edits, read `plans/task-log.md` and report to the
   owner: In progress / Unassigned / Stopped midway (which agent + where + why; see AGENTS.md Workflow).
+- **Git flow:** backlog work never commits or pushes directly to `main`. Work in
+  the assigned feature branch/worktree, push it, and open or update a draft PR.
+  Merge only after the required PR checks pass.
