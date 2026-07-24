@@ -7,7 +7,6 @@ import PlaceInput from "../components/PlaceInput";
 import { fmtTimeD } from "../components/format";
 import VratVidhiCard from "../components/VratVidhiCard";
 import NavadurgaDayGuide, { NavadurgaSeasonLinks } from "../components/NavadurgaDayGuide";
-import FestivalHeroImage from "../components/FestivalHeroImage";
 import { VRAT_VIDHI } from "../data/vrat-vidhis";
 import { CHHATH_SHARED_KEYS, FESTIVAL_PAGE_ROUTES, FEST_META, OBS_META } from "../data/festival-pages";
 import { sankrantiPunyaKala, scanPanchangCalendar } from "../engine/festivals";
@@ -285,7 +284,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
         <h2 id="festival-guide-title" style={{ margin: "0 0 5px", color: C.ivory, fontFamily: T.serif, fontSize: T.fHeading, lineHeight: 1.2 }}>
           {title}
         </h2>
-        {isNavadurga && guide.form?.image ? (
+        {isNavadurga && guide.form?.image && (
           <img
             src={guide.form.image}
             alt={guide.form.alt?.[L] || title}
@@ -295,8 +294,6 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
             decoding="async"
             style={{ display: "block", width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: C.panel, marginBottom: 14 }}
           />
-        ) : (
-          guide.vidhiKey && <FestivalHeroImage imageKey={guide.vidhiKey} lang={lang} C={C} />
         )}
         <p style={{ margin: "0 0 14px", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55 }}>
           {hasFullGuide

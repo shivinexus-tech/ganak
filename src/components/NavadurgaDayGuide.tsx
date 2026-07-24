@@ -116,21 +116,12 @@ function NavadurgaDayGuide({ guide, dateInfo, lang, C }) {
     <div style={{ display: "grid", gap: 16 }}>
       <NavadurgaSeasonLinks parentKey={guide.parentKey} activeDay={form.day} lang={lang} C={C} />
 
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 14 }}>
-        <img
-          src={form.image}
-          alt={form.alt[L]}
-          width="900"
-          height="900"
-          loading="eager"
-          style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: T.rLg, border: `1px solid ${C.line}`, background: C.panel }}
-        />
-        <div style={{ padding: "14px 15px", borderRadius: T.rLg, border: `1px solid ${C.line}`, background: "linear-gradient(145deg, rgba(194,69,30,.07), rgba(168,106,18,.08))" }}>
-          <div style={{ ...T.label, color: C.sindoor, marginBottom: 7 }}>
-            {L === "hi" ? `पहले उत्तर · दिवस ${form.day}` : `ANSWER FIRST · DAY ${form.day}`}
-          </div>
-          <p style={{ margin: 0, color: C.ivory, fontSize: T.fBody, lineHeight: 1.62 }}>{form.identity[L]}</p>
+      {/* Hero image now renders at the top of FestivalGuideScreen; keep the answer card here. */}
+      <div style={{ padding: "14px 15px", borderRadius: T.rLg, border: `1px solid ${C.line}`, background: "linear-gradient(145deg, rgba(194,69,30,.07), rgba(168,106,18,.08))" }}>
+        <div style={{ ...T.label, color: C.sindoor, marginBottom: 7 }}>
+          {L === "hi" ? `पहले उत्तर · दिवस ${form.day}` : `ANSWER FIRST · DAY ${form.day}`}
         </div>
+        <p style={{ margin: 0, color: C.ivory, fontSize: T.fBody, lineHeight: 1.62 }}>{form.identity[L]}</p>
       </div>
 
       <LocalNavadurgaDate dateInfo={dateInfo} form={form} lang={lang} C={C} />
