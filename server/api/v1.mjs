@@ -87,7 +87,7 @@ function tzOffsetHours(tz, ms) {
   return h + Math.sign(h || 1) * (min / 60);
 }
 
-export function createV1Router({ keyStore, requireKey }) {
+export function createV1Router({ keyStore, authenticate, chargeQuota }) {
   const router = Router();
 
   /* Engines are loaded once and reused. Loading here rather than at import time keeps
@@ -95,7 +95,9 @@ export function createV1Router({ keyStore, requireKey }) {
   let enginesPromise = null;
   const engines = () => (enginesPromise ||= loadEngines());
 
-  router.use(requireKey);
+  router.use(authenticate);
+
+  const charge = (req, res) => chargeQuota(req, res);
 
   /* --- discovery ------------------------------------------------------------ */
 
@@ -129,6 +131,7 @@ export function createV1Router({ keyStore, requireKey }) {
       if (place.problem) return res.status(400).json(place.problem);
       const ayan = parseAyanamsa(req.query.ayanamsa);
       if (ayan.problem) return res.status(400).json(ayan.problem);
+      if (!charge(req, res)) return;
 
       const E = await engines();
       E.setAyanMode(ayan.value);
@@ -148,6 +151,7 @@ export function createV1Router({ keyStore, requireKey }) {
       if (place.problem) return res.status(400).json(place.problem);
       const days = parseDays(req.query.days, { def: 30, max: 400 });
       if (days.problem) return res.status(400).json(days.problem);
+      if (!charge(req, res)) return;
 
       const E = await engines();
       E.setAyanMode("lahiri");
@@ -184,6 +188,7 @@ export function createV1Router({ keyStore, requireKey }) {
         const valid = Object.keys(E.MUHURTA_RULES || {});
         if (valid.length && !valid.includes(activity))
           return res.status(400).json(err(`activity must be one of: ${valid.join(", ")}.`, "INVALID_ACTIVITY"));
+        if (!charge(req, res)) return;
 
         const out = E.muhuratScanRange(toPlace(place.value), ayan.value, from.value.text, to.value.text, activity);
         return res.json(muhuratResponse(out, { ...place.value, from: from.value.text, to: to.value.text, activity, ayanamsa: ayan.value }));
@@ -191,6 +196,7 @@ export function createV1Router({ keyStore, requireKey }) {
 
       const date = parseDate(req.query.date);
       if (date.problem) return res.status(400).json(date.problem);
+      if (!charge(req, res)) return;
       const out = E.muhuratForDate(toPlace(place.value), ayan.value, date.value.y, date.value.m, date.value.d);
       res.json(muhuratResponse([out], { ...place.value, date: date.value.text, ayanamsa: ayan.value }));
     } catch (e) { next(e); }
@@ -202,6 +208,7 @@ export function createV1Router({ keyStore, requireKey }) {
       if (date.problem) return res.status(400).json(date.problem);
       const place = parsePlace(req.query);
       if (place.problem) return res.status(400).json(place.problem);
+      if (!charge(req, res)) return;
 
       const E = await engines();
       E.setAyanMode("lahiri");
@@ -221,6 +228,7 @@ export function createV1Router({ keyStore, requireKey }) {
       if (place.problem) return res.status(400).json(place.problem);
       const ayan = parseAyanamsa(req.query.ayanamsa);
       if (ayan.problem) return res.status(400).json(ayan.problem);
+      if (!charge(req, res)) return;
 
       const E = await engines();
       const at = date.value.ms - tzOffsetHours(place.value.tz, date.value.ms) * 3_600_000 + 6 * 3_600_000;

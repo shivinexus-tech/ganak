@@ -81,11 +81,18 @@ app.use(
       error.code = "CORS_NOT_ALLOWED";
       callback(error);
     },
-    methods: ["POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "x-ganak-key"],
+    methods: ["GET", "HEAD", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "x-ganak-key", "x-api-key"],
     // without this the browser app cannot read Retry-After on a 429 and would
     // have no idea how long to tell the user to wait
-    exposedHeaders: ["Retry-After", "RateLimit", "RateLimit-Policy"],
+    exposedHeaders: [
+      "Retry-After",
+      "RateLimit",
+      "RateLimit-Policy",
+      "X-Quota-Limit",
+      "X-Quota-Remaining",
+      "X-Quota-Reset",
+    ],
     maxAge: 600,
   }),
 );
@@ -245,9 +252,9 @@ const apiRateLimiter = rateLimit({
   },
 });
 
-/* Key check plus daily quota. Both failures are 401/429 with the standard shape, and
-   neither reveals whether a key exists — a wrong key and a missing key look the same. */
-function requireApiKey(request, response, next) {
+/* Authenticate only — quota is charged after input validation on calculation routes,
+   and /v1/me never charges. Wrong and missing keys look the same. */
+function authenticateApiKey(request, response, next) {
   if (keyStore.size === 0) {
     response.status(503).json(requestError("The API has no keys configured yet.", "API_NOT_CONFIGURED"));
     return;
@@ -258,7 +265,17 @@ function requireApiKey(request, response, next) {
     return;
   }
 
-  const quota = keyStore.consume(record);
+  const quota = keyStore.peek(record);
+  response.setHeader("X-Quota-Limit", String(quota.limit));
+  response.setHeader("X-Quota-Remaining", String(quota.remaining));
+  response.setHeader("X-Quota-Reset", quota.resetAt);
+
+  request.apiKey = record;
+  next();
+}
+
+export function chargeApiQuota(keyStore, request, response) {
+  const quota = keyStore.consume(request.apiKey);
   response.setHeader("X-Quota-Limit", String(quota.limit));
   response.setHeader("X-Quota-Remaining", String(quota.remaining));
   response.setHeader("X-Quota-Reset", quota.resetAt);
@@ -266,11 +283,9 @@ function requireApiKey(request, response, next) {
   if (!quota.allowed) {
     response.setHeader("Retry-After", String(Math.max(1, Math.ceil((Date.parse(quota.resetAt) - Date.now()) / 1000))));
     response.status(429).json(requestError("Daily quota exhausted for this key.", "QUOTA_EXCEEDED"));
-    return;
+    return false;
   }
-
-  request.apiKey = record;
-  next();
+  return true;
 }
 
 // Spec is public: an integrator needs it before they have a key.
@@ -278,7 +293,7 @@ app.get("/v1/openapi.json", (_request, response) => {
   response.json(openApiSpec({ publicUrl: process.env.PUBLIC_API_URL }));
 });
 
-app.use("/v1", apiRateLimiter, createV1Router({ keyStore, requireKey: requireApiKey }));
+app.use("/v1", apiRateLimiter, createV1Router({ keyStore, authenticate: authenticateApiKey, chargeQuota: (req, res) => chargeApiQuota(keyStore, req, res) }));
 
 app.post("/api/explain", explainRateLimiter, requireSharedSecret, async (request, response) => {
   const normalized = normalizeRequest(request.body);

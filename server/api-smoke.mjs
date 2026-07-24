@@ -159,6 +159,31 @@ try {
     me.key?.name === "smoke" && typeof me.key?.fingerprint === "string"
     && !JSON.stringify(me).includes(KEY) && typeof me.quota?.remaining === "number");
 
+  const meQuotaBefore = me.quota?.used ?? 0;
+  for (let i = 0; i < 3; i++) await get("/v1/me");
+  const meQuotaAfter = (await (await get("/v1/me")).json()).quota?.used ?? 0;
+  check("/v1/me does not consume quota", meQuotaBefore === meQuotaAfter, `before ${meQuotaBefore} after ${meQuotaAfter}`);
+
+  const badQuotaBefore = (await (await get("/v1/me", SMALL)).json()).quota?.used ?? 0;
+  await get(`/v1/panchang?date=not-a-date&${DELHI}`, SMALL);
+  const badQuotaAfter = (await (await get("/v1/me", SMALL)).json()).quota?.used ?? 0;
+  check("validation failure does not consume quota", badQuotaBefore === badQuotaAfter,
+    `before ${badQuotaBefore} after ${badQuotaAfter}`);
+
+  /* ---- CORS for browser integrators ---- */
+  const preflight = await fetch(`${BASE}/v1/panchang?date=2026-07-19&${DELHI}`, {
+    method: "OPTIONS",
+    headers: {
+      Origin: "http://localhost:5173",
+      "Access-Control-Request-Method": "GET",
+      "Access-Control-Request-Headers": "x-api-key",
+    },
+  });
+  const allowMethods = preflight.headers.get("access-control-allow-methods") || "";
+  const allowHeaders = preflight.headers.get("access-control-allow-headers") || "";
+  check("v1 preflight allows GET", preflight.status === 204 && allowMethods.includes("GET"), `methods ${allowMethods}`);
+  check("v1 preflight allows x-api-key", allowHeaders.toLowerCase().includes("x-api-key"), `headers ${allowHeaders}`);
+
   /* ---- headers ---- */
   const h = await get(`/v1/panchang?date=2026-07-19&${DELHI}`);
   check("v1 sets nosniff and no-store", h.headers.get("x-content-type-options") === "nosniff" && h.headers.get("cache-control") === "no-store");
