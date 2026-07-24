@@ -130,6 +130,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
   - [ ] Complete the answer-before-data life interpretation layer so the public
         Kundli is more than a collection of technical tables; qualify uncertainty
         and keep detailed calculations available below each plain-language result.
+        _(Modules complete on draft PR #1: bilingual 27-nakshatra/12-sign data,
+        six-area builder, card and non-vacuous copy/safety gate. Still open:
+        current-main rebase, ChartScreen hookup, owner high-risk content review,
+        browser/phone QA, merge and production verification.)_
   - [ ] Downloadable Kundli PDF and general PDF reports, with bilingual rendering,
         chart legibility and print verification.
       _(P0-JYOTISH-PUBLIC-LAUNCH; owner scope 2026-07-21)_

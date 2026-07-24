@@ -146,6 +146,17 @@
       "sourceConfidence": "Not applicable — technical UI exposure; underlying calculation engines retain their own source and anchor evidence",
       "recommendedAction": "No corrective action required; retain the Jyotish exposure/translation gate and phone smoke matrix for future panel changes."
     },
+    "4": {
+      "deliveryState": "Modules complete on draft PR — public hookup pending",
+      "limitations": "The bilingual interpretation data, six-area builder, presentational card and copy/safety gate exist on draft PR #1, but ChartScreen hookup was reverted to avoid a past ownership collision. The branch now needs a current-main rebase, owner content review, integration, merge and production verification.",
+      "shortTermImpact": "Users still see the existing chart experience; the new answer-first life reading is not publicly rendered.",
+      "longTermImpact": "Until the integration and review close, Ganak's public Kundli remains more technical than the approved answer-before-data design.",
+      "bugBashStatus": "Required before this high-impact interpretation journey closes — not started because the feature is not yet wired.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-24 · Draft PR #1 modules: life-interpretation gate, canonical gates and build recorded; no production evidence",
+      "sourceConfidence": "BPHS and Phaladeepika attribution framework recorded in the feature plan; owner high-risk content review remains required",
+      "recommendedAction": "Rebase draft PR #1 onto current main, complete the ChartScreen answer-first hookup, run the owner high-risk content review, then execute full gates plus an independent EN/HI phone/desktop bug bash and production verification."
+    },
     "5": {
       "deliveryState": "Built and tested locally — not publicly delivered",
       "limitations": "Not deployed; keys are stored in an environment variable and require a restart to rotate; quotas are in memory per process and reset on restart; multiple instances would each grant a full quota; engines are bundled at startup (~1 second); no datastore, key self-service, usage dashboard, SDK or developer portal.",
