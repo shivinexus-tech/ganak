@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { T } from "../components/tokens";
 import { fmtDeg } from "../components/format";
 import { NAK_HI } from "../engine/muhurat";
@@ -571,6 +571,11 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
 
   const clearResult = () => { setResult(null); setError(null); };
   const switchMode = (m) => { if (m !== mode) { setMode(m); clearResult(); } };
+  // F1 repeat protection: after a number cast, "New question" is the only way to recast.
+  const newQuestion = () => { setNumberInput(''); setResult(null); setError(null); };
+  // F3: a cast answer is judged for one place — if the place changes, the old answer no
+  // longer applies, so clear it (changing place is the user's own action).
+  useEffect(() => { setResult(null); setError(null); }, [lat, lon, placeLabel]);
 
   const ask = () => {
     setError(null);
@@ -602,6 +607,9 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   const isNum = result && result.mode === 'number';
   const vs = v && (isNum ? NUM_VERDICT[v.verdict] : VERDICT_STYLE[v.verdict]);
   const canAsk = selected && (mode === 'time' || numberInput.trim() !== '');
+  const numberLocked = mode === 'number' && isNum;            // F1: locked after a cast
+  const nTyped = numberInput.trim() === '' ? null : Number(numberInput);
+  const numOutOfRange = nTyped !== null && (nTyped < KP_NUMBER_MIN || nTyped > KP_NUMBER_MAX); // F2: live hint
 
   return (
     <div style={{ background: TOKENS.bg, minHeight: '100%', padding: 16, color: TOKENS.ink,
@@ -658,28 +666,49 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
       {/* Number entry — only in KP number mode */}
       {mode === 'number' && (
         <div style={{ marginBottom: 10 }}>
-          <input inputMode="numeric" value={numberInput}
-            onChange={e => { setNumberInput(e.target.value.replace(/[^0-9]/g, '').slice(0, 3)); clearResult(); }}
+          <input inputMode="numeric" value={numberInput} readOnly={numberLocked}
+            onChange={e => { setNumberInput(e.target.value.replace(/[^0-9]/g, '').replace(/^0+/, '').slice(0, 3)); clearResult(); }}
             placeholder={hi ? '1 से 249 के बीच अंक' : 'a number from 1 to 249'}
             aria-label={hi ? 'KP अंक (1 से 249)' : 'KP number (1 to 249)'}
             style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%', boxSizing: 'border-box',
-              border: `1.5px solid ${TOKENS.line}`, background: TOKENS.card, color: TOKENS.ink,
+              border: `1.5px solid ${numOutOfRange ? TOKENS.sindoor : TOKENS.line}`,
+              background: numberLocked ? TOKENS.goldSoft : TOKENS.card, color: TOKENS.ink,
               fontSize: 18, textAlign: 'center', letterSpacing: '0.05em' }} />
-          <Gloss>
-            {hi
-              ? 'यह शुभ-अंक नहीं है — पहला सच्चा अंक ही मान्य है, उसे बदलें नहीं। एक समय एक ही प्रश्न।'
-              : 'This is not a lucky number — the first sincere number is the one; don’t change it. One question at a time.'}
-          </Gloss>
+          {numOutOfRange && !numberLocked && (
+            <div style={{ marginTop: 4, fontSize: 12, color: TOKENS.sindoor }}>
+              {hi ? `परम्परा 1 से ${KP_NUMBER_MAX} तक का अंक ही स्वीकारती है।` : `The tradition only takes a number from 1 to ${KP_NUMBER_MAX}.`}
+            </div>
+          )}
+          {numberLocked ? (
+            <Gloss>
+              {hi ? 'यही प्रश्न, यही अंक। नए उत्तर के लिए नीचे "नया प्रश्न" दबाएँ।'
+                  : 'Same question, same number. Tap “New question” below to ask again.'}
+            </Gloss>
+          ) : (
+            <Gloss>
+              {hi ? 'यह शुभ-अंक नहीं है — पहला सच्चा अंक ही मान्य है, उसे बदलें नहीं। एक समय एक ही प्रश्न।'
+                  : 'This is not a lucky number — the first sincere number is the one; don’t change it. One question at a time.'}
+            </Gloss>
+          )}
         </div>
       )}
 
-      <button onClick={ask} disabled={!canAsk}
-        style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
-          border: 'none', background: canAsk ? TOKENS.ink : TOKENS.line,
-          color: canAsk ? TOKENS.bg : TOKENS.muted, fontSize: 15, fontWeight: 600,
-          cursor: canAsk ? 'pointer' : 'default' }}>
-        {mode === 'number' ? (hi ? 'उत्तर देखें' : 'Cast the answer') : (hi ? 'अभी पूछें' : 'Ask now')}
-      </button>
+      {numberLocked ? (
+        <button onClick={newQuestion}
+          style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
+            border: `1.5px solid ${TOKENS.gold}`, background: TOKENS.card, color: TOKENS.ink,
+            fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
+          {hi ? 'नया प्रश्न' : 'New question'}
+        </button>
+      ) : (
+        <button onClick={ask} disabled={!canAsk || numOutOfRange}
+          style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
+            border: 'none', background: (canAsk && !numOutOfRange) ? TOKENS.ink : TOKENS.line,
+            color: (canAsk && !numOutOfRange) ? TOKENS.bg : TOKENS.muted, fontSize: 15, fontWeight: 600,
+            cursor: (canAsk && !numOutOfRange) ? 'pointer' : 'default' }}>
+          {mode === 'number' ? (hi ? 'उत्तर देखें' : 'Cast the answer') : (hi ? 'अभी पूछें' : 'Ask now')}
+        </button>
+      )}
 
       {error && (
         <div style={{ marginTop: 14, padding: 12, borderRadius: TOKENS.radius,

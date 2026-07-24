@@ -34,6 +34,16 @@ pass and the brief for Agent-2. Feature is LIVE at ganak.pages.dev → Prashna �
 **Recommendation:** fix **F1** before quality-closure (it touches the method's integrity,
 not just polish). F2/F3 are launch-polish.
 
+**FIXED 2026-07-24 (Claude Code), all below the parity-frozen markers, parity still EXACT
+198/6 + build green:**
+- **F1** → after a number cast the field is `readOnly`, its guidance changes to "same
+  question, same number," and the action button becomes **"नया प्रश्न / New question"**
+  (the only way to recast — clears number + result). No silent recasts.
+- **F2** → input strips leading zeros (`007`→`7`) and, when a complete number is out of
+  1–249, shows a live inline "1–249" hint and disables Cast (no silent coercion on cast).
+- **F3** → a `useEffect` on `[lat, lon, placeLabel]` clears a standing result when the
+  place changes, so an answer is never shown against a place it wasn't cast for.
+
 ---
 
 ## Agent-2 brief — INDEPENDENT pass required (unassigned)
