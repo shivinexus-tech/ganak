@@ -116,6 +116,8 @@ const legacyHeaderLive = makeLive(base);
 legacyHeaderLive.headerMigrations.push({
   kind: "header",
   sheetName: "P0 Before Go-Live",
+  sheetId: 123,
+  additionalColumns: 1,
   sheetIndex: 18,
   value: "Recommendation / action items",
 });

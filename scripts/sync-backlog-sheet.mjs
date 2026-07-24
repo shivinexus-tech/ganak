@@ -370,13 +370,19 @@ async function validateLiveDashboard(config) {
 async function readLiveSheet(config) {
   const metadata = await sheetsRequest(
     config,
-    "?fields=properties.title,sheets.properties(title,sheetId)",
+    "?fields=properties.title,sheets.properties(title,sheetId,gridProperties(columnCount))",
   );
   if (metadata.properties?.title !== config.spreadsheetTitle) {
     fail(`Refusing to sync spreadsheet titled “${metadata.properties?.title || "unknown"}”; expected “${config.spreadsheetTitle}”`);
   }
 
-  const liveTabs = new Set((metadata.sheets || []).map((sheet) => sheet.properties?.title));
+  const liveTabs = new Map((metadata.sheets || []).map((sheet) => [
+    sheet.properties?.title,
+    {
+      sheetId: sheet.properties?.sheetId,
+      columnCount: sheet.properties?.gridProperties?.columnCount || 0,
+    },
+  ]));
   for (const tab of config.tabs) {
     if (!liveTabs.has(tab.sheetName)) fail(`Live spreadsheet is missing tab “${tab.sheetName}”`);
   }
@@ -408,6 +414,8 @@ async function readLiveSheet(config) {
       headerMigrations.push({
         kind: "header",
         sheetName: tab.sheetName,
+        sheetId: liveTabs.get(tab.sheetName).sheetId,
+        additionalColumns: Math.max(0, SHEET_COLUMNS.length - liveTabs.get(tab.sheetName).columnCount),
         sheetIndex: SHEET_COLUMNS.length - 1,
         value: SHEET_COLUMNS.at(-1),
       });
@@ -530,6 +538,22 @@ function printBootstrapPlan(changes) {
 }
 
 async function applyChanges(changes, live, config) {
+  const columnExpansionRequests = changes
+    .filter((change) => change.kind === "header" && change.additionalColumns > 0)
+    .map((change) => ({
+      appendDimension: {
+        sheetId: change.sheetId,
+        dimension: "COLUMNS",
+        length: change.additionalColumns,
+      },
+    }));
+  if (columnExpansionRequests.length) {
+    await sheetsRequest(config, ":batchUpdate", {
+      method: "POST",
+      body: JSON.stringify({ requests: columnExpansionRequests }),
+    });
+  }
+
   const data = [];
   const nextAppendRow = new Map(
     config.tabs.map((tab) => [tab.section, Math.max(2, (live.liveBySection.get(tab.section) || []).length + 1)]),
