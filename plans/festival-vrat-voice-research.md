@@ -101,6 +101,8 @@ Cite URL + second source in task evidence when you change copy. Do not invent ri
 |-------|-------|--------|
 | P0 | karva-chauth, hartalika-teej, chhath, diwali — verdict, sankalpa, vidhi one-liners | **OPEN** — owner flagged 2026-07-24 |
 | P1 | Remaining 46 guides — sankalpa + verdict pass | OPEN |
-| P2 | Regional kathas — remove product meta; tighten Hindi where calqued | OPEN |
+| P2 | **Hindi tone pass** on regional kathas + guide fields — devotional rewrite, no calques; **do not shorten katha length** (owner 2026-07-24: length OK for now, revisit later) | OPEN |
+
+**Owner 2026-07-24:** Katha paragraph count and word count stay as-is. P2 is tone only — read aloud, fix nonsensical or essay-like Hindi; keep `devotional-guide-quality` min-length gate unchanged unless owner reopens length.
 
 Track in `plans/task-log.md` when a slice starts. One writer per file batch.
