@@ -108,7 +108,7 @@
     57
   ],
   "sourceConfidenceByItem": {
-    "1": "Drik Panchang 108-pada table plus a second published table; variant English aliases require one documented Ganak convention",
+    "1": "Drik Panchang's parallel English/Hindi 108-pada tables; all positional pairs regression-tested",
     "2": "Primary/textual and institutional sources; regional and seasonal variation labelled",
     "6": "Textual rule/source matrix and institutional calendar anchors",
     "7": "Institutional/published calendar anchors; astronomical conventions documented",
@@ -125,15 +125,15 @@
   },
   "qualityOverrides": {
     "1": {
-      "deliveryState": "Delivered with a minor bilingual naming-source limitation",
-      "limitations": "The fresh independent post-fix bug bash found no P0/P1 defect. F7 P2 remains: a few English baby-name aliases do not transparently transliterate the sourced Devanagari output after switching language.",
-      "shortTermImpact": "All calculator journeys work, but a user may see a variant English sound change to a non-obvious Devanagari equivalent when switching language.",
-      "longTermImpact": "Leaving mixed naming conventions undocumented would weaken bilingual trust and make future source updates harder to audit.",
-      "bugBashStatus": "Completed 2026-07-24 — fresh independent 60-focused-minute pass across all 12 calculators; no P0/P1 findings; F7 P2 bilingual naming-source consistency recorded.",
-      "qualityRisk": "Amber",
-      "lastVerified": "2026-07-24 · Production all-12 EN/HI adversarial matrix plus port 5199 reproduction and full validation/build gates",
-      "sourceConfidence": "Drik Panchang 108-pada table plus a second published table; variant English aliases require one documented Ganak convention",
-      "recommendedAction": "Choose and document one published naming-syllable convention; align the English aliases with each Devanagari pada, add 108-pada bilingual parity assertions, then production-check the affected results."
+      "deliveryState": "Delivered and production-verified",
+      "limitations": "None in the approved utility-calculator scope.",
+      "shortTermImpact": "All 12 approved calculator journeys are available with aligned bilingual naming sounds and visible input validation.",
+      "longTermImpact": "The exact 108-pair fixture prevents future English/Hindi alias drift while preserving the documented family-language spelling caveat.",
+      "bugBashStatus": "Completed 2026-07-24 — fresh independent 60-focused-minute all-12 pass found no P0/P1; F7 was then fixed, regression-tested and production-verified.",
+      "qualityRisk": "Green",
+      "lastVerified": "2026-07-24 · Production bundle index-C1i23ZgZ.js; corrected rows plus live EN/HI result, metadata and layout",
+      "sourceConfidence": "Drik Panchang's parallel English/Hindi 108-pada tables; all positional pairs regression-tested",
+      "recommendedAction": "No corrective action required; retain the 108-pair parity gate for future naming-table changes."
     },
     "5": {
       "deliveryState": "Built and tested locally — not publicly delivered",
