@@ -19,8 +19,9 @@ reading a chart.
 
 **In (v1, free):**
 - One summary card, rendered first in the Chart view.
-- **Five life areas**, each 3–4 lines: Nature & temperament · Mind & emotions ·
-  Strengths & talents · How you relate to others · Work leanings.
+- **Six life areas**, each 3–4 lines: Nature & temperament · Mind & emotions ·
+  Strengths & talents · How you relate to others · Work leanings · How others see
+  you.
 - Bilingual (en/hi), following the app-wide language toggle.
 - Content sourced to classical texts and written as attribution, not verdict.
 
@@ -36,25 +37,29 @@ reading a chart.
 
 The engine already produces, per chart (`ChartScreen` `r` object):
 `r.moon.nak` (0–26 Janma Nakshatra), `r.moon.sign` (0–11 Moon sign / Janma Rashi),
-`r.moon.pada`, `r.ascSign`. No new astronomy is needed.
+`r.moon.pada`, `r.ascSign` (0–11 Lagna sign). No new astronomy is needed.
 
 | Card area | Driven by | Table |
 |---|---|---|
 | Nature & temperament | Janma Nakshatra (27) | `NAKSHATRA_TRAITS[nak].nature` |
 | Strengths & talents | Janma Nakshatra (27) | `NAKSHATRA_TRAITS[nak].strengths` |
-| Mind & emotions | Moon sign (12) | `RASHI_TRAITS[sign].mind` |
-| How you relate | Moon sign (12) | `RASHI_TRAITS[sign].relating` |
-| Work leanings | Moon sign (12) | `RASHI_TRAITS[sign].work` |
+| Mind & emotions | Moon sign (12) | `SIGN_TRAITS[moon.sign].mind` |
+| How you relate | Moon sign (12) | `SIGN_TRAITS[moon.sign].relating` |
+| Work leanings | Moon sign (12) | `SIGN_TRAITS[moon.sign].work` |
+| How others see you | Lagna sign (12) | `SIGN_TRAITS[ascSign].outward` |
 
-These five are exactly what classical texts describe per nakshatra/sign, which is
-why the reading can be honest. Career *timing*, wealth *amounts*, marriage
-*prediction* and health are **not** derivable from Moon nakshatra + sign alone and
-are deliberately absent.
+These six are exactly what classical texts describe per nakshatra/sign/lagna, which
+is why the reading can be honest. Career *timing*, wealth *amounts*, marriage
+*prediction* and health are **not** derivable from these points alone and are
+deliberately absent.
 
-**Consequence to confirm:** the current bottom reading also shows a Lagna-driven
-"outer temperament" line (`SIGN_NOTE[r.ascSign]`). The chosen five-area set is
-Moon-only, so the Lagna line is **dropped** in v1. If the owner wants an
-"outward self" area, it becomes a sixth area or a swap — flagged, not assumed.
+**Moon vs Lagna are distinct content.** `SIGN_TRAITS` is one 12-entry table keyed
+by sign index, but a sign as the **Moon** (inner: mind/relating/work) and the same
+sign as the **Lagna** (outer: how one is met and perceived) get *different* copy —
+`outward` is authored separately and read at `ascSign`, while `mind`/`relating`/
+`work` are read at `moon.sign`. So Aries-rising and Aries-Moon never show the same
+line. This restores the Lagna "outer temperament" dimension the old reading
+carried (`SIGN_NOTE[r.ascSign]`), now written properly.
 
 ## 4. Content model
 
@@ -66,10 +71,10 @@ type Sourced<T> = T & { source: string; status: "sourced" | "owner-verified" };
 
 // 27 entries, indexed by Janma Nakshatra
 NAKSHATRA_TRAITS: Sourced<{ nature: Bilingual; strengths: Bilingual }>[]
-// 12 entries, indexed by Moon sign
-RASHI_TRAITS:     Sourced<{ mind: Bilingual; relating: Bilingual; work: Bilingual }>[]
+// 12 entries, indexed by sign; mind/relating/work read at moon.sign, outward at ascSign
+SIGN_TRAITS: Sourced<{ mind: Bilingual; relating: Bilingual; work: Bilingual; outward: Bilingual }>[]
 
-buildLifeReading({ nak, sign }): { areaKey; label: Bilingual; text: Bilingual; source; status }[]
+buildLifeReading({ nak, moonSign, ascSign }): { areaKey; label: Bilingual; text: Bilingual; source; status }[]
 ```
 
 - **Voice (B):** every string is attribution — "Classical texts associate
@@ -81,14 +86,16 @@ buildLifeReading({ nak, sign }): { areaKey; label: Bilingual; text: Bilingual; s
   ones to `"owner-verified"`. The field is internal (not shown to users) and lets
   us track review progress in the data itself.
 
-**Volume:** 27×2 + 12×3 = **90 fields** × 2 languages = 180 strings, 39 citations.
+**Volume:** 27×2 + 12×4 = **102 fields** × 2 languages = 204 strings, 39 citations.
 
 **Owner review burden (C):** only the higher-risk fields need human eyes — the
-`relating` and `work` fields, which are sign-level: **12 signs × 2 fields**. That
-is a single sitting, not all 180 strings. The 27 nakshatra `nature`/`strengths`
-and 12 sign `mind` fields ride on sourcing + the safety gate. Hindi is authored
-**Hindi-first for the high-risk fields**: when a line resists natural Hindi it is
-usually an English-astrology framing, not a Hindu one — free cultural signal.
+sign-level `relating`, `work` and `outward` fields: **12 signs × 3 fields**. That
+is a single sitting, not all 204 strings. `outward` is in the review set because
+appearance/manner copy can stray into looks-based judgement (see the safety
+register, §7.2). The 27 nakshatra `nature`/`strengths` and 12 sign `mind` fields
+ride on sourcing + the safety gate. Hindi is authored **Hindi-first for the
+high-risk fields**: when a line resists natural Hindi it is usually an
+English-astrology framing, not a Hindu one — free cultural signal.
 
 ## 5. UI
 
@@ -96,7 +103,7 @@ New presentational component **`src/components/LifeInterpretationCard.tsx`**:
 - Props: `{ reading, lang, C }` — `reading` is `buildLifeReading(...)` output. No
   chart logic in the component.
 - Renders the app's summary-card pattern: bilingual section head (`फलादेश` /
-  "YOUR READING"), then five labelled areas, each 3–4 lines.
+  "YOUR READING"), then six labelled areas, each 3–4 lines.
 - Closes with the existing humility note ("Offered in the spirit of the
   tradition… not a substitute for a qualified jyotishi's reading").
 - Design tokens/colours from the shared system; theme- and language-aware.
@@ -112,7 +119,8 @@ In **`src/screens/ChartScreen.tsx`** (birth-chart page; no shell edit needed):
    orphaned references (project no-orphans rule; parse-check enforces).
 
 The richer bilingual/sourced `NAKSHATRA_TRAITS.nature` supersedes the English-only
-`NAK_NOTE`; `RASHI_TRAITS.mind` supersedes `SIGN_NOTE`'s Moon usage.
+`NAK_NOTE`; `SIGN_TRAITS.outward` supersedes `SIGN_NOTE`'s Lagna usage (the old
+reading only ever read `SIGN_NOTE` at `ascSign`).
 
 ## 7. Validation
 
@@ -128,7 +136,9 @@ New gate **`validation/life-interpretation-copy.cjs`** — two checks:
    - death / lifespan / longevity,
    - guaranteed wealth or financial outcomes,
    - marriage/divorce prediction, fatalistic relationship claims,
-   - fear/pressure ("misfortune unless…", "must remedy or…").
+   - fear/pressure ("misfortune unless…", "must remedy or…"),
+   - looks-based judgement / body-shaming (relevant to the `outward` field —
+     no claims about skin, weight, beauty as worth).
 
    Patterns are maintained in the gate with rationale comments. This catches the
    dangerous *registers* automation can recognise; it cannot judge whether prose
@@ -149,8 +159,9 @@ correctness is also checked deterministically via a node harness calling
 - **A — Sourced:** every entry cites a classical text; the completeness gate
   enforces a citation exists. Owner checks entries against sources, not from memory.
 - **B — Attribution:** copy attributes to the tradition; no second-person verdicts.
-- **C — Triage + widen:** only the 12×2 high-risk sign fields need owner eyes; the
-  beta cohort + existing feedback button are the ongoing second reader.
+- **C — Triage + widen:** only the 12×3 high-risk sign fields (relating, work,
+  outward) need owner eyes; the beta cohort + existing feedback button are the
+  ongoing second reader.
 - **D — Labelled + correctable:** internal `status` per entry; content is data, so
   a fix is a one-line edit, not a code change.
 
@@ -166,6 +177,7 @@ correctness is also checked deterministically via a node harness calling
 ## 10. Open items for owner
 
 1. **Sources** — default to *BPHS* + *Phaladeepika*, or name preferred texts?
-2. **Lagna line** — accept dropping the "outer temperament" (Lagna) dimension in
-   v1's Moon-only set, or keep it as a sixth area?
-3. **Safety-register list (§7.2)** — any categories to add or soften?
+2. **Safety-register list (§7.2)** — any categories to add or soften?
+
+*(Resolved 2026-07-23: Lagna is kept as the sixth area, "How others see you",
+driven by `ascSign`.)*
