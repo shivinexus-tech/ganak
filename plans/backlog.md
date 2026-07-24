@@ -463,6 +463,14 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       **Scope grew 2026-07-20** (owner shipped ruling planets + Moon-sincerity in v1):
       must now also anchor the ruling-planet rules (which five, ranking, timing use)
       and the sincerity doctrine — the areas where popular KP sites vary most.
+      **First-pass citation index 2026-07-24: `plans/prashna-249-ksk-verify.md`.**
+      Confirmed **Reader VI — *Horary Astrology*** is the primary text (correcting a
+      secondary-source Reader III mis-attribution). 4/8 core rules primary-text verified
+      (number→lagna, ruling planets, significators, repeat/sincerity); 4/8 remain
+      web-corroborated pending **Reader II** page-pin (the 249 Vimshottari basis and the
+      cuspal-sub-lord-as-final-judge thesis, the 12th-from negation) — whose-place stays
+      a Ganak self-service adaptation, not KSK doctrine. Book-strict closure still needs
+      an owned-copy page-pin + the KP-ayanamsa constant (KP-Old vs KP-New).
       _(P0-PRASHNA-249-KSK-VERIFY)_
 - [x] **P1 — Prashna ordinal bug.** English house labels now use proper ordinals
       (`1st`, `2nd`, `3rd`, `4th`, including `11th`/`12th`) in all three verdict
