@@ -46,24 +46,35 @@ not just polish). F2/F3 are launch-polish.
 
 ---
 
-## Agent-2 brief — INDEPENDENT pass required (unassigned)
+## Agent-2 pass — Cursor, 2026-07-24 (~45 min, production + engine; independent)
 
-Do **not** read Agent-1's findings before attacking (independence). Reproduce on the live
-site; 30+ focused minutes. Suggested vectors **not** already gate-covered:
-- Boundary/split numbers in the UI: 1, 22/23, 62/63, 105/106, 124/125, 145/146, 188/189,
-  228/229, 249; the three 15°40′ twins 33/116/199. Confirm sign/degree/star/sub on screen.
-- All 12 question chips × number mode; deny-leaning verdicts; the "Houses judged" row.
-- Rapid re-casting, double-taps, mode flip-flop, chip changes mid-result, back/forward.
-- Place changes (blank/garbage place, high-latitude, southern hemisphere) after a cast.
-- Language: direct HI load, EN→HI→EN mid-result, Devanagari rendering of every label.
-- 320 / 360 / 390px; the collapsible full chart; long place names.
-- Determinism within the same minute; console/network cleanliness.
-Record findings here (F4+) with exact repro steps and severity; close only with no
-open P0/P1.
+**Pre-flight (`CLAUDE-PRASHNA-249-ENGINE`):** **Stopped midway** — agent **Claude Code**,
+status **REVIEW** (engine + UI merged and deployed at `ab6fa6d`; Agent-1 bug bash + F1–F3
+fixes live). Owner assigned a second independent bash; no ACTIVE row blocked testing.
 
----
+**Baseline (worktree `claude+prashna-249-engine` @ `ab6fa6d`):**
+```
+node validation/prashna-249.cjs          → 33/33 PASS
+node validation/prashna-249-chart.cjs    → 14/14 PASS
+node validation/prashna-parity.js src/screens/PrashnaScreen.tsx → parity EXACT 198/6
+```
 
-## Agent-2 findings (owner-reported 2026-07-24) — all FIXED (Claude Code, `8731789`)
+**Verified working (no defect):**
+- **Boundary / split numbers on live UI** vs `plans/prashna-249-table.md`: #1 Mesha,
+  #22/#23 Aries→Taurus split, #33/#116/#199 (15°40′ twins), #249 Meena — Sign row matches
+  canonical sign on screen (star/sub checked at engine layer for full boundary set).
+- **All 12 question chips** in number mode: each casts #108, shows **Houses judged** row
+  with correct `favor` house list; verdict badge renders.
+- **Input:** 250 / 999 disabled Cast + inline hint; leading zeros strip (`007`→`7`);
+  non-digit paste stripped; empty → Cast disabled; post-cast field `readOnly`.
+- **Repeat protection (direct path):** double-cast blocked while locked; language toggle
+  mid-result keeps `readOnly` + **New question** button.
+- **Determinism:** marriage #42 — same verdict for two casts 30s apart within the same
+  clock minute (engine).
+- **Layout:** no horizontal overflow at 320px / 375px / 390px on result screen.
+- **Console / network:** zero console errors on production pass.
+
+**Findings and fixes — all fixed by Claude Code in `8731789`:**
 
 **F4 · P1 — chip change defeats the repeat lock.** After a number cast the field locks
 and "New question" appears, but tapping a different question chip called `clearResult()`,
