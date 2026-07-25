@@ -158,15 +158,15 @@
       "recommendedAction": "Complete the 12-sign owner checklist, mark approved sign entries owner-verified, run the independent EN/HI phone/desktop bug bash, then release and verify production."
     },
     "5": {
-      "deliveryState": "Built and tested locally — not publicly delivered",
-      "limitations": "Not deployed; keys are stored in an environment variable and require a restart to rotate; quotas are in memory per process and reset on restart; multiple instances would each grant a full quota; engines are bundled at startup (~1 second); no datastore, key self-service, usage dashboard, SDK or developer portal.",
-      "shortTermImpact": "External developers cannot use the API yet. Local and single-instance testing works, but key rotation is manual and there is no production URL or production monitoring.",
+      "deliveryState": "Built, adversarially tested and fix-merged locally — not publicly delivered",
+      "limitations": "Not deployed; no production API keys or public base URL; quotas and rate limits are in memory per process and reset on restart; multiple instances would each grant a full quota; keys are stored in an environment variable and require a restart to rotate; engines are bundled at startup (~1 second); no datastore, key self-service, usage dashboard, SDK or developer portal.",
+      "shortTermImpact": "External developers cannot use the API yet. Local and single-instance testing works, and the bug-bash P1 quota/CORS defects are fixed on main, but there is no production URL, production monitoring or live smoke evidence.",
       "longTermImpact": "Public scale would make quota enforcement unreliable across instances and restarts, increase manual key-management work and weaken abuse/capacity visibility until shared storage, deployment and monitoring are added.",
-      "bugBashStatus": "Required for this high-impact public platform — not completed. An uncommitted adversarial test exists, but there is no independent completed bug-bash record or production test evidence yet.",
-      "qualityRisk": "Red",
-      "lastVerified": "2026-07-22 · Local HTTP smoke only; not production-verified",
+      "bugBashStatus": "Required high-impact bug bash completed 2026-07-24. Findings F1–F4 covered quota accounting and browser CORS; merge c271dc9 fixed /v1/me quota, validation-failure quota and x-api-key preflight. Local regression: smoke 15/15, smoke:api 48/48, adversarial/parity harnesses recorded in plans/dev-api-bug-bash.md.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-24 · Local server smoke after c271dc9: npm run smoke 15/15; npm run smoke:api 48/48; not production-verified",
       "sourceConfidence": "Not applicable — technical API; calculation engines retain their own source/anchor evidence",
-      "recommendedAction": "Deploy the API behind production authentication; replace per-process quota state with shared durable storage; add key lifecycle/self-service and usage monitoring; then run contract, abuse, quota and production smoke tests."
+      "recommendedAction": "Choose backend hosting, set production API_KEYS and origins, deploy the API, run live contract/abuse/quota smoke against the production base URL, then plan shared durable quota/key storage before multi-instance scale."
     },
     "12": {
       "deliveryState": "Core overlay delivered; UI placement decision open",

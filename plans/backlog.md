@@ -287,7 +287,9 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
   - [ ] Editorial astrology/news publishing area with authorship, dates, corrections,
         sources, topic/archive routes and a standard that prevents thin SEO pages.
   - [ ] A documented, rate-limited public developer API with versioning, keys,
-        quotas, abuse controls, privacy terms and stable error contracts.
+        quotas, abuse controls, privacy terms and stable error contracts. Local
+        implementation and the 2026-07-24 adversarial bug-bash fixes are merged;
+        production hosting, API keys and live smoke remain before closure.
   - [ ] Push notifications, including permission education, granular opt-in,
         timezone/location correctness and an easy unsubscribe path.
   - [ ] Privacy-friendly analytics plus an in-product feedback channel; update the
