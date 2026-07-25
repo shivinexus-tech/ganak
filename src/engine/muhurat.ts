@@ -17,6 +17,11 @@ const NAK_HI = ['अश्विनी','भरणी','कृत्तिका
    AI only parses the request into {event, range}; all timing math is computed here. */
 const NAK_GOOD = {
   purchase:     [0, 3, 4, 7, 12, 13, 14, 16, 21, 22, 23, 26],
+  engagement:   [3, 4, 9, 11, 12, 14, 16, 18, 20, 25, 26],
+  bhoomi:       [3, 4, 7, 11, 13, 16, 20, 22, 23, 25, 26],
+  construction: [3, 4, 7, 11, 13, 16, 20, 22, 23, 25, 26],
+  business:     [0, 6, 7, 11, 12, 13, 14, 16, 20, 21, 22, 26],
+  document:     [3, 4, 6, 7, 11, 12, 13, 16, 20, 21, 22, 25, 26],
   venture:      [0, 3, 7, 12, 13, 14, 16, 21, 22, 26],
   puja:         [3, 6, 7, 11, 12, 16, 20, 21, 25, 26],
   travel:       [0, 4, 6, 7, 12, 16, 21, 22, 26],
@@ -81,9 +86,14 @@ const WEEKDAY_FAV = {
   general:  { 0: 0, 1: 1, 2: -1, 3: 1, 4: 1, 5: 1, 6: -1 },
   purchase: { 0: 1, 1: 1, 2: -1, 3: 0, 4: 2, 5: 1, 6: -1 },
   wedding:  { 0: 0, 1: 1, 2: -1, 3: 1, 4: 2, 5: 1, 6: -1 },
+  engagement:{ 0: -1, 1: 1, 2: -1, 3: 1, 4: 2, 5: 1, 6: 0 },
   travel:   { 0: 0, 1: 1, 2: -1, 3: 1, 4: 1, 5: 1, 6: -1 },
+  document: { 0: 0, 1: 0, 2: -1, 3: 2, 4: 2, 5: 1, 6: -1 },
   puja:     { 0: 1, 1: 1, 2: 0, 3: 1, 4: 2, 5: 1, 6: 0 },
   housewarming: { 0: 0, 1: 1, 2: -1, 3: 1, 4: 1, 5: 1, 6: -1 },
+  bhoomi:   { 0: 0, 1: 1, 2: -1, 3: 1, 4: 2, 5: 1, 6: -1 },
+  construction: { 0: 0, 1: 1, 2: -1, 3: 1, 4: 2, 5: 1, 6: -1 },
+  business: { 0: 1, 1: 1, 2: -1, 3: 2, 4: 2, 5: 1, 6: -1 },
   venture:  { 0: 1, 1: 1, 2: -1, 3: 1, 4: 1, 5: 1, 6: -1 },
   vehicle:  { 0: 1, 1: 1, 2: -1, 3: 1, 4: 2, 5: 1, 6: -1 },
   property: { 0: 0, 1: 1, 2: -1, 3: 1, 4: 2, 5: 2, 6: -1 },
@@ -135,6 +145,8 @@ function muhuratForDate(place, ayanamsa, y, m, day) {
 function dayScore(info, category) {
   const f = []; let s = 0;
   const nakHi = NAK_HI[info.nak] || info.nakName;
+  const rule = MUHURTA_RULES[category] || null;
+  const categoryAuspNak = rule?.auspNak || AUSP_NAK;
   // tithi
   if (info.tithiNum === 15 && !info.krishna) { s += 2; f.push({ en: "Purnima", hi: "पूर्णिमा", g: true }); }
   else if (info.tn === 29) { s -= 3; f.push({ en: "Amavasya", hi: "अमावस्या", g: false }); }
@@ -142,9 +154,9 @@ function dayScore(info, category) {
   else { s += 1; }
   // nakshatra
   if (info.nak === 7) {
-    if (category === "wedding") { f.push({ en: "Pushya (not used for weddings)", hi: "पुष्य (विवाह हेतु वर्जित)", g: false }); }
+    if (!categoryAuspNak.has(7)) { f.push({ en: "Pushya (not used for this activity)", hi: "पुष्य (इस कार्य हेतु वर्जित)", g: false }); }
     else { s += 3; f.push({ en: "Pushya nakshatra", hi: "पुष्य नक्षत्र", g: true }); }
-  } else if (AUSP_NAK.has(info.nak)) { s += 2; f.push({ en: info.nakName + " nakshatra", hi: nakHi + " नक्षत्र", g: true }); }
+  } else if (categoryAuspNak.has(info.nak)) { s += 2; f.push({ en: info.nakName + " nakshatra", hi: nakHi + " नक्षत्र", g: true }); }
   else if (INAUSP_NAK.has(info.nak)) { s -= 2; f.push({ en: info.nakName + " (avoid)", hi: nakHi + " (टालें)", g: false }); }
   // weekday
   const wd = (WEEKDAY_FAV[category] || WEEKDAY_FAV.general)[info.dow] ?? 0;
@@ -268,6 +280,13 @@ function vaishnavaEkadashiDay(place, ayanamsa, ms) {
 const GP_AUSP_NAK = new Set([3, 4, 7, 11, 12, 13, 14, 16, 20, 22, 23, 25, 26]);
 const GP_GOOD_TITHI = new Set([2, 3, 5, 7, 10, 11, 12, 13]);
 const CHATURMAS_MONTHS = new Set([3, 4, 5, 6]);
+const VIVAH_NAK = new Set([3, 4, 9, 11, 12, 14, 16, 18, 20, 25, 26]);
+const BHOOMI_NAK = new Set([3, 4, 7, 11, 13, 16, 20, 22, 23, 25, 26]);
+const BUSINESS_NAK = new Set([0, 6, 7, 11, 12, 13, 14, 16, 20, 21, 22, 26]);
+const DOCUMENT_NAK = new Set([3, 4, 6, 7, 11, 12, 13, 16, 20, 21, 22, 25, 26]);
+const GROWTH_TITHI = new Set([1, 2, 3, 5, 7, 10, 11, 13, 15]);
+const BHOOMI_TITHI = new Set([1, 2, 3, 5, 6, 7, 10, 11, 12, 13, 15]);
+const TRAVEL_TITHI = new Set([2, 3, 5, 7, 10, 11, 13]);
 /* Shuddhi rule sets per activity. Nakshatra/tithi/weekday sets follow the classical
    muhurta canon as published by Drik Panchang's shubh-dates lists (2026 Delhi lists used
    as validation anchors — see validation/muhurat-anchors.cjs). Wedding additionally blocks
@@ -276,12 +295,18 @@ const CHATURMAS_MONTHS = new Set([3, 4, 5, 6]);
 const MUHURTA_RULES = {
   housewarming: { forbiddenMonths: new Set([3, 4, 5, 6, 9]), auspNak: GP_AUSP_NAK, goodTithi: GP_GOOD_TITHI, forbidWeekday: new Set([2]),
     monthsLabel: { en: "Magha, Phalguna, Vaishakha, Jyeshtha, Kartika, Margashirsha — never during Chaturmas (monsoon) or Pausha", hi: "माघ, फाल्गुन, वैशाख, ज्येष्ठ, कार्तिक, मार्गशीर्ष — चातुर्मास व पौष में कभी नहीं" } },
-  wedding: { auspNak: new Set([3, 4, 9, 11, 12, 14, 16, 18, 20, 25, 26]), noAmavasya: true, kharmas: true, devshayana: true, asta: true,
+  wedding: { auspNak: VIVAH_NAK, noAmavasya: true, kharmas: true, devshayana: true, asta: true,
     monthsLabel: { en: "Blocked during Devshayana (roughly mid-July to late November), Kharmas (mid-December to mid-January, mid-March to mid-April) and while Venus or Jupiter is combust", hi: "देवशयन काल, खरमास तथा शुक्र/गुरु अस्त में विवाह वर्जित" } },
+  engagement: { auspNak: VIVAH_NAK, goodTithi: new Set([2, 3, 5, 7, 10, 11, 12, 13, 15]), noAmavasya: true, kharmas: true, devshayana: true, asta: true, forbidWeekday: new Set([0, 2]),
+    monthsLabel: { en: "Engagement follows a Vivah-like screen: clean tithi, marriage nakshatra, no Sunday/Tuesday, and no Devshayana, Kharmas or Tara Asta", hi: "सगाई में विवाह-जैसी छँटाई: शुद्ध तिथि, विवाह नक्षत्र, रविवार/मंगलवार नहीं, तथा देवशयन, खरमास या तारा-अस्त नहीं" } },
   vehicle: { auspNak: new Set([0, 3, 4, 6, 7, 12, 13, 14, 16, 21, 22, 23, 26]), goodTithi: new Set([1, 2, 3, 5, 6, 7, 8, 10, 11, 12, 13, 15]), noAmavasya: true, forbidWeekday: new Set([2, 6]),
     monthsLabel: { en: "Any month — needs an auspicious nakshatra, a clean tithi, and not Tuesday or Saturday", hi: "कोई भी मास — शुभ नक्षत्र, शुद्ध तिथि; मंगलवार व शनिवार वर्जित" } },
   property: { auspNak: new Set([4, 6, 8, 9, 10, 15, 16, 18, 19, 24, 25, 26]), allowWeekday: new Set([4, 5]),
     monthsLabel: { en: "Any month — Thursdays and Fridays only, on the fixed set of registration nakshatras", hi: "कोई भी मास — केवल गुरुवार व शुक्रवार, निर्धारित नक्षत्रों में" } },
+  bhoomi: { auspNak: BHOOMI_NAK, goodTithi: BHOOMI_TITHI, noAmavasya: true, allowWeekday: new Set([1, 3, 4, 5]),
+    monthsLabel: { en: "Bhoomi Puja/Shilanyas uses stable construction nakshatras, a clean tithi, and Monday, Wednesday, Thursday or Friday; Adhik month and Shraddha days are avoided", hi: "भूमि पूजन/शिलान्यास में स्थिर निर्माण नक्षत्र, शुद्ध तिथि और सोम, बुध, गुरु या शुक्रवार; अधिक मास व श्राद्ध दिन वर्जित" } },
+  construction: { auspNak: BHOOMI_NAK, goodTithi: new Set([2, 3, 5, 7, 10, 11, 12, 13]), noAmavasya: true, allowWeekday: new Set([1, 3, 4, 5]), forbidWeekday: new Set([2, 6]),
+    monthsLabel: { en: "Construction start keeps the Bhoomi Puja nakshatra set but is stricter about work-start tithis and avoids Tuesday/Saturday", hi: "निर्माण आरम्भ में भूमि-पूजन नक्षत्र ही रहते हैं, पर कार्यारम्भ तिथियाँ सख्त हैं और मंगलवार/शनिवार वर्जित" } },
   mundan: { forbiddenMonths: new Set([4, 5, 6, 9]), auspNak: new Set([0, 4, 6, 7, 12, 13, 14, 17, 21, 22, 23, 26]), goodTithi: new Set([2, 3, 5, 7, 10, 11, 13]), allowWeekday: new Set([1, 3, 4, 5]),
     monthsLabel: { en: "Traditionally Chaitra to Ashadha and the winter months — not during Chaturmas or Pausha; Monday, Wednesday, Thursday, Friday", hi: "चैत्र से आषाढ़ व शीत मास — चातुर्मास व पौष वर्जित; सोम, बुध, गुरु, शुक्रवार" } },
   naming: { auspNak: new Set([0, 3, 4, 6, 7, 11, 12, 13, 14, 16, 20, 21, 22, 23, 25, 26]), goodTithi: new Set([1, 2, 3, 5, 7, 10, 11, 12, 13]), noAmavasya: true, allowWeekday: new Set([1, 3, 4, 5]),
@@ -292,8 +317,14 @@ const MUHURTA_RULES = {
     monthsLabel: { en: "Sunday, Wednesday, Thursday or Friday with a clean learning-oriented tithi and nakshatra. Vijayadashami remains a distinct regional exception.", hi: "रवि, बुध, गुरु या शुक्रवार तथा विद्या के अनुकूल शुद्ध तिथि-नक्षत्र। विजयादशमी की क्षेत्रीय परम्परा अलग अपवाद है।" } },
   upanayana: { forbiddenMonths: new Set([4, 5, 6, 9]), auspNak: new Set([3, 4, 6, 7, 11, 12, 13, 14, 16, 20, 21, 22, 23, 25, 26]), goodTithi: new Set([2, 3, 5, 7, 10, 11, 12, 13]), noAmavasya: true, allowWeekday: new Set([1, 3, 4, 5]),
     monthsLabel: { en: "Traditionally performed outside Chaturmas and Pausha, on Monday, Wednesday, Thursday or Friday. Age, Vedic branch and family custom need an acharya's confirmation.", hi: "परम्परागत रूप से चातुर्मास और पौष के बाहर, सोम, बुध, गुरु या शुक्रवार। आयु, वेद-शाखा और कुलाचार की पुष्टि आचार्य से करें।" } },
-  venture: { auspNak: new Set([0, 3, 4, 6, 7, 11, 12, 13, 14, 16, 20, 21, 22, 23, 25, 26]), goodTithi: new Set([1, 2, 3, 5, 7, 10, 11, 13, 15]), noAmavasya: true, forbidWeekday: new Set([2]),
-    monthsLabel: { en: "Any month — an auspicious nakshatra and growing tithi; Tuesday avoided", hi: "कोई भी मास — शुभ नक्षत्र व वृद्धि तिथि; मंगलवार वर्जित" } },
+  business: { auspNak: BUSINESS_NAK, goodTithi: GROWTH_TITHI, noAmavasya: true, allowWeekday: new Set([1, 3, 4, 5]),
+    monthsLabel: { en: "Business opening uses prosperous nakshatras, growth tithis and Monday, Wednesday, Thursday or Friday; Diwali bookkeeping remains a separate festival exception", hi: "व्यापार आरम्भ में लाभदायक नक्षत्र, वृद्धि तिथियाँ और सोम, बुध, गुरु या शुक्रवार; दीपावली बही-खाता अलग पर्व अपवाद है" } },
+  venture: { auspNak: BUSINESS_NAK, goodTithi: GROWTH_TITHI, noAmavasya: true, allowWeekday: new Set([1, 3, 4, 5]),
+    monthsLabel: { en: "Any month — an auspicious business nakshatra, growing tithi and Monday, Wednesday, Thursday or Friday", hi: "कोई भी मास — व्यापार हेतु शुभ नक्षत्र, वृद्धि तिथि और सोम, बुध, गुरु या शुक्रवार" } },
+  travel: { auspNak: new Set([0, 4, 6, 7, 12, 16, 21, 22, 26]), goodTithi: TRAVEL_TITHI, noAmavasya: true, forbidWeekday: new Set([2, 6]),
+    monthsLabel: { en: "Travel starts prefer movable/supportive nakshatras, clean tithis and Char/Shubh/Amrit/Labh periods; Tuesday and Saturday are avoided when the trip is flexible", hi: "यात्रा आरम्भ में चल/सहायक नक्षत्र, शुद्ध तिथि और चर/शुभ/अमृत/लाभ काल; यात्रा लचीली हो तो मंगलवार और शनिवार टालें" } },
+  document: { auspNak: DOCUMENT_NAK, goodTithi: new Set([2, 3, 5, 7, 10, 11, 13, 15]), noAmavasya: true, allowWeekday: new Set([3, 4, 5]),
+    monthsLabel: { en: "Document signing and registration prefer Mercury/Jupiter days — Wednesday, Thursday or Friday — with clear tithi, stable/supportive nakshatra and no Rahu/Gulika/Yama window", hi: "दस्तावेज़ हस्ताक्षर/पंजीकरण में बुध-गुरु प्रधान दिन — बुध, गुरु या शुक्रवार — शुद्ध तिथि, स्थिर/सहायक नक्षत्र और राहु/गुलिक/यम रहित समय" } },
 };
 
 function muhuratShuddhi(info, category) {
@@ -361,6 +392,36 @@ function samskaraWindows(place, ayanamsa, info, category) {
   }
   return out;
 }
+
+const ACTIVITY_CHOGHADIYA = {
+  travel: new Set(["char", "labh", "amrit", "shubh"]),
+  business: new Set(["labh", "amrit", "shubh"]),
+  venture: new Set(["labh", "amrit", "shubh"]),
+  document: new Set(["labh", "amrit", "shubh"]),
+  property: new Set(["labh", "amrit", "shubh"]),
+  vehicle: new Set(["labh", "amrit", "shubh"]),
+  purchase: new Set(["labh", "amrit", "shubh"]),
+};
+const PANCHAKA_WINDOW_CATEGORIES = new Set(["wedding", "engagement", "housewarming", "bhoomi", "construction", "puja"]);
+function overlaps(a, b) { return a && b && a.start < b.end && b.start < a.end; }
+function cleanChoghadiyaWindows(info, category) {
+  const keys = ACTIVITY_CHOGHADIYA[category] || new Set(["amrit", "shubh", "labh"]);
+  const avoid = [info.rahu, info.gulika, info.yama].filter(Boolean);
+  return (info.choghaDay || [])
+    .filter((c) => keys.has(c.key) && !avoid.some((w) => overlaps(c, w)))
+    .map((c) => ({ start: c.start, end: c.end, kind: "choghadiya", key: c.key }));
+}
+function activityWindows(place, ayanamsa, info, category) {
+  if (SAMSKARA_CATEGORIES.has(category)) return samskaraWindows(place, ayanamsa, info, category).map((w) => ({ ...w, kind: "samskara-lagna" }));
+  if (PANCHAKA_WINDOW_CATEGORIES.has(category)) {
+    const p = computeLagnaPanchaka(place, ayanamsa, info.rise);
+    const clean = (p.panchakaWindows || [])
+      .filter((w) => w.shubha && w.end > info.rise && w.start < info.rise + 86400000)
+      .map((w) => ({ start: Math.max(w.start, info.rise), end: Math.min(w.end, info.rise + 86400000), kind: "panchaka-rahita", type: w.type }));
+    return clean.length ? clean : cleanChoghadiyaWindows(info, category);
+  }
+  return cleanChoghadiyaWindows(info, category);
+}
 /* scan an arbitrary from→to day range (inclusive), capped at 400 days */
 function muhuratScanRange(place, ayanamsa, fromYmd, toYmd, category) {
   const out = [];
@@ -372,10 +433,10 @@ function muhuratScanRange(place, ayanamsa, fromYmd, toYmd, category) {
     if (!info) continue;
     const sc = dayScore(info, category);
     const sh = muhuratShuddhi(info, category);
-    const windows=sh.valid && SAMSKARA_CATEGORIES.has(category) ? samskaraWindows(place,ayanamsa,info,category) : [];
-    const noWindow=sh.valid && SAMSKARA_CATEGORIES.has(category) && windows.length===0;
-    const blockers=noWindow ? [...sh.blockers,{en:"no ceremony-specific lagna/chart window",hi:"संस्कार के अनुकूल लग्न/कुण्डली काल नहीं"}] : sh.blockers;
-    out.push({ ...info, ...sc, valid: sh.valid&&!noWindow, blockers, samskaraWindows:windows });
+    const windows=sh.valid ? activityWindows(place,ayanamsa,info,category) : [];
+    const noWindow=sh.valid && windows.length===0;
+    const blockers=noWindow ? [...sh.blockers,{en:"no activity-specific clean window",hi:"कार्य के अनुकूल शुद्ध समय नहीं"}] : sh.blockers;
+    out.push({ ...info, ...sc, valid: sh.valid&&!noWindow, blockers, samskaraWindows:SAMSKARA_CATEGORIES.has(category)?windows:[], activityWindows:windows });
   }
   out.sort((a, b) => b.score - a.score || a.rise - b.rise);
   return out;
@@ -384,5 +445,5 @@ function muhuratScanRange(place, ayanamsa, fromYmd, toYmd, category) {
 export {
   NAK_HI, NAK_GOOD, tithiScore, dayMuhurat, findMuhurat,
   muhuratForDate, dayScore, vaishnavaEkadashi, vratDetail,
-  vaishnavaEkadashiDay, MUHURTA_RULES, muhuratShuddhi, samskaraWindows, muhuratScanRange,
+  vaishnavaEkadashiDay, MUHURTA_RULES, muhuratShuddhi, samskaraWindows, activityWindows, muhuratScanRange,
 };

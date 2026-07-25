@@ -21,7 +21,7 @@ import { computeLagnaPanchaka, panchakaRem, PANCHAKA_TYPE } from "../engine/panc
 import { obsKind } from "../engine/festivals";
 import { vaishnavaEkadashiDay } from "../engine/muhurat";
 import { VIM_LORDS } from "../engine/dasha";
-import { MUH_CATS, EVENTS, SAMSKARA_GUIDANCE, SAMSKARA_INPUTS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS } from "../data/muhurat-ui";
+import { MUH_CATS, EVENTS, MUHURAT_GUIDANCE, SAMSKARA_INPUTS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS } from "../data/muhurat-ui";
 import DailyWindowsCard from "../components/DailyWindowsCard";
 import SeasonClockCard from "../components/SeasonClockCard";
 import { ascendantAt } from "../engine/ephemeris";
@@ -599,7 +599,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
               );
             })}
           </div>
-          {SAMSKARA_GUIDANCE[mfCat] && <div style={{ margin:"10px 0", padding:"11px 12px", borderRadius:T.rMd, background:"#FBF5E7", border:`1px solid ${C.line}`, color:C.ivory, fontSize:12.5, lineHeight:1.55 }}>{SAMSKARA_GUIDANCE[mfCat][lang === "hi" ? "hi" : "en"]}</div>}
+          {MUHURAT_GUIDANCE[mfCat] && <div style={{ margin:"10px 0", padding:"11px 12px", borderRadius:T.rMd, background:"#FBF5E7", border:`1px solid ${C.line}`, color:C.ivory, fontSize:12.5, lineHeight:1.55 }}>{MUHURAT_GUIDANCE[mfCat][lang === "hi" ? "hi" : "en"]}</div>}
           {SAMSKARA_INPUTS[mfCat] && (() => {
             const spec=SAMSKARA_INPUTS[mfCat], profile=samskaraProfiles[mfCat] || {};
             const setProfile=(key,value)=>setSamskaraProfiles(prev=>({ ...prev, [mfCat]:{ ...(prev[mfCat]||{}), [key]:value } }));
@@ -672,6 +672,14 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                             </div>
                             <div style={{ fontSize:11.5, color:C.muted, lineHeight:1.45 }}>{lang === "hi" ? "तिथि, नक्षत्र, वार और इस संस्कार के लग्न/कुण्डली नियम लागू हैं। पञ्चक दोष नीचे द्वितीयक सावधानी है।" : "Tithi, nakshatra, weekday and this Samskara's lagna/chart rules are applied. Panchaka dosha remains a secondary caution."}</div>
                           </>
+                        ) : (top.activityWindows || []).length ? (
+                          <>
+                            <div style={{ ...T.label, color:"#1F7A4D", marginBottom:5 }}>{lang === "hi" ? "कार्य-विशिष्ट शुद्ध समय" : "Activity-specific clean windows"}</div>
+                            <div style={{ display:"flex", flexDirection:"column", gap:4, marginBottom:8 }}>
+                              {top.activityWindows.slice(0,6).map((w,i)=><div key={i} style={{ display:"flex", justifyContent:"space-between", gap:10, fontSize:12.5 }}><span style={{ color:"#1F7A4D" }}>✓ {w.kind === "panchaka-rahita" ? (lang === "hi" ? "पञ्चक रहित" : "Panchaka Rahita") : trN(lang, CHOG_NAME, w.key)}</span><span style={{ color:C.ivory, fontVariantNumeric:"tabular-nums" }}>{fmtTime(w.start,top.tz)} – {fmtTime(w.end,top.tz)}</span></div>)}
+                            </div>
+                            <div style={{ fontSize:11.5, color:C.muted, lineHeight:1.45 }}>{lang === "hi" ? "ऊपर के समय इस कार्य की अलग छँटाई से निकले हैं; राहु/गुलिक/यमगण्ड हटाए गए हैं।" : "These windows come from this activity's own filter; Rahu, Gulika and Yamaganda are excluded."}</div>
+                          </>
                         ) : finderTopPanchaka && (finderTopPanchaka.panchakaWindows || []).length ? (() => {
                           const ptz = finderTopPanchaka.tz;
                           const shubha = finderTopPanchaka.panchakaWindows.filter((w) => w.shubha);
@@ -722,7 +730,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                         ); })}
                       </div>
                     )}
-                    <div style={{ fontSize: 11, color: C.muted, marginTop: 8, fontStyle: "italic" }}>{SAMSKARA_GUIDANCE[ans.category] ? (lang === "hi" ? "केवल मास, तिथि, नक्षत्र, वार और संस्कार-विशिष्ट लग्न/कुण्डली शुद्धि पर खरे दिन दिखाए गए हैं।" : "Only dates passing month, tithi, nakshatra, weekday and Samskara-specific lagna/chart screening are shown.") : (lang === "hi" ? "केवल मास, तिथि, नक्षत्र व वार शुद्धि पर खरे दिन दिखाए गए हैं।" : "Only dates passing month, tithi, nakshatra & weekday shuddhi are shown.")}</div>
+                    <div style={{ fontSize: 11, color: C.muted, marginTop: 8, fontStyle: "italic" }}>{SAMSKARA_INPUTS[ans.category] ? (lang === "hi" ? "केवल मास, तिथि, नक्षत्र, वार और संस्कार-विशिष्ट लग्न/कुण्डली शुद्धि पर खरे दिन दिखाए गए हैं।" : "Only dates passing month, tithi, nakshatra, weekday and Samskara-specific lagna/chart screening are shown.") : (lang === "hi" ? "केवल इस कार्य की तिथि, नक्षत्र, वार और समय-खिड़की शुद्धि पर खरे दिन दिखाए गए हैं।" : "Only dates passing this activity's tithi, nakshatra, weekday and clean-window shuddhi are shown.")}</div>
                     {whyList && (
                       <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: T.rMd, background: "#FBF5E7", border: `1px solid ${C.line}` }}>
                         <div style={{ ...T.label, color: C.muted, marginBottom: 4 }}>{lang === "hi" ? "अन्य दिन क्यों शामिल नहीं" : "Why other days weren't included"}</div>
@@ -732,7 +740,9 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                   </>
                 )}
                 <div style={{ fontSize: 11, color: C.muted, marginTop: 12, lineHeight: 1.5, fontStyle: "italic" }}>
-                  {lang === "hi" ? "दिन तिथि, नक्षत्र, वार व करण से चुने जाते हैं; समय-काल पञ्चक रहित (लग्न आधारित) से निकाले जाते हैं। विवाह जैसे बड़े कार्यों हेतु वर-वधू की कुंडली मिलान भी किसी आचार्य से कराएँ।" : "Days are screened by tithi, nakshatra, weekday and karana; the time windows use Panchaka Rahita (lagna-based). For weddings and other major events, also match the charts with a practitioner."}
+                  {SAMSKARA_INPUTS[ans.category]
+                    ? (lang === "hi" ? "दिन तिथि, नक्षत्र, वार व करण से चुने जाते हैं; संस्कार हेतु लग्न/कुण्डली शुद्धि भी लागू है।" : "Days are screened by tithi, nakshatra, weekday and karana; ceremony-specific lagna/chart screening is also applied.")
+                    : (lang === "hi" ? "दिन तिथि, नक्षत्र, वार व करण से चुने जाते हैं; समय-काल चुने हुए कार्य की अलग शुद्धि से निकाले जाते हैं। विवाह जैसे बड़े कार्यों हेतु वर-वधू की कुंडली मिलान भी किसी आचार्य से कराएँ।" : "Days are screened by tithi, nakshatra, weekday and karana; the time windows use this activity's own clean-window rules. For weddings and other major events, also match the charts with a practitioner.")}
                 </div>
               </div>
             );

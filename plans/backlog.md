@@ -268,6 +268,13 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         property purchase, vehicle purchase, Bhoomi Puja/construction, business,
         travel, housewarming and document signing/registration. The existing generic
         “purchase” category does **not** close the property or vehicle gaps.
+        **Implementation pass 2026-07-24:** eight distinct public finder categories
+        now have separate chips/guidance, rule tables, blockers and clean-window
+        logic, with `validation/deep-muhurats.cjs` guarding against fallback to
+        generic purchase/business behavior. Cursor bug bash found and fixed one P2
+        stale footer-copy issue. Rows #16/#17 stay below 100% until Claude Code
+        completes the reserved second bug-bash pass and production verification
+        follows the push.
   - [x] Samskara Muhurtas: Mundan/tonsure, Namakaran, Annaprashan, Vidyarambha and
         Upanayana, with tradition and regional conventions stated.
   - [ ] Birth-chart-personalized Muhurat only after its method is sourced and

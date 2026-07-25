@@ -66,6 +66,8 @@
     10,
     11,
     15,
+    16,
+    17,
     19,
     21,
     23,
@@ -118,6 +120,8 @@
     "12": "Primary government holiday source; non-religious overlay",
     "13": "Regional and institutional Bengali sources; day practices kept distinct",
     "14": "Drik Panchang festival dates plus Tamil/Kerala regional practice notes; Sabarimala pilgrimage guidance for Ayyappa safety boundaries",
+    "16": "Published 2026 New Delhi Muhurat rule tables/anchors plus Drik-style wedding and housewarming shuddhi gates",
+    "17": "Published 2026 New Delhi Bhoomi/business/travel/document rule tables plus activity-specific clean-window regression gates",
     "29": "Mixed textual, institutional and regional sources across the published corpus; item-level confidence varies",
     "30": "Astronomical and seasonal published anchors; calculation convention documented",
     "44": "Regional/institutional sources partially verified; final four-day reconciliation remains",
@@ -222,6 +226,28 @@
       "lastVerified": "2026-07-24 · Local `eclipse-sutak-pages.cjs` plus production build; full canonical gates in closeout",
       "sourceConfidence": "Drik Panchang/public Drik-citing 2026 eclipse date and Sutak rule anchors; Ganak topocentric geometry for city visibility",
       "recommendedAction": "No corrective action required; spot-check `/festival/surya-grahan` and `/festival/chandra-grahan` in EN/HI after deploy."
+    },
+    "16": {
+      "deliveryState": "Implemented locally — second bug bash and production verification pending",
+      "limitations": "Marriage, engagement and housewarming have distinct finder chips, guidance, rule tables, blockers and clean windows, but the owner-required second independent bug bash is not complete and the pushed build has not yet been verified live.",
+      "shortTermImpact": "Users can locally get separate ranked Muhurat results for marriage, engagement and housewarming instead of a generic date list.",
+      "longTermImpact": "The shared deep-muhurats gate prevents these relationship/home-entry categories from silently collapsing back into one generic score.",
+      "bugBashStatus": "First Cursor bug bash completed 2026-07-24; one P2 stale-footer copy issue was fixed. Claude Code second pass is reserved in plans/claude-task-muhurat-full-parity-testing.md.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-24 · Local fresh port :5303 EN engagement/travel/documents and HI 390px documents; focused gates green; not production-verified",
+      "sourceConfidence": "Published 2026 New Delhi Muhurat rule tables/anchors plus Drik-style wedding and housewarming shuddhi gates",
+      "recommendedAction": "Have Claude Code run the reserved second bug bash, fix any findings, then verify the deployed production route before marking 100%."
+    },
+    "17": {
+      "deliveryState": "Implemented locally — second bug bash and production verification pending",
+      "limitations": "Bhoomi Puja, construction, business, travel and documents have distinct finder chips, guidance, rule tables, blockers and clean windows, but the owner-required second independent bug bash is not complete and the pushed build has not yet been verified live.",
+      "shortTermImpact": "Users can locally get separate ranked Muhurat results for Bhoomi, construction, business, travel and document signing/registration; Travel uses Char/Labh/Amrit/Shubh while Documents/Business avoid Char leakage.",
+      "longTermImpact": "The deep-muhurats gate locks category-specific rule sets and clean-window behavior so these journeys do not regress to generic purchase/business logic.",
+      "bugBashStatus": "First Cursor bug bash completed 2026-07-24; one P2 stale-footer copy issue was fixed. Claude Code second pass is reserved in plans/claude-task-muhurat-full-parity-testing.md.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-24 · Local fresh port :5303 EN engagement/travel/documents and HI 390px documents; focused gates green; not production-verified",
+      "sourceConfidence": "Published 2026 New Delhi Bhoomi/business/travel/document rule tables plus activity-specific clean-window regression gates",
+      "recommendedAction": "Have Claude Code run the reserved second bug bash, fix any findings, then verify the deployed production route before marking 100%."
     }
   },
   "dashboard": {

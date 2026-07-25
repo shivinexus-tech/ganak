@@ -2,7 +2,13 @@
 
 const MUH_CATS = [
   { key: "wedding", hi: "विवाह", en: "Wedding" },
+  { key: "engagement", hi: "सगाई", en: "Engagement" },
   { key: "housewarming", hi: "गृह प्रवेश", en: "Housewarming" },
+  { key: "bhoomi", hi: "भूमि पूजन", en: "Bhoomi Puja" },
+  { key: "construction", hi: "निर्माण आरम्भ", en: "Construction" },
+  { key: "business", hi: "व्यापार आरम्भ", en: "Business" },
+  { key: "travel", hi: "यात्रा", en: "Travel" },
+  { key: "document", hi: "दस्तावेज़", en: "Documents" },
   { key: "vehicle", hi: "वाहन", en: "Vehicle" },
   { key: "property", hi: "सम्पत्ति", en: "Property" },
   { key: "mundan", hi: "मुंडन", en: "Mundan" },
@@ -10,7 +16,6 @@ const MUH_CATS = [
   { key: "annaprashana", hi: "अन्नप्राशन", en: "Annaprashana" },
   { key: "vidyarambha", hi: "विद्यारम्भ", en: "Vidyarambha" },
   { key: "upanayana", hi: "उपनयन", en: "Upanayana" },
-  { key: "venture", hi: "व्यापार", en: "Business" },
 ];
 const PANCHAKA_NAME = { shubha: { en: "Panchaka Rahita", hi: "पञ्चक रहित" }, mrityu: { en: "Mrityu Panchaka", hi: "मृत्यु पञ्चक" }, agni: { en: "Agni Panchaka", hi: "अग्नि पञ्चक" }, raja: { en: "Raja Panchaka", hi: "राज पञ्चक" }, chora: { en: "Chora Panchaka", hi: "चोर पञ्चक" }, roga: { en: "Roga Panchaka", hi: "रोग पञ्चक" } };
 const PANCHAKA_SHORT = { shubha: { en: "Shubha", hi: "शुभ" }, mrityu: { en: "Mrityu", hi: "मृत्यु" }, agni: { en: "Agni", hi: "अग्नि" }, raja: { en: "Raja", hi: "राज" }, chora: { en: "Chora", hi: "चोर" }, roga: { en: "Roga", hi: "रोग" } };
@@ -26,6 +31,38 @@ const EVENTS = [
 ];
 
 const SAMSKARA_GUIDANCE = {
+  wedding: {
+    en: "Marriage Muhurat screens for Vivah nakshatra, clean tithi, Devshayana/Kharmas/Tara Asta blocks and Panchaka-Rahita time windows. Final family matching remains separate.",
+    hi: "विवाह मुहूर्त विवाह नक्षत्र, शुद्ध तिथि, देवशयन/खरमास/तारा-अस्त निषेध और पञ्चक-रहित समय देखता है। अंतिम कुल/कुण्डली मिलान अलग है।",
+  },
+  engagement: {
+    en: "Engagement/Ring ceremony uses a Vivah-like but separate screen: clean tithi and marriage nakshatra, with Sunday/Tuesday and Tara Asta periods avoided.",
+    hi: "सगाई/अंगूठी रस्म विवाह-जैसी पर अलग छँटाई रखती है: शुद्ध तिथि और विवाह नक्षत्र, रविवार/मंगलवार व तारा-अस्त काल वर्जित।",
+  },
+  housewarming: {
+    en: "Griha Pravesh is stricter than a generic auspicious day: allowed lunar months, clean tithi, house-entry nakshatra and Panchaka-Rahita windows are all checked.",
+    hi: "गृह प्रवेश सामान्य शुभ दिन से सख्त है: अनुमत चान्द्र मास, शुद्ध तिथि, गृह-प्रवेश नक्षत्र और पञ्चक-रहित समय सब देखे जाते हैं।",
+  },
+  bhoomi: {
+    en: "Bhoomi Puja/Shilanyas prefers stable construction nakshatras and a clean work-start tithi. Use the site/registrar city for the selected place.",
+    hi: "भूमि पूजन/शिलान्यास में स्थिर निर्माण नक्षत्र और शुद्ध कार्यारम्भ तिथि प्रधान हैं। चुना शहर वही रखें जहाँ पूजा/आरम्भ होना है।",
+  },
+  construction: {
+    en: "Construction start is distinct from Bhoomi Puja: it keeps the construction nakshatra set but uses a stricter work-start filter and avoids Tuesday/Saturday.",
+    hi: "निर्माण आरम्भ भूमि पूजन से अलग है: निर्माण नक्षत्र वही हैं, पर कार्यारम्भ छँटाई सख्त है और मंगलवार/शनिवार टाले जाते हैं।",
+  },
+  business: {
+    en: "Business opening uses prosperous nakshatras, growth tithis and Labh/Amrit/Shubh windows. Festival bookkeeping such as Diwali remains a separate observance.",
+    hi: "व्यापार आरम्भ में लाभदायक नक्षत्र, वृद्धि तिथि और लाभ/अमृत/शुभ समय चुने जाते हैं। दीपावली बही-खाता अलग पर्व परम्परा है।",
+  },
+  travel: {
+    en: "Travel uses movable/supportive nakshatras and Char-first Choghadiya windows, while avoiding Rahu, Gulika and Yamaganda for the departure.",
+    hi: "यात्रा में चल/सहायक नक्षत्र और चर-प्रधान चौघड़िया समय लिए जाते हैं, तथा प्रस्थान में राहु, गुलिक और यमगण्ड टाले जाते हैं।",
+  },
+  document: {
+    en: "Document signing/registration is not a generic purchase Muhurat: it favors Mercury/Jupiter days and clean Labh/Amrit/Shubh windows for paperwork.",
+    hi: "दस्तावेज़ हस्ताक्षर/पंजीकरण सामान्य खरीद मुहूर्त नहीं है: इसमें कागज़ी कार्य हेतु बुध/गुरु प्रधान दिन और लाभ/अमृत/शुभ समय चुने जाते हैं।",
+  },
   mundan: {
     en: "First tonsure. Ganak screens the civil date by lunar month, tithi, nakshatra and weekday; the child's age, family deity observance and whether the mother is pregnant remain family/acharya decisions.",
     hi: "प्रथम केश-उत्सर्जन। गणक चान्द्र मास, तिथि, नक्षत्र और वार से दिन छाँटता है; शिशु की आयु, कुलदेवता की परम्परा और माता की गर्भावस्था जैसे निर्णय परिवार/आचार्य के हैं।",
@@ -47,6 +84,8 @@ const SAMSKARA_GUIDANCE = {
     hi: "यज्ञोपवीत संस्कार। गणक सामान्य पंचांग-आधारित संक्षिप्त सूची देता है, अंतिम संस्कार-दिन नहीं। वेद-शाखा, आयु, गोत्र-कुलाचार, गुरु और क्षेत्रीय अनुष्ठान-पद्धति की पुष्टि आचार्य करें।",
   },
 };
+
+const MUHURAT_GUIDANCE = SAMSKARA_GUIDANCE;
 
 // Ceremony-specific context is kept separate from the general date range. It
 // explains the customary fit without silently pretending to perform a full
@@ -93,4 +132,4 @@ const SAMSKARA_INPUTS = {
   },
 };
 
-export { MUH_CATS, EVENTS, SAMSKARA_GUIDANCE, SAMSKARA_INPUTS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS };
+export { MUH_CATS, EVENTS, MUHURAT_GUIDANCE, SAMSKARA_GUIDANCE, SAMSKARA_INPUTS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS };
