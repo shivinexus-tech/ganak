@@ -622,20 +622,27 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
       fontFamily: "-apple-system, 'Segoe UI', sans-serif" }}>
       <PrashnaSecHead hi="प्रश्न कुण्डली" en="Prashna · ask the moment" />
 
-      {/* Method toggle — two named methods, never mixed (owner-approved) */}
+      {/* Method toggle — two named methods, never mixed (owner-approved).
+          Follows the language switch (single language), each with a short description. */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
         {[
-          { key: 'time',   hi: 'इस क्षण से पूछें',       en: 'Ask from this moment' },
-          { key: 'number', hi: 'KP अंक विधि (1–249)', en: 'KP number method' },
+          { key: 'time',
+            hi: 'इस क्षण से पूछें',       en: 'Ask from this moment',
+            descHi: 'पारम्परिक होरारी — पूछने के ठीक क्षण और स्थान से, कोई अंक नहीं।',
+            descEn: 'Classic horary — casts for the exact moment & place you ask, no number.' },
+          { key: 'number',
+            hi: 'KP अंक विधि (1–249)', en: 'KP number method (1–249)',
+            descHi: 'आप 1–249 के बीच एक अंक चुनते हैं, जो कुण्डली का लग्न तय करता है।',
+            descEn: 'You choose a number from 1 to 249, which sets the chart’s ascendant.' },
         ].map(m => {
           const on = mode === m.key;
           return (
             <button key={m.key} onClick={() => switchMode(m.key)}
-              style={{ flex: 1, minHeight: TOKENS.ctrlH, padding: '7px 10px', borderRadius: TOKENS.radius,
+              style={{ flex: 1, minHeight: TOKENS.ctrlH, padding: '8px 10px', borderRadius: TOKENS.radius, textAlign: 'left',
                 border: `1.5px solid ${on ? TOKENS.gold : TOKENS.line}`,
-                background: on ? TOKENS.goldSoft : TOKENS.card, color: TOKENS.ink, cursor: 'pointer', lineHeight: 1.25 }}>
-              <div style={{ fontFamily: TOKENS.devanagari, fontSize: 15 }}>{m.hi}</div>
-              <div style={{ fontSize: 10.5, letterSpacing: '0.08em', textTransform: 'uppercase', color: TOKENS.muted }}>{m.en}</div>
+                background: on ? TOKENS.goldSoft : TOKENS.card, color: TOKENS.ink, cursor: 'pointer', lineHeight: 1.3 }}>
+              <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: 15, fontWeight: 600 }}>{hi ? m.hi : m.en}</div>
+              <div style={{ fontSize: 11, color: TOKENS.muted, marginTop: 3, lineHeight: 1.35 }}>{hi ? m.descHi : m.descEn}</div>
             </button>
           );
         })}
