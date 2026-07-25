@@ -568,14 +568,19 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [showFull, setShowFull] = useState(false);
+  // F1/F4/F5: a cast number session is LOCKED independently of `result`, so nothing that
+  // merely clears the result (chip change, mode toggle) can silently re-enable a recast.
+  const [locked, setLocked] = useState(false);
 
   const clearResult = () => { setResult(null); setError(null); };
-  const switchMode = (m) => { if (m !== mode) { setMode(m); clearResult(); } };
-  // F1 repeat protection: after a number cast, "New question" is the only way to recast.
-  const newQuestion = () => { setNumberInput(''); setResult(null); setError(null); };
-  // F3: a cast answer is judged for one place — if the place changes, the old answer no
-  // longer applies, so clear it (changing place is the user's own action).
-  useEffect(() => { setResult(null); setError(null); }, [lat, lon, placeLabel]);
+  // F5: switching method must not unlock a cast number session — keep the lock (and its
+  // result) intact so a mode toggle can never re-enable recast of the same number.
+  const switchMode = (m) => { if (m !== mode) { setMode(m); if (!locked) clearResult(); } };
+  // F1/F4/F5 repeat protection: once a number is cast, only "New question" reopens it.
+  const newQuestion = () => { setLocked(false); setNumberInput(''); setResult(null); setError(null); };
+  // F3: a cast answer is judged for one place — a place change clears it and reopens the
+  // number session (a new place is a genuinely changed circumstance).
+  useEffect(() => { setResult(null); setError(null); setLocked(false); }, [lat, lon, placeLabel]);
 
   const ask = () => {
     setError(null);
@@ -592,6 +597,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         }
         const chart = PR_castNumber(ms, lat, lon, n);
         setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'number', number: n, info: kpNumberInfo(n) });
+        setLocked(true);
       } else {
         const chart = PR_cast(ms, lat, lon);
         setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'time' });
@@ -607,7 +613,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   const isNum = result && result.mode === 'number';
   const vs = v && (isNum ? NUM_VERDICT[v.verdict] : VERDICT_STYLE[v.verdict]);
   const canAsk = selected && (mode === 'time' || numberInput.trim() !== '');
-  const numberLocked = mode === 'number' && isNum;            // F1: locked after a cast
+  const numberLocked = mode === 'number' && locked;          // F1/F4/F5: locked until "New question"
   const nTyped = numberInput.trim() === '' ? null : Number(numberInput);
   const numOutOfRange = nTyped !== null && (nTyped < KP_NUMBER_MIN || nTyped > KP_NUMBER_MAX); // F2: live hint
 
@@ -650,7 +656,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         {QUESTIONS.map(q => {
           const on = selected === q.key;
           return (
-            <button key={q.key} onClick={() => { setSelected(q.key); clearResult(); }}
+            <button key={q.key} onClick={() => { if (numberLocked) return; setSelected(q.key); clearResult(); }}
               style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, padding: '0 14px',
                 border: `1.5px solid ${on ? TOKENS.gold : TOKENS.line}`,
                 background: on ? TOKENS.goldSoft : TOKENS.card,
@@ -716,7 +722,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
           color: TOKENS.sindoor, fontSize: 14 }}>{error}</div>
       )}
 
-      {result && !error && (
+      {result && !error && result.mode === mode && (
         <div style={{ marginTop: 16 }}>
           {/* Verdict card — answer before data */}
           <div style={{ background: TOKENS.card, borderRadius: TOKENS.radius,
@@ -831,8 +837,8 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               <div style={{ marginTop: 8 }}>
                 <Gloss>
                   {hi
-                    ? `तारा/उप = नक्षत्र स्वामी / KP उप-स्वामी — प्रश्न इसी दो-स्तरीय स्वामित्व को पढ़ता है। भाव = ग्रह का भाव (${result.chart.system === 'placidus' ? 'प्लेसिडस भाव — KP मानक' : 'समान भाव — उच्च अक्षांश विकल्प'})। स्थितियाँ: लाहिरी अयनांश, मध्यम राहु/केतु — द्रिक पंचांग की मानक परिपाटी।`
-                    : `Star/Sub = nakshatra lord / KP sub-lord — the two-level rulership Prashna reads. House = the house the planet occupies (${result.chart.system === 'placidus' ? 'Placidus cusps, the KP standard' : 'equal houses — high-latitude fallback'}). Positions: Lahiri ayanamsa, mean Rahu/Ketu — the same conventions as Drik Panchang defaults.`}
+                    ? `तारा/उप = नक्षत्र स्वामी / KP उप-स्वामी — प्रश्न इसी दो-स्तरीय स्वामित्व को पढ़ता है। भाव = ग्रह का भाव (${result.chart.system === 'placidus' ? 'प्लेसिडस भाव — KP मानक' : 'समान भाव — उच्च अक्षांश विकल्प'})। स्थितियाँ: ${isNum ? 'KP-New अयनांश (KP अंक विधि)' : 'लाहिरी अयनांश — द्रिक पंचांग की मानक परिपाटी'}, मध्यम राहु/केतु।`
+                    : `Star/Sub = nakshatra lord / KP sub-lord — the two-level rulership Prashna reads. House = the house the planet occupies (${result.chart.system === 'placidus' ? 'Placidus cusps, the KP standard' : 'equal houses — high-latitude fallback'}). Positions: ${isNum ? 'KP-New ayanamsa (KP number method)' : 'Lahiri ayanamsa — the same conventions as Drik Panchang defaults'}, mean Rahu/Ketu.`}
                 </Gloss>
               </div>
             </div>
