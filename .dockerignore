@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.worktrees
+.scratch
+.cursor
+.claude
+*.md
+!server/README.md
+plans
+validation
+public
+festival-images-src
+.github
+.env
+.env.*
+**/.env

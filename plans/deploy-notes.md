@@ -10,7 +10,9 @@
 - Build command: `npm run build`
 - Build output directory: `dist`
 - Root directory: repository root
-- Backend status: not deployed and not connected; `server/` remains a separate future service.
+- **Public developer API:** not on Pages. Deploy separately — see `plans/dev-api-deploy.md`
+  and `render.yaml` (Docker on Render or equivalent). Calculation API only; frontend
+  remains `https://ganak.pages.dev`.
 
 Cloudflare's GitHub app is restricted to the Ganak repository. Every push to
 `main` now starts an automatic production build. Pull-request and non-production

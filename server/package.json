@@ -11,7 +11,8 @@
     "start": "node index.js",
     "dev": "node --watch index.js",
     "smoke": "node smoke.js",
-    "smoke:api": "node api-smoke.mjs"
+    "smoke:api": "node api-smoke.mjs",
+    "smoke:production": "node ../scripts/dev-api-production-smoke.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",

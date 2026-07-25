@@ -1,0 +1,30 @@
+# Render blueprint — Ganak public developer API (v1).
+# Connect this repo in Render → New → Blueprint → apply this file.
+# Frontend stays on Cloudflare Pages; this service hosts /v1/* only.
+
+services:
+  - type: web
+    name: ganak-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      - key: ALLOWED_ORIGINS
+        value: https://ganak.pages.dev
+      - key: API_DEFAULT_QUOTA
+        value: "1000"
+      - key: API_RATE_PER_MIN
+        value: "60"
+      # Set in the Render dashboard before announcing the API (never commit keys):
+      # API_KEYS=[{"key":"<generated>","name":"production","quotaPerDay":1000}]
+      - key: API_KEYS
+        sync: false
+      # After first deploy, set to https://<your-service>.onrender.com
+      - key: PUBLIC_API_URL
+        sync: false
