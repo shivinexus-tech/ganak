@@ -8,3 +8,4 @@ src/kundli-app.tsx.backup-*
 .scratch/
 .claude/settings.local.json
 .superpowers/
+.worktrees/
