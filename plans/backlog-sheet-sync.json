@@ -195,15 +195,15 @@
       "recommendedAction": "Complete `P0-PRASHNA-249-KSK-VERIFY`, then implement Q1b and the 249 number engine as a clearly labelled alternative to time-based Prashna."
     },
     "29": {
-      "deliveryState": "Delivered and production-verified",
-      "limitations": "None in the approved festival/vrat guide scope.",
-      "shortTermImpact": "All 50 openable guides have profiles, hero art, city muhurat where required, and longform bilingual kathas.",
-      "longTermImpact": "Composite festival-row-29 gate prevents profile/hero/timing drift across the catalogue.",
-      "bugBashStatus": "Owner spot-check recommended on four high-traffic Hindi URLs; automated gates green 2026-07-24.",
-      "qualityRisk": "Green",
-      "lastVerified": "2026-07-24 · Local gates incl. festival-row-29.cjs; production build index-BZY2Bywx.js",
-      "sourceConfidence": "Mixed textual, institutional and regional sources across the published corpus; Drik benchmark for timings",
-      "recommendedAction": "No corrective action required; owner spot-check `/festival/diwali`, `/festival/chhath`, `/festival/karva-chauth`, `/festival/hartalika-teej` in HI."
+      "deliveryState": "Reopened by owner — unacceptable festival/fast page quality",
+      "limitations": "Existing pages are not launch-quality. Route/profile/hero/timing gates passed, but owner review found the festival and fast pages poor enough that the prior Green status is invalid.",
+      "shortTermImpact": "Users may reach dedicated festival/fast URLs, but the page content cannot be trusted as a polished Ganak experience until every page is audited and rewritten where needed.",
+      "longTermImpact": "Leaving weak devotional pages live would damage religious trust, source credibility and launch confidence across one of Ganak's core public journeys.",
+      "bugBashStatus": "Required before Green: at least five recorded iterative audit/test/fix rounds across the full festival and fast inventory, performed by a minimum of two agents. No qualifying rounds are recorded after the owner rejection.",
+      "qualityRisk": "Red",
+      "lastVerified": "2026-07-24 · Owner quality rejection after spot-check; previous automated gates are insufficient quality evidence",
+      "sourceConfidence": "Mixed textual, institutional and regional sources across the published corpus; item-level source and copy quality must be re-audited page by page",
+      "recommendedAction": "Create a dedicated P0 audit/rewrite task for every festival, vrat, fast, recurring observance and named variant; inventory route-level defects; rewrite weak EN/HI content; strengthen semantic/devotional/timing/hero gates; complete five iterative rounds with at least two agents; then rerun full gates, phone/desktop smoke and production verification before restoring Green."
     },
     "14": {
       "deliveryState": "Delivered — production verification pending",

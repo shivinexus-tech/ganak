@@ -260,6 +260,16 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         safe household guidance. Shipped 2026-07-24 with topocentric solar
         visibility, lunar moonrise overlap, no-Sutak handling for non-visible
         cities and EN/HI festival + MuhuratHub wiring.
+  - [ ] **P0 owner-quality reset — audit and rewrite every festival/fast page.**
+        Owner rejected the current festival and fast page quality on 2026-07-24;
+        previous automated route/profile/katha gates no longer count as quality
+        acceptance. Create a dedicated task that audits every festival, vrat, fast,
+        recurring observance and named variant page, records defects route by route,
+        rewrites weak English/Hindi devotional copy, verifies timing/profile/hero
+        relevance, strengthens semantic gates, and completes at least **five**
+        iterative test-fix rounds by a minimum of **two agents** before any Green
+        closeout. Do not restore row #29 to Done/100% without those rounds,
+        full gates, phone/desktop smoke and production verification recorded.
       _(P0-FESTIVAL-VRAT-PARITY; owner scope 2026-07-21)_
 - [ ] **P0 before go-live — exceptionally strong Muhurat parity.** Complete every
       gap from the competitor comparison and keep the verdict/explanation stronger
@@ -339,7 +349,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       the current Fasts & Festivals card click/expand behaviour exactly as it is.
       After launch, compare direct-link use with in-app card use and only reconsider
       navigation after observing real user behaviour. _(P1-FESTIVAL-DEEPLINKS — shipped)_
-- [x] **P0 before go-live — complete festival and vrat page-link coverage (no
+- [ ] **P0 before go-live — complete festival and vrat page-link coverage (no
       tier exclusions).** Every festival, vrat, fast, recurring observance and named
       variant that a user can open anywhere in the website/app must also have a
       stable, shareable dedicated-page URL. This covers the **full current inventory:
@@ -353,8 +363,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       click/expand action as well. Add a generated coverage gate that compares the
       live openable-item registries against the route registry, so adding a future
       festival without a page link fails validation. Full checkable snapshot and
-      rules: `plans/festival-page-link-inventory.md`. **Completed 2026-07-22:**
-      Bengal Durga Puja ×6 substantive guides + routes; zero deferred labels.
+      rules: `plans/festival-page-link-inventory.md`. **Technical route coverage
+      shipped 2026-07-22:** Bengal Durga Puja ×6 substantive guides + routes; zero
+      deferred labels. **Reopened 2026-07-24:** owner rejected the actual festival
+      and fast page quality; route existence is not enough for closure.
       _(P0-FESTIVAL-PAGES-ALL — shipped 2026-07-22)_
 - [x] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
       selection box directly on every dedicated festival/vrat page. Replace “Open
