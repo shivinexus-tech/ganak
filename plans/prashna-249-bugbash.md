@@ -60,3 +60,36 @@ site; 30+ focused minutes. Suggested vectors **not** already gate-covered:
 - Determinism within the same minute; console/network cleanliness.
 Record findings here (F4+) with exact repro steps and severity; close only with no
 open P0/P1.
+
+---
+
+## Agent-2 findings (owner-reported 2026-07-24) — all FIXED (Claude Code, `8731789`)
+
+**F4 · P1 — chip change defeats the repeat lock.** After a number cast the field locks
+and "New question" appears, but tapping a different question chip called `clearResult()`,
+which dropped `result` and — because `numberLocked` was derived from `result` — silently
+unlocked the same number, re-enabling recast without "New question." Repro: number mode →
+Marriage → 108 → Cast → tap Job/career → field editable + Cast enabled with 108 present.
+
+**F5 · P1 — method toggle defeats the repeat lock.** Same root cause via `switchMode` →
+`clearResult()`: time↔number toggle dropped the result and unlocked the number for recast.
+
+**F6 · P2 — number-mode Full-chart footnote said "Lahiri."** The expanded chart's
+positions footnote was hardcoded to "Lahiri ayanamsa," but the number method runs on
+KP-New — a copy leak contradicting the answer-card disclaimer.
+
+**Fix (all below the parity-frozen markers; parity still EXACT 198/6 + build green):**
+- Introduced a dedicated **`locked`** state, set on a number cast and cleared **only** by
+  "New question" (or a place change) — independent of `result`. `numberLocked` now derives
+  from `locked`, not `result`.
+- **Chip clicks are ignored while locked** (`if (numberLocked) return`); `switchMode`
+  preserves the locked session; the result card renders only for the **matching mode**
+  (`result.mode === mode`), so a mode toggle hides-but-keeps the locked number answer.
+- **F6:** the footnote now reads "KP-New ayanamsa (KP number method)" in number mode and
+  keeps "Lahiri ayanamsa — … Drik Panchang defaults" in time mode.
+
+**Live-verified on ganak.pages.dev (`8731789`, 0 console errors):** F4 chip-tap stays
+locked (108, "New question", no Cast); F5 time↔number toggle stays locked; language
+toggle while locked preserved (Hindi "नया प्रश्न"); "New question" fully resets; `007`→`7`,
+`999` → hint + Cast disabled; number-mode footnote = KP-New, time-mode footnote = Lahiri.
+**No open P0/P1 from this pass.**
