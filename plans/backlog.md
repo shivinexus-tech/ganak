@@ -290,11 +290,21 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
   - [ ] Birth-chart-personalized Muhurat only after its method is sourced and
         validated; never silently mix natal filtering into the general finder.
   - [ ] Save/share/export the chosen Muhurat and create calendar reminders.
-  - [ ] Surgery/medical Muhurat under the separate Claude research brief
+  - [x] Surgery/medical Muhurat under the separate Claude research brief
         `plans/claude-task-surgery-medical-muhurat.md`. It is strictly for optional
         timing preferences around clinician-approved, non-urgent care; it must never
         delay urgent treatment or claim to improve medical safety/outcomes.
-      _(P0-MUHURAT-FULL-PARITY; owner scope 2026-07-21)_
+        **v1 shipped 2026-07-25** (owner-approved Option C): dedicated route
+        `/muhurat/medical`, safety wall first + mandatory "timing is flexible"
+        checkbox, conservative Purnima/Amavasya avoidance (covers eclipses),
+        neutral Abhijit Muhurta + Rahu Kaal, honest krura-karma tradition note,
+        plus an optional opt-in Janma Rashi (birth Moon-sign, R10) overlay. No
+        birth chart required in the base finder, no outcome score, no storage.
+        Merged to `main`. Body-part Moon rule (R9) intentionally omitted. Engine
+        `src/engine/medical-muhurat.ts`; gate `validation/medical-muhurat.cjs`;
+        findings `plans/claude-medical-muhurat-findings.md`. Open: live deploy
+        verification + owner sign-off.
+      _(P0-MUHURAT-FULL-PARITY; owner scope 2026-07-21; v1 built 2026-07-25)_
 - [ ] **P0 before go-live — discoverability, publishing and public platform.** Ship
       all of the following as launch gates rather than post-launch polish:
   - [ ] Clean path-based routes for every public screen and calculator; preserve
