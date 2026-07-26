@@ -7,6 +7,7 @@ import { SEQUENCE_GUIDES } from "./sequence-guides";
 import { GRAHAN_GUIDES } from "./grahan-guides";
 import { VRAT_GUIDE_ENRICHMENTS } from "./vrat-guide-enrichments";
 import { REGIONAL_KATHAS } from "./regional-kathas";
+import { GANESH_AARTI, LAKSHMI_AARTI, OM_JAI_JAGDISH_HARE } from "./aarti-texts";
 
 /* Vrat vidhi content — sourced from plans/vrat-vidhis.md. User-facing copy only;
    implementation and editorial instructions stay in plans, never in this object. */
@@ -190,6 +191,7 @@ export const VRAT_VIDHI = {
       en: "Keep every flame on a stable non-flammable surface and supervised; protect children, elders, animals and respiratory patients from smoke and loud noise. Prefer lamps, community celebration and low-pollution alternatives. Never mix fasting with missed medicines or ignore medical dietary needs.",
       hi: "प्रत्येक दीप स्थिर अग्निरोधी सतह पर और निगरानी में रखें; बच्चों, बुज़ुर्गों, पशुओं तथा श्वास-रोगियों को धुएँ और तेज़ शोर से बचाएँ। दीप, सामुदायिक उत्सव और कम-प्रदूषण विकल्प चुनें। व्रत के कारण दवा न छोड़ें और चिकित्सकीय आहार-आवश्यकता की उपेक्षा न करें।",
     },
+    aartis: [GANESH_AARTI, LAKSHMI_AARTI, OM_JAI_JAGDISH_HARE],
   },
   ekadashi: {
     verdict: {

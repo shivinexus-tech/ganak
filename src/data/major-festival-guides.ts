@@ -10,6 +10,7 @@ const guide = (x) => ({
   stories: list(x.stories), regional: list(x.regional), paran: p(...x.paran),
   udyapan: p(...x.udyapan),
   ...(x.safety ? { safety: p(...x.safety) } : {}),
+  ...(x.aartis ? { aartis: x.aartis } : {}),
 });
 
 const commonCompletion = {
