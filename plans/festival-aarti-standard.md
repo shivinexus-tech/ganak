@@ -91,3 +91,15 @@ Rules:
 - First-line anchor per named aarti (catches a wrong/swapped aarti).
 - Explicit allow-list of guides that correctly carry **no** aarti (eclipses, Makar
   Sankranti Surya arghya, plain Ekadashi/Pradosh timing pages).
+
+---
+
+## 6. Source citations (per aarti)
+
+Cross-validated Devanagari sources. drikpanchang.com is the primary anchor (an
+app-approved host); a second/third source is checked per aarti during drafting.
+
+### Diwali proof slice (verified 2026-07-26)
+- **Ganesh — Jai Ganesh Deva:** drikpanchang `/lyrics/aarti/shree-ganesh/jay-ganesh-aarti.html` (hi). Standard couplet form; parenthetical regional variants and `x2` repeat markers dropped for a clean single reading.
+- **Lakshmi — Om Jai Lakshmi Mata:** drikpanchang `/lyrics/aarti/lakshmi-mata/lakshmi-mata-aarti.html` (hi). Full 8-stanza form.
+- **Om Jai Jagdish Hare:** drikpanchang `/lyrics/aarti/lord-narayan/jai-jagdish-aarti.html` (hi). Standard couplet form (echo half-lines condensed). **Note:** source has a typo `स्वमी` in one line — corrected to `स्वामी` here (example of why 2–3 sources are cross-checked).
