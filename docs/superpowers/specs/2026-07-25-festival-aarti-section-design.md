@@ -130,36 +130,37 @@ container — long Devanagari lines wrap, no horizontal overflow.
 
 ## Phase 1 scope — North Indian deity aartis
 
-Default order is **Ganesh invocation → deity aarti → Om Jai Jagdish Hare (universal
-close)**, but the set is **curated per festival** — not every festival carries all
-three. Owner-confirmed `aartis` set per guide slug (2026-07-26):
+Order: **Ganesh invocation → deity aarti → closing aarti**, where the **closing aarti
+is chosen by deity family** (owner rule, 2026-07-26; `festival-aarti-standard.md` §2):
+Vishnu-family → *Om Jai Jagdish Hare*; Shiva/Shakti-family → *Om Jai Shiv Omkara*;
+Hanuman → the Rama aarti. If the deity aarti already *is* the family closer, it is not
+repeated. Rule-derived `aartis` set per guide slug:
 
-| Guide key | Aartis (in order) |
-|-----------|-------------------|
-| `diwali` | Ganesh (*Jai Ganesh Deva*) · Lakshmi (*Om Jai Lakshmi Mata*) · *Om Jai Jagdish Hare* |
-| `dhanteras` | Ganesh · Lakshmi (*Om Jai Lakshmi Mata*) · *Om Jai Jagdish Hare* |
-| `ganeshChaturthi` | Ganesh (*Jai Ganesh Deva*) — only |
-| `janmashtami` | Ganesh · Krishna (*Aarti Kunj Bihari ki*) |
-| `govardhanPuja` | Ganesh · Krishna (*Aarti Kunj Bihari ki*) |
-| `ramNavami` | Ganesh · Rama (*Aarti Kije Ramchandra ji ki*) · *Om Jai Jagdish Hare* |
-| `hanumanJ` | Hanuman (*Aarti Kije Hanuman Lala ki*) · Rama |
-| `sharadNavratri`, `chaitraNavratri` | Ganesh · Durga (*Jai Ambe Gauri*) · Shiva (*Om Jai Shiv Omkara*) |
-| `mahaShivaratri`, `masikShivaratri`, `pradosh` | Ganesh · Shiva (*Om Jai Shiv Omkara*) · *Om Jai Jagdish Hare* |
-| `karvaChauth` | Ganesh · Gauri/Karva Mata · *Om Jai Jagdish Hare* |
-| `ahoiAshtami` | Ganesh · Ahoi Mata · *Om Jai Jagdish Hare* |
-| `hartalikaTeej` | Ganesh · Shiva (*Om Jai Shiv Omkara*) · Gauri · *Om Jai Jagdish Hare* |
-| `purnima` (Satyanarayan) | Ganesh · Satyanarayan (*Jai Lakshmi Ramana*) · *Om Jai Jagdish Hare* |
+| Guide key | Family | Aartis (in order) |
+|-----------|--------|-------------------|
+| `diwali` | Vishnu (Lakshmi) | Ganesh · Lakshmi (*Om Jai Lakshmi Mata*) · *Om Jai Jagdish Hare* |
+| `dhanteras` | Vishnu (Lakshmi) | Ganesh · Lakshmi (*Om Jai Lakshmi Mata*) · *Om Jai Jagdish Hare* |
+| `ganeshChaturthi` | Ganesh | Ganesh (*Jai Ganesh Deva*) — only |
+| `janmashtami` | Vishnu (Krishna) | Ganesh · Krishna (*Kunj Bihari*) · *Om Jai Jagdish Hare* ⟵ *rule adds closer* |
+| `govardhanPuja` | Vishnu (Krishna) | Ganesh · Krishna (*Kunj Bihari*) · *Om Jai Jagdish Hare* ⟵ *rule adds closer* |
+| `ramNavami` | Vishnu (Rama) | Ganesh · Rama (*Aarti Kije Ramchandra ji ki*) · *Om Jai Jagdish Hare* |
+| `hanumanJ` | Hanuman | Hanuman (*Aarti Kije Hanuman Lala ki*) · Rama |
+| `sharadNavratri`, `chaitraNavratri` | Shakti (Durga) | Ganesh · Durga (*Jai Ambe Gauri*) · *Om Jai Shiv Omkara* |
+| `mahaShivaratri`, `masikShivaratri`, `pradosh` | Shiva | Ganesh · Shiva (*Om Jai Shiv Omkara*) ⟵ *closer removed (deity aarti = family closer)* |
+| `karvaChauth` | Shakti (Gauri) | Ganesh · Gauri/Karva Mata · *Om Jai Shiv Omkara* ⟵ *closer changed from Jagdish Hare* |
+| `ahoiAshtami` | Shakti (Ahoi Mata) | Ganesh · Ahoi Mata · *Om Jai Shiv Omkara* ⟵ *closer changed from Jagdish Hare* |
+| `hartalikaTeej` | Shiva+Shakti | Ganesh · Shiva (*Om Jai Shiv Omkara*) · Gauri ⟵ *Jagdish Hare closer removed* |
+| `purnima` (Satyanarayan) | Vishnu | Ganesh · Satyanarayan (*Jai Lakshmi Ramana*) · *Om Jai Jagdish Hare* |
+
+**Six cells changed by the family rule** (⟵ marks) vs. the earlier explicit table —
+pending owner confirmation before these are treated as final.
 
 Reusable texts (Ganesh *Jai Ganesh Deva*, *Om Jai Jagdish Hare*, Krishna *Kunj
 Bihari*, Shiva *Om Jai Shiv Omkara*, Rama) are **defined once and referenced** by the
 guides that list them — no duplication in the data.
 
-Content notes for the sourcing pass:
-- `karvaChauth` (Karva Mata) and `ahoiAshtami` (Ahoi Mata) aartis are more regionally
-  variable than the big-deity ones — give them extra source care.
-- Two deliberate, slightly-unusual owner choices captured verbatim: **Navratri closes
-  with the Shiva aarti** (*Om Jai Shiv Omkara*), not *Om Jai Jagdish Hare*; **Hanuman
-  Jayanti** carries **Hanuman + Rama only** (no Ganesh, no universal close).
+Content note: `karvaChauth` (Karva Mata) and `ahoiAshtami` (Ahoi Mata) aartis are more
+regionally variable than the big-deity ones — give them extra source care.
 
 Exact final list is confirmed during implementation against which keys actually
 render a full guide; any key without a clean, standard North Indian aarti is deferred

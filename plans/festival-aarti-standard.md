@@ -39,11 +39,19 @@ Standard North Indian puja order gives up to **three** aartis for a major festiv
    Ganesh (most major pujas).
 2. **The festival deity's own aarti** — e.g. Lakshmi, Durga, Shiva, Krishna, Ram,
    Hanuman.
-3. **Universal closing aarti** — *Om Jai Jagdish Hare* — sung to close most pujas.
+3. **Closing aarti — chosen by the deity family** (owner rule, 2026-07-26):
+   - **Vishnu-related** (Vishnu, Lakshmi, Krishna, Ram, Satyanarayan) → *Om Jai
+     Jagdish Hare*.
+   - **Shiva- or Shakti-related** (Shiva, Durga, Gauri/Parvati, Devi forms) → *Om Jai
+     Shiv Omkara*.
+   - **Hanuman-related** → the **Rama aarti is a must** as the paired close.
 
 Rules:
-- Order in the UI follows worship order: **invocation → deity → universal close.**
+- Order in the UI follows worship order: **invocation → deity → closing.**
 - A single-deity vrat may carry just its deity aarti (1), optionally + the close.
+- If the deity aarti already **is** the family's closing aarti (e.g. a pure Shiva
+  festival whose deity aarti is *Om Jai Shiv Omkara*), do **not** repeat it as a
+  separate closer.
 - Include an aarti only where it is genuinely customary; do not pad to reach three.
 - Confirmed per-festival list lives in the spec once the owner signs off.
 
