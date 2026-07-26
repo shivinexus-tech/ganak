@@ -295,6 +295,39 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         safe household guidance. Shipped 2026-07-24 with topocentric solar
         visibility, lunar moonrise overlap, no-Sutak handling for non-visible
         cities and EN/HI festival + MuhuratHub wiring.
+  - [ ] **Aarti section — full aarti lyrics on festival/vrat pages.** Add a
+        collapsible Devanagari aarti (with an English meaning line in EN mode) after
+        the Puja section of each relevant guide, rendering in both the in-app Fasts
+        & Festivals list and the standalone `/festival/...` routes. Design:
+        `docs/superpowers/specs/2026-07-25-festival-aarti-section-design.md`. Phase 1
+        = North Indian deity festivals & vrats; Phase 2 = remaining/regional.
+        _(P1-FESTIVAL-AARTI; owner scope 2026-07-25)_
+    - [ ] **Aarti content sourcing & proof-reading (the substantive work).** For each
+          aarti, cross-validate **2–3 authentic sources against each other** and enter
+          the most widely-sung standard Devanagari text with zero transcription errors.
+          Handle known challenges: regional/sampradaya **wording variants** (choose the
+          common version, add a non-prescriptive "your family's wording may differ"
+          note consistent with the app voice); **which aarti maps to each festival**
+          (editorial mapping; a festival may carry more than one); **Devanagari
+          orthography consistency** (ॐ vs ओम्, anusvara/chandrabindu, half-letters,
+          nukta — sources agree on words but differ on spelling); **provenance/
+          copyright** (confirm each is genuinely traditional/public-domain, not a
+          modern copyrighted arrangement) recorded per aarti in a citations doc like
+          the existing festival-guide research file. Must pass the new
+          `validation/festival-aarti.cjs` gate **and** the row-#29 quality bar
+          (independent EN/HI review, two-agent bug bash, production verification).
+          _(P1-FESTIVAL-AARTI-CONTENT; owner scope 2026-07-25)_
+    - [ ] **Aarti discoverability UI — find/open an aarti directly.** Beyond embedding
+          aartis in guides, add a direct way to reach one: a dedicated aarti
+          finder/index, input-driven navigation (user types/searches a deity or
+          festival → lands on its aarti), and stable per-aarti deep-links. Reuse the
+          existing search/route patterns; keep additive to current festival routes.
+          _(P1-FESTIVAL-AARTI-FINDER; owner scope 2026-07-25)_
+    - [ ] **Aarti SEO.** Per-aarti page titles, meta descriptions and structured data
+          so each aarti is search-discoverable (e.g. "Lakshmi Aarti — Om Jai Lakshmi
+          Mata"), consistent with the existing festival-page SEO work. Depends on the
+          finder/deep-link routes above.
+          _(P1-FESTIVAL-AARTI-SEO; owner scope 2026-07-25)_
   - [ ] **P0 owner-quality reset — audit and rewrite every festival/fast page.**
         Owner rejected the current festival and fast page quality on 2026-07-24;
         previous automated route/profile/katha gates no longer count as quality
