@@ -50,3 +50,35 @@ order**, so the floating-point result is identical to the last bit.
 Only the hot `sunGeo` path was changed. The planet path (`vsopSer`/`helioBody`) runs
 far less often (once per body per chart, not in the scan loop) and already uses a
 for-of loop; it was left untouched to keep the change tight and low-risk.
+
+## Bug bash — 2026-07-24
+
+**Self-review** (I am the author; a truly independent pass by another agent is still
+the gold standard). For a pure numeric rewrite the decisive checks are objective and
+cannot be fudged, which is what this round leans on.
+
+1. **Exhaustive differential vs the pre-change baseline** — materialised `main`'s
+   `sunGeo` and compared `sunPos(d)` new-vs-old over **2,448,039 evaluations** with
+   `Object.is` (catches NaN and ±0), spanning the normal range at 6h steps, **~3000 BCE**,
+   **~4700 CE**, sub-second fractions around the epoch, and the pathological set
+   `{0, -0, NaN, +Inf, -Inf, 1e15, MAX_SAFE_INTEGER, MIN_VALUE}`. **0 mismatches** —
+   bit-identical everywhere, well past the original 600k sample. Since `sunGeo` is the
+   only changed code, bit-identical `sunPos` means every downstream value is unchanged
+   by construction.
+2. **Staleness hunt (the bug this class is prone to)** — the flat arrays are built once
+   at module load from immutable constant tables and are ayanamsa-independent, so there
+   is no per-call cache to go stale. Proven, not assumed: `setAyanMode` lahiri↔kp shifts
+   `sunSidMs` by exactly 0.096667° (5′48″), lahiri round-trips `Object.is`-exact, kp
+   repeats stable, moon path unaffected.
+3. **Full gate suite + build** green on the branch (parity EXACT, calc 24/24, muhurat,
+   content-dates, sankranti-punya, vedic-season-clock, build).
+4. **Perf reproduces** — `sunPos` 8.60→1.86 µs (**4.6×**); flat-array build is part of a
+   one-time module load, negligible.
+
+**Not done, and why:** no browser smoke. The change is engine-only with a proof of
+bit-identical output and no new import/component/hook, so the runtime-only bug class
+(e.g. the bare-hook crash) cannot apply here — a page load would only re-confirm what
+the differential and every gate already prove. `Float64Array` is universally supported
+and whitelisted in parse-check. Happy to run one if desired.
+
+**Result: no defects found.** The change is safe to merge.
