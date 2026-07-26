@@ -43,6 +43,14 @@ export default function UtilityCalculatorScreen({route,lang,C,card,place,onPlace
   const [confirmedA,setConfirmedA]=useState(true),[confirmedB,setConfirmedB]=useState(true);
   const item=route.kind==="calculator"?route.calculator:null;
   const notFound=route.kind==="notfound";
+  // Clear a stale answer the moment any input changes, so a previous result never
+  // masquerades as a fresh one (e.g. two places that happen to give the same value
+  // read as "didn't recalculate"). The user then knowingly re-runs Calculate.
+  // Keyed on primitive input VALUES (not object identity) so unrelated shell
+  // re-renders — which mint a new default-place object each time — don't wipe a
+  // valid result. Runs once on mount too, which is harmless (result starts null).
+  useEffect(()=>{ setResult(null); setError(""); setNotice(""); },
+    [birth.date,birth.time,second.date,second.time,asOf,place?.lat,place?.lon,place?.label,placeB?.lat,placeB?.lon,placeB?.label,item?.slug]);
   useEffect(()=>{
     const title=notFound?(hi?"कैलकुलेटर नहीं मिला | Ganak":"Calculator not found | Ganak"):item?`${hi?item.hi:item.en} | Ganak`:`${hi?"ज्योतिष कैलकुलेटर":"Astrology calculators"} | Ganak`;
     document.title=title;

@@ -175,6 +175,32 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       unsupported-calculator routing; localize Hindi naming syllables. Re-run the
       full 60-minute adversarial matrix before restoring 100% closure.
       _(P0-UTILITY-CALCULATORS; owner scope 2026-07-21)_
+- [ ] **P0 — Calculator pages must be content-rich, not one-line answers (owner,
+      2026-07-25).** Owner feedback on the dosha calculators: the pages are "very
+      surface level" — an answer line and a method note, but they "don't render or
+      explain anything to an enthusiast." An astrologer reads a chart themselves; the
+      people who actually use a calculator are curious non-experts who want to
+      *understand*. Every calculator page (all vedic + western utility routes AND the
+      dosha pages) must teach: what this concept is (plain, sourced), how the user's
+      own result was derived (the specific placements that produced it, not just the
+      generic rule), what it means in balanced non-fatalistic terms, common myths vs
+      reality, and when/whether to consult a qualified person. Keep answer-first, keep
+      it bilingual and phone-readable, keep sources/conventions honest. Applies
+      retroactively to the shipped `CLAUDE-P0-DOSHAS-01` pages
+      (`/calculator/kala-sarpa`, `/pitra-dosha`, `/papa-dosha`). _(P0-CALCULATOR-DEPTH)_
+- [ ] **TESTING STANDARD — calculator-type features need 4–5 recorded adversarial
+      rounds before Done (owner, 2026-07-25).** Prompted by a stale-result bug the
+      owner caught on the live dosha calculators (result did not visibly refresh
+      after changing inputs; fixed in `CLAUDE-P0-DOSHAS-01` by auto-clearing the
+      result on any input change). For any calculator/finder-style feature (utility
+      calculators, muhurat/prashna finders, matching, dosha pages), a minimum of
+      **4–5 iterative test→fix rounds** must be recorded in `plans/task-log.md`
+      before it is marked Done — covering: re-calculation after every input change
+      (date, time, place, language, second person), stale-result clearing, the
+      unconfirmed/blank/stale-place guard, boundary and invalid inputs, EN/HI and
+      phone-width, and live production behaviour (not just localhost). Gates prove the
+      maths; these rounds prove the *interaction* works. This is in addition to the
+      two-agent 30-minute bug-bash rule in the closure contract. _(TEST-STD-CALCULATORS)_
 - [ ] **P0 before go-live — exceptionally strong Panchang and calendar parity.**
       Ganak must close every gap identified in the 2026-07-21 competitor comparison,
       while retaining answer-before-data, Hindi/English journeys, local-time accuracy
