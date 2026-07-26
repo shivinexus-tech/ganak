@@ -6,6 +6,8 @@ export const UTILITY_CALCULATORS = [
   { slug: "baby-name", group: "vedic", en: "Baby-name initials", hi: "शिशु नामाक्षर", blurbEn: "Traditional starting sounds from birth nakshatra and pada.", blurbHi: "जन्म नक्षत्र और चरण से पारम्परिक नामाक्षर।" },
   { slug: "mangal-dosha", group: "vedic", en: "Mangal Dosha", hi: "मंगल दोष", blurbEn: "Three-reference analysis from Lagna, Moon and Venus.", blurbHi: "लग्न, चन्द्र और शुक्र से त्रि-सन्दर्भ विश्लेषण।" },
   { slug: "kala-sarpa", group: "vedic", en: "Kala Sarpa pattern", hi: "काल सर्प योग", blurbEn: "A transparent node-axis geometry check with caveats.", blurbHi: "राहु-केतु अक्ष की स्पष्ट ज्यामितीय जाँच।" },
+  { slug: "pitra-dosha", group: "vedic", en: "Pitra Dosha", hi: "पितृ दोष", blurbEn: "Transparent ancestral-indication checks from the Sun and 9th house.", blurbHi: "सूर्य और नवम भाव से पूर्वज-सूचक स्पष्ट जाँच।" },
+  { slug: "papa-dosha", group: "vedic", en: "Papa Dosha (malefic load)", hi: "पाप दोष", blurbEn: "Malefic-load index from Lagna, Moon and Venus — used for Papasamyam.", blurbHi: "लग्न, चन्द्र और शुक्र से पापग्रह-भार सूचकांक।" },
   { slug: "sade-sati", group: "vedic", en: "Sade Sati", hi: "साढ़ेसाती", blurbEn: "Checks Saturn against your natal Moon sign for a chosen date.", blurbHi: "चुनी तिथि पर जन्म चन्द्र राशि से शनि की स्थिति।" },
   { slug: "shraddha-tithi", group: "vedic", en: "Shraddha Tithi", hi: "श्राद्ध तिथि", blurbEn: "Records the lunar tithi and paksha at the time of death.", blurbHi: "देहावसान समय की तिथि और पक्ष।" },
   { slug: "pancha-pakshi", group: "vedic", en: "Pancha Pakshi", hi: "पञ्च पक्षी", blurbEn: "Birth bird from nakshatra and lunar fortnight.", blurbHi: "नक्षत्र और पक्ष से जन्म-पक्षी।" },

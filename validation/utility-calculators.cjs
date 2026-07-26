@@ -6,7 +6,7 @@ const { loadApp } = require('./_load-app.cjs');
 const data = loadApp('src/data/utility-calculators.ts');
 const calc = loadApp('src/engine/utility-calculators.ts');
 
-const expected = ['rashi','sun-sign','lagna','nakshatra','baby-name','mangal-dosha','kala-sarpa','sade-sati','shraddha-tithi','pancha-pakshi','western-natal','western-relationship'];
+const expected = ['rashi','sun-sign','lagna','nakshatra','baby-name','mangal-dosha','kala-sarpa','pitra-dosha','papa-dosha','sade-sati','shraddha-tithi','pancha-pakshi','western-natal','western-relationship'];
 assert.deepStrictEqual(data.UTILITY_CALCULATORS.map(x=>x.slug), expected, 'approved calculator inventory changed');
 assert(data.UTILITY_CALCULATORS.every(x=>x.en&&x.hi&&x.blurbEn&&x.blurbHi), 'catalogue must be bilingual');
 const paths = expected.map(x=>`/calculator/${x}`);
@@ -48,7 +48,9 @@ assert(data.NAMING_SYLLABLES_HI.every(row=>row.length===4&&row.every(x=>/[\u0900
 const mangal=calc.mangalDosha(delhi);
 assert.strictEqual(mangal.refs.length,3,'Mangal must check Lagna, Moon and Venus separately');
 assert(mangal.refs.every(x=>[1,2,4,7,8,12].includes(x.house)===x.counted),'Mangal house rule drift');
-const ks=calc.kalaSarpa(delhi); assert(ks.enclosed>=0&&ks.enclosed<=7,'Kala Sarpa geometry invalid');
+const ks=calc.kalaSarpa(delhi); assert(ks.enclosed>=0&&ks.enclosed<=7,'Kala Sarpa geometry invalid'); assert(ks.typeKey&&ks.typeEn&&ks.typeHi,'Kala Sarpa named type missing');
+const pit=calc.pitraDosha(delhi); assert(pit.checks.length===5&&['none','single','multiple'].includes(pit.grade),'Pitra Dosha structure invalid'); assert(pit.checks.every(c=>c.en&&c.hi),'Pitra checks must be bilingual');
+const papa=calc.papaDosha(delhi); assert(papa.byRef.length===3&&['low','moderate','high'].includes(papa.grade),'Papa Dosha structure invalid'); assert(papa.total>=0&&papa.total<=15,'Papa total out of range');
 const ss=calc.sadeSati(delhi,Date.UTC(2026,6,22)); assert(['rising','middle','setting','not active'].includes(ss.phase),'Sade Sati phase invalid');
 const sh=calc.shraddhaTithi(delhi); assert(sh.tithi&&sh.fortnight&&sh.amanta,'Shraddha identity incomplete');
 const pp=calc.panchaPakshi(delhi); assert(calc.BIRDS.includes(pp.bird),'Pancha Pakshi bird invalid');

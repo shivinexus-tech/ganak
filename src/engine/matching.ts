@@ -3,6 +3,7 @@
    until computeKundli itself is extracted (avoids circular imports with the shell). */
 
 import { SIGN_LORD } from "./panchang";
+import { papasamyam } from "./doshas";
 
 const NF = {
   Sun: { F: ["Moon", "Mars", "Jupiter"], E: ["Venus", "Saturn"] },
@@ -72,7 +73,8 @@ export function computeMatch(computeKundli, boyDetails, girlDetails) {
   const boy=ex(cb), girl=ex(cg), gm=gunaMilan(boy,girl);
   const manglik = { boy:boy.manglikLagna, girl:girl.manglikLagna, boyMoon:boy.manglikMoon, girlMoon:girl.manglikMoon,
     cancelled: boy.manglikLagna===girl.manglikLagna };
-  return { boy, girl, ...gm, manglik, charts:{ boy:cb, girl:cg } };
+  const papa = papasamyam(cb, cg);
+  return { boy, girl, ...gm, manglik, papa, charts:{ boy:cb, girl:cg } };
 }
 
 export { gunaMilan, NF, MANGLIK_HOUSES };

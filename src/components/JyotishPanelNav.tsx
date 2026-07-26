@@ -16,6 +16,7 @@ const JYOTISH_GROUPS = [
       ["#chalit", "Bhava strength", "भाव बल"],
       ["#av", "Ashtakavarga", "अष्टकवर्ग"],
       ["#arudha", "Arudha", "आरूढ़"],
+      ["#doshas", "Doshas", "दोष"],
       ["#reading", "Reading", "फलादेश"],
     ],
   },

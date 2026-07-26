@@ -13,6 +13,7 @@ import { SEVEN } from "../engine/classical";
 import { BALA_PARTS } from "../engine/shadbala";
 import { KP_PLANETS, vimSub } from "../engine/dasha";
 import { computeKundli } from "../engine/kundli";
+import { kalaSarpaFromRows, pitraDoshaFromRows, papaCount } from "../engine/doshas";
 import { DashaTree } from "../components/DashaTree";
 import { ChartVault } from "../components/ChartVault";
 import { JyotishPanelNav } from "../components/JyotishPanelNav";
@@ -783,6 +784,55 @@ export default function ChartScreen({ C, card, lang }) {
                 );
               })}
             </div>
+
+            {/* doshas — Kala Sarpa, Pitra, Papa. Answer-first, non-fatalistic. */}
+            <Eyebrow id="doshas" deva="दोष विश्लेषण" en="Dosha analysis" />
+            {(() => {
+              const ksa = kalaSarpaFromRows(r.rows, r.ascSign);
+              const pit = pitraDoshaFromRows(r.rows, r.ascSign);
+              const papa = papaCount(r);
+              const gradeHi = { low: "न्यून", moderate: "मध्यम", high: "उच्च" };
+              const ksAnswer = ksa.full
+                ? (hi ? `पूर्ण ${ksa.typeHi} काल सर्प (राहु ${ksa.rahuHouse}वें भाव)` : `Full ${ksa.typeEn} Kala Sarpa (Rahu in house ${ksa.rahuHouse})`)
+                : ksa.partial
+                  ? (hi ? `आंशिक रचना · ${ksa.enclosed}/7 ग्रह घिरे` : `Partial pattern · ${ksa.enclosed}/7 enclosed`)
+                  : (hi ? `पूर्ण रचना नहीं · ${ksa.enclosed}/7 ग्रह एक ओर` : `Not a full pattern · ${ksa.enclosed}/7 on one side`);
+              const pitAnswer = pit.count === 0
+                ? (hi ? "कोई पितृ दोष संकेत नहीं" : "No indications found")
+                : (hi ? `${pit.count} संकेत मिले` : `${pit.count} indication${pit.count > 1 ? "s" : ""}`);
+              const cards = [
+                { id: "kala-sarpa", head: hi ? "काल सर्प" : "Kala Sarpa", answer: ksAnswer,
+                  detail: hi ? `${ksa.typeHi} · ${ksa.areaHi}` : `${ksa.typeEn} · ${ksa.areaEn}`,
+                  hot: ksa.full || ksa.partial },
+                { id: "pitra-dosha", head: hi ? "पितृ दोष" : "Pitra Dosha", answer: pitAnswer,
+                  detail: pit.count ? pit.checks.filter((c) => c.fired).map((c) => hi ? c.hi : c.en).join(" · ") : (hi ? "सूर्य व नवम भाव आधारित जाँच" : "Sun & 9th-house based checks"),
+                  hot: pit.count >= 2 },
+                { id: "papa-dosha", head: hi ? "पाप दोष" : "Papa Dosha", answer: hi ? `भार ${papa.total}/15 · ${gradeHi[papa.grade]}` : `Load ${papa.total}/15 · ${papa.grade}`,
+                  detail: papa.byRef.map((rr) => `${hi ? { lagna: "लग्न", moon: "चन्द्र", venus: "शुक्र" }[rr.ref] : rr.ref}: ${rr.points}`).join(" · "),
+                  hot: papa.grade === "high" },
+              ];
+              return (
+                <>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+                    {cards.map((cd) => (
+                      <div key={cd.id} className="rise" style={{ ...card, padding: "14px 16px", border: `1px solid ${cd.hot ? C.gold : C.line}` }}>
+                        <div style={{ ...T.label, color: cd.hot ? C.gold : C.muted, marginBottom: 6 }}>{cd.head}</div>
+                        <div style={{ fontFamily: "Eczar, serif", fontSize: 16, color: cd.hot ? C.gold : C.ivory, lineHeight: 1.35 }}>{cd.answer}</div>
+                        <div style={{ color: C.muted, fontSize: 12, marginTop: 6, lineHeight: 1.5 }}>{cd.detail}</div>
+                        <a href={`/calculator/${cd.id}?lang=${lang}`} style={{ display: "inline-block", marginTop: 8, fontSize: 12, color: C.gold, textDecoration: "none" }}>
+                          {hi ? "विस्तृत पृष्ठ →" : "Full page →"}
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{ margin: "10px 2px 0", color: C.muted, fontSize: 12.5, lineHeight: 1.6 }}>
+                    {hi
+                      ? "ये पारम्परिक व्याख्यात्मक रचनाएँ हैं, स्पष्ट नियमों के साथ दिखाई गई हैं—किसी अनिष्ट या शाप की भविष्यवाणी नहीं। परम्पराएँ भिन्न होती हैं; किसी योग्य ज्योतिषी से परामर्श करें।"
+                      : "These are traditional interpretive patterns shown with the exact rule that fired — not a prediction of harm or a curse. Traditions differ; please consult a qualified jyotishi."}
+                  </p>
+                </>
+              );
+            })()}
 
             {/* dasha */}
             <Eyebrow id="rectify" deva="जन्म समय शोधन" en="Birth-time rectification" />

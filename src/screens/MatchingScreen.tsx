@@ -125,6 +125,9 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
               <DoshaCard C={C} card={card} ok={mOk} title={hi ? "मांगलिक दोष" : "Manglik (Mangal) dosha"}
                 good={hi ? ((mBoy || mGirl) ? "दोनों मांगलिक हैं — परंपरा में दोष का परस्पर निरसन माना जाता है।" : "स्पष्ट — लग्न से कोई भी मांगलिक नहीं है।") : ((mBoy || mGirl) ? "Both partners are Manglik — the dosha is considered mutually cancelled." : "Clear — neither partner is Manglik from the Lagna.")}
                 bad={hi ? `${mBoy ? "वर" : "कन्या"} मांगलिक है और दूसरा व्यक्ति नहीं। विवाह निर्णय से पहले किसी योग्य ज्योतिषी से संपूर्ण परीक्षण कराएँ।` : (mBoy ? "The groom" : "The bride") + " is Manglik (Mars falls in house 1, 2, 4, 7, 8 or 12 from the Lagna) while the other is not. Traditionally flagged for marriage; an astrologer can advise on remedies and the Moon/Venus-based checks."} />
+              <DoshaCard C={C} card={card} ok={res.papa.balanced} title={hi ? "पापसाम्य (पाप-भार)" : "Papasamyam (papa load)"}
+                good={hi ? `संतुलित — वर ${res.papa.boy.total}/15, कन्या ${res.papa.girl.total}/15। दोनों का पापग्रह-भार तुलनीय है, जिसे परम्परा में अनुकूल माना जाता है।` : `Balanced — groom ${res.papa.boy.total}/15, bride ${res.papa.girl.total}/15. Comparable malefic loads, traditionally considered favourable.`}
+                bad={hi ? `असंतुलित — वर ${res.papa.boy.total}/15, कन्या ${res.papa.girl.total}/15। ${res.papa.heavier === "boy" ? "वर" : "कन्या"} पर पापग्रह-भार अधिक है। यह अनेक पारम्परिक दृष्टियों में से एक है, अंतिम निर्णय नहीं।` : `Uneven — groom ${res.papa.boy.total}/15, bride ${res.papa.girl.total}/15. The ${res.papa.heavier === "boy" ? "groom" : "bride"} carries the heavier malefic load (Sun, Mars, Saturn, Rahu, Ketu in houses 1,2,4,7,8,12 from Lagna, Moon and Venus). One traditional lens among many, not a verdict.`} />
             </div>
 
             <p style={{ color: C.muted, fontSize: 12, marginTop: 14, lineHeight: 1.55 }}>

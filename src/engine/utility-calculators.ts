@@ -2,6 +2,7 @@ import { computeKundli } from "./kundli";
 import { NAKSHATRAS, SIGNS, lunarMonthInfo, planetSidMs, sunEvents } from "./panchang";
 import { rev } from "./ephemeris";
 import { NAMING_SYLLABLES, NAMING_SYLLABLES_HI } from "../data/utility-calculators";
+import { kalaSarpaFromRows, pitraDoshaFromRows, papaCount } from "./doshas";
 
 export type BirthInput = { y:number; m:number; day:number; hh:number; mi:number; tz:number; lat:number; lon:number };
 const WESTERN_SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
@@ -25,12 +26,18 @@ export function mangalDosha(input:BirthInput) {
 }
 
 export function kalaSarpa(input:BirthInput) {
-  const { chart }=quickBirth(input), rahu=chart.rows.find((p:any)=>p.name==="Rahu")!.lon;
-  const classical=chart.rows.filter((p:any)=>!["Rahu","Ketu"].includes(p.name));
-  const clockwise=classical.filter((p:any)=>rev(p.lon-rahu)>0.0001 && rev(p.lon-rahu)<179.9999);
-  const other=classical.filter((p:any)=>rev(rahu-p.lon)>0.0001 && rev(rahu-p.lon)<179.9999);
-  const present=clockwise.length===7||other.length===7;
-  return { present, enclosed:Math.max(clockwise.length,other.length), outside:classical.filter((p:any)=>!(clockwise.length>=other.length?clockwise:other).includes(p)).map((p:any)=>p.name), boundary:"Nodes are excluded; all seven classical planets must lie strictly within one node semicircle." };
+  const { chart }=quickBirth(input);
+  return kalaSarpaFromRows(chart.rows, chart.ascSign);
+}
+
+export function pitraDosha(input:BirthInput) {
+  const { chart }=quickBirth(input);
+  return pitraDoshaFromRows(chart.rows, chart.ascSign);
+}
+
+export function papaDosha(input:BirthInput) {
+  const { chart }=quickBirth(input);
+  return papaCount(chart);
 }
 
 export function sadeSati(input:BirthInput, asOfMs:number) {

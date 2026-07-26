@@ -112,8 +112,17 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
   - [ ] Standalone Mangal Dosha analysis from Lagna, Moon and Venus, with sourced
         exceptions/cancellation rules and a plain-language verdict.
   - [ ] Dedicated Kala Sarpa Dosha analysis with explicit caveats against
-        fear-based or universal claims.
+        fear-based or universal claims. _(v1 built 2026-07-25, `CLAUDE-P0-DOSHAS-01`
+        REVIEW: 12 named types by Rahu house + full/partial geometry; enriched
+        `/calculator/kala-sarpa` + Kundli `#doshas` card; non-fatalistic caveats.
+        Open: deploy, owner sign-off, second bug bash.)_
   - [ ] Papasamyam/Papa Dosham and Pitra Dosha analyses with documented conventions.
+        _(v1 built 2026-07-25, `CLAUDE-P0-DOSHAS-01` REVIEW: Pitra Dosha = 5
+        transparent same-sign checks (Sun/nodes/Saturn/9th-lord); Papa Dosha =
+        malefic-load count from Lagna/Moon/Venus; Papasamyam = two-chart balance
+        in Matching. Owner chose Both — Kundli sections + standalone
+        `/calculator/pitra-dosha` & `/calculator/papa-dosha`. Engine `doshas.ts`,
+        gate `validation/doshas.cjs`. Open: deploy, owner sign-off, second bug bash.)_
   - [ ] Finish and validate Arudha Padas, Bhavabala presentation, and Special
         Lagnas/Upagrahas; expose their existing engines with useful explanations.
   - [ ] Expose and polish every already-built specialist panel: Graha/Bhava detail,
@@ -388,6 +397,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       deferred labels. **Reopened 2026-07-24:** owner rejected the actual festival
       and fast page quality; route existence is not enough for closure.
       _(P0-FESTIVAL-PAGES-ALL — shipped 2026-07-22)_
+- [ ] **BUG — calendar & search festival rows are navigation dead-ends.** In `src/screens/CalendarPage.tsx` the full-year calendar (`view.type==="year"`) and search results render each festival as a static `Row` (line ~39) with no onClick/link/expand, so tapping does nothing — breaking the "openable anywhere" contract above. File header says "Wire deferred"; the daily list already links (`DailyScreen.tsx` expand). Category: navigation/wayfinding wiring gap (not IA-structure). Fix: route each row to its festival guide page (or inline-expand). Low risk.
 - [x] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
       selection box directly on every dedicated festival/vrat page. Replace “Open
       this festival in the Daily Panchang to see the local timing referred to below.”
