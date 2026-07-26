@@ -305,6 +305,16 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         findings `plans/claude-medical-muhurat-findings.md`. Open: live deploy
         verification + owner sign-off.
       _(P0-MUHURAT-FULL-PARITY; owner scope 2026-07-21; v1 built 2026-07-25)_
+  - [ ] **Independent review + bug bash of the medical Muhurat feature** — assign to a
+        different agent (Cursor/Codex) than the builder (Claude Code). Second
+        adversarial pass on live `/muhurat/medical`: engine correctness
+        (Purnima/Amavasya + eclipse coverage, Abhijit/Rahu Kaal, natal Janma Rashi
+        overlay), safety framing (safety wall first, confirmation gates the finder, no
+        medical-outcome/success claims), DST + high-latitude places, EN/HI at 320–390px,
+        and regressions on the F1–F3 fixes. Record findings; do not fix non-trivial
+        defects — hand back to the owner. Brief/refs: task-log row
+        `MEDICAL-MUHURAT-BUGBASH-02` and `plans/claude-medical-muhurat-findings.md`.
+      _(follow-up to P0-MEDICAL-MUHURAT v1; owner-requested 2026-07-25)_
 - [ ] **P0 before go-live — discoverability, publishing and public platform.** Ship
       all of the following as launch gates rather than post-launch polish:
   - [ ] Clean path-based routes for every public screen and calculator; preserve
