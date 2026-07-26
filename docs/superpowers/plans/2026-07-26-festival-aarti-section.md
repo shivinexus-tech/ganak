@@ -91,7 +91,7 @@ validation gates (`.cjs`) using `validation/_load-app.cjs`.
 Append to the "Active and recent tasks" table in `plans/task-log.md`:
 
 ```
-| CLAUDE-FESTIVAL-AARTI-01 | ACTIVE | Claude Code | `main` | `src/data/aarti-texts.ts` (new), `src/data/vrat-vidhis.ts`, `src/data/major-festival-guides.ts`, `src/components/VratVidhiCard.tsx`, `validation/festival-aarti.cjs` (new), `plans/festival-aarti-standard.md`, own task-log row | Aarti section: Devanagari aartis after Puja on N.Indian festival/vrat guides (spec 2026-07-25). Code+gate first, content by batch, owner-verified. | Pre-flight 2026-07-26: clean lane; no overlap with ACTIVE hero-art files. |
+| CLAUDE-FESTIVAL-AARTI-01 | ACTIVE | Claude Code | worktree `claude/festival-aarti` | `src/data/aarti-texts.ts` (new), `src/data/vrat-vidhis.ts`, `src/data/major-festival-guides.ts`, `src/components/VratVidhiCard.tsx`, `validation/festival-aarti.cjs` (new), `plans/festival-aarti-standard.md`, own task-log row | Aarti section: Devanagari aartis after Puja on N.Indian festival/vrat guides (spec 2026-07-25). Code+gate first, content by batch, owner-verified. Isolated branch — no auto-deploy until owner approves merge. | Pre-flight 2026-07-26: clean lane; no overlap with ACTIVE hero-art files. |
 ```
 
 - [ ] **Step 2: Add the two labels**
@@ -137,9 +137,11 @@ git commit -m "feat(aarti): reserve lane + add aarti section labels"
 
 - [ ] **Step 1: Create `src/data/aarti-texts.ts` with the three Diwali aartis**
 
-Create the file. `verses` must hold the full cross-validated Devanagari text entered
-per `plans/festival-aarti-standard.md` §1 (opening lines shown as the required
-first-line anchors; complete the remaining stanzas from 2–3 sources at execution):
+Create the file. `verses` must hold the **full, cross-validated Devanagari text**
+(2–3 sources incl. drikpanchang.com), entered per `plans/festival-aarti-standard.md`
+§1 — **not placeholders** (the gate rejects Latin text and requires ≥4 Devanagari
+lines). The skeletons below show the required first-line anchors and shape; replace the
+`… (complete per standard)` with the complete verses before running the gate:
 
 ```ts
 // Reusable and festival-specific aarti texts. Defined once, referenced by guides.
@@ -359,14 +361,12 @@ git commit -m "test(aarti): festival-aarti gate (structure + Devanagari + orthog
 
 ## Task 5: Browser-verify the Diwali proof slice + production build
 
-**Files:** none (verification only)
+**Files:** none (verification only — Diwali's full text was entered in Task 2)
 
-- [ ] **Step 1: Complete the three Diwali verses to full verified text**
+- [ ] **Step 1: Confirm sources recorded**
 
-Replace the `… (complete per standard)` placeholders in `GANESH_AARTI`,
-`LAKSHMI_AARTI`, `OM_JAI_JAGDISH_HARE` with the full cross-validated Devanagari
-(2–3 sources incl. drikpanchang.com), following `plans/festival-aarti-standard.md` §1.
-Record the sources in the standard's citations section.
+Verify the three Diwali aarti sources (2–3 each) are recorded in the citations section
+of `plans/festival-aarti-standard.md`. If not, add them.
 
 - [ ] **Step 2: Re-run the gate**
 
@@ -390,15 +390,19 @@ Festivals list, and the standalone `/festival/diwali` route). Verify, in EN and 
 - no horizontal overflow at 375px; 0 console errors.
 Capture a screenshot of the expanded Diwali aarti as proof.
 
-- [ ] **Step 5: Commit the completed Diwali content**
+- [ ] **Step 5: Commit any source citations added**
 
 ```bash
-git add src/data/aarti-texts.ts plans/festival-aarti-standard.md
-git commit -m "content(aarti): complete Diwali aartis (Ganesh/Lakshmi/Om Jai Jagdish Hare) + sources"
+git add plans/festival-aarti-standard.md
+git commit -m "docs(aarti): record Diwali aarti sources"
 ```
+(If citations were already committed in Task 2, this step is a no-op — skip it.)
 
-> **Owner checkpoint:** Diwali is the proof slice — owner proof-reads the three texts
-> before the content batches proceed.
+> **⛔ OWNER CHECKPOINT — HARD PAUSE.** Diwali is the proof slice and the end of the
+> autonomous "frame now" scope. Do **not** start Task 6+. Present the working Diwali
+> aarti (screenshot + the three texts) to the owner for proof-reading and an explicit
+> go-ahead before drafting the remaining aartis. Nothing merges to `main` (production)
+> until the owner approves.
 
 ---
 
