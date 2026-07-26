@@ -8,6 +8,16 @@ const { loadApp } = require('./_load-app.cjs');
 const doshas = loadApp('src/engine/doshas.ts');
 const calc = loadApp('src/engine/utility-calculators.ts');
 const { computeKundli } = loadApp('src/engine/kundli.ts');
+const explain = loadApp('src/data/dosha-explainers.ts');
+
+// ---- content taxonomy must stay aligned with the engine (or "yours" mis-highlights) ----
+assert.deepStrictEqual(explain.KALA_SARPA_TYPES.map(t => t.key), doshas.KS_TYPES.map(t => t.key), 'Kala Sarpa type content drifted from engine KS_TYPES');
+assert(explain.KALA_SARPA_TYPES.every((t, i) => t.house === i + 1 && t.descEn && t.descHi), 'each Kala Sarpa type needs its Rahu house and a bilingual description');
+assert.deepStrictEqual(explain.PITRA_FORMS.map(f => f.key), doshas.PITRA_CHECKS.map(c => c.key), 'Pitra form content drifted from engine PITRA_CHECKS');
+assert(explain.PITRA_FORMS.every(f => f.descEn && f.descHi), 'each Pitra form needs a bilingual description');
+['kala-sarpa', 'pitra-dosha', 'papa-dosha'].forEach(s => assert(explain.DOSHA_REMEDIES[s] && explain.DOSHA_REMEDIES[s].length && explain.DOSHA_REMEDIES[s].every(r => r.en && r.hi), `remedies missing/incomplete for ${s}`));
+assert(explain.PAPA_HOUSE_MEANINGS.length === 6 && explain.PAPA_HOUSE_MEANINGS.every(m => m.en && m.hi), 'papa house meanings must cover all 6 sensitive houses bilingually');
+assert(explain.PITRA_CAUSES.length >= 3 && explain.PITRA_CAUSES.every(c => c.en && c.hi), 'Pitra causes must be bilingual');
 
 // ---- structure ----
 assert.strictEqual(doshas.KS_TYPES.length, 12, 'Kala Sarpa must define all 12 named types');
