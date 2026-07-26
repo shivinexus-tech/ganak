@@ -6,6 +6,7 @@ import DailyScreen from "./screens/DailyScreen";
 import FestivalGuideScreen, { festivalGuideFromPath } from "./screens/FestivalGuideScreen";
 import UtilityCalculatorScreen from "./screens/UtilityCalculatorScreen";
 import { utilityFromPath } from "./data/utility-calculators";
+import MedicalMuhuratScreen, { medicalMuhuratFromPath } from "./screens/MedicalMuhuratScreen";
 import { FEST_NAME } from "./data/festival-meta";
 import { urlPrefGet, urlPrefSet, urlPrefsSet } from "./components/url-prefs";
 import {
@@ -83,6 +84,7 @@ export default function KundliApp() {
   const chooseMode = (v) => { setMode(v); urlPrefSet("screen", v); };
   const directFestivalGuide = festivalGuideFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const utilityRoute = utilityFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
+  const medicalRoute = medicalMuhuratFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const hero = pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute);
 
   const DEFAULT_PLACE = { label: "New Delhi, India", lat: 28.61, lon: 77.21, zone: "Asia/Kolkata" };
@@ -152,7 +154,7 @@ export default function KundliApp() {
           </p>
         </header>
 
-        {!directFestivalGuide && !utilityRoute && <div style={{ display: "flex", justifyContent: "center", marginBottom: T.s5 }}>
+        {!directFestivalGuide && !utilityRoute && !medicalRoute && <div style={{ display: "flex", justifyContent: "center", marginBottom: T.s5 }}>
           <div style={{ display: "inline-flex", background: "#F1E9D5", borderRadius: T.rMd, padding: 3, border: `1px solid ${C.line}` }}>
             {[["daily", lang === "hi" ? "आज · पंचांग" : "Daily"], ["prashna", lang === "hi" ? "प्रश्न" : "Prashna"], ["chart", lang === "hi" ? "ज्योतिष" : "Jyotish"]].map(([mk, label]) => (
               <button key={mk} onClick={() => chooseMode(mk)} style={{ padding: "9px 26px", borderRadius: T.rSm, fontFamily: T.serif, fontSize: T.fBody, cursor: "pointer", border: "none", background: mode === mk ? C.panel : "transparent", color: mode === mk ? C.gold : C.muted, fontWeight: mode === mk ? 600 : 400, boxShadow: mode === mk ? T.e1 : "none", transition: "all .15s" }}>{label}</button>
@@ -173,15 +175,17 @@ export default function KundliApp() {
 
         {utilityRoute && <UtilityCalculatorScreen route={utilityRoute} lang={lang} C={C} card={card} place={panchEff} onPlace={setPanchPlace} />}
 
-        {!directFestivalGuide && !utilityRoute && mode === "prashna" && (
+        {medicalRoute && <MedicalMuhuratScreen lang={lang} C={C} card={card} place={panchEff} onPlace={setPanchPlace} />}
+
+        {!directFestivalGuide && !utilityRoute && !medicalRoute && mode === "prashna" && (
           <PrashnaScreen lat={panchEff?.lat} lon={panchEff?.lon} placeLabel={panchEff?.label} lang={lang} />
         )}
 
-        {!directFestivalGuide && !utilityRoute && mode === "daily" && (
+        {!directFestivalGuide && !utilityRoute && !medicalRoute && mode === "daily" && (
           <DailyScreen C={C} card={card} lang={lang} place={panchEff} onPlace={setPanchPlace} />
         )}
 
-        {!directFestivalGuide && !utilityRoute && mode === "chart" && (
+        {!directFestivalGuide && !utilityRoute && !medicalRoute && mode === "chart" && (
           <ChartScreen C={C} card={card} lang={lang} />
         )}
 
