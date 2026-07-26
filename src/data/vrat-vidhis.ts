@@ -29,6 +29,11 @@ export const VRAT_VIDHI_LABELS = {
   meaning: { en: "Why this day matters", hi: "इस दिन का महत्त्व" },
   stories: { en: "Regional kathas to read or hear", hi: "पढ़ने या सुनने योग्य क्षेत्रीय कथाएँ" },
   regional: { en: "Regional traditions", hi: "क्षेत्रीय परम्पराएँ" },
+  aarti: { en: "Aarti (devotional lamp-song)", hi: "आरती" },
+  aartiDisclaimer: {
+    en: "This is a widely-sung version; your family's wording may differ.",
+    hi: "यह व्यापक रूप से गाई जाने वाली आरती है; आपके परिवार की परम्परा में शब्द भिन्न हो सकते हैं।",
+  },
 };
 export const VRAT_VIDHI_SAFETY = {
   en: "This health note does not change the religious rule described below. Some vrats are traditionally nirjala (without food or water). Children, older people, anyone who is pregnant or breastfeeding, unwell, taking medicines, or living with diabetes, kidney disease or an eating disorder should seek medical advice and guidance from their family or religious tradition before observing a strict fast. Seek help if you become faint, confused, severely weak, cannot keep fluids down, or have unsafe blood-sugar symptoms. Never stop or retime prescribed medicine without medical advice.",
