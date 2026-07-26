@@ -185,7 +185,16 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       own result was derived (the specific placements that produced it, not just the
       generic rule), what it means in balanced non-fatalistic terms, common myths vs
       reality, and when/whether to consult a qualified person. Keep answer-first, keep
-      it bilingual and phone-readable, keep sources/conventions honest. Applies
+      it bilingual and phone-readable, keep sources/conventions honest.
+      **Follow-up (owner, 2026-07-26): describe IMPACT, not just a taxonomy.** The
+      v2 dosha pages now *list* the kinds (12 Kala Sarpa types, 5 Pitra forms, 6
+      papa houses) but only give a one-line descriptor per entry — they still don't
+      tell the reader *how each one actually affects life* (temperament, timing,
+      the areas it colours, what tends to ease it). Every enumerated type/form must
+      gain a short, non-fatalistic "how it tends to show up / what helps" impact
+      note, and the user's own type should get an expanded personalised read — not
+      just a highlight. Then roll the full template to the remaining calculators
+      (Mangal Dosha, Sade Sati, Rashi, Nakshatra, Lagna, etc.). Applies
       retroactively to the shipped `CLAUDE-P0-DOSHAS-01` pages
       (`/calculator/kala-sarpa`, `/pitra-dosha`, `/papa-dosha`). _(P0-CALCULATOR-DEPTH)_
 - [ ] **TESTING STANDARD — calculator-type features need 4–5 recorded adversarial
@@ -201,6 +210,20 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       phone-width, and live production behaviour (not just localhost). Gates prove the
       maths; these rounds prove the *interaction* works. This is in addition to the
       two-agent 30-minute bug-bash rule in the closure contract. _(TEST-STD-CALCULATORS)_
+- [ ] **P1 — script/language consistency for rashi, nakshatra and planet names
+      (owner, 2026-07-26).** In Hindi mode, sign (rashi) and nakshatra names — and
+      in places planet names — still render as Latin transliteration (e.g. "Kumbha
+      (Aquarius)", "Dhanishta", "Saturn") instead of Devanagari (कुम्भ, धनिष्ठा,
+      शनि). Today localization is patchy and per-screen: `UtilityCalculatorScreen`
+      has ad-hoc `SIGN_HI`/`TERM_HI`/`PLANET_HI` maps and `localTerm`/`signOnly`
+      helpers, while `SIGNS`/`NAKSHATRAS`/`PLANET_DEVA` from the engine are mixed
+      Latin. This leaks English into Hindi journeys across the dosha pages, Kundli
+      screen, utility calculators and matching. Solution (design later): ONE shared
+      bilingual lookup for the 12 rashis, 27 nakshatras, 9 grahas (+ tithi/yoga/
+      karana already partly done) used by every screen, so `lang` alone flips the
+      script everywhere; remove the scattered per-file maps. Add a gate that fails
+      if a user-facing sign/nakshatra/planet string renders Latin while `lang==="hi"`.
+      Cross-cutting; coordinate with EPIC-DS. _(I18N-DEVANAGARI-TERMS)_
 - [ ] **P0 before go-live — exceptionally strong Panchang and calendar parity.**
       Ganak must close every gap identified in the 2026-07-21 competitor comparison,
       while retaining answer-before-data, Hindi/English journeys, local-time accuracy
