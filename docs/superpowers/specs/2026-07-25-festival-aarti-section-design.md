@@ -48,28 +48,36 @@ non-overlapping lane requiring its own reserved task-log row before editing.
 
 ## Data model
 
-A new **optional** field on any guide object:
+A festival can need **several** aartis (Diwali = Ganesh + Lakshmi + Om Jai Jagdish
+Hare). So the field is an **optional array**, `aartis`:
 
 ```js
-aarti: {
-  title: { en: "Aarti of Lakshmi — Om Jai Lakshmi Mata", hi: "श्री लक्ष्मी जी की आरती" },
-  intro: { en: "Sung at the close of the puja while circling the lamp before the Goddess.",
-           hi: "पूजा के अंत में देवी के सम्मुख दीपक घुमाते हुए गाई जाती है।" },
-  verses: "ॐ जय लक्ष्मी माता,\nमैया जय लक्ष्मी माता।\n…"   // Devanagari, \n-separated lines
-}
+aartis: [
+  { title: { en: "Ganesh Aarti — Jai Ganesh Deva", hi: "..." },
+    intro: { en: "Sung first, invoking Ganesha before the main worship.", hi: "..." },
+    verses: "..." },                                  // Devanagari, \n-separated lines
+  { title: { en: "Lakshmi Aarti — Om Jai Lakshmi Mata", hi: "..." },
+    intro: { en: "The Goddess's own aarti at the heart of the puja.", hi: "..." },
+    verses: "..." },
+  { title: { en: "Om Jai Jagdish Hare", hi: "..." },
+    intro: { en: "The universal aarti that closes the worship.", hi: "..." },
+    verses: "..." },
+]
 ```
 
-- `verses` — a **single Devanagari string**, line breaks preserved, rendered
-  identically in EN and HI. This is the aarti proper.
-- `title` — bilingual heading for the collapsible toggle.
-- `intro` — short bilingual context line. In EN mode the `en` line supplies the
-  "English meaning". In HI mode the `hi` line shows (or is omitted if empty).
-- The field is optional. Guides without it render exactly as today. Observances
-  where a lamp-aarti does not apply (eclipses, Makar Sankranti Surya arghya, plain
-  Ekadashi/Pradosh timing pages) intentionally carry **no** `aarti`.
+- `aartis` — an **ordered array**; order follows worship order (invocation → deity →
+  universal close), per `plans/festival-aarti-standard.md` §2.
+- Each entry: `verses` (single Devanagari string, line breaks preserved, identical in
+  EN and HI — the aarti proper), `title` (bilingual toggle heading), `intro`
+  (bilingual context; the `en` line is the "English meaning" shown in EN mode).
+- The field is optional. Guides without it render exactly as today. Observances where
+  a lamp-aarti does not apply (eclipses, Makar Sankranti Surya arghya, plain
+  Ekadashi/Pradosh timing pages) intentionally carry **no** `aartis`.
 
-If the `guide()` factory is used, thread `aarti` through it the same optional way
-`safety` is threaded (`...(x.aarti ? { aarti: ... } : {})`).
+If the `guide()` factory is used, thread `aartis` through it the same optional way
+`safety` is threaded (`...(x.aartis ? { aartis: ... } : {})`).
+
+Orthography and layout for all verses follow `plans/festival-aarti-standard.md`.
 
 ## Rendering
 
@@ -77,51 +85,73 @@ In `VratVidhiCard`, after the Puja section (`section(lbl("puja"), pujaBody)`) an
 before the stories block, add:
 
 ```jsx
-{data.aarti && (
-  <details style={{ marginTop: 8, borderTop: `1px solid ${C.line}`, paddingTop: 8 }}>
-    <summary style={{ color: C.gold, fontWeight: 700, cursor: "pointer" }}>
-      {txt(data.aarti.title) || lbl("aarti")}
-    </summary>
-    {data.aarti.intro && txt(data.aarti.intro) && (
-      <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5, margin: "6px 0" }}>
-        {txt(data.aarti.intro)}
-      </div>
-    )}
-    <div style={{ whiteSpace: "pre-line", fontSize: T.fSmall, color: C.ivory,
-                  lineHeight: 1.7, marginTop: 6 }}>
-      {data.aarti.verses}
+{data.aartis && data.aartis.length > 0 && (
+  <div style={{ marginTop: 8 }}>
+    <div style={{ ...T.label, color: C.gold, marginBottom: 3 }}>{lbl("aarti")}</div>
+    {data.aartis.map((a, i) => (
+      <details key={i} style={{ borderTop: `1px solid ${C.line}`, paddingTop: 8, marginTop: i ? 6 : 0 }}>
+        <summary style={{ color: C.gold, fontWeight: 700, cursor: "pointer" }}>
+          {txt(a.title)}
+        </summary>
+        {a.intro && txt(a.intro) && (
+          <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5, margin: "6px 0" }}>
+            {txt(a.intro)}
+          </div>
+        )}
+        <div style={{ whiteSpace: "pre-line", fontSize: T.fSmall, color: C.ivory,
+                      lineHeight: 1.7, marginTop: 6 }}>
+          {a.verses}
+        </div>
+      </details>
+    ))}
+    <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5, marginTop: 8 }}>
+      {lbl("aartiDisclaimer")}
     </div>
-  </details>
+  </div>
 )}
 ```
 
-New label in `VRAT_VIDHI_LABELS`:
+Each aarti is its own collapsible; the section header (`aarti` label) sits above the
+list, and **one** small muted disclaimer sits at the bottom of the whole block —
+"widely-sung version; your family's wording may differ" (`aartiDisclaimer` label),
+never per-verse.
+
+New labels in `VRAT_VIDHI_LABELS`:
 ```js
 aarti: { en: "Aarti (devotional lamp-song)", hi: "आरती" },
+aartiDisclaimer: {
+  en: "This is a widely-sung version; your family's wording may differ.",
+  hi: "यह व्यापक रूप से गाई जाने वाली आरती है; आपके परिवार की परम्परा में शब्द भिन्न हो सकते हैं।",
+},
 ```
-`whiteSpace: "pre-line"` preserves the `\n` line breaks without needing an array.
-The block reuses existing tokens; no new colors. Verified against the card's
-`overflow: hidden` container — long Devanagari lines wrap, no horizontal overflow.
+`whiteSpace: "pre-line"` preserves the `\n` line breaks per verse. The block reuses
+existing tokens; no new colors. Verified against the card's `overflow: hidden`
+container — long Devanagari lines wrap, no horizontal overflow.
 
 ## Phase 1 scope — North Indian deity aartis
 
-Guides that get an `aarti` in Phase 1 (each keyed to its guide slug):
+Standard order per festival: **Ganesh invocation → deity aarti → Om Jai Jagdish Hare
+(universal close)**. Proposed `aartis` set per guide slug (owner confirmation pending):
 
-| Guide key | Deity / aarti |
-|-----------|---------------|
-| `diwali` | Lakshmi — *Om Jai Lakshmi Mata* |
-| `dhanteras` | Dhanvantari / Lakshmi |
-| `govardhanPuja` | Krishna / Govardhan |
-| `ganeshChaturthi` | Ganesha — *Jai Ganesh Deva* |
-| `janmashtami` | Krishna — *Aarti Kunj Bihari ki* |
-| `ramNavami` | Rama — *Shri Ramchandra Kripalu* (aarti form) |
-| `hanumanJ` | Hanuman — *Aarti Kije Hanuman Lala ki* |
-| `sharadNavratri`, `chaitraNavratri` | Durga — *Jai Ambe Gauri* |
-| `mahaShivaratri`, `masikShivaratri`, `pradosh` | Shiva — *Om Jai Shiv Omkara* |
-| `karvaChauth` | Gauri / Karva Mata |
-| `ahoiAshtami` | Ahoi Mata |
-| `hartalikaTeej` | Gauri–Shankar |
-| `purnima` (Satyanarayan) | Vishnu — *Om Jai Jagdish Hare* |
+| Guide key | Aartis (in order) |
+|-----------|-------------------|
+| `diwali` | Ganesh (*Jai Ganesh Deva*) · Lakshmi (*Om Jai Lakshmi Mata*) · *Om Jai Jagdish Hare* |
+| `dhanteras` | Ganesh · Lakshmi (*Om Jai Lakshmi Mata*) · *Om Jai Jagdish Hare* |
+| `govardhanPuja` | Ganesh · Krishna (*Aarti Kunj Bihari ki*) · *Om Jai Jagdish Hare* |
+| `ganeshChaturthi` | Ganesh (*Jai Ganesh Deva*) · *Om Jai Jagdish Hare* |
+| `janmashtami` | Ganesh · Krishna (*Aarti Kunj Bihari ki*) · *Om Jai Jagdish Hare* |
+| `ramNavami` | Ganesh · Rama (*Aarti Kije Ramchandra ji ki*) · *Om Jai Jagdish Hare* |
+| `hanumanJ` | Ganesh · Hanuman (*Aarti Kije Hanuman Lala ki*) · *Om Jai Jagdish Hare* |
+| `sharadNavratri`, `chaitraNavratri` | Ganesh · Durga (*Jai Ambe Gauri*) · *Om Jai Jagdish Hare* |
+| `mahaShivaratri`, `masikShivaratri`, `pradosh` | Ganesh · Shiva (*Om Jai Shiv Omkara*) · *Om Jai Jagdish Hare* |
+| `karvaChauth` | Ganesh · Gauri/Karva Mata · *Om Jai Jagdish Hare* |
+| `ahoiAshtami` | Ganesh · Ahoi Mata · *Om Jai Jagdish Hare* |
+| `hartalikaTeej` | Ganesh · Shiva (*Om Jai Shiv Omkara*) · Gauri · *Om Jai Jagdish Hare* |
+| `purnima` (Satyanarayan) | Ganesh · Satyanarayan (*Jai Lakshmi Ramana*) · *Om Jai Jagdish Hare* |
+
+The Ganesh invocation and *Om Jai Jagdish Hare* are the same reusable texts across
+festivals (define once, reference). Per §2 of the standard, include an aarti only where
+genuinely customary — do not pad to reach three.
 
 Exact final list is confirmed during implementation against which keys actually
 render a full guide; any key without a clean, standard North Indian aarti is deferred
@@ -158,15 +188,19 @@ production verification. Backlog: `P1-FESTIVAL-AARTI-CONTENT`.
 
 ## Validation gate
 
-New `validation/festival-aarti.cjs` asserts, for every Phase-1 guide key:
+New `validation/festival-aarti.cjs` asserts, per `plans/festival-aarti-standard.md`
+§5, for every Phase-1 guide key:
 
-1. An `aarti` object exists with non-empty `title`, `intro`, and `verses`.
-2. `verses` contains Devanagari (Unicode range `ऀ–ॿ`) and is multi-line
-   (at least 4 `\n`-separated non-empty lines) — catches empty/placeholder/garbled
-   entries.
-3. A **first-line anchor** per aarti (e.g. `diwali` verses start with `ॐ जय लक्ष्मी माता`)
-   — catches a wrong or swapped aarti.
-4. Guides intentionally without aarti (eclipses, Makar Sankranti, plain Ekadashi)
+1. A non-empty `aartis` **array** exists; each entry has non-empty `title`, `intro`,
+   `verses`.
+2. Each `verses` contains Devanagari (Unicode range `ऀ–ॿ`) and is multi-line (at
+   least 4 `\n`-separated non-empty lines) — catches empty/placeholder/garbled.
+3. **Orthography checks:** reject `ओम्` in verses (must be `ॐ`); reject Latin letters
+   inside verse text.
+4. A **first-line anchor** per named aarti (e.g. the Diwali Lakshmi aarti starts with
+   `ॐ जय लक्ष्मी माता`, its Ganesh aarti with `जय गणेश`) — catches a wrong/swapped
+   aarti.
+5. Guides intentionally without aarti (eclipses, Makar Sankranti, plain Ekadashi)
    are **not** required to have one (explicit allow-list, so the gate can't be
    satisfied by silently dropping the field).
 
@@ -175,12 +209,16 @@ Gate is added to the standard `.cjs` suite. Existing festival gates
 
 ## Files touched
 
-- `src/data/major-festival-guides.ts` — add `aarti` to relevant `guide({...})` calls;
-  thread `aarti` through the `guide()` factory.
-- `src/data/vrat-vidhis.ts` — add `aarti` label to `VRAT_VIDHI_LABELS`; add `aarti`
-  to inline base guides (e.g. `diwali`, `mahaShivaratri`, `ganeshChaturthi`, …).
-- `src/components/VratVidhiCard.tsx` — render the collapsible aarti block.
-- `validation/festival-aarti.cjs` — new structure + Devanagari + anchor gate.
+- `src/data/major-festival-guides.ts` — add `aartis` to relevant `guide({...})`
+  calls; thread `aartis` through the `guide()` factory.
+- `src/data/vrat-vidhis.ts` — add `aarti` + `aartiDisclaimer` labels to
+  `VRAT_VIDHI_LABELS`; add `aartis` to inline base guides (e.g. `diwali`,
+  `mahaShivaratri`, `ganeshChaturthi`, …).
+- `src/components/VratVidhiCard.tsx` — render the aarti list (one collapsible each)
+  with the single bottom disclaimer.
+- `validation/festival-aarti.cjs` — new structure + Devanagari + orthography + anchor
+  gate.
+- `plans/festival-aarti-standard.md` — rendering/orthography/sourcing standard (done).
 - `plans/task-log.md` — reserved row for this lane.
 
 ## Testing / gates
