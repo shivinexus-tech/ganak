@@ -132,8 +132,18 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         No engine counts as launched while its route/panel is hidden, untranslated,
         visually unfinished or missing validation evidence.
   - [ ] South- and East-Indian chart styles in addition to the current chart.
+        _(South shipped 2026-07-26, `CLAUDE-P0-CHARTSTYLES-AYAN-01` REVIEW:
+        sign-fixed 4×4 grid, lagna wedge, degrees/retro, North/South toggle
+        persisted in URL. **East-Indian deferred** — the Bengali chart has real
+        regional ambiguity (house-fixed vs sign-fixed; exact compartment→sign
+        order + triangular geometry). Needs a reliable source before shipping so
+        Ganak doesn't present a subtly-wrong traditional chart. Fast-follow.)_
   - [ ] Keep and expose multiple ayanamshas without changing Ganak's default
-        Lahiri + mean Rahu/Ketu convention.
+        Lahiri + mean Rahu/Ketu convention. _(Shipped 2026-07-26,
+        `CLAUDE-P0-CHARTSTYLES-AYAN-01` REVIEW: Lahiri (default) + Raman + KP +
+        True Chitrapaksha selectable in the Kundli screen; changing it auto-recasts
+        a live chart; gate pins the offsets + verifies the Raman shift. Default
+        unchanged. Open: deploy + sign-off.)_
   - [ ] Complete the general Dosha explanation layer and finish Ruling Planets,
         reusing existing engine work only after rule/anchor verification.
   - [ ] Complete the answer-before-data life interpretation layer so the public

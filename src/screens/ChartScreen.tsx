@@ -7,6 +7,8 @@ import { fmtDeg, fmtDateT } from "../components/format";
 import { searchOffline, searchOnline } from "../data/places";
 import MatchMaker from "./MatchingScreen";
 import DiamondChart from "../components/DiamondChart";
+import SouthChart from "../components/SouthChart";
+import { urlPrefGet, urlPrefSet } from "../components/url-prefs";
 import { VARGAS, SPECIAL_CHARTS, SIGN_SHORT, PLANET_GLYPH } from "../data/chart-divisions";
 import { vargaSign } from "../engine/varga";
 import { SEVEN } from "../engine/classical";
@@ -52,6 +54,9 @@ export default function ChartScreen({ C, card, lang }) {
   const [varga, setVarga] = useState("D1");
   const [refPt, setRefPt] = useState("lagna");
   const [ayanamsa, setAyanamsa] = useState("lahiri");
+  // Chart style (North diamond / South grid) survives reload + sharing via the URL.
+  const [chartStyle, setChartStyle] = useState(() => (urlPrefGet("cstyle") === "south" ? "south" : "north"));
+  const chooseStyle = (v) => { setChartStyle(v); urlPrefSet("cstyle", v); };
   const [err, setErr] = useState("");
 
   // Vimshottari drill-down: which sub-periods are expanded (keys "level:startMs").
@@ -143,6 +148,21 @@ export default function ChartScreen({ C, card, lang }) {
     setTimeout(() => { const el = document.getElementById("summary"); if (el) el.scrollIntoView({ behavior: "smooth" }); }, 150);
   };
 
+  // Changing the ayanamsa after a chart is cast recomputes it live from the same
+  // birth data — so picking Raman/KP visibly updates instead of silently waiting
+  // for a re-cast.
+  useEffect(() => {
+    if (!chartContext) return;
+    const c = chartContext;
+    if (c.ayanamsa === ayanamsa) return;
+    const [y, m, day] = (c.form.date || "").split("-").map(Number);
+    const [hh, mi] = (c.form.time || "").split(":").map(Number);
+    const tz = tzOverride !== "" ? parseFloat(tzOverride) : zoneOffset(c.place.zone, y, m, day);
+    if (!y || isNaN(hh) || tz == null || isNaN(tz)) return;
+    setResult(computeKundli({ y, m, day, hh, mi, tz, lat: c.place.lat, lon: c.place.lon, ayanamsa }));
+    setChartContext({ ...c, ayanamsa });
+  }, [ayanamsa]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const inputStyle = {
     width: "100%", boxSizing: "border-box", background: "#FFFDF7",
     border: `1px solid ${C.line}`, borderRadius: 6, color: C.ivory,
@@ -179,6 +199,10 @@ export default function ChartScreen({ C, card, lang }) {
         const vs = vargaSign(p.lon, varga);
         return { label: PLANET_GLYPH[p.name], house: ((vs - vAscSign + 12) % 12) + 1, retro: p.retro, deg: p.deg };
       })
+    : [];
+  // Sign-indexed planets for the sign-fixed South chart (varga sign, not house).
+  const vPlanetsSign = r
+    ? r.rows.map((p) => ({ label: PLANET_GLYPH[p.name], sign: vargaSign(p.lon, varga), retro: p.retro, deg: p.deg }))
     : [];
 
 
@@ -252,10 +276,10 @@ export default function ChartScreen({ C, card, lang }) {
           {err && <p style={{ color: C.sindoor, fontSize: 14, margin: "12px 0 0" }}><span aria-hidden="true">⚠ </span>{err}</p>}
           <div style={{ marginTop: 16 }}>
             <label style={labelStyle}>{lang === "hi" ? "अयनांश" : "Ayanamsa"}</label>
-            <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 8, marginTop: 6 }}>
               {Object.entries(AYANAMSA).map(([k, v]) => (
                 <button key={k} onClick={() => setAyanamsa(k)}
-                  style={{ flex: 1, padding: "9px 10px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600,
+                  style={{ padding: "9px 10px", borderRadius: 8, cursor: "pointer", fontSize: 12.5, fontWeight: 600,
                     border: ayanamsa === k ? "1.5px solid #A86A12" : "1px solid #D9CCAE",
                     background: ayanamsa === k ? "rgba(168,106,18,.10)" : "#FBF6EC",
                     color: ayanamsa === k ? C.gold : C.muted }}>
@@ -265,8 +289,8 @@ export default function ChartScreen({ C, card, lang }) {
             </div>
             <p style={{ color: C.muted, fontSize: 11.5, margin: "6px 0 0", lineHeight: 1.5 }}>
               {lang === "hi"
-                ? "लाहिरी सरकारी/वैदिक मानक है। KP (कृष्णमूर्ति) हर स्थिति को लगभग 5′48″ पहले खिसकाता है — कृष्णमूर्ति पद्धति के उप-स्वामी कार्य हेतु आवश्यक।"
-                : "Lahiri is the government/Vedic standard. KP (Krishnamurti) shifts every position ~5′48″ earlier — required for Krishnamurti Paddhati sub-lord work."}
+                ? "लाहिरी सरकारी/वैदिक मानक (डिफ़ॉल्ट) है। रमन इससे ~1°28′ भिन्न है; KP (कृष्णमूर्ति) ~5′48″ पहले — उप-स्वामी कार्य हेतु; ट्रू चित्रपक्ष चित्रा को ठीक 180° पर रखता है और व्यवहार में लाहिरी के समान रहता है।"
+                : "Lahiri is the government/Vedic standard (default). Raman differs by ~1°28′; KP (Krishnamurti) is ~5′48″ earlier — needed for sub-lord work; True Chitrapaksha fixes Spica at exactly 180° and in practice coincides with Lahiri."}
             </p>
           </div>
           <button
@@ -343,6 +367,29 @@ export default function ChartScreen({ C, card, lang }) {
               </p>
               {refNote && <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "2px 0 10px" }}>{refNote}</p>}
               {!refNote && <div style={{ height: 10 }} />}
+              {/* chart-style switch — North diamond / South grid; choice persists in the URL */}
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+                <div style={{ display: "inline-flex", background: "#F1E9D5", borderRadius: 10, padding: 3, border: `1px solid ${C.line}` }}>
+                  {[["north", hi ? "उत्तर भारतीय" : "North"], ["south", hi ? "दक्षिण भारतीय" : "South"]].map(([sk, slabel]) => (
+                    <button key={sk} onClick={() => chooseStyle(sk)}
+                      style={{ padding: "6px 16px", borderRadius: 8, fontFamily: "Spectral, serif", fontSize: 12.5, cursor: "pointer", border: "none",
+                        background: chartStyle === sk ? C.panel || "#FFFFFF" : "transparent", color: chartStyle === sk ? C.gold : C.muted, fontWeight: chartStyle === sk ? 600 : 400 }}>
+                      {slabel}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {chartStyle === "south" ? (
+                <SouthChart
+                  key={"s" + varga + refPt}
+                  title={form.name ? `${form.name} · ${(place && place.label) || ""}` : (place && place.label) || (hi ? "जन्म कुंडली" : "Birth chart")}
+                  ascSign={vAscSign}
+                  planets={vPlanetsSign}
+                  showDeg={varga === "D1"}
+                  lagnaLabel={refPt === "lagna" ? "LAGNA" : refPt === "surya" ? "SURYA" : refPt === "chandra" ? "CHANDRA" : "KARAKAMSA"}
+                  gold={C.gold} ivory={C.ivory} muted={C.muted} sindoor={C.sindoor}
+                />
+              ) : (
               <DiamondChart
                 key={varga + refPt}
                 title={form.name ? `${form.name} · ${(place && place.label) || ""}` : (place && place.label) || (hi ? "जन्म कुंडली" : "Birth chart")}
@@ -352,8 +399,9 @@ export default function ChartScreen({ C, card, lang }) {
                 lagnaLabel={refPt === "lagna" ? "LAGNA" : refPt === "surya" ? "SURYA" : refPt === "chandra" ? "CHANDRA" : "KARAKAMSA"}
                 gold={C.gold} ivory={C.ivory} muted={C.muted} sindoor={C.sindoor}
               />
+              )}
               <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "8px 0 0" }}>
-                {hi ? "हर भाव की संख्या उसकी राशि दिखाती है" : "Numbers mark the rashi in each house"} · <span style={{ color: C.sindoor }}>℞</span> {hi ? "वक्री" : "retrograde"}
+                {chartStyle === "south" ? (hi ? "राशियाँ स्थिर हैं; भाव लग्न से गिने जाते हैं" : "Signs are fixed; houses are counted from the lagna") : (hi ? "हर भाव की संख्या उसकी राशि दिखाती है" : "Numbers mark the rashi in each house")} · <span style={{ color: C.sindoor }}>℞</span> {hi ? "वक्री" : "retrograde"}
                 {varga === "D2" && (hi ? " · होरा कुंडली में केवल कर्क (चन्द्र) और सिंह (सूर्य) राशियाँ होती हैं" : " · the Hora chart uses only Cancer (Moon) and Leo (Sun)")}
               </p>
             </div>

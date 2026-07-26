@@ -86,7 +86,9 @@ const SAMVATSARA = ["Prabhava", "Vibhava", "Shukla", "Pramoda", "Prajapati", "An
 const jdOf = (ms) => ms / 86400000 + 2440587.5;
 const AYANAMSA = {
   lahiri: { label: "Lahiri (Chitrapaksha)", offset: 0 },
+  raman: { label: "Raman (B.V. Raman)", offset: -1.479 }, // Raman ≈ Lahiri − 1°28'; visibly different
   kp: { label: "KP (Krishnamurti)", offset: -0.096667 }, // KP Old = Lahiri − 5'48"
+  trueChitra: { label: "True Chitrapaksha", offset: -0.0003 }, // Spica fixed at 180°; coincides with Lahiri to the arc-second
 };
 let AYAN_MODE = "lahiri";
 const ayanAt = (JD) => 23.853 + 0.0139651 * ((JD - 2451545.0) / 365.25) + AYANAMSA[AYAN_MODE].offset;
