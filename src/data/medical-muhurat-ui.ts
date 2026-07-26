@@ -132,6 +132,13 @@ export const MEDICAL_JANMA = {
   hi: "चन्द्र आपकी जन्म राशि में — परंपरागत रूप से टाला गया।",
 };
 
+/* Shown when a birth date is entered but the birth city has not been picked from the
+   suggestions — otherwise the Janma Rashi overlay would be silently skipped. */
+export const MEDICAL_NATAL_UNCONFIRMED = {
+  en: "Pick your birth city from the suggestions to include the Janma Rashi caution.",
+  hi: "जन्म राशि सावधानी जोड़ने के लिए सुझावों में से अपना जन्म-शहर चुनें।",
+};
+
 export const MEDICAL_BIRTHSIGN = {
   en: "Your birth Moon sign",
   hi: "आपकी जन्म चन्द्र राशि",

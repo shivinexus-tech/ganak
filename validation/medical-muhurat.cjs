@@ -15,7 +15,7 @@
 
 const { loadApp } = require('./_load-app.cjs');
 const { medicalMuhuratScan, medicalMuhuratClean, natalMoonSign } = loadApp('src/engine/medical-muhurat.ts');
-const { MEDICAL_SAFETY, MEDICAL_TRADITION_NOTE, MEDICAL_INTRO, MEDICAL_NATAL_HINT, MEDICAL_JANMA } = loadApp('src/data/medical-muhurat-ui.ts');
+const { MEDICAL_SAFETY, MEDICAL_TRADITION_NOTE, MEDICAL_INTRO, MEDICAL_NATAL_HINT, MEDICAL_JANMA, MEDICAL_NATAL_UNCONFIRMED } = loadApp('src/data/medical-muhurat-ui.ts');
 
 const DELHI = { label: 'New Delhi', lat: 28.6139, lon: 77.2090, zone: 'Asia/Kolkata' };
 let failures = 0;
@@ -136,6 +136,7 @@ if (cleanNatal.some((r) => !r.clean)) fail('medicalMuhuratClean returned a syzyg
 // Natal copy: bilingual, and no medical-outcome claim.
 if (!MEDICAL_NATAL_HINT?.en || !MEDICAL_NATAL_HINT?.hi) fail('missing bilingual natal hint');
 if (!MEDICAL_JANMA?.en || !MEDICAL_JANMA?.hi) fail('missing bilingual Janma Rashi label');
+if (!MEDICAL_NATAL_UNCONFIRMED?.en || !MEDICAL_NATAL_UNCONFIRMED?.hi) fail('missing bilingual natal-unconfirmed hint (F3)');
 if (MEDICAL_NATAL_HINT?.en && !/optional/i.test(MEDICAL_NATAL_HINT.en)) fail('natal hint must state it is optional');
 if (MEDICAL_NATAL_HINT?.en && !/stored|store/i.test(MEDICAL_NATAL_HINT.en)) fail('natal hint must address that birth details are not stored');
 for (const [k, v] of Object.entries({ MEDICAL_NATAL_HINT, MEDICAL_JANMA })) {

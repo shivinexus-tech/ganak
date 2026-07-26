@@ -7,6 +7,7 @@ import {
   MEDICAL_EXCLUSION, MEDICAL_LABELS, MEDICAL_RESULT_NOTE, MEDICAL_NO_WINDOW,
   MEDICAL_REFUSAL, MEDICAL_TITLE,
   MEDICAL_NATAL_SECTION, MEDICAL_NATAL_HINT, MEDICAL_JANMA, MEDICAL_BIRTHSIGN, MEDICAL_RASHIS,
+  MEDICAL_NATAL_UNCONFIRMED,
 } from "../data/medical-muhurat-ui";
 
 /* Dedicated, deliberately conservative screen for timing a planned, clinician-approved
@@ -69,6 +70,16 @@ export default function MedicalMuhuratScreen({ lang, C, card, place, onPlace }: 
     if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
     canonical.href = location.origin + "/muhurat/medical";
   }, [hi]);
+
+  // F1/F2: any change to an input that feeds the calculation invalidates a shown
+  // result. Clearing it here dismisses a stale list when the range/place/birth details
+  // change, AND hides the result the moment the "timing is flexible" confirmation is
+  // withdrawn. Depends on place PRIMITIVES (the shell may hand a fresh object each
+  // render), never the object identity, so it does not wipe results on every render.
+  useEffect(() => {
+    setResult(null);
+    setNatalSign(null);
+  }, [from, to, place?.lat, place?.lon, place?.label, confirmed, agreed, birthDate, birthTime, birthConfirmed, birthPlace]);
 
   const run = () => {
     setError("");
@@ -139,6 +150,9 @@ export default function MedicalMuhuratScreen({ lang, C, card, place, onPlace }: 
             <label style={{ fontSize: 13, color: C.muted }}>{hi ? "जन्म स्थान" : "Birth place"}
               <PlaceInput value={birthPlace} onPick={setBirthPlace} onConfirmed={setBirthConfirmed} C={C} lang={lang} />
             </label>
+            {birthDate && !(birthPlace && birthConfirmed) && (
+              <p role="note" style={{ fontSize: 12, color: C.gold, margin: 0, lineHeight: 1.5 }}>{bi(MEDICAL_NATAL_UNCONFIRMED)}</p>
+            )}
           </div>
         </details>
 
