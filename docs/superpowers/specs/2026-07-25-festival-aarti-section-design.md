@@ -130,28 +130,36 @@ container — long Devanagari lines wrap, no horizontal overflow.
 
 ## Phase 1 scope — North Indian deity aartis
 
-Standard order per festival: **Ganesh invocation → deity aarti → Om Jai Jagdish Hare
-(universal close)**. Proposed `aartis` set per guide slug (owner confirmation pending):
+Default order is **Ganesh invocation → deity aarti → Om Jai Jagdish Hare (universal
+close)**, but the set is **curated per festival** — not every festival carries all
+three. Owner-confirmed `aartis` set per guide slug (2026-07-26):
 
 | Guide key | Aartis (in order) |
 |-----------|-------------------|
 | `diwali` | Ganesh (*Jai Ganesh Deva*) · Lakshmi (*Om Jai Lakshmi Mata*) · *Om Jai Jagdish Hare* |
 | `dhanteras` | Ganesh · Lakshmi (*Om Jai Lakshmi Mata*) · *Om Jai Jagdish Hare* |
-| `govardhanPuja` | Ganesh · Krishna (*Aarti Kunj Bihari ki*) · *Om Jai Jagdish Hare* |
-| `ganeshChaturthi` | Ganesh (*Jai Ganesh Deva*) · *Om Jai Jagdish Hare* |
-| `janmashtami` | Ganesh · Krishna (*Aarti Kunj Bihari ki*) · *Om Jai Jagdish Hare* |
+| `ganeshChaturthi` | Ganesh (*Jai Ganesh Deva*) — only |
+| `janmashtami` | Ganesh · Krishna (*Aarti Kunj Bihari ki*) |
+| `govardhanPuja` | Ganesh · Krishna (*Aarti Kunj Bihari ki*) |
 | `ramNavami` | Ganesh · Rama (*Aarti Kije Ramchandra ji ki*) · *Om Jai Jagdish Hare* |
-| `hanumanJ` | Ganesh · Hanuman (*Aarti Kije Hanuman Lala ki*) · *Om Jai Jagdish Hare* |
-| `sharadNavratri`, `chaitraNavratri` | Ganesh · Durga (*Jai Ambe Gauri*) · *Om Jai Jagdish Hare* |
+| `hanumanJ` | Hanuman (*Aarti Kije Hanuman Lala ki*) · Rama |
+| `sharadNavratri`, `chaitraNavratri` | Ganesh · Durga (*Jai Ambe Gauri*) · Shiva (*Om Jai Shiv Omkara*) |
 | `mahaShivaratri`, `masikShivaratri`, `pradosh` | Ganesh · Shiva (*Om Jai Shiv Omkara*) · *Om Jai Jagdish Hare* |
 | `karvaChauth` | Ganesh · Gauri/Karva Mata · *Om Jai Jagdish Hare* |
 | `ahoiAshtami` | Ganesh · Ahoi Mata · *Om Jai Jagdish Hare* |
 | `hartalikaTeej` | Ganesh · Shiva (*Om Jai Shiv Omkara*) · Gauri · *Om Jai Jagdish Hare* |
 | `purnima` (Satyanarayan) | Ganesh · Satyanarayan (*Jai Lakshmi Ramana*) · *Om Jai Jagdish Hare* |
 
-The Ganesh invocation and *Om Jai Jagdish Hare* are the same reusable texts across
-festivals (define once, reference). Per §2 of the standard, include an aarti only where
-genuinely customary — do not pad to reach three.
+Reusable texts (Ganesh *Jai Ganesh Deva*, *Om Jai Jagdish Hare*, Krishna *Kunj
+Bihari*, Shiva *Om Jai Shiv Omkara*, Rama) are **defined once and referenced** by the
+guides that list them — no duplication in the data.
+
+Content notes for the sourcing pass:
+- `karvaChauth` (Karva Mata) and `ahoiAshtami` (Ahoi Mata) aartis are more regionally
+  variable than the big-deity ones — give them extra source care.
+- Two deliberate, slightly-unusual owner choices captured verbatim: **Navratri closes
+  with the Shiva aarti** (*Om Jai Shiv Omkara*), not *Om Jai Jagdish Hare*; **Hanuman
+  Jayanti** carries **Hanuman + Rama only** (no Ganesh, no universal close).
 
 Exact final list is confirmed during implementation against which keys actually
 render a full guide; any key without a clean, standard North Indian aarti is deferred
