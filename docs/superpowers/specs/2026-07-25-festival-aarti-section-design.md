@@ -128,12 +128,33 @@ render a full guide; any key without a clean, standard North Indian aarti is def
 to Phase 2 rather than padded. Phase 2 covers Rath Yatra, Ugadi/Gudi Padwa, Chhath,
 Skanda/Kanda Sashti, Ayyappa, Buddha Purnima, and other regional observances.
 
-## Content quality & sourcing
+## Content quality & sourcing (the substantive work)
 
 Aarti texts are traditional, widely-published devotional songs (effectively
-traditional/public-domain). Each is entered as the **standard, well-known
-Devanagari text** and proof-read for accuracy (correct first line, verse order,
-no OCR/typing corruption). This is the substantive work and the row-#29 quality bar.
+traditional/public-domain). Method (owner-directed 2026-07-25):
+
+- **Cross-validate 2–3 authentic sources against each other** per aarti; enter the
+  most widely-sung standard Devanagari text with zero transcription errors.
+- **Record the sources used per aarti** in a citations doc (mirroring
+  `plans/major-festival-guide-research.md`) so proof-reading is auditable and the
+  gate can cite provenance.
+
+Known challenge classes to handle explicitly:
+
+- **Regional/sampradaya wording variants** — the same aarti differs by region/sect.
+  Choose the common version and add a non-prescriptive "your family's wording may
+  differ" note, consistent with the app voice and the existing `regional` sections.
+- **Festival→aarti mapping** — some festivals have a general and a deity-specific
+  aarti; decide the canonical one editorially, and allow more than one where genuine.
+- **Devanagari orthography consistency** — sources agree on words but differ on
+  spelling (ॐ vs ओम्, anusvara vs chandrabindu, half-letters, nukta). Fix one house
+  orthographic standard so aartis look consistent across the app.
+- **Provenance / copyright** — confirm each is genuinely traditional/public-domain,
+  not a modern copyrighted arrangement; note authorship where known (e.g. *Om Jai
+  Jagdish Hare*, Pt. Shardha Ram Phillauri, 1870).
+
+Passes the row-#29 quality bar: independent EN/HI review, two-agent bug bash,
+production verification. Backlog: `P1-FESTIVAL-AARTI-CONTENT`.
 
 ## Validation gate
 
@@ -174,9 +195,19 @@ Gate is added to the standard `.cjs` suite. Existing festival gates
   to Devanagari verses, English intro shows in EN mode, no 375px horizontal overflow,
   0 console errors. Repeat on a standalone `/festival/...` route.
 
-## Out of scope
+## Out of scope (tracked separately)
+
+This spec covers **aarti-in-guide** only. Related work is separate backlog items:
+
+- **Aarti discoverability UI** (`P1-FESTIVAL-AARTI-FINDER`) — a dedicated aarti
+  finder/index, input-driven navigation (search a deity/festival → its aarti), and
+  stable per-aarti deep-links. Its own spec/plan later.
+- **Aarti SEO** (`P1-FESTIVAL-AARTI-SEO`) — per-aarti titles, meta and structured
+  data; depends on the finder/deep-link routes.
+- **Phase 2 regional aartis** — remaining/regional observances, follow-up content pass.
+
+Also out of scope here:
 
 - Transliteration or line-by-line translation of verses (owner chose Devanagari-only).
 - Audio playback / sing-along timing.
-- Phase 2 regional aartis (separate follow-up pass).
 - Any change to hero-art files (owned by the ACTIVE Cursor lane).
