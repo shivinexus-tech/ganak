@@ -283,15 +283,15 @@
       "recommendedAction": "Deploy, verify the vehicle URL and result on production in EN/HI, then record the live bundle and owner sign-off."
     },
     "37": {
-      "deliveryState": "Implemented locally — live import verification pending",
-      "limitations": "Permanent URL and standards-based ICS/VALARM export are implemented without browser storage. Production download and import in real calendar apps remain unverified.",
+      "deliveryState": "Timezone-shift fix ready — production/native retest pending",
+      "limitations": "The calendar event is now date-stable across device timezones and retains the chosen place/local window in its details. Owner iPhone and Android confirmation remains.",
       "shortTermImpact": "Users can preserve the full Muhurat context in a URL and create a device-calendar event with a 24-hour reminder.",
-      "longTermImpact": "Standards-based calendar reminders avoid a notification backend, but calendar-app import behavior still needs platform coverage.",
-      "bugBashStatus": "Focused EN/HI phone smoke and structural round-trip/ICS/privacy gate completed 2026-07-28; real Google/Apple/Outlook calendar import and production download remain.",
+      "longTermImpact": "Date-only ICS semantics prevent a selected Muhurat day from moving backward or forward when a calendar app displays it in another timezone.",
+      "bugBashStatus": "Owner iPhone test found New Delhi Aug 13 displaying as Aug 12 in Los Angeles. Root cause was correct-but-surprising UTC conversion of a timed event. Fix exports an all-day Aug 13 entry and writes the New Delhi local window in event details; focused regression gate, parse check and build pass.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-28 · Local :5199 EN/HI 390×844; category/action/range restored; actions visible; no overflow or console errors",
+      "lastVerified": "2026-07-28 · muhurat-actions gate, parse-check and Vite production build pass after date-stable ICS fix",
       "sourceConfidence": "Not applicable — technical URL and iCalendar export workflow",
-      "recommendedAction": "After deployment, download and import one event into Google Calendar and one native device calendar, verify local time/reminder, and test the shared URL in a fresh browser."
+      "recommendedAction": "Deploy, then repeat one Los Angeles export on iPhone and Android; confirm the selected date, chosen place/local window in details and 24-hour reminder."
     },
     "38": {
       "deliveryState": "Repository-ready — provider and production dashboard not configured",
