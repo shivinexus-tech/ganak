@@ -17,6 +17,11 @@ assert(
   'canonical route key must drive route-specific lookup',
 );
 assert(
+  screen.includes('(guide.vidhiKey || routeContent?.heroKey)')
+    && screen.includes('imageKey={guide.vidhiKey || routeContent.heroKey}'),
+  'metadata-only routes must render their reviewed parent hero family',
+);
+assert(
   screen.includes('guide.sourceKind === "observance" && guide.metaKey !== guide.key'),
   'named recurring variants must be distinguished from their shared family',
 );
@@ -63,6 +68,7 @@ assert(
 );
 
 console.log('PASS  canonical route key drives route-specific content lookup');
+console.log('PASS  metadata-only routes render their reviewed parent hero family');
 console.log('PASS  metadata-only and named-variant routes require distinct content');
 console.log('PASS  bilingual verdict, meaning, timing note and source boundary render answer-first');
 console.log('PASS  missing required content surfaces a visible bilingual error');

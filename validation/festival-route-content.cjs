@@ -18,7 +18,7 @@ const pradoshKeys = Object.values(FESTIVAL_PAGE_ROUTES)
   .filter((entry) => entry.vidhiKey === 'pradosh' && entry.key !== 'pradosh')
   .map((entry) => entry.key);
 const expectedKeys = [...nullGuideKeys, ...ekadashiKeys, ...pradoshKeys].sort();
-const REQUIRED_PAIRS = ['identity', 'meaning', 'practice', 'completion', 'timingNote', 'sourceBoundary'];
+const REQUIRED_PAIRS = ['identity', 'meaning', 'practice', 'verdict', 'completion', 'timingNote', 'sourceBoundary'];
 const PRODUCT_META = /\bGanak\b|गणक/u;
 const ENGLISH_IN_HINDI = /\b(?:the|this|festival|worship|fast|puja|complete|temple|day|guide|timing|local)\b/i;
 const GENERIC = /^(?:observe|honour|worship|complete) (?:this|the) (?:festival|observance|fast|day)\b/i;

@@ -2,16 +2,19 @@
 // devotional guide is absent or intentionally shared. Integration is separate.
 
 const p = (en, hi) => Object.freeze({ en, hi });
-const record = (key, kind, identity, meaning, practice, completion, timingNote, sourceBoundary) =>
-  Object.freeze({
+const record = (key, kind, identity, meaning, practice, completion, timingNote, sourceBoundary) => {
+  const practicePair = p(...practice);
+  return Object.freeze({
     key, kind, heroKey: heroKeyFor(key, kind),
     identity: p(...identity),
     meaning: p(...meaning),
-    practice: p(...practice),
+    practice: practicePair,
+    verdict: practicePair,
     completion: p(...completion),
     timingNote: p(...timingNote),
     sourceBoundary: p(...sourceBoundary),
   });
+};
 
 const annual = (row) => record(
   row[0], "full", [row[1], row[2]], [row[3], row[4]], [row[5], row[6]],

@@ -371,7 +371,9 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
             style={{ display: "block", width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: C.panel, marginBottom: 14 }}
           />
         ) : (
-          guide.vidhiKey && <FestivalRasterHero imageKey={guide.vidhiKey} lang={lang} C={C} />
+          (guide.vidhiKey || routeContent?.heroKey) && (
+            <FestivalRasterHero imageKey={guide.vidhiKey || routeContent.heroKey} lang={lang} C={C} />
+          )
         )}
         <p style={{ margin: "0 0 14px", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55 }}>
           {hasFullGuide
