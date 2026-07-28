@@ -17,6 +17,7 @@ import { BALA_PARTS } from "../engine/shadbala";
 import { KP_PLANETS, vimSub } from "../engine/dasha";
 import { computeKundli } from "../engine/kundli";
 import { kalaSarpaFromRows, pitraDoshaFromRows, papaCount } from "../engine/doshas";
+import { marriageWindows } from "../engine/marriage-timing";
 import { DashaTree } from "../components/DashaTree";
 import { ChartVault } from "../components/ChartVault";
 import { JyotishPanelNav } from "../components/JyotishPanelNav";
@@ -967,6 +968,37 @@ export default function ChartScreen({ C, card, lang }) {
                 </>
               )}
             </div>
+
+            {/* marriage timing — supportive Vimshottari windows, heavily qualified */}
+            <Eyebrow id="marriage" deva="विवाह — सम्भावित समय" en="Marriage — supportive timing" />
+            {(() => {
+              const mw = marriageWindows(r);
+              const fmtY = (t) => new Date(t + r.tz * 3600000).toLocaleDateString(hi ? "hi-IN" : "en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+              return (
+                <div className="rise" style={{ ...card, padding: "16px 20px" }}>
+                  <p style={{ fontSize: 13.5, lineHeight: 1.6, color: C.ivory, margin: "0 0 12px" }}>
+                    {hi
+                      ? <>विवाह के कारक — शुक्र व गुरु, सप्तम भाव का स्वामी (<strong>{PLANET_DEVA[mw.seventhLord]}</strong>){mw.occ7.length ? <> तथा सप्तम में स्थित ग्रह</> : null} — जिन दशा-अवधियों में सक्रिय होते हैं, परम्परा उन्हें विवाह हेतु अनुकूल मानती है।</>
+                      : <>Periods run by the marriage significators — Venus &amp; Jupiter, the 7th lord (<strong>{mw.seventhLord}</strong>){mw.occ7.length ? <> and planets in the 7th</> : null} — are traditionally seen as supportive for marriage.</>}
+                  </p>
+                  {mw.windows.length === 0 ? (
+                    <p style={{ color: C.muted, fontSize: 13 }}>{hi ? "आगामी बीस वर्षों में कोई स्पष्ट अनुकूल अवधि नहीं मिली।" : "No clearly supportive window found in the next twenty years."}</p>
+                  ) : (
+                    <div style={{ display: "grid", gap: 8 }}>
+                      {mw.windows.map((w, i) => (
+                        <div key={i} style={{ display: "flex", gap: 12, alignItems: "baseline", padding: "8px 2px", borderBottom: "1px solid #F1EADA" }}>
+                          <span style={{ color: C.gold, fontSize: 12.5, minWidth: 128, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{fmtY(w.start)} – {fmtY(w.end)}</span>
+                          <span style={{ fontSize: 13.5, color: C.ivory, flex: 1 }}>{hi ? `${PLANET_DEVA[w.maha]} / ${PLANET_DEVA[w.antar]} दशा` : `${w.maha} / ${w.antar} dasha`}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <p style={{ color: C.muted, fontSize: 11.5, marginTop: 12, lineHeight: 1.55 }}>
+                    {hi ? "यह भविष्यवाणी नहीं है। विवाह का वास्तविक समय गोचर (विशेषतः गुरु), नवांश, आयु, व्यक्तिगत इच्छा और अनेक कारकों पर निर्भर करता है। इसे किसी योग्य ज्योतिषी से पूरी कुंडली सहित समझें।" : "This is not a prediction. Actual timing depends on transits (especially Jupiter), the navamsa, age, personal choice and many other factors. Read it with the full chart and a qualified astrologer."}
+                  </p>
+                </div>
+              );
+            })()}
 
             {/* panchang */}
             <Eyebrow deva="पञ्चाङ्ग" en="Birth panchang" />

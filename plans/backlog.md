@@ -168,7 +168,15 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       Dashakoota alongside the existing Ashtakoota path; add a downloadable match
       PDF/report and a clearly qualified marriage prediction/timing view. State the
       method and limitations; never present a match score or timing estimate as a
-      certainty. _(P0-MATCHING-LAUNCH; owner scope 2026-07-21)_
+      certainty. _(P0-MATCHING-LAUNCH; owner scope 2026-07-21.
+      **Dashakoota + explanations + marriage timing shipped 2026-07-26,
+      `CLAUDE-P0-MATCHING-DASHAKOOTA-01` REVIEW:** 10-koota South-Indian system
+      (36 pts, Rajju/Vedha hard-blocks) beside Ashtakoota with a bilingual table +
+      verdict bands + dosha callouts; a heavily-qualified marriage-timing section
+      in the Kundli screen (`#marriage`) listing supportive Venus/Jupiter/7th-lord
+      dasha windows with a "not a prediction" caveat. Gates `dashakoota.cjs` +
+      `marriage-timing` engine. **Still open: downloadable match PDF/report**
+      (part of the PDF-reports epic), deploy + owner sign-off + 2nd bug bash.)_
 - [ ] **P0 before go-live — approved utility-calculator catalogue.** Build public,
       cleanly routed calculators for Moon sign/Rashi, Sun sign, Ascendant/Lagna,
       birth Nakshatra, baby-name initials/finder, standalone Mangal Dosha, Kala

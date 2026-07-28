@@ -32,7 +32,7 @@ for (const group of groups) {
 
 const anchors = [
   "summary", "chart", "planets", "yogas", "karakas", "special", "chalit", "av",
-  "arudha", "doshas", "reading", "dasha", "bnn", "bhrigu", "match", "kp", "ksig",
+  "arudha", "doshas", "reading", "dasha", "marriage", "bnn", "bhrigu", "match", "kp", "ksig",
   "shadbala", "rectify", "vault",
 ];
 for (const id of anchors) {
