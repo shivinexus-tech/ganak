@@ -13,6 +13,7 @@ import { CalendarPage } from "./CalendarPage";
 import { MuhuratHub } from "./MuhuratHub";
 import { scanPanchangCalendar } from "../engine/festivals";
 import { planetGochar, PLANET_PERIOD_DAYS } from "../engine/gochar";
+import PlanetCalendarCard from "../components/PlanetCalendarCard";
 import { fmtDur, eventDetail } from "../engine/transit-copy";
 import { CALENDAR_CONVENTIONS, DEFAULT_REGIONAL_CALENDAR_FLAGS, calendarLabel, conventionIsEnabled, resolveConvention } from "../engine/calendar-conventions";
 import { loadRegionalCalendarFlags } from "../engine/regional-calendar-flags";
@@ -279,6 +280,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
               );
             })}
           </div>
+          <PlanetCalendarCard tz={todayP.tz} placeLabel={place && place.label} lang={lang} C={C} card={card} />
         </>
       )}
     </>

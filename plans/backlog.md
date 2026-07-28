@@ -107,7 +107,13 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       section is no longer a Phase-2 reveal. Bring the already-built engines into a
       coherent, bilingual, phone-ready public experience; do not merely unhide the
       current dense screen. This launch gate includes:
-  - [ ] Retrograde/direct calendar and planetary combustion, rise and set calendar.
+  - [x] Retrograde/direct calendar and planetary combustion, rise and set calendar.
+        _(Shipped 2026-07-26, `CLAUDE-P0-PLANET-CALENDAR-01` REVIEW: engine
+        `planet-calendar.ts` + `PlanetCalendarCard` in the Daily gochar area —
+        a 12-month retrograde/direct + combustion (Asta/Udaya rise-set) calendar
+        for the five star planets, "now" summary, bilingual Devanagari planet
+        names, place-aware. Gate pins 2026 Mercury R×3 (Feb-26) + set/rise
+        alternation. Open: deploy + owner sign-off + 2nd bug bash.)_
   - [ ] Standalone Sade Sati calculator and report.
   - [ ] Standalone Mangal Dosha analysis from Lagna, Moon and Venus, with sourced
         exceptions/cancellation rules and a plain-language verdict.
