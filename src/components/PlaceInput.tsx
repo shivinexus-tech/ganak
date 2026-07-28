@@ -10,7 +10,7 @@ import { searchOffline, searchOnline } from "../data/places";
    typed garbage keeps seeing their garbage, so the parent can block and explain,
    instead of silently reusing the old coordinates. Callers without onConfirmed
    (Daily, Prashna) keep the original behaviour untouched. */
-function PlaceInput({ value, onPick, C, lang = "en", onConfirmed }) {
+function PlaceInput({ value, onPick, C, lang = "en", onConfirmed, inputId }) {
   const [q, setQ] = useState(value ? value.label : "");
   const [sugs, setSugs] = useState([]);
   const [open, setOpen] = useState(false);
@@ -58,6 +58,7 @@ function PlaceInput({ value, onPick, C, lang = "en", onConfirmed }) {
   return (
     <div style={{ position: "relative", minWidth: 180, flex: "0 1 240px" }}>
       <input
+        id={inputId}
         value={q}
         onChange={(e) => onChange(e.target.value)}
         onFocus={(e) => { e.target.select(); setOpen(true); }}

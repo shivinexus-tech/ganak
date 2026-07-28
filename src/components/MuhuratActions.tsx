@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { T } from "./tokens";
 import { privacyEvent } from "../telemetry/privacy-events";
 
@@ -86,8 +86,13 @@ export function muhuratIcs({ result, categoryLabel, placeLabel, actionLabel, lan
   ].join("\r\n");
 }
 
-export default function MuhuratActions({ result, category, categoryLabel, action, actionLabel, from, to, place, lang, C }) {
+export default function MuhuratActions({ result, category, categoryLabel, action, actionLabel, from, to, place, lang, onChangeCity = () => {}, C }) {
   const [notice, setNotice] = useState("");
+  const [confirmCity, setConfirmCity] = useState(false);
+  useEffect(() => {
+    setConfirmCity(false);
+    setNotice("");
+  }, [place.label, result.rise]);
   const shareUrl = muhuratShareUrl({ category, from, to, place, lang, action });
   const copyShare = async () => {
     try {
@@ -106,6 +111,7 @@ export default function MuhuratActions({ result, category, categoryLabel, action
     a.download = `ganak-${category}-${ymd(result.rise, result.tz)}.ics`;
     a.click();
     URL.revokeObjectURL(url);
+    setConfirmCity(false);
     setNotice(lang === "hi" ? "कैलेंडर फ़ाइल तैयार है; इसमें 24 घंटे पहले स्मरण है।" : "Calendar file ready; it includes a 24-hour reminder.");
     privacyEvent("muhurat_export",{action:category,language:lang});
   };
@@ -119,10 +125,28 @@ export default function MuhuratActions({ result, category, categoryLabel, action
         <button onClick={copyShare} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "8px 13px", border: `1px solid ${C.gold}`, background: "#FFF", color: C.gold, cursor: "pointer" }}>
           {lang === "hi" ? "इस परिणाम का लिंक कॉपी करें" : "Copy link to this result"}
         </button>
-        <button onClick={exportCalendar} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "8px 13px", border: `1px solid ${C.line}`, background: "#FFF", color: C.ivory, cursor: "pointer" }}>
-          {lang === "hi" ? "कैलेंडर + स्मरण (.ics)" : "Calendar + reminder (.ics)"}
+        <button onClick={() => setConfirmCity(true)} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "8px 13px", border: `1px solid ${C.line}`, background: "#FFF", color: C.ivory, cursor: "pointer" }}>
+          {lang === "hi" ? "कैलेंडर में जोड़ें" : "Add to calendar"}
         </button>
       </div>
+      {confirmCity && (
+        <div role="group" aria-label={lang === "hi" ? "कैलेंडर का शहर पक्का करें" : "Confirm calendar city"} style={{ marginTop: 10, padding: 12, borderRadius: T.rMd, border: `1px solid ${C.gold}`, background: "#FFF9ED" }}>
+          <div style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.ivory }}>
+            {lang === "hi" ? `${place.label} के लिए स्मरण जोड़ें?` : `Add this reminder for ${place.label}?`}
+          </div>
+          <div style={{ fontSize: T.fSmall, color: C.muted, lineHeight: 1.5, marginTop: 3 }}>
+            {lang === "hi" ? "तारीख़ और मुहूर्त का समय इसी शहर के स्थानीय समय में है।" : "The date and Muhurat window use this city’s local time."}
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+            <button onClick={exportCalendar} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "8px 13px", border: 0, background: C.gold, color: "#FFF", cursor: "pointer" }}>
+              {lang === "hi" ? "हाँ, कैलेंडर में जोड़ें" : "Yes, add to calendar"}
+            </button>
+            <button onClick={() => { setConfirmCity(false); onChangeCity(); }} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "8px 13px", border: `1px solid ${C.line}`, background: "#FFF", color: C.ivory, cursor: "pointer" }}>
+              {lang === "hi" ? "शहर बदलें" : "Change city"}
+            </button>
+          </div>
+        </div>
+      )}
       <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5, marginTop: 7 }}>
         {lang === "hi" ? "कोई ब्राउज़र संग्रह नहीं। स्मरण आपके कैलेंडर ऐप में रहता है।" : "No browser storage. The reminder stays in your calendar app."}
       </div>
