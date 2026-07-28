@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('node:crypto');
+const sharp = require('sharp');
 
 const EXPECTED_WIDTH = 1280;
 const EXPECTED_HEIGHT = 480;
@@ -64,21 +65,34 @@ function validateRaster(buffer, options = {}) {
   return { info, problems };
 }
 
+async function assertDecodable(buffer) {
+  try {
+    await sharp(buffer, { failOn: 'error' }).raw().toBuffer();
+  } catch (error) {
+    throw new Error(`image decoder rejected WebP payload: ${error.message}`);
+  }
+}
+
 function duplicateProblems(records, sharedAllowlist = new Set()) {
   const byHash = new Map();
+  const problems = [];
   for (const record of records) {
     if (!record.sha256) continue;
-    const prior = byHash.get(record.sha256);
-    if (!prior) {
-      byHash.set(record.sha256, record.key);
+    const priorKeys = byHash.get(record.sha256) || [];
+    if (!priorKeys.length) {
+      byHash.set(record.sha256, [record.key]);
       continue;
     }
-    const pair = [prior, record.key].sort().join('|');
-    if (!sharedAllowlist.has(pair)) {
-      return [`duplicate raster bytes: ${prior}.webp and ${record.key}.webp (${record.sha256})`];
+    for (const prior of priorKeys) {
+      const pair = [prior, record.key].sort().join('|');
+      if (!sharedAllowlist.has(pair)) {
+        problems.push(`duplicate raster bytes: ${prior}.webp and ${record.key}.webp (${record.sha256})`);
+      }
     }
+    priorKeys.push(record.key);
+    byHash.set(record.sha256, priorKeys);
   }
-  return [];
+  return problems;
 }
 
 function fixtureWebP(width = EXPECTED_WIDTH, height = EXPECTED_HEIGHT, totalBytes = MIN_BYTES) {
@@ -95,7 +109,7 @@ function fixtureWebP(width = EXPECTED_WIDTH, height = EXPECTED_HEIGHT, totalByte
   return buffer;
 }
 
-function runMutationFixtures() {
+async function runMutationFixtures() {
   const expectedFailure = (label, fn, pattern) => {
     let message = '';
     try { fn(); } catch (error) { message = error.message; }
@@ -116,6 +130,22 @@ function runMutationFixtures() {
     new Set(['a|b']),
   );
   if (allowed.length) throw new Error('explicit shared-art allowlist fixture was rejected');
+  const duplicateGroups = duplicateProblems([
+    { key: 'a', sha256: 'same-1' }, { key: 'b', sha256: 'same-1' },
+    { key: 'c', sha256: 'same-2' }, { key: 'd', sha256: 'same-2' },
+  ]);
+  if (duplicateGroups.length !== 2) {
+    throw new Error(`multiple duplicate groups fixture found ${duplicateGroups.length}; expected 2`);
+  }
+  let decodeMessage = '';
+  try {
+    await assertDecodable(fixtureWebP());
+  } catch (error) {
+    decodeMessage = error.message;
+  }
+  if (!/decoder rejected/.test(decodeMessage)) {
+    throw new Error('header-only fake WebP fixture was not rejected by the image decoder');
+  }
 }
 
 module.exports = {
@@ -124,6 +154,7 @@ module.exports = {
   MIN_BYTES,
   inspectWebP,
   validateRaster,
+  assertDecodable,
   duplicateProblems,
   runMutationFixtures,
 };
