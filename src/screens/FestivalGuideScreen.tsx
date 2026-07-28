@@ -9,6 +9,7 @@ import VratVidhiCard from "../components/VratVidhiCard";
 import NavadurgaDayGuide, { NavadurgaSeasonLinks } from "../components/NavadurgaDayGuide";
 import FestivalRasterHero from "../components/FestivalRasterHero";
 import { VRAT_VIDHI } from "../data/vrat-vidhis";
+import { festivalRouteContentFor } from "../data/festival-route-content";
 import {
   CHHATH_SHARED_KEYS, FESTIVAL_LEGACY_PATH_REDIRECTS,
   FESTIVAL_PAGE_ROUTES, FEST_META, OBS_META,
@@ -169,11 +170,64 @@ function dayKalaWindow(detail, timing) {
   return null;
 }
 
+function localizedRouteContentField(content, field, lang) {
+  const value = content && content[field];
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return value[lang === "hi" ? "hi" : "en"] || value.en || "";
+}
+
+function RouteSpecificAnswer({ content, lang, C }) {
+  const L = lang === "hi" ? "hi" : "en";
+  const verdict = localizedRouteContentField(content, "verdict", L);
+  const meaning = localizedRouteContentField(content, "meaning", L);
+  const timingNote = localizedRouteContentField(content, "timingNote", L);
+  const sourceBoundary = localizedRouteContentField(content, "sourceBoundary", L);
+  return (
+    <section
+      aria-label={L === "hi" ? "इस पर्व का स्पष्ट उत्तर" : "Route-specific answer"}
+      style={{
+        display: "grid", gap: 9, margin: "0 0 14px", padding: "13px 14px",
+        borderRadius: T.rMd, border: `1px solid ${C.gold}`,
+        background: "rgba(168,106,18,.08)",
+      }}
+    >
+      <div style={{ ...T.label, color: C.gold }}>
+        {L === "hi" ? "इस पर्व का स्पष्ट उत्तर" : "WHAT THIS OBSERVANCE MEANS FOR YOU"}
+      </div>
+      <div style={{ color: C.ivory, fontSize: T.fBody, lineHeight: 1.55, fontWeight: 650 }}>
+        {verdict}
+      </div>
+      {meaning && <div style={{ color: C.ivory, fontSize: T.fSmall, lineHeight: 1.55 }}>{meaning}</div>}
+      {timingNote && (
+        <div style={{ color: C.muted, fontSize: T.fSmall, lineHeight: 1.5 }}>
+          <strong style={{ color: C.ivory }}>{L === "hi" ? "समय: " : "Timing: "}</strong>{timingNote}
+        </div>
+      )}
+      {sourceBoundary && (
+        <div style={{ color: C.muted, fontSize: T.fMicro, lineHeight: 1.5 }}>
+          <strong style={{ color: C.ivory }}>{L === "hi" ? "परम्परा और स्रोत-सीमा: " : "Tradition and source boundary: "}</strong>{sourceBoundary}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
   const L = lang === "hi" ? "hi" : "en";
   const isNavadurga = guide && guide.contentKind === "navadurga";
   const data = guide && guide.vidhiKey && !isNavadurga ? VRAT_VIDHI[guide.vidhiKey] : null;
   const hasFullGuide = Boolean(data || isNavadurga);
+  const isNamedVariant = Boolean(guide && guide.sourceKind === "observance" && guide.metaKey !== guide.key);
+  const routeContent = guide && !isNavadurga ? festivalRouteContentFor(guide.key) : null;
+  const routeContentComplete = Boolean(
+    localizedRouteContentField(routeContent, "verdict", L)
+    && localizedRouteContentField(routeContent, "timingNote", L)
+    && localizedRouteContentField(routeContent, "sourceBoundary", L),
+  );
+  const requiresRouteContent = Boolean(
+    guide && guide.status === "required" && !isNavadurga && (!data || isNamedVariant),
+  );
   const meta = guide
     ? (guide.sourceKind === "observance" ? OBS_META[guide.metaKey] : FEST_META[guide.metaKey])
     : null;
@@ -328,6 +382,23 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                 ? "गणक में अभी उपलब्ध पंचांग परिचय नीचे है। विस्तृत पूजा-विधि स्रोत और समीक्षा के बाद ही जोड़ी जाएगी।"
                 : "Below is the calendar description currently available in Ganak. Detailed worship guidance will be added only after it is sourced and reviewed.")}
         </p>
+
+        {routeContentComplete ? (
+          <RouteSpecificAnswer content={routeContent} lang={lang} C={C} />
+        ) : requiresRouteContent ? (
+          <div
+            role="alert"
+            style={{
+              margin: "0 0 14px", padding: "12px 13px", borderRadius: T.rMd,
+              border: `1px solid ${C.sindoor}`, background: "rgba(194,69,30,.08)",
+              color: C.ivory, fontSize: T.fSmall, lineHeight: 1.55,
+            }}
+          >
+            {L === "hi"
+              ? "इस नाम वाले पर्व की अलग, स्रोत-समीक्षित मार्गदर्शिका अभी उपलब्ध नहीं है। नीचे सामान्य पंचांग और साझा व्रत-विधि दिख सकती है; इसे इस विशेष पर्व की पूरी विधि न मानें।"
+              : "The distinct, source-reviewed guide for this named observance is not available yet. General calendar details and a shared fast guide may appear below; do not treat them as the complete guide for this specific observance."}
+          </div>
+        ) : null}
 
         <div style={{ marginBottom: 14, padding: "12px 13px", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: "rgba(168,106,18,.06)" }}>
           <div style={{ ...T.label, color: C.gold, marginBottom: 8 }}>
