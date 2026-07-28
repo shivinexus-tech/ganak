@@ -10,6 +10,7 @@ const root = path.resolve(__dirname, '..');
 const { VRAT_VIDHI } = loadApp('src/data/vrat-vidhis.ts');
 const { FESTIVAL_HERO_ART } = loadApp('src/data/festival-hero-art.ts');
 const { FESTIVAL_PAGE_ROUTES } = loadApp('src/data/festival-pages.ts');
+const { FESTIVAL_ROUTE_CONTENT } = loadApp('src/data/festival-route-content.ts');
 const imageDir = path.join(root, 'public/festival-images/raster');
 
 const keys = Object.keys(VRAT_VIDHI).sort();
@@ -28,12 +29,13 @@ for (const [routePath, entry] of routeEntries) {
     if (!fs.existsSync(ownedImage)) problems.push(`${routePath}: missing owned route hero ${entry.form.image}`);
     continue;
   }
-  if (!entry.vidhiKey) {
-    problems.push(`${routePath}: no hero disposition (needs vidhiKey parent hero or owned form image)`);
+  const parentHeroKey = entry.vidhiKey || FESTIVAL_ROUTE_CONTENT[entry.key]?.heroKey;
+  if (!parentHeroKey) {
+    problems.push(`${routePath}: no hero disposition (needs guide or route-content parent hero)`);
     continue;
   }
-  if (!VRAT_VIDHI[entry.vidhiKey]) problems.push(`${routePath}: parent hero key ${entry.vidhiKey} has no worship guide`);
-  if (!FESTIVAL_HERO_ART[entry.vidhiKey]) problems.push(`${routePath}: parent hero key ${entry.vidhiKey} has no art registry entry`);
+  if (!VRAT_VIDHI[parentHeroKey]) problems.push(`${routePath}: parent hero key ${parentHeroKey} has no worship guide`);
+  if (!FESTIVAL_HERO_ART[parentHeroKey]) problems.push(`${routePath}: parent hero key ${parentHeroKey} has no art registry entry`);
 }
 
 for (const key of keys) {
