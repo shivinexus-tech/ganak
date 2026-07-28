@@ -426,17 +426,19 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         birth chart required in the base finder, no outcome score, no storage.
         Merged to `main`. Body-part Moon rule (R9) intentionally omitted. Engine
         `src/engine/medical-muhurat.ts`; gate `validation/medical-muhurat.cjs`;
-        findings `plans/claude-medical-muhurat-findings.md`. Open: live deploy
-        verification + owner sign-off.
+        findings `plans/claude-medical-muhurat-findings.md`. **Closed at 100% on
+        2026-07-28:** independent Codex bug bash fixed safety-wall order, polar
+        no-sunrise copy and bypassed future birth dates; PR #4 merged as `557664c`;
+        production EN/HI 320px verification passed with zero overflow or console errors.
       _(P0-MUHURAT-FULL-PARITY; owner scope 2026-07-21; v1 built 2026-07-25)_
-  - [ ] **Independent review + bug bash of the medical Muhurat feature** — assign to a
+  - [x] **Independent review + bug bash of the medical Muhurat feature** — completed by a
         different agent (Cursor/Codex) than the builder (Claude Code). Second
         adversarial pass on live `/muhurat/medical`: engine correctness
         (Purnima/Amavasya + eclipse coverage, Abhijit/Rahu Kaal, natal Janma Rashi
         overlay), safety framing (safety wall first, confirmation gates the finder, no
         medical-outcome/success claims), DST + high-latitude places, EN/HI at 320–390px,
-        and regressions on the F1–F3 fixes. Record findings; do not fix non-trivial
-        defects — hand back to the owner. Brief/refs: task-log row
+        and regressions on the F1–F3 fixes. F4–F6 were fixed with TDD and verified
+        in production. Brief/refs: task-log row
         `MEDICAL-MUHURAT-BUGBASH-02` and `plans/claude-medical-muhurat-findings.md`.
       _(follow-up to P0-MEDICAL-MUHURAT v1; owner-requested 2026-07-25)_
 - [ ] **P0 before go-live — discoverability, publishing and public platform.** Ship
