@@ -30,7 +30,7 @@ export const VRAT_VIDHI_LABELS = {
   meaning: { en: "Why this day matters", hi: "इस दिन का महत्त्व" },
   stories: { en: "Regional kathas to read or hear", hi: "पढ़ने या सुनने योग्य क्षेत्रीय कथाएँ" },
   regional: { en: "Regional traditions", hi: "क्षेत्रीय परम्पराएँ" },
-  aarti: { en: "Aarti (devotional lamp-song)", hi: "आरती" },
+  aarti: { en: "Aarti", hi: "आरती" },
   aartiDisclaimer: {
     en: "This is a widely-sung version; your family's wording may differ.",
     hi: "यह व्यापक रूप से गाई जाने वाली आरती है; आपके परिवार की परम्परा में शब्द भिन्न हो सकते हैं।",
