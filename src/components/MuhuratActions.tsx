@@ -92,7 +92,7 @@ export default function MuhuratActions({ result, category, categoryLabel, action
   const copyShare = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      setNotice(lang === "hi" ? "स्थायी लिंक कॉपी हुआ।" : "Permanent link copied.");
+      setNotice(lang === "hi" ? "इस परिणाम का लिंक कॉपी हो गया।" : "Result link copied.");
       privacyEvent("muhurat_share",{action:category,language:lang});
     } catch (e) {
       setNotice(lang === "hi" ? "लिंक कॉपी नहीं हुआ—पता-पट्टी से कॉपी करें।" : "Couldn’t copy the link—copy it from the address bar.");
@@ -112,9 +112,12 @@ export default function MuhuratActions({ result, category, categoryLabel, action
   return (
     <div className="no-print" style={{ marginTop: T.s3, paddingTop: T.s3, borderTop: `1px solid ${C.line}` }}>
       <div style={{ ...T.label, color: C.muted, marginBottom: 7 }}>{lang === "hi" ? "सहेजें एवं साझा करें" : "SAVE & SHARE"}</div>
+      <div style={{ fontSize: T.fSmall, color: C.muted, lineHeight: 1.5, marginBottom: 8 }}>
+        {lang === "hi" ? "यह परिणाम किसी को भेजें या बाद में फिर खोलें।" : "Send this result to someone or open it again later."}
+      </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button onClick={copyShare} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "8px 13px", border: `1px solid ${C.gold}`, background: "#FFF", color: C.gold, cursor: "pointer" }}>
-          {lang === "hi" ? "स्थायी लिंक कॉपी करें" : "Copy permanent link"}
+          {lang === "hi" ? "इस परिणाम का लिंक कॉपी करें" : "Copy link to this result"}
         </button>
         <button onClick={exportCalendar} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "8px 13px", border: `1px solid ${C.line}`, background: "#FFF", color: C.ivory, cursor: "pointer" }}>
           {lang === "hi" ? "कैलेंडर + स्मरण (.ics)" : "Calendar + reminder (.ics)"}
