@@ -15,6 +15,19 @@ function icsStamp(ms) {
   return `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`;
 }
 
+function icsDate(ms, tz) {
+  return ymd(ms, tz).replaceAll("-", "");
+}
+
+function nextIcsDate(ms, tz) {
+  return ymd(ms + 86400000, tz).replaceAll("-", "");
+}
+
+function localTime(ms, tz) {
+  const d = new Date(ms + tz * 3600000);
+  return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
+}
+
 function cleanText(value) {
   return String(value || "").replace(/[\\,;\n]/g, (m) => ({ "\\": "\\\\", ",": "\\,", ";": "\\;", "\n": "\\n" }[m]));
 }
@@ -42,12 +55,13 @@ export function muhuratIcs({ result, categoryLabel, placeLabel, actionLabel, lan
   const first = (result.activityWindows || result.samskaraWindows || [])[0];
   const start = first?.start || result.abhijit?.start || result.rise;
   const end = first?.end || result.abhijit?.end || Math.min(result.set, start + 3600000);
+  const localWindow = `${localTime(start, result.tz)}–${localTime(end, result.tz)}`;
   const title = lang === "hi"
     ? `गणक मुहूर्त · ${actionLabel || categoryLabel}`
     : `Ganak Muhurat · ${actionLabel || categoryLabel}`;
   const description = lang === "hi"
-    ? "गणक द्वारा चुना गया स्थानीय मुहूर्त। अंतिम निर्णय में परिवार/परम्परा और व्यावहारिक आवश्यकताएँ भी देखें।"
-    : "A local Muhurat selected by Ganak. Confirm family tradition and practical requirements before acting.";
+    ? `${placeLabel} का स्थानीय मुहूर्त: ${localWindow}। गणक द्वारा चुना गया दिन। अंतिम निर्णय में परिवार/परम्परा और व्यावहारिक आवश्यकताएँ भी देखें।`
+    : `Local Muhurat for ${placeLabel}: ${localWindow}. A day selected by Ganak. Confirm family tradition and practical requirements before acting.`;
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -56,8 +70,8 @@ export function muhuratIcs({ result, categoryLabel, placeLabel, actionLabel, lan
     "BEGIN:VEVENT",
     `UID:ganak-${result.y}-${result.m}-${result.day}-${result.rise}@ganak`,
     `DTSTAMP:${icsStamp(Date.now())}`,
-    `DTSTART:${icsStamp(start)}`,
-    `DTEND:${icsStamp(end)}`,
+    `DTSTART;VALUE=DATE:${icsDate(result.rise, result.tz)}`,
+    `DTEND;VALUE=DATE:${nextIcsDate(result.rise, result.tz)}`,
     `SUMMARY:${cleanText(title)}`,
     `DESCRIPTION:${cleanText(description)}`,
     `LOCATION:${cleanText(placeLabel)}`,
