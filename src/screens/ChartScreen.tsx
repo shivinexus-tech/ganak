@@ -43,6 +43,48 @@ const DASHA_NOTE = {
 
 const PLANET_COLOR = { Sun: "color-mix(in srgb, #C05A0C, var(--ink) 26%)", Moon: "color-mix(in srgb, #4E6E96, var(--ink) 26%)", Mars: "color-mix(in srgb, #BB3A2A, var(--ink) 26%)", Mercury: "color-mix(in srgb, #2C7D4F, var(--ink) 26%)", Jupiter: "color-mix(in srgb, #9A7000, var(--ink) 26%)", Venus: "color-mix(in srgb, #B3537F, var(--ink) 26%)", Saturn: "color-mix(in srgb, #46588F, var(--ink) 26%)", Rahu: "color-mix(in srgb, #6E5C82, var(--ink) 26%)", Ketu: "color-mix(in srgb, #8A5A36, var(--ink) 26%)" };
 
+const HOUSE_TOPICS = [
+  { en: "self and vitality", hi: "स्वभाव और जीवन-बल" },
+  { en: "speech, family and savings", hi: "वाणी, परिवार और बचत" },
+  { en: "siblings, courage and effort", hi: "भाई-बहन, साहस और प्रयास" },
+  { en: "home, mother and inner comfort", hi: "घर, माता और मन का सुख" },
+  { en: "children, learning and creativity", hi: "संतान, विद्या और सृजन" },
+  { en: "service, health and conflicts", hi: "सेवा, स्वास्थ्य और संघर्ष" },
+  { en: "marriage and partnerships", hi: "विवाह और साझेदारी" },
+  { en: "change, vulnerability and longevity", hi: "परिवर्तन, संवेदनशीलता और आयु" },
+  { en: "dharma, fortune and teachers", hi: "धर्म, भाग्य और गुरु" },
+  { en: "career, karma and public work", hi: "कर्म, करियर और सार्वजनिक कार्य" },
+  { en: "gains, networks and fulfilment", hi: "लाभ, संबंध-जाल और पूर्णता" },
+  { en: "release, expenses and private life", hi: "त्याग, खर्च और निजी जीवन" },
+];
+
+const SPECIAL_POINT_COPY = {
+  "Bhava Lagna": { en: "Body and lived vitality through the day.", hi: "दिन भर की देह-ऊर्जा और जीवनी-शक्ति।", useEn: "Use it as a vitality lens, not as a replacement for the main Lagna.", useHi: "इसे मुख्य लग्न का विकल्प नहीं, जीवन-बल का सूक्ष्म संकेत मानें।" },
+  "Hora Lagna": { en: "Wealth, resources and practical capacity.", hi: "धन, संसाधन और व्यवहारिक क्षमता।", useEn: "Helpful when reading earning capacity and material support.", useHi: "आय, संसाधन और भौतिक सहारे को पढ़ते समय उपयोगी।" },
+  "Ghati Lagna": { en: "Power, authority, visibility and command.", hi: "शक्ति, अधिकार, प्रतिष्ठा और प्रभाव।", useEn: "Use with the 10th house and Sun/Saturn themes for status questions.", useHi: "प्रतिष्ठा के प्रश्नों में दशम भाव और सूर्य/शनि के साथ पढ़ें।" },
+  "Sree Lagna": { en: "Prosperity, grace and comfort flow.", hi: "समृद्धि, कृपा और सुख का प्रवाह।", useEn: "A Lakshmi-oriented prosperity point; formulas vary, so read gently.", useHi: "लक्ष्मी-प्रधान समृद्धि बिंदु; सूत्र बदलते हैं, इसलिए सावधानी से पढ़ें।" },
+  "Bhrigu Bindu": { en: "A karmic focus point between Moon and Rahu.", hi: "चन्द्र और राहु के बीच कर्म-फोकस बिंदु।", useEn: "Often read with transits as a sensitive trigger point.", useHi: "गोचर के साथ इसे संवेदनशील सक्रिय-बिंदु की तरह पढ़ा जाता है।" },
+  "Yogi Point": { en: "Supportive point showing where help and ease may arise.", hi: "सहायक बिंदु जहाँ से सहयोग और सहजता मिल सकती है।", useEn: "Its planet is read as a helper when well-supported.", useHi: "इसका ग्रह समर्थ हो तो सहायक माना जाता है।" },
+  "Avayogi Point": { en: "Testing point showing friction or delay.", hi: "परीक्षा-बिंदु जहाँ घर्षण या विलम्ब दिख सकता है।", useEn: "Use it to name caution, not fear.", useHi: "इसे सावधानी बताने के लिए लें, भय पैदा करने के लिए नहीं।" },
+  Fortuna: { en: "Flow of fortune and ease, borrowed from the Lot of Fortune idea.", hi: "भाग्य और सहज प्रवाह का बिंदु।", useEn: "A supporting sensitive point; not a classical Vedic core factor.", useHi: "सहायक संवेदनशील बिंदु; वैदिक मूल-कारक नहीं।" },
+  "Gulika / Mandi": { en: "Saturnine shadow point, traditionally treated as sensitive and malefic.", hi: "शनि-स्वभाव छाया बिंदु, परम्परा में संवेदनशील/पाप प्रभाव वाला।", useEn: "Read with restraint and house context.", useHi: "इसे संयम और भाव-संदर्भ के साथ पढ़ें।" },
+  Dhuma: { en: "Smoke point — obscuration and obstacles.", hi: "धूम बिंदु — धुंधलापन और बाधा।", useEn: "Useful as a caution marker.", useHi: "सावधानी-सूचक की तरह उपयोगी।" },
+  Vyatipata: { en: "Disruption point — sudden imbalance.", hi: "व्यतीपात — अचानक असंतुलन का बिंदु।", useEn: "Do not read alone; combine with house and dasha evidence.", useHi: "अकेले न पढ़ें; भाव और दशा के प्रमाण के साथ जोड़ें।" },
+  Parivesha: { en: "Halo point — intensity around the house it occupies.", hi: "परिवेष — जिस भाव में हो वहाँ तीव्रता।", useEn: "A secondary sensitive point.", useHi: "द्वितीयक संवेदनशील बिंदु।" },
+  Indrachapa: { en: "Rainbow point — unusual openings and visibility.", hi: "इन्द्रचाप — असामान्य अवसर और दृश्यता।", useEn: "Treat as a supportive nuance only.", useHi: "केवल सहायक सूक्ष्म संकेत की तरह लें।" },
+  Upaketu: { en: "Comet point — sudden change and separation themes.", hi: "उपकेतु — अचानक बदलाव और अलगाव के विषय।", useEn: "Use as a timing sensitivity, not a standalone verdict.", useHi: "इसे समय-संवेदनशील संकेत मानें, अकेला निर्णय नहीं।" },
+};
+
+const RP_SOURCE_LABELS = {
+  ascSignLord: { en: "Asc sign lord", hi: "लग्न राशि स्वामी" },
+  ascStarLord: { en: "Asc star lord", hi: "लग्न नक्षत्र स्वामी" },
+  ascSubLord: { en: "Asc sub-lord", hi: "लग्न उप-स्वामी" },
+  moonSignLord: { en: "Moon sign lord", hi: "चन्द्र राशि स्वामी" },
+  moonStarLord: { en: "Moon star lord", hi: "चन्द्र नक्षत्र स्वामी" },
+  moonSubLord: { en: "Moon sub-lord", hi: "चन्द्र उप-स्वामी" },
+  dayLord: { en: "Day lord", hi: "वार स्वामी" },
+};
+
 export default function ChartScreen({ C, card, lang }) {
   // Guidance depth. Guided keeps the chart and the plain reading; Balanced is unchanged;
   // Expert additionally states the calculation basis. The chart itself, every date and
@@ -628,6 +670,7 @@ export default function ChartScreen({ C, card, lang }) {
             <Eyebrow id="ksig" deva="के॰पी॰ सूचक" en="KP significators & ruling planets" />
             {(() => {
               const RP = r.rulingPlanets;
+              const topRp = RP.ranked?.[0];
               const Chip = ({ pl, dim }) => (
                 <span style={{ display: "inline-block", padding: "0.125rem 0.4375rem", borderRadius: "0.375rem", fontSize: "var(--font-label)", fontWeight: 600, margin: "0.125rem 0.1875rem 0.125rem 0",
                   color: dim ? C.muted : "var(--on-accent)", background: dim ? "transparent" : PLANET_COLOR[pl], border: dim ? `0.0625rem solid ${PLANET_COLOR[pl]}` : "none" }}>
@@ -642,6 +685,14 @@ export default function ChartScreen({ C, card, lang }) {
               );
               return (
                 <div>
+                  {topRp && (
+                    <div className="rise" style={{ ...card, padding: "0.875rem 1rem", borderLeft: "0.25rem solid var(--accent)", marginBottom: "0.75rem", background: "var(--surface-raised)" }}>
+                      <div style={{ ...T.label, color: C.gold, marginBottom: "0.375rem" }}>{hi ? "पहले पढ़ें · शासक ग्रह का सार" : "Read first · ruling-planet summary"}</div>
+                      <p style={{ margin: 0, color: C.ivory, lineHeight: 1.6, fontSize: "var(--font-small)" }}>
+                        {hi ? <>इस जन्म-क्षण में सबसे समर्थ शासक ग्रह <strong style={{ color: PLANET_COLOR[topRp.planet] }}>{PLANET_DEVA[topRp.planet] || topRp.planet}</strong> है — यह {topRp.count} संकेतों में आया है। KP में बार-बार आने वाला ग्रह प्रश्न/घटना के फलित होने में अधिक ध्यान योग्य माना जाता है; इसे वादा नहीं, प्राथमिकता-सूचक मानें।</> : <>The strongest Ruling Planet at this birth moment is <strong style={{ color: PLANET_COLOR[topRp.planet] }}>{topRp.planet}</strong> — it appears through {topRp.count} source{topRp.count > 1 ? "s" : ""}. In KP, repeated ruling planets are read as higher-priority witnesses for timing and judgement; treat this as a priority signal, not a promise.</>}
+                      </p>
+                    </div>
+                  )}
                   <div className="rise" style={{ ...card, padding: "0.875rem 1rem", borderLeft: "0.1875rem solid var(--accent)", marginBottom: "0.875rem" }}>
                     <div style={{ ...T.label, color: C.gold, marginBottom: "0.5rem" }}>{hi ? "शासक ग्रह · जन्म क्षण" : "Ruling Planets · birth moment"}</div>
                     <div style={{ display: "flex", flexWrap: "wrap", rowGap: "0.25rem" }}>
@@ -654,6 +705,23 @@ export default function ChartScreen({ C, card, lang }) {
                       <RPItem label={hi ? "वार स्वामी" : "Day lord"} pl={RP.dayLord} />
                     </div>
                   </div>
+
+                  {RP.ranked && (
+                    <div className="rise" style={{ ...card, padding: "0.75rem 0.875rem", marginBottom: "0.875rem" }}>
+                      <div style={{ ...T.label, color: C.muted, marginBottom: "0.5rem" }}>{hi ? "समर्थन क्रम · कौन-सा ग्रह कितनी बार आया" : "Support ranking · how often each planet appears"}</div>
+                      <div style={{ display: "grid", gap: "0.5rem" }}>
+                        {RP.ranked.map((rp, idx) => (
+                          <div key={rp.planet} style={{ display: "grid", gridTemplateColumns: "1.75rem minmax(3.375rem, 4.375rem) 1fr", alignItems: "center", gap: "0.5rem" }}>
+                            <span style={{ color: C.muted, fontSize: "var(--font-micro)" }}>#{idx + 1}</span>
+                            <span style={{ color: PLANET_COLOR[rp.planet], fontWeight: 700 }}>{hi ? (PLANET_DEVA[rp.planet] || rp.planet) : rp.planet}</span>
+                            <span style={{ color: C.muted, fontSize: "var(--font-micro)", lineHeight: 1.4 }}>
+                              {rp.sources.map((s) => hi ? RP_SOURCE_LABELS[s].hi : RP_SOURCE_LABELS[s].en).join(" · ")}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div style={{ ...T.label, color: C.muted, margin: "0.25rem 0 0.5rem" }}>
                     {hi ? "भाव सूचक (सबसे प्रबल पहले)" : "House significators (strongest first)"}
@@ -791,7 +859,8 @@ export default function ChartScreen({ C, card, lang }) {
                     <span style={{ fontSize: "var(--font-label)", color: C.gold }}>H{hOf(item.v)}</span>
                     {item.pl && <span style={{ fontSize: "var(--font-label)", color: PLANET_COLOR[item.pl] }}>· {item.pl}</span>}
                   </div>
-                  <div style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.25rem" }}>{hi ? "यह विशेष बिंदु कुंडली के एक सूक्ष्म जीवन-विषय को दर्शाता है।" : item.note}</div>
+                  <div style={{ color: C.muted, fontSize: "var(--font-micro)", marginTop: "0.25rem", lineHeight: 1.45 }}>{hi ? (SPECIAL_POINT_COPY[item.k]?.hi || "यह विशेष बिंदु कुंडली के एक सूक्ष्म जीवन-विषय को दर्शाता है।") : (SPECIAL_POINT_COPY[item.k]?.en || item.note)}</div>
+                  <div style={{ color: C.muted, fontSize: "var(--font-micro)", marginTop: "0.25rem", lineHeight: 1.45, fontStyle: "italic" }}>{hi ? (SPECIAL_POINT_COPY[item.k]?.useHi || "") : (SPECIAL_POINT_COPY[item.k]?.useEn || "")}</div>
                 </div>
               );
               const Group = ({ title, items, accent }) => (
@@ -804,6 +873,11 @@ export default function ChartScreen({ C, card, lang }) {
               );
               return (
                 <div>
+                  <div style={{ ...card, padding: "0.75rem 1rem", marginBottom: "0.75rem", background: "var(--surface-raised)", borderLeft: `0.25rem solid var(--accent)` }}>
+                    <p style={{ margin: 0, fontSize: "var(--font-small)", lineHeight: 1.6, color: C.ivory }}>
+                      {hi ? "ये मुख्य लग्न का विकल्प नहीं हैं। ये सूक्ष्म बिंदु बताते हैं कि धन, अधिकार, समृद्धि, बाधा या संवेदनशीलता किस भाव में जोर पकड़ सकती है। पहले मुख्य कुंडली पढ़ें, फिर इन्हें सहायक संकेत की तरह जोड़ें।" : "These do not replace the main Lagna. They are secondary lenses showing where wealth, authority, prosperity, friction or sensitivity may concentrate. Read the main chart first, then use these as supporting signals."}
+                    </p>
+                  </div>
                   <Group title={hi ? "विशेष लग्न" : "Special Lagnas"} items={SP.lagnas} accent={C.gold} />
                   <Group title={hi ? "संवेदनशील बिंदु" : "Sensitive Points"} items={SP.points} accent="color-mix(in srgb, #6E5C82, var(--ink) 26%)" />
                   <div style={{ ...card, padding: "0.75rem 0.875rem", marginTop: "0.625rem", borderLeft: `0.1875rem solid var(--good)`, display: "inline-block" }}>
@@ -820,6 +894,11 @@ export default function ChartScreen({ C, card, lang }) {
 
             {/* bhava chalit + bhava bala */}
             <Eyebrow id="chalit" deva="भाव चलित" en="Bhava Chalit & Bhava Bala" />
+            <div style={{ ...card, padding: "0.75rem 1rem", marginBottom: "0.75rem", background: "var(--surface-raised)", borderLeft: `0.25rem solid var(--accent)` }}>
+              <p style={{ margin: 0, fontSize: "var(--font-small)", lineHeight: 1.6, color: C.ivory }}>
+                {hi ? <>सबसे मजबूत भाव <strong style={{ color: C.gold }}>H{r.bhava.strongest}</strong> है — {HOUSE_TOPICS[r.bhava.strongest - 1].hi} अपेक्षाकृत सहज चलते हैं। सबसे कमजोर भाव <strong style={{ color: C.sindoor }}>H{r.bhava.weakest}</strong> है — {HOUSE_TOPICS[r.bhava.weakest - 1].hi} में अधिक जागरूकता और प्रयास चाहिए।</> : <>The strongest house is <strong style={{ color: C.gold }}>H{r.bhava.strongest}</strong> — {HOUSE_TOPICS[r.bhava.strongest - 1].en} tend to have more support. The weakest is <strong style={{ color: C.sindoor }}>H{r.bhava.weakest}</strong> — {HOUSE_TOPICS[r.bhava.weakest - 1].en} may need more awareness and effort.</>}
+              </p>
+            </div>
             <div className="rise" style={{ ...card, padding: "1.25rem 0.875rem 0.75rem" }}>
               <DiamondChart
                 title={hi ? "भाव चलित — वास्तविक भाव-संधि के अनुसार ग्रह" : "Bhava Chalit — planets by true house cusp"}
@@ -919,6 +998,11 @@ export default function ChartScreen({ C, card, lang }) {
             {/* arudha padas */}
             </>}
             <Eyebrow id="arudha" deva="आरूढ पद" en="Arudha padas" />
+            <div style={{ ...card, padding: "0.75rem 1rem", marginBottom: "0.75rem", background: "var(--surface-raised)", borderLeft: `0.25rem solid var(--accent)` }}>
+              <p style={{ margin: 0, fontSize: "var(--font-small)", lineHeight: 1.6, color: C.ivory }}>
+                {hi ? <>आरूढ़ पद “लोगों को क्या दिखाई देता है” बताते हैं — भीतर की सच्चाई नहीं। <strong style={{ color: C.gold }}>आरूढ़ लग्न</strong> सार्वजनिक छवि है, और <strong style={{ color: C.gold }}>उपपद</strong> विवाह/साथी की सामाजिक छवि को दिखाता है।</> : <>Arudha padas show “how life appears to others,” not the inner truth. <strong style={{ color: C.gold }}>Arudha Lagna</strong> is public image, while <strong style={{ color: C.gold }}>Upapada</strong> shows the visible/social face of marriage and partner matters.</>}
+              </p>
+            </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.75rem" }}>
               {r.arudhas.map((a, i) => {
                 const ARUDHA_MEAN = hi ? ["दिखाई देने वाली छवि और प्रतिष्ठा", "धन और वाणी", "भाई-बहन और साहस", "घर और सुख", "संतान और सृजन", "सेवा और संघर्ष", "साझेदारी", "आयु और परिवर्तन", "धर्म और भाग्य", "कर्म और प्रतिष्ठा", "लाभ और संबंध-जाल", "विवाह और जीवनसाथी"] : ["perceived image & status", "wealth & speech", "siblings & courage", "home & comforts", "children & creativity", "service & conflicts", "partnerships", "longevity & change", "dharma & fortune", "career & status", "gains & networks", "marriage & spouse"];
