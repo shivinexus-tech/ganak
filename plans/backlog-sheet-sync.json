@@ -248,6 +248,72 @@
       "lastVerified": "2026-07-28 · Merged code present on main from 11083dd; latest evidence remains local :5303 smoke and focused gates; not production-verified",
       "sourceConfidence": "Published 2026 New Delhi Bhoomi/business/travel/document rule tables plus activity-specific clean-window regression gates",
       "recommendedAction": "Have Claude Code run the reserved second bug bash, fix any findings, then verify the deployed production route before marking 100%."
+    },
+    "31": {
+      "deliveryState": "Implemented locally — production verification pending",
+      "limitations": "Dedicated purchase/booking, deed-signing and registration context is implemented and validated; the new flow is not yet production-verified.",
+      "shortTermImpact": "Users can distinguish the property act they are timing and receive ranked clean windows with legal/financial caveats instead of a generic purchase result.",
+      "longTermImpact": "The dedicated action inventory and regression gate prevent property purchase, deed and registration context from collapsing back into generic Muhurat copy.",
+      "bugBashStatus": "Focused EN 390×844 local smoke completed 2026-07-28 with URL restoration, ranked result, rationale, no overflow and zero browser warnings/errors; production check remains.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · Local :5199 EN property-registration flow; Drik-period recall 91%/precision 100%; canonical gates and build pass",
+      "sourceConfidence": "Published Drik-style 2026 property dates plus existing property-specific rule table and clean-window anchors",
+      "recommendedAction": "Deploy, verify the property URL and result on production in EN/HI, then record the live bundle and owner sign-off."
+    },
+    "32": {
+      "deliveryState": "Implemented locally — production verification pending",
+      "limitations": "Dedicated purchase/payment and delivery/first-drive context is implemented and validated; the new flow is not yet production-verified.",
+      "shortTermImpact": "Users can time purchase separately from delivery/first drive and see explicit finance, insurance and road-safety boundaries.",
+      "longTermImpact": "The dedicated action inventory and regression gate prevent vehicle delivery from being hidden inside a generic purchase flow.",
+      "bugBashStatus": "Focused HI 390×844 local smoke completed 2026-07-28 with URL restoration, ranked result, safety rationale, no overflow and zero browser warnings/errors; production check remains.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · Local :5199 HI vehicle-delivery flow; Drik-period recall 100%; canonical gates and build pass",
+      "sourceConfidence": "Published Drik-style 2026 vehicle dates plus existing vehicle-specific rule table and clean-window anchors",
+      "recommendedAction": "Deploy, verify the vehicle URL and result on production in EN/HI, then record the live bundle and owner sign-off."
+    },
+    "37": {
+      "deliveryState": "Implemented locally — live import verification pending",
+      "limitations": "Permanent URL and standards-based ICS/VALARM export are implemented without browser storage. Production download and import in real calendar apps remain unverified.",
+      "shortTermImpact": "Users can preserve the full Muhurat context in a URL and create a device-calendar event with a 24-hour reminder.",
+      "longTermImpact": "Standards-based calendar reminders avoid a notification backend, but calendar-app import behavior still needs platform coverage.",
+      "bugBashStatus": "Focused EN/HI phone smoke and structural round-trip/ICS/privacy gate completed 2026-07-28; real Google/Apple/Outlook calendar import and production download remain.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · Local :5199 EN/HI 390×844; category/action/range restored; actions visible; no overflow or console errors",
+      "sourceConfidence": "Not applicable — technical URL and iCalendar export workflow",
+      "recommendedAction": "After deployment, download and import one event into Google Calendar and one native device calendar, verify local time/reminder, and test the shared URL in a fresh browser."
+    },
+    "38": {
+      "deliveryState": "Repository-ready — provider and production dashboard not configured",
+      "limitations": "Analytics and feedback endpoints are intentionally disabled until the owner chooses providers and publishes updated privacy terms. No production dashboard or collection evidence exists.",
+      "shortTermImpact": "The app shows a feedback path and honest disconnected state; the owner still cannot receive feedback or view funnels until endpoints are configured.",
+      "longTermImpact": "The fixed no-PII event dictionary limits future data creep, but provider retention/security and privacy obligations require owner review.",
+      "bugBashStatus": "Mandatory privacy bug bash not complete. Static no-PII/storage/cookie/credential checks pass; a production network audit is impossible before provider configuration.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · Local build and privacy-events gate; no production endpoints configured",
+      "sourceConfidence": "Not applicable — technical/privacy integration",
+      "recommendedAction": "Choose analytics and feedback providers, publish the matching privacy notice, configure endpoints, verify dashboard events and feedback delivery, then run a no-PII production network audit and independent privacy bug bash."
+    },
+    "39": {
+      "deliveryState": "Repository-ready — domain purchase and DNS pending",
+      "limitations": "Canonical origin configuration and SPA fallback exist, but no owner-approved branded domain, DNS, SSL or pages.dev redirect has been configured.",
+      "shortTermImpact": "Current pages.dev URLs remain valid; branded identity and canonical-domain consolidation are not delivered.",
+      "longTermImpact": "Without a single approved canonical domain, search and shared-link authority remain split when a branded domain is eventually introduced.",
+      "bugBashStatus": "Optional after external setup — repository gate passes; DNS/SSL/redirect/share-preview production matrix cannot run yet.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · Local canonical-deployment and route-metadata gates; current fallback is ganak.pages.dev",
+      "sourceConfidence": "Not applicable — deployment and DNS work",
+      "recommendedAction": "Owner selects and purchases the domain; attach it in Cloudflare, set VITE_CANONICAL_ORIGIN, configure pages.dev redirect, then verify HTTPS, deep links, language/query preservation, search/share metadata and error origin."
+    },
+    "40": {
+      "deliveryState": "Implemented locally — production verification pending",
+      "limitations": "Bilingual route-aware title, description, canonical and Open Graph handling is implemented; breadcrumbs are not a distinct UI pattern in the current single-shell navigation and production metadata remains unverified.",
+      "shortTermImpact": "Daily, Prashna, Jyotish, festival, calculator, medical and Muhurat journeys identify their own area in the browser/share metadata.",
+      "longTermImpact": "The generated registry gate reduces cross-route identity leaks, but every new route must be added to the metadata matrix.",
+      "bugBashStatus": "Focused EN/HI 390×844 local matrix completed 2026-07-28; existing page-context header and new route-metadata gates pass; production share-preview verification remains.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · Local :5199 EN/HI title/description/canonical checks; no overflow or console errors; canonical gates and build pass",
+      "sourceConfidence": "Not applicable — technical route identity and metadata",
+      "recommendedAction": "Deploy and verify titles/descriptions/canonical/Open Graph on representative Daily, Prashna, Jyotish, festival, calculator, medical and Muhurat production URLs; add future routes to the registry gate."
     }
   },
   "dashboard": {

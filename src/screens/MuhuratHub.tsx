@@ -21,7 +21,7 @@ import { computeLagnaPanchaka, panchakaRem, PANCHAKA_TYPE } from "../engine/panc
 import { obsKind } from "../engine/festivals";
 import { vaishnavaEkadashiDay } from "../engine/muhurat";
 import { VIM_LORDS } from "../engine/dasha";
-import { MUH_CATS, EVENTS, MUHURAT_GUIDANCE, SAMSKARA_INPUTS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS } from "../data/muhurat-ui";
+import { MUH_CATS, EVENTS, MUHURAT_GUIDANCE, SAMSKARA_INPUTS, PURCHASE_ACTIONS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS } from "../data/muhurat-ui";
 import DailyWindowsCard from "../components/DailyWindowsCard";
 import SeasonClockCard from "../components/SeasonClockCard";
 import { ascendantAt } from "../engine/ephemeris";
@@ -35,6 +35,8 @@ import { chhathTimings } from "../engine/chhath";
 import { navratriTimings } from "../engine/navratri";
 import { eclipseDetail } from "../engine/eclipse";
 import { urlPrefGet, urlPrefPush } from "../components/url-prefs";
+import MuhuratActions from "../components/MuhuratActions";
+import { privacyEvent } from "../telemetry/privacy-events";
 
 const VRAT_VIDHI_KEY = Object.freeze({
   chhathNahayKhay: "chhath",
@@ -79,14 +81,17 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   const isoAtOffset = (days) => new Date(Date.now() + tz * 3600000 + days * 86400000).toISOString().slice(0, 10);
   const validMuhuratKey=(value)=>MUH_CATS.some(c=>c.key===value) ? value : null;
   const [mfCat, setMfCat] = useState(() => validMuhuratKey(urlPrefGet("muhurat")));
-  const [mfFrom, setMfFrom] = useState(isoAtOffset(0));
-  const [mfTo, setMfTo] = useState(isoAtOffset(90));
+  const validIso=(value)=>/^\d{4}-\d{2}-\d{2}$/.test(value || "") ? value : null;
+  const [mfFrom, setMfFrom] = useState(() => validIso(urlPrefGet("mfrom")) || isoAtOffset(0));
+  const [mfTo, setMfTo] = useState(() => validIso(urlPrefGet("mto")) || isoAtOffset(90));
   const [mfPreset, setMfPreset] = useState("90");
   const [mfErr, setMfErr] = useState(null);
   const [mfBusy, setMfBusy] = useState(false);
   const [samskaraProfiles, setSamskaraProfiles] = useState({});
+  const initialAction=()=>{const cat=validMuhuratKey(urlPrefGet("muhurat")),spec=PURCHASE_ACTIONS[cat],value=urlPrefGet("maction");return spec?.options.some((x)=>x.value===value)?value:(spec?.options[0]?.value||"");};
+  const [purchaseAction,setPurchaseAction]=useState(initialAction);
   const [ans, setAns] = useState(null);
-  const chooseMfCat=(key)=>{ const next=validMuhuratKey(key); setMfCat(next); setMfErr(null); if(next) urlPrefPush("muhurat",next); if(ans&&next) findDays(null,null,next); };
+  const chooseMfCat=(key)=>{ const next=validMuhuratKey(key); setMfCat(next); setMfErr(null); if(next) { urlPrefPush("muhurat",next); const first=PURCHASE_ACTIONS[next]?.options[0]?.value || ""; setPurchaseAction(first); if(first) urlPrefPush("maction",first); } if(ans&&next) findDays(null,null,next); };
   useEffect(()=>{ const restore=()=>setMfCat(validMuhuratKey(urlPrefGet("muhurat"))); window.addEventListener("popstate",restore); return()=>window.removeEventListener("popstate",restore); },[]);
   const finderTopPanchaka = useMemo(() => { try { if (!ans || !ans.days) return null; const top = ans.days.filter((d) => d.valid)[0]; return top ? computeLagnaPanchaka(place, "lahiri", top.rise) : null; } catch (e) { return null; } }, [ans, place]);
   const mfYmd = (iso) => { const [y, m, d] = iso.split("-").map(Number); return { y, m, d }; };
@@ -105,7 +110,9 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
     setTimeout(() => {
       try {
         const dd = muhuratScanRange(place, "lahiri", from, to, cat);
-        setAns({ category: cat, days: dd, from: fromIso || mfFrom, to: toIso || mfTo, profile: SAMSKARA_INPUTS[cat] ? { ...(samskaraProfiles[cat] || {}) } : null });
+        const chosenAction=PURCHASE_ACTIONS[cat] ? purchaseAction : "";
+        setAns({ category: cat, days: dd, from: fromIso || mfFrom, to: toIso || mfTo, profile: SAMSKARA_INPUTS[cat] ? { ...(samskaraProfiles[cat] || {}) } : null, action: chosenAction });
+        privacyEvent("muhurat_search",{action:cat,language:lang,outcome:dd.some((d)=>d.valid)?"found":"none"});
       } catch (e) {
         if (typeof console !== "undefined") console.error("muhurat scan failed:", e);
         setMfErr(lang === "hi" ? "गणना नहीं हो सकी — कृपया छोटी अवधि आज़माएँ या पुनः प्रयास करें।" : "Couldn't complete the search — try a shorter date range or try again.");
@@ -600,6 +607,17 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
             })}
           </div>
           {MUHURAT_GUIDANCE[mfCat] && <div style={{ margin:"10px 0", padding:"11px 12px", borderRadius:T.rMd, background:"#FBF5E7", border:`1px solid ${C.line}`, color:C.ivory, fontSize:12.5, lineHeight:1.55 }}>{MUHURAT_GUIDANCE[mfCat][lang === "hi" ? "hi" : "en"]}</div>}
+          {PURCHASE_ACTIONS[mfCat] && (() => {
+            const spec=PURCHASE_ACTIONS[mfCat], selected=spec.options.find((x)=>x.value===purchaseAction) || spec.options[0];
+            return <div style={{ margin:"10px 0" }}>
+              <label style={{ ...T.label,color:C.muted,display:"flex",flexDirection:"column",gap:4 }}>{spec.label[lang === "hi" ? "hi" : "en"]}
+                <select value={selected.value} onChange={(e)=>{setPurchaseAction(e.target.value);urlPrefPush("maction",e.target.value);}} style={{height:T.ctrlH,borderRadius:T.rMd,border:`1px solid ${C.line}`,background:"#FFFDF7",padding:"0 10px",fontFamily:T.body,color:C.ivory}}>
+                  {spec.options.map((x)=><option key={x.value} value={x.value}>{x[lang === "hi" ? "hi" : "en"]}</option>)}
+                </select>
+              </label>
+              <div style={{fontSize:12,color:C.muted,lineHeight:1.5,marginTop:5}}>{selected.note[lang === "hi" ? "hi" : "en"]}</div>
+            </div>;
+          })()}
           {SAMSKARA_INPUTS[mfCat] && (() => {
             const spec=SAMSKARA_INPUTS[mfCat], profile=samskaraProfiles[mfCat] || {};
             const setProfile=(key,value)=>setSamskaraProfiles(prev=>({ ...prev, [mfCat]:{ ...(prev[mfCat]||{}), [key]:value } }));
@@ -664,6 +682,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                           <span style={{ marginLeft: 8, fontSize: 11, padding: "1px 9px", borderRadius: 10, background: qual(top.score).c + "20", color: qual(top.score).c }}>{qual(top.score).t}</span>
                         </div>
                         <div style={{ fontSize: 12.5, color: C.ivory, marginBottom: 10, lineHeight: 1.5 }}>{(lang === "hi" ? "क्यों यह दिन: " : "Why this day: ") + (top.factors.filter((f) => f.g).map((f) => lang === "hi" ? f.hi : f.en).join(lang === "hi" ? ", " : ", ") || "—")}</div>
+                        {PURCHASE_ACTIONS[ans.category] && (()=>{const selected=PURCHASE_ACTIONS[ans.category].options.find((x)=>x.value===ans.action)||PURCHASE_ACTIONS[ans.category].options[0];return <div style={{fontSize:12.5,color:C.gold,marginBottom:10,lineHeight:1.5}}><strong>{selected[lang==="hi"?"hi":"en"]}:</strong> {selected.note[lang==="hi"?"hi":"en"]}</div>;})()}
                         {(top.samskaraWindows || []).length ? (
                           <>
                             <div style={{ ...T.label, color:"#1F7A4D", marginBottom:5 }}>{lang === "hi" ? "संस्कार के अनुकूल लग्न-काल" : "Ceremony-specific lagna windows"}</div>
@@ -716,6 +735,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                             <div style={{ fontSize: 11.5, color: C.sindoor, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>{tr(lang, "avoidWindows")}: {tr(lang, "rahuL")} {fmtTime(top.rahu.start, top.tz)}–{fmtTime(top.rahu.end, top.tz)}</div>
                           </>
                         )}
+                        <MuhuratActions result={top} category={ans.category} categoryLabel={lang === "hi" ? catInfo.hi : catInfo.en} action={ans.action} actionLabel={PURCHASE_ACTIONS[ans.category]?.options.find((x)=>x.value===ans.action)?.[lang === "hi" ? "hi" : "en"]} from={ans.from} to={ans.to} place={place} lang={lang} C={C} />
                       </div>
                     )}
                     {days.length > 1 && (

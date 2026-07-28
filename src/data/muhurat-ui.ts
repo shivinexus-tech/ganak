@@ -87,6 +87,24 @@ const SAMSKARA_GUIDANCE = {
 
 const MUHURAT_GUIDANCE = SAMSKARA_GUIDANCE;
 
+const PURCHASE_ACTIONS = {
+  property: {
+    label: { en: "Property step", hi: "सम्पत्ति का चरण" },
+    options: [
+      { value: "purchase", en: "Purchase decision / booking", hi: "खरीद निर्णय / बुकिंग", note: { en: "Uses the property rule set; legal and financial due diligence remains separate.", hi: "सम्पत्ति नियम लागू होते हैं; कानूनी और वित्तीय जाँच अलग आवश्यक है।" } },
+      { value: "deed", en: "Sale deed signing", hi: "विक्रय-पत्र हस्ताक्षर", note: { en: "Use the registrar’s city. Complete title, lender and lawyer checks before choosing a ritual time.", hi: "रजिस्ट्रार का शहर चुनें। मुहूर्त से पहले स्वामित्व, ऋणदाता और वकील की जाँच पूरी करें।" } },
+      { value: "registration", en: "Registration", hi: "पंजीकरण", note: { en: "The displayed clean window is for the signing/registration act, not a promise about investment returns.", hi: "दिखाया समय हस्ताक्षर/पंजीकरण के लिए है—निवेश लाभ का वादा नहीं।" } },
+    ],
+  },
+  vehicle: {
+    label: { en: "Vehicle step", hi: "वाहन का चरण" },
+    options: [
+      { value: "purchase", en: "Purchase / payment", hi: "खरीद / भुगतान", note: { en: "Complete price, finance, insurance and safety checks independently.", hi: "मूल्य, ऋण, बीमा और सुरक्षा जाँच अलग से पूरी करें।" } },
+      { value: "delivery", en: "Delivery / first drive", hi: "डिलीवरी / प्रथम यात्रा", note: { en: "Use the delivery city. The clean window is for handover or first departure; road safety always comes first.", hi: "डिलीवरी का शहर चुनें। समय हस्तांतरण या प्रथम प्रस्थान हेतु है; सड़क सुरक्षा हमेशा पहले है।" } },
+    ],
+  },
+};
+
 // Ceremony-specific context is kept separate from the general date range. It
 // explains the customary fit without silently pretending to perform a full
 // natal-chart election; the engine's Panchang and lagna exclusions remain the
@@ -132,4 +150,4 @@ const SAMSKARA_INPUTS = {
   },
 };
 
-export { MUH_CATS, EVENTS, MUHURAT_GUIDANCE, SAMSKARA_GUIDANCE, SAMSKARA_INPUTS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS };
+export { MUH_CATS, EVENTS, MUHURAT_GUIDANCE, SAMSKARA_GUIDANCE, SAMSKARA_INPUTS, PURCHASE_ACTIONS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS };
