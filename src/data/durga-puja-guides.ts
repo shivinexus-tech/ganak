@@ -13,8 +13,14 @@ const guide = (x) => ({
   ...(x.safety ? { safety: p(...x.safety) } : {}),
 });
 
-const commonSafety = {
-  udyapan: ["The annual Durga Puja concludes with Dashami farewell and visarjan. Complete a personal counted vow with the same household or priestly tradition in which it was begun.", "वार्षिक दुर्गा पूजा दशमी की विदाई और विसर्जन से पूर्ण होती है। व्यक्तिगत गिनती के संकल्प का समापन उसी गृह या पुरोहित परम्परा में करें जिसमें वह आरम्भ हुआ।"],
+const completion = (en, hi) => ({ udyapan: [en, hi] });
+const COMPLETION = {
+  mahalaya: completion("Mahalaya closes ancestor remembrance and opens Devi Paksha; Puja itself continues into the following named days.", "महालया पितृ-स्मरण पूर्ण कर देवी पक्ष आरम्भ करता है; पूजा आगामी नामित दिनों में आगे बढ़ती है।"),
+  shashthi: completion("Bodhan formally opens the image worship; keep the welcomed Devi's worship through Saptami, Ashtami, Navami and Dashami.", "बोधन प्रतिमा-पूजन आरम्भ करता है; स्वागत की गई देवी की पूजा सप्तमी, अष्टमी, नवमी और दशमी तक जारी रखें।"),
+  saptami: completion("After Nabapatrika installation, the worship continues through the remaining Puja days; preserve the ritual team's installed form.", "नवपत्रिका स्थापना के बाद पूजा शेष पर्व-दिनों तक चलती है; पूजा-दल द्वारा स्थापित रूप को सुरक्षित रखें।"),
+  ashtami: completion("Complete today's anjali and Sandhi worship at their announced times; the festival continues into Navami.", "आज की अंजलि और संधि पूजा घोषित समय पर पूर्ण करें; पर्व नवमी में आगे चलता है।"),
+  navami: completion("Navami homa completes the full worship cycle, but Devi's farewell occurs on Dashami; keep the shrine until Baran.", "नवमी हवन पूर्ण पूजा-चक्र पूरा करता है, पर देवी की विदाई दशमी को होती है; बरण तक पूजा-स्थान बनाए रखें।"),
+  dashami: completion("Devi Baran, visarjan and Bijoya blessings complete the annual Puja; a personal counted vow follows the tradition that began it.", "देवी बरण, विसर्जन और बिजया आशीर्वाद वार्षिक पूजा पूर्ण करते हैं; व्यक्तिगत गिनती वाला संकल्प आरम्भ कराने वाली परम्परा से पूरा करें।"),
 };
 
 export const DURGA_PUJA_GUIDES = {
@@ -27,7 +33,7 @@ export const DURGA_PUJA_GUIDES = {
     puja: ["Ancestor offerings first; then Chandipath listening or recitation; lamp and flowers for Devi as the guest who arrives tomorrow in public worship.", "पहले पितर-अर्पण; फिर चंडीपाठ श्रवण/पाठ; देवी के लिए दीप और फूल — जो कल सार्वजनिक पूजा में आती हैं।"],
     stories: [["Mahalaya joins gratitude to the ancestors with the auspicious arrival of Devi Paksha.", "महालया पितरों के प्रति कृतज्ञता को देवी पक्ष के मंगल आगमन से जोड़ता है।"], ["The beloved Mahishasuramardini recitation narrates the awakening and victory of the Goddess, and has become a cherished dawn devotion in Bengali homes.", "प्रिय महिषासुरमर्दिनी पाठ देवी के आविर्भाव और विजय की कथा सुनाता है और बंगाली घरों की भोर की श्रद्धामयी परम्परा बन चुका है।"]],
     regional: [["Bengali homes in India and the diaspora commonly listen to the dawn recitation together and begin Puja preparations.", "भारत और प्रवास के बंगाली घरों में प्रायः मिलकर भोर का पाठ सुना जाता है और पूजा की तैयारी आरम्भ होती है।"], ["Households performing tarpana complete ancestor offerings before turning to Devi's welcome and Chandipath.", "तर्पण करने वाले घर पहले पितृ-अर्पण पूर्ण करते हैं, फिर देवी के स्वागत और चंडीपाठ की ओर बढ़ते हैं।"]],
-    paran: ["Break any morning fast after tarpana and the family's Mahalaya observance completes.", "तर्पण और पारिवारिक महालया अनुष्ठान पूर्ण होने पर प्रातः व्रत खोलें।"], ...commonSafety,
+    paran: ["Break any morning fast after tarpana and the family's Mahalaya observance completes.", "तर्पण और पारिवारिक महालया अनुष्ठान पूर्ण होने पर प्रातः व्रत खोलें।"], ...COMPLETION.mahalaya,
   }),
   durgaPujaShashthi: guide({
     verdict: ["Shashthi is Bodhan day — welcome Devi and witness the awakening of her image. Join Kalparambha, Bodhan and unveiling through the household priest or pandal's announced worship.", "षष्ठी बोधन दिवस है—देवी का स्वागत करें और प्रतिमा के जागरण का दर्शन करें। कल्पारम्भ, बोधन और अनावरण में गृह-पुरोहित या पंडाल की घोषित पूजा-विधि से सम्मिलित हों।"],
@@ -38,7 +44,7 @@ export const DURGA_PUJA_GUIDES = {
     puja: ["Kalparambha, Bodhan, offering of flowers and the first arati belong to the authorised ritual team. Household visitors may offer pushpanjali when announced.", "कल्पारंभ, बोधन, पुष्प और प्रथम आरती अधिकृत पूजा-दल की है। घर से आए भक्त घोषणा पर पुष्पांजलि दे सकते हैं।"],
     stories: [["Bodhan remembers inviting the wandering Devi to stay for the paksha.", "बोधन में भ्रमण करती देवी को पक्षभर ठहरने का आमंत्रण याद किया जाता है।"], ["The Mahishasura story frames the public festival's protective purpose.", "महिषासुर कथा सार्वजनिक पर्व के रक्षात्मक उद्देश्य को रेखांकित करती है।"]],
     regional: [["Kolkata pandals may unveil the face or complete the idol today.", "कोलकाता के पंडाल आज मुख खोल या प्रतिमा पूर्ण कर सकते हैं।"], ["Villages may keep a simpler kalash-centred Bodhan — both are valid under local authority.", "ग्रामीण क्षेत्र सरल कलश-केंद्रित बोधन रख सकते हैं — दोनों स्थानीय अधिकार में मान्य।"]],
-    paran: ["If you keep the Shashthi fast, complete it with Devi's prasad after the evening arati according to your household or pandal tradition.", "षष्ठी व्रत हो तो संध्या आरती के बाद गृह या पंडाल परम्परा के अनुसार देवी के प्रसाद से पूर्ण करें।"], ...commonSafety,
+    paran: ["If you keep the Shashthi fast, complete it with Devi's prasad after the evening arati according to your household or pandal tradition.", "षष्ठी व्रत हो तो संध्या आरती के बाद गृह या पंडाल परम्परा के अनुसार देवी के प्रसाद से पूर्ण करें।"], ...COMPLETION.shashthi,
   }),
   durgaPujaSaptami: guide({
     verdict: ["Saptami brings Nabapatrika Snan, Kolabou installation and the first full morning of Durga Puja. Join the dawn worship, offer pushpanjali and receive Devi's bhog.", "सप्तमी पर नवपत्रिका स्नान, कोलाबौ स्थापना और दुर्गा पूजा की पहली पूर्ण प्रभात-विधि होती है। प्रातः पूजा में सम्मिलित होकर पुष्पांजलि दें और देवी का भोग ग्रहण करें।"],
@@ -49,7 +55,7 @@ export const DURGA_PUJA_GUIDES = {
     puja: ["Nabapatrika bath, Kolabou placement and Saptami pushpanjali are led by the ritual team. Devotees participate at announced moments.", "नवपत्रिका स्नान, कोलाबौ स्थापन और सप्तमी पुष्पांजलि पूजा-दल द्वारा संचालित होती है। भक्त घोषित समय पर सम्मिलित हों।"],
     stories: [["Nabapatrika links Durga with agricultural fertility symbols.", "नवपत्रिका दुर्गा को कृषि-फलदायी प्रतीकों से जोड़ती है।"], ["Kolabou honours Ganga and the banana plant as Devi's companion.", "कोलाबौ गंगा और केले के पौधे को देवी के साथी के रूप में सम्मानित करता है।"]],
     regional: [["North Kolkata and temple traditions may emphasise different bathing ghats.", "उत्तर कोलकाता और मंदिर परम्पराएँ भिन्न स्नान घाट पर जोर दे सकती हैं।"], ["Diaspora pandals may simplify Nabapatrika while keeping the name and flowers.", "प्रवासी पंडाल नवपत्रिका सरल रख सकते हैं पर नाम और पुष्प बनाए रखें।"]],
-    paran: ["Complete a Saptami fast after Nabapatrika worship and pushpanjali with Devi's prasad, following the timing observed by your household or pandal.", "सप्तमी व्रत को नवपत्रिका पूजा और पुष्पांजलि के बाद गृह या पंडाल के समयानुसार देवी के प्रसाद से पूर्ण करें।"], ...commonSafety,
+    paran: ["Complete a Saptami fast after Nabapatrika worship and pushpanjali with Devi's prasad, following the timing observed by your household or pandal.", "सप्तमी व्रत को नवपत्रिका पूजा और पुष्पांजलि के बाद गृह या पंडाल के समयानुसार देवी के प्रसाद से पूर्ण करें।"], ...COMPLETION.saptami,
   }),
   durgaPujaAshtami: guide({
     verdict: ["Ashtami is the devotional heart of Durga Puja: offer morning pushpanjali, receive Kumari Puja darshan where observed, and return for Sandhi Puja at the exact Ashtami–Navami junction.", "अष्टमी दुर्गा पूजा का भक्तिमय हृदय है—प्रातः पुष्पांजलि दें, जहाँ हो वहाँ कुमारी पूजा के दर्शन करें और अष्टमी–नवमी की ठीक संधि पर संधि पूजा में सम्मिलित हों।"],
@@ -60,7 +66,7 @@ export const DURGA_PUJA_GUIDES = {
     puja: ["Pushpanjali, Sandhi arati with 108 lamps, and optional Kumari puja are conducted by priests. Devotees offer flowers and silent prayer at assigned times.", "पुष्पांजलि, १०८ दीप की संधि आरती और वैकल्पिक कुमारी पूजा पुरोहितों द्वारा। भक्त निर्धारित समय पर पुष्प और मौन प्रार्थना अर्पित करें।"],
     stories: [["Sandhi puja marks the slaying of Mahishasura in festival memory.", "संधि पूजा उत्सव स्मृति में महिषासुर वध का चिह्न है।"], ["Durga as Mahishasuramardini dominates Ashtami iconography.", "अष्टमी प्रतिमा में महिषासुरमर्दिनी दुर्गा प्रमुख हैं।"]],
     regional: [["Belur Math and major temples publish the local Sandhi clock for their worship; devotees gather before that sacred junction.", "बेलूर मठ और प्रमुख मंदिर अपनी पूजा का स्थानीय संधि समय प्रकाशित करते हैं; भक्त उस पवित्र संधि से पहले एकत्र होते हैं।"], ["At home, offer flowers, a lamp and Devi prayer during the local Sandhi window.", "घर पर स्थानीय संधि समय में पुष्प, दीप और देवी-प्रार्थना अर्पित करें।"]],
-    paran: ["If fasting, many break after morning anjali or after Sandhi per pandal guidance.", "व्रत हो तो अनेक प्रातः अंजलि या संधि के बाद पंडाल मार्गदर्शन से खोलते हैं।"], ...commonSafety,
+    paran: ["If fasting, many break after morning anjali or after Sandhi per pandal guidance.", "व्रत हो तो अनेक प्रातः अंजलि या संधि के बाद पंडाल मार्गदर्शन से खोलते हैं।"], ...COMPLETION.ashtami,
   }),
   durgaPujaNavami: guide({
     verdict: ["Navami is Maha Navami — join the priest-led homa, offer pushpanjali, receive the special bhog and cherish the last full day of Devi's stay.", "नवमी महानवमी है—पुरोहित-विधि से हवन में सम्मिलित हों, पुष्पांजलि दें, विशेष भोग ग्रहण करें और देवी के आगमन के अंतिम पूर्ण दिन को श्रद्धा से मनाएँ।"],
@@ -71,7 +77,7 @@ export const DURGA_PUJA_GUIDES = {
     puja: ["Navami homa, special offerings and arati are priest-led. Devotees offer flowers and receive prasad in order.", "नवमी हवन, विशेष अर्पण और आरती पुरोहित-निर्देशित। भक्त क्रम से पुष्प अर्पित करें और प्रसाद ग्रहण करें।"],
     stories: [["Navami homa brings the nine-night worship toward fulfilment through sacred fire and Devi mantra.", "नवमी हवन पवित्र अग्नि और देवी-मंत्र से नौ-रात्रि पूजा को पूर्णता की ओर ले जाता है।"], ["Sharing bhog expresses Devi's grace as nourishment offered to the whole community.", "भोग-वितरण देवी की कृपा को पूरे समुदाय के लिए अन्न-प्रसाद के रूप में व्यक्त करता है।"]],
     regional: [["Temples may hold Kumari puja again or special Devi names recitation.", "मंदिर पुनः कुमारी पूजा या विशेष देवी नाम-पाठ कर सकते हैं।"], ["Diaspora communities may compress homa and bhog into one afternoon slot.", "प्रवासी समुदाय हवन और भोग एक दोपहर में समेट सकते हैं।"]],
-    paran: ["Break fast after homa or evening arati according to local announcement.", "स्थानीय घोषणा अनुसार हवन या संध्या आरती के बाद व्रत खोलें।"], ...commonSafety,
+    paran: ["Break fast after homa or evening arati according to local announcement.", "स्थानीय घोषणा अनुसार हवन या संध्या आरती के बाद व्रत खोलें।"], ...COMPLETION.navami,
   }),
   durgaPujaDashami: guide({
     verdict: ["Dashami is Vijaya Dashami and Devi's loving farewell. Offer the final anjali, join sindoor khela where customary, accompany the visarjan procession and return home with Bijoya greetings.", "दशमी विजयादशमी और देवी की स्नेहमयी विदाई है। अंतिम अंजलि दें, परम्परानुसार सिंदूर खेल में सम्मिलित हों, विसर्जन यात्रा के साथ चलें और बिजया शुभकामनाओं के साथ घर लौटें।"],
@@ -80,8 +86,8 @@ export const DURGA_PUJA_GUIDES = {
     diet: ["Share sweets and the household's Bijoya meal after farewell worship or visarjan. Follow the vegetarian or customary festive menu received in your family.", "विदाई पूजा या विसर्जन के बाद मिठाई और घर का बिजया भोजन साझा करें। परिवार में प्राप्त शाकाहारी या पारम्परिक उत्सवी आहार-विधि रखें।"],
     sankalpa: ["“With gratitude for Devi's visit, I bid her loving farewell and seek blessings for the year ahead.”", "“देवी के आगमन के प्रति कृतज्ञता से उन्हें स्नेहपूर्वक विदा करूँगी/करूँगा और आने वाले वर्ष के लिए आशीर्वाद मांगूँगी/मांगूँगा।”"],
     puja: ["Complete Devi Baran with lamp, sweets, betel leaf and sindoor according to Bengali custom; offer final arati, join visarjan and close with pranam and Bijoya blessings.", "बंगाली परम्परा से दीप, मिठाई, पान और सिंदूर द्वारा देवी बरण करें; अंतिम आरती, विसर्जन, प्रणाम और बिजया आशीर्वाद से पूजा पूर्ण करें।"],
-    stories: [["Vijaya Dashami remembers Durga's return to Kailash after restoring dharma.", "विजयादशमी में धर्म स्थापन के बाद दुर्गा की कैलाश वापसी स्मरण होती है।"], ["Bijoya embraces reconcile neighbours after the intense festival week.", "बिजया उग्र उत्सव सप्ताह के बाद पड़ोसियों का मिलन कराती है।"]],
+    stories: [["Vijaya Dashami remembers Durga's return to Kailash after restoring dharma.", "विजयादशमी में धर्म स्थापन के बाद दुर्गा की कैलाश वापसी स्मरण होती है।"], ["Bijoya embraces help reconcile neighbours and renew affection after the intense festival week.", "बिजया के आलिंगन गहन उत्सव-सप्ताह के बाद पड़ोसियों में मेल और स्नेह नया करते हैं।"]],
     regional: [["Kolkata's barowari pujas carry the image in community processions to the Ganga for visarjan.", "कोलकाता की बारोवारी पूजा में सामुदायिक शोभायात्रा द्वारा प्रतिमा को गंगा-विसर्जन हेतु ले जाया जाता है।"], ["Traditional household pujas may perform a smaller farewell, mirror immersion or symbolic visarjan according to family custom.", "पारम्परिक गृह-पूजा में कुल-रीति से छोटा विदाई अनुष्ठान, दर्पण-विसर्जन या प्रतीकात्मक विसर्जन किया जा सकता है।"]],
-    paran: ["If a Navratri or Durga Puja fast continues through Dashami, complete it after Devi Baran or visarjan with prasad according to your household tradition.", "नवरात्रि या दुर्गा पूजा व्रत दशमी तक हो तो देवी बरण या विसर्जन के बाद गृह-परम्परा अनुसार प्रसाद से पूर्ण करें।"], ...commonSafety,
+    paran: ["If a Navratri or Durga Puja fast continues through Dashami, complete it after Devi Baran or visarjan with prasad according to your household tradition.", "नवरात्रि या दुर्गा पूजा व्रत दशमी तक हो तो देवी बरण या विसर्जन के बाद गृह-परम्परा अनुसार प्रसाद से पूर्ण करें।"], ...COMPLETION.dashami,
   }),
 };

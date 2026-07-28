@@ -29,6 +29,9 @@ const BANNED = [
   /follow your own community sources/i,
   /जैन और सिख दीपावली/,
   /केवल हिन्दू गृह-पूजा के लिए है; उन परम्पराओं के लिए/,
+  /\bGanak (?:shows|states|labels|keeps|lists|does)\b/i,
+  /\bGanak's\b/i,
+  /गणक (?:दिखाता|चुनी|उन्हें|बौद्ध)/u,
 ];
 
 const REQUIRED_OBJECTS = ['verdict', 'meaning', 'diet', 'sankalpa', 'puja', 'paran', 'udyapan'];
@@ -66,6 +69,15 @@ const NAMED_STORY_ANCHORS = {
   },
 };
 const NAMED_PRODUCT_META = [/\bGanak (?:shows|states|labels|keeps)\b/i, /\bGanak's\b/i];
+const DISTINCT_COMPLETION_KEYS = [
+  'holika', 'rangwaliHoli', 'ramNavami', 'hanumanJ', 'akshaya',
+  'guruPurnima', 'rakshaBandhan', 'dussehra', 'dhanteras',
+  'narakChaturdashi', 'govardhanPuja', 'bhaiDooj', 'gudiPadwa', 'ugadi',
+  'buddhaPurnima', 'rathYatra', 'kartikaPurnima', 'durgaPujaMahalaya',
+  'durgaPujaShashthi', 'durgaPujaSaptami', 'durgaPujaAshtami',
+  'durgaPujaNavami', 'durgaPujaDashami', 'skandaSashtiBegins',
+  'skandaSashtiSoorasamharam', 'skandaSashtiThirukalyanam',
+];
 
 function parseKathaBody(text) {
   const sep = ' — ';
@@ -84,6 +96,7 @@ function validateGuides(guides) {
 
   const fingerprints = new Map();
   const storyFingerprints = new Map();
+  const completionFingerprints = new Map();
 
   for (const key of keys) {
     const guide = guides[key];
@@ -126,6 +139,13 @@ function validateGuides(guides) {
     if (guide.safety && !SAFETY_KEYS.has(key)) problems.push(`${key} has a generic safety note without an approved guide-specific risk`);
     if (guide.safety && (!guide.safety.en || !guide.safety.hi)) problems.push(`${key}.safety must be bilingual`);
 
+    if (DISTINCT_COMPLETION_KEYS.includes(key)) {
+      const fingerprint = normalized(`${guide.udyapan?.en || ''}\n${guide.udyapan?.hi || ''}`);
+      const prior = completionFingerprints.get(fingerprint);
+      if (prior) problems.push(`${key}.udyapan duplicates ${prior}.udyapan`);
+      else completionFingerprints.set(fingerprint, key);
+    }
+
     for (const field of ['verdict', 'meaning', 'diet']) {
       if (!guide[field]) continue;
       const fingerprint = normalized(`${guide[field]?.en || ''}\n${guide[field]?.hi || ''}`);
@@ -162,6 +182,8 @@ fixture.skandaSashtiBegins.stories = [
 ];
 fixture.skandaSashtiSoorasamharam.stories = structuredClone(fixture.skandaSashtiThirukalyanam.stories);
 fixture.suryaGrahan.meaning.en = 'Ganak shows an eclipse and keeps the details here.';
+fixture.ekadashi.meaning.en = 'Ganak shows the generic fast here.';
+fixture.holika.udyapan = structuredClone(fixture.rangwaliHoli.udyapan);
 const fixtureProblems = validateGuides(fixture);
 assert(fixtureProblems.some((p) => p.includes('skandaSashtiBegins.stories[0].en is too short')), 'fixture must fail short-story check');
 assert(
@@ -170,5 +192,7 @@ assert(
 );
 assert(fixtureProblems.some((p) => p.includes('skandaSashtiBegins.stories.en misses named semantic anchor')), 'fixture must fail named-anchor check');
 assert(fixtureProblems.some((p) => p.includes('suryaGrahan contains named-route product-meta wording')), 'fixture must fail product-meta check');
+assert(fixtureProblems.some((p) => p.includes('ekadashi contains defensive/product-meta wording')), 'fixture must fail global product-meta check');
+assert(fixtureProblems.some((p) => p.includes('holika.udyapan duplicates rangwaliHoli.udyapan') || p.includes('rangwaliHoli.udyapan duplicates holika.udyapan')), 'fixture must fail copied-completion check');
 
 console.log(`DEVOTIONAL GUIDE QUALITY PASSED (${Object.keys(VRAT_VIDHI).length} dynamically discovered bilingual guides; ${Object.keys(NAMED_STORY_ANCHORS).length} named-route semantic profiles; failure fixtures proven)`);
