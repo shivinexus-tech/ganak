@@ -15,4 +15,9 @@ assert(src.includes('No browser storage')&&src.includes('कोई ब्रा�
 assert(src.includes('Copy link to this result')&&src.includes('इस परिणाम का लिंक कॉपी करें'),'share action must say plainly what is copied');
 assert(src.includes('Send this result to someone or open it again later.')&&src.includes('यह परिणाम किसी को भेजें या बाद में फिर खोलें।'),'share purpose must be explained in both languages');
 assert(!src.includes('Copy permanent link')&&!src.includes('स्थायी लिंक कॉपी करें'),'technical permanence jargon must not appear in the share action');
+assert(src.includes('Add this reminder for ${place.label}?')&&src.includes('${place.label} के लिए स्मरण जोड़ें?'),'calendar export must confirm the selected city in both languages');
+assert(src.includes('The date and Muhurat window use this city’s local time.')&&src.includes('तारीख़ और मुहूर्त का समय इसी शहर के स्थानीय समय में है।'),'city confirmation must explain local timing');
+assert(src.includes('Yes, add to calendar')&&src.includes('Change city')&&src.includes('हाँ, कैलेंडर में जोड़ें')&&src.includes('शहर बदलें'),'city confirmation must offer clear proceed/change actions');
+assert(src.includes('onClick={() => setConfirmCity(true)}'),'initial calendar action must open city confirmation');
+assert(!src.includes('onClick={exportCalendar} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "8px 13px", border: `1px solid ${C.line}`'),'initial calendar action must not create a file before confirmation');
 console.log('✓ muhurat-actions PASSED (stable URL state, ICS export, calendar reminder and no browser storage)');

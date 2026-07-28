@@ -26,6 +26,12 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
   const [ayanamsa] = useState("lahiri");
   const [regionalFlags,setRegionalFlags]=useState(DEFAULT_REGIONAL_CALENDAR_FLAGS);
   const [calendarState, setCalendarState] = useState(() => resolveConvention(urlPrefGet("cal"),DEFAULT_REGIONAL_CALENDAR_FLAGS));
+  const focusPlaceInput = () => {
+    const input = document.getElementById("daily-place-input");
+    if (!input) return;
+    input.scrollIntoView({ behavior: "smooth", block: "center" });
+    input.focus();
+  };
   const calendarMode=calendarState.id;
   const [holidayMode, setHolidayMode] = useState(() => resolveHolidayMode(urlPrefGet("hol")));
   const chooseCalendarMode = (value) => { const next = resolveConvention(value,regionalFlags); setCalendarState(next); urlPrefPush("cal", next.id); };
@@ -99,7 +105,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
             <div style={{ fontSize: 13.5, color: C.muted, marginBottom: 14, lineHeight: 1.55 }}>
               {lang === "hi" ? "कृपया दूसरी तारीख़ चुनें, या नीचे कोई और शहर खोजें।" : "Try picking a different date, or search for another city below."}
             </div>
-            <div style={{ maxWidth: 320 }}><PlaceInput value={place} onPick={onPlace} C={C} lang={lang} /></div>
+            <div style={{ maxWidth: 320 }}><PlaceInput inputId="daily-place-input" value={place} onPick={onPlace} C={C} lang={lang} /></div>
           </div>
         </div>
       )}
@@ -107,7 +113,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
       {todayP && (
         <>
           <div className="rise" style={{ position: "relative", zIndex: calOpen ? 50 : 1, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 20 }}>
-            <div style={{ flex: "1 1 200px", minWidth: 180 }}><PlaceInput value={place} onPick={onPlace} C={C} lang={lang} /></div>
+            <div style={{ flex: "1 1 200px", minWidth: 180 }}><PlaceInput inputId="daily-place-input" value={place} onPick={onPlace} C={C} lang={lang} /></div>
             {(() => {
               const [py, pm, pd] = panchDate.split("-").map(Number);
               const baseUTC = Date.UTC(py, pm - 1, pd);
@@ -198,7 +204,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
             </div>
           </div>}
           <HolidayOverlayCard isoDate={panchDate} mode={holidayMode} onMode={chooseHolidayMode} lang={lang} C={C} card={card} />
-          <MuhuratHub todayP={todayP} place={place} lang={lang} ayanamsa={ayanamsa} isToday={isPanchToday} onCal={setCalView} C={C} card={card} />
+          <MuhuratHub todayP={todayP} place={place} lang={lang} ayanamsa={ayanamsa} isToday={isPanchToday} onCal={setCalView} onChangeCity={focusPlaceInput} C={C} card={card} />
 
           <div className="rise2" style={{ ...card, padding: "16px 20px", marginTop: 12 }}>
             <div style={{ ...T.label, color: C.muted, marginBottom: 4 }}>

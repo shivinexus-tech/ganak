@@ -283,15 +283,15 @@
       "recommendedAction": "Deploy, verify the vehicle URL and result on production in EN/HI, then record the live bundle and owner sign-off."
     },
     "37": {
-      "deliveryState": "Timezone-shift fix ready — production/native retest pending",
-      "limitations": "The calendar event is now date-stable across device timezones and retains the chosen place/local window in its details. Owner iPhone and Android confirmation remains.",
-      "shortTermImpact": "Users can preserve the full Muhurat context in a URL and create a device-calendar event with a 24-hour reminder.",
-      "longTermImpact": "Date-only ICS semantics prevent a selected Muhurat day from moving backward or forward when a calendar app displays it in another timezone.",
-      "bugBashStatus": "Owner iPhone test found New Delhi Aug 13 displaying as Aug 12 in Los Angeles. Root cause was correct-but-surprising UTC conversion of a timed event. Fix exports an all-day Aug 13 entry and writes the New Delhi local window in event details; focused regression gate, parse check and build pass.",
+      "deliveryState": "City-confirmation guard implemented — production/native retest pending",
+      "limitations": "The event is date-stable and retains the chosen place/local window. Native iPhone and Android confirmation remains after the city-confirmation guard deploys.",
+      "shortTermImpact": "Before any file is created, users see the selected city and can either confirm its local timing or return directly to the city field.",
+      "longTermImpact": "An explicit place boundary prevents shared links from silently exporting another city's Muhurat while date-only ICS semantics prevent cross-timezone day shifts.",
+      "bugBashStatus": "Owner found New Delhi Aug 13 shifting to Aug 12 on an LA iPhone and questioned how a shared-link user would notice the inherited city. Date-stable export is live; the new bilingual pre-export guard names the city, explains local timing, blocks download until confirmation and provides Change city without resetting state.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-28 · muhurat-actions gate, parse-check and Vite production build pass after date-stable ICS fix",
+      "lastVerified": "2026-07-28 · local LA interaction: no prompt/file before Add; prompt names LA; Change city focuses existing field and preserves result; confirmed export succeeds; zero console warnings/errors; focused gate, parse, sheet check and build pass",
       "sourceConfidence": "Not applicable — technical URL and iCalendar export workflow",
-      "recommendedAction": "Deploy, then repeat one Los Angeles export on iPhone and Android; confirm the selected date, chosen place/local window in details and 24-hour reminder."
+      "recommendedAction": "Run focused/full gates and production smoke, then repeat one Los Angeles export on iPhone and Android; verify city prompt, selected date, local window details and 24-hour reminder."
     },
     "38": {
       "deliveryState": "Repository-ready — provider and production dashboard not configured",
