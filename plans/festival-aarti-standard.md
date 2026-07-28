@@ -63,7 +63,11 @@ singing along:**
 - **Include commonly-sung optional stanzas** (e.g. Ganesh "दीनन की लाज राखो …"), keeping a
   single clean base version — do NOT inline parenthetical word-variants (पान/हार,
   तिलक/सिन्दूर); the bottom "your family's wording may differ" note covers those.
-- Still drop pure performance markers (`x2` repeat counts) — they are instructions, not text.
+- **Return to the refrain after every verse** (the aarti's opening line/couplet, as it is
+  actually sung): Ganesh repeats the full "जय गणेश…" couplet; Lakshmi/Om Jai Jagdish Hare
+  repeat their single refrain line ("ॐ जय लक्ष्मी माता॥" / "ॐ जय जगदीश हरे॥").
+- **Repeat marker:** render "sing twice" as the Devanagari **"(२ बार)"** (never Latin `x2` —
+  the gate forbids Latin in verses), placed on **every couplet's closing (॥) line**.
 
 ## 3. Layout / rendering
 
