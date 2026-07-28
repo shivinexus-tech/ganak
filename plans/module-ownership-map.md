@@ -35,6 +35,17 @@ deeplinks**.
 | 4 | Chart | **MERGED** (hidden) | ✅ Open for panel peels |
 | 5–10 | Matching, Prashna, Hora, Jyotish, Validation, Backend | **MERGED** / open | ✅ Reservable |
 
+### Current exact reservations — Jyotish/calculator rows #33–#36
+
+| Backlog | Task ID | Owner | File boundary |
+|---|---|---|---|
+| #33 Sade Sati report | `CODEX-P0-SADE-SATI-REPORT-33` | Codex | New `sade-sati-report` engine/data/gate only; no shared calculator UI until integration |
+| #34 Mangal Dosha three-reference report | `CLAUDE-P0-MANGAL-THREE-REF-34` | Claude Code | New `mangal-dosha` engine/data/gate only; no shared calculator UI until integration |
+| #35 Arudha/Bhavabala/Special presentation | `CURSOR-P0-ARUDHA-BHAVA-SPECIAL-35` | Cursor | `ChartScreen.tsx` only in `#arudha`, `#chalit`, `#special`; no engine/nav edits |
+| #36 Ruling Planets rule map | `CODEX-P0-RULING-PLANETS-RULEMAP-36` | Codex | `dasha.ts` only around Ruling Planets/KP exports + new proof gate; no UI until integration |
+
+Detailed handoff: [`plans/jyotish-calculator-parallel-assignments.md`](jyotish-calculator-parallel-assignments.md).
+
 ### Shared files
 
 | File | Note |

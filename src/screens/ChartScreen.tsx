@@ -7,6 +7,9 @@ import { fmtDeg, fmtDateT } from "../components/format";
 import { searchOffline, searchOnline } from "../data/places";
 import MatchMaker from "./MatchingScreen";
 import DiamondChart from "../components/DiamondChart";
+import SouthChart from "../components/SouthChart";
+import EastChart from "../components/EastChart";
+import { urlPrefGet, urlPrefSet } from "../components/url-prefs";
 import { VARGAS, SPECIAL_CHARTS, SIGN_SHORT, PLANET_GLYPH } from "../data/chart-divisions";
 import { vargaSign } from "../engine/varga";
 import { SEVEN } from "../engine/classical";
@@ -14,6 +17,7 @@ import { BALA_PARTS } from "../engine/shadbala";
 import { KP_PLANETS, vimSub } from "../engine/dasha";
 import { computeKundli } from "../engine/kundli";
 import { kalaSarpaFromRows, pitraDoshaFromRows, papaCount } from "../engine/doshas";
+import { marriageWindows } from "../engine/marriage-timing";
 import { DashaTree } from "../components/DashaTree";
 import { ChartVault } from "../components/ChartVault";
 import { JyotishPanelNav } from "../components/JyotishPanelNav";
@@ -52,6 +56,9 @@ export default function ChartScreen({ C, card, lang }) {
   const [varga, setVarga] = useState("D1");
   const [refPt, setRefPt] = useState("lagna");
   const [ayanamsa, setAyanamsa] = useState("lahiri");
+  // Chart style (North diamond / South grid) survives reload + sharing via the URL.
+  const [chartStyle, setChartStyle] = useState(() => { const s = urlPrefGet("cstyle"); return s === "south" || s === "east" ? s : "north"; });
+  const chooseStyle = (v) => { setChartStyle(v); urlPrefSet("cstyle", v); };
   const [err, setErr] = useState("");
 
   // Vimshottari drill-down: which sub-periods are expanded (keys "level:startMs").
@@ -143,6 +150,21 @@ export default function ChartScreen({ C, card, lang }) {
     setTimeout(() => { const el = document.getElementById("summary"); if (el) el.scrollIntoView({ behavior: "smooth" }); }, 150);
   };
 
+  // Changing the ayanamsa after a chart is cast recomputes it live from the same
+  // birth data — so picking Raman/KP visibly updates instead of silently waiting
+  // for a re-cast.
+  useEffect(() => {
+    if (!chartContext) return;
+    const c = chartContext;
+    if (c.ayanamsa === ayanamsa) return;
+    const [y, m, day] = (c.form.date || "").split("-").map(Number);
+    const [hh, mi] = (c.form.time || "").split(":").map(Number);
+    const tz = tzOverride !== "" ? parseFloat(tzOverride) : zoneOffset(c.place.zone, y, m, day);
+    if (!y || isNaN(hh) || tz == null || isNaN(tz)) return;
+    setResult(computeKundli({ y, m, day, hh, mi, tz, lat: c.place.lat, lon: c.place.lon, ayanamsa }));
+    setChartContext({ ...c, ayanamsa });
+  }, [ayanamsa]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const inputStyle = {
     width: "100%", boxSizing: "border-box", background: "#FFFDF7",
     border: `1px solid ${C.line}`, borderRadius: 6, color: C.ivory,
@@ -179,6 +201,10 @@ export default function ChartScreen({ C, card, lang }) {
         const vs = vargaSign(p.lon, varga);
         return { label: PLANET_GLYPH[p.name], house: ((vs - vAscSign + 12) % 12) + 1, retro: p.retro, deg: p.deg };
       })
+    : [];
+  // Sign-indexed planets for the sign-fixed South chart (varga sign, not house).
+  const vPlanetsSign = r
+    ? r.rows.map((p) => ({ label: PLANET_GLYPH[p.name], sign: vargaSign(p.lon, varga), retro: p.retro, deg: p.deg }))
     : [];
 
 
@@ -252,10 +278,10 @@ export default function ChartScreen({ C, card, lang }) {
           {err && <p style={{ color: C.sindoor, fontSize: 14, margin: "12px 0 0" }}><span aria-hidden="true">⚠ </span>{err}</p>}
           <div style={{ marginTop: 16 }}>
             <label style={labelStyle}>{lang === "hi" ? "अयनांश" : "Ayanamsa"}</label>
-            <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 8, marginTop: 6 }}>
               {Object.entries(AYANAMSA).map(([k, v]) => (
                 <button key={k} onClick={() => setAyanamsa(k)}
-                  style={{ flex: 1, padding: "9px 10px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600,
+                  style={{ padding: "9px 10px", borderRadius: 8, cursor: "pointer", fontSize: 12.5, fontWeight: 600,
                     border: ayanamsa === k ? "1.5px solid #A86A12" : "1px solid #D9CCAE",
                     background: ayanamsa === k ? "rgba(168,106,18,.10)" : "#FBF6EC",
                     color: ayanamsa === k ? C.gold : C.muted }}>
@@ -265,8 +291,8 @@ export default function ChartScreen({ C, card, lang }) {
             </div>
             <p style={{ color: C.muted, fontSize: 11.5, margin: "6px 0 0", lineHeight: 1.5 }}>
               {lang === "hi"
-                ? "लाहिरी सरकारी/वैदिक मानक है। KP (कृष्णमूर्ति) हर स्थिति को लगभग 5′48″ पहले खिसकाता है — कृष्णमूर्ति पद्धति के उप-स्वामी कार्य हेतु आवश्यक।"
-                : "Lahiri is the government/Vedic standard. KP (Krishnamurti) shifts every position ~5′48″ earlier — required for Krishnamurti Paddhati sub-lord work."}
+                ? "लाहिरी सरकारी/वैदिक मानक (डिफ़ॉल्ट) है। रमन इससे ~1°28′ भिन्न है; KP (कृष्णमूर्ति) ~5′48″ पहले — उप-स्वामी कार्य हेतु; ट्रू चित्रपक्ष चित्रा को ठीक 180° पर रखता है और व्यवहार में लाहिरी के समान रहता है।"
+                : "Lahiri is the government/Vedic standard (default). Raman differs by ~1°28′; KP (Krishnamurti) is ~5′48″ earlier — needed for sub-lord work; True Chitrapaksha fixes Spica at exactly 180° and in practice coincides with Lahiri."}
             </p>
           </div>
           <button
@@ -293,6 +319,19 @@ export default function ChartScreen({ C, card, lang }) {
 
       {r && (
           <>
+            {/* Save-as-PDF (print). Hidden in the printed output itself. */}
+            <div className="no-print" style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}>
+              <button onClick={() => window.print()} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 16px", borderRadius: 9, border: `1px solid ${C.gold}`, background: "#FFFDF7", color: C.gold, cursor: "pointer", fontFamily: "Spectral, serif", fontSize: 13 }}>
+                ⬇ {hi ? "पीडीएफ़ सहेजें" : "Save as PDF"}
+              </button>
+            </div>
+            {/* print-only report header (the on-screen form inputs are hidden in print) */}
+            <div className="print-only" style={{ textAlign: "center", marginBottom: 18, borderBottom: `2px solid ${C.gold}`, paddingBottom: 12 }}>
+              <div style={{ fontFamily: "Eczar, serif", fontSize: 26, color: C.gold }}>{((chartContext?.form || form).name) || (hi ? "जन्म कुंडली" : "Janma Kundli")}</div>
+              <div style={{ fontSize: 13.5, color: C.ivory, marginTop: 4 }}>{(chartContext?.form || form).date} · {(chartContext?.form || form).time} · {(chartContext?.place || place)?.label}</div>
+              <div style={{ fontSize: 11, color: C.muted, marginTop: 3, letterSpacing: ".08em" }}>{hi ? "अयनांश" : "Ayanamsa"}: {AYANAMSA[chartContext?.ayanamsa || ayanamsa]?.label || (chartContext?.ayanamsa || ayanamsa)} · Ganak · ganak.pages.dev</div>
+            </div>
+
             {/* identity strip */}
             <Eyebrow id="summary" deva="जन्म विवरण" en="Birth summary" />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
@@ -343,6 +382,34 @@ export default function ChartScreen({ C, card, lang }) {
               </p>
               {refNote && <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "2px 0 10px" }}>{refNote}</p>}
               {!refNote && <div style={{ height: 10 }} />}
+              {/* chart-style switch — North diamond / South grid; choice persists in the URL */}
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+                <div style={{ display: "inline-flex", background: "#F1E9D5", borderRadius: 10, padding: 3, border: `1px solid ${C.line}` }}>
+                  {[["north", hi ? "उत्तर भारतीय" : "North"], ["south", hi ? "दक्षिण भारतीय" : "South"], ["east", hi ? "पूर्व भारतीय" : "East"]].map(([sk, slabel]) => (
+                    <button key={sk} onClick={() => chooseStyle(sk)}
+                      style={{ padding: "6px 16px", borderRadius: 8, fontFamily: "Spectral, serif", fontSize: 12.5, cursor: "pointer", border: "none",
+                        background: chartStyle === sk ? C.panel || "#FFFFFF" : "transparent", color: chartStyle === sk ? C.gold : C.muted, fontWeight: chartStyle === sk ? 600 : 400 }}>
+                      {slabel}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {chartStyle === "south" || chartStyle === "east" ? (
+                (() => {
+                  const StyleChart = chartStyle === "east" ? EastChart : SouthChart;
+                  return (
+                    <StyleChart
+                      key={chartStyle + varga + refPt}
+                      title={form.name ? `${form.name} · ${(place && place.label) || ""}` : (place && place.label) || (hi ? "जन्म कुंडली" : "Birth chart")}
+                      ascSign={vAscSign}
+                      planets={vPlanetsSign}
+                      showDeg={varga === "D1"}
+                      lagnaLabel={refPt === "lagna" ? "LAGNA" : refPt === "surya" ? "SURYA" : refPt === "chandra" ? "CHANDRA" : "KARAKAMSA"}
+                      gold={C.gold} ivory={C.ivory} muted={C.muted} sindoor={C.sindoor}
+                    />
+                  );
+                })()
+              ) : (
               <DiamondChart
                 key={varga + refPt}
                 title={form.name ? `${form.name} · ${(place && place.label) || ""}` : (place && place.label) || (hi ? "जन्म कुंडली" : "Birth chart")}
@@ -352,8 +419,9 @@ export default function ChartScreen({ C, card, lang }) {
                 lagnaLabel={refPt === "lagna" ? "LAGNA" : refPt === "surya" ? "SURYA" : refPt === "chandra" ? "CHANDRA" : "KARAKAMSA"}
                 gold={C.gold} ivory={C.ivory} muted={C.muted} sindoor={C.sindoor}
               />
+              )}
               <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "8px 0 0" }}>
-                {hi ? "हर भाव की संख्या उसकी राशि दिखाती है" : "Numbers mark the rashi in each house"} · <span style={{ color: C.sindoor }}>℞</span> {hi ? "वक्री" : "retrograde"}
+                {chartStyle === "east" ? (hi ? "राशियाँ स्थिर (मेष ऊपर, वामावर्त); भाव लग्न से" : "Signs fixed (Aries top, anti-clockwise); houses from the lagna") : chartStyle === "south" ? (hi ? "राशियाँ स्थिर हैं; भाव लग्न से गिने जाते हैं" : "Signs are fixed; houses are counted from the lagna") : (hi ? "हर भाव की संख्या उसकी राशि दिखाती है" : "Numbers mark the rashi in each house")} · <span style={{ color: C.sindoor }}>℞</span> {hi ? "वक्री" : "retrograde"}
                 {varga === "D2" && (hi ? " · होरा कुंडली में केवल कर्क (चन्द्र) और सिंह (सूर्य) राशियाँ होती हैं" : " · the Hora chart uses only Cancer (Moon) and Leo (Sun)")}
               </p>
             </div>
@@ -913,6 +981,37 @@ export default function ChartScreen({ C, card, lang }) {
                 </>
               )}
             </div>
+
+            {/* marriage timing — supportive Vimshottari windows, heavily qualified */}
+            <Eyebrow id="marriage" deva="विवाह — सम्भावित समय" en="Marriage — supportive timing" />
+            {(() => {
+              const mw = marriageWindows(r);
+              const fmtY = (t) => new Date(t + r.tz * 3600000).toLocaleDateString(hi ? "hi-IN" : "en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+              return (
+                <div className="rise" style={{ ...card, padding: "16px 20px" }}>
+                  <p style={{ fontSize: 13.5, lineHeight: 1.6, color: C.ivory, margin: "0 0 12px" }}>
+                    {hi
+                      ? <>विवाह के कारक — शुक्र व गुरु, सप्तम भाव का स्वामी (<strong>{PLANET_DEVA[mw.seventhLord]}</strong>){mw.occ7.length ? <> तथा सप्तम में स्थित ग्रह</> : null} — जिन दशा-अवधियों में सक्रिय होते हैं, परम्परा उन्हें विवाह हेतु अनुकूल मानती है।</>
+                      : <>Periods run by the marriage significators — Venus &amp; Jupiter, the 7th lord (<strong>{mw.seventhLord}</strong>){mw.occ7.length ? <> and planets in the 7th</> : null} — are traditionally seen as supportive for marriage.</>}
+                  </p>
+                  {mw.windows.length === 0 ? (
+                    <p style={{ color: C.muted, fontSize: 13 }}>{hi ? "आगामी बीस वर्षों में कोई स्पष्ट अनुकूल अवधि नहीं मिली।" : "No clearly supportive window found in the next twenty years."}</p>
+                  ) : (
+                    <div style={{ display: "grid", gap: 8 }}>
+                      {mw.windows.map((w, i) => (
+                        <div key={i} style={{ display: "flex", gap: 12, alignItems: "baseline", padding: "8px 2px", borderBottom: "1px solid #F1EADA" }}>
+                          <span style={{ color: C.gold, fontSize: 12.5, minWidth: 128, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{fmtY(w.start)} – {fmtY(w.end)}</span>
+                          <span style={{ fontSize: 13.5, color: C.ivory, flex: 1 }}>{hi ? `${PLANET_DEVA[w.maha]} / ${PLANET_DEVA[w.antar]} दशा` : `${w.maha} / ${w.antar} dasha`}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <p style={{ color: C.muted, fontSize: 11.5, marginTop: 12, lineHeight: 1.55 }}>
+                    {hi ? "यह भविष्यवाणी नहीं है। विवाह का वास्तविक समय गोचर (विशेषतः गुरु), नवांश, आयु, व्यक्तिगत इच्छा और अनेक कारकों पर निर्भर करता है। इसे किसी योग्य ज्योतिषी से पूरी कुंडली सहित समझें।" : "This is not a prediction. Actual timing depends on transits (especially Jupiter), the navamsa, age, personal choice and many other factors. Read it with the full chart and a qualified astrologer."}
+                  </p>
+                </div>
+              );
+            })()}
 
             {/* panchang */}
             <Eyebrow deva="पञ्चाङ्ग" en="Birth panchang" />

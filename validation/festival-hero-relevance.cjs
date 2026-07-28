@@ -1,38 +1,92 @@
 #!/usr/bin/env node
 'use strict';
 
-const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 const { loadApp } = require('./_load-app.cjs');
+const { validateRaster, assertDecodable, duplicateProblems, runMutationFixtures } = require('./_festival-raster-validator.cjs');
 
 const root = path.resolve(__dirname, '..');
 const { VRAT_VIDHI } = loadApp('src/data/vrat-vidhis.ts');
 const { FESTIVAL_HERO_ART } = loadApp('src/data/festival-hero-art.ts');
-const imageDir = path.join(root, 'public/festival-images');
+const { FESTIVAL_PAGE_ROUTES } = loadApp('src/data/festival-pages.ts');
+const { FESTIVAL_ROUTE_CONTENT } = loadApp('src/data/festival-route-content.ts');
+const imageDir = path.join(root, 'public/festival-images/raster');
 
 const keys = Object.keys(VRAT_VIDHI).sort();
-let failures = 0;
+const problems = [];
+const records = [];
+const decodeChecks = [];
+// Shared art is never implicit. Add a sorted "keyA|keyB" only after devotional
+// relevance review records why the exact same composition is correct for both.
+const SHARED_RASTER_ALLOWLIST = new Set();
+
+const routeEntries = Object.entries(FESTIVAL_PAGE_ROUTES);
+if (routeEntries.length < 181) problems.push(`festival route inventory shrank: expected at least 181, got ${routeEntries.length}`);
+for (const [routePath, entry] of routeEntries) {
+  if (entry.form?.image) {
+    const ownedImage = path.join(root, 'public', entry.form.image.replace(/^\/+/, ''));
+    if (!fs.existsSync(ownedImage)) problems.push(`${routePath}: missing owned route hero ${entry.form.image}`);
+    continue;
+  }
+  const parentHeroKey = entry.vidhiKey || FESTIVAL_ROUTE_CONTENT[entry.key]?.heroKey;
+  if (!parentHeroKey) {
+    problems.push(`${routePath}: no hero disposition (needs guide or route-content parent hero)`);
+    continue;
+  }
+  if (!VRAT_VIDHI[parentHeroKey]) problems.push(`${routePath}: parent hero key ${parentHeroKey} has no worship guide`);
+  if (!FESTIVAL_HERO_ART[parentHeroKey]) problems.push(`${routePath}: parent hero key ${parentHeroKey} has no art registry entry`);
+}
 
 for (const key of keys) {
   const art = FESTIVAL_HERO_ART[key];
-  assert(art, `${key} must have a festival-hero-art registry entry`);
-  const file = path.join(imageDir, `${key}.svg`);
-  assert(fs.existsSync(file), `${key} must have public/festival-images/${key}.svg`);
-  const svg = fs.readFileSync(file, 'utf8');
-  assert(svg.includes(`data-subject="${art.subject}"`), `${key}.svg must declare data-subject="${art.subject}"`);
-  assert(svg.includes('aria-label'), `${key}.svg must include aria-label`);
-  assert(!/GANAK FESTIVAL GUIDE/i.test(svg), `${key}.svg must not use the old placeholder label`);
-  assert(svg.includes('viewBox="0 0 640 240"') || svg.includes('height="240"'), `${key}.svg must use the 640×240 hero format`);
-  if (key === 'diwali') {
-    assert(/lakshmi/i.test(svg) || art.subject === 'lakshmi', 'Diwali hero must depict Lakshmi puja');
-    assert(svg.includes('lotus') || svg.includes('Lotus') || svg.includes('कमल'), 'Diwali hero must include lotus imagery');
+  if (!art) {
+    problems.push(`${key}: missing festival-hero-art registry entry`);
+    continue;
   }
-  console.log(`PASS  ${key} → ${art.subject} (${art.template})`);
+  if (!art.subject || !art.template) problems.push(`${key}: registry needs subject and template`);
+  if (!art.alt?.en?.trim() || !art.alt?.hi?.trim()) problems.push(`${key}: registry needs non-blank English and Hindi alt text`);
+  const file = path.join(imageDir, `${key}.webp`);
+  if (!fs.existsSync(file)) {
+    problems.push(`${key}: missing public/festival-images/raster/${key}.webp`);
+    continue;
+  }
+  try {
+    const buffer = fs.readFileSync(file);
+    const { info, problems: rasterProblems } = validateRaster(buffer);
+    for (const problem of rasterProblems) problems.push(`${key}: ${problem}`);
+    records.push({ key, sha256: info.sha256 });
+    decodeChecks.push(assertDecodable(buffer).catch((error) => {
+      problems.push(`${key}: invalid or undecodable WebP — ${error.message}`);
+    }));
+    console.log(`PASS  ${key} → ${art.subject} (${info.width}×${info.height}, ${info.bytes} bytes)`);
+  } catch (error) {
+    problems.push(`${key}: invalid or undecodable WebP — ${error.message}`);
+  }
 }
 
-const diwali = fs.readFileSync(path.join(imageDir, 'diwali.svg'), 'utf8');
-assert(diwali.includes('data-subject="lakshmi"'), 'hand-crafted diwali.svg must be Lakshmi-themed');
+async function finish() {
+  await Promise.all(decodeChecks);
+  problems.push(...duplicateProblems(records, SHARED_RASTER_ALLOWLIST));
 
-if (failures) process.exit(1);
-console.log(`\nFESTIVAL HERO RELEVANCE PASSED (${keys.length} guides)`);
+  const component = fs.readFileSync(path.join(root, 'src/components/FestivalRasterHero.tsx'), 'utf8');
+  const screen = fs.readFileSync(path.join(root, 'src/screens/FestivalGuideScreen.tsx'), 'utf8');
+  if (!component.includes('/festival-images/raster/${imageKey}.webp')) problems.push('FestivalRasterHero must request the key-specific raster WebP');
+  if (!component.includes('onError={() => setFailed(true)}')) problems.push('FestivalRasterHero must handle an image load failure');
+  if (!component.includes('heroArtForKey(imageKey)')) problems.push('FestivalRasterHero must use registry alt text');
+  if (!screen.includes('imageKey={guide.vidhiKey || routeContent.heroKey}')) problems.push('FestivalGuideScreen must render guide or route-content hero keys');
+
+  try { await runMutationFixtures(); } catch (error) { problems.push(`validator mutation fixtures: ${error.message}`); }
+
+  if (problems.length) {
+    console.error(`\nFESTIVAL HERO RELEVANCE FAILED (${problems.length} problems; ${records.length}/${keys.length} rasters present)`);
+    for (const problem of problems) console.error(' -', problem);
+    process.exit(1);
+  }
+  console.log(`\nFESTIVAL HERO RELEVANCE PASSED (${keys.length} guides; ${routeEntries.length} routes disposed; mutation fixtures rejected)`);
+}
+
+finish().catch((error) => {
+  console.error(`festival-hero-relevance.cjs crashed: ${error.stack || error.message}`);
+  process.exit(1);
+});

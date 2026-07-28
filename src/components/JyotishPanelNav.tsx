@@ -26,6 +26,7 @@ const JYOTISH_GROUPS = [
     hi: "दशा",
     items: [
       ["#dasha", "Vimshottari", "विंशोत्तरी"],
+      ["#marriage", "Marriage timing", "विवाह समय"],
       ["#bnn", "BNN", "बीएनएन"],
       ["#bhrigu", "Bhrigu", "भृगु"],
     ],

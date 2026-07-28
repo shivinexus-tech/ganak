@@ -258,29 +258,34 @@ function ayyappaMandalaFor(ms, tz) {
 const EKADASHI_NAMES = {
   "Chaitra_Shukla_11": { en: "Kamada Ekadashi", hi: "कामदा एकादशी" },
   "Vaisakha_Shukla_11": { en: "Mohini Ekadashi", hi: "मोहिनी एकादशी" },
-  "Jyeshtha_Shukla_11": { en: "Apara Ekadashi", hi: "अपरा एकादशी" },
+  "Jyeshtha_Shukla_11": { en: "Nirjala Ekadashi", hi: "निर्जला एकादशी" },
   "Ashadha_Shukla_11": { en: "Devshayani Ekadashi", hi: "देवशयनी एकादशी" },
-  "Shravan_Shukla_11": { en: "Varuthini Ekadashi", hi: "वरूथिनी एकादशी" },
-  "Bhadrapad_Shukla_11": { en: "Padma Ekadashi", hi: "पद्मा एकादशी" },
-  "Ashwin_Shukla_11": { en: "Indira Ekadashi", hi: "इंदिरा एकादशी" },
-  "Kartik_Shukla_11": { en: "Dev Uthani Ekadashi", hi: "देव उठनी एकादशी" },
+  "Shravan_Shukla_11": { en: "Shravana Putrada Ekadashi", hi: "श्रावण पुत्रदा एकादशी" },
+  "Bhadrapad_Shukla_11": { en: "Parivartini Ekadashi", hi: "परिवर्तिनी एकादशी" },
+  "Ashwin_Shukla_11": { en: "Papankusha Ekadashi", hi: "पापांकुशा एकादशी" },
+  "Kartik_Shukla_11": { en: "Devutthana Ekadashi", hi: "देवोत्थान एकादशी" },
   "Margshirsh_Shukla_11": { en: "Mokshada Ekadashi", hi: "मोक्षदा एकादशी" },
-  "Paush_Shukla_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" },
-  "Magh_Shukla_11": { en: "Safala Ekadashi", hi: "सफला एकादशी" },
+  "Paush_Shukla_11": { en: "Pausha Putrada Ekadashi", hi: "पौष पुत्रदा एकादशी" },
+  "Magh_Shukla_11": { en: "Jaya Ekadashi", hi: "जया एकादशी" },
   "Phalgun_Shukla_11": { en: "Amalaki Ekadashi", hi: "आमलकी एकादशी" },
-  "Chaitra_Krishna_11": { en: "Pap Mochini Ekadashi", hi: "पाप मोचिनी एकादशी" },
-  "Vaisakha_Krishna_11": { en: "Nrisimha Jayanti", hi: "नृसिंह जयंती" },
-  "Jyeshtha_Krishna_11": { en: "Nirjala Ekadashi", hi: "निर्जला एकादशी" },
+  "Chaitra_Krishna_11": { en: "Papmochani Ekadashi", hi: "पापमोचनी एकादशी" },
+  "Vaisakha_Krishna_11": { en: "Varuthini Ekadashi", hi: "वरूथिनी एकादशी" },
+  "Jyeshtha_Krishna_11": { en: "Apara Ekadashi", hi: "अपरा एकादशी" },
   "Ashadha_Krishna_11": { en: "Yogini Ekadashi", hi: "योगिनी एकादशी" },
-  "Shravan_Krishna_11": { en: "Putrada Ekadashi", hi: "पुत्रदा एकादशी" },
+  "Shravan_Krishna_11": { en: "Kamika Ekadashi", hi: "कामिका एकादशी" },
   "Bhadrapad_Krishna_11": { en: "Aja Ekadashi", hi: "अजा एकादशी" },
-  "Ashwin_Krishna_11": { en: "Vijaya Ekadashi", hi: "विजया एकादशी" },
-  "Kartik_Krishna_11": { en: "Prabodhini Ekadashi", hi: "प्रबोधिनी एकादशी" },
+  "Ashwin_Krishna_11": { en: "Indira Ekadashi", hi: "इंदिरा एकादशी" },
+  "Kartik_Krishna_11": { en: "Rama Ekadashi", hi: "रमा एकादशी" },
   "Margshirsh_Krishna_11": { en: "Utpanna Ekadashi", hi: "उत्पन्ना एकादशी" },
   "Paush_Krishna_11": { en: "Safala Ekadashi", hi: "सफला एकादशी" },
-  "Magh_Krishna_11": { en: "Shatila Ekadashi", hi: "शतिला एकादशी" },
-  "Phalgun_Krishna_11": { en: "Phalaharini Ekadashi", hi: "फलहारिणी एकादशी" }
+  "Magh_Krishna_11": { en: "Shattila Ekadashi", hi: "षट्तिला एकादशी" },
+  "Phalgun_Krishna_11": { en: "Vijaya Ekadashi", hi: "विजया एकादशी" }
 };
+const PRADOSH_KEY_BY_DAY = Object.freeze([
+  "pradosh_Sunday", "pradosh_Monday", "pradosh_Tuesday",
+  "pradosh_Wednesday", "pradosh_Thursday", "pradosh_Friday",
+  "pradosh_Saturday",
+]);
 const PRADOSH_NAMES_BY_DAY = {
   0: { en: "Ravi Pradosh", hi: "रवि प्रदोष" },
   1: { en: "Som Pradosh", hi: "सोम प्रदोष" },
@@ -301,7 +306,7 @@ function observancesFor(krishna, tithiNum, month = null, dow = null) {
   }
   if (tithiNum === 13) {
     const variant = dow != null ? PRADOSH_NAMES_BY_DAY[dow % 7] : null;
-    const variantKey = variant ? `pradosh_${dow % 7}` : "pradosh";
+    const variantKey = variant ? PRADOSH_KEY_BY_DAY[dow % 7] : "pradosh";
     out.push({ key: variantKey, fasting: true, isVariant: !!variant, baseKey: "pradosh" });
   }
   if (tithiNum === 4 && krishna) out.push({ key: "sankashti", fasting: true });

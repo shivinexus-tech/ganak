@@ -15,14 +15,29 @@
 
 const { loadApp } = require('./_load-app.cjs');
 const { medicalMuhuratScan, medicalMuhuratClean, natalMoonSign } = loadApp('src/engine/medical-muhurat.ts');
-const { MEDICAL_SAFETY, MEDICAL_TRADITION_NOTE, MEDICAL_INTRO, MEDICAL_NATAL_HINT, MEDICAL_JANMA, MEDICAL_NATAL_UNCONFIRMED } = loadApp('src/data/medical-muhurat-ui.ts');
+const {
+  MEDICAL_SAFETY, MEDICAL_TRADITION_NOTE, MEDICAL_INTRO, MEDICAL_NATAL_HINT,
+  MEDICAL_JANMA, MEDICAL_NATAL_UNCONFIRMED, MEDICAL_NO_SOLAR_DATA,
+} = loadApp('src/data/medical-muhurat-ui.ts');
+const fs = require('fs');
 
 const DELHI = { label: 'New Delhi', lat: 28.6139, lon: 77.2090, zone: 'Asia/Kolkata' };
+const LONDON = { label: 'London', lat: 51.5074, lon: -0.1278, zone: 'Europe/London' };
+const NEW_YORK = { label: 'New York', lat: 40.7128, lon: -74.0060, zone: 'America/New_York' };
+const SYDNEY = { label: 'Sydney', lat: -33.8688, lon: 151.2093, zone: 'Australia/Sydney' };
+const TROMSO = { label: 'Tromsø', lat: 69.6492, lon: 18.9553, zone: 'Europe/Oslo' };
 let failures = 0;
 const fail = (m) => { failures++; console.error('FAIL ' + m); };
 const pad = (n) => String(n).padStart(2, '0');
 const ymd = (y, m, d) => ({ y, m, d });
 const key = (r) => `${r.y}-${pad(r.m)}-${pad(r.day)}`;
+const localMinutes = (ms, tz) => {
+  const d = new Date(ms + tz * 3600000);
+  return d.getUTCHours() * 60 + d.getUTCMinutes();
+};
+const nearMinutes = (actual, expected, tolerance, message) => {
+  if (Math.abs(actual - expected) > tolerance) fail(`${message}: expected ${expected}±${tolerance} minutes, got ${actual}`);
+};
 
 const scan = medicalMuhuratScan(DELHI, 'lahiri', ymd(2026, 1, 16), ymd(2026, 3, 5));
 const byDate = Object.fromEntries(scan.map((r) => [key(r), r]));
@@ -75,6 +90,31 @@ if (clean.some((r) => !r.clean)) fail('medicalMuhuratClean returned a non-clean 
 const a = JSON.stringify(medicalMuhuratScan(DELHI, 'lahiri', ymd(2026, 2, 9), ymd(2026, 2, 15)));
 const b = JSON.stringify(medicalMuhuratScan(DELHI, 'lahiri', ymd(2026, 2, 9), ymd(2026, 2, 15)));
 if (a !== b) fail('scan is not deterministic for identical inputs');
+
+// --- Independent adversarial coverage: DST, polar days and range boundaries -------
+// Drik Panchang London, 2026-03-29 (DST starts that day): sunrise 06:43,
+// Abhijit 12:40–13:31. The engine may differ by one minute due to rounding.
+const londonDst = medicalMuhuratScan(LONDON, 'lahiri', ymd(2026, 3, 29), ymd(2026, 3, 29))[0];
+if (!londonDst) fail('London DST-transition day returned no result');
+else {
+  if (londonDst.tz !== 1) fail(`London 2026-03-29 expected DST offset +1, got ${londonDst.tz}`);
+  nearMinutes(localMinutes(londonDst.rise, londonDst.tz), 6 * 60 + 43, 2, 'London DST sunrise');
+  nearMinutes(localMinutes(londonDst.abhijit.start, londonDst.tz), 12 * 60 + 40, 2, 'London DST Abhijit start');
+  nearMinutes(localMinutes(londonDst.abhijit.end, londonDst.tz), 13 * 60 + 31, 2, 'London DST Abhijit end');
+}
+const nyWinter = medicalMuhuratScan(NEW_YORK, 'lahiri', ymd(2026, 12, 21), ymd(2026, 12, 21))[0];
+if (!nyWinter || nyWinter.tz !== -5) fail(`New York winter offset expected -5, got ${nyWinter?.tz}`);
+const sydneySummer = medicalMuhuratScan(SYDNEY, 'lahiri', ymd(2026, 12, 21), ymd(2026, 12, 21))[0];
+if (!sydneySummer || sydneySummer.tz !== 11) fail(`Sydney summer offset expected +11, got ${sydneySummer?.tz}`);
+if (medicalMuhuratScan(TROMSO, 'lahiri', ymd(2026, 6, 21), ymd(2026, 6, 21)).length !== 0) {
+  fail('Tromsø midnight-sun day should be skipped because there is no sunrise/sunset pair');
+}
+if (medicalMuhuratScan(LONDON, 'lahiri', ymd(2026, 12, 31), ymd(2026, 12, 31)).length !== 1) fail('from==to must return one day');
+if (medicalMuhuratScan(LONDON, 'lahiri', ymd(2027, 1, 2), ymd(2026, 12, 31)).length !== 0) fail('from>to must return no days');
+const yearBoundary = medicalMuhuratScan(LONDON, 'lahiri', ymd(2026, 12, 30), ymd(2027, 1, 2));
+if (yearBoundary.length !== 4 || key(yearBoundary[0]) !== '2026-12-30' || key(yearBoundary[3]) !== '2027-01-02') {
+  fail('year-boundary scan must preserve all four civil dates');
+}
 
 // --- Safety copy: bilingual, and actually says the required things ---
 if (!MEDICAL_SAFETY?.en || !MEDICAL_SAFETY?.hi) fail('missing bilingual safety wall');
@@ -137,12 +177,27 @@ if (cleanNatal.some((r) => !r.clean)) fail('medicalMuhuratClean returned a syzyg
 if (!MEDICAL_NATAL_HINT?.en || !MEDICAL_NATAL_HINT?.hi) fail('missing bilingual natal hint');
 if (!MEDICAL_JANMA?.en || !MEDICAL_JANMA?.hi) fail('missing bilingual Janma Rashi label');
 if (!MEDICAL_NATAL_UNCONFIRMED?.en || !MEDICAL_NATAL_UNCONFIRMED?.hi) fail('missing bilingual natal-unconfirmed hint (F3)');
+if (!MEDICAL_NO_SOLAR_DATA?.en || !MEDICAL_NO_SOLAR_DATA?.hi) fail('missing bilingual no-sunrise/no-sunset result copy');
 if (MEDICAL_NATAL_HINT?.en && !/optional/i.test(MEDICAL_NATAL_HINT.en)) fail('natal hint must state it is optional');
 if (MEDICAL_NATAL_HINT?.en && !/stored|store/i.test(MEDICAL_NATAL_HINT.en)) fail('natal hint must address that birth details are not stored');
 for (const [k, v] of Object.entries({ MEDICAL_NATAL_HINT, MEDICAL_JANMA })) {
   for (const lang of ['en', 'hi']) {
     if (v?.[lang] && outcomeClaim.test(v[lang])) fail(`${k}.${lang} makes a medical-outcome claim`);
   }
+}
+
+// --- UI safety and bypass guards ---------------------------------------------------
+const screenSource = fs.readFileSync('src/screens/MedicalMuhuratScreen.tsx', 'utf8');
+const safetyRender = screenSource.indexOf('{bi(MEDICAL_SAFETY)}');
+const introRender = screenSource.indexOf('{bi(MEDICAL_INTRO)}');
+if (safetyRender < 0 || introRender < 0 || safetyRender > introRender) {
+  fail('safety wall must render before the astrological intro');
+}
+if (!/birthDate\s*>\s*todayStr/.test(screenSource)) {
+  fail('UI must reject a future birth date even when the input max is bypassed');
+}
+if (!/result\.length\s*===\s*0[\s\S]{0,300}MEDICAL_NO_SOLAR_DATA/.test(screenSource)) {
+  fail('zero calculable solar days must use dedicated no-sunrise/no-sunset copy');
 }
 
 if (failures) { console.error(`\n✗ medical-muhurat FAILED (${failures})`); process.exit(1); }

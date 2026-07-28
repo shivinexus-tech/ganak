@@ -107,7 +107,13 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       section is no longer a Phase-2 reveal. Bring the already-built engines into a
       coherent, bilingual, phone-ready public experience; do not merely unhide the
       current dense screen. This launch gate includes:
-  - [ ] Retrograde/direct calendar and planetary combustion, rise and set calendar.
+  - [x] Retrograde/direct calendar and planetary combustion, rise and set calendar.
+        _(Shipped 2026-07-26, `CLAUDE-P0-PLANET-CALENDAR-01` REVIEW: engine
+        `planet-calendar.ts` + `PlanetCalendarCard` in the Daily gochar area —
+        a 12-month retrograde/direct + combustion (Asta/Udaya rise-set) calendar
+        for the five star planets, "now" summary, bilingual Devanagari planet
+        names, place-aware. Gate pins 2026 Mercury R×3 (Feb-26) + set/rise
+        alternation. Open: deploy + owner sign-off + 2nd bug bash.)_
   - [ ] Standalone Sade Sati calculator and report.
   - [ ] Standalone Mangal Dosha analysis from Lagna, Moon and Venus, with sourced
         exceptions/cancellation rules and a plain-language verdict.
@@ -132,8 +138,18 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         No engine counts as launched while its route/panel is hidden, untranslated,
         visually unfinished or missing validation evidence.
   - [ ] South- and East-Indian chart styles in addition to the current chart.
+        _(Both shipped 2026-07-26, `CLAUDE-P0-CHARTSTYLES-AYAN-01` REVIEW:
+        **South** = sign-fixed 4×4 grid + lagna wedge; **East** = Bengali
+        diamond-in-square, convention verified (Rashi-fixed, Aries top-centre,
+        anti-clockwise) with lagna-compartment tint. Three-way North/South/East
+        toggle, choice persisted in URL (`cstyle`); degrees + retro on both. Gate
+        `chart-styles-ayanamsha.cjs` pins both layouts. Open: deploy + sign-off.)_
   - [ ] Keep and expose multiple ayanamshas without changing Ganak's default
-        Lahiri + mean Rahu/Ketu convention.
+        Lahiri + mean Rahu/Ketu convention. _(Shipped 2026-07-26,
+        `CLAUDE-P0-CHARTSTYLES-AYAN-01` REVIEW: Lahiri (default) + Raman + KP +
+        True Chitrapaksha selectable in the Kundli screen; changing it auto-recasts
+        a live chart; gate pins the offsets + verifies the Raman shift. Default
+        unchanged. Open: deploy + sign-off.)_
   - [ ] Complete the general Dosha explanation layer and finish Ruling Planets,
         reusing existing engine work only after rule/anchor verification.
   - [ ] Complete the answer-before-data life interpretation layer so the public
@@ -145,14 +161,29 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         link remain hidden until all sign entries are owner-verified. Still open:
         owner high-risk content review, EN/HI phone visual QA, release and
         production verification.)_
-  - [ ] Downloadable Kundli PDF and general PDF reports, with bilingual rendering,
-        chart legibility and print verification.
+  - [x] Downloadable Kundli PDF and general PDF reports, with bilingual rendering,
+        chart legibility and print verification. _(Shipped 2026-07-26,
+        `CLAUDE-P0-PDF-PRINT-01` REVIEW. Owner chose **browser print-to-PDF**
+        (no heavy deps, offline): global `@media print` stylesheet hides the
+        interactive chrome, expands collapsibles and prints a clean report; a
+        bilingual "Save as PDF" button + print-only report header (name · DOB ·
+        place · ayanamsa · Ganak) on both the **Kundli** and **Match** results.
+        Gate `print-reports.cjs`. Open: deploy + owner sign-off + print QA on a
+        real printer/PDF.)_
       _(P0-JYOTISH-PUBLIC-LAUNCH; owner scope 2026-07-21)_
 - [ ] **P0 before go-live — matching and marriage-completion suite.** Finish
       Dashakoota alongside the existing Ashtakoota path; add a downloadable match
       PDF/report and a clearly qualified marriage prediction/timing view. State the
       method and limitations; never present a match score or timing estimate as a
-      certainty. _(P0-MATCHING-LAUNCH; owner scope 2026-07-21)_
+      certainty. _(P0-MATCHING-LAUNCH; owner scope 2026-07-21.
+      **Dashakoota + explanations + marriage timing shipped 2026-07-26,
+      `CLAUDE-P0-MATCHING-DASHAKOOTA-01` REVIEW:** 10-koota South-Indian system
+      (36 pts, Rajju/Vedha hard-blocks) beside Ashtakoota with a bilingual table +
+      verdict bands + dosha callouts; a heavily-qualified marriage-timing section
+      in the Kundli screen (`#marriage`) listing supportive Venus/Jupiter/7th-lord
+      dasha windows with a "not a prediction" caveat. Gates `dashakoota.cjs` +
+      `marriage-timing` engine. **Still open: downloadable match PDF/report**
+      (part of the PDF-reports epic), deploy + owner sign-off + 2nd bug bash.)_
 - [ ] **P0 before go-live — approved utility-calculator catalogue.** Build public,
       cleanly routed calculators for Moon sign/Rashi, Sun sign, Ascendant/Lagna,
       birth Nakshatra, baby-name initials/finder, standalone Mangal Dosha, Kala
@@ -257,11 +288,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         URL-backed toggle, blue collision-safe calendar marks, EN/HI phone/browser
         checks and a permanent source/inventory gate. State, bank and local closures
         remain correctly outside this Central layer rather than being guessed.
-        **UI placement decision parked 2026-07-23:** empty holiday cards are removed.
-        Decide where the off/national/gazetted control belongs so it stays discoverable
-        without occupying the Daily answer area on dates with no selected holiday.
-        Re-test desktop/phone, EN/HI, URL restoration and calendar-marker discovery
-        after that owner-approved placement is implemented.
+        **UI placement implemented 2026-07-24:** empty holiday cards are removed and
+        the off/national/gazetted control sits in the Daily calendar-options row beside
+        the calendar convention selector. Final closeout now needs EN/HI phone/desktop
+        bug bash, URL restoration, calendar-marker discovery and production verification.
       _(P0-PANCHANG-CALENDAR-PARITY; owner scope 2026-07-21)_
 - [ ] **P0 before go-live — exceptionally strong festival and vrat completion.**
       Close every festival/vrat gap in the competitor comparison: complete all
@@ -361,6 +391,9 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         iterative test-fix rounds by a minimum of **two agents** before any Green
         closeout. Do not restore row #29 to Done/100% without those rounds,
         full gates, phone/desktop smoke and production verification recorded.
+        **Hero-art note 2026-07-28:** the real raster pipeline and first three images
+        (`diwali`, `ganeshChaturthi`, `sankashti`) are preserved; remaining festival
+        heroes are batchable row-#29 quality work, not an active Cursor source edit.
       _(P0-FESTIVAL-VRAT-PARITY; owner scope 2026-07-21)_
 - [ ] **P0 before go-live — exceptionally strong Muhurat parity.** Complete every
       gap from the competitor comparison and keep the verdict/explanation stronger
@@ -373,9 +406,9 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         now have separate chips/guidance, rule tables, blockers and clean-window
         logic, with `validation/deep-muhurats.cjs` guarding against fallback to
         generic purchase/business behavior. Cursor bug bash found and fixed one P2
-        stale footer-copy issue. Rows #16/#17 stay below 100% until Claude Code
-        completes the reserved second bug-bash pass and production verification
-        follows the push.
+        stale footer-copy issue. Cursor's implementation is merged; rows #16/#17
+        stay below 100% until Claude Code completes the reserved second bug-bash
+        pass and production verification follows the push.
   - [x] Samskara Muhurtas: Mundan/tonsure, Namakaran, Annaprashan, Vidyarambha and
         Upanayana, with tradition and regional conventions stated.
   - [ ] Birth-chart-personalized Muhurat only after its method is sourced and
@@ -393,17 +426,19 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         birth chart required in the base finder, no outcome score, no storage.
         Merged to `main`. Body-part Moon rule (R9) intentionally omitted. Engine
         `src/engine/medical-muhurat.ts`; gate `validation/medical-muhurat.cjs`;
-        findings `plans/claude-medical-muhurat-findings.md`. Open: live deploy
-        verification + owner sign-off.
+        findings `plans/claude-medical-muhurat-findings.md`. **Closed at 100% on
+        2026-07-28:** independent Codex bug bash fixed safety-wall order, polar
+        no-sunrise copy and bypassed future birth dates; PR #4 merged as `557664c`;
+        production EN/HI 320px verification passed with zero overflow or console errors.
       _(P0-MUHURAT-FULL-PARITY; owner scope 2026-07-21; v1 built 2026-07-25)_
-  - [ ] **Independent review + bug bash of the medical Muhurat feature** — assign to a
+  - [x] **Independent review + bug bash of the medical Muhurat feature** — completed by a
         different agent (Cursor/Codex) than the builder (Claude Code). Second
         adversarial pass on live `/muhurat/medical`: engine correctness
         (Purnima/Amavasya + eclipse coverage, Abhijit/Rahu Kaal, natal Janma Rashi
         overlay), safety framing (safety wall first, confirmation gates the finder, no
         medical-outcome/success claims), DST + high-latitude places, EN/HI at 320–390px,
-        and regressions on the F1–F3 fixes. Record findings; do not fix non-trivial
-        defects — hand back to the owner. Brief/refs: task-log row
+        and regressions on the F1–F3 fixes. F4–F6 were fixed with TDD and verified
+        in production. Brief/refs: task-log row
         `MEDICAL-MUHURAT-BUGBASH-02` and `plans/claude-medical-muhurat-findings.md`.
       _(follow-up to P0-MEDICAL-MUHURAT v1; owner-requested 2026-07-25)_
 - [ ] **P0 before go-live — discoverability, publishing and public platform.** Ship

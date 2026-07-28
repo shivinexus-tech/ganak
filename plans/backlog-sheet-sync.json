@@ -128,6 +128,17 @@
     "47": "Mixed textual, institutional and regional sources across the launch corpus; future batches require their own classification"
   },
   "qualityOverrides": {
+    "19": {
+      "deliveryState": "Delivered and production-verified",
+      "limitations": "None in the owner-approved conservative medical Muhurat scope. R9 body-part rules and procedure-specific outcome logic remain intentionally excluded.",
+      "shortTermImpact": "Users have a safety-gated cultural timing tool for clinician-approved flexible care, with truthful handling of high-latitude daylight limits.",
+      "longTermImpact": "Dedicated engine boundaries, outcome-claim checks and DST/polar/range regressions prevent this safety-sensitive feature from drifting into generic Muhurat or medical advice.",
+      "bugBashStatus": "Completed 2026-07-28 — independent Codex pass found and fixed F4 P1 safety order, F5 P2 polar empty-state and F6 P2 future-birth bypass; production EN/HI phone verification passed.",
+      "qualityRisk": "Green",
+      "lastVerified": "2026-07-28 · Production bundle index-D8DzyB5u.js after PR #4 / 557664c; EN/HI 320px, safety/confirmation/F1–F3, zero overflow and zero console warnings/errors",
+      "sourceConfidence": "Primary/textual Muhurta sources and B.V. Raman rule review; Drik Panchang timing/date anchors; lineage-variable factors disclosed and not prescribed",
+      "recommendedAction": "No corrective action required; retain the dedicated engine, safety-first source-order guard, outcome-claim ban and independent medical-risk bug-bash requirement for future scope changes."
+    },
     "1": {
       "deliveryState": "Delivered and production-verified",
       "limitations": "None in the approved utility-calculator scope.",
@@ -173,15 +184,15 @@
       "recommendedAction": "Choose backend hosting, set production API_KEYS and origins, deploy the API, run live contract/abuse/quota smoke against the production base URL, then plan shared durable quota/key storage before multi-instance scale."
     },
     "12": {
-      "deliveryState": "Core overlay delivered; UI placement decision open",
-      "limitations": "Empty holiday cards are removed and live-verified. The off/national/gazetted control still needs an owner-approved discoverable location outside the Daily answer area; its final phone/desktop and EN/HI bug bash remains.",
-      "shortTermImpact": "Daily dates without a selected holiday no longer show a distracting empty card. Until placement is decided, users may not discover the overlay control from an empty Daily date.",
+      "deliveryState": "Implemented on main — final QA and production verification pending",
+      "limitations": "Empty holiday cards are removed and the off/national/gazetted control is placed in the Daily calendar-options row. Final EN/HI phone/desktop bug bash, URL-restoration check, calendar-marker discovery and production verification remain open.",
+      "shortTermImpact": "Users are no longer shown a distracting empty holiday card, and the overlay control has a concrete home near the calendar convention selector. The final risk is discoverability/usability until the focused bug bash is recorded.",
       "longTermImpact": "A poor control location could either clutter the primary Panchang answer or make optional government overlays hard to discover.",
-      "bugBashStatus": "Required before re-closing this high-impact calendar journey — pending after owner-approved placement is implemented.",
+      "bugBashStatus": "Required before re-closing this high-impact calendar journey — Codex owns the final EN/HI phone/desktop bug bash after the 2026-07-28 Cursor handoff cleanup.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-23 · Production: ordinary date hides empty card; Republic Day still renders",
+      "lastVerified": "2026-07-28 · Code merged on main from Cursor commit 34bdd47; production verification still pending after this coordination pass",
       "sourceConfidence": "Primary government holiday source; non-religious overlay",
-      "recommendedAction": "Approve the permanent holiday-overlay control location, implement it outside the Daily answer area, then complete EN/HI phone/desktop discovery, URL-restoration and calendar-marker bug-bash verification."
+      "recommendedAction": "Run Codex-owned EN/HI phone/desktop discovery, URL-restoration and calendar-marker bug-bash verification, then verify production before marking 100%."
     },
     "25": {
       "deliveryState": "Time-based Prashna polish delivered; 249 number engine not started",
@@ -195,15 +206,15 @@
       "recommendedAction": "Complete `P0-PRASHNA-249-KSK-VERIFY`, then implement Q1b and the 249 number engine as a clearly labelled alternative to time-based Prashna."
     },
     "29": {
-      "deliveryState": "Reopened by owner — unacceptable festival/fast page quality",
-      "limitations": "Existing pages are not launch-quality. Route/profile/hero/timing gates passed, but owner review found the festival and fast pages poor enough that the prior Green status is invalid.",
-      "shortTermImpact": "Users may reach dedicated festival/fast URLs, but the page content cannot be trusted as a polished Ganak experience until every page is audited and rewritten where needed.",
-      "longTermImpact": "Leaving weak devotional pages live would damage religious trust, source credibility and launch confidence across one of Ganak's core public journeys.",
-      "bugBashStatus": "Required before Green: at least five recorded iterative audit/test/fix rounds across the full festival and fast inventory, performed by a minimum of two agents. No qualifying rounds are recorded after the owner rejection.",
-      "qualityRisk": "Red",
-      "lastVerified": "2026-07-24 · Owner quality rejection after spot-check; previous automated gates are insufficient quality evidence",
-      "sourceConfidence": "Mixed textual, institutional and regional sources across the published corpus; item-level source and copy quality must be re-audited page by page",
-      "recommendedAction": "Create a dedicated P0 audit/rewrite task for every festival, vrat, fast, recurring observance and named variant; inventory route-level defects; rewrite weak EN/HI content; strengthen semantic/devotional/timing/hero gates; complete five iterative rounds with at least two agents; then rerun full gates, phone/desktop smoke and production verification before restoring Green."
+      "deliveryState": "Local quality closure complete — production verification pending",
+      "limitations": "Public delivery is not yet verified. Several human-reviewed raster iconography/crop refinements remain documented as P1 follow-ups; all P0 route, content, timing and runtime hero contracts are complete.",
+      "shortTermImpact": "All 181 festival routes now provide an answer-first bilingual experience; 108 formerly empty or generic named routes have distinct guidance and every route renders an owned or reviewed parent hero.",
+      "longTermImpact": "Route-derived semantic, devotional, identity, timing, raster-decode, duplicate and runtime-wiring gates protect the complete festival corpus from returning to generic or technically-only coverage.",
+      "bugBashStatus": "Five iterative audit/fix rounds completed on 2026-07-28 with three agents. Round 4 caught and fixed two false-green runtime contracts and 31 Hindi semantic-parity defects; Round 5 found no remaining genuine P0.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · Full canonical gates/build green; EN desktop Nirjala and HI 390×844 Pongal smoke green with zero alerts, console errors/warnings or horizontal overflow",
+      "sourceConfidence": "Reviewed family-specific devotional corpus with explicit per-route tradition/source boundaries; specialised initiated rites remain clearly outside household guidance",
+      "recommendedAction": "Commit and push the exact green state, verify representative EN/HI phone and desktop routes on production, then set Done/100% and record the live commit."
     },
     "14": {
       "deliveryState": "Delivered — production verification pending",
@@ -228,26 +239,92 @@
       "recommendedAction": "No corrective action required; spot-check `/festival/surya-grahan` and `/festival/chandra-grahan` in EN/HI after deploy."
     },
     "16": {
-      "deliveryState": "Implemented locally — second bug bash and production verification pending",
+      "deliveryState": "Merged on main — second bug bash and production verification pending",
       "limitations": "Marriage, engagement and housewarming have distinct finder chips, guidance, rule tables, blockers and clean windows, but the owner-required second independent bug bash is not complete and the pushed build has not yet been verified live.",
-      "shortTermImpact": "Users can locally get separate ranked Muhurat results for marriage, engagement and housewarming instead of a generic date list.",
+      "shortTermImpact": "Users should receive separate ranked Muhurat results for marriage, engagement and housewarming instead of a generic date list once production verification confirms the merged build.",
       "longTermImpact": "The shared deep-muhurats gate prevents these relationship/home-entry categories from silently collapsing back into one generic score.",
-      "bugBashStatus": "First Cursor bug bash completed 2026-07-24; one P2 stale-footer copy issue was fixed. Claude Code second pass is reserved in plans/claude-task-muhurat-full-parity-testing.md.",
+      "bugBashStatus": "First Cursor bug bash completed 2026-07-24; one P2 stale-footer copy issue was fixed. 2026-07-28: Cursor row closed as handed off; Claude Code second pass remains reserved in plans/claude-task-muhurat-full-parity-testing.md.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-24 · Local fresh port :5303 EN engagement/travel/documents and HI 390px documents; focused gates green; not production-verified",
+      "lastVerified": "2026-07-28 · Merged code present on main from 11083dd; latest evidence remains local :5303 smoke and focused gates; not production-verified",
       "sourceConfidence": "Published 2026 New Delhi Muhurat rule tables/anchors plus Drik-style wedding and housewarming shuddhi gates",
       "recommendedAction": "Have Claude Code run the reserved second bug bash, fix any findings, then verify the deployed production route before marking 100%."
     },
     "17": {
-      "deliveryState": "Implemented locally — second bug bash and production verification pending",
+      "deliveryState": "Merged on main — second bug bash and production verification pending",
       "limitations": "Bhoomi Puja, construction, business, travel and documents have distinct finder chips, guidance, rule tables, blockers and clean windows, but the owner-required second independent bug bash is not complete and the pushed build has not yet been verified live.",
-      "shortTermImpact": "Users can locally get separate ranked Muhurat results for Bhoomi, construction, business, travel and document signing/registration; Travel uses Char/Labh/Amrit/Shubh while Documents/Business avoid Char leakage.",
+      "shortTermImpact": "Users should receive separate ranked Muhurat results for Bhoomi, construction, business, travel and document signing/registration once production verification confirms the merged build; Travel uses Char/Labh/Amrit/Shubh while Documents/Business avoid Char leakage.",
       "longTermImpact": "The deep-muhurats gate locks category-specific rule sets and clean-window behavior so these journeys do not regress to generic purchase/business logic.",
-      "bugBashStatus": "First Cursor bug bash completed 2026-07-24; one P2 stale-footer copy issue was fixed. Claude Code second pass is reserved in plans/claude-task-muhurat-full-parity-testing.md.",
+      "bugBashStatus": "First Cursor bug bash completed 2026-07-24; one P2 stale-footer copy issue was fixed. 2026-07-28: Cursor row closed as handed off; Claude Code second pass remains reserved in plans/claude-task-muhurat-full-parity-testing.md.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-24 · Local fresh port :5303 EN engagement/travel/documents and HI 390px documents; focused gates green; not production-verified",
+      "lastVerified": "2026-07-28 · Merged code present on main from 11083dd; latest evidence remains local :5303 smoke and focused gates; not production-verified",
       "sourceConfidence": "Published 2026 New Delhi Bhoomi/business/travel/document rule tables plus activity-specific clean-window regression gates",
       "recommendedAction": "Have Claude Code run the reserved second bug bash, fix any findings, then verify the deployed production route before marking 100%."
+    },
+    "31": {
+      "deliveryState": "Implemented locally — production verification pending",
+      "limitations": "Dedicated purchase/booking, deed-signing and registration context is implemented and validated; the new flow is not yet production-verified.",
+      "shortTermImpact": "Users can distinguish the property act they are timing and receive ranked clean windows with legal/financial caveats instead of a generic purchase result.",
+      "longTermImpact": "The dedicated action inventory and regression gate prevent property purchase, deed and registration context from collapsing back into generic Muhurat copy.",
+      "bugBashStatus": "Focused EN 390×844 local smoke completed 2026-07-28 with URL restoration, ranked result, rationale, no overflow and zero browser warnings/errors; production check remains.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · Local :5199 EN property-registration flow; Drik-period recall 91%/precision 100%; canonical gates and build pass",
+      "sourceConfidence": "Published Drik-style 2026 property dates plus existing property-specific rule table and clean-window anchors",
+      "recommendedAction": "Deploy, verify the property URL and result on production in EN/HI, then record the live bundle and owner sign-off."
+    },
+    "32": {
+      "deliveryState": "Implemented locally — production verification pending",
+      "limitations": "Dedicated purchase/payment and delivery/first-drive context is implemented and validated; the new flow is not yet production-verified.",
+      "shortTermImpact": "Users can time purchase separately from delivery/first drive and see explicit finance, insurance and road-safety boundaries.",
+      "longTermImpact": "The dedicated action inventory and regression gate prevent vehicle delivery from being hidden inside a generic purchase flow.",
+      "bugBashStatus": "Focused HI 390×844 local smoke completed 2026-07-28 with URL restoration, ranked result, safety rationale, no overflow and zero browser warnings/errors; production check remains.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · Local :5199 HI vehicle-delivery flow; Drik-period recall 100%; canonical gates and build pass",
+      "sourceConfidence": "Published Drik-style 2026 vehicle dates plus existing vehicle-specific rule table and clean-window anchors",
+      "recommendedAction": "Deploy, verify the vehicle URL and result on production in EN/HI, then record the live bundle and owner sign-off."
+    },
+    "37": {
+      "deliveryState": "Timezone-shift fix ready — production/native retest pending",
+      "limitations": "The calendar event is now date-stable across device timezones and retains the chosen place/local window in its details. Owner iPhone and Android confirmation remains.",
+      "shortTermImpact": "Users can preserve the full Muhurat context in a URL and create a device-calendar event with a 24-hour reminder.",
+      "longTermImpact": "Date-only ICS semantics prevent a selected Muhurat day from moving backward or forward when a calendar app displays it in another timezone.",
+      "bugBashStatus": "Owner iPhone test found New Delhi Aug 13 displaying as Aug 12 in Los Angeles. Root cause was correct-but-surprising UTC conversion of a timed event. Fix exports an all-day Aug 13 entry and writes the New Delhi local window in event details; focused regression gate, parse check and build pass.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · muhurat-actions gate, parse-check and Vite production build pass after date-stable ICS fix",
+      "sourceConfidence": "Not applicable — technical URL and iCalendar export workflow",
+      "recommendedAction": "Deploy, then repeat one Los Angeles export on iPhone and Android; confirm the selected date, chosen place/local window in details and 24-hour reminder."
+    },
+    "38": {
+      "deliveryState": "Repository-ready — provider and production dashboard not configured",
+      "limitations": "Analytics and feedback endpoints are intentionally disabled until the owner chooses providers and publishes updated privacy terms. No production dashboard or collection evidence exists.",
+      "shortTermImpact": "The app shows a feedback path and honest disconnected state; the owner still cannot receive feedback or view funnels until endpoints are configured.",
+      "longTermImpact": "The fixed no-PII event dictionary limits future data creep, but provider retention/security and privacy obligations require owner review.",
+      "bugBashStatus": "Mandatory privacy bug bash not complete. Static no-PII/storage/cookie/credential checks pass; a production network audit is impossible before provider configuration.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · Local build and privacy-events gate; no production endpoints configured",
+      "sourceConfidence": "Not applicable — technical/privacy integration",
+      "recommendedAction": "Choose analytics and feedback providers, publish the matching privacy notice, configure endpoints, verify dashboard events and feedback delivery, then run a no-PII production network audit and independent privacy bug bash."
+    },
+    "39": {
+      "deliveryState": "Repository-ready — domain purchase and DNS pending",
+      "limitations": "Canonical origin configuration and SPA fallback exist, but no owner-approved branded domain, DNS, SSL or pages.dev redirect has been configured.",
+      "shortTermImpact": "Current pages.dev URLs remain valid; branded identity and canonical-domain consolidation are not delivered.",
+      "longTermImpact": "Without a single approved canonical domain, search and shared-link authority remain split when a branded domain is eventually introduced.",
+      "bugBashStatus": "Optional after external setup — repository gate passes; DNS/SSL/redirect/share-preview production matrix cannot run yet.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · Local canonical-deployment and route-metadata gates; current fallback is ganak.pages.dev",
+      "sourceConfidence": "Not applicable — deployment and DNS work",
+      "recommendedAction": "Owner selects and purchases the domain; attach it in Cloudflare, set VITE_CANONICAL_ORIGIN, configure pages.dev redirect, then verify HTTPS, deep links, language/query preservation, search/share metadata and error origin."
+    },
+    "40": {
+      "deliveryState": "Implemented locally — production verification pending",
+      "limitations": "Bilingual route-aware title, description, canonical and Open Graph handling is implemented; breadcrumbs are not a distinct UI pattern in the current single-shell navigation and production metadata remains unverified.",
+      "shortTermImpact": "Daily, Prashna, Jyotish, festival, calculator, medical and Muhurat journeys identify their own area in the browser/share metadata.",
+      "longTermImpact": "The generated registry gate reduces cross-route identity leaks, but every new route must be added to the metadata matrix.",
+      "bugBashStatus": "Focused EN/HI 390×844 local matrix completed 2026-07-28; existing page-context header and new route-metadata gates pass; production share-preview verification remains.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · Local :5199 EN/HI title/description/canonical checks; no overflow or console errors; canonical gates and build pass",
+      "sourceConfidence": "Not applicable — technical route identity and metadata",
+      "recommendedAction": "Deploy and verify titles/descriptions/canonical/Open Graph on representative Daily, Prashna, Jyotish, festival, calculator, medical and Muhurat production URLs; add future routes to the registry gate."
     }
   },
   "dashboard": {
@@ -515,22 +592,58 @@
     "33": {
       "section": "P0",
       "title": "Sade Sati calculator/report",
-      "technicalComplexity": "Medium"
+      "technicalComplexity": "Medium",
+      "deliveryState": "Not delivered — reserved for Wave 1",
+      "limitations": "Only a basic current-date Sade Sati check exists today; full periods/report copy and UI wiring are pending.",
+      "shortTermImpact": "Users can see a basic status only, not a launch-quality report with phase boundaries.",
+      "longTermImpact": "Without the full report, Sade Sati cannot support alerts, saved chart journeys or credible Jyotish depth.",
+      "bugBashStatus": "Not started",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · local repo coordination audit",
+      "sourceConfidence": "Needs rule/source review",
+      "recommendedAction": "Run `CODEX-P0-SADE-SATI-REPORT-33` Wave 1, then wire through `INTEGRATOR-P0-JYOTISH-CALC-WIRE-33-36`."
     },
     "34": {
       "section": "P0",
       "title": "Mangal Dosha three-reference analysis",
-      "technicalComplexity": "Medium"
+      "technicalComplexity": "Medium",
+      "deliveryState": "Partially delivered — reserved for Wave 1",
+      "limitations": "Basic Lagna/Moon/Venus logic exists, but sourced exception/cancellation presentation and standalone report depth are pending.",
+      "shortTermImpact": "Users may get a result, but not enough explanation for sensitive marriage-context interpretation.",
+      "longTermImpact": "Weak explanation risks fear-based or oversimplified readings unless exceptions and caveats are proven.",
+      "bugBashStatus": "Not started for full three-reference report",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · local repo coordination audit",
+      "sourceConfidence": "Needs exception/source review",
+      "recommendedAction": "Run `CLAUDE-P0-MANGAL-THREE-REF-34` Wave 1, then wire through `INTEGRATOR-P0-JYOTISH-CALC-WIRE-33-36`."
     },
     "35": {
       "section": "P0",
       "title": "Arudha, Bhavabala, Special Lagnas/Upagrahas",
-      "technicalComplexity": "Medium"
+      "technicalComplexity": "Medium",
+      "deliveryState": "Partially delivered — presentation reserved",
+      "limitations": "Engines and current ChartScreen panels exist, but answer-first explanation, anchors and panel-quality proof are not complete.",
+      "shortTermImpact": "Technical users can inspect data; household users may not understand what the panels mean.",
+      "longTermImpact": "Dense specialist panels weaken Ganak's answer-before-data principle unless presentation is improved.",
+      "bugBashStatus": "Not completed for these panels",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · local repo coordination audit",
+      "sourceConfidence": "Existing engine; presentation/anchor confidence pending",
+      "recommendedAction": "Run `CURSOR-P0-ARUDHA-BHAVA-SPECIAL-35` inside the exact ChartScreen sections only."
     },
     "36": {
       "section": "P0",
       "title": "Ruling Planets",
-      "technicalComplexity": "Medium"
+      "technicalComplexity": "Medium",
+      "deliveryState": "Partially delivered — rule proof reserved",
+      "limitations": "Ruling Planets are computed/displayed, but canonical KSK rule map, ranking proof and source-backed UI claims are pending.",
+      "shortTermImpact": "The panel exists but should not be overstated as a completed KP/RP feature.",
+      "longTermImpact": "Unproven RP rules could contaminate Prashna/KP interpretation if reused without source anchors.",
+      "bugBashStatus": "Not started for completed RP report",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · local repo coordination audit",
+      "sourceConfidence": "Needs KSK primary-source verification",
+      "recommendedAction": "Run `CODEX-P0-RULING-PLANETS-RULEMAP-36` before any UI expansion."
     },
     "37": {
       "section": "P0",

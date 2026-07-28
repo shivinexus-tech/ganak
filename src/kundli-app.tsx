@@ -7,6 +7,9 @@ import FestivalGuideScreen, { festivalGuideFromPath } from "./screens/FestivalGu
 import UtilityCalculatorScreen from "./screens/UtilityCalculatorScreen";
 import { utilityFromPath } from "./data/utility-calculators";
 import MedicalMuhuratScreen, { medicalMuhuratFromPath } from "./screens/MedicalMuhuratScreen";
+import FeedbackCard from "./components/FeedbackCard";
+import { applyRouteMetadata, routeMetadata } from "./metadata/route-metadata";
+import { privacyEvent } from "./telemetry/privacy-events";
 import { FEST_NAME } from "./data/festival-meta";
 import { urlPrefGet, urlPrefSet, urlPrefsSet } from "./components/url-prefs";
 import {
@@ -86,6 +89,11 @@ export default function KundliApp() {
   const utilityRoute = utilityFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const medicalRoute = medicalMuhuratFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const hero = pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute);
+  useEffect(() => {
+    const meta=routeMetadata({lang,mode,festival:directFestivalGuide,utility:utilityRoute,medical:medicalRoute,muhurat:urlPrefGet("muhurat")});
+    applyRouteMetadata({...meta,lang,path:typeof window!=="undefined"?window.location.pathname:"/"});
+    privacyEvent("page_view",{area:directFestivalGuide?"festival":utilityRoute?"calculator":medicalRoute?"medical-muhurat":mode,language:lang});
+  },[lang,mode,directFestivalGuide,utilityRoute,medicalRoute]);
 
   const DEFAULT_PLACE = { label: "New Delhi, India", lat: 28.61, lon: 77.21, zone: "Asia/Kolkata" };
   const placeFromUrl=()=>{const label=urlPrefGet("city"),lat=Number(urlPrefGet("lat")),lon=Number(urlPrefGet("lon")),zone=urlPrefGet("zone");return label&&zone&&Number.isFinite(lat)&&Math.abs(lat)<=90&&Number.isFinite(lon)&&Math.abs(lon)<=180?{label,lat,lon,zone}:null;};
@@ -127,6 +135,24 @@ export default function KundliApp() {
         tbody tr:last-child td { border-bottom: none; }
         tbody tr:hover td { background: rgba(168,106,18,.05); }
         th { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #8C8173; font-weight: 400; }
+
+        /* Print / Save-as-PDF: hide interactive chrome, show the report cleanly. */
+        .print-only { display: none; }
+        @media print {
+          @page { margin: 12mm; }
+          html, body { background: #fff !important; }
+          nav, input, select, textarea, footer, .no-print { display: none !important; }
+          button { display: none !important; }
+          .print-only { display: block !important; }
+          * { box-shadow: none !important; text-shadow: none !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .rise, .rise2 { animation: none !important; }
+          section, table, svg, .card { break-inside: avoid; }
+          h1, h2, h3 { break-after: avoid; }
+          a { text-decoration: none !important; color: inherit !important; }
+          details { display: block !important; }
+          details > summary { display: none !important; }
+          details > *:not(summary) { display: revert !important; }
+        }
       `}</style>
 
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "40px 20px 80px" }}>
@@ -189,12 +215,13 @@ export default function KundliApp() {
           <ChartScreen C={C} card={card} lang={lang} />
         )}
 
-        {/* Footer must stay factually true: city search does use an online lookup
-            (open-meteo geocoder) — see plans/legal-privacy-terms-draft.md §4.1. */}
+        <FeedbackCard lang={lang} C={C} card={card} />
+
+        {/* Footer stays accurate with or without optional telemetry endpoints. */}
         <footer style={{ textAlign: "center", color: C.muted, fontSize: 12, marginTop: 56, letterSpacing: ".06em" }}>
           {lang === "hi"
-            ? "ॐ · गणना आपके डिवाइस पर · न खाता, न ट्रैकिंग · शहर खोज हेतु ऑनलाइन सेवा"
-            : "ॐ · computed on your device · no account, no tracking · city search uses an online lookup"}
+            ? "ॐ · गणना आपके डिवाइस पर · न खाता · शहर खोज ऑनलाइन · सेवा जुड़ने पर केवल अनाम उपयोग-घटनाएँ"
+            : "ॐ · computed on your device · no account · city search online · anonymous usage events only when configured"}
         </footer>
       </div>
     </div>

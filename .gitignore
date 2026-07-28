@@ -4,8 +4,10 @@ dist/
 *.tmp.cjs
 validation/.perf*.cjs
 validation/.app-transpiled*.cjs
+validation/.fest-test.ts
 src/kundli-app.tsx.backup-*
 .scratch/
+festival-images-src/
 .claude/settings.local.json
 .superpowers/
 .worktrees/

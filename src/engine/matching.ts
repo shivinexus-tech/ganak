@@ -63,6 +63,55 @@ function gunaMilan(boy, girl) {
   return { kootas:k, total, max:36, nadiDosha:k[7].got===0, bhakootDosha:k[6].got===0 };
 }
 
+/* ---------------- Dashakoota (South-Indian, 10 kutas, 36 points) ----------------
+   Reuses the Ashtakoota tables where the koota is shared (Gana, Yoni, Rasi/Bhakoot,
+   Rasyadhipati/Graha-Maitri, Vashya) and adds the five South-Indian-specific ones
+   (Dina, Mahendra, Stree Deergha, Rajju, Vedha). Point maxima per the standard
+   36-point distribution. Rajju and Vedha are the critical "hard-block" doshas. */
+// Rajju: 27 stars zig-zag through 5 body-part groups in a 9-star cycle.
+const RAJJU_CYCLE = [0, 1, 2, 3, 4, 3, 2, 1, 0]; // Pada,Kati,Nabhi,Kantha,Siro,(desc)
+const RAJJU_NAMES = ["Pada (feet)", "Kati (waist)", "Nabhi (navel)", "Kantha (neck)", "Siro (head)"];
+const RAJJU_NAMES_HI = ["पाद", "कटि", "नाभि", "कण्ठ", "शिरो"];
+const rajjuOf = (nak: number) => RAJJU_CYCLE[nak % 9];
+// Vedha (obstruction) star pairs, 0-indexed; Mrigashira (4) has no vedha partner.
+const VEDHA_PAIRS = [[0, 17], [1, 16], [2, 15], [3, 14], [5, 21], [6, 20], [7, 19], [8, 18], [9, 26], [10, 25], [11, 24], [12, 23], [13, 22]];
+const isVedha = (a: number, b: number) => VEDHA_PAIRS.some(([x, y]) => (a === x && b === y) || (a === y && b === x));
+// Gana compatibility scaled to a 4-point maximum (from the Ashtakoota 6-point matrix).
+const GANA_D = [[4, 4, 1], [3, 4, 0], [1, 0, 4]];
+const countStar = (from: number, to: number) => ((to - from + 27) % 27) + 1; // 1..27
+
+function dashakoota(boy: any, girl: any) {
+  const dinaFav = _taraFav(girl.nak, boy.nak);
+  const cMah = countStar(girl.nak, boy.nak);
+  const cStree = countStar(girl.nak, boy.nak);
+  const rB = rajjuOf(boy.nak), rG = rajjuOf(girl.nak);
+  const vedha = isVedha(boy.nak, girl.nak);
+  const bhakootBad = [2, 5, 6, 8, 9, 12].includes(((girl.rashi - boy.rashi + 12) % 12) + 1);
+  const k = [
+    { name: "Dina", got: dinaFav ? 3 : 0, max: 3, note: "day-to-day harmony & fortune" },
+    { name: "Gana", got: GANA_D[NAK_GANA[boy.nak]][NAK_GANA[girl.nak]], max: 4,
+      note: GANA_NAMES[NAK_GANA[boy.nak]] + " / " + GANA_NAMES[NAK_GANA[girl.nak]] },
+    { name: "Mahendra", got: [4, 7, 10, 13, 16, 19, 22, 25].includes(cMah) ? 2 : 0, max: 2, note: "wellbeing & progeny support" },
+    { name: "Stree Deergha", got: cStree > 13 ? 2 : 0, max: 2, note: "protection & longevity for the wife" },
+    { name: "Yoni", got: YONI_MATRIX[NAK_YONI[boy.nak]][NAK_YONI[girl.nak]], max: 4,
+      note: YONI_NAMES[NAK_YONI[boy.nak]] + " / " + YONI_NAMES[NAK_YONI[girl.nak]] },
+    { name: "Rasi", got: bhakootBad ? 0 : 7, max: 7, note: "emotional & prosperity axis (Bhakoot)" },
+    { name: "Rasyadhipati", got: _maitri(SIGN_LORD[boy.rashi], SIGN_LORD[girl.rashi]), max: 5,
+      note: SIGN_LORD[boy.rashi] + " / " + SIGN_LORD[girl.rashi] + " — sign-lord friendship" },
+    { name: "Vashya", got: SIGN_VASHYA[boy.rashi] === SIGN_VASHYA[girl.rashi] ? 2 : VASHYA_MATRIX[SIGN_VASHYA[boy.rashi]][SIGN_VASHYA[girl.rashi]], max: 2,
+      note: "mutual attraction & control" },
+    { name: "Rajju", got: rB === rG ? 0 : 5, max: 5, note: rB === rG ? "same " + RAJJU_NAMES[rB] + " rajju — dosha" : RAJJU_NAMES[rB] + " / " + RAJJU_NAMES[rG] },
+    { name: "Vedha", got: vedha ? 0 : 2, max: 2, note: vedha ? "vedha (obstruction) star pair" : "no obstruction" },
+  ];
+  const total = k.reduce((s, x) => s + x.got, 0);
+  const verdict = total < 18 ? "poor" : total <= 22 ? "moderate" : total <= 25 ? "good" : total <= 28 ? "very-good" : "excellent";
+  return {
+    kootas: k, total, max: 36, verdict,
+    rajjuDosha: rB === rG, rajjuGroup: rB === rG ? RAJJU_NAMES[rB] : null, rajjuGroupHi: rB === rG ? RAJJU_NAMES_HI[rB] : null,
+    vedhaDosha: vedha,
+  };
+}
+
 /** Build a match report using an injected kundli engine (usually shell computeKundli). */
 export function computeMatch(computeKundli, boyDetails, girlDetails) {
   const cb = computeKundli(boyDetails), cg = computeKundli(girlDetails);
@@ -74,7 +123,8 @@ export function computeMatch(computeKundli, boyDetails, girlDetails) {
   const manglik = { boy:boy.manglikLagna, girl:girl.manglikLagna, boyMoon:boy.manglikMoon, girlMoon:girl.manglikMoon,
     cancelled: boy.manglikLagna===girl.manglikLagna };
   const papa = papasamyam(cb, cg);
-  return { boy, girl, ...gm, manglik, papa, charts:{ boy:cb, girl:cg } };
+  const dasha = dashakoota(boy, girl);
+  return { boy, girl, ...gm, manglik, papa, dasha, charts:{ boy:cb, girl:cg } };
 }
 
-export { gunaMilan, NF, MANGLIK_HOUSES };
+export { gunaMilan, dashakoota, NF, MANGLIK_HOUSES };
