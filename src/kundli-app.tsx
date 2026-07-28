@@ -127,6 +127,24 @@ export default function KundliApp() {
         tbody tr:last-child td { border-bottom: none; }
         tbody tr:hover td { background: rgba(168,106,18,.05); }
         th { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #8C8173; font-weight: 400; }
+
+        /* Print / Save-as-PDF: hide interactive chrome, show the report cleanly. */
+        .print-only { display: none; }
+        @media print {
+          @page { margin: 12mm; }
+          html, body { background: #fff !important; }
+          nav, input, select, textarea, footer, .no-print { display: none !important; }
+          button { display: none !important; }
+          .print-only { display: block !important; }
+          * { box-shadow: none !important; text-shadow: none !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .rise, .rise2 { animation: none !important; }
+          section, table, svg, .card { break-inside: avoid; }
+          h1, h2, h3 { break-after: avoid; }
+          a { text-decoration: none !important; color: inherit !important; }
+          details { display: block !important; }
+          details > summary { display: none !important; }
+          details > *:not(summary) { display: revert !important; }
+        }
       `}</style>
 
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "40px 20px 80px" }}>

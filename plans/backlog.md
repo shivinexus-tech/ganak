@@ -161,8 +161,15 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         link remain hidden until all sign entries are owner-verified. Still open:
         owner high-risk content review, EN/HI phone visual QA, release and
         production verification.)_
-  - [ ] Downloadable Kundli PDF and general PDF reports, with bilingual rendering,
-        chart legibility and print verification.
+  - [x] Downloadable Kundli PDF and general PDF reports, with bilingual rendering,
+        chart legibility and print verification. _(Shipped 2026-07-26,
+        `CLAUDE-P0-PDF-PRINT-01` REVIEW. Owner chose **browser print-to-PDF**
+        (no heavy deps, offline): global `@media print` stylesheet hides the
+        interactive chrome, expands collapsibles and prints a clean report; a
+        bilingual "Save as PDF" button + print-only report header (name · DOB ·
+        place · ayanamsa · Ganak) on both the **Kundli** and **Match** results.
+        Gate `print-reports.cjs`. Open: deploy + owner sign-off + print QA on a
+        real printer/PDF.)_
       _(P0-JYOTISH-PUBLIC-LAUNCH; owner scope 2026-07-21)_
 - [ ] **P0 before go-live — matching and marriage-completion suite.** Finish
       Dashakoota alongside the existing Ashtakoota path; add a downloadable match

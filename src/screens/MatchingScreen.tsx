@@ -87,6 +87,18 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
         const mBoy = res.manglik.boy, mGirl = res.manglik.girl, mOk = res.manglik.cancelled;
         return (
           <div id="matchresult" style={{ marginTop: 20 }}>
+            <div className="no-print" style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}>
+              <button onClick={() => window.print()} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 16px", borderRadius: 9, border: `1px solid ${C.gold}`, background: "#FFFDF7", color: C.gold, cursor: "pointer", fontFamily: "Spectral, serif", fontSize: 13 }}>
+                ⬇ {hi ? "पीडीएफ़ सहेजें" : "Save as PDF"}
+              </button>
+            </div>
+            <div className="print-only" style={{ textAlign: "center", marginBottom: 18, borderBottom: `2px solid ${C.gold}`, paddingBottom: 12 }}>
+              <div style={{ fontFamily: "Eczar, serif", fontSize: 24, color: C.gold }}>{hi ? "कुण्डली मिलान" : "Kundali Matching"}</div>
+              <div style={{ fontSize: 13, color: C.ivory, marginTop: 4 }}>
+                {(boyName || (hi ? "वर" : "Groom"))} ({bDate} · {bTime} · {bPlace?.label}) &nbsp;✦&nbsp; {(girlName || (hi ? "कन्या" : "Bride"))} ({gDate} · {gTime} · {gPlace?.label})
+              </div>
+              <div style={{ fontSize: 11, color: C.muted, marginTop: 3, letterSpacing: ".08em" }}>Ganak · ganak.pages.dev</div>
+            </div>
             <div style={{ ...card, padding: "22px 20px", textAlign: "center", borderTop: `3px solid ${vcolor}` }}>
               <div style={{ ...T.label, color: C.muted }}>{hi ? "अष्टकूट गुण मिलान" : "Ashtakoota Guna Milan"}</div>
               <div style={{ fontFamily: "Eczar, serif", fontSize: 46, color: vcolor, lineHeight: 1.1, margin: "4px 0" }}>{res.total}<span style={{ fontSize: 22, color: C.muted }}> / 36</span></div>

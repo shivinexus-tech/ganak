@@ -319,6 +319,19 @@ export default function ChartScreen({ C, card, lang }) {
 
       {r && (
           <>
+            {/* Save-as-PDF (print). Hidden in the printed output itself. */}
+            <div className="no-print" style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}>
+              <button onClick={() => window.print()} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 16px", borderRadius: 9, border: `1px solid ${C.gold}`, background: "#FFFDF7", color: C.gold, cursor: "pointer", fontFamily: "Spectral, serif", fontSize: 13 }}>
+                ⬇ {hi ? "पीडीएफ़ सहेजें" : "Save as PDF"}
+              </button>
+            </div>
+            {/* print-only report header (the on-screen form inputs are hidden in print) */}
+            <div className="print-only" style={{ textAlign: "center", marginBottom: 18, borderBottom: `2px solid ${C.gold}`, paddingBottom: 12 }}>
+              <div style={{ fontFamily: "Eczar, serif", fontSize: 26, color: C.gold }}>{((chartContext?.form || form).name) || (hi ? "जन्म कुंडली" : "Janma Kundli")}</div>
+              <div style={{ fontSize: 13.5, color: C.ivory, marginTop: 4 }}>{(chartContext?.form || form).date} · {(chartContext?.form || form).time} · {(chartContext?.place || place)?.label}</div>
+              <div style={{ fontSize: 11, color: C.muted, marginTop: 3, letterSpacing: ".08em" }}>{hi ? "अयनांश" : "Ayanamsa"}: {AYANAMSA[chartContext?.ayanamsa || ayanamsa]?.label || (chartContext?.ayanamsa || ayanamsa)} · Ganak · ganak.pages.dev</div>
+            </div>
+
             {/* identity strip */}
             <Eyebrow id="summary" deva="जन्म विवरण" en="Birth summary" />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
