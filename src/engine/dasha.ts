@@ -72,6 +72,23 @@ function computeKPSignificators(rows, kpCusps) {
 }
 const WEEKDAY_LORDS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
 function computeRulingPlanets(ascSid, moonSid, dayLord) {
+  const sources = [
+    { key: "ascSignLord", planet: SIGN_LORD[Math.floor(ascSid / 30)], weight: 3 },
+    { key: "ascStarLord", planet: nakLordOf(ascSid), weight: 2 },
+    { key: "ascSubLord", planet: subLordChain(ascSid).subLord, weight: 2 },
+    { key: "moonSignLord", planet: SIGN_LORD[Math.floor(moonSid / 30)], weight: 3 },
+    { key: "moonStarLord", planet: nakLordOf(moonSid), weight: 2 },
+    { key: "moonSubLord", planet: subLordChain(moonSid).subLord, weight: 2 },
+    { key: "dayLord", planet: dayLord, weight: 1 },
+  ];
+  const score = {};
+  for (const s of sources) {
+    if (!score[s.planet]) score[s.planet] = { planet: s.planet, count: 0, weight: 0, sources: [] };
+    score[s.planet].count += 1;
+    score[s.planet].weight += s.weight;
+    score[s.planet].sources.push(s.key);
+  }
+  const ranked = Object.values(score).sort((a, b) => b.weight - a.weight || b.count - a.count || KP_PLANETS.indexOf(a.planet) - KP_PLANETS.indexOf(b.planet));
   return {
     ascSignLord: SIGN_LORD[Math.floor(ascSid / 30)],
     ascStarLord: nakLordOf(ascSid),
@@ -80,6 +97,8 @@ function computeRulingPlanets(ascSid, moonSid, dayLord) {
     moonStarLord: nakLordOf(moonSid),
     moonSubLord: subLordChain(moonSid).subLord,
     dayLord,
+    sources,
+    ranked,
   };
 }
 

@@ -114,9 +114,17 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         for the five star planets, "now" summary, bilingual Devanagari planet
         names, place-aware. Gate pins 2026 Mercury R×3 (Feb-26) + set/rise
         alternation. Open: deploy + owner sign-off + 2nd bug bash.)_
-  - [ ] Standalone Sade Sati calculator and report.
+  - [ ] Standalone Sade Sati calculator and report. _(Built locally 2026-07-28,
+        `CODEX-P0-JYOTISH-33-36-BUILD`: full period scan, phase segments,
+        current/previous/next cycles, EN/HI responsible copy and calculator
+        result panel. Open: production verification, owner review and independent
+        bug bash before quality closure.)_
   - [ ] Standalone Mangal Dosha analysis from Lagna, Moon and Venus, with sourced
-        exceptions/cancellation rules and a plain-language verdict.
+        exceptions/cancellation rules and a plain-language verdict. _(Built
+        locally 2026-07-28, `CODEX-P0-JYOTISH-33-36-BUILD`: three-reference
+        Lagna/Moon/Venus result, mitigation context, EN/HI report copy and
+        calculator result panel. Open: production verification, owner review and
+        independent bug bash before quality closure.)_
   - [ ] Dedicated Kala Sarpa Dosha analysis with explicit caveats against
         fear-based or universal claims. _(v1 built 2026-07-25, `CLAUDE-P0-DOSHAS-01`
         REVIEW: 12 named types by Rahu house + full/partial geometry; enriched
@@ -131,6 +139,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         gate `validation/doshas.cjs`. Open: deploy, owner sign-off, second bug bash.)_
   - [ ] Finish and validate Arudha Padas, Bhavabala presentation, and Special
         Lagnas/Upagrahas; expose their existing engines with useful explanations.
+        _(Built locally 2026-07-28, `CODEX-P0-JYOTISH-33-36-BUILD`: Chart
+        sections now render answer-first summaries for Arudha, Bhava
+        Chalit/Bhava Bala and Special Lagnas/Upagrahas, with a focused panel
+        validation gate. Open: production verification and owner review.)_
   - [ ] Expose and polish every already-built specialist panel: Graha/Bhava detail,
         Bhava Chalit, D1–D60 divisional charts, Vimshottari sub-dashas,
         Ashtakavarga, Shadbala, Yoga detection, Gochar, rectification, KP
@@ -152,6 +164,11 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         unchanged. Open: deploy + sign-off.)_
   - [ ] Complete the general Dosha explanation layer and finish Ruling Planets,
         reusing existing engine work only after rule/anchor verification.
+        _(Ruling Planets built locally 2026-07-28,
+        `CODEX-P0-JYOTISH-33-36-BUILD`: engine now exposes source witnesses and
+        weighted support ranking; Chart UI shows a plain-language summary and
+        proof list. Open: primary KSK source review, production verification and
+        independent bug bash before quality closure.)_
   - [ ] Complete the answer-before-data life interpretation layer so the public
         Kundli is more than a collection of technical tables; qualify uncertainty
         and keep detailed calculations available below each plain-language result.

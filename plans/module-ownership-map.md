@@ -39,10 +39,7 @@ deeplinks**.
 
 | Backlog | Task ID | Owner | File boundary |
 |---|---|---|---|
-| #33 Sade Sati report | `CODEX-P0-SADE-SATI-REPORT-33` | Codex | New `sade-sati-report` engine/data/gate only; no shared calculator UI until integration |
-| #34 Mangal Dosha three-reference report | `CLAUDE-P0-MANGAL-THREE-REF-34` | Claude Code | New `mangal-dosha` engine/data/gate only; no shared calculator UI until integration |
-| #35 Arudha/Bhavabala/Special presentation | `CURSOR-P0-ARUDHA-BHAVA-SPECIAL-35` | Cursor | `ChartScreen.tsx` only in `#arudha`, `#chalit`, `#special`; no engine/nav edits |
-| #36 Ruling Planets rule map | `CODEX-P0-RULING-PLANETS-RULEMAP-36` | Codex | `dasha.ts` only around Ruling Planets/KP exports + new proof gate; no UI until integration |
+| #33–#36 combined build | `CODEX-P0-JYOTISH-33-36-BUILD` | Codex | Branch/worktree integration slice: Sade Sati engine/data/calculator UI, Mangal engine/data/calculator UI, Ruling Planets engine/UI proof, Arudha/Bhava/Special panel presentation and focused gates. Status `REVIEW`; merge/deploy/owner review still pending. |
 
 Detailed handoff: [`plans/jyotish-calculator-parallel-assignments.md`](jyotish-calculator-parallel-assignments.md).
 

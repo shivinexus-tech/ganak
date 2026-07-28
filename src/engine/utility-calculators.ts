@@ -3,6 +3,8 @@ import { NAKSHATRAS, SIGNS, lunarMonthInfo, planetSidMs, sunEvents } from "./pan
 import { rev } from "./ephemeris";
 import { NAMING_SYLLABLES, NAMING_SYLLABLES_HI } from "../data/utility-calculators";
 import { kalaSarpaFromRows, pitraDoshaFromRows, papaCount } from "./doshas";
+import { mangalDoshaReport } from "./mangal-dosha";
+import { sadeSatiReport } from "./sade-sati-report";
 
 export type BirthInput = { y:number; m:number; day:number; hh:number; mi:number; tz:number; lat:number; lon:number };
 const WESTERN_SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
@@ -17,12 +19,11 @@ export function quickBirth(input:BirthInput) {
 }
 
 export function mangalDosha(input:BirthInput) {
-  const { chart } = quickBirth(input); const mars = chart.rows.find((p:any)=>p.name === "Mars")!;
-  const refs = [{key:"Lagna",sign:chart.ascSign},{key:"Moon",sign:chart.moon.sign},{key:"Venus",sign:chart.rows.find((p:any)=>p.name === "Venus")!.sign}]
-    .map(r=>({ ...r, house:((mars.sign-r.sign+12)%12)+1 })).map(r=>({ ...r, counted:[1,2,4,7,8,12].includes(r.house) }));
-  const count=refs.filter(r=>r.counted).length;
-  const dignity=[0,7,9].includes(mars.sign) ? "Mars is in its own or exaltation sign; some traditions treat this as mitigation, not automatic cancellation." : null;
-  return { present:count>0, strength:count===3?"strong":count===2?"moderate":count===1?"limited":"none", refs, dignity, marsSign:SIGNS[mars.sign] };
+  const report = mangalDoshaReport(input);
+  return {
+    ...report,
+    refs: report.refs.map((r:any)=>({ ...r, key: r.labelEn })),
+  };
 }
 
 export function kalaSarpa(input:BirthInput) {
@@ -41,10 +42,7 @@ export function papaDosha(input:BirthInput) {
 }
 
 export function sadeSati(input:BirthInput, asOfMs:number) {
-  const { moon }=quickBirth(input); const saturnSign=Math.floor(planetSidMs("Saturn",asOfMs)/30);
-  const relation=(saturnSign-moon.sign+12)%12;
-  const active=[11,0,1].includes(relation), phase=relation===11?"rising":relation===0?"middle":relation===1?"setting":"not active";
-  return { active, phase, moonSign:SIGNS[moon.sign], saturnSign:SIGNS[saturnSign], relation };
+  return sadeSatiReport(input, asOfMs);
 }
 
 export function shraddhaTithi(input:BirthInput, nowMs:number = Date.now()) {
