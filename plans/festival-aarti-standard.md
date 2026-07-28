@@ -55,6 +55,16 @@ Rules:
 - Include an aarti only where it is genuinely customary; do not pad to reach three.
 - Confirmed per-festival list lives in the spec once the owner signs off.
 
+**Fidelity rule (owner, 2026-07-28) — favour the full sung form, since the app is for
+singing along:**
+- **Keep echo / call-and-response repeat lines** where an aarti is traditionally sung
+  that way (e.g. Om Jai Jagdish Hare's "स्वामी …" half-line after the first line of each
+  verse). Do not condense them to bare couplets.
+- **Include commonly-sung optional stanzas** (e.g. Ganesh "दीनन की लाज राखो …"), keeping a
+  single clean base version — do NOT inline parenthetical word-variants (पान/हार,
+  तिलक/सिन्दूर); the bottom "your family's wording may differ" note covers those.
+- Still drop pure performance markers (`x2` repeat counts) — they are instructions, not text.
+
 ## 3. Layout / rendering
 
 - Each aarti = one collapsible `<details>` in `VratVidhiCard`, titled from `title`.
