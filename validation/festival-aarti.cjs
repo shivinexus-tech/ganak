@@ -9,10 +9,29 @@ const assert = require('node:assert');
 const { loadApp } = require('./_load-app.cjs');
 const { VRAT_VIDHI } = loadApp('src/data/vrat-vidhis.ts');
 
-const COVERED = ['diwali'];
+const COVERED = [
+  'diwali', 'dhanteras', 'ganeshChaturthi', 'janmashtami', 'govardhanPuja',
+  'ramNavami', 'hanumanJ', 'chaitraNavratri', 'sharadNavratri', 'mahaShivaratri',
+  'masikShivaratri', 'pradosh', 'karvaChauth', 'ahoiAshtami', 'hartalikaTeej', 'purnima',
+];
 
 const ANCHORS = {
   diwali: ['जय गणेश', 'ॐ जय लक्ष्मी माता', 'ॐ जय जगदीश हरे'],
+  dhanteras: ['जय गणेश', 'ॐ जय लक्ष्मी माता', 'ॐ जय जगदीश हरे'],
+  ganeshChaturthi: ['जय गणेश'],
+  janmashtami: ['जय गणेश', 'आरती कुंजबिहारी की', 'ॐ जय जगदीश हरे'],
+  govardhanPuja: ['जय गणेश', 'आरती कुंजबिहारी की', 'ॐ जय जगदीश हरे'],
+  ramNavami: ['जय गणेश', 'आरती श्री रामायणजी की', 'ॐ जय जगदीश हरे'],
+  hanumanJ: ['आरती कीजै हनुमान लला की', 'आरती श्री रामायणजी की'],
+  chaitraNavratri: ['जय गणेश', 'जय अम्बे गौरी', 'अम्बे तू है जगदम्बे काली', 'ॐ जय शिव ओंकारा'],
+  sharadNavratri: ['जय गणेश', 'जय अम्बे गौरी', 'अम्बे तू है जगदम्बे काली', 'ॐ जय शिव ओंकारा'],
+  mahaShivaratri: ['जय गणेश', 'ॐ जय शिव ओंकारा'],
+  masikShivaratri: ['जय गणेश', 'ॐ जय शिव ओंकारा'],
+  pradosh: ['जय गणेश', 'ॐ जय शिव ओंकारा'],
+  karvaChauth: ['जय गणेश', 'जय पार्वती माता', 'ॐ जय शिव ओंकारा'],
+  ahoiAshtami: ['जय गणेश', 'जय पार्वती माता', 'ॐ जय शिव ओंकारा'],
+  hartalikaTeej: ['जय गणेश', 'ॐ जय शिव ओंकारा', 'जय पार्वती माता'],
+  purnima: ['जय गणेश', 'जय लक्ष्मीरमणा', 'ॐ जय जगदीश हरे'],
 };
 
 const DEVANAGARI = /[ऀ-ॿ]/;
