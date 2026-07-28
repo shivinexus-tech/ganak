@@ -97,6 +97,11 @@ export const MEDICAL_NO_WINDOW = {
   hi: "इस अवधि में कोई परंपरागत रूप से पसंदीदा दिन नहीं मिला — संभवतः पूर्णिमा या अमावस्या इसमें आ रही है। इसका अर्थ कभी यह नहीं कि 'प्रक्रिया न कराएँ।' अपनी चिकित्सा टीम के कार्यक्रम का पालन करें।",
 };
 
+export const MEDICAL_NO_SOLAR_DATA = {
+  en: "No days could be calculated for this place and range because there is no local sunrise or sunset. This is a high-latitude daylight limitation, not an astrological warning. Follow your medical team's schedule.",
+  hi: "इस स्थान और अवधि के लिए दिन नहीं निकाले जा सके क्योंकि स्थानीय सूर्योदय या सूर्यास्त नहीं है। यह उच्च अक्षांश पर दिन-रात की गणना की सीमा है, कोई ज्योतिषीय चेतावनी नहीं। अपनी चिकित्सा टीम के कार्यक्रम का पालन करें।",
+};
+
 /* Shown near any symptom/urgency wording — a plain redirect to real care. */
 export const MEDICAL_REFUSAL = {
   en: "If this is an emergency, or your symptoms are new, severe, or getting worse, contact your doctor or emergency services now — do not wait for a muhurat. Ganak cannot choose a time for urgent care.",

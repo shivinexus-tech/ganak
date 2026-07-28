@@ -136,4 +136,33 @@ than guessing.
 
 ---
 ### Findings (Codex to fill in)
-_(append F1…/severity/repro/fix here)_
+
+- **F4 · P1 · Safety wall was not first.** Repro: open
+  `/muhurat/medical`; the astrological intro (“avoids…suggests Abhijit”) appeared
+  above `READ FIRST`. Fix: moved the safety wall ahead of all astrological framing;
+  a source-order assertion now fails if the intro moves above it again.
+- **F5 · P2 · Polar no-sunrise result was misleading.** Repro: scan Tromsø on
+  2026-06-21 (midnight sun); the engine correctly returns no calculable days, but
+  the UI used the “most likely a full or new moon” empty-state. Fix: added distinct
+  EN/HI copy explaining the high-latitude sunrise/sunset limitation and explicitly
+  saying it is not an astrological warning.
+- **F6 · P2 · Future birth date could be accepted when HTML `max` was bypassed.**
+  Repro: programmatically set a future birth date and run with a selected birth
+  place; the optional natal overlay calculated it. Fix: the run path now rejects
+  future birth dates with a visible bilingual error, independent of browser input
+  enforcement.
+
+Adversarial passes that did not produce defects:
+
+- London’s 2026-03-29 DST-change day matches Drik Panchang within one minute
+  (sunrise 06:43; Abhijit 12:39–13:30 vs 12:40–13:31 published); New York winter
+  offset `-5` and Sydney summer offset `+11` are correct.
+- `from==to`, `from>to`, a four-day 2026→2027 boundary, Purnima/Amavasya,
+  Wednesday Abhijit void, weekday Rahu Kaal, and natal overlay invariants pass.
+- Live 320px EN/HI has no horizontal overflow; switching language keeps and
+  localises an existing result; the confirmation disables the finder and unchecking
+  it hides results; changing inputs clears results; checkbox/labels/details/alerts
+  expose appropriate browser semantics.
+- No medical-outcome/“safe surgery”/clearance claim and no browser storage were
+  found. Option C, omitted R9, and optional natal behaviour were treated as
+  intentional design, not findings.
