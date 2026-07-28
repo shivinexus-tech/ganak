@@ -74,7 +74,7 @@ async function finish() {
   if (!component.includes('/festival-images/raster/${imageKey}.webp')) problems.push('FestivalRasterHero must request the key-specific raster WebP');
   if (!component.includes('onError={() => setFailed(true)}')) problems.push('FestivalRasterHero must handle an image load failure');
   if (!component.includes('heroArtForKey(imageKey)')) problems.push('FestivalRasterHero must use registry alt text');
-  if (!screen.includes('<FestivalRasterHero imageKey={guide.vidhiKey}')) problems.push('FestivalGuideScreen must render FestivalRasterHero for guide keys');
+  if (!screen.includes('imageKey={guide.vidhiKey || routeContent.heroKey}')) problems.push('FestivalGuideScreen must render guide or route-content hero keys');
 
   try { await runMutationFixtures(); } catch (error) { problems.push(`validator mutation fixtures: ${error.message}`); }
 

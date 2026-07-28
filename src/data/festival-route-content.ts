@@ -127,13 +127,13 @@ const pradosh = (row) => record(
 
 const HERO_GROUPS = {
   ganeshChaturthi: ["anantChaturdashi","sakatChauth","vinayakaChaturthi"],
-  diwali: ["pongal","govatsaDwadashi","kaliChaudas","lakshmiPanchami","mahalakshmiVrat","kaliPuja","karthigaiDeepam","kojagaraPuja"],
+  diwali: ["govatsaDwadashi","kaliChaudas","lakshmiPanchami","mahalakshmiVrat","kaliPuja","karthigaiDeepam","kojagaraPuja"],
   purnima: ["pitruPakshaBegins","sarvaPitruAmavasya","sharadPurnima","mauniAmavasya","gangaDussehra"],
   masikDurgashtami: ["kaliJayanti","lalitaJayanti","taraJayanti","matangiJayanti","bagalamukhiJayanti","chhinnamastaJayanti","dhumavatiJayanti","bhuvaneshvariJayanti","kamalaJayanti","bhairaviJayanti","annapurnaJayanti","shakambhariNavratriBegins","shakambhariPurnima","lalitaPanchami","sandhiPuja","mahaAshtami","mahaNavami"],
   mahaShivaratri: ["kalabhairavJayanti","arudraDarshan","kalashtami"],
   skandaShashti: ["vaikasiVisakam","panguniUthiram","thaipusam"],
   varalakshmi: ["aadiPooram","tulasiVivah","gangaur","hariyaliTeej","kajariTeej"],
-  makarSankranti: ["rathaSaptami","meshaSankranti","vrishabhaSankranti","mithunaSankranti","karkaSankranti","simhaSankranti","kanyaSankranti","tulaSankranti","vrishchikaSankranti","dhanuSankranti","kumbhaSankranti","meenaSankranti"],
+  makarSankranti: ["pongal","rathaSaptami","meshaSankranti","vrishabhaSankranti","mithunaSankranti","karkaSankranti","simhaSankranti","kanyaSankranti","tulaSankranti","vrishchikaSankranti","dhanuSankranti","kumbhaSankranti","meenaSankranti"],
   sharadNavratri: ["chaitraGhatasthapana","sharadGhatasthapana","saraswatiAvahan","saraswatiPuja"],
   rakshaBandhan: ["nagPanchami","rishiPanchami"],
   janmashtami: ["radhaAshtami","onam","balaramaJayanti"],
