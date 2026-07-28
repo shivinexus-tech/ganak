@@ -66,8 +66,9 @@ singing along:**
 - **Return to the refrain after every verse** (the aarti's opening line/couplet, as it is
   actually sung): Ganesh repeats the full "जय गणेश…" couplet; Lakshmi/Om Jai Jagdish Hare
   repeat their single refrain line ("ॐ जय लक्ष्मी माता॥" / "ॐ जय जगदीश हरे॥").
-- **Repeat marker:** render "sing twice" as the Devanagari **"(२ बार)"** (never Latin `x2` —
-  the gate forbids Latin in verses), placed on **every couplet's closing (॥) line**.
+- **No repeat markers** (owner, 2026-07-28): do not add "sing twice" markers — neither Latin
+  `x2` nor Devanagari "(२ बार)". The refrain-after-every-verse already carries the repetition;
+  verses read clean. (Latin is forbidden in verses regardless.)
 
 ## 3. Layout / rendering
 
