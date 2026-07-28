@@ -132,12 +132,12 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         No engine counts as launched while its route/panel is hidden, untranslated,
         visually unfinished or missing validation evidence.
   - [ ] South- and East-Indian chart styles in addition to the current chart.
-        _(South shipped 2026-07-26, `CLAUDE-P0-CHARTSTYLES-AYAN-01` REVIEW:
-        sign-fixed 4×4 grid, lagna wedge, degrees/retro, North/South toggle
-        persisted in URL. **East-Indian deferred** — the Bengali chart has real
-        regional ambiguity (house-fixed vs sign-fixed; exact compartment→sign
-        order + triangular geometry). Needs a reliable source before shipping so
-        Ganak doesn't present a subtly-wrong traditional chart. Fast-follow.)_
+        _(Both shipped 2026-07-26, `CLAUDE-P0-CHARTSTYLES-AYAN-01` REVIEW:
+        **South** = sign-fixed 4×4 grid + lagna wedge; **East** = Bengali
+        diamond-in-square, convention verified (Rashi-fixed, Aries top-centre,
+        anti-clockwise) with lagna-compartment tint. Three-way North/South/East
+        toggle, choice persisted in URL (`cstyle`); degrees + retro on both. Gate
+        `chart-styles-ayanamsha.cjs` pins both layouts. Open: deploy + sign-off.)_
   - [ ] Keep and expose multiple ayanamshas without changing Ganak's default
         Lahiri + mean Rahu/Ketu convention. _(Shipped 2026-07-26,
         `CLAUDE-P0-CHARTSTYLES-AYAN-01` REVIEW: Lahiri (default) + Raman + KP +

@@ -8,6 +8,7 @@ const { loadApp } = require('./_load-app.cjs');
 const panchang = loadApp('src/engine/panchang.ts');
 const { computeKundli } = loadApp('src/engine/kundli.ts');
 const south = loadApp('src/components/SouthChart.tsx');
+const east = loadApp('src/components/EastChart.tsx');
 
 // ---- ayanamsha table ----
 const A = panchang.AYANAMSA;
@@ -41,4 +42,18 @@ assert(cells.every((c) => c >= 0 && c <= 15 && !centre.has(c)), 'signs must sit 
 assert.strictEqual(cells[0], 1, 'Aries must sit in the top row, second cell');
 assert.strictEqual(cells[11], 0, 'Pisces must sit top-left');
 
-console.log('chart-styles-ayanamsha.cjs OK — 4 ayanamshas (Raman shift verified) + South-Indian layout');
+// ---- East-Indian (Bengali) layout ----
+const es = east.EAST_SIGNS;
+assert(Array.isArray(es) && es.length === 12, 'East layout must define all 12 signs');
+assert(es.every((c) => Array.isArray(c.poly) && c.poly.length >= 3 && Array.isArray(c.c)), 'each East sign needs a polygon and a centroid');
+// Aries (0) sits top-centre: centroid x≈200 and high on the board (small y).
+assert(Math.abs(es[0].c[0] - 200) < 20 && es[0].c[1] < 130, 'Aries must sit at the top-centre');
+// Libra (6) is opposite Aries at the bottom-centre.
+assert(Math.abs(es[6].c[0] - 200) < 20 && es[6].c[1] > 270, 'Libra must sit at the bottom-centre (opposite Aries)');
+// Anti-clockwise: Cancer (3, 90° ccw from Aries) is on the LEFT; Capricorn (9) on the RIGHT.
+assert(es[3].c[0] < 130, 'Cancer must be on the left (anti-clockwise)');
+assert(es[9].c[0] > 270, 'Capricorn must be on the right');
+// all centroids distinct
+assert(new Set(es.map((c) => c.c.join(','))).size === 12, 'each East sign needs a distinct centroid');
+
+console.log('chart-styles-ayanamsha.cjs OK — 4 ayanamshas (Raman shift verified) + South & East layouts');
