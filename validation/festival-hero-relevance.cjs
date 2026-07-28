@@ -9,6 +9,7 @@ const { validateRaster, assertDecodable, duplicateProblems, runMutationFixtures 
 const root = path.resolve(__dirname, '..');
 const { VRAT_VIDHI } = loadApp('src/data/vrat-vidhis.ts');
 const { FESTIVAL_HERO_ART } = loadApp('src/data/festival-hero-art.ts');
+const { FESTIVAL_PAGE_ROUTES } = loadApp('src/data/festival-pages.ts');
 const imageDir = path.join(root, 'public/festival-images/raster');
 
 const keys = Object.keys(VRAT_VIDHI).sort();
@@ -18,6 +19,22 @@ const decodeChecks = [];
 // Shared art is never implicit. Add a sorted "keyA|keyB" only after devotional
 // relevance review records why the exact same composition is correct for both.
 const SHARED_RASTER_ALLOWLIST = new Set();
+
+const routeEntries = Object.entries(FESTIVAL_PAGE_ROUTES);
+if (routeEntries.length < 181) problems.push(`festival route inventory shrank: expected at least 181, got ${routeEntries.length}`);
+for (const [routePath, entry] of routeEntries) {
+  if (entry.form?.image) {
+    const ownedImage = path.join(root, 'public', entry.form.image.replace(/^\/+/, ''));
+    if (!fs.existsSync(ownedImage)) problems.push(`${routePath}: missing owned route hero ${entry.form.image}`);
+    continue;
+  }
+  if (!entry.vidhiKey) {
+    problems.push(`${routePath}: no hero disposition (needs vidhiKey parent hero or owned form image)`);
+    continue;
+  }
+  if (!VRAT_VIDHI[entry.vidhiKey]) problems.push(`${routePath}: parent hero key ${entry.vidhiKey} has no worship guide`);
+  if (!FESTIVAL_HERO_ART[entry.vidhiKey]) problems.push(`${routePath}: parent hero key ${entry.vidhiKey} has no art registry entry`);
+}
 
 for (const key of keys) {
   const art = FESTIVAL_HERO_ART[key];
@@ -64,7 +81,7 @@ async function finish() {
     for (const problem of problems) console.error(' -', problem);
     process.exit(1);
   }
-  console.log(`\nFESTIVAL HERO RELEVANCE PASSED (${keys.length} guides; mutation fixtures rejected)`);
+  console.log(`\nFESTIVAL HERO RELEVANCE PASSED (${keys.length} guides; ${routeEntries.length} routes disposed; mutation fixtures rejected)`);
 }
 
 finish().catch((error) => {

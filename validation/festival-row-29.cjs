@@ -8,11 +8,12 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 const { loadApp } = require('./_load-app.cjs');
-const { validateRaster, duplicateProblems, runMutationFixtures } = require('./_festival-raster-validator.cjs');
+const { validateRaster, assertDecodable, duplicateProblems, runMutationFixtures } = require('./_festival-raster-validator.cjs');
 
 const root = path.resolve(__dirname, '..');
 const { VRAT_VIDHI } = loadApp('src/data/vrat-vidhis.ts');
 const { FEST_META, OBS_META } = loadApp('src/data/festival-meta.ts');
+const { FESTIVAL_PAGE_ROUTES } = loadApp('src/data/festival-pages.ts');
 
 const EXPECTED_KEYS = Object.keys(VRAT_VIDHI).sort();
 const PROFILE_DIR = path.join(root, 'plans/festival-profiles');
@@ -40,11 +41,13 @@ const TIMING_ENGINE_FILES = {
 };
 
 const SUPPORTED_VRAT_DETAIL = new Set([
-  'parana', 'moonrise', 'stars', 'sunset', 'sunrise', 'morning', 'midnight', 'lakshmi-puja', 'grahan',
+  'parana', 'moonrise', 'stars', 'sunset', 'sunrise', 'morning', 'midnight',
+  'madhyahna', 'aparahna', 'lakshmi-puja', 'grahan',
 ]);
 
 const problems = [];
 const rasterRecords = [];
+const decodeChecks = [];
 
 function metaTiming(key) {
   if (FEST_META[key]?.timing) return FEST_META[key].timing;
@@ -73,9 +76,13 @@ for (const key of EXPECTED_KEYS) {
     problems.push(`missing hero: public/festival-images/raster/${key}.webp`);
   } else {
     try {
-      const checked = validateRaster(fs.readFileSync(heroPath));
+      const buffer = fs.readFileSync(heroPath);
+      const checked = validateRaster(buffer);
       for (const issue of checked.problems) problems.push(`invalid hero ${key}: ${issue}`);
       rasterRecords.push({ key, sha256: checked.info.sha256 });
+      decodeChecks.push(assertDecodable(buffer).catch((error) => {
+        problems.push(`invalid hero ${key}: ${error.message}`);
+      }));
     } catch (error) {
       problems.push(`invalid hero ${key}: ${error.message}`);
     }
@@ -96,23 +103,47 @@ for (const key of EXPECTED_KEYS) {
   }
 }
 
-const guideScreen = fs.readFileSync(path.join(root, 'src/screens/FestivalGuideScreen.tsx'), 'utf8');
-const heroComponent = fs.readFileSync(path.join(root, 'src/components/FestivalRasterHero.tsx'), 'utf8');
-if (!guideScreen.includes('FestivalRasterHero')) problems.push('FestivalGuideScreen must render FestivalRasterHero');
-if (!guideScreen.includes('chhathTimings')) problems.push('FestivalGuideScreen must wire chhathTimings');
-if (!guideScreen.includes('d.nishita')) problems.push('FestivalGuideScreen must render nishita timing');
-if (!heroComponent.includes('/festival-images/raster/${imageKey}.webp')) problems.push('FestivalRasterHero must use key-specific raster WebP paths');
-if (!heroComponent.includes('onError={() => setFailed(true)}')) problems.push('FestivalRasterHero must handle load failure');
-problems.push(...duplicateProblems(rasterRecords, new Set()));
-try { runMutationFixtures(); } catch (error) { problems.push(`raster validator mutation fixtures: ${error.message}`); }
-
-const muhuratHub = fs.readFileSync(path.join(root, 'src/screens/MuhuratHub.tsx'), 'utf8');
-if (!muhuratHub.includes('chhathTimings')) problems.push('MuhuratHub must wire chhathTimings for expand rows');
-
-if (problems.length) {
-  console.error('festival-row-29.cjs FAIL');
-  for (const p of problems) console.error(' -', p);
-  process.exit(1);
+const routeEntries = Object.entries(FESTIVAL_PAGE_ROUTES);
+if (routeEntries.length < 181) problems.push(`festival route inventory shrank: expected at least 181, got ${routeEntries.length}`);
+for (const [routePath, entry] of routeEntries) {
+  if (entry.form?.image) {
+    const ownedImage = path.join(root, 'public', entry.form.image.replace(/^\/+/, ''));
+    if (!fs.existsSync(ownedImage)) problems.push(`${routePath}: missing owned route hero ${entry.form.image}`);
+    continue;
+  }
+  if (!entry.vidhiKey) {
+    problems.push(`${routePath}: no hero disposition (needs vidhiKey parent hero or owned form image)`);
+    continue;
+  }
+  if (!VRAT_VIDHI[entry.vidhiKey]) problems.push(`${routePath}: parent hero key ${entry.vidhiKey} has no worship guide`);
+  if (!FESTIVAL_HERO_ART[entry.vidhiKey]) problems.push(`${routePath}: parent hero key ${entry.vidhiKey} has no art registry entry`);
 }
 
-console.log(`festival-row-29.cjs PASS — ${EXPECTED_KEYS.length} guide keys, profiles, heroes, timing wiring`);
+async function finish() {
+  await Promise.all(decodeChecks);
+  problems.push(...duplicateProblems(rasterRecords, new Set()));
+  try { await runMutationFixtures(); } catch (error) { problems.push(`raster validator mutation fixtures: ${error.message}`); }
+
+  const guideScreen = fs.readFileSync(path.join(root, 'src/screens/FestivalGuideScreen.tsx'), 'utf8');
+  const heroComponent = fs.readFileSync(path.join(root, 'src/components/FestivalRasterHero.tsx'), 'utf8');
+  if (!guideScreen.includes('FestivalRasterHero')) problems.push('FestivalGuideScreen must render FestivalRasterHero');
+  if (!guideScreen.includes('chhathTimings')) problems.push('FestivalGuideScreen must wire chhathTimings');
+  if (!guideScreen.includes('d.nishita')) problems.push('FestivalGuideScreen must render nishita timing');
+  if (!heroComponent.includes('/festival-images/raster/${imageKey}.webp')) problems.push('FestivalRasterHero must use key-specific raster WebP paths');
+  if (!heroComponent.includes('onError={() => setFailed(true)}')) problems.push('FestivalRasterHero must handle load failure');
+
+  const muhuratHub = fs.readFileSync(path.join(root, 'src/screens/MuhuratHub.tsx'), 'utf8');
+  if (!muhuratHub.includes('chhathTimings')) problems.push('MuhuratHub must wire chhathTimings for expand rows');
+
+  if (problems.length) {
+    console.error('festival-row-29.cjs FAIL');
+    for (const problem of problems) console.error(' -', problem);
+    process.exit(1);
+  }
+  console.log(`festival-row-29.cjs PASS — ${EXPECTED_KEYS.length} guide keys, ${routeEntries.length} routes, profiles, heroes, timing wiring`);
+}
+
+finish().catch((error) => {
+  console.error(`festival-row-29.cjs crashed: ${error.stack || error.message}`);
+  process.exit(1);
+});
