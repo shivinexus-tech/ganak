@@ -4,7 +4,7 @@ import { zoneOffset } from "../engine/panchang";
 import { medicalMuhuratScan, natalMoonSign } from "../engine/medical-muhurat";
 import {
   MEDICAL_SAFETY, MEDICAL_INTRO, MEDICAL_CONFIRM, MEDICAL_TRADITION_NOTE,
-  MEDICAL_EXCLUSION, MEDICAL_LABELS, MEDICAL_RESULT_NOTE, MEDICAL_NO_WINDOW,
+  MEDICAL_EXCLUSION, MEDICAL_LABELS, MEDICAL_RESULT_NOTE, MEDICAL_NO_WINDOW, MEDICAL_NO_SOLAR_DATA,
   MEDICAL_REFUSAL, MEDICAL_TITLE,
   MEDICAL_NATAL_SECTION, MEDICAL_NATAL_HINT, MEDICAL_JANMA, MEDICAL_BIRTHSIGN, MEDICAL_RASHIS,
   MEDICAL_NATAL_UNCONFIRMED,
@@ -93,6 +93,11 @@ export default function MedicalMuhuratScreen({ lang, C, card, place, onPlace }: 
     if ((end - start) / 864e5 > 92) { setResult(null); setError(hi ? "कृपया लगभग 90 दिनों तक की सीमा चुनें।" : "Please choose a range of about 90 days or less."); return; }
     // Optional natal overlay: only when birth date, place and a confirmed pick are present.
     let ns: number | null = null;
+    if (birthDate && birthDate > todayStr) {
+      setResult(null);
+      setError(hi ? "जन्म तिथि भविष्य की नहीं हो सकती।" : "Birth date cannot be in the future.");
+      return;
+    }
     if (birthDate && birthPlace && birthConfirmed) {
       const [by, bm, bd] = birthDate.split("-").map(Number);
       const [bhh, bmi] = birthTime.split(":").map(Number);
@@ -111,9 +116,8 @@ export default function MedicalMuhuratScreen({ lang, C, card, place, onPlace }: 
   return (
     <div>
       <h2 style={{ fontFamily: "Eczar, serif", color: C.gold, fontSize: 24, margin: "0 0 4px" }}>{bi(MEDICAL_TITLE)}</h2>
-      <p style={{ color: C.muted, fontSize: 14.5, margin: "0 0 16px" }}>{bi(MEDICAL_INTRO)}</p>
 
-      {/* SAFETY WALL — always first, before any input or result */}
+      {/* SAFETY WALL — first substantive content, before any astrological framing, input or result */}
       <div role="note" style={{ ...card, padding: 16, marginBottom: 16, borderLeft: `4px solid ${C.gold}`, background: "rgba(168,106,18,.06)" }}>
         <div style={{ fontFamily: "Eczar, serif", color: C.gold, fontSize: 13, letterSpacing: ".08em", marginBottom: 6 }}>
           {hi ? "पहले पढ़ें" : "READ FIRST"}
@@ -121,6 +125,7 @@ export default function MedicalMuhuratScreen({ lang, C, card, place, onPlace }: 
         <p style={{ margin: 0, color: C.ivory, fontSize: 14, lineHeight: 1.6 }}>{bi(MEDICAL_SAFETY)}</p>
         <p style={{ margin: "10px 0 0", color: C.muted, fontSize: 13, lineHeight: 1.6 }}>{bi(MEDICAL_REFUSAL)}</p>
       </div>
+      <p style={{ color: C.muted, fontSize: 14.5, margin: "0 0 16px" }}>{bi(MEDICAL_INTRO)}</p>
 
       {/* Inputs */}
       <div style={panel}>
@@ -172,7 +177,9 @@ export default function MedicalMuhuratScreen({ lang, C, card, place, onPlace }: 
       {/* Results */}
       {result && (
         <div style={{ marginBottom: 14 }}>
-          {cleanDays.length === 0 ? (
+          {result.length === 0 ? (
+            <div style={{ ...panel, color: C.muted, fontSize: 14, lineHeight: 1.6 }}>{bi(MEDICAL_NO_SOLAR_DATA)}</div>
+          ) : cleanDays.length === 0 ? (
             <div style={{ ...panel, color: C.muted, fontSize: 14, lineHeight: 1.6 }}>{bi(MEDICAL_NO_WINDOW)}</div>
           ) : (
             <>
