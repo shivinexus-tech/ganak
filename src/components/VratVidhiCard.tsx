@@ -103,8 +103,14 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
                       {txt(a.intro)}
                     </div>
                   )}
-                  <div style={{ whiteSpace: "pre-line", fontSize: T.fSmall, color: C.ivory, lineHeight: 1.7, marginTop: 6 }}>
-                    {a.verses}
+                  <div style={{ fontSize: T.fSmall, lineHeight: 1.8, marginTop: 6 }}>
+                    <div style={{ whiteSpace: "pre-line", color: C.gold, fontWeight: 600 }}>{a.refrain}</div>
+                    {a.stanzas.map((s, j) => (
+                      <React.Fragment key={j}>
+                        <div style={{ whiteSpace: "pre-line", color: C.ivory, marginTop: "1em" }}>{s}</div>
+                        <div style={{ color: C.gold, fontWeight: 600, marginTop: "0.1em" }}>{a.cue}</div>
+                      </React.Fragment>
+                    ))}
                   </div>
                 </details>
               ))}
