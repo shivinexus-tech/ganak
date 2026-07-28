@@ -5,6 +5,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 const { loadApp, ROOT } = require('./_load-app.cjs');
+const { validateRaster } = require('./_festival-raster-validator.cjs');
 
 const content = loadApp('src/data/vrat-vidhis.ts');
 const pages = loadApp('src/data/festival-pages.ts');
@@ -18,6 +19,7 @@ const DELHI = { zone: 'Asia/Kolkata', lat: 28.6139, lon: 77.2090, label: 'Delhi'
 const CAPE_TOWN = { zone: 'Africa/Johannesburg', lat: -33.9249, lon: 18.4241, label: 'Cape Town' };
 const LONDON = { zone: 'Europe/London', lat: 51.5072, lon: -0.1276, label: 'London' };
 const fmt = (ms) => new Date(ms + IST * 3600000).toISOString().slice(0, 10);
+const assetProblems = [];
 const minutes = (ms) => Math.round(ms / 60000);
 const withinMinutes = (actual, expected, tolerance, label) => {
   const diff = Math.abs(minutes(actual - expected));
@@ -43,11 +45,18 @@ for (const key of GRAHAN_KEYS) {
   }
   const routeGuide = routeModule.festivalGuideFromPath(entry.path);
   assert(routeGuide && routeGuide.vidhiKey === key, `${entry.path} must resolve to ${key}`);
-  const svg = path.join(ROOT, `public/festival-images/${key}.svg`);
-  assert(fs.existsSync(svg), `missing hero ${key}.svg`);
-  const body = fs.readFileSync(svg, 'utf8');
-  assert(body.includes('data-subject'), `${key}.svg must declare data-subject`);
-  console.log(`PASS  ${key} page, guide and hero at ${entry.path}`);
+  const raster = path.join(ROOT, `public/festival-images/raster/${key}.webp`);
+  if (!fs.existsSync(raster)) {
+    assetProblems.push(`missing hero public/festival-images/raster/${key}.webp`);
+  } else {
+    try {
+      const checked = validateRaster(fs.readFileSync(raster));
+      for (const problem of checked.problems) assetProblems.push(`${key}: ${problem}`);
+    } catch (error) {
+      assetProblems.push(`${key}: invalid or undecodable WebP — ${error.message}`);
+    }
+  }
+  console.log(`PASS  ${key} page and guide at ${entry.path}`);
 }
 
 assert(routeModule.findLocalFestivalOccurrence, 'FestivalGuideScreen must export findLocalFestivalOccurrence');
@@ -109,4 +118,9 @@ assert(occ.hit && occ.detail && occ.detail.grahan, 'findLocalFestivalOccurrence 
 assert(typeof occ.detail.grahan.visible === 'boolean', 'grahan detail must include visibility');
 console.log('PASS  FestivalGuideScreen grahan wiring');
 
+if (assetProblems.length) {
+  console.error(`\nECLIPSE SUTAK PAGES FAILED (${assetProblems.length} raster problems)`);
+  for (const problem of assetProblems) console.error(' -', problem);
+  process.exit(1);
+}
 console.log('\nECLIPSE SUTAK PAGES PASSED');

@@ -1,38 +1,60 @@
 #!/usr/bin/env node
 'use strict';
 
-const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 const { loadApp } = require('./_load-app.cjs');
+const { validateRaster, duplicateProblems, runMutationFixtures } = require('./_festival-raster-validator.cjs');
 
 const root = path.resolve(__dirname, '..');
 const { VRAT_VIDHI } = loadApp('src/data/vrat-vidhis.ts');
 const { FESTIVAL_HERO_ART } = loadApp('src/data/festival-hero-art.ts');
-const imageDir = path.join(root, 'public/festival-images');
+const imageDir = path.join(root, 'public/festival-images/raster');
 
 const keys = Object.keys(VRAT_VIDHI).sort();
-let failures = 0;
+const problems = [];
+const records = [];
+// Shared art is never implicit. Add a sorted "keyA|keyB" only after devotional
+// relevance review records why the exact same composition is correct for both.
+const SHARED_RASTER_ALLOWLIST = new Set();
 
 for (const key of keys) {
   const art = FESTIVAL_HERO_ART[key];
-  assert(art, `${key} must have a festival-hero-art registry entry`);
-  const file = path.join(imageDir, `${key}.svg`);
-  assert(fs.existsSync(file), `${key} must have public/festival-images/${key}.svg`);
-  const svg = fs.readFileSync(file, 'utf8');
-  assert(svg.includes(`data-subject="${art.subject}"`), `${key}.svg must declare data-subject="${art.subject}"`);
-  assert(svg.includes('aria-label'), `${key}.svg must include aria-label`);
-  assert(!/GANAK FESTIVAL GUIDE/i.test(svg), `${key}.svg must not use the old placeholder label`);
-  assert(svg.includes('viewBox="0 0 640 240"') || svg.includes('height="240"'), `${key}.svg must use the 640×240 hero format`);
-  if (key === 'diwali') {
-    assert(/lakshmi/i.test(svg) || art.subject === 'lakshmi', 'Diwali hero must depict Lakshmi puja');
-    assert(svg.includes('lotus') || svg.includes('Lotus') || svg.includes('कमल'), 'Diwali hero must include lotus imagery');
+  if (!art) {
+    problems.push(`${key}: missing festival-hero-art registry entry`);
+    continue;
   }
-  console.log(`PASS  ${key} → ${art.subject} (${art.template})`);
+  if (!art.subject || !art.template) problems.push(`${key}: registry needs subject and template`);
+  if (!art.alt?.en?.trim() || !art.alt?.hi?.trim()) problems.push(`${key}: registry needs non-blank English and Hindi alt text`);
+  const file = path.join(imageDir, `${key}.webp`);
+  if (!fs.existsSync(file)) {
+    problems.push(`${key}: missing public/festival-images/raster/${key}.webp`);
+    continue;
+  }
+  try {
+    const { info, problems: rasterProblems } = validateRaster(fs.readFileSync(file));
+    for (const problem of rasterProblems) problems.push(`${key}: ${problem}`);
+    records.push({ key, sha256: info.sha256 });
+    console.log(`PASS  ${key} → ${art.subject} (${info.width}×${info.height}, ${info.bytes} bytes)`);
+  } catch (error) {
+    problems.push(`${key}: invalid or undecodable WebP — ${error.message}`);
+  }
 }
 
-const diwali = fs.readFileSync(path.join(imageDir, 'diwali.svg'), 'utf8');
-assert(diwali.includes('data-subject="lakshmi"'), 'hand-crafted diwali.svg must be Lakshmi-themed');
+problems.push(...duplicateProblems(records, SHARED_RASTER_ALLOWLIST));
 
-if (failures) process.exit(1);
-console.log(`\nFESTIVAL HERO RELEVANCE PASSED (${keys.length} guides)`);
+const component = fs.readFileSync(path.join(root, 'src/components/FestivalRasterHero.tsx'), 'utf8');
+const screen = fs.readFileSync(path.join(root, 'src/screens/FestivalGuideScreen.tsx'), 'utf8');
+if (!component.includes('/festival-images/raster/${imageKey}.webp')) problems.push('FestivalRasterHero must request the key-specific raster WebP');
+if (!component.includes('onError={() => setFailed(true)}')) problems.push('FestivalRasterHero must handle an image load failure');
+if (!component.includes('heroArtForKey(imageKey)')) problems.push('FestivalRasterHero must use registry alt text');
+if (!screen.includes('<FestivalRasterHero imageKey={guide.vidhiKey}')) problems.push('FestivalGuideScreen must render FestivalRasterHero for guide keys');
+
+try { runMutationFixtures(); } catch (error) { problems.push(`validator mutation fixtures: ${error.message}`); }
+
+if (problems.length) {
+  console.error(`\nFESTIVAL HERO RELEVANCE FAILED (${problems.length} problems; ${records.length}/${keys.length} rasters present)`);
+  for (const problem of problems) console.error(' -', problem);
+  process.exit(1);
+}
+console.log(`\nFESTIVAL HERO RELEVANCE PASSED (${keys.length} guides; mutation fixtures rejected)`);

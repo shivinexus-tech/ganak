@@ -8,6 +8,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 const { loadApp } = require('./_load-app.cjs');
+const { validateRaster, duplicateProblems, runMutationFixtures } = require('./_festival-raster-validator.cjs');
 
 const root = path.resolve(__dirname, '..');
 const { VRAT_VIDHI } = loadApp('src/data/vrat-vidhis.ts');
@@ -15,7 +16,8 @@ const { FEST_META, OBS_META } = loadApp('src/data/festival-meta.ts');
 
 const EXPECTED_KEYS = Object.keys(VRAT_VIDHI).sort();
 const PROFILE_DIR = path.join(root, 'plans/festival-profiles');
-const IMAGE_DIR = path.join(root, 'public/festival-images');
+const IMAGE_DIR = path.join(root, 'public/festival-images/raster');
+const { FESTIVAL_HERO_ART } = loadApp('src/data/festival-hero-art.ts');
 
 const slugFromKey = (key) => String(key)
   .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
@@ -38,10 +40,11 @@ const TIMING_ENGINE_FILES = {
 };
 
 const SUPPORTED_VRAT_DETAIL = new Set([
-  'parana', 'moonrise', 'stars', 'sunset', 'sunrise', 'morning', 'midnight', 'lakshmi-puja',
+  'parana', 'moonrise', 'stars', 'sunset', 'sunrise', 'morning', 'midnight', 'lakshmi-puja', 'grahan',
 ]);
 
 const problems = [];
+const rasterRecords = [];
 
 function metaTiming(key) {
   if (FEST_META[key]?.timing) return FEST_META[key].timing;
@@ -55,15 +58,28 @@ for (const key of EXPECTED_KEYS) {
   const profilePath = path.join(PROFILE_DIR, `${slug}.md`);
   if (!fs.existsSync(profilePath)) {
     problems.push(`missing profile: plans/festival-profiles/${slug}.md`);
-    continue;
-  }
-  const profile = fs.readFileSync(profilePath, 'utf8');
-  for (const section of REQUIRED_PROFILE_SECTIONS) {
-    if (!profile.includes(section)) problems.push(`${slug}.md missing ${section}`);
+  } else {
+    const profile = fs.readFileSync(profilePath, 'utf8');
+    for (const section of REQUIRED_PROFILE_SECTIONS) {
+      if (!profile.includes(section)) problems.push(`${slug}.md missing ${section}`);
+    }
   }
 
-  const heroPath = path.join(IMAGE_DIR, `${key}.svg`);
-  if (!fs.existsSync(heroPath)) problems.push(`missing hero: public/festival-images/${key}.svg`);
+  const art = FESTIVAL_HERO_ART[key];
+  if (!art) problems.push(`missing hero registry entry: ${key}`);
+  else if (!art.alt?.en?.trim() || !art.alt?.hi?.trim()) problems.push(`hero registry alt must be bilingual: ${key}`);
+  const heroPath = path.join(IMAGE_DIR, `${key}.webp`);
+  if (!fs.existsSync(heroPath)) {
+    problems.push(`missing hero: public/festival-images/raster/${key}.webp`);
+  } else {
+    try {
+      const checked = validateRaster(fs.readFileSync(heroPath));
+      for (const issue of checked.problems) problems.push(`invalid hero ${key}: ${issue}`);
+      rasterRecords.push({ key, sha256: checked.info.sha256 });
+    } catch (error) {
+      problems.push(`invalid hero ${key}: ${error.message}`);
+    }
+  }
 
   const timing = metaTiming(key);
   if (timing === 'chhath-sequence' && key !== 'chhath') continue;
@@ -81,11 +97,14 @@ for (const key of EXPECTED_KEYS) {
 }
 
 const guideScreen = fs.readFileSync(path.join(root, 'src/screens/FestivalGuideScreen.tsx'), 'utf8');
-const heroComponent = fs.readFileSync(path.join(root, 'src/components/FestivalHeroImage.tsx'), 'utf8');
-if (!guideScreen.includes('FestivalHeroImage')) problems.push('FestivalGuideScreen must render FestivalHeroImage');
+const heroComponent = fs.readFileSync(path.join(root, 'src/components/FestivalRasterHero.tsx'), 'utf8');
+if (!guideScreen.includes('FestivalRasterHero')) problems.push('FestivalGuideScreen must render FestivalRasterHero');
 if (!guideScreen.includes('chhathTimings')) problems.push('FestivalGuideScreen must wire chhathTimings');
 if (!guideScreen.includes('d.nishita')) problems.push('FestivalGuideScreen must render nishita timing');
-if (!heroComponent.includes('/festival-images/')) problems.push('FestivalHeroImage must use /festival-images/');
+if (!heroComponent.includes('/festival-images/raster/${imageKey}.webp')) problems.push('FestivalRasterHero must use key-specific raster WebP paths');
+if (!heroComponent.includes('onError={() => setFailed(true)}')) problems.push('FestivalRasterHero must handle load failure');
+problems.push(...duplicateProblems(rasterRecords, new Set()));
+try { runMutationFixtures(); } catch (error) { problems.push(`raster validator mutation fixtures: ${error.message}`); }
 
 const muhuratHub = fs.readFileSync(path.join(root, 'src/screens/MuhuratHub.tsx'), 'utf8');
 if (!muhuratHub.includes('chhathTimings')) problems.push('MuhuratHub must wire chhathTimings for expand rows');
