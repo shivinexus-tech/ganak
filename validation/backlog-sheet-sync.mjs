@@ -13,8 +13,8 @@ assert.equal(base.rows.get("1").quality.deliveryState, "Delivered and production
 assert.equal(base.rows.get("1").quality.qualityRisk, "Green");
 assert.match(base.rows.get("1").quality.bugBashStatus, /F7 was then fixed/);
 assert.equal(base.rows.get("12").quality.qualityRisk, "Amber");
-assert.equal(base.rows.get("12").quality.deliveryState, "Core overlay delivered; UI placement decision open");
-assert.match(base.rows.get("12").quality.limitations, /owner-approved discoverable location/);
+assert.equal(base.rows.get("12").quality.deliveryState, "Implemented on main — final QA and production verification pending");
+assert.match(base.rows.get("12").quality.limitations, /calendar-options row/);
 assert.match(base.rows.get("2").quality.sourceConfidence, /Primary\/textual and institutional/);
 assert.match(base.rows.get("13").quality.sourceConfidence, /Bengali sources/);
 assert.equal(base.rows.get("5").quality.deliveryState, "Built, adversarially tested and fix-merged locally — not publicly delivered");
@@ -27,7 +27,7 @@ assert.match(base.rows.get("5").quality.lastVerified, /Local server smoke after 
 assert.match(base.rows.get("5").quality.sourceConfidence, /Not applicable/);
 assert.match(base.rows.get("1").quality.recommendedAction, /No corrective action required/);
 assert.match(base.rows.get("5").quality.recommendedAction, /deploy the API/);
-assert.match(base.rows.get("12").quality.recommendedAction, /holiday-overlay control/);
+assert.match(base.rows.get("12").quality.recommendedAction, /Codex-owned EN\/HI phone\/desktop/);
 assert.match(base.rows.get("2").quality.recommendedAction, /bug bash/);
 assert.match(base.rows.get("13").quality.recommendedAction, /No corrective action/);
 

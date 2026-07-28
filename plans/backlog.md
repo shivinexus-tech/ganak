@@ -288,11 +288,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         URL-backed toggle, blue collision-safe calendar marks, EN/HI phone/browser
         checks and a permanent source/inventory gate. State, bank and local closures
         remain correctly outside this Central layer rather than being guessed.
-        **UI placement decision parked 2026-07-23:** empty holiday cards are removed.
-        Decide where the off/national/gazetted control belongs so it stays discoverable
-        without occupying the Daily answer area on dates with no selected holiday.
-        Re-test desktop/phone, EN/HI, URL restoration and calendar-marker discovery
-        after that owner-approved placement is implemented.
+        **UI placement implemented 2026-07-24:** empty holiday cards are removed and
+        the off/national/gazetted control sits in the Daily calendar-options row beside
+        the calendar convention selector. Final closeout now needs EN/HI phone/desktop
+        bug bash, URL restoration, calendar-marker discovery and production verification.
       _(P0-PANCHANG-CALENDAR-PARITY; owner scope 2026-07-21)_
 - [ ] **P0 before go-live — exceptionally strong festival and vrat completion.**
       Close every festival/vrat gap in the competitor comparison: complete all
@@ -392,6 +391,9 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         iterative test-fix rounds by a minimum of **two agents** before any Green
         closeout. Do not restore row #29 to Done/100% without those rounds,
         full gates, phone/desktop smoke and production verification recorded.
+        **Hero-art note 2026-07-28:** the real raster pipeline and first three images
+        (`diwali`, `ganeshChaturthi`, `sankashti`) are preserved; remaining festival
+        heroes are batchable row-#29 quality work, not an active Cursor source edit.
       _(P0-FESTIVAL-VRAT-PARITY; owner scope 2026-07-21)_
 - [ ] **P0 before go-live — exceptionally strong Muhurat parity.** Complete every
       gap from the competitor comparison and keep the verdict/explanation stronger
@@ -404,9 +406,9 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         now have separate chips/guidance, rule tables, blockers and clean-window
         logic, with `validation/deep-muhurats.cjs` guarding against fallback to
         generic purchase/business behavior. Cursor bug bash found and fixed one P2
-        stale footer-copy issue. Rows #16/#17 stay below 100% until Claude Code
-        completes the reserved second bug-bash pass and production verification
-        follows the push.
+        stale footer-copy issue. Cursor's implementation is merged; rows #16/#17
+        stay below 100% until Claude Code completes the reserved second bug-bash
+        pass and production verification follows the push.
   - [x] Samskara Muhurtas: Mundan/tonsure, Namakaran, Annaprashan, Vidyarambha and
         Upanayana, with tradition and regional conventions stated.
   - [ ] Birth-chart-personalized Muhurat only after its method is sourced and

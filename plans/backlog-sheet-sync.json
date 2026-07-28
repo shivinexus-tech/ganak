@@ -173,15 +173,15 @@
       "recommendedAction": "Choose backend hosting, set production API_KEYS and origins, deploy the API, run live contract/abuse/quota smoke against the production base URL, then plan shared durable quota/key storage before multi-instance scale."
     },
     "12": {
-      "deliveryState": "Core overlay delivered; UI placement decision open",
-      "limitations": "Empty holiday cards are removed and live-verified. The off/national/gazetted control still needs an owner-approved discoverable location outside the Daily answer area; its final phone/desktop and EN/HI bug bash remains.",
-      "shortTermImpact": "Daily dates without a selected holiday no longer show a distracting empty card. Until placement is decided, users may not discover the overlay control from an empty Daily date.",
+      "deliveryState": "Implemented on main — final QA and production verification pending",
+      "limitations": "Empty holiday cards are removed and the off/national/gazetted control is placed in the Daily calendar-options row. Final EN/HI phone/desktop bug bash, URL-restoration check, calendar-marker discovery and production verification remain open.",
+      "shortTermImpact": "Users are no longer shown a distracting empty holiday card, and the overlay control has a concrete home near the calendar convention selector. The final risk is discoverability/usability until the focused bug bash is recorded.",
       "longTermImpact": "A poor control location could either clutter the primary Panchang answer or make optional government overlays hard to discover.",
-      "bugBashStatus": "Required before re-closing this high-impact calendar journey — pending after owner-approved placement is implemented.",
+      "bugBashStatus": "Required before re-closing this high-impact calendar journey — Codex owns the final EN/HI phone/desktop bug bash after the 2026-07-28 Cursor handoff cleanup.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-23 · Production: ordinary date hides empty card; Republic Day still renders",
+      "lastVerified": "2026-07-28 · Code merged on main from Cursor commit 34bdd47; production verification still pending after this coordination pass",
       "sourceConfidence": "Primary government holiday source; non-religious overlay",
-      "recommendedAction": "Approve the permanent holiday-overlay control location, implement it outside the Daily answer area, then complete EN/HI phone/desktop discovery, URL-restoration and calendar-marker bug-bash verification."
+      "recommendedAction": "Run Codex-owned EN/HI phone/desktop discovery, URL-restoration and calendar-marker bug-bash verification, then verify production before marking 100%."
     },
     "25": {
       "deliveryState": "Time-based Prashna polish delivered; 249 number engine not started",
@@ -196,14 +196,14 @@
     },
     "29": {
       "deliveryState": "Reopened by owner — unacceptable festival/fast page quality",
-      "limitations": "Existing pages are not launch-quality. Route/profile/hero/timing gates passed, but owner review found the festival and fast pages poor enough that the prior Green status is invalid.",
+      "limitations": "Existing pages are not launch-quality. Route/profile/hero/timing gates passed, but owner review found the festival and fast pages poor enough that the prior Green status is invalid. The real raster-hero pipeline and first three images are preserved, but remaining festival heroes are part of the reopened quality work.",
       "shortTermImpact": "Users may reach dedicated festival/fast URLs, but the page content cannot be trusted as a polished Ganak experience until every page is audited and rewritten where needed.",
       "longTermImpact": "Leaving weak devotional pages live would damage religious trust, source credibility and launch confidence across one of Ganak's core public journeys.",
       "bugBashStatus": "Required before Green: at least five recorded iterative audit/test/fix rounds across the full festival and fast inventory, performed by a minimum of two agents. No qualifying rounds are recorded after the owner rejection.",
       "qualityRisk": "Red",
       "lastVerified": "2026-07-24 · Owner quality rejection after spot-check; previous automated gates are insufficient quality evidence",
       "sourceConfidence": "Mixed textual, institutional and regional sources across the published corpus; item-level source and copy quality must be re-audited page by page",
-      "recommendedAction": "Create a dedicated P0 audit/rewrite task for every festival, vrat, fast, recurring observance and named variant; inventory route-level defects; rewrite weak EN/HI content; strengthen semantic/devotional/timing/hero gates; complete five iterative rounds with at least two agents; then rerun full gates, phone/desktop smoke and production verification before restoring Green."
+      "recommendedAction": "Create a dedicated P0 audit/rewrite task for every festival, vrat, fast, recurring observance and named variant; inventory route-level defects; rewrite weak EN/HI content; complete the remaining raster hero batches; strengthen semantic/devotional/timing/hero gates; complete five iterative rounds with at least two agents; then rerun full gates, phone/desktop smoke and production verification before restoring Green."
     },
     "14": {
       "deliveryState": "Delivered — production verification pending",
@@ -228,24 +228,24 @@
       "recommendedAction": "No corrective action required; spot-check `/festival/surya-grahan` and `/festival/chandra-grahan` in EN/HI after deploy."
     },
     "16": {
-      "deliveryState": "Implemented locally — second bug bash and production verification pending",
+      "deliveryState": "Merged on main — second bug bash and production verification pending",
       "limitations": "Marriage, engagement and housewarming have distinct finder chips, guidance, rule tables, blockers and clean windows, but the owner-required second independent bug bash is not complete and the pushed build has not yet been verified live.",
-      "shortTermImpact": "Users can locally get separate ranked Muhurat results for marriage, engagement and housewarming instead of a generic date list.",
+      "shortTermImpact": "Users should receive separate ranked Muhurat results for marriage, engagement and housewarming instead of a generic date list once production verification confirms the merged build.",
       "longTermImpact": "The shared deep-muhurats gate prevents these relationship/home-entry categories from silently collapsing back into one generic score.",
-      "bugBashStatus": "First Cursor bug bash completed 2026-07-24; one P2 stale-footer copy issue was fixed. Claude Code second pass is reserved in plans/claude-task-muhurat-full-parity-testing.md.",
+      "bugBashStatus": "First Cursor bug bash completed 2026-07-24; one P2 stale-footer copy issue was fixed. 2026-07-28: Cursor row closed as handed off; Claude Code second pass remains reserved in plans/claude-task-muhurat-full-parity-testing.md.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-24 · Local fresh port :5303 EN engagement/travel/documents and HI 390px documents; focused gates green; not production-verified",
+      "lastVerified": "2026-07-28 · Merged code present on main from 11083dd; latest evidence remains local :5303 smoke and focused gates; not production-verified",
       "sourceConfidence": "Published 2026 New Delhi Muhurat rule tables/anchors plus Drik-style wedding and housewarming shuddhi gates",
       "recommendedAction": "Have Claude Code run the reserved second bug bash, fix any findings, then verify the deployed production route before marking 100%."
     },
     "17": {
-      "deliveryState": "Implemented locally — second bug bash and production verification pending",
+      "deliveryState": "Merged on main — second bug bash and production verification pending",
       "limitations": "Bhoomi Puja, construction, business, travel and documents have distinct finder chips, guidance, rule tables, blockers and clean windows, but the owner-required second independent bug bash is not complete and the pushed build has not yet been verified live.",
-      "shortTermImpact": "Users can locally get separate ranked Muhurat results for Bhoomi, construction, business, travel and document signing/registration; Travel uses Char/Labh/Amrit/Shubh while Documents/Business avoid Char leakage.",
+      "shortTermImpact": "Users should receive separate ranked Muhurat results for Bhoomi, construction, business, travel and document signing/registration once production verification confirms the merged build; Travel uses Char/Labh/Amrit/Shubh while Documents/Business avoid Char leakage.",
       "longTermImpact": "The deep-muhurats gate locks category-specific rule sets and clean-window behavior so these journeys do not regress to generic purchase/business logic.",
-      "bugBashStatus": "First Cursor bug bash completed 2026-07-24; one P2 stale-footer copy issue was fixed. Claude Code second pass is reserved in plans/claude-task-muhurat-full-parity-testing.md.",
+      "bugBashStatus": "First Cursor bug bash completed 2026-07-24; one P2 stale-footer copy issue was fixed. 2026-07-28: Cursor row closed as handed off; Claude Code second pass remains reserved in plans/claude-task-muhurat-full-parity-testing.md.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-24 · Local fresh port :5303 EN engagement/travel/documents and HI 390px documents; focused gates green; not production-verified",
+      "lastVerified": "2026-07-28 · Merged code present on main from 11083dd; latest evidence remains local :5303 smoke and focused gates; not production-verified",
       "sourceConfidence": "Published 2026 New Delhi Bhoomi/business/travel/document rule tables plus activity-specific clean-window regression gates",
       "recommendedAction": "Have Claude Code run the reserved second bug bash, fix any findings, then verify the deployed production route before marking 100%."
     }
