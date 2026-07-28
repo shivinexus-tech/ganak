@@ -7,6 +7,7 @@ const { loadApp } = require('./_load-app.cjs');
 const engine = loadApp('src/engine/festivals.ts');
 const meta = loadApp('src/data/festival-meta.ts');
 const pages = loadApp('src/data/festival-pages.ts');
+const screen = loadApp('src/screens/FestivalGuideScreen.tsx');
 
 // Independent fixture: deliberately not imported from either app table.
 const EKADASHI_FIXTURE = Object.freeze({
@@ -80,11 +81,16 @@ console.log('PASS  800-day live scan produces every named Ekadashi and weekday P
 for (const [oldPath, canonicalPath] of Object.entries(pages.FESTIVAL_LEGACY_PATH_REDIRECTS)) {
   assert(!pages.FESTIVAL_PAGE_ROUTES[oldPath], `${oldPath} must not remain a second live identity`);
   assert(pages.FESTIVAL_PAGE_ROUTES[canonicalPath], `${oldPath} redirect target must resolve`);
+  assert.strictEqual(
+    screen.festivalGuideFromPath(oldPath),
+    screen.festivalGuideFromPath(canonicalPath),
+    `${oldPath} must resolve the canonical route object`,
+  );
 }
 assert.strictEqual(
   pages.FESTIVAL_LEGACY_PATH_REDIRECTS['/festival/nrisimha-jayanti'],
   '/festival/narasimha-jayanti',
 );
-console.log('PASS  incorrect historical slugs have canonical, non-duplicating redirect targets');
+console.log('PASS  incorrect historical slugs resolve canonical content without duplicate route ownership');
 
 console.log('\nFESTIVAL VARIANT IDENTITY PASSED');

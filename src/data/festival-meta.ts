@@ -192,3 +192,30 @@ export const FEST_META = {
   dattatreyaJayanti: { deity: { en: "Dattatreya", hi: "दत्तात्रेय" }, gloss: { en: "Birth anniversary of Lord Dattatreya — Margashirsha Purnima", hi: "भगवान दत्तात्रेय जयंती — मार्गशीर्ष पूर्णिमा" }, rules: { en: "Same tithi as Bhairavi and Annapurna Jayanti", hi: "भैरवी व अन्नपूर्णा जयंती के समान तिथि" }, timing: null },
   swaminarayanJayanti: { deity: { en: "Swaminarayan", hi: "स्वामीनारायण" }, gloss: { en: "Birth anniversary of Bhagwan Swaminarayan — Chaitra Shukla Navami", hi: "भगवान स्वामीनारायण जयंती — चैत्र शुक्ल नवमी" }, rules: { en: "Same tithi as Ram Navami; Ganak uses the Udaya Navami day (Drik Delhi)", hi: "राम नवमी के समान तिथि; गणक उदय नवमी दिवस (दृक दिल्ली)" }, timing: null },
 };
+
+// Route timing contracts for deciding-kala rules already implemented by the
+// festival engine. Values describe what the guide must calculate and display.
+Object.assign(FEST_META, {
+  ramNavami: { ...FEST_META.ramNavami, timing: "madhyahna" },
+  hanumanJ: { ...FEST_META.hanumanJ, timing: "sunrise" },
+  sitaNavami: { ...FEST_META.sitaNavami, timing: "sunrise" },
+  narasimhaJayanti: { ...FEST_META.narasimhaJayanti, timing: "sunrise" },
+  guruPurnima: { ...FEST_META.guruPurnima, timing: "sunrise" },
+  hartalikaTeej: { ...FEST_META.hartalikaTeej, timing: "sunrise" },
+  anantChaturdashi: { ...FEST_META.anantChaturdashi, timing: "aparahna" },
+  mahaAshtami: { ...FEST_META.mahaAshtami, timing: "sunrise" },
+  mahaNavami: { ...FEST_META.mahaNavami, timing: "aparahna" },
+  dussehra: { ...FEST_META.dussehra, timing: "aparahna" },
+  sharadPurnima: { ...FEST_META.sharadPurnima, timing: "midnight" },
+  bhaiDooj: { ...FEST_META.bhaiDooj, timing: "aparahna" },
+  tulasiVivah: { ...FEST_META.tulasiVivah, timing: "aparahna" },
+  gitaJayanti: { ...FEST_META.gitaJayanti, timing: "sunrise" },
+  pitruPakshaBegins: { ...FEST_META.pitruPakshaBegins, timing: "aparahna-shraddha" },
+  sarvaPitruAmavasya: { ...FEST_META.sarvaPitruAmavasya, timing: "aparahna-shraddha" },
+});
+
+// Null no longer ambiguously means "finished date-only page". These routes are
+// explicitly queued for timing review; no clock window is guessed for them.
+for (const meta of [...Object.values(FEST_META), ...Object.values(OBS_META)]) {
+  meta.timingStatus = meta.timing ? "implemented" : "date-only-pending-review";
+}
