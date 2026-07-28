@@ -515,22 +515,58 @@
     "33": {
       "section": "P0",
       "title": "Sade Sati calculator/report",
-      "technicalComplexity": "Medium"
+      "technicalComplexity": "Medium",
+      "deliveryState": "Not delivered — reserved for Wave 1",
+      "limitations": "Only a basic current-date Sade Sati check exists today; full periods/report copy and UI wiring are pending.",
+      "shortTermImpact": "Users can see a basic status only, not a launch-quality report with phase boundaries.",
+      "longTermImpact": "Without the full report, Sade Sati cannot support alerts, saved chart journeys or credible Jyotish depth.",
+      "bugBashStatus": "Not started",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · local repo coordination audit",
+      "sourceConfidence": "Needs rule/source review",
+      "recommendedAction": "Run `CODEX-P0-SADE-SATI-REPORT-33` Wave 1, then wire through `INTEGRATOR-P0-JYOTISH-CALC-WIRE-33-36`."
     },
     "34": {
       "section": "P0",
       "title": "Mangal Dosha three-reference analysis",
-      "technicalComplexity": "Medium"
+      "technicalComplexity": "Medium",
+      "deliveryState": "Partially delivered — reserved for Wave 1",
+      "limitations": "Basic Lagna/Moon/Venus logic exists, but sourced exception/cancellation presentation and standalone report depth are pending.",
+      "shortTermImpact": "Users may get a result, but not enough explanation for sensitive marriage-context interpretation.",
+      "longTermImpact": "Weak explanation risks fear-based or oversimplified readings unless exceptions and caveats are proven.",
+      "bugBashStatus": "Not started for full three-reference report",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · local repo coordination audit",
+      "sourceConfidence": "Needs exception/source review",
+      "recommendedAction": "Run `CLAUDE-P0-MANGAL-THREE-REF-34` Wave 1, then wire through `INTEGRATOR-P0-JYOTISH-CALC-WIRE-33-36`."
     },
     "35": {
       "section": "P0",
       "title": "Arudha, Bhavabala, Special Lagnas/Upagrahas",
-      "technicalComplexity": "Medium"
+      "technicalComplexity": "Medium",
+      "deliveryState": "Partially delivered — presentation reserved",
+      "limitations": "Engines and current ChartScreen panels exist, but answer-first explanation, anchors and panel-quality proof are not complete.",
+      "shortTermImpact": "Technical users can inspect data; household users may not understand what the panels mean.",
+      "longTermImpact": "Dense specialist panels weaken Ganak's answer-before-data principle unless presentation is improved.",
+      "bugBashStatus": "Not completed for these panels",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · local repo coordination audit",
+      "sourceConfidence": "Existing engine; presentation/anchor confidence pending",
+      "recommendedAction": "Run `CURSOR-P0-ARUDHA-BHAVA-SPECIAL-35` inside the exact ChartScreen sections only."
     },
     "36": {
       "section": "P0",
       "title": "Ruling Planets",
-      "technicalComplexity": "Medium"
+      "technicalComplexity": "Medium",
+      "deliveryState": "Partially delivered — rule proof reserved",
+      "limitations": "Ruling Planets are computed/displayed, but canonical KSK rule map, ranking proof and source-backed UI claims are pending.",
+      "shortTermImpact": "The panel exists but should not be overstated as a completed KP/RP feature.",
+      "longTermImpact": "Unproven RP rules could contaminate Prashna/KP interpretation if reused without source anchors.",
+      "bugBashStatus": "Not started for completed RP report",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-28 · local repo coordination audit",
+      "sourceConfidence": "Needs KSK primary-source verification",
+      "recommendedAction": "Run `CODEX-P0-RULING-PLANETS-RULEMAP-36` before any UI expansion."
     },
     "37": {
       "section": "P0",
