@@ -7,6 +7,11 @@ import { SEQUENCE_GUIDES } from "./sequence-guides";
 import { GRAHAN_GUIDES } from "./grahan-guides";
 import { VRAT_GUIDE_ENRICHMENTS } from "./vrat-guide-enrichments";
 import { REGIONAL_KATHAS } from "./regional-kathas";
+import {
+  GANESH_AARTI, LAKSHMI_AARTI, OM_JAI_JAGDISH_HARE, OM_JAI_SHIV_OMKARA,
+  KUNJ_BIHARI_AARTI, SATYANARAYAN_AARTI, JAI_AMBE_GAURI_AARTI,
+  AMBE_TU_HAI_JAGDAMBE_AARTI, JAI_PARVATI_MATA_AARTI,
+} from "./aarti-texts";
 
 /* Vrat vidhi content — sourced from plans/vrat-vidhis.md. User-facing copy only;
    implementation and editorial instructions stay in plans, never in this object. */
@@ -29,6 +34,11 @@ export const VRAT_VIDHI_LABELS = {
   meaning: { en: "Why this day matters", hi: "इस दिन का महत्त्व" },
   stories: { en: "Regional kathas to read or hear", hi: "पढ़ने या सुनने योग्य क्षेत्रीय कथाएँ" },
   regional: { en: "Regional traditions", hi: "क्षेत्रीय परम्पराएँ" },
+  aarti: { en: "Aarti", hi: "आरती" },
+  aartiDisclaimer: {
+    en: "This is a widely-sung version; your family's wording may differ.",
+    hi: "यह व्यापक रूप से गाई जाने वाली आरती है; आपके परिवार की परम्परा में शब्द भिन्न हो सकते हैं।",
+  },
 };
 export const VRAT_VIDHI_SAFETY = {
   en: "This health note does not change the religious rule described below. Some vrats are traditionally nirjala (without food or water). Children, older people, anyone who is pregnant or breastfeeding, unwell, taking medicines, or living with diabetes, kidney disease or an eating disorder should seek medical advice and guidance from their family or religious tradition before observing a strict fast. Seek help if you become faint, confused, severely weak, cannot keep fluids down, or have unsafe blood-sugar symptoms. Never stop or retime prescribed medicine without medical advice.",
@@ -185,6 +195,7 @@ export const VRAT_VIDHI = {
       en: "Keep every flame on a stable non-flammable surface and supervised; protect children, elders, animals and respiratory patients from smoke and loud noise. Prefer lamps, community celebration and low-pollution alternatives. Never mix fasting with missed medicines or ignore medical dietary needs.",
       hi: "प्रत्येक दीप स्थिर अग्निरोधी सतह पर और निगरानी में रखें; बच्चों, बुज़ुर्गों, पशुओं तथा श्वास-रोगियों को धुएँ और तेज़ शोर से बचाएँ। दीप, सामुदायिक उत्सव और कम-प्रदूषण विकल्प चुनें। व्रत के कारण दवा न छोड़ें और चिकित्सकीय आहार-आवश्यकता की उपेक्षा न करें।",
     },
+    aartis: [GANESH_AARTI, LAKSHMI_AARTI, OM_JAI_JAGDISH_HARE],
   },
   ekadashi: {
     verdict: {
@@ -223,6 +234,7 @@ export const VRAT_VIDHI = {
     },
   },
   pradosh: {
+    aartis: [GANESH_AARTI, OM_JAI_SHIV_OMKARA],
     verdict: {
       en: "This twice-monthly Shiva observance falls when Trayodashi overlaps the local evening Pradosh period. Worship Shiva and Nandi in the time shown above.",
       hi: "यह मास में दो बार होने वाला शिव-व्रत उस दिन पड़ता है जब त्रयोदशी स्थानीय सायंकालीन प्रदोष से मिलती है। ऊपर दिखाए समय में शिव और नन्दी की पूजा करें।",
@@ -283,6 +295,7 @@ export const VRAT_VIDHI = {
     },
   },
   purnima: {
+    aartis: [GANESH_AARTI, SATYANARAYAN_AARTI, OM_JAI_JAGDISH_HARE],
     verdict: {
       en: "Satyanarayan puja may be done on many auspicious days; Purnima is especially common. Evening puja is practical because the fast can end with Panchamrit and prasad.",
       hi: "सत्यनारायण पूजा कई शुभ दिनों में हो सकती है; पूर्णिमा विशेष प्रचलित है। सायं पूजा के बाद पंचामृत-प्रसाद से व्रत खोलना सुविधाजनक है।",
@@ -341,6 +354,7 @@ export const VRAT_VIDHI = {
     },
   },
   masikShivaratri: {
+    aartis: [GANESH_AARTI, OM_JAI_SHIV_OMKARA],
     verdict: {
       en: "This monthly Shiva observance falls on Krishna Chaturdashi. Perform the main Shiva puja in the local Nishita (midnight) time shown above.",
       hi: "यह कृष्ण चतुर्दशी का मासिक शिव-व्रत है। ऊपर दिखाए स्थानीय निषीथ (मध्यरात्रि) समय में मुख्य शिव-पूजा करें।",
@@ -370,6 +384,7 @@ export const VRAT_VIDHI = {
     },
   },
   mahaShivaratri: {
+    aartis: [GANESH_AARTI, OM_JAI_SHIV_OMKARA],
     verdict: {
       en: "Eat once on Trayodashi, fast on Shivaratri, worship Shiva at night (once at Nishita or in four prahars), and break next morning inside the displayed paran window.",
       hi: "त्रयोदशी को एक बार भोजन, शिवरात्रि को व्रत, रात में शिव-पूजा (निषीथ में एक बार या चार प्रहर), और अगली सुबह दिखाए पारण समय में खोलें।",
@@ -399,6 +414,7 @@ export const VRAT_VIDHI = {
     },
   },
   chaitraNavratri: {
+    aartis: [GANESH_AARTI, JAI_AMBE_GAURI_AARTI, AMBE_TU_HAI_JAGDAMBE_AARTI, OM_JAI_SHIV_OMKARA],
     verdict: {
       en: "Chaitra Navratri begins with Ghatasthapana in the local Chaitra Shukla Pratipada morning time shown above. Worship Navadurga through the nine days; Rama Navami is the principal concluding festival on Navami.",
       hi: "चैत्र नवरात्रि ऊपर दिखाए स्थानीय चैत्र शुक्ल प्रतिपदा के प्रातः घटस्थापना से आरम्भ होती है। नौ दिनों तक नवदुर्गा पूजन करें; नवमी पर राम नवमी इसका प्रमुख समापन पर्व है।",
@@ -430,6 +446,7 @@ export const VRAT_VIDHI = {
     },
   },
   sharadNavratri: {
+    aartis: [GANESH_AARTI, JAI_AMBE_GAURI_AARTI, AMBE_TU_HAI_JAGDAMBE_AARTI, OM_JAI_SHIV_OMKARA],
     verdict: {
       en: "Sharad Navratri begins with Ghatasthapana in the local Ashwin Shukla Pratipada morning time shown above. Worship Navadurga through the nine nights, with Durga Ashtami, Maha Navami and Vijayadashami as the principal concluding observances.",
       hi: "शारदीय नवरात्रि ऊपर दिखाए स्थानीय आश्विन शुक्ल प्रतिपदा के प्रातः घटस्थापना से आरम्भ होती है। नौ रात नवदुर्गा पूजन करें; दुर्गाष्टमी, महानवमी और विजयादशमी इसके प्रमुख समापन पर्व हैं।",
@@ -566,6 +583,7 @@ export const VRAT_VIDHI = {
     },
   },
   karvaChauth: {
+    aartis: [GANESH_AARTI, JAI_PARVATI_MATA_AARTI, OM_JAI_SHIV_OMKARA],
     verdict: {
       en: "Karva Chauth is a festival where women fast for their husband's wellbeing, from sunrise until moonrise.",
       hi: "करवा चौथ वह पर्व है जिसमें महिलाएँ पति के मंगल के लिए सूर्योदय से चन्द्रोदय तक व्रत रखती हैं।",
@@ -595,6 +613,7 @@ export const VRAT_VIDHI = {
     },
   },
   ahoiAshtami: {
+    aartis: [GANESH_AARTI, JAI_PARVATI_MATA_AARTI, OM_JAI_SHIV_OMKARA],
     verdict: {
       en: "A North-Indian fast for the wellbeing of all children, kept from dawn until the stars are visible; households with a moonrise tradition complete it after Chandra darshan.",
       hi: "सभी बच्चों के मंगल के लिए उत्तर भारतीय व्रत, प्रातः से तारों के दर्शन तक; कुछ कुल चन्द्रोदय तक रखते हैं।",
@@ -624,6 +643,7 @@ export const VRAT_VIDHI = {
     },
   },
   hartalikaTeej: {
+    aartis: [GANESH_AARTI, OM_JAI_SHIV_OMKARA, JAI_PARVATI_MATA_AARTI],
     verdict: {
       en: "Hartalika Teej is traditionally observed as a nirjala fast, with Shiva-Parvati worship in the early-morning Hartalika time shown above. Follow the puja and completion rule of your family tradition.",
       hi: "हरतालिका तीज परम्परागत रूप से निर्जला व्रत है। ऊपर दिखाए प्रातः हरतालिका समय में शिव-पार्वती पूजा करें और कुल-परम्परा की पूजा व समापन-विधि मानें।",
@@ -719,6 +739,7 @@ export const VRAT_VIDHI = {
     },
   },
   ganeshChaturthi: {
+    aartis: [GANESH_AARTI],
     verdict: {
       en: "Worship Ganesha in the local Madhyahna (midday) time shown above. Home installation is optional; an already worshipped household murti is not treated as a new temporary idol and is not immersed.",
       hi: "ऊपर दिखाए स्थानीय मध्याह्न समय में गणेश-पूजा करें। घर में नई स्थापना वैकल्पिक है; नित्य-पूजित गृह-मूर्ति को नई अस्थायी प्रतिमा मानकर विसर्जित नहीं किया जाता।",
@@ -748,6 +769,7 @@ export const VRAT_VIDHI = {
     },
   },
   janmashtami: {
+    aartis: [GANESH_AARTI, KUNJ_BIHARI_AARTI, OM_JAI_JAGDISH_HARE],
     verdict: {
       en: "Fast during the day and worship Bal Krishna in the local Nishita (midnight) time. Smarta and ISKCON/Vaishnava dates and paran can differ, so follow one tradition consistently.",
       hi: "दिन में व्रत रखें और स्थानीय निषीथ (मध्यरात्रि) में बालकृष्ण की पूजा करें। स्मार्त और इस्कॉन/वैष्णव तिथि व पारण अलग हो सकते हैं, इसलिए एक ही परम्परा लगातार मानें।",

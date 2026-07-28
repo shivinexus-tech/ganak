@@ -55,14 +55,31 @@ Rules:
 - Include an aarti only where it is genuinely customary; do not pad to reach three.
 - Confirmed per-festival list lives in the spec once the owner signs off.
 
+**Fidelity rule (owner, 2026-07-28) — favour the full sung form, since the app is for
+singing along:**
+- **Keep echo / call-and-response repeat lines** where an aarti is traditionally sung
+  that way (e.g. Om Jai Jagdish Hare's "स्वामी …" half-line after the first line of each
+  verse). Do not condense them to bare couplets.
+- **Include commonly-sung optional stanzas** (e.g. Ganesh "दीनन की लाज राखो …"), keeping a
+  single clean base version — do NOT inline parenthetical word-variants (पान/हार,
+  तिलक/सिन्दूर); the bottom "your family's wording may differ" note covers those.
+- **Refrain shown once + short cue after each verse** (owner-approved layout, 2026-07-28):
+  the full **refrain** is written **once** at the top; between verses it is **not** repeated
+  in full — instead each stanza is followed by a short **cue** (the refrain's opening words +
+  " …", e.g. "जय गणेश …", "ॐ जय लक्ष्मी माता …", "ॐ जय जगदीश हरे …") that marks the return.
+  Both the top refrain and the cues render in the accent (gold) colour; stanzas in ink.
+- **No repeat markers**: do not add "sing twice" markers — neither Latin `x2` nor Devanagari
+  "(२ बार)". The cue already signals the repetition. (Latin is forbidden in verses regardless.)
+
 ## 3. Layout / rendering
 
 - Each aarti = one collapsible `<details>` in `VratVidhiCard`, titled from `title`.
 - The aarti block sits **after the Puja section**, before the kathas.
 - **English meaning** (`intro.en`) shows above the verses in **English mode only**;
   Hindi mode shows `intro.hi` or nothing.
-- Verses render in `white-space: pre-line` (line breaks preserved), Devanagari in
-  both language modes.
+- Data shape per aarti: `{ title, intro, refrain, cue, stanzas[] }`. Render order:
+  `refrain` (gold, `white-space: pre-line`) → for each stanza: the stanza (ink,
+  pre-line) then the `cue` (gold). Devanagari in both language modes.
 - **One shared disclaimer** at the **bottom** of the whole aarti block, in small
   muted text (`T.fMicro`, `C.muted`):
   - EN: "This is a widely-sung version; your family's wording may differ."
@@ -84,10 +101,23 @@ Rules:
 ## 5. Validation hooks (for `validation/festival-aarti.cjs`)
 
 - Every Phase-1 guide key has a non-empty `aartis` array.
-- Each aarti: non-empty `title`, `intro`, `verses`; `verses` contains Devanagari
-  (range `ऀ`–`ॿ`) and ≥ 4 non-empty lines.
-- Orthography spot-checks: reject `ओम्` in verses (must be `ॐ`); reject Latin letters
-  inside verse text.
-- First-line anchor per named aarti (catches a wrong/swapped aarti).
+- Each aarti: non-empty `title`, `intro`, `refrain`, `cue`, and a non-empty `stanzas`
+  array. Combined text (`refrain` + `cue` + all `stanzas`) contains Devanagari
+  (range `ऀ`–`ॿ`) and ≥ 4 non-empty lines; `cue` is a single short line.
+- Orthography spot-checks: reject `ओम्` (must be `ॐ`); reject Latin letters anywhere in
+  the aarti text.
+- Refrain first-line anchor per named aarti (catches a wrong/swapped aarti).
 - Explicit allow-list of guides that correctly carry **no** aarti (eclipses, Makar
   Sankranti Surya arghya, plain Ekadashi/Pradosh timing pages).
+
+---
+
+## 6. Source citations (per aarti)
+
+Cross-validated Devanagari sources. drikpanchang.com is the primary anchor (an
+app-approved host); a second/third source is checked per aarti during drafting.
+
+### Diwali proof slice (verified 2026-07-26)
+- **Ganesh — Jai Ganesh Deva:** drikpanchang `/lyrics/aarti/shree-ganesh/jay-ganesh-aarti.html` (hi). Standard couplet form; parenthetical regional variants and `x2` repeat markers dropped for a clean single reading.
+- **Lakshmi — Om Jai Lakshmi Mata:** drikpanchang `/lyrics/aarti/lakshmi-mata/lakshmi-mata-aarti.html` (hi). Full 8-stanza form.
+- **Om Jai Jagdish Hare:** drikpanchang `/lyrics/aarti/lord-narayan/jai-jagdish-aarti.html` (hi). Standard couplet form (echo half-lines condensed). **Note:** source has a typo `स्वमी` in one line — corrected to `स्वामी` here (example of why 2–3 sources are cross-checked).

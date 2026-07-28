@@ -90,6 +90,35 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
           ))}
           {section(lbl("sankalpa"), <span style={{ fontStyle: "italic" }}>{txt(data.sankalpa)}</span>)}
           {section(lbl("puja"), pujaBody)}
+          {data.aartis && data.aartis.length > 0 && (
+            <div style={{ marginTop: 8 }}>
+              <div style={{ ...T.label, color: C.gold, marginBottom: 3 }}>{lbl("aarti")}</div>
+              {data.aartis.map((a, i) => (
+                <details key={i} style={{ borderTop: `1px solid ${C.line}`, paddingTop: 8, marginTop: i ? 6 : 0 }}>
+                  <summary style={{ color: C.gold, fontWeight: 700, cursor: "pointer" }}>
+                    {txt(a.title)}
+                  </summary>
+                  {a.intro && txt(a.intro) && (
+                    <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5, margin: "6px 0" }}>
+                      {txt(a.intro)}
+                    </div>
+                  )}
+                  <div style={{ fontSize: T.fSmall, lineHeight: 1.8, marginTop: 6 }}>
+                    <div style={{ whiteSpace: "pre-line", color: C.gold, fontWeight: 600 }}>{a.refrain}</div>
+                    {a.stanzas.map((s, j) => (
+                      <React.Fragment key={j}>
+                        <div style={{ whiteSpace: "pre-line", color: C.ivory, marginTop: "1em" }}>{s}</div>
+                        <div style={{ color: C.gold, fontWeight: 600, marginTop: "0.1em" }}>{a.cue}</div>
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </details>
+              ))}
+              <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5, marginTop: 8 }}>
+                {lbl("aartiDisclaimer")}
+              </div>
+            </div>
+          )}
           {data.stories && section(lbl("stories"), (
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {data.stories.map((story, i) => {

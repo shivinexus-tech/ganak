@@ -2,6 +2,11 @@
 // resolved only to calendar metadata. Editorial sources and scope decisions are
 // recorded in plans/major-festival-guide-research.md.
 
+import {
+  GANESH_AARTI, LAKSHMI_AARTI, OM_JAI_JAGDISH_HARE,
+  KUNJ_BIHARI_AARTI, RAMAYANA_AARTI, HANUMAN_AARTI,
+} from "./aarti-texts";
+
 const p = (en, hi) => ({ en, hi });
 const list = (items) => items.map(([en, hi]) => p(en, hi));
 const guide = (x) => ({
@@ -10,6 +15,7 @@ const guide = (x) => ({
   stories: list(x.stories), regional: list(x.regional), paran: p(...x.paran),
   udyapan: p(...x.udyapan),
   ...(x.safety ? { safety: p(...x.safety) } : {}),
+  ...(x.aartis ? { aartis: x.aartis } : {}),
 });
 
 const completion = (en, hi) => ({ udyapan: [en, hi] });
@@ -57,6 +63,7 @@ export const MAJOR_FESTIVAL_GUIDES = {
     paran: ["No paran applies unless a family undertook a separate fast; complete that declared vow according to its own rule.", "अलग पारिवारिक व्रत न हो तो पारण लागू नहीं; घोषित संकल्प हो तो उसी नियम से पूरा करें।"], ...COMPLETION.rangwaliHoli,
   }),
   ramNavami: guide({
+    aartis: [GANESH_AARTI, RAMAYANA_AARTI, OM_JAI_JAGDISH_HARE],
     verdict: ["Worship Shri Rama and hear the Ramayana, with the principal birth observance at local Madhyahna. Fasting is common but its level follows family or temple practice.", "श्रीराम की पूजा और रामायण श्रवण करें; मुख्य जन्मोत्सव स्थानीय मध्याह्न में रखें। व्रत प्रचलित है पर उसका स्तर परिवार या मंदिर की परम्परा से लें।"],
     meaning: ["Rama Navami marks Rama's birth on Chaitra Shukla Navami and concludes Chaitra Navratri in many homes. Rama is remembered as an exemplar of dharma, responsibility and service.", "राम नवमी चैत्र शुक्ल नवमी पर श्रीराम जन्म और अनेक घरों में चैत्र नवरात्रि का समापन है। राम धर्म, उत्तरदायित्व और सेवा के आदर्श रूप में स्मरण किए जाते हैं।"],
     vidhi: [["Bathe, clean the altar and place Rama with Sita, Lakshmana and Hanuman where customary.", "स्नान, वेदी की सफाई और परम्परानुसार सीता, लक्ष्मण व हनुमान सहित राम की स्थापना करें।"], ["Read or hear the birth section or another familiar Ramayana passage and chant Rama's name.", "जन्म प्रसंग या परिचित रामायण अंश पढ़ें-सुनें और राम-नाम जपें।"], ["At Madhyahna offer flowers, fruit or panakam, perform aarti and share prasad.", "मध्याह्न में फूल, फल या पानकम अर्पित कर आरती और प्रसाद करें।"]],
@@ -68,6 +75,7 @@ export const MAJOR_FESTIVAL_GUIDES = {
     paran: ["Break after the Madhyahna birth worship or according to the completing Chaitra Navratri rule received from family or temple.", "मध्याह्न जन्म-पूजन बाद या परिवार-मंदिर से मिले चैत्र नवरात्रि समापन नियम से पारण करें।"], ...COMPLETION.ramNavami,
   }),
   hanumanJ: guide({
+    aartis: [HANUMAN_AARTI, RAMAYANA_AARTI],
     verdict: ["Worship Hanuman, recite a familiar Hanuman text or name, and offer simple prasad. The worship time and fasting rule differ by regional calendar, so use the date and practice shown for your tradition.", "हनुमान पूजन, परिचित हनुमान पाठ या नाम-जप और सरल प्रसाद करें। पूजा-समय व व्रत क्षेत्रीय पंचांग से बदलते हैं, इसलिए अपनी परम्परा की तिथि-विधि मानें।"],
     meaning: ["This Jayanti honours Hanuman's birth and his strength, wisdom, humility and service to Rama. Chaitra Purnima is the widely used North Indian date; several regional traditions observe Hanuman Jayanti on another date.", "यह जयंती हनुमान जन्म तथा उनकी शक्ति, बुद्धि, विनम्रता और राम-सेवा का सम्मान है। चैत्र पूर्णिमा व्यापक उत्तर भारतीय तिथि है; अनेक क्षेत्रीय परम्पराएँ हनुमान जयंती किसी अन्य तिथि पर मनाती हैं।"],
     vidhi: [["Bathe, clean the altar and remember Rama before Hanuman.", "स्नान, वेदी की सफाई और हनुमान से पहले राम-स्मरण करें।"], ["Offer flowers, fruit and sindoor only in the manner accepted by the temple or household image.", "फूल, फल और सिंदूर केवल मंदिर या गृह-मूर्ति की मान्य विधि से अर्पित करें।"], ["Recite Hanuman Chalisa, Sundara Kanda, names or bhajan according to capacity and complete with aarti-prasad.", "सामर्थ्य से हनुमान चालीसा, सुंदरकांड, नाम या भजन करके आरती-प्रसाद करें।"]],
@@ -123,6 +131,7 @@ export const MAJOR_FESTIVAL_GUIDES = {
     paran: ["Complete a Navratri fast according to its displayed local paran rule; Dussehra itself has no separate universal paran.", "नवरात्रि व्रत को दिखाए स्थानीय पारण नियम से पूरा करें; दशहरे की पारण-रीति अपने गृह-अनुष्ठान से रखें।"], ...COMPLETION.dussehra,
   }),
   dhanteras: guide({
+    aartis: [GANESH_AARTI, LAKSHMI_AARTI, OM_JAI_JAGDISH_HARE],
     verdict: ["In the local Pradosha period, worship Lakshmi and Dhanvantari according to family custom and place a supervised Yama Deepa safely. Buying metal or gold is optional and should never create debt.", "स्थानीय प्रदोष काल में कुलानुसार लक्ष्मी और धन्वंतरि पूजन तथा सुरक्षित निगरानी में यम दीप रखें। धातु या सोना खरीदना वैकल्पिक है और उससे ऋण नहीं लेना चाहिए।"],
     meaning: ["Dhantrayodashi begins the principal Diwali sequence in many regions. It joins prayers for well-being and responsible prosperity with Dhanvantari remembrance and the Yama Deepa custom.", "धनत्रयोदशी अनेक क्षेत्रों में मुख्य दीपावली क्रम आरम्भ करती है। यह कल्याण और उत्तरदायी समृद्धि की प्रार्थना को धन्वंतरि-स्मरण और यम दीप से जोड़ती है।"],
     vidhi: [["Clean the entrance and altar; prepare a stable lamp, flowers, water and simple naivedya.", "प्रवेश और वेदी साफ कर स्थिर दीप, फूल, जल और सरल नैवेद्य रखें।"], ["During Pradosha worship Lakshmi, Dhanvantari or the family deity without promising medical or financial miracles.", "प्रदोष में लक्ष्मी, धन्वंतरि या कुलदेव पूजन करें, चिकित्सा या धन के चमत्कार का दावा न करें।"], ["Place Yama Deepa only in a safe customary location, supervised until extinguished.", "यम दीप केवल सुरक्षित पारम्परिक स्थान पर रखें और बुझने तक निगरानी करें।"]],
@@ -145,6 +154,7 @@ export const MAJOR_FESTIVAL_GUIDES = {
     paran: ["Paran follows the household observance. If a fast is kept, complete it after the morning bath and worship according to family custom.", "पारण की रीति अपने गृह-अनुष्ठान से रखें। व्रत हो तो प्रातः स्नान-पूजा बाद कुलानुसार खोलें।"], ...COMPLETION.narakChaturdashi,
   }),
   govardhanPuja: guide({
+    aartis: [GANESH_AARTI, KUNJ_BIHARI_AARTI, OM_JAI_JAGDISH_HARE],
     verdict: ["Worship Krishna and Govardhan and offer Annakut according to household capacity during the local Pratipada period. A small home meal offered with gratitude is valid; food waste is not required.", "स्थानीय प्रतिपदा काल में गृह-सामर्थ्य अनुसार कृष्ण-गोवर्धन पूजा और अन्नकूट भोग करें। कृतज्ञता से अर्पित छोटा पारिवारिक भोजन मान्य है; भोजन की बर्बादी आवश्यक नहीं।"],
     meaning: ["Govardhan Puja follows Diwali and remembers Krishna sheltering Braj beneath Govardhan, teaching humility, ecological care and gratitude for food, cattle and land.", "गोवर्धन पूजा दीपावली के बाद कृष्ण द्वारा ब्रज को गोवर्धन तले आश्रय देने की कथा स्मरण करती है—विनम्रता, प्रकृति, अन्न, गौ और भूमि के प्रति कृतज्ञता।"],
     vidhi: [["Clean the altar and make a small Govardhan representation only from safe, locally accepted material, or use an image.", "वेदी साफ कर सुरक्षित स्थानीय मान्य सामग्री से छोटा गोवर्धन रूप या चित्र रखें।"], ["Offer water, flowers, Tulsi, seasonal foods and the family's meal to Krishna-Govardhan.", "जल, फूल, तुलसी, मौसमी अन्न और पारिवारिक भोजन कृष्ण-गोवर्धन को अर्पित करें।"], ["Perform aarti or symbolic circumambulation, distribute all edible food and avoid waste.", "आरती या प्रतीकात्मक परिक्रमा, समस्त खाद्य प्रसाद वितरण और अपव्यय से बचें।"]],
