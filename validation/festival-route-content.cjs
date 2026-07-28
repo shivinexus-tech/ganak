@@ -22,6 +22,7 @@ const REQUIRED_PAIRS = ['identity', 'meaning', 'practice', 'verdict', 'completio
 const PRODUCT_META = /\bGanak\b|गणक/u;
 const ENGLISH_IN_HINDI = /\b(?:the|this|festival|worship|fast|puja|complete|temple|day|guide|timing|local)\b/i;
 const GENERIC = /^(?:observe|honour|worship|complete) (?:this|the) (?:festival|observance|fast|day)\b/i;
+const NAME_ONLY_VARIANT_HI = /(?:की नामित कथा सुनें, विष्णु-पूजन करें और चुना हुआ अन्न-रहित व्रत रखें|में शिव को जल, मान्य हो तो बिल्व और दीप अर्पित करें; लोक-फल को निश्चित न मानें)/u;
 
 function normalized(text) {
   return String(text || '').toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
@@ -43,6 +44,7 @@ function validate(content) {
     if (item.key !== key) problems.push(`${key}.key must equal registry key`);
     if (!['full', 'named-variant'].includes(item.kind)) problems.push(`${key}.kind is unsupported`);
     if (!VRAT_VIDHI[item.heroKey]) problems.push(`${key}.heroKey ${item.heroKey} is not an existing devotional/hero family`);
+    if (item.verdict !== item.practice) problems.push(`${key}.verdict must alias practice`);
 
     for (const field of REQUIRED_PAIRS) {
       for (const lang of ['en', 'hi']) {
@@ -67,6 +69,7 @@ function validate(content) {
     else identities.set(identity, key);
 
     if (item.kind === 'named-variant') {
+      if (NAME_ONLY_VARIANT_HI.test(item.practice.hi)) problems.push(`${key}.practice.hi is a name-only family template`);
       const all = normalized(`${item.identity.en} ${item.meaning.en} ${item.identity.hi} ${item.meaning.hi}`);
       const enAnchor = normalized(item.identity.en).split(' ')[0];
       const hiAnchor = normalized(item.identity.hi).split(' ')[0];
@@ -90,11 +93,14 @@ fixture.tulasiVivah.meaning.en = 'Observe this festival with devotion.';
 fixture.kaliPuja.practice.en = 'Ganak shows this puja timing.';
 fixture.kaliPuja.practice.hi = 'Follow the local temple timing.';
 fixture.onam.identity = structuredClone(fixture.vishu.identity);
+fixture.Jyeshtha_Shukla_11.practice.hi = 'निर्जला एकादशी की नामित कथा सुनें, विष्णु-पूजन करें और चुना हुआ अन्न-रहित व्रत रखें।';
+fixture.Jyeshtha_Shukla_11.verdict = fixture.Jyeshtha_Shukla_11.practice;
 const fixtureProblems = validate(fixture);
 assert(fixtureProblems.some((p) => p.includes('missing route content:') && p.includes('pongal')), 'fixture must reject missing coverage');
 assert(fixtureProblems.some((p) => p.includes('tulasiVivah.meaning.en is generic')), 'fixture must reject generic meaning');
 assert(fixtureProblems.some((p) => p.includes('kaliPuja.practice.en contains product-meta')), 'fixture must reject product-meta');
 assert(fixtureProblems.some((p) => p.includes('kaliPuja.practice.hi lacks Devanagari') || p.includes('leaks English prose')), 'fixture must reject English Hindi');
 assert(fixtureProblems.some((p) => p.includes('identity duplicates') && (p.includes('onam') || p.includes('vishu'))), 'fixture must reject duplicate identity');
+assert(fixtureProblems.some((p) => p.includes('Jyeshtha_Shukla_11.practice.hi is a name-only family template')), 'fixture must reject name-only Hindi variant action');
 
 console.log(`FESTIVAL ROUTE CONTENT PASSED (${nullGuideKeys.length} full routes + ${ekadashiKeys.length} Ekadashi + ${pradoshKeys.length} Pradosh; ${Object.keys(VRAT_VIDHI).length} hero families; failure fixtures proven)`);
