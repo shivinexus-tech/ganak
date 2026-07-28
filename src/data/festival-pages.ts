@@ -27,6 +27,22 @@ const LEGACY_TITLES = Object.freeze({
   chhath: { en: "Chhath — four-day observance", hi: "छठ — चार-दिवसीय व्रत" },
 });
 
+/* Old generated slugs are redirects, never second identities. The shell/deploy
+   adapter can issue a canonical redirect from this registry without teaching the
+   route registry that an incorrect historical label is still a live observance. */
+const FESTIVAL_LEGACY_PATH_REDIRECTS = Object.freeze({
+  "/festival/nrisimha-jayanti": "/festival/narasimha-jayanti",
+  "/festival/pap-mochini-ekadashi": "/festival/papmochani-ekadashi",
+  "/festival/padma-ekadashi": "/festival/parivartini-ekadashi",
+  "/festival/dev-uthani-ekadashi": "/festival/devutthana-ekadashi",
+  "/festival/putrada-ekadashi-paush-shukla": "/festival/pausha-putrada-ekadashi",
+  "/festival/putrada-ekadashi-shravan-krishna": "/festival/shravana-putrada-ekadashi",
+  "/festival/safala-ekadashi-magh-shukla": "/festival/jaya-ekadashi",
+  "/festival/safala-ekadashi-paush-krishna": "/festival/safala-ekadashi",
+  "/festival/shatila-ekadashi": "/festival/shattila-ekadashi",
+  "/festival/phalaharini-ekadashi": "/festival/vijaya-ekadashi",
+});
+
 const FESTIVAL_VIDHI_KEYS = Object.freeze({
   skandaSashtiBegins: "skandaSashtiBegins",
   skandaSashtiSoorasamharam: "skandaSashtiSoorasamharam",
@@ -174,6 +190,7 @@ export {
   REQUIRED_PAGE_ENTRIES,
   DEFERRED_PAGE_ENTRIES,
   SHARED_PAGE_ENTRIES,
+  FESTIVAL_LEGACY_PATH_REDIRECTS,
   REVIEWED_MAJOR_FESTIVAL_KEYS,
   NAVADURGA_PAGE_ENTRIES,
   FEST_META,
