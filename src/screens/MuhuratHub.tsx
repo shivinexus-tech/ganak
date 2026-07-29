@@ -220,6 +220,25 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         const nextFast = (effFasts || []).find((f) => f.ms >= dayStart);
         const nextFest = (cal.festivals || []).find((f) => f.ms >= dayStart);
         const away = (ms) => { const d = Math.round((ms - dayStart) / DAY); return d <= 0 ? (lang === "hi" ? "आज" : "today") : d === 1 ? (lang === "hi" ? "कल" : "tomorrow") : (lang === "hi" ? d + " दिन में" : "in " + d + " days"); };
+        // "Coming up" summary rows follow the same interaction contract as the
+        // Fasts & Festivals list: the whole row opens the canonical festival page
+        // (lang+city preserved). A key with no page falls back to a plain,
+        // non-interactive row rather than a broken link.
+        const comingRow = (kind, item, label, dotColor) => {
+          const p = festivalPathForKey(kind, item.key);
+          const body = (<>
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: dotColor, flexShrink: 0 }} />
+            <span style={{ flex: 1, minWidth: 0, fontSize: T.fSmall, color: C.ivory, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
+            <span style={{ fontSize: T.fMicro, color: C.gold, fontWeight: 600, flexShrink: 0 }}>{away(item.ms)}</span>
+          </>);
+          if (!p) return <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "2px 0" }}>{body}</div>;
+          return (
+            <a href={festHref(p)} className="ff-row" aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 3px", borderRadius: 8, textDecoration: "none", color: "inherit" }}>
+              {body}
+              <span aria-hidden="true" style={{ color: C.muted, fontSize: T.fSmall, flexShrink: 0 }}>›</span>
+            </a>
+          );
+        };
         const goodW = [["abhijit", p.abhijit]].filter((x) => x[1]);
         const avoidW = [["rahu", p.rahu], ["gulika", p.gulika], ["yama", p.yama]].filter((x) => x[1]);
         const winName = { abhijit: { en: "Abhijit Muhurat", hi: "अभिजित मुहूर्त" }, rahu: { en: "Rahu Kalam", hi: "राहु काल" }, gulika: { en: "Gulika Kalam", hi: "गुलिक काल" }, yama: { en: "Yamaganda", hi: "यमगण्ड" } };
@@ -242,10 +261,16 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                 <span style={{ fontSize: T.fMicro, color: C.muted, fontVariantNumeric: "tabular-nums" }}>{p.tithis[0].end ? (lang === "hi" ? "तक " : "till ") + fmtT(p.tithis[0].end) : ""}</span>
               </div>
               <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: 2 }}>{p.paksha} · {lang === "hi" ? (p.krishna ? "कृष्ण (क्षीयमान)" : "शुक्ल (वर्धमान)") : (p.krishna ? "waning moon" : "waxing moon")} · {lang === "hi" ? "चंद्र दिवस " + p.tithiDay : "lunar day " + p.tithiDay}</div>
-              {obs.length > 0 && <div style={{ marginTop: 8, display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 11px", borderRadius: T.rMd, background: fastObs.fasting ? "rgba(194,69,30,.08)" : "rgba(168,106,18,.08)", border: "1px solid " + (fastObs.fasting ? C.sindoor : C.gold) + "33" }}>
-                <span style={{ fontSize: T.fSmall, fontWeight: 600, color: fastObs.fasting ? C.sindoor : C.gold }}>{obsLabel(lang, fastObs)}</span>
-                {OBS_GLOSS[fastObs.baseKey || fastObs.key] && <span style={{ fontSize: T.fMicro, color: C.muted }}>· {OBS_GLOSS[fastObs.baseKey || fastObs.key][L2]}</span>}
-              </div>}
+              {obs.length > 0 && (() => {
+                const obsPath = festivalPathForKey("fast", fastObs.key);
+                const chipStyle = { marginTop: 8, display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 11px", borderRadius: T.rMd, background: fastObs.fasting ? "rgba(194,69,30,.08)" : "rgba(168,106,18,.08)", border: "1px solid " + (fastObs.fasting ? C.sindoor : C.gold) + "33" };
+                const inner = (<>
+                  <span style={{ fontSize: T.fSmall, fontWeight: 600, color: fastObs.fasting ? C.sindoor : C.gold }}>{obsLabel(lang, fastObs)}</span>
+                  {OBS_GLOSS[fastObs.baseKey || fastObs.key] && <span style={{ fontSize: T.fMicro, color: C.muted }}>· {OBS_GLOSS[fastObs.baseKey || fastObs.key][L2]}</span>}
+                </>);
+                if (!obsPath) return <div style={chipStyle}>{inner}</div>;
+                return <a href={festHref(obsPath)} className="ff-row" aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + obsLabel(lang, fastObs)} style={{ ...chipStyle, textDecoration: "none", color: "inherit", cursor: "pointer" }}>{inner}<span aria-hidden="true" style={{ color: C.muted, fontSize: T.fMicro, flexShrink: 0 }}>›</span></a>;
+              })()}
               {p.pitruPaksha && (() => {
                 const pp = p.pitruPaksha;
                 const SP = { mahalaya: { en: "Sarva Pitru Amavasya (Mahalaya)", hi: "सर्वपितृ अमावस्या (महालय)" }, purnimaShraddha: { en: "Purnima Shraddha — Pitru Paksha begins", hi: "पूर्णिमा श्राद्ध — पितृ पक्ष आरंभ" }, avidhavaNavami: { en: "Avidhava Navami", hi: "अविधवा नवमी" }, ghataChaturdashi: { en: "Ghata Chaturdashi", hi: "घट चतुर्दशी" } };
@@ -304,16 +329,8 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
             </div>
             {(nextFast || nextFest) && <div style={{ padding: T.s3 + "px " + T.s5 + "px", borderTop: "1px solid " + C.line, background: "rgba(168,106,18,.04)" }}>
               <div style={{ ...T.label, color: C.muted, marginBottom: 6 }}>{lang === "hi" ? "आगामी" : "Coming up"}</div>
-              {nextFast && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "2px 0" }}>
-                <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.sindoor, flexShrink: 0 }} />
-                <span style={{ flex: 1, fontSize: T.fSmall, color: C.ivory }}>{obsLabel(lang, { key: nextFast.key, baseKey: nextFast.key })}</span>
-                <span style={{ fontSize: T.fMicro, color: C.gold, fontWeight: 600 }}>{away(nextFast.ms)}</span>
-              </div>}
-              {nextFest && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "2px 0" }}>
-                <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.gold, flexShrink: 0 }} />
-                <span style={{ flex: 1, fontSize: T.fSmall, color: C.ivory }}>{trN(lang, FEST_NAME, nextFest.key)}</span>
-                <span style={{ fontSize: T.fMicro, color: C.gold, fontWeight: 600 }}>{away(nextFest.ms)}</span>
-              </div>}
+              {nextFast && comingRow("fast", nextFast, obsLabel(lang, { key: nextFast.key, baseKey: nextFast.key }), C.sindoor)}
+              {nextFest && comingRow("festival", nextFest, trN(lang, FEST_NAME, nextFest.key), C.gold)}
             </div>}
             <button type="button" onClick={() => setShowPanch((v) => !v)} style={{ width: "100%", padding: "11px", border: "none", borderTop: "1px solid " + C.line, background: "transparent", color: C.gold, cursor: "pointer", fontFamily: T.serif, fontSize: T.fSmall, fontWeight: 500 }}>
               {showPanch ? (lang === "hi" ? "पंचांग छिपाएँ ▴" : "Hide full panchang ▴") : (lang === "hi" ? "पूरा पंचांग देखें ▾" : "View full panchang ▾")}

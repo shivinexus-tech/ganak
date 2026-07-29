@@ -131,12 +131,15 @@ check(/scrollIntoView/.test(HUB), 'MuhuratHub: expanded panel is not revealed wi
 check(/<div id=\{panelId\} ref=\{openPanelRef\}/.test(HUB), 'MuhuratHub: controlled panel missing id={panelId}/ref (state/panel disagree)');
 // the old invisible whole-row toggle must be gone
 check(!/role="button"[\s\S]{0,120}onClick=\{\(\) => setFexp/.test(HUB), 'MuhuratHub: invisible whole-row toggle (role=button) still present');
-// scope the primary row anchor (opens the canonical page)
-const hubRow = HUB.match(/<a\b[^>]*className="ff-row"[\s\S]*?<\/a>/);
-check(!!hubRow, 'MuhuratHub: primary row is not a real <a> anchor to the canonical page');
-if (hubRow) {
-  check(/href=\{festHref\(path\)\}/.test(hubRow[0]) && /aria-label=/.test(hubRow[0]), 'MuhuratHub: primary row anchor missing festHref(path)/aria-label');
+// every ff-row anchor (F&F list primary row + "Coming up" summary rows) must be a
+// real <a> that navigates via festHref with an accessible name
+const hubAnchors = HUB.match(/<a\b[^>]*className="ff-row"[\s\S]*?<\/a>/g) || [];
+check(hubAnchors.length >= 2, 'MuhuratHub: expected ff-row anchors for both the F&F list and the "Coming up" summary');
+for (const a of hubAnchors) {
+  check(anchorBlockOk(a), 'MuhuratHub: an ff-row anchor is missing festHref/aria-label');
 }
+// the F&F list primary row specifically opens the canonical page for its entry
+check(/href=\{festHref\(path\)\}/.test(HUB), 'MuhuratHub: F&F list primary row does not open the canonical festival page');
 // scope the quick-details toggle
 const hubToggle = HUB.match(/<button\b[^>]*className="ff-toggle"[\s\S]*?<\/button>/);
 check(!!hubToggle, 'MuhuratHub: quick-details toggle <button> not found');
@@ -151,6 +154,10 @@ if (hubGuide) {
 }
 const hubFestHref = HUB.match(/const festHref = \([\s\S]*?\n  \};/);
 check(hubFestHref && festHrefPreservesState(hubFestHref[0]), 'MuhuratHub: festHref drops lang/city (lost state)');
+// the "Coming up" summary rows (nextFast/nextFest) must open the canonical page too
+check(/comingRow\("fast",/.test(HUB) && /comingRow\("festival",/.test(HUB), 'MuhuratHub: "Coming up" nextFast/nextFest not wired through comingRow');
+const comingRowFn = HUB.match(/const comingRow = \([\s\S]*?<\/a>[\s\S]*?\n {8}\};/);
+check(comingRowFn && /festivalPathForKey\(kind, item\.key\)/.test(comingRowFn[0]) && /href=\{festHref\(p\)\}/.test(comingRowFn[0]), 'MuhuratHub: "Coming up" rows do not open the canonical festival page');
 
 /* ---- 3. Live registry coverage — every displayed key reaches a route ---- */
 
