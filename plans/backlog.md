@@ -267,6 +267,14 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
   - [x] Dedicated Sarvartha Siddhi, Amrita Siddhi, Ravi Yoga, Ravi/Guru Pushya,
         Dwipushkar, Tripushkar and Ganda Moola calculations/calendars.
   - [x] Ritu/season, solstice/equinox and Vedic/Ghati clock.
+  - [ ] **Direct date entry and better Panchang date picker.** The current calendar
+        popup forces month-by-month navigation, which is painful when checking a
+        far-future or past Panchang date. Add a direct typed date input plus a
+        year/month jump picker so a user can enter or select a specific date quickly.
+        The selected date must survive URL reload/Back/Forward, respect the selected
+        city/timezone, validate invalid dates visibly, and never reset unless the
+        user explicitly chooses today or changes the date. _(Backlog #58;
+        owner feedback 2026-07-29)_
   - [x] User-controlled lunar/Gregorian presentation, Amanta/Purnimanta switch and
         pre-launch Tamil Thirukanitha/Bengali Vishuddha Siddhanta calendar-base
         switches. Complete Tamil/Bengali-language journeys remain a separate
@@ -864,6 +872,14 @@ Work:
       **gut the overloaded MuhuratHub** (it does ~10 jobs) into dedicated screens;
       fix "too many taps" / "unclear where features live" (owner's own words,
       confirmed by messaging audit). Do in-place in the Vite app — no rewrite.
+- [ ] **Global site search / guided input (before go-live):** a user who does not
+      know where a festival, vrat, muhurat, calculator or Panchang term lives should
+      not be clueless. Add a prominent search/input box that accepts English, Hindi,
+      Sanskrit/transliteration and common aliases, then routes to the right page or
+      shows clear suggestions. It should cover public festival pages, recurring
+      vrats, calculators, Muhurat needs, Panchang terms and help-style questions;
+      no dead-end results, no browser storage, and phone keyboard UX must be tested.
+      _(Backlog #59; owner feedback 2026-07-29)_
 - [ ] **Jyotish-zone hierarchy (Phase 1, before the chart reveal):** the 17 flat
       chart sub-sections (messaging audit finding) need grouping — Kundli / Dashas /
       Matching / Tools / Vault sub-navigation, not one flat list.
