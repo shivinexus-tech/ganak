@@ -29,6 +29,34 @@ check(
   'the cast path independently rejects non-digit strings'
 );
 
+// F12: a long digit string must not be shortened to a different valid KP number.
+// Leading zeros are still intentionally normalized (`007` → `7`).
+check(
+  /const normalized = trimmed\.replace\(\/\^0\+\(\?=\\d\)\/,\s*''\)[\s\S]*?normalized\.length > 3[\s\S]*?return trimmed[\s\S]*?return normalized/.test(source) &&
+    !/\.slice\(0,\s*3\)/.test(source),
+  'F12: long digit strings remain visibly invalid instead of being truncated to another number'
+);
+
+// F11: canonical KP starts are exact to an arcsecond, but binary floats can sit just
+// below an exact minute (15°39′59.999…). Number-mode display must stabilize at the
+// arcsecond before deriving degrees/minutes.
+const numberDegreeBody = source.match(/function PR_fmtNumberDeg\(deg\) \{([\s\S]*?)\n\}/);
+let numberDegreeFormatter = null;
+try {
+  numberDegreeFormatter = numberDegreeBody && new Function('deg', numberDegreeBody[1]);
+} catch {}
+check(
+  numberDegreeFormatter &&
+    numberDegreeFormatter(15.666666666666664) === '15°40′' &&
+    numberDegreeFormatter(27.888888888888886) === '27°53′',
+  'F11: exact KP minute boundaries render consistently despite floating-point noise'
+);
+check(
+  /PR_fmtNumberDeg\(info\.signDeg\)/.test(source) &&
+    /isNum \? PR_fmtNumberDeg\(result\.chart\.lagna\.deg\) : fmtDeg\(result\.chart\.lagna\.deg\)/.test(source),
+  'F11: number answer and expanded-chart Lagna use the stable KP degree formatter'
+);
+
 // F10: the 5-column full chart is wider than a 320px phone; it must scroll inside its
 // own container rather than push the whole page into horizontal overflow.
 check(

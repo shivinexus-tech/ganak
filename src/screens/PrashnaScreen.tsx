@@ -565,7 +565,19 @@ function PR_normalizeNumberInput(raw) {
   const trimmed = String(raw).trim();
   if (trimmed === '') return '';
   if (!/^\d+$/.test(trimmed)) return trimmed;
-  return trimmed.replace(/^0+(?=\d)/, '').slice(0, 3);
+  const normalized = trimmed.replace(/^0+(?=\d)/, '');
+  if (normalized.length > 3) return trimmed;
+  return normalized;
+}
+
+// F11: KP number starts are exact to an arcsecond, but a binary float can land a
+// hair below an exact minute (15°39′59.999…). Stabilize number-mode display at the
+// arcsecond before deriving degrees/minutes; time-mode formatting stays unchanged.
+function PR_fmtNumberDeg(deg) {
+  const arcSec = Math.round(deg * 3600);
+  const wholeDeg = Math.floor(arcSec / 3600);
+  const minute = Math.floor((arcSec - wholeDeg * 3600) / 60);
+  return `${wholeDeg}°${String(minute).padStart(2, '0')}′`;
 }
 
 // ------------------------------------------------------------ MAIN SCREEN
@@ -834,7 +846,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                 ))}
               </div>
               <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-                <PrashnaChip label={hi ? 'लग्न' : 'Lagna'} value={`${hi ? RASHI_HI[result.chart.lagna.sign] : RASHI_EN[result.chart.lagna.sign]} ${fmtDeg(result.chart.lagna.deg)}`}
+                <PrashnaChip label={hi ? 'लग्न' : 'Lagna'} value={`${hi ? RASHI_HI[result.chart.lagna.sign] : RASHI_EN[result.chart.lagna.sign]} ${isNum ? PR_fmtNumberDeg(result.chart.lagna.deg) : fmtDeg(result.chart.lagna.deg)}`}
                   gloss={hi ? 'इस क्षण पूर्व में उदित राशि' : 'the sign rising in the east at this moment'} />
                 <PrashnaChip label={hi ? 'नक्षत्र' : 'Nakshatra'} value={`${hi ? NAK_HI[result.chart.lagna.nak.idx] : result.chart.lagna.nak.en}-${result.chart.lagna.nak.pada}`}
                   gloss={hi ? 'उदित अंश जिस चन्द्र-नक्षत्र में पड़ता है' : 'the lunar mansion the rising degree falls in'} />
@@ -929,7 +941,7 @@ function NumberSetBox({ info, favor, hi }) {
         gloss={hi ? 'जिस नक्षत्र में अंक गिरा' : 'the star your number fell into'} />
       <NumRow label={hi ? 'उप-स्वामी · Sub lord' : 'Sub lord'} value={sub}
         gloss={hi ? 'जो अंतिम निर्णय देता है (हाँ या नहीं)' : 'the planet that gives the final yes or no'} />
-      <NumRow label={hi ? 'लग्न · Ascendant' : 'Ascendant'} value={`${signName} ${fmtDeg(info.signDeg)}`}
+      <NumRow label={hi ? 'लग्न · Ascendant' : 'Ascendant'} value={`${signName} ${PR_fmtNumberDeg(info.signDeg)}`}
         gloss={hi ? 'जहाँ अंक ने कुण्डली स्थिर की' : 'where the number fixed your chart'} />
       <div style={{ borderTop: `1px solid ${TOKENS.line}`, marginTop: 4, paddingTop: 3 }}>
         <NumRow label={hi ? 'विचारित भाव · Houses judged' : 'Houses judged'} value={favor.join(' · ')} />
