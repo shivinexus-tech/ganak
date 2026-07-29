@@ -106,6 +106,20 @@ assertions. If a gate fails, fix the cause — never weaken a gate to pass it
   Ask only for risky/unstable work, or when the owner said “don’t push.”
   See `plans/how-you-steer.md`.
 - Complete fixes only. If a fix is partial, say so explicitly.
+- **Autonomy boundary (owner, 2026-07-28) — definition of done + when to ask.**
+  Self-drive the whole loop without pinging the owner: *fix → run gates → deploy →
+  verify live → record in `plans/task-log.md`*, including **all repo plumbing**
+  (branches, worktrees, merges, conflict resolution, commits, pushes, deploys) and
+  bug-bash regression (spawn a helper subagent for the independent pass rather than
+  routing a prompt back to the owner). The owner does **not** want to be involved in
+  repo-management-type things. **Ask the owner first ONLY for:** (1) **requirement
+  gathering** — clarify what to build before building it; (2) any **external /
+  third-party tool, service, API or dependency**; (3) **bigger decisions** —
+  architecture, or product/UX direction; (4) **prioritisation** — now vs later,
+  scope, sequencing; plus the standing human-gates — religious-accuracy/sourcing,
+  irreversible/outward-facing actions, cost, a real P0/P1 needing a product call,
+  and the owner's live-URL sign-off. Otherwise act, then give a short plain-language
+  status of what was done and only what (if anything) genuinely needs the owner.
 
 ## Design system
 - Control height 42px, corner radius 11px (tokens `T.ctrlH`, `T.rMd`).
