@@ -23,9 +23,10 @@ import {
    GANAK — shell: nav, shared prefs/place, screen compose
    ============================================================ */
 
-function pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute = null) {
+function pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute = null, medicalRoute = null, muhuratRoute = null) {
   const hi = lang === "hi";
   if (utilityRoute) return { eyebrow: hi ? "ज्योतिष कैलकुलेटर" : "ASTROLOGY CALCULATORS", detail: hi ? "स्पष्ट उत्तर · पारदर्शी पद्धति · स्थायी लिंक" : "Clear answers · transparent methods · permanent links" };
+  if (medicalRoute) return { eyebrow: hi ? "चिकित्सा मुहूर्त" : "MEDICAL MUHURAT", detail: hi ? "सुरक्षा प्रथम · केवल लचीली तिथियाँ · उपचार में कभी विलम्ब नहीं" : "Safety first · flexible dates only · never delay care" };
   if (directFestivalGuide) {
     const hasFullGuide = Boolean(directFestivalGuide.vidhiKey);
     return {
@@ -41,6 +42,7 @@ function pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute = null) {
             : "Festival date · local timing · verified calendar overview"),
     };
   }
+  if (muhuratRoute) return { eyebrow: hi ? "शुभ मुहूर्त" : "SHUBH MUHURAT", detail: hi ? "कार्य · स्थान · अवधि · कारण सहित चुने हुए शुभ समय" : "Activity · place · date range · ranked windows with reasons" };
   if (mode === "prashna") {
     return {
       eyebrow: hi ? "प्रश्न" : "PRASHNA",
@@ -88,12 +90,13 @@ export default function KundliApp() {
   const directFestivalGuide = festivalGuideFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const utilityRoute = utilityFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const medicalRoute = medicalMuhuratFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
-  const hero = pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute);
+  const muhuratRoute = urlPrefGet("muhurat");
+  const hero = pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute, medicalRoute, muhuratRoute);
   useEffect(() => {
-    const meta=routeMetadata({lang,mode,festival:directFestivalGuide,utility:utilityRoute,medical:medicalRoute,muhurat:urlPrefGet("muhurat")});
+    const meta=routeMetadata({lang,mode,festival:directFestivalGuide,utility:utilityRoute,medical:medicalRoute,muhurat:muhuratRoute});
     applyRouteMetadata({...meta,lang,path:typeof window!=="undefined"?window.location.pathname:"/"});
-    privacyEvent("page_view",{area:directFestivalGuide?"festival":utilityRoute?"calculator":medicalRoute?"medical-muhurat":mode,language:lang});
-  },[lang,mode,directFestivalGuide,utilityRoute,medicalRoute]);
+    privacyEvent("page_view",{area:directFestivalGuide?"festival":utilityRoute?"calculator":medicalRoute?"medical-muhurat":muhuratRoute?"muhurat":mode,language:lang});
+  },[lang,mode,directFestivalGuide,utilityRoute,medicalRoute,muhuratRoute]);
 
   const DEFAULT_PLACE = { label: "New Delhi, India", lat: 28.61, lon: 77.21, zone: "Asia/Kolkata" };
   const placeFromUrl=()=>{const label=urlPrefGet("city"),lat=Number(urlPrefGet("lat")),lon=Number(urlPrefGet("lon")),zone=urlPrefGet("zone");return label&&zone&&Number.isFinite(lat)&&Math.abs(lat)<=90&&Number.isFinite(lon)&&Math.abs(lon)<=180?{label,lat,lon,zone}:null;};
