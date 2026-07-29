@@ -210,3 +210,29 @@ wait measured 1001ms). The logic is airtight, but the **final real-device double
 confirmation should be done by the resumed Agent-2 pass or the owner on a foreground device.**
 **Still open for closure:** that F9 real-tap confirmation + the remaining place/boundary/12-chip/
 Hindi/layout/F1–F6 regression matrix (Codex halted before it) + owner live-URL sign-off.
+
+**F9 BEHAVIORAL DOUBLE-TAP — now VERIFIED (Claude Code, 2026-07-28).** The open
+"real-tap confirmation" gap is closed. The earlier background-tab timer clamp only defeats
+`setTimeout`-staged taps; a real OS double-tap can be fired with the browser tool's
+`computer{action:"double_click"}` after growing the viewport height so the Cast button is
+on-screen (320×1400). Captured on the deployed bundle at **https://ganakapp.com/?screen=prashna**
+(KP number, Marriage, 108) — before: `value=108, editable, no New question, no result`;
+**after a real double-click: `value=108, readOnly=true, New question present, result present`**
+— exactly one locked result; the second tap on the swapped New-question control was swallowed.
+Also verified live: deliberate single New-question resets (mouse), keyboard activation resets,
+chip-change / mode-toggle / EN↔HI↔EN all keep the lock and result, Back/Forward safely resets
+the screen (no recast bypass), F8 (`007`→`7`; `1.5`/`-5`/`0`/`250`/`999`/`१०८`/emoji stay invalid
++ Cast disabled), F6 footnotes (number=KP-New, time=Lahiri), **0 console errors on production**.
+
+### F10 · P2 — full Prashna chart overflowed the page horizontally at 320px
+Found during the F9 verification above. With the **Full Prashna chart** expanded, the
+5-column planetary table (`Graha/Rashi/Nakshatra/Star-Sub/House`) is intrinsically ~382px
+wide; it sat in an `overflow-x: visible` parent, so it pushed the whole page to
+`scrollWidth 440 > clientWidth 320` — a real horizontal page overflow (the existing "no 320px
+overflow" notes tested the collapsed state). **F10 FIXED — Claude Code, 2026-07-28 (`f6a3440`,
+in `main`), below the parity-frozen markers:** the table is wrapped in an
+`overflow-x: auto` container (`minWidth: 300`) so it scrolls inside itself; the page no longer
+overflows at 320/360/390, and the table scrolls within its wrapper. **Gates:** parity EXACT
+198/6, prashna-249 33/33, prashna-249-chart 14/14, prashna-249-input PASS (adds the F10 wrapper
+check), parse-check, build all green. **Live-verified** on ganakapp.com: expanded chart →
+`wrapOverflowX=auto`, `pageOverflow=false`, `scrollWidth=320`.
