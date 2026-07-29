@@ -77,12 +77,18 @@ export default function ChartScreen({ C, card, lang }) {
   const debounceRef = React.useRef(null);
   const seqRef = React.useRef(0);
 
-  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  // A cast chart is only valid for the inputs it was cast from. Any user edit to
+  // those inputs drops the old result so stale astrology can never look like it
+  // belongs to the newly-typed person/place (Codex F1). loadChart sets state
+  // directly (not via these handlers), so vault-load is unaffected.
+  const clearResult = () => { setResult(null); setChartContext(null); setErr(""); };
+  const set = (k, v) => { setForm((f) => ({ ...f, [k]: v })); clearResult(); };
 
   const onQuery = (q) => {
     setQuery(q);
     setPlace(null);
     setTzOverride("");
+    clearResult();
     const offline = searchOffline(q);
     setSugs(offline);
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -132,6 +138,9 @@ export default function ChartScreen({ C, card, lang }) {
 
   const generate = () => {
     setErr("");
+    // Drop any prior chart up front: if this cast fails validation below, the user
+    // is left with the guard message and no stale result (Codex F1).
+    setResult(null); setChartContext(null);
     const [y, m, day] = (form.date || "").split("-").map(Number);
     const [hh, mi] = (form.time || "").split(":").map(Number);
     if (!y || isNaN(hh)) { setErr(lang === "hi" ? "जन्म की पूरी तारीख़ और समय भरें।" : "Enter a complete date and time of birth."); return; }
@@ -270,7 +279,7 @@ export default function ChartScreen({ C, card, lang }) {
               <input
                 type="number" step="0.25" style={inputStyle}
                 value={tzOverride !== "" ? tzOverride : autoTz ?? ""}
-                onChange={(e) => setTzOverride(e.target.value)}
+                onChange={(e) => { setTzOverride(e.target.value); clearResult(); }}
                 placeholder={lang === "hi" ? "जैसे: +5.5" : "e.g. +5.5"}
               />
             </div>
