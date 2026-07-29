@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { T } from "../components/tokens";
 import { fmtDeg } from "../components/format";
 import { NAK_HI } from "../engine/muhurat";
@@ -580,13 +580,23 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   // F1/F4/F5: a cast number session is LOCKED independently of `result`, so nothing that
   // merely clears the result (chip change, mode toggle) can silently re-enable a recast.
   const [locked, setLocked] = useState(false);
+  // F9: the "New question" button appears in the exact tap target the "Cast" button
+  // just vacated, so a phone double-tap on Cast would land its 2nd tap on New question
+  // and wipe the just-cast answer. Record when the cast locked, and ignore a reset that
+  // fires within a double-tap window of it (a deliberate later tap is unaffected).
+  const lockedAtRef = useRef(0);
+  const DOUBLE_TAP_MS = 600;
 
   const clearResult = () => { setResult(null); setError(null); };
   // F5: switching method must not unlock a cast number session — keep the lock (and its
   // result) intact so a mode toggle can never re-enable recast of the same number.
   const switchMode = (m) => { if (m !== mode) { setMode(m); if (!locked) clearResult(); } };
   // F1/F4/F5 repeat protection: once a number is cast, only "New question" reopens it.
-  const newQuestion = () => { setLocked(false); setNumberInput(''); setResult(null); setError(null); };
+  // F9 guard: swallow a reset landing within the double-tap window of the cast.
+  const newQuestion = () => {
+    if (Date.now() - lockedAtRef.current < DOUBLE_TAP_MS) return;
+    setLocked(false); setNumberInput(''); setResult(null); setError(null);
+  };
   // F3: a cast answer is judged for one place — a place change clears it and reopens the
   // number session (a new place is a genuinely changed circumstance).
   useEffect(() => { setResult(null); setError(null); setLocked(false); }, [lat, lon, placeLabel]);
@@ -613,6 +623,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         const chart = PR_castNumber(ms, lat, lon, n);
         setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'number', number: n, info: kpNumberInfo(n) });
         setLocked(true);
+        lockedAtRef.current = Date.now(); // F9: start the double-tap guard window
       } else {
         const chart = PR_cast(ms, lat, lon);
         setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'time' });
