@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { T } from "../components/tokens";
 import PlaceInput from "../components/PlaceInput";
 import { zoneOffset } from "../engine/panchang";
@@ -50,6 +50,10 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
   const [gPlace, setGPlace] = useState({ label: "Mumbai, India", lat: 19.08, lon: 72.88, zone: "Asia/Kolkata" });
   const [res, setRes] = useState(null);
   const [err, setErr] = useState("");
+  // Editing either person invalidates the previous match: drop the old result so
+  // stale scores don't linger AND the print-only header (which only renders when
+  // `res` exists) can never pair new birth details with old scores (Codex F2).
+  useEffect(() => { setRes(null); setErr(""); }, [boyName, girlName, bDate, bTime, bPlace, gDate, gTime, gPlace]);
 
   const run = () => {
     setErr("");
@@ -149,16 +153,16 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
             {res.dasha && (() => {
               const d = res.dasha;
               const KI = {
-                Dina: { hi: "दिन", en: "day-to-day harmony" },
-                Gana: { hi: "गण", en: "temperament (deva/manushya/rakshasa)" },
-                Mahendra: { hi: "महेन्द्र", en: "wellbeing & progeny" },
-                "Stree Deergha": { hi: "स्त्री दीर्घ", en: "protection & longevity for the wife" },
-                Yoni: { hi: "योनि", en: "instinctive compatibility" },
-                Rasi: { hi: "राशि", en: "emotional & prosperity axis" },
-                Rasyadhipati: { hi: "राश्यधिपति", en: "sign-lord friendship" },
-                Vashya: { hi: "वश्य", en: "mutual attraction" },
-                Rajju: { hi: "रज्जु", en: "stability & longevity of the marriage" },
-                Vedha: { hi: "वेध", en: "mutual obstruction" },
+                Dina: { hi: "दिन", en: "day-to-day harmony", mHi: "दैनिक सामंजस्य व शुभता" },
+                Gana: { hi: "गण", en: "temperament (deva/manushya/rakshasa)", mHi: "स्वभाव (देव/मनुष्य/राक्षस)" },
+                Mahendra: { hi: "महेन्द्र", en: "wellbeing & progeny", mHi: "कल्याण व संतति" },
+                "Stree Deergha": { hi: "स्त्री दीर्घ", en: "protection & longevity for the wife", mHi: "स्त्री की रक्षा व दीर्घायु" },
+                Yoni: { hi: "योनि", en: "instinctive compatibility", mHi: "सहज/शारीरिक अनुकूलता" },
+                Rasi: { hi: "राशि", en: "emotional & prosperity axis", mHi: "भावनात्मक व समृद्धि अक्ष (भकूट)" },
+                Rasyadhipati: { hi: "राश्यधिपति", en: "sign-lord friendship", mHi: "राशि-स्वामियों की मैत्री" },
+                Vashya: { hi: "वश्य", en: "mutual attraction", mHi: "परस्पर आकर्षण" },
+                Rajju: { hi: "रज्जु", en: "stability & longevity of the marriage", mHi: "विवाह की स्थिरता व दीर्घता" },
+                Vedha: { hi: "वेध", en: "mutual obstruction", mHi: "परस्पर बाधा" },
               };
               const V = { poor: [hi ? "सावधानी आवश्यक" : "Needs caution", C.sindoor], moderate: [hi ? "मध्यम" : "Moderate", "#B0610F"], good: [hi ? "अच्छा मिलान" : "Good match", C.gold], "very-good": [hi ? "बहुत अच्छा" : "Very good", "#1F7A4D"], excellent: [hi ? "उत्कृष्ट" : "Excellent", "#1F7A4D"] };
               const [vl, vc] = V[d.verdict];
@@ -174,7 +178,7 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
                           return (
                             <tr key={k.name} style={crit ? { background: "rgba(194,69,30,.06)" } : null}>
                               <td style={{ fontFamily: "Eczar, serif", color: crit ? C.sindoor : C.gold, whiteSpace: "nowrap" }}>{hi ? KI[k.name].hi : k.name}</td>
-                              <td style={{ fontSize: 12.5, color: C.muted }}>{hi ? KI[k.name].hi + " — " + KI[k.name].en : KI[k.name].en}</td>
+                              <td style={{ fontSize: 12.5, color: C.muted }}>{hi ? KI[k.name].mHi : KI[k.name].en}</td>
                               <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: k.got === 0 ? C.sindoor : C.ivory, whiteSpace: "nowrap" }}>{k.got} / {k.max}</td>
                             </tr>
                           );
