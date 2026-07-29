@@ -195,3 +195,18 @@ method-integrity guard against answer shopping.
 **Closure:** blocked on F9. No F9 product fix was made because the Agent-2 brief says
 to stop and report a fresh P0/P1 rather than fix it. The remaining place, full boundary,
 12-chip, Hindi, layout and F1–F6 regression matrix is still not signed off.
+
+**F9 FIXED — Claude Code, 2026-07-28 (`03341c0`, in `main`), below the parity-frozen markers.**
+The number cast records a timestamp (`lockedAtRef.current = Date.now()`), and `newQuestion()`
+swallows any reset firing within a 600ms double-tap window (`if (Date.now() - lockedAtRef.current
+< 600) return;`). A deliberate later tap still resets. **Gates:** parity EXACT 198/6, prashna-249
+33/33, prashna-249-chart 14/14, prashna-249-input PASS, parse-check, build all green.
+**Verification note (honest):** the fix is *code-verified in the live executing bundle*
+(`index-DvWr_yqW.js`): `E.current=Date.now()` on cast + guard `Date.now()-E.current<D` with
+`D=600`. A clean *behavioral* double-tap could NOT be staged in the harness browser — the
+pane is a hidden/background tab, which clamps `setTimeout` to ~1000ms and pauses
+`requestAnimationFrame`, so no real sub-600ms two-tap gap is reproducible here (a "150ms"
+wait measured 1001ms). The logic is airtight, but the **final real-device double-tap
+confirmation should be done by the resumed Agent-2 pass or the owner on a foreground device.**
+**Still open for closure:** that F9 real-tap confirmation + the remaining place/boundary/12-chip/
+Hindi/layout/F1–F6 regression matrix (Codex halted before it) + owner live-URL sign-off.
