@@ -1,0 +1,62 @@
+name: Quality gates (Tier A)
+
+# Tier A of the owner's automated quality plan (2026-07-28): run the deterministic
+# validation gate suite + production build on every push to main and on PRs, plus a
+# daily safety-net cron. Near-zero cost; catches regressions the moment code changes.
+# The deeper adversarial "judgment" pass is Tier B (a scheduled Claude routine).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * *"   # 06:00 UTC daily safety net
+  workflow_dispatch:       # allow manual runs
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Canonical validation gates
+        run: |
+          set -euo pipefail
+          node validation/parse-check.js src/kundli-app.tsx
+          node validation/prashna-parity.js src/screens/PrashnaScreen.tsx
+          node validation/prashna-calc.js
+          node validation/muhurat-anchors.cjs
+          node validation/navratri-timings.cjs
+          node validation/navadurga-pages.cjs
+          node validation/sankranti-punya.cjs
+          node validation/panchaka-windows.cjs
+          node validation/hindi-devotional-language.cjs
+          node validation/hindi-worship-glossary.cjs
+          node validation/devotional-voice-english.cjs
+          node validation/festival-deeplinks.cjs
+          node validation/festival-page-coverage.cjs
+          node validation/major-festival-pages.cjs
+          node validation/durga-puja-pages.cjs
+          node validation/vedic-season-clock.cjs
+          node validation/page-context-header.cjs
+
+      - name: Prashna KP number-method gates
+        run: |
+          set -euo pipefail
+          node validation/prashna-249.cjs
+          node validation/prashna-249-chart.cjs
+          [ -f validation/prashna-249-input.cjs ] && node validation/prashna-249-input.cjs || true
+
+      - name: Production build
+        run: npm run build
