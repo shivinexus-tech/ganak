@@ -28,6 +28,18 @@ const cases = [
     excludes: ['JYOTISH', 'birth chart', 'FASTING & WORSHIP'],
   },
   {
+    label: 'Medical Muhurat',
+    copy: pageHeroCopy('en', 'daily', null, null, { kind: 'medical' }),
+    includes: ['MEDICAL MUHURAT', 'Safety first', 'never delay care'],
+    excludes: ['PANCHANG', 'birth chart'],
+  },
+  {
+    label: 'Muhurat finder',
+    copy: pageHeroCopy('en', 'daily', null, null, null, 'wedding'),
+    includes: ['SHUBH MUHURAT', 'Activity', 'ranked windows'],
+    excludes: ['PANCHANG', 'birth chart'],
+  },
+  {
     label: 'Daily Panchang',
     copy: pageHeroCopy('en', 'daily', null),
     includes: ['PANCHANG', 'Tithi', 'fasts and festivals'],
