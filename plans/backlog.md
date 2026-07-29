@@ -544,6 +544,24 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       a round-4 independent audit (state/keyboard/entry-type matrix) passed and
       closed one gate gap (`e99a2e7`). **Still open before check-off:** owner
       live-URL sign-off only.
+- [ ] **PARKED (owner-reported 2026-07-29) — EN vs HI festival-page rendering
+      inconsistency.** After the festival-interaction fix, clicking a fast/festival
+      in Hindi opens the dedicated page, but the owner reports it does **not render
+      / behave the same as the English side** — the two languages present the
+      festival page differently. This is **separate from the dead-interaction P0**
+      (navigation itself works in both languages). First-pass production check of
+      `/festival/purnima` in EN and HI showed the **same** layout (both "full
+      guide", place box present, matching heading structure; body-text length
+      differs as expected by language), so the difference is likely **visual /
+      content-level, not structural** — e.g. a section, timing block, hero image,
+      or regional-variation block that renders in one language but not the other,
+      or a layout/formatting divergence. **Needs to action:** owner to name one
+      example festival + exactly what looks different between EN and HI, then diff
+      EN vs HI rendering on that route (`src/screens/FestivalGuideScreen.tsx` and
+      its data sources — `festival-route-content`, `major-festival-guides`,
+      `vrat-vidhis`, `named-observance-guides`, `festival-variant-guides`). Likely
+      a per-language content-completeness gap in the guide data rather than a
+      rendering bug. Not yet assigned/reserved.
 - [x] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
       selection box directly on every dedicated festival/vrat page. Replace “Open
       this festival in the Daily Panchang to see the local timing referred to below.”
