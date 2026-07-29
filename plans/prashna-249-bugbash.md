@@ -150,3 +150,48 @@ the live build despite its recorded fix. Product code was not changed.
 **Closure:** blocked. Reopen the input fix, reject decimal/sign-bearing strings instead
 of removing punctuation, then have an independent agent rerun the complete 30+ minute
 matrix. Do not count this halted run as the closing independent pass.
+
+### F8 fix + resumed production pass — Codex, 2026-07-28 (halted on fresh P1)
+
+**F8 fixed and live at `40b6c4a`:** a TDD-first fix below the parity-frozen engine
+markers preserves punctuation/sign-bearing input as visibly invalid, requires a
+digits-only integer from 1–249 for both button enablement and the cast path, and keeps
+the intended `007`→`7` normalization. New gate
+`validation/prashna-249-input.cjs` passes 4/4. The full required gate set also remains
+green: engine 33/33, chart 14/14, parity EXACT 198/6, calc 24/24, parse clean, build
+132 modules.
+
+Production loaded the new `index-CD92KACz.js` asset. At 320px, `1.5` and `-5` stayed
+visible, showed the 1–249 warning and kept Cast disabled; `007` became `7`. The resumed
+matrix then stopped at its first repeat-lock attack because it exposed a fresh P1.
+
+### F9 · P1 — double-tapping Cast activates the replacement reset control
+
+**Exact production repro** (`https://ganak.pages.dev/?screen=prashna`, 320×844,
+English, repeated twice with different numbers):
+
+1. Open **KP number method (1–249)**.
+2. Select **Marriage / relationship**.
+3. Enter `108` (the first reproduction used `7`).
+4. Double-tap **Cast the answer**.
+5. Observe that no result remains, the number field is empty and editable, Cast is
+   disabled, and **New question** is not present.
+
+**Captured state:**
+
+```text
+before double-tap: value=108, Cast disabled=false, New question=false
+after double-tap:  value="", readOnly=false, Cast disabled=true,
+                   New question=false, Houses judged/result=false
+```
+
+**Why P1:** the first tap casts and swaps the button to **New question** in the same
+tap target; the second tap lands on that replacement control and silently resets the
+locked session. A normal phone double-tap on Cast therefore performs the supposedly
+explicit-only reset without a deliberate **New question** action, making the number
+recastable. This directly violates the repeat-lock acceptance criterion and the
+method-integrity guard against answer shopping.
+
+**Closure:** blocked on F9. No F9 product fix was made because the Agent-2 brief says
+to stop and report a fresh P0/P1 rather than fix it. The remaining place, full boundary,
+12-chip, Hindi, layout and F1–F6 regression matrix is still not signed off.
