@@ -514,7 +514,16 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       deferred labels. **Reopened 2026-07-24:** owner rejected the actual festival
       and fast page quality; route existence is not enough for closure.
       _(P0-FESTIVAL-PAGES-ALL — shipped 2026-07-22)_
-- [ ] **BUG — calendar & search festival rows are navigation dead-ends.** In `src/screens/CalendarPage.tsx` the full-year calendar (`view.type==="year"`) and search results render each festival as a static `Row` (line ~39) with no onClick/link/expand, so tapping does nothing — breaking the "openable anywhere" contract above. File header says "Wire deferred"; the daily list already links (`DailyScreen.tsx` expand). Category: navigation/wayfinding wiring gap (not IA-structure). Fix: route each row to its festival guide page (or inline-expand). Low risk.
+- [ ] **P0 BUG BASH — festival interaction dead ends and invisible expansion.**
+      Calendar year/search rows are true static dead ends. The Fasts & Festivals
+      list technically expands inline, but has no visible state affordance,
+      `aria-expanded`, scroll/reveal behavior or direct-page navigation, so a
+      phone tap appears to do nothing. Audit every festival/fast entry surface,
+      use one consistent row-action contract, wire canonical pages, preserve
+      language/city/date/tab/Back state, add route-derived interaction and
+      accessibility gates, then complete an EN/HI phone/desktop bug bash with at
+      least two agents and production verification. Full brief:
+      `plans/festival-interaction-dead-end-bugbash.md`.
 - [x] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
       selection box directly on every dedicated festival/vrat page. Replace “Open
       this festival in the Daily Panchang to see the local timing referred to below.”
