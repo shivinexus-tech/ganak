@@ -10,6 +10,7 @@ assert(src.includes('festival')&&src.includes('utility')&&src.includes('medical'
 assert(src.includes('utility.kind === "calculator"')&&src.includes('utility.calculator'),'calculator routes must use their resolved calculator identity');
 assert(src.includes('item.blurbHi')&&src.includes('item.blurbEn'),'calculator routes must use their own bilingual descriptions');
 assert(src.includes('Astrology Calculators | Ganak')&&src.includes('Calculator not found | Ganak'),'calculator catalogue and not-found routes need distinct identity');
+assert(src.includes('canonicalPath: "/calculators"')&&src.includes('meta.canonicalPath || meta.path'),'unknown calculator URLs must canonicalise to the valid calculator catalogue');
 const html=fs.readFileSync('index.html','utf8');
 assert(html.includes('rel="canonical"')&&html.includes('property="og:title"'),'static fallback metadata missing');
 console.log('✓ route-metadata PASSED (route identity, bilingual title/description, canonical and Open Graph coverage)');

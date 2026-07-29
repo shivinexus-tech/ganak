@@ -44,6 +44,7 @@ export function routeMetadata({ lang, mode, festival, utility, medical, muhurat 
       return {
         title: l === "hi" ? "कैलकुलेटर नहीं मिला | गणक" : "Calculator not found | Ganak",
         description: l === "hi" ? "यह कैलकुलेटर उपलब्ध नहीं है; गणक के समर्थित ज्योतिष कैलकुलेटर देखें।" : "This calculator is unavailable; browse Ganak’s supported astrology calculators.",
+        canonicalPath: "/calculators",
       };
     }
     return {
@@ -76,7 +77,7 @@ export function applyRouteMetadata(meta) {
     }
     node.setAttribute(attr, value);
   };
-  const canonical = canonicalOrigin() + (meta.path || "/");
+  const canonical = canonicalOrigin() + (meta.canonicalPath || meta.path || "/");
   set('meta[name="description"]', "content", meta.description);
   set('link[rel="canonical"]', "href", canonical);
   set('meta[property="og:title"]', "content", meta.title);
