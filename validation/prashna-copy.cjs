@@ -28,8 +28,14 @@ if ((source.match(/englishOrdinal\(h\)/g) || []).length !== 2) {
 if (source.includes('en="Prashna · ask the moment"')) {
   failures.push('removed Prashna section subtitle "ask the moment" has returned');
 }
-if (!source.includes('<PrashnaSecHead hi="प्रश्न कुण्डली" en="Prashna" />')) {
-  failures.push('Prashna section header must keep its title without the removed subtitle');
+if (!source.includes('<PrashnaSecHead hiMode={hi} />')) {
+  failures.push('Prashna section header must follow the active language');
+}
+if (!source.includes("{hiMode ? 'प्रश्न कुण्डली' : 'Prashna'}")) {
+  failures.push('Prashna section header must show exactly one language');
+}
+if (/PrashnaSecHead hi=/.test(source)) {
+  failures.push('bilingual Prashna heading props have returned');
 }
 for (const forbiddenHindi of [
   "hi: 'KP अंक विधि",

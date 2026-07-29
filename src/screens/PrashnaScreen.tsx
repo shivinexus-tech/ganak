@@ -335,11 +335,15 @@ function PR_castNumber(ms, lat, lonE, number) {
 }
 
 // ------------------------------------------------------------ UI PIECES
-function PrashnaSecHead({ hi, en }) {
+function PrashnaSecHead({ hiMode }) {
   return (
     <div style={{ marginBottom: 10 }}>
-      <div style={{ fontFamily: TOKENS.devanagari, fontSize: 20, color: TOKENS.ink, lineHeight: 1.2 }}>{hi}</div>
-      <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: TOKENS.muted }}>{en}</div>
+      <div style={{ fontFamily: hiMode ? TOKENS.devanagari : 'inherit',
+        fontSize: hiMode ? 20 : 11, letterSpacing: hiMode ? undefined : '0.14em',
+        textTransform: hiMode ? undefined : 'uppercase', color: hiMode ? TOKENS.ink : TOKENS.muted,
+        lineHeight: 1.2 }}>
+        {hiMode ? 'प्रश्न कुण्डली' : 'Prashna'}
+      </div>
     </div>
   );
 }
@@ -660,7 +664,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   return (
     <div style={{ background: TOKENS.bg, minHeight: '100%', padding: 16, color: TOKENS.ink,
       fontFamily: "-apple-system, 'Segoe UI', sans-serif" }}>
-      <PrashnaSecHead hi="प्रश्न कुण्डली" en="Prashna" />
+      <PrashnaSecHead hiMode={hi} />
 
       {/* Method toggle — two named methods, never mixed (owner-approved).
           Follows the language switch (single language), each with a short description. */}
