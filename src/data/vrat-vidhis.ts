@@ -11,6 +11,7 @@ import {
   GANESH_AARTI, LAKSHMI_AARTI, OM_JAI_JAGDISH_HARE, OM_JAI_SHIV_OMKARA,
   KUNJ_BIHARI_AARTI, SATYANARAYAN_AARTI, JAI_AMBE_GAURI_AARTI,
   AMBE_TU_HAI_JAGDAMBE_AARTI, JAI_PARVATI_MATA_AARTI,
+  KARVA_MATA_AARTI, AHOI_MATA_AARTI,
 } from "./aarti-texts";
 
 /* Vrat vidhi content — sourced from plans/vrat-vidhis.md. User-facing copy only;
@@ -583,7 +584,7 @@ export const VRAT_VIDHI = {
     },
   },
   karvaChauth: {
-    aartis: [GANESH_AARTI, JAI_PARVATI_MATA_AARTI, OM_JAI_SHIV_OMKARA],
+    aartis: [GANESH_AARTI, KARVA_MATA_AARTI, OM_JAI_SHIV_OMKARA],
     verdict: {
       en: "Karva Chauth is a festival where women fast for their husband's wellbeing, from sunrise until moonrise.",
       hi: "करवा चौथ वह पर्व है जिसमें महिलाएँ पति के मंगल के लिए सूर्योदय से चन्द्रोदय तक व्रत रखती हैं।",
@@ -613,7 +614,7 @@ export const VRAT_VIDHI = {
     },
   },
   ahoiAshtami: {
-    aartis: [GANESH_AARTI, JAI_PARVATI_MATA_AARTI, OM_JAI_SHIV_OMKARA],
+    aartis: [GANESH_AARTI, AHOI_MATA_AARTI, OM_JAI_SHIV_OMKARA],
     verdict: {
       en: "A North-Indian fast for the wellbeing of all children, kept from dawn until the stars are visible; households with a moonrise tradition complete it after Chandra darshan.",
       hi: "सभी बच्चों के मंगल के लिए उत्तर भारतीय व्रत, प्रातः से तारों के दर्शन तक; कुछ कुल चन्द्रोदय तक रखते हैं।",

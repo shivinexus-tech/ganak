@@ -4,7 +4,7 @@
 
 import {
   GANESH_AARTI, LAKSHMI_AARTI, OM_JAI_JAGDISH_HARE,
-  KUNJ_BIHARI_AARTI, RAMAYANA_AARTI, HANUMAN_AARTI,
+  KUNJ_BIHARI_AARTI, RAMAYANA_AARTI, HANUMAN_AARTI, GOVARDHAN_MAHARAJ_AARTI,
 } from "./aarti-texts";
 
 const p = (en, hi) => ({ en, hi });
@@ -154,7 +154,7 @@ export const MAJOR_FESTIVAL_GUIDES = {
     paran: ["Paran follows the household observance. If a fast is kept, complete it after the morning bath and worship according to family custom.", "पारण की रीति अपने गृह-अनुष्ठान से रखें। व्रत हो तो प्रातः स्नान-पूजा बाद कुलानुसार खोलें।"], ...COMPLETION.narakChaturdashi,
   }),
   govardhanPuja: guide({
-    aartis: [GANESH_AARTI, KUNJ_BIHARI_AARTI, OM_JAI_JAGDISH_HARE],
+    aartis: [GANESH_AARTI, GOVARDHAN_MAHARAJ_AARTI, OM_JAI_JAGDISH_HARE],
     verdict: ["Worship Krishna and Govardhan and offer Annakut according to household capacity during the local Pratipada period. A small home meal offered with gratitude is valid; food waste is not required.", "स्थानीय प्रतिपदा काल में गृह-सामर्थ्य अनुसार कृष्ण-गोवर्धन पूजा और अन्नकूट भोग करें। कृतज्ञता से अर्पित छोटा पारिवारिक भोजन मान्य है; भोजन की बर्बादी आवश्यक नहीं।"],
     meaning: ["Govardhan Puja follows Diwali and remembers Krishna sheltering Braj beneath Govardhan, teaching humility, ecological care and gratitude for food, cattle and land.", "गोवर्धन पूजा दीपावली के बाद कृष्ण द्वारा ब्रज को गोवर्धन तले आश्रय देने की कथा स्मरण करती है—विनम्रता, प्रकृति, अन्न, गौ और भूमि के प्रति कृतज्ञता।"],
     vidhi: [["Clean the altar and make a small Govardhan representation only from safe, locally accepted material, or use an image.", "वेदी साफ कर सुरक्षित स्थानीय मान्य सामग्री से छोटा गोवर्धन रूप या चित्र रखें।"], ["Offer water, flowers, Tulsi, seasonal foods and the family's meal to Krishna-Govardhan.", "जल, फूल, तुलसी, मौसमी अन्न और पारिवारिक भोजन कृष्ण-गोवर्धन को अर्पित करें।"], ["Perform aarti or symbolic circumambulation, distribute all edible food and avoid waste.", "आरती या प्रतीकात्मक परिक्रमा, समस्त खाद्य प्रसाद वितरण और अपव्यय से बचें।"]],
