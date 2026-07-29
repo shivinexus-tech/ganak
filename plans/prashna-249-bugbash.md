@@ -416,9 +416,16 @@ bundle, calculations or journeys, and produced no console/network error in the a
 but the global favicon deployment should be corrected in the branding/platform lane.
 It was not expanded into this exclusively scoped feature fix.
 
+**Resolution (2026-07-29): FIXED.** `main` commit `23e4a56` added an owned,
+self-contained Ganak SVG favicon, selected it explicitly in `index.html`, and placed
+the legacy `/favicon.ico` → `/favicon.svg` redirect before the SPA fallback.
+Production verification on `ganakapp.com` now returns `301` followed by
+`200 image/svg+xml` (650 bytes), and the live document exposes
+`rel="icon"` with `type="image/svg+xml"`. The favicon regression gate passes 5/5.
+
 **Technical close-out:** the required independent production matrix exceeds 30
 minutes and has **no open P0/P1**. F11 and F12 are fixed and live. Codex gives a clean
 technical sign-off on `https://ganakapp.com/?screen=prashna`. F13 is unrelated P2
-platform polish. The older `CLAUDE-PRASHNA-249-ENGINE` row remains `REVIEW` because
+platform polish and is now resolved. The older `CLAUDE-PRASHNA-249-ENGINE` row remains `REVIEW` because
 its separate owner live-URL acceptance, numeric house-cusp cross-check and Reader
 II/VI page-pin are outside this bug-bash authority.
