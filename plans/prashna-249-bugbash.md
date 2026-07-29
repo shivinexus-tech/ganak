@@ -366,7 +366,7 @@ npm run build                   132 modules, PASS
   preserved the locked result.
 - **Conventions:** expanded number mode said KP-New ayanamsa; time mode said Lahiri,
   with no cross-mode leak.
-- **Diagnostics:** deployed asset `index-CzZh2LKs.js`; zero production console
+- **Diagnostics:** final integrated asset `index-ChyoZmlr.js`; zero production console
   warnings/errors. The app bundle, stylesheet and seven fonts were observed and
   fetched successfully.
 
