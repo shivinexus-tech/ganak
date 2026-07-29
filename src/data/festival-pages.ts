@@ -176,6 +176,30 @@ function makeRouteRegistry(entries) {
   return Object.freeze(routes);
 }
 
+/* Reverse lookup used by every festival/fast entry surface (Daily, Fasts &
+   Festivals list, full-year calendar, tithi/festival search) to turn a live
+   registry key into its canonical dedicated-page path. Interaction surfaces must
+   never invent a route or silently swallow an unmapped key — they call this and,
+   on null, render a visible bilingual "page unavailable" affordance (and the
+   festival-interaction gate fails if any displayed key is unmapped). */
+const KEY_ROUTE = (() => {
+  const festival = Object.create(null);
+  const observance = Object.create(null);
+  for (const entry of FESTIVAL_PAGE_ENTRIES) {
+    if (!entry.path) continue;
+    (entry.sourceKind === "festival" ? festival : observance)[entry.key] = entry.path;
+  }
+  return { festival, observance };
+})();
+
+function festivalPathForKey(kind, key) {
+  if (!key) return null;
+  const isFast = kind === "fast" || kind === "observance";
+  const primary = isFast ? KEY_ROUTE.observance : KEY_ROUTE.festival;
+  const secondary = isFast ? KEY_ROUTE.festival : KEY_ROUTE.observance;
+  return primary[key] || secondary[key] || null;
+}
+
 const FESTIVAL_PAGE_ROUTES = makeRouteRegistry([...FESTIVAL_PAGE_ENTRIES, ...NAVADURGA_PAGE_ENTRIES]);
 const REQUIRED_PAGE_ENTRIES = Object.freeze(FESTIVAL_PAGE_ENTRIES.filter((entry) => entry.status === "required"));
 const DEFERRED_PAGE_ENTRIES = Object.freeze(FESTIVAL_PAGE_ENTRIES.filter((entry) => entry.status === "deferred"));
@@ -187,6 +211,7 @@ export {
   EXCLUDED_PAGE_KEYS,
   FESTIVAL_PAGE_ENTRIES,
   FESTIVAL_PAGE_ROUTES,
+  festivalPathForKey,
   REQUIRED_PAGE_ENTRIES,
   DEFERRED_PAGE_ENTRIES,
   SHARED_PAGE_ENTRIES,

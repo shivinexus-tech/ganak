@@ -524,6 +524,19 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       accessibility gates, then complete an EN/HI phone/desktop bug bash with at
       least two agents and production verification. Full brief:
       `plans/festival-interaction-dead-end-bugbash.md`.
+      **Fix delivered locally + 2 independent audits (`P0-FESTIVAL-INTERACTION-DEAD-END-BUGBASH`, 2026-07-28):**
+      one interaction contract across every festival/fast surface — CalendarPage
+      year+search dead rows and MuhuratHub F&F rows now open the canonical
+      `/festival/...` page via real `<a href>` (lang+city preserved); the F&F
+      inline preview is a separate accessible chevron toggle
+      (`aria-expanded`/`aria-controls`, open-state chevron, in-viewport reveal,
+      bilingual "Open full guide"); tithi-only rows stay non-interactive; unmapped
+      keys show a visible bilingual error. New route-derived gate
+      `validation/festival-interaction.cjs` (166 keys + live engine emission
+      coverage + 11 element-scoped failure fixtures, prove-the-guard verified).
+      Live-verified EN/HI at 390×844 + 1280px; both audit agents PASS (gate
+      hardened after audit). **Still open before check-off:** commit/deploy and
+      EN/HI phone+desktop production smoke on `ganak.pages.dev` + owner live sign-off.
 - [x] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
       selection box directly on every dedicated festival/vrat page. Replace “Open
       this festival in the Daily Panchang to see the local timing referred to below.”
