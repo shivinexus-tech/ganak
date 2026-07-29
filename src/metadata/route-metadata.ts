@@ -34,8 +34,22 @@ export function routeMetadata({ lang, mode, festival, utility, medical, muhurat 
     };
   }
   if (utility) {
-    const label = utility.label?.[l] || utility.name?.[l] || utility.key || "Calculator";
-    return { title: `${label} | Ganak`, description: l === "hi" ? `${label} का सरल उत्तर और पारदर्शी गणना-विधि।` : `${label} with a plain-language answer and transparent calculation method.` };
+    if (utility.kind === "calculator" && utility.calculator) {
+      const item = utility.calculator;
+      const label = l === "hi" ? item.hi : item.en;
+      const description = l === "hi" ? item.blurbHi : item.blurbEn;
+      return { title: `${label} | Ganak`, description };
+    }
+    if (utility.kind === "notfound") {
+      return {
+        title: l === "hi" ? "कैलकुलेटर नहीं मिला | गणक" : "Calculator not found | Ganak",
+        description: l === "hi" ? "यह कैलकुलेटर उपलब्ध नहीं है; गणक के समर्थित ज्योतिष कैलकुलेटर देखें।" : "This calculator is unavailable; browse Ganak’s supported astrology calculators.",
+      };
+    }
+    return {
+      title: l === "hi" ? "ज्योतिष कैलकुलेटर | गणक" : "Astrology Calculators | Ganak",
+      description: l === "hi" ? "स्पष्ट उत्तर और पारदर्शी गणना-विधि वाले वैदिक और पाश्चात्य ज्योतिष कैलकुलेटर।" : "Vedic and Western astrology calculators with plain-language answers and transparent methods.",
+    };
   }
   if (medical) return { title: l === "hi" ? "चिकित्सा मुहूर्त सुरक्षा मार्गदर्शन | गणक" : "Medical Muhurat Safety Guidance | Ganak", description: l === "hi" ? "अत्यावश्यक चिकित्सा में विलम्ब न करें; केवल लचीली, चिकित्सक-अनुमोदित तारीख़ों हेतु सीमित मार्गदर्शन।" : "Never delay urgent care; limited guidance only for flexible dates approved by a clinician." };
   if (muhurat) {
