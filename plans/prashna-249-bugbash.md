@@ -310,3 +310,115 @@ this pass.** F9 is behaviorally confirmed fixed. F11 remains open as P2 polish, 
 the existing owner live-URL sign-off plus primary-source/cusp-verification items remain
 outside this bug-bash closure; therefore the engine row should not be represented as
 fully quality/source-closed solely from this pass.
+
+---
+
+## Agent-2 final-closure sweep — Codex, 2026-07-28 (46 focused production minutes)
+
+**Pre-flight:** `origin/main` had advanced from the supplied `45c1416` to `9d6fa2f`.
+The ownership case remained **Stopped midway historically**: Claude Code had shipped
+F9/F10 and stopped for an independent Agent-2 review. A prior Codex continuation had
+already recorded a closing matrix with F11 P2 open, so this owner-directed run was a
+fresh production audit rather than an assumption that the earlier note was sufficient.
+The shared checkout contained unrelated edits; all product work used isolated branch
+`codex/prashna-249-f12-final-closure`.
+
+**Baseline on fetched main — PASS:**
+
+```text
+prashna-249-input.cjs           5/5 PASS before new tests
+prashna-249.cjs                 33/33 PASS
+prashna-249-chart.cjs           14/14 PASS
+prashna parity                  EXACT 198 values / 6 charts
+prashna-calc.js                 24/24 PASS
+parse-check kundli-app.tsx      clean
+npm run build                   132 modules, PASS
+```
+
+### Independent production evidence
+
+- **Repeat lock:** a real foreground double-click at 320px and rapid triple taps on
+  Cast produced exactly one locked #108 result. The input stayed read-only; chip
+  changes were ignored; number→time→number and EN→HI→EN restored the same answer.
+  A reset inside the 600ms replacement-button window was swallowed; one deliberate
+  later New-question click reset correctly. Back/Forward or section navigation ended
+  the old document without surfacing a stale result.
+- **Canonical table:** 1, 22/23, 62/63, 105/106, 124/125, 145/146, 188/189,
+  228/229, 249, the 33/116/199 twins and anchor 108 all matched the expected sign,
+  star lord and sub-lord. F11 was independently reproduced before its fix.
+- **All 12 question chips:** each #108 result preserved the selected question and
+  rendered its exact configured Houses-judged list. Live verdict sampling covered
+  Not yet (#108), Mixed (#42) and Favourable (#249).
+- **Determinism:** two #42 casts within one minute were identical across verdict,
+  summary, sign, star, sub-lord and houses.
+- **Places:** blank/garbage input did not replace the selected city. A locked answer
+  was cleared by a real place transition. Reykjavik disclosed the equal-house
+  high-latitude fallback; Ushuaia cast #249 with the correct southern place and no
+  stale New Delhi/Reykjavik answer.
+- **Language:** direct `?lang=hi` loaded Hindi-only method names/descriptions and all
+  12 Hindi chips. Locked EN→HI→EN results preserved the number and lock; Hindi verdict
+  and guidance rendered in Devanagari without an English verdict leak. Intentional
+  bilingual technical labels remained.
+- **Layout/chart:** 320/360/390px all had
+  `documentElement.scrollWidth === innerWidth`. At 320px the expanded chart wrapper
+  measured `clientWidth=205`, `scrollWidth=382`, `overflow-x:auto`; a real horizontal
+  touch scroll moved it to `scrollLeft=150` while page width stayed 320. Collapse
+  preserved the locked result.
+- **Conventions:** expanded number mode said KP-New ayanamsa; time mode said Lahiri,
+  with no cross-mode leak.
+- **Diagnostics:** deployed asset `index-CzZh2LKs.js`; zero production console
+  warnings/errors. The app bundle, stylesheet and seven fonts were observed and
+  fetched successfully.
+
+### F11 · P2 — FIXED (`7880d99`)
+
+The exact 15°40′ structural twins #33/#116 previously displayed 15°39′ because the
+generic minute formatter floored a binary value just below the exact minute. A
+number-mode-only formatter now rounds to the nearest arcsecond before deriving
+degrees/minutes. It is used for both the answer-card ascendant and the expanded
+number-chart Lagna; time-mode formatting is unchanged.
+
+**TDD:** the new behavioral regression failed before the formatter existed, then
+passed for noisy 15°40′ and 27°53′ anchors. Production #33 now renders
+`Vrishabha 15°40′` in both answer and expanded-chart state.
+
+### F12 · P1 — overlong digits silently selected a different number — FIXED (`7880d99`)
+
+**Exact pre-fix production repro:** enter `123456789`; the field silently became
+`123`, the hint disappeared and Cast enabled. This was the same chart-changing input
+integrity class as F8. The prior `slice(0, 3)` happened to keep `999999…` blocked only
+because it produced `999`.
+
+**Fix:** normalize leading zeros first, but preserve any normalized value longer than
+three digits as visibly invalid. `007` and `0007` still become `7`; `1234`,
+`123456789` and `0001234` remain visible with the 1–249 warning and Cast disabled.
+The production fuzz matrix also rejected decimal/sign, exponent, embedded-space,
+Latin-letter, Devanagari, Arabic-Indic and full-width numeral strings.
+
+**TDD/gates after both fixes:**
+
+```text
+prashna-249-input.cjs           8/8 PASS (F8/F10/F11/F12)
+prashna-249.cjs                 33/33 PASS
+prashna-249-chart.cjs           14/14 PASS
+prashna parity                  EXACT 198 values / 6 charts
+prashna-calc.js                 24/24 PASS
+parse-check kundli-app.tsx      clean
+npm run build                   132 modules, PASS
+```
+
+### F13 · P2 (global deployment, not Prashna) — favicon returns HTML
+
+A strict production asset fetch downloaded 8/9 requested stylesheet/font/image
+assets. `/favicon.ico` returned `text/html` (the SPA fallback document), so the asset
+checker rejected it as an image MIME mismatch. This does not affect the Prashna
+bundle, calculations or journeys, and produced no console/network error in the app,
+but the global favicon deployment should be corrected in the branding/platform lane.
+It was not expanded into this exclusively scoped feature fix.
+
+**Technical close-out:** the required independent production matrix exceeds 30
+minutes and has **no open P0/P1**. F11 and F12 are fixed and live. Codex gives a clean
+technical sign-off on `https://ganakapp.com/?screen=prashna`. F13 is unrelated P2
+platform polish. The older `CLAUDE-PRASHNA-249-ENGINE` row remains `REVIEW` because
+its separate owner live-URL acceptance, numeric house-cusp cross-check and Reader
+II/VI page-pin are outside this bug-bash authority.
