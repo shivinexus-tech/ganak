@@ -5,6 +5,7 @@ import { T } from "../components/tokens";
 import { fmtTime } from "../components/format";
 import { tr, trN, obsLabel } from "../i18n";
 import { FEST_NAME } from "../data/festival-meta";
+import { festivalPathForKey } from "../data/festival-pages";
 import { zoneOffset } from "../engine/panchang";
 import { scanPanchangCalendar } from "../engine/festivals";
 import { searchUpcoming } from "../engine/search-upcoming";
@@ -36,16 +37,69 @@ function CalendarPage({ view, place, lang, onBack, C, card }) {
     ? ((it.paksha ? (lang === "hi" ? (it.paksha === "Krishna" ? "कृष्ण " : "शुक्ल ") : it.paksha + " ") : "") + it.label)
     : (it.kind === "fast" ? obsLabel(lang, {key: it.key}) : trN(lang, FEST_NAME, it.key));
 
-  const Row = ({ it, first }) => (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 2px", borderTop: first ? "none" : `1px solid ${C.line}` }}>
-      <span style={{ width: 7, height: 7, borderRadius: "50%", background: it.kind === "festival" ? C.gold : C.sindoor, flexShrink: 0 }} />
-      <span style={{ flex: 1, fontFamily: T.serif, fontSize: T.fBody, color: C.ivory }}>{labelOf(it)}</span>
-      <span style={{ fontSize: T.fSmall, color: C.gold, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{fmtFull(it.ms)}</span>
-    </div>
-  );
+  // Preserve language + selected city on the dedicated festival page and on the
+  // browser Back trip (no localStorage/sessionStorage; URL query only).
+  const festHref = (path) => {
+    const p = new URLSearchParams();
+    p.set("lang", lang);
+    if (place && place.label) {
+      p.set("city", place.label);
+      p.set("lat", String(place.lat));
+      p.set("lon", String(place.lon));
+      if (place.zone) p.set("zone", place.zone);
+    }
+    return `${path}?${p.toString()}`;
+  };
+
+  const dot = (it) => <span style={{ width: 7, height: 7, borderRadius: "50%", background: it.kind === "festival" ? C.gold : C.sindoor, flexShrink: 0 }} />;
+  const dateSpan = (it) => <span style={{ fontSize: T.fSmall, color: C.gold, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{fmtFull(it.ms)}</span>;
+
+  const Row = ({ it, first }) => {
+    const border = first ? "none" : `1px solid ${C.line}`;
+    // Tithi-only rows are informational, never a dedicated page — keep them plainly
+    // non-interactive so they don't look like a broken button (and never route a
+    // bare tithi to an unrelated festival).
+    if (it.kind === "tithi") {
+      return (
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 4px", borderTop: border }}>
+          {dot(it)}
+          <span style={{ flex: 1, fontFamily: T.serif, fontSize: T.fBody, color: C.ivory }}>{labelOf(it)}</span>
+          {dateSpan(it)}
+        </div>
+      );
+    }
+    const path = festivalPathForKey(it.kind, it.key);
+    // A festival/fast with no canonical page must fail visibly, never silently.
+    if (!path) {
+      return (
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 4px", borderTop: border }}>
+          {dot(it)}
+          <span style={{ flex: 1, minWidth: 0, fontFamily: T.serif, fontSize: T.fBody, color: C.ivory }}>
+            {labelOf(it)}
+            <span style={{ display: "block", fontFamily: T.body, fontSize: T.fMicro, color: C.sindoor }}>{lang === "hi" ? "इस पर्व का पूरा पृष्ठ अभी उपलब्ध नहीं है" : "Full page for this entry isn't available yet"}</span>
+          </span>
+          {dateSpan(it)}
+        </div>
+      );
+    }
+    return (
+      <a
+        href={festHref(path)}
+        className="fest-row"
+        aria-label={`${labelOf(it)} — ${fmtFull(it.ms)}`}
+        style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 4px", borderTop: border, textDecoration: "none", color: "inherit" }}
+      >
+        {dot(it)}
+        <span style={{ flex: 1, minWidth: 0, fontFamily: T.serif, fontSize: T.fBody, color: C.ivory, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{labelOf(it)}</span>
+        {dateSpan(it)}
+        <span aria-hidden="true" style={{ flexShrink: 0, color: C.muted, fontSize: T.fBody }}>›</span>
+      </a>
+    );
+  };
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 60, background: C.bg, overflowY: "auto" }}>
+      <style>{`.fest-row{border-radius:8px;transition:background .12s ease;} .fest-row:hover{background:rgba(168,106,18,.08);} .fest-row:hover span[aria-hidden]{color:${C.gold};} .fest-row:focus-visible{outline:2px solid #A86A12;outline-offset:-2px;background:rgba(168,106,18,.10);}`}</style>
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 18px 60px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, position: "sticky", top: 0, background: C.bg, padding: "14px 0 12px", zIndex: 2, borderBottom: `1px solid ${C.line}`, marginBottom: 18 }}>
           <button onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "9px 15px", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: C.panel, color: C.ivory, cursor: "pointer", fontFamily: T.serif, fontSize: T.fSmall }}>‹ {tr(lang, "backLabel")}</button>

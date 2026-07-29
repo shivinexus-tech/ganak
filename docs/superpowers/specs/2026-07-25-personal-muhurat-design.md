@@ -23,20 +23,22 @@ astrologer knowledge — answer-first, bilingual, honest.
 - An **opt-in** "Personalise with your birth star" panel inside the existing Muhurat
   finder (`MuhuratHub`), for the general finder categories (marriage, engagement,
   property, vehicle, Bhoomi/construction, business, travel, housewarming, documents).
-- Four natal filters, all reusing already-shipped validated engines (except the
-  named-nakshatra rule, which is new data over the reused nakshatra maths):
-  - **Tarabala** (birth Nakshatra → day's Moon-star), `taraBala` reused.
+- **Two hard filters + two soft layers.** The hard filters (which can remove a day) are
+  both properly-sourced muhurta rules; the soft layers only mark/rank, never remove:
+  - **Tarabala** (birth Nakshatra → day's Moon-star), `taraBala` reused. *Hard filter.*
   - **Chandrabala** (birth Moon-sign → day's Moon-sign, waxing/waning aware),
-    `chandraBala` reused.
-  - **Special-nakshatra (Adhanadi) avoidance** — the day's Moon-star at ordinal
-    **{1, 10, 16, 18, 22, 25}** from the birth star (Janma, Karma, Sanghatika,
-    Samudayika, Vainasika, Manasa) is set aside *by name*. Owner-requested
-    2026-07-25; see §3.1 for provenance. Over Tarabala this newly adds the **18th
-    (Samudayika)** and **22nd (Vainasika)**; the others already fall on avoided taras.
+    `chandraBala` reused. *Hard filter.*
   - **Advanced strength** = the day's transit **Moon Bhinnashtakavarga bindu count**,
-    via `computeKundli` → `computeAshtakavarga` reused.
+    via `computeKundli` → `computeAshtakavarga` reused. *Soft — ranks, never removes.*
+  - **Special-nakshatra (Adhanadi) caution** — the day's Moon-star at ordinal
+    **{1, 10, 16, 18, 22, 25}** from the birth star (Janma, Karma, Sanghatika,
+    Samudayika, Vainasika, Manasa). *Soft — the day is **kept and marked**, never removed*,
+    and labelled "a personal tradition, not a classical muhurta rule." Owner decision
+    2026-07-25 after the source hunt came back negative; see §3.1.
 - Owner-chosen behaviour: **filter weak days out automatically** — implemented as a
   *graded, visible* filter (see §5) so it never silently changes the general results.
+  Only the two sourced hard filters remove days; strength and the named caution only
+  annotate.
 - Bilingual (en/hi) throughout, following the app-wide language toggle.
 - Birth details held in **URL prefs only, never stored** (project no-storage ban).
 
@@ -65,31 +67,37 @@ Gap: the current gate `validation/daily-windows.cjs` only shape-checks these (le
 12/27); it does not anchor the auspiciousness *logic* or the bindu totals. This spec adds
 a dedicated anchor gate (§8) so the personalisation method is validated, not assumed.
 
-### 3.1 Special-nakshatra (Adhanadi) rule — honest provenance
+### 3.1 Special-nakshatra (Adhanadi) caution — honest provenance (source hunt: negative)
 
-This fourth filter is a named traditional convention, **not** primary-text-verified, and
-must be labelled as such in the spec, the UI and the acceptance register — the same
-living-tradition/oral-provenance standard Ganak already applies to festival content.
+Owner asked (2026-07-25) to hunt a primary text **before** building this rule. The hunt
+returned negative, and that result shapes the design: the named set ships as a **soft,
+honestly-labelled personal caution**, never a hard filter and never presented as sourced
+muhurta doctrine.
 
-- **What is well-attested:** the Adhanadi "special nakshatras" scheme counted from the
-  Janma Nakshatra, and the names + positions Janma (1), Karma (10), Sanghatika (16),
-  Samudayika (18), Manasa (25). Secondary sources agree on these.
-- **What was disputed:** the Vainasika ordinal — most sources place it at the **22nd**,
-  not the 23rd. **Owner decision 2026-07-25: use the 22nd.** So the set is
-  `{1, 10, 16, 18, 22, 25}`.
-- **What could NOT be established:** a classical *primary* text (Brihat Samhita, Muhurta
-  Chintamani, etc.) citing this exact set specifically for **muhurta election avoidance**.
-  Reachable sources are teaching notes / astrology sites, and several frame these as
-  transit/dasha vulnerability points rather than electional avoidances.
-- **Owner decision 2026-07-25:** ship it as an explicitly-labelled traditional convention
-  (never "universal"/"guaranteed"), with the reason named per day. Provenance recorded as
-  *secondary Adhanadi sources + owner's stated tradition; primary-text page-pin still open*.
+- **What is attested (secondary only):** the Adhanadi "special nakshatras" scheme counted
+  from the Janma Nakshatra, with names/positions Janma (1), Karma (10), Sanghatika (16),
+  Samudayika (18), Vainasika (**22nd** — owner-chosen over the disputed 23rd), Manasa (25).
+- **What could NOT be established (two failures):**
+  1. **No classical primary text.** Targeted searches for Prasna Marga, Brihat Samhita,
+     Muhurta Chintamani and Kalaprakashika found no citation; every detailed source is a
+     modern astrology site or teaching note (one explicitly carries no citation).
+  2. **Purpose mismatch.** The sources use this set for **transit/gochara timing** ("a
+     malefic transiting your Vainasika nakshatra brings loss in that life-area"), *not* for
+     **muhurta election**. No reachable source rejects a muhurta day on this basis. The
+     ordinals are also unstable across sources (Vainasika 22/23; Abhisheka 13/28).
+- **Owner decision 2026-07-25 (after seeing the negative hunt):** include the 6-set as an
+  **honest personal/tradition caution** — the day is **kept and marked**, never removed,
+  and every surface (UI, spec, acceptance register) labels it *"a personal tradition, not a
+  classical muhurta rule."* It never poses as sourced doctrine and never overrides the two
+  sourced hard filters.
 - **Sources consulted (secondary):**
   `astrobix.com/.../1162-adhanadi-nakshatra-meaning...`,
   `shrifreedom.org/vedic-astrology/navatara-chakra/`,
-  `astroveda.wikidot.com/special-nakshatras-taras`.
-- **Follow-up (non-blocking):** a primary-text page-pin remains a backlog nicety, mirroring
-  the KSK-verify pattern; it does not block this labelled-tradition v1.
+  `astroveda.wikidot.com/special-nakshatras-taras`,
+  `horasarvam.blogspot.com/2023/08/aadhanaadi-nakshatras-special-nakshatras.html`.
+- **Open item (surfaced, not parked):** if a primary text is ever found (or the owner
+  supplies a lineage text), the caution can be upgraded to a sourced rule — logged as an
+  explicit open backlog line, not a silent TODO.
 
 ## 4. Architecture
 
@@ -102,18 +110,18 @@ Pure overlay module. Never mutates a finder day's own fields. Exports:
     birth instant, same technique as `medical-muhurat.ts:natalMoonSign`).
   - `moonBav` = `computeAshtakavarga(signOf, ascSign).bav.Moon` (12-length bindu array),
     where `signOf`/`ascSign` come from `computeKundli` on the birth details.
-- `personalFit(anchors, day)` → `{ tara, taraGood, chandraGood, special, specialOk,
-  moonBindu, strength, coreOk, verdict }` for one finder day.
+- `personalFit(anchors, day)` → `{ tara, taraGood, chandraGood, special, specialCaution,
+  specialName, moonBindu, strength, coreOk, verdict }` for one finder day.
   - `day` supplies `{ ms, moonNak, moonSign, waxing }` — all already on a
     `muhuratScanRange` result row (or derivable from `ms` via the panchang helpers).
   - `taraGood` = `!(tara in {1,3,5,7})`; `chandraGood` from `chandraBala` lookup;
     `moonBindu` = `moonBav[day.moonSign]` (0–8); `strength` = bucket of `moonBindu`.
-  - `special` = ordinal-from-Janma `((moonNak - janmaNak + 27) % 27) + 1`; a lookup
-    maps the avoided ordinals `{1,10,16,18,22,25}` to their names (Janma/Karma/
-    Sanghatika/Samudayika/Vainasika/Manasa) for the UI reason. `specialOk` =
-    `!(special in {1,10,16,18,22,25})`.
-  - `coreOk` = `taraGood && chandraGood && specialOk` (the hard-cut predicate). The
-    named rule joins the hard cut so the 18th/22nd are genuinely set aside.
+  - `special` = ordinal-from-Janma `((moonNak - janmaNak + 27) % 27) + 1`; a lookup maps
+    `{1,10,16,18,22,25}` to their names (Janma/Karma/Sanghatika/Samudayika/Vainasika/
+    Manasa). `specialCaution` = `special in {1,10,16,18,22,25}`; `specialName` = the mapped
+    name (or null). This is a **soft caution only** — it does *not* feed `coreOk`.
+  - `coreOk` = `taraGood && chandraGood` (the hard-cut predicate — the two sourced muhurta
+    filters only). A day may be `coreOk === true` yet still carry a `specialCaution` mark.
 - `applyPersonalisation(days, anchors, opts)` → `{ kept, setAside, mode }` implementing
   the graded filter and safety fallback (§5). `days` is the **existing** finder output;
   the function only partitions and ranks it.
@@ -134,15 +142,17 @@ Honoured, but made explicit and non-silent so it satisfies the backlog rule:
 
 1. **Default (no birth details):** general finder output is passed through unchanged.
    Zero natal logic runs. This is the invariant that keeps the promise.
-2. **Hard cut (removed → `setAside`):** a day is removed when `coreOk` is false, i.e. it
-   fails Tarabala (tara ∈ {1,3,5,7}) **or** Chandrabala **or** the named special-nakshatra
-   rule (ordinal ∈ {1,10,16,18,22,25}). Each removed day keeps its precise reason (which
-   filter, and for the named rule *which* nakshatra by name) so the "tap to view" list can
-   explain it.
-3. **Advanced strength = ranking, not a second hard cut:** surviving (`kept`) days sort by
-   `moonBindu` desc, then by the finder's own score. A very-low-bindu day (`moonBindu ≤ 2`)
-   is **kept but flagged** "weaker strength" — never deleted by strength alone. This stops
-   three stacked filters from collapsing the list.
+2. **Hard cut (removed → `setAside`):** a day is removed only when `coreOk` is false, i.e.
+   it fails Tarabala (tara ∈ {1,3,5,7}) **or** Chandrabala — the two sourced muhurta
+   filters. Each removed day keeps its precise reason so the "tap to view" list explains it.
+3. **Soft annotations on kept days (never remove):**
+   - **Advanced strength** — kept days sort by `moonBindu` desc, then the finder's own
+     score; a very-low-bindu day (`moonBindu ≤ 2`) is **kept and flagged** "weaker
+     strength", never deleted by strength alone.
+   - **Special-nakshatra caution** — a kept day whose Moon-star is at ordinal
+     {1,10,16,18,22,25} from Janma is **kept and marked** with the named caution
+     ("18th from your birth star — Samudayika · a personal tradition, not a classical
+     muhurta rule"). Never removed.
 4. **Safety fallback (`mode: "annotate"`):** if the hard cut would leave fewer than **3**
    kept days in the chosen range, the engine does not filter — it returns all days in
    original order, each annotated with its fit, plus a bilingual note
@@ -152,10 +162,13 @@ Honoured, but made explicit and non-silent so it satisfies the backlog rule:
 ## 6. What the user sees
 
 - **Count line** (top of results, bilingual): "6 of 21 days set aside for your birth star ·
-  tap to view" → tapping reveals the `setAside` days each with a plain reason, including the
-  named special nakshatra where that is why (e.g. "18th from your birth star — Samudayika").
+  tap to view" → tapping reveals the `setAside` days, each with a plain reason (Tarabala or
+  Chandrabala — the two filters that actually remove days).
 - **Fit badge** per kept day (bilingual): birth-star supportive · Moon-sign supportive ·
-  strength shown as filled/empty dots (●●●○) from `moonBindu`.
+  strength as filled/empty dots (●●●○) from `moonBindu`. A kept day at a special nakshatra
+  also shows a small **caution chip** — "18th from your birth star — Samudayika" — with a
+  tap-through note reading *"a personal tradition, not a classical muhurta rule."* The day
+  is still offered; the chip is advisory only.
 - **One-line honest gloss**, medical-screen tone: a traditional personal-timing guide, not
   a guarantee of outcome — consistent with answer-before-data honesty.
 - **Language:** all of the above follow the app hi/en toggle.
@@ -181,16 +194,15 @@ RED → GREEN → prove-the-guard, mirroring `validation/medical-muhurat.cjs`:
   and good/bad (e.g. same-star ⇒ tara 1 ⇒ avoided).
 - **Chandrabala anchor:** a fixed (birthSign, dayMoonSign, paksha) triple pins good/bad,
   including a waxing-only extra sign.
-- **Special-nakshatra anchor:** pins `special` ordinal + name for the avoided set
-  `{1,10,16,18,22,25}` and proves the two *new* additions bite — an 18th-from-Janma day
-  (Tarabala tara 9 = good) and a 22nd-from-Janma day (tara 4 = good) both come back
-  `coreOk === false` with the correct named reason; a control day at the 20th (not in the
-  set, good tara) stays `coreOk === true`.
+- **Special-nakshatra anchor (soft caution):** pins `special` ordinal + `specialName` for
+  the set `{1,10,16,18,22,25}` and proves it is **advisory, not a cut** — an 18th-from-Janma
+  day (Tarabala tara 9 = good) comes back `specialCaution === true` **and** `coreOk === true`
+  (kept, marked, not removed); a control day at the 20th has `specialCaution === false`.
 - **Ashtakavarga anchor:** one fixed birth chart pins `bav.Moon` per-sign totals and the
   structural invariant `sum(sav) === 337`.
 - **Filter behaviour:** a synthetic day list proves the hard cut removes only `!coreOk`
-  days, strength ranks (does not cut) survivors, and the `<3` fallback flips to
-  annotate-only.
+  days (Tara/Chandra only), that strength and `specialCaution` rank/mark but never remove,
+  and that the `<3` fallback flips to annotate-only.
 - **Prove-the-guard:** perturb a tara table / bindu value / an entry in the avoided-ordinal
   set → the relevant anchor fails → restore.
 - **No-regression:** the general finder path is untouched; `deep-muhurats.cjs`,

@@ -335,11 +335,15 @@ function PR_castNumber(ms, lat, lonE, number) {
 }
 
 // ------------------------------------------------------------ UI PIECES
-function PrashnaSecHead({ hi, en }) {
+function PrashnaSecHead({ hiMode }) {
   return (
     <div style={{ marginBottom: 10 }}>
-      <div style={{ fontFamily: TOKENS.devanagari, fontSize: 20, color: TOKENS.ink, lineHeight: 1.2 }}>{hi}</div>
-      <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: TOKENS.muted }}>{en}</div>
+      <div style={{ fontFamily: hiMode ? TOKENS.devanagari : 'inherit',
+        fontSize: hiMode ? 20 : 11, letterSpacing: hiMode ? undefined : '0.14em',
+        textTransform: hiMode ? undefined : 'uppercase', color: hiMode ? TOKENS.ink : TOKENS.muted,
+        lineHeight: 1.2 }}>
+        {hiMode ? 'प्रश्न कुण्डली' : 'Prashna'}
+      </div>
     </div>
   );
 }
@@ -565,7 +569,19 @@ function PR_normalizeNumberInput(raw) {
   const trimmed = String(raw).trim();
   if (trimmed === '') return '';
   if (!/^\d+$/.test(trimmed)) return trimmed;
-  return trimmed.replace(/^0+(?=\d)/, '').slice(0, 3);
+  const normalized = trimmed.replace(/^0+(?=\d)/, '');
+  if (normalized.length > 3) return trimmed;
+  return normalized;
+}
+
+// F11: KP number starts are exact to an arcsecond, but a binary float can land a
+// hair below an exact minute (15°39′59.999…). Stabilize number-mode display at the
+// arcsecond before deriving degrees/minutes; time-mode formatting stays unchanged.
+function PR_fmtNumberDeg(deg) {
+  const arcSec = Math.round(deg * 3600);
+  const wholeDeg = Math.floor(arcSec / 3600);
+  const minute = Math.floor((arcSec - wholeDeg * 3600) / 60);
+  return `${wholeDeg}°${String(minute).padStart(2, '0')}′`;
 }
 
 // ------------------------------------------------------------ MAIN SCREEN
@@ -648,7 +664,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   return (
     <div style={{ background: TOKENS.bg, minHeight: '100%', padding: 16, color: TOKENS.ink,
       fontFamily: "-apple-system, 'Segoe UI', sans-serif" }}>
-      <PrashnaSecHead hi="प्रश्न कुण्डली" en="Prashna · ask the moment" />
+      <PrashnaSecHead hiMode={hi} />
 
       {/* Method toggle — two named methods, never mixed (owner-approved).
           Follows the language switch (single language), each with a short description. */}
@@ -659,7 +675,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
             descHi: 'पारम्परिक होरारी — पूछने के ठीक क्षण और स्थान से, कोई अंक नहीं।',
             descEn: 'Classic horary — casts for the exact moment & place you ask, no number.' },
           { key: 'number',
-            hi: 'KP अंक विधि (1–249)', en: 'KP number method (1–249)',
+            hi: 'कृष्णमूर्ति पद्धति अंक विधि (1–249)', en: 'KP number method (1–249)',
             descHi: 'आप 1–249 के बीच एक अंक चुनते हैं, जो कुण्डली का लग्न तय करता है।',
             descEn: 'You choose a number from 1 to 249, which sets the chart’s ascendant.' },
         ].map(m => {
@@ -710,7 +726,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
           <input inputMode="numeric" value={numberInput} readOnly={numberLocked}
             onChange={e => { setNumberInput(PR_normalizeNumberInput(e.target.value)); clearResult(); }}
             placeholder={hi ? '1 से 249 के बीच अंक' : 'a number from 1 to 249'}
-            aria-label={hi ? 'KP अंक (1 से 249)' : 'KP number (1 to 249)'}
+            aria-label={hi ? 'कृष्णमूर्ति पद्धति अंक (1 से 249)' : 'KP number (1 to 249)'}
             style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%', boxSizing: 'border-box',
               border: `1.5px solid ${numOutOfRange ? TOKENS.sindoor : TOKENS.line}`,
               background: numberLocked ? TOKENS.goldSoft : TOKENS.card, color: TOKENS.ink,
@@ -796,7 +812,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                 <div style={{ marginTop: 4, padding: '9px 11px', background: TOKENS.amberSoft,
                   borderRadius: TOKENS.radius, border: `1px solid ${TOKENS.line}`, fontSize: 11.5, color: TOKENS.muted, lineHeight: 1.5 }}>
                   {hi
-                    ? 'यह KP अंक विधि है, KP-New अयनांश पर — गणक की सामान्य लाहिरी परिपाटी से भिन्न। निर्णय के नियम प्रचलित KP पद्धति पर आधारित हैं; कृष्णमूर्ति के मूल ग्रंथों से सत्यापन प्रगति पर है।'
+                    ? 'यह कृष्णमूर्ति पद्धति अंक विधि है, इसके नए अयनांश पर — गणक की सामान्य लाहिरी परिपाटी से भिन्न। निर्णय के नियम प्रचलित कृष्णमूर्ति पद्धति पर आधारित हैं; कृष्णमूर्ति के मूल ग्रंथों से सत्यापन प्रगति पर है।'
                     : 'This is the KP number method on the KP-New ayanamsa — distinct from Ganak’s usual Lahiri convention. The judgment rules follow widely-published KP practice; verification against Krishnamurti’s primary texts is in progress.'}
                 </div>
               )}
@@ -834,7 +850,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                 ))}
               </div>
               <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-                <PrashnaChip label={hi ? 'लग्न' : 'Lagna'} value={`${hi ? RASHI_HI[result.chart.lagna.sign] : RASHI_EN[result.chart.lagna.sign]} ${fmtDeg(result.chart.lagna.deg)}`}
+                <PrashnaChip label={hi ? 'लग्न' : 'Lagna'} value={`${hi ? RASHI_HI[result.chart.lagna.sign] : RASHI_EN[result.chart.lagna.sign]} ${isNum ? PR_fmtNumberDeg(result.chart.lagna.deg) : fmtDeg(result.chart.lagna.deg)}`}
                   gloss={hi ? 'इस क्षण पूर्व में उदित राशि' : 'the sign rising in the east at this moment'} />
                 <PrashnaChip label={hi ? 'नक्षत्र' : 'Nakshatra'} value={`${hi ? NAK_HI[result.chart.lagna.nak.idx] : result.chart.lagna.nak.en}-${result.chart.lagna.nak.pada}`}
                   gloss={hi ? 'उदित अंश जिस चन्द्र-नक्षत्र में पड़ता है' : 'the lunar mansion the rising degree falls in'} />
@@ -876,7 +892,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               <div style={{ marginTop: 8 }}>
                 <Gloss>
                   {hi
-                    ? `तारा/उप = नक्षत्र स्वामी / KP उप-स्वामी — प्रश्न इसी दो-स्तरीय स्वामित्व को पढ़ता है। भाव = ग्रह का भाव (${result.chart.system === 'placidus' ? 'प्लेसिडस भाव — KP मानक' : 'समान भाव — उच्च अक्षांश विकल्प'})। स्थितियाँ: ${isNum ? 'KP-New अयनांश (KP अंक विधि)' : 'लाहिरी अयनांश — द्रिक पंचांग की मानक परिपाटी'}, मध्यम राहु/केतु।`
+                    ? `तारा/उप = नक्षत्र स्वामी / कृष्णमूर्ति पद्धति का उप-स्वामी — प्रश्न इसी दो-स्तरीय स्वामित्व को पढ़ता है। भाव = ग्रह का भाव (${result.chart.system === 'placidus' ? 'प्लेसिडस भाव — कृष्णमूर्ति पद्धति का मानक' : 'समान भाव — उच्च अक्षांश विकल्प'})। स्थितियाँ: ${isNum ? 'कृष्णमूर्ति पद्धति का नया अयनांश (अंक विधि)' : 'लाहिरी अयनांश — द्रिक पंचांग की मानक परिपाटी'}, मध्यम राहु/केतु।`
                     : `Star/Sub = nakshatra lord / KP sub-lord — the two-level rulership Prashna reads. House = the house the planet occupies (${result.chart.system === 'placidus' ? 'Placidus cusps, the KP standard' : 'equal houses — high-latitude fallback'}). Positions: ${isNum ? 'KP-New ayanamsa (KP number method)' : 'Lahiri ayanamsa — the same conventions as Drik Panchang defaults'}, mean Rahu/Ketu.`}
                 </Gloss>
               </div>
@@ -929,7 +945,7 @@ function NumberSetBox({ info, favor, hi }) {
         gloss={hi ? 'जिस नक्षत्र में अंक गिरा' : 'the star your number fell into'} />
       <NumRow label={hi ? 'उप-स्वामी · Sub lord' : 'Sub lord'} value={sub}
         gloss={hi ? 'जो अंतिम निर्णय देता है (हाँ या नहीं)' : 'the planet that gives the final yes or no'} />
-      <NumRow label={hi ? 'लग्न · Ascendant' : 'Ascendant'} value={`${signName} ${fmtDeg(info.signDeg)}`}
+      <NumRow label={hi ? 'लग्न · Ascendant' : 'Ascendant'} value={`${signName} ${PR_fmtNumberDeg(info.signDeg)}`}
         gloss={hi ? 'जहाँ अंक ने कुण्डली स्थिर की' : 'where the number fixed your chart'} />
       <div style={{ borderTop: `1px solid ${TOKENS.line}`, marginTop: 4, paddingTop: 3 }}>
         <NumRow label={hi ? 'विचारित भाव · Houses judged' : 'Houses judged'} value={favor.join(' · ')} />

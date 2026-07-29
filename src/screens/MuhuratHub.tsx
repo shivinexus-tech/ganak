@@ -1,7 +1,7 @@
 /* Muhurat hub UI — pure extraction (SPLIT-UI-03g). Wire deferred.
    Broad imports; unused ones are fine for now until wire trims. */
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { T } from "../components/tokens";
 import { fmtTime, fmtTimeD, fmtDeg } from "../components/format";
 import { tr, trN, obsLabel } from "../i18n";
@@ -19,6 +19,7 @@ import {
 import { dayHoras, analyzeHora, horaResultText, HORA_GLYPH, HORA_COLOR, HORA_NAME, HORA_NATURE, HORA_PLANET_KEYS, horaDetectPlanet, horaIntent, HORA_CLARIFY, HORA_ACTIVITY_MAP, horaWindowsForPlanet } from "../engine/hora";
 import { computeLagnaPanchaka, panchakaRem, PANCHAKA_TYPE } from "../engine/panchaka";
 import { obsKind } from "../engine/festivals";
+import { festivalPathForKey } from "../data/festival-pages";
 import { vaishnavaEkadashiDay } from "../engine/muhurat";
 import { VIM_LORDS } from "../engine/dasha";
 import { MUH_CATS, EVENTS, MUHURAT_GUIDANCE, SAMSKARA_INPUTS, PURCHASE_ACTIONS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS } from "../data/muhurat-ui";
@@ -72,6 +73,27 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       return vratDetail(place, ayanamsa, fexp.ms, fexp.timing);
     } catch (e) { return null; }
   }, [fexp, place, ayanamsa]);
+  // Reveal the inline "quick details" panel inside the phone viewport when it opens,
+  // so a tap is never a silent no-op below the fold.
+  const openPanelRef = useRef(null);
+  useEffect(() => {
+    if (fexp && openPanelRef.current && typeof openPanelRef.current.scrollIntoView === "function") {
+      openPanelRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [fexp]);
+  // Preserve language + selected city on the canonical festival page and Back trip
+  // (URL query only — no localStorage/sessionStorage).
+  const festHref = (path) => {
+    const p = new URLSearchParams();
+    p.set("lang", lang);
+    if (place && place.label) {
+      p.set("city", place.label);
+      p.set("lat", String(place.lat));
+      p.set("lon", String(place.lon));
+      if (place.zone) p.set("zone", place.zone);
+    }
+    return `${path}?${p.toString()}`;
+  };
   const [horaQuestion, setHoraQuestion] = useState("");
   const [horaResult, setHoraResult] = useState(null);
   const [horaAsc, setHoraAsc] = useState(null);
@@ -198,6 +220,25 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         const nextFast = (effFasts || []).find((f) => f.ms >= dayStart);
         const nextFest = (cal.festivals || []).find((f) => f.ms >= dayStart);
         const away = (ms) => { const d = Math.round((ms - dayStart) / DAY); return d <= 0 ? (lang === "hi" ? "आज" : "today") : d === 1 ? (lang === "hi" ? "कल" : "tomorrow") : (lang === "hi" ? d + " दिन में" : "in " + d + " days"); };
+        // "Coming up" summary rows follow the same interaction contract as the
+        // Fasts & Festivals list: the whole row opens the canonical festival page
+        // (lang+city preserved). A key with no page falls back to a plain,
+        // non-interactive row rather than a broken link.
+        const comingRow = (kind, item, label, dotColor) => {
+          const p = festivalPathForKey(kind, item.key);
+          const body = (<>
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: dotColor, flexShrink: 0 }} />
+            <span style={{ flex: 1, minWidth: 0, fontSize: T.fSmall, color: C.ivory, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
+            <span style={{ fontSize: T.fMicro, color: C.gold, fontWeight: 600, flexShrink: 0 }}>{away(item.ms)}</span>
+          </>);
+          if (!p) return <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "2px 0" }}>{body}</div>;
+          return (
+            <a href={festHref(p)} className="ff-row" aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 3px", borderRadius: 8, textDecoration: "none", color: "inherit" }}>
+              {body}
+              <span aria-hidden="true" style={{ color: C.muted, fontSize: T.fSmall, flexShrink: 0 }}>›</span>
+            </a>
+          );
+        };
         const goodW = [["abhijit", p.abhijit]].filter((x) => x[1]);
         const avoidW = [["rahu", p.rahu], ["gulika", p.gulika], ["yama", p.yama]].filter((x) => x[1]);
         const winName = { abhijit: { en: "Abhijit Muhurat", hi: "अभिजित मुहूर्त" }, rahu: { en: "Rahu Kalam", hi: "राहु काल" }, gulika: { en: "Gulika Kalam", hi: "गुलिक काल" }, yama: { en: "Yamaganda", hi: "यमगण्ड" } };
@@ -220,10 +261,16 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                 <span style={{ fontSize: T.fMicro, color: C.muted, fontVariantNumeric: "tabular-nums" }}>{p.tithis[0].end ? (lang === "hi" ? "तक " : "till ") + fmtT(p.tithis[0].end) : ""}</span>
               </div>
               <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: 2 }}>{p.paksha} · {lang === "hi" ? (p.krishna ? "कृष्ण (क्षीयमान)" : "शुक्ल (वर्धमान)") : (p.krishna ? "waning moon" : "waxing moon")} · {lang === "hi" ? "चंद्र दिवस " + p.tithiDay : "lunar day " + p.tithiDay}</div>
-              {obs.length > 0 && <div style={{ marginTop: 8, display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 11px", borderRadius: T.rMd, background: fastObs.fasting ? "rgba(194,69,30,.08)" : "rgba(168,106,18,.08)", border: "1px solid " + (fastObs.fasting ? C.sindoor : C.gold) + "33" }}>
-                <span style={{ fontSize: T.fSmall, fontWeight: 600, color: fastObs.fasting ? C.sindoor : C.gold }}>{obsLabel(lang, fastObs)}</span>
-                {OBS_GLOSS[fastObs.baseKey || fastObs.key] && <span style={{ fontSize: T.fMicro, color: C.muted }}>· {OBS_GLOSS[fastObs.baseKey || fastObs.key][L2]}</span>}
-              </div>}
+              {obs.length > 0 && (() => {
+                const obsPath = festivalPathForKey("fast", fastObs.key);
+                const chipStyle = { marginTop: 8, display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 11px", borderRadius: T.rMd, background: fastObs.fasting ? "rgba(194,69,30,.08)" : "rgba(168,106,18,.08)", border: "1px solid " + (fastObs.fasting ? C.sindoor : C.gold) + "33" };
+                const inner = (<>
+                  <span style={{ fontSize: T.fSmall, fontWeight: 600, color: fastObs.fasting ? C.sindoor : C.gold }}>{obsLabel(lang, fastObs)}</span>
+                  {OBS_GLOSS[fastObs.baseKey || fastObs.key] && <span style={{ fontSize: T.fMicro, color: C.muted }}>· {OBS_GLOSS[fastObs.baseKey || fastObs.key][L2]}</span>}
+                </>);
+                if (!obsPath) return <div style={chipStyle}>{inner}</div>;
+                return <a href={festHref(obsPath)} className="ff-row" aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + obsLabel(lang, fastObs)} style={{ ...chipStyle, textDecoration: "none", color: "inherit", cursor: "pointer" }}>{inner}<span aria-hidden="true" style={{ color: C.muted, fontSize: T.fMicro, flexShrink: 0 }}>›</span></a>;
+              })()}
               {p.pitruPaksha && (() => {
                 const pp = p.pitruPaksha;
                 const SP = { mahalaya: { en: "Sarva Pitru Amavasya (Mahalaya)", hi: "सर्वपितृ अमावस्या (महालय)" }, purnimaShraddha: { en: "Purnima Shraddha — Pitru Paksha begins", hi: "पूर्णिमा श्राद्ध — पितृ पक्ष आरंभ" }, avidhavaNavami: { en: "Avidhava Navami", hi: "अविधवा नवमी" }, ghataChaturdashi: { en: "Ghata Chaturdashi", hi: "घट चतुर्दशी" } };
@@ -282,16 +329,8 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
             </div>
             {(nextFast || nextFest) && <div style={{ padding: T.s3 + "px " + T.s5 + "px", borderTop: "1px solid " + C.line, background: "rgba(168,106,18,.04)" }}>
               <div style={{ ...T.label, color: C.muted, marginBottom: 6 }}>{lang === "hi" ? "आगामी" : "Coming up"}</div>
-              {nextFast && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "2px 0" }}>
-                <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.sindoor, flexShrink: 0 }} />
-                <span style={{ flex: 1, fontSize: T.fSmall, color: C.ivory }}>{obsLabel(lang, { key: nextFast.key, baseKey: nextFast.key })}</span>
-                <span style={{ fontSize: T.fMicro, color: C.gold, fontWeight: 600 }}>{away(nextFast.ms)}</span>
-              </div>}
-              {nextFest && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "2px 0" }}>
-                <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.gold, flexShrink: 0 }} />
-                <span style={{ flex: 1, fontSize: T.fSmall, color: C.ivory }}>{trN(lang, FEST_NAME, nextFest.key)}</span>
-                <span style={{ fontSize: T.fMicro, color: C.gold, fontWeight: 600 }}>{away(nextFest.ms)}</span>
-              </div>}
+              {nextFast && comingRow("fast", nextFast, obsLabel(lang, { key: nextFast.key, baseKey: nextFast.key }), C.sindoor)}
+              {nextFest && comingRow("festival", nextFest, trN(lang, FEST_NAME, nextFest.key), C.gold)}
             </div>}
             <button type="button" onClick={() => setShowPanch((v) => !v)} style={{ width: "100%", padding: "11px", border: "none", borderTop: "1px solid " + C.line, background: "transparent", color: C.gold, cursor: "pointer", fontFamily: T.serif, fontSize: T.fSmall, fontWeight: 500 }}>
               {showPanch ? (lang === "hi" ? "पंचांग छिपाएँ ▴" : "Hide full panchang ▴") : (lang === "hi" ? "पूरा पंचांग देखें ▾" : "View full panchang ▾")}
@@ -430,6 +469,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         </span>
       ) : null} />
       <div style={{ ...card, padding: 0, overflow: "hidden" }}>
+        <style>{`.ff-row{transition:background .12s ease;} .ff-row:hover{background:rgba(168,106,18,.07);} .ff-row:focus-visible{outline:2px solid #A86A12;outline-offset:-2px;background:rgba(168,106,18,.10);} .ff-toggle:focus-visible{outline:2px solid #A86A12;outline-offset:-2px;} .ff-toggle:hover{background:rgba(168,106,18,.08) !important;color:${C.gold} !important;}`}</style>
         <div style={{ display: "flex", gap: 6, padding: "10px 12px 6px" }}>
           {[["fasting", "fastingTab"], ["festival", "festivalTab"]].map(([k, lbl]) => (
             <button key={k} onClick={() => { setTab(k); setFexp(null); }} style={{ padding: "6px 14px", borderRadius: T.rPill, fontFamily: "Eczar, serif", fontSize: 13, cursor: "pointer", border: `1px solid ${tab === k ? C.gold : "transparent"}`, background: tab === k ? "rgba(168,106,18,.1)" : "transparent", color: tab === k ? C.gold : C.muted }}>{tr(lang, lbl)}</button>
@@ -466,26 +506,57 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
             const header = mLbl !== lastMonth ? <div style={{ ...T.label, color: C.muted, padding: "12px 12px 2px" }}>{mLbl}</div> : null;
             lastMonth = mLbl;
             const id = tab + ":" + it.key + ":" + it.ms;
-            const open = fexp && fexp.id === id;
+            // Boolean, never null — a collapsed toggle must render aria-expanded="false",
+            // not omit the attribute.
+            const open = Boolean(fexp && fexp.id === id);
             const nextFexp = { id, key: it.key, ms: it.ms, eclipseMs: it.eclipseMs || null, timing: meta ? meta.timing : null, shifted: it.shifted, reason: it.reason };
+            const path = festivalPathForKey(tab === "fasting" ? "fast" : "festival", it.key);
+            const panelId = "ff-panel-" + id.replace(/[^a-zA-Z0-9]+/g, "-");
+            const nameCell = (
+              <>
+                <span style={{ fontSize: 14, color: C.ivory, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
+                <span style={{ flexShrink: 0, fontSize: 12.5, color: C.muted, fontVariantNumeric: "tabular-nums" }}><span style={{ color: C.gold }}>{fmtDay(it.ms)}</span> · {away(it.ms)}</span>
+              </>
+            );
             return (
               <div key={id}>
                 {header}
                 <div style={{ borderTop: "1px solid #F3ECDC", background: open ? "rgba(168,106,18,.05)" : undefined }}>
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setFexp(open ? null : nextFexp)}
-                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFexp(open ? null : nextFexp); } }}
-                    style={{ cursor: "pointer", padding: "10px 12px", display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}
-                  >
-                    <span style={{ fontSize: 14, color: C.ivory, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
-                    <span style={{ flexShrink: 0, fontSize: 12.5, color: C.muted, fontVariantNumeric: "tabular-nums" }}><span style={{ color: C.gold }}>{fmtDay(it.ms)}</span> · {away(it.ms)}</span>
+                  <div style={{ display: "flex", alignItems: "stretch" }}>
+                    {path ? (
+                      <a
+                        href={festHref(path)}
+                        className="ff-row"
+                        aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + name}
+                        style={{ flex: 1, minWidth: 0, textDecoration: "none", color: "inherit", padding: "10px 6px 10px 12px", display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}
+                      >
+                        {nameCell}
+                      </a>
+                    ) : (
+                      <div style={{ flex: 1, minWidth: 0, padding: "10px 6px 10px 12px", display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>
+                        <span style={{ flex: 1, minWidth: 0 }}>
+                          <span style={{ fontSize: 14, color: C.ivory, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
+                          <span style={{ fontSize: 11, color: C.sindoor }}>{lang === "hi" ? "पूरा पृष्ठ अभी उपलब्ध नहीं" : "Full page not available yet"}</span>
+                        </span>
+                        <span style={{ flexShrink: 0, fontSize: 12.5, color: C.muted, fontVariantNumeric: "tabular-nums" }}><span style={{ color: C.gold }}>{fmtDay(it.ms)}</span> · {away(it.ms)}</span>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      className="ff-toggle"
+                      aria-expanded={open}
+                      aria-controls={panelId}
+                      aria-label={(open ? (lang === "hi" ? "त्वरित विवरण बंद करें: " : "Hide quick details: ") : (lang === "hi" ? "त्वरित विवरण दिखाएँ: " : "Show quick details: ")) + name}
+                      onClick={() => setFexp(open ? null : nextFexp)}
+                      style={{ flexShrink: 0, width: 46, border: "none", borderLeft: `1px solid ${C.line}`, background: open ? "rgba(168,106,18,.10)" : "transparent", color: open ? C.gold : C.muted, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                    >
+                      <span aria-hidden="true" style={{ fontSize: 16, lineHeight: 1, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform .15s ease" }}>›</span>
+                    </button>
                   </div>
                   {open && (() => {
                     const d = fexpDetail;
                     return (
-                      <div style={{ padding: "0 12px 10px", marginTop: -2, paddingTop: 8, borderTop: "1px dashed #EBDFC6", display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-start" }}>
+                      <div id={panelId} ref={openPanelRef} style={{ padding: "0 12px 10px", marginTop: -2, paddingTop: 8, borderTop: "1px dashed #EBDFC6", display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-start" }}>
                         {meta && meta.gloss && <div style={{ fontSize: T.fSmall, color: C.ivory }}>{meta.gloss[LL]}{meta.deity && <span style={{ color: C.muted }}> · {meta.deity[LL]}</span>}</div>}
                         {d && d.info && <div style={{ fontSize: T.fMicro, color: C.muted }}>{d.info.lmonthName} · {d.info.krishna ? (lang === "hi" ? "कृष्ण पक्ष" : "Krishna Paksha") : (lang === "hi" ? "शुक्ल पक्ष" : "Shukla Paksha")} · {(lang === "hi" ? (NAK_HI[d.info.nak] || d.info.nakName) : d.info.nakName)}</div>}
                         {d && d.chhath && (
@@ -552,6 +623,11 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                         {fexp && fexp.shifted && <div style={{ color: C.gold, fontSize: T.fMicro }}>{fexp.reason === "spans" ? (lang === "hi" ? "वैष्णव तिथि — दो अरुणोदय पर एकादशी; दूसरे दिन व्रत" : "Vaishnava date — Ekadashi at two dawns; observed on the second") : (lang === "hi" ? "वैष्णव तिथि — अरुणोदय पर दशमी होने से व्रत एक दिन आगे" : "Vaishnava date — Dashami touched arunodaya (dawn), so the fast shifts one day")}</div>}
                         {meta && meta.rules && <div style={{ color: C.muted, fontSize: T.fMicro, fontStyle: "italic" }}>{meta.rules[LL]}</div>}
                         {VRAT_VIDHI[vidhiKey] && <VratVidhiCard data={VRAT_VIDHI[vidhiKey]} lang={lang} C={C} />}
+                        {path && (
+                          <a href={festHref(path)} style={{ marginTop: 4, alignSelf: "stretch", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5, minHeight: 38, padding: "0 14px", borderRadius: T.rMd, border: `1px solid ${C.gold}`, background: "rgba(168,106,18,.08)", color: C.gold, textDecoration: "none", fontFamily: T.serif, fontSize: 13, fontWeight: 600 }}>
+                            {lang === "hi" ? "पूरी मार्गदर्शिका खोलें" : "Open full guide"} ›
+                          </a>
+                        )}
                       </div>
                     );
                   })()}
