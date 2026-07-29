@@ -559,6 +559,15 @@ function buildReasons(v, lang) {
   return lines;
 }
 
+// F8: preserve invalid punctuation so it remains visibly invalid. Removing "." or
+// "-" would silently turn 1.5→15 or -5→5 and cast a different number's chart.
+function PR_normalizeNumberInput(raw) {
+  const trimmed = String(raw).trim();
+  if (trimmed === '') return '';
+  if (!/^\d+$/.test(trimmed)) return trimmed;
+  return trimmed.replace(/^0+(?=\d)/, '').slice(0, 3);
+}
+
 // ------------------------------------------------------------ MAIN SCREEN
 function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', lang = 'en' }) {
   const hi = lang === 'hi';
@@ -588,7 +597,13 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
       const q = QUESTIONS.find(x => x.key === selected) || QUESTIONS[QUESTIONS.length - 1];
       const ms = Date.now();
       if (mode === 'number') {
-        const n = Number(numberInput.trim());
+        if (!/^\d+$/.test(numberInput)) {
+          setError(hi
+            ? `कृपया ${KP_NUMBER_MIN} से ${KP_NUMBER_MAX} के बीच एक पूर्ण अंक दें — परम्परा यही निर्धारित करती है।`
+            : `Please enter a whole number between ${KP_NUMBER_MIN} and ${KP_NUMBER_MAX} — that is what the tradition prescribes.`);
+          return;
+        }
+        const n = Number(numberInput);
         if (!Number.isInteger(n) || n < KP_NUMBER_MIN || n > KP_NUMBER_MAX) {
           setError(hi
             ? `कृपया ${KP_NUMBER_MIN} से ${KP_NUMBER_MAX} के बीच एक पूर्ण अंक दें — परम्परा यही निर्धारित करती है।`
@@ -612,10 +627,12 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   const v = result && result.verdict;
   const isNum = result && result.mode === 'number';
   const vs = v && (isNum ? NUM_VERDICT[v.verdict] : VERDICT_STYLE[v.verdict]);
-  const canAsk = selected && (mode === 'time' || numberInput.trim() !== '');
   const numberLocked = mode === 'number' && locked;          // F1/F4/F5: locked until "New question"
-  const nTyped = numberInput.trim() === '' ? null : Number(numberInput);
-  const numOutOfRange = nTyped !== null && (nTyped < KP_NUMBER_MIN || nTyped > KP_NUMBER_MAX); // F2: live hint
+  const nTyped = numberInput === '' ? null : Number(numberInput);
+  const numberIsValid = /^\d+$/.test(numberInput) && Number.isInteger(nTyped) &&
+    nTyped >= KP_NUMBER_MIN && nTyped <= KP_NUMBER_MAX;
+  const numOutOfRange = numberInput !== '' && !numberIsValid; // F2/F8: live hint for every invalid value
+  const canAsk = selected && (mode === 'time' || numberIsValid);
 
   return (
     <div style={{ background: TOKENS.bg, minHeight: '100%', padding: 16, color: TOKENS.ink,
@@ -680,7 +697,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
       {mode === 'number' && (
         <div style={{ marginBottom: 10 }}>
           <input inputMode="numeric" value={numberInput} readOnly={numberLocked}
-            onChange={e => { setNumberInput(e.target.value.replace(/[^0-9]/g, '').replace(/^0+/, '').slice(0, 3)); clearResult(); }}
+            onChange={e => { setNumberInput(PR_normalizeNumberInput(e.target.value)); clearResult(); }}
             placeholder={hi ? '1 से 249 के बीच अंक' : 'a number from 1 to 249'}
             aria-label={hi ? 'KP अंक (1 से 249)' : 'KP number (1 to 249)'}
             style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%', boxSizing: 'border-box',
