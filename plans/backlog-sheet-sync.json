@@ -210,9 +210,9 @@
       "limitations": "Several human-reviewed raster iconography/crop refinements remain documented as P1 follow-ups; all P0 route, content, timing and runtime hero contracts are complete.",
       "shortTermImpact": "All 181 festival routes now provide an answer-first bilingual experience; 108 formerly empty or generic named routes have distinct guidance and every route renders an owned or reviewed parent hero.",
       "longTermImpact": "Route-derived semantic, devotional, identity, timing, raster-decode, duplicate and runtime-wiring gates protect the complete festival corpus from returning to generic or technically-only coverage.",
-      "bugBashStatus": "Five iterative audit/fix rounds completed on 2026-07-28 with three agents. Round 4 caught and fixed two false-green runtime contracts and 31 Hindi semantic-parity defects; Round 5 found no remaining genuine P0.",
+      "bugBashStatus": "Five iterative audit/fix rounds completed with three agents, followed by `CODEX-BUGBASH-FESTIVAL-LABELS-2026-07-28` with two independent audits. The follow-up fixed raw Pradosh keys, generic/named Pradosh and Ekadashi search, safe malformed-key fallback and Daily/Hora named identity.",
       "qualityRisk": "Green",
-      "lastVerified": "2026-07-28 · Production `ganak.pages.dev` at live commit 3deb0c6: EN desktop Nirjala and HI 390×844 Pongal show answer-first content and correct heroes with zero alerts, console errors/warnings or horizontal overflow",
+      "lastVerified": "2026-07-28 · Production `ganak.pages.dev` at live commit fa9857f: generic Hindi Pradosh search returns reviewed weekday labels and HI 390×844 Guru Pradosh shows the correct title/answer with zero raw keys, alerts, console warnings/errors or horizontal overflow",
       "sourceConfidence": "Reviewed family-specific devotional corpus with explicit per-route tradition/source boundaries; specialised initiated rites remain clearly outside household guidance",
       "recommendedAction": "No P0 corrective action required; schedule the documented P1 iconography/crop refinements as a separate visual-polish batch."
     },
