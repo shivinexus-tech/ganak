@@ -25,6 +25,27 @@ if (/Working against it:.*fortune and support/.test(source)) {
 if ((source.match(/englishOrdinal\(h\)/g) || []).length !== 2) {
   failures.push('supporting and denying house reasons must both use englishOrdinal');
 }
+if (source.includes('en="Prashna · ask the moment"')) {
+  failures.push('removed Prashna section subtitle "ask the moment" has returned');
+}
+if (!source.includes('<PrashnaSecHead hi="प्रश्न कुण्डली" en="Prashna" />')) {
+  failures.push('Prashna section header must keep its title without the removed subtitle');
+}
+for (const forbiddenHindi of [
+  "hi: 'KP अंक विधि",
+  "hi ? 'KP अंक",
+  "'यह KP अंक विधि",
+  "'KP-New अयनांश (KP अंक विधि)'",
+  "'प्लेसिडस भाव — KP मानक'",
+  "'KP उप-स्वामी",
+]) {
+  if (source.includes(forbiddenHindi)) {
+    failures.push(`Latin KP remains in Hindi-mode copy: ${forbiddenHindi}`);
+  }
+}
+if (!source.includes("hi: 'कृष्णमूर्ति पद्धति अंक विधि (1–249)'")) {
+  failures.push('Hindi number-method toggle must use कृष्णमूर्ति पद्धति, not Latin KP');
+}
 
 function expectedOrdinal(n) {
   const lastTwo = n % 100;
