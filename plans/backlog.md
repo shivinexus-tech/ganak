@@ -1075,6 +1075,26 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
 - `parseMuhuratQuery` dead AI path — fetch to api.anthropic.com with no key;
   route via proxy (Phase 4) or remove.
 - Startup performance — `scanPanchangCalendar` 400-day scan ~1.8s.
+- **E-1.0 English (Western) sign names in EN mode — sidereal preserved (owner, 2026-07-28).**
+  In English mode, show the 12 rashi by their English names (Mesha→Aries … **Kanya→Virgo**
+  … Meena→Pisces) instead of the romanised Sanskrit. **Calculation stays 100% sidereal
+  (Lahiri)** — this is a *label* change only; "Virgo" here means the sidereal sign, not
+  tropical. Hindi mode keeps कन्या etc. **Blast radius mapped:** `src/engine/panchang.ts`
+  `SIGNS` (already `"Mesha (Aries)"`), `PrashnaScreen.tsx` local `RASHI_EN` (**inside the
+  parity-frozen markers** — display-only, parity compares numbers not names, but edit
+  carefully), `UtilityCalculatorScreen`, `MuhuratHub`, `daily-windows.ts`, the Daily gochar
+  line; update gates `prashna-calc.js` + `vedic-season-clock.cjs` if they assert Sanskrit
+  strings. **Keep Sanskrit for proper festival names** (`Kanya Sankranti` etc. in
+  `festival-meta.ts` — those are event names, not sign displays). Folds in the
+  language-leak fixes (leaked Hindi planet names like `शुक्र` on the EN gochar line).
+  **Owner directed: proceed.** Being executed as a focused pass; also build a permanent
+  `validation/language-leak-scan` gate as the "zero leaks" oracle.
+- **E-1.1 Western-calculator display — rethink (owner, 2026-07-28).** The app keeps a
+  Western/Tropical calculator group (`western-natal`, `western-relationship`) deliberately
+  separated from Vedic. Owner wants it **kept for now but presented better** (it's a
+  sidereal-first app; Western sits awkwardly beside it). Revisit the framing/placement/
+  labelling — e.g. clearer "not our core method" separation, or a distinct section — as a
+  product/UX decision. Not a removal; a presentation rethink.
 
 ---
 
