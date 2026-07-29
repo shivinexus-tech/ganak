@@ -294,37 +294,37 @@
       "recommendedAction": "Repeat one Los Angeles export on iPhone and Android; verify city prompt, selected date, local window details and 24-hour reminder."
     },
     "38": {
-      "deliveryState": "Repository-ready — provider and production dashboard not configured",
-      "limitations": "Analytics and feedback endpoints are intentionally disabled until the owner chooses providers and publishes updated privacy terms. No production dashboard or collection evidence exists.",
-      "shortTermImpact": "The app shows a feedback path and honest disconnected state; the owner still cannot receive feedback or view funnels until endpoints are configured.",
-      "longTermImpact": "The fixed no-PII event dictionary limits future data creep, but provider retention/security and privacy obligations require owner review.",
+      "deliveryState": "65% — provider/privacy decisions complete; external projects and production collection pending",
+      "limitations": "PostHog EU and Supabase Mumbai are approved, but no owner-controlled projects, production keys, published Privacy/opt-out route, dashboard or delivered feedback evidence exists yet.",
+      "shortTermImpact": "The implementation target is now unambiguous: cookieless navigation/autocapture/private replay plus protected feedback/research. The live app remains honestly disabled until configuration.",
+      "longTermImpact": "Aggregate navigation data and spiritual-activity preferences can guide IA/personalisation and weekly agent recommendations without creating a default birth-chart library.",
       "bugBashStatus": "Mandatory privacy bug bash not complete. Static no-PII/storage/cookie/credential checks pass; a production network audit is impossible before provider configuration.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-28 · Local build and privacy-events gate; no production endpoints configured",
-      "sourceConfidence": "Not applicable — technical/privacy integration",
-      "recommendedAction": "Choose analytics and feedback providers, publish the matching privacy notice, configure endpoints, verify dashboard events and feedback delivery, then run a no-PII production network audit and independent privacy bug bash."
+      "lastVerified": "2026-07-28 · Owner decisions recorded; PostHog/Supabase official privacy/region controls checked; local privacy-events gate passes; production endpoints absent",
+      "sourceConfidence": "High for provider configuration boundaries; final legal wording still needs qualified review",
+      "recommendedAction": "Create/sign into the owner-controlled PostHog EU and Supabase Mumbai projects, then configure, publish, verify and privacy-bug-bash the production integration."
     },
     "39": {
-      "deliveryState": "90% — branded host and redirects live; canonical metadata deployment pending",
-      "limitations": "Cloudflare DNS, TLS and redirects are live, but the new checked-in canonical metadata still needs its production deployment and route/share verification. Search and social caches update externally.",
+      "deliveryState": "Complete and live on ganakapp.com",
+      "limitations": "Application and Cloudflare work is complete. External DNS, search and social-preview caches refresh on their own schedules.",
       "shortTermImpact": "Visitors using pages.dev or www retain their exact route and language query while being consolidated onto ganakapp.com.",
       "longTermImpact": "One HTTPS canonical host consolidates shared-link and search authority and prevents future hostname drift.",
-      "bugBashStatus": "External network checks pass for apex/www TLS and two path/query-preserving 301 vectors. Focused and full repository gates pass; post-deployment branded deep-link and metadata matrix remains.",
-      "qualityRisk": "Amber",
-      "lastVerified": "2026-07-28 · Cloudflare TLS + 301 checks, canonical-deployment/page-context gates, full canonical suite and production build",
+      "bugBashStatus": "Production matrix passed apex HTTPS, pages.dev/www 301 path+query preservation and EN/HI Daily/Prashna/Jyotish/festival/calculator/medical/Muhurat canonical/Open Graph checks.",
+      "qualityRisk": "Green",
+      "lastVerified": "2026-07-28 · live Cloudflare deployment e6afa4e; apex 200; pages.dev/www 301; branded canonical/OG route matrix; full canonical suite and build pass",
       "sourceConfidence": "Not applicable — deployment and DNS work",
-      "recommendedAction": "Deploy the branded canonical configuration, then verify apex EN/HI deep links, canonical/Open Graph output, share behavior and error-reporting origin before closing."
+      "recommendedAction": "Monitor certificate/redirect health and refresh search-console/social caches when those external accounts are connected."
     },
     "40": {
-      "deliveryState": "Implemented locally — production verification pending",
-      "limitations": "Bilingual route-aware title, description, canonical and Open Graph handling is implemented; breadcrumbs are not a distinct UI pattern in the current single-shell navigation and production metadata remains unverified.",
-      "shortTermImpact": "Daily, Prashna, Jyotish, festival, calculator, medical and Muhurat journeys identify their own area in the browser/share metadata.",
-      "longTermImpact": "The generated registry gate reduces cross-route identity leaks, but every new route must be added to the metadata matrix.",
-      "bugBashStatus": "Focused EN/HI 390×844 local matrix completed 2026-07-28; existing page-context header and new route-metadata gates pass; production share-preview verification remains.",
-      "qualityRisk": "Amber",
-      "lastVerified": "2026-07-28 · Local :5199 EN/HI title/description/canonical checks; no overflow or console errors; canonical gates and build pass",
+      "deliveryState": "Complete and production-verified",
+      "limitations": "Closed for current routes; every future permanent route must be added to the metadata and page-context gates.",
+      "shortTermImpact": "Daily, Prashna, Jyotish, festival, calculator, medical and Muhurat journeys now identify their own area in the hero and browser/share metadata.",
+      "longTermImpact": "Permanent route-context gates prevent inherited cross-section copy and invalid canonical URLs from silently returning.",
+      "bugBashStatus": "Production EN/HI phone matrix found and fixed generic calculator titles, invalid not-found canonicals and inherited Panchang heroes on Medical/Muhurat pages; final matrix passes.",
+      "qualityRisk": "Green",
+      "lastVerified": "2026-07-28 · live deployment e6afa4e; EN/HI production title/canonical/Open Graph/hero matrix; page-context, route-metadata, canonical-deployment, full canonical suite and build pass",
       "sourceConfidence": "Not applicable — technical route identity and metadata",
-      "recommendedAction": "Deploy and verify titles/descriptions/canonical/Open Graph on representative Daily, Prashna, Jyotish, festival, calculator, medical and Muhurat production URLs; add future routes to the registry gate."
+      "recommendedAction": "Keep every new route in the registry/gates and repeat the representative production matrix after route-system changes."
     }
   },
   "dashboard": {

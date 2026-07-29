@@ -62,6 +62,33 @@ failures, and only when the maintainer has configured a reporting endpoint.
 Fonts load from the same website as the app (self-hosted). There is no ad
 tracking and no product-analytics script.
 
+### 2.2A Approved replacement for the analytics/research launch — not live yet
+
+The owner approved PostHog EU for cookieless product analytics/session replay and
+Supabase Mumbai for feedback, protected research records and future optional
+accounts. This paragraph is the general-policy notice to publish **before** those
+services are enabled:
+
+> Ganak collects limited product-usage information so we can understand navigation,
+> find broken or confusing screens, improve regional and spiritual-interest
+> relevance, and decide what to build next. This can include the page or product
+> area used, interface clicks, scrolling, language, device class, success/failure
+> outcomes and a privacy-masked replay of the interface. Analytics uses no cookies
+> or browser storage, discards IP capture, and removes URL query strings. Names,
+> email addresses, birth details, question text and personal chart/results are
+> masked from ordinary analytics and replay. Feedback and information deliberately
+> volunteered for research may be stored separately with the research-use record
+> and used to evaluate correctness and improve Ganak. Ganak does not sell this
+> information or use it for advertising. Aggregate analytics events are retained
+> for 12 months, privacy-masked replays for 30 days, and volunteered feedback or
+> research records for 24 months. A user can opt out or request deletion through
+> the Privacy page.
+
+The policy must name the operator/contact before it is published. Standard PostHog
+analytics must never receive precise birth/question data. If a later research
+workflow accepts such material, it belongs in restricted Supabase storage, must
+state the specific purpose and deletion route, and requires fresh counsel review.
+
 ### 2.3 Preferences in the web address
 Your language and current screen are kept in the page's web address (for example
 `?lang=hi`). This is so a link you share or bookmark opens the way you left it. It
