@@ -841,7 +841,10 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                 <PrashnaChip label={hi ? 'उप-स्वामी' : 'Sub-lord'} value={hi ? GRAHA_HI[v.cuspSub] : GRAHA_EN[v.cuspSub]}
                   gloss={hi ? 'निर्णायक मत देने वाला सूक्ष्म स्वामी' : 'the fine-grained ruler that casts the deciding vote'} />
               </div>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              {/* F10: the 5-column chart is intrinsically wider than a 320px phone, so it
+                  scrolls inside its own container instead of pushing the whole page wide. */}
+              <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              <table style={{ width: '100%', minWidth: 300, borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr style={{ color: TOKENS.muted, textAlign: 'left' }}>
                     <th style={{ padding: '4px 2px' }}>{hi ? 'ग्रह' : 'Graha'}</th><th>{hi ? 'राशि' : 'Rashi'}</th>
@@ -866,6 +869,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                   ))}
                 </tbody>
               </table>
+              </div>
               <div style={{ marginTop: 8, fontSize: 11.5, color: TOKENS.muted }}>
                 {hi ? "Rx = वक्री, आकाश में पीछे चलता प्रतीत होता है" : "Rx = retrograde, appears to move backward in the sky"}
               </div>

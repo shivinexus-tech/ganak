@@ -29,6 +29,13 @@ check(
   'the cast path independently rejects non-digit strings'
 );
 
+// F10: the 5-column full chart is wider than a 320px phone; it must scroll inside its
+// own container rather than push the whole page into horizontal overflow.
+check(
+  /overflowX: 'auto'[\s\S]{0,160}<table style=\{\{ width: '100%', minWidth: 300/.test(source),
+  'F10: the full-chart table is wrapped in a horizontal-scroll container'
+);
+
 if (failures) {
   console.error(`\nprashna-249-input FAILED: ${failures}`);
   process.exit(1);
