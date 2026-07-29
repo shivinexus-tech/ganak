@@ -210,18 +210,18 @@ function PR_cast(ms, lat, lonE) {
   return { ms, lagna, planets, cusps, system: p ? 'placidus' : 'equal' };
 }
 const QUESTIONS = [
-  { key:'marriage',  cusp:7,  favor:[2,7,11],    deny:[1,6,10], hi:'विवाह / सम्बन्ध',      en:'Marriage / relationship' },
-  { key:'career',    cusp:10, favor:[2,6,10,11], deny:[5,9,12], hi:'नौकरी / करियर',       en:'Job / career' },
-  { key:'money',     cusp:11, favor:[2,6,11],    deny:[5,8,12], hi:'धन / लाभ',            en:'Money / gains' },
-  { key:'health',    cusp:6,  favor:[1,5,11],    deny:[6,8,12], hi:'स्वास्थ्य / रोगमुक्ति', en:'Health / recovery' },
-  { key:'travel',    cusp:12, favor:[3,9,12],    deny:[2,4,11], hi:'यात्रा / विदेश',       en:'Travel / abroad' },
-  { key:'education', cusp:4,  favor:[4,9,11],    deny:[3,8,12], hi:'शिक्षा / परीक्षा',     en:'Education / exams' },
-  { key:'property',  cusp:4,  favor:[2,4,11],    deny:[3,8,12], hi:'सम्पत्ति / वाहन',      en:'Property / vehicle' },
-  { key:'children',  cusp:5,  favor:[2,5,11],    deny:[1,4,10], hi:'सन्तान',              en:'Children' },
-  { key:'litigation',cusp:6,  favor:[6,11],      deny:[7,8,12], hi:'मुक़दमा / विवाद',      en:'Dispute / court case' },
-  { key:'lost',      cusp:2,  favor:[2,6,11],    deny:[3,8,12], hi:'खोई वस्तु',           en:'Lost object' },
-  { key:'venture',   cusp:10, favor:[2,6,10,11], deny:[5,8,12], hi:'नया कार्य / व्यवसाय',  en:'New venture' },
-  { key:'general',   cusp:1,  favor:[1,10,11],   deny:[6,8,12], hi:'सामान्य प्रश्न',       en:'General question' }
+  { key:'marriage',  cusp:7,  favor:[2,7,11],    deny:[1,6,10], hi:'विवाह',      subHi:'सम्बन्ध और जीवनसाथी',          en:'Marriage',    subEn:'Relationships and commitment' },
+  { key:'career',    cusp:10, favor:[2,6,10,11], deny:[5,9,12], hi:'करियर',      subHi:'नौकरी, पदोन्नति या काम',       en:'Career',      subEn:'Job, promotion or work' },
+  { key:'money',     cusp:11, favor:[2,6,11],    deny:[5,8,12], hi:'धन',         subHi:'आय, बचत या लाभ',               en:'Money',       subEn:'Income, savings or gains' },
+  { key:'health',    cusp:6,  favor:[1,5,11],    deny:[6,8,12], hi:'स्वास्थ्य',   subHi:'रोगमुक्ति और सेहत',             en:'Health',      subEn:'Recovery and wellbeing' },
+  { key:'travel',    cusp:12, favor:[3,9,12],    deny:[2,4,11], hi:'यात्रा',      subHi:'सफ़र या विदेश जाना',           en:'Travel',      subEn:'Journeys or going abroad' },
+  { key:'education', cusp:4,  favor:[4,9,11],    deny:[3,8,12], hi:'शिक्षा',      subHi:'पढ़ाई, परीक्षा या प्रवेश',       en:'Education',   subEn:'Study, exams or admission' },
+  { key:'property',  cusp:4,  favor:[2,4,11],    deny:[3,8,12], hi:'सम्पत्ति',    subHi:'घर, भूमि या वाहन',              en:'Property',    subEn:'Home, land or vehicle' },
+  { key:'children',  cusp:5,  favor:[2,5,11],    deny:[1,4,10], hi:'सन्तान',      subHi:'गर्भधारण या सन्तान के विषय',    en:'Children',    subEn:'Conception or child matters' },
+  { key:'litigation',cusp:6,  favor:[6,11],      deny:[7,8,12], hi:'विवाद',       subHi:'मुक़दमा या आपसी टकराव',          en:'Disputes',    subEn:'Court cases or conflicts' },
+  { key:'lost',      cusp:2,  favor:[2,6,11],    deny:[3,8,12], hi:'खोई वस्तु',   subHi:'गुम वस्तु की खोज',              en:'Lost item',   subEn:'Finding something missing' },
+  { key:'venture',   cusp:10, favor:[2,6,10,11], deny:[5,8,12], hi:'नया कार्य',   subHi:'व्यवसाय या नई परियोजना',         en:'New venture', subEn:'Business or a new project' },
+  { key:'general',   cusp:1,  favor:[1,10,11],   deny:[6,8,12], hi:'अन्य प्रश्न', subHi:'ऊपर न दिया गया विषय',            en:'Other question', subEn:'Anything not listed above' }
 ];
 const HOUSE_MEANING = { 1:'you yourself', 2:'wealth & family', 3:'courage & effort',
   4:'home & comfort', 5:'children & creativity', 6:'obstacles, illness & debt',
@@ -708,13 +708,17 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
           const on = selected === q.key;
           return (
             <button key={q.key} onClick={() => { if (numberLocked) return; setSelected(q.key); clearResult(); }}
-              style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, padding: '0 14px',
+              style={{ minHeight: TOKENS.ctrlH, borderRadius: TOKENS.radius, padding: '6px 12px',
                 border: `1.5px solid ${on ? TOKENS.gold : TOKENS.line}`,
                 background: on ? TOKENS.goldSoft : TOKENS.card,
-                color: TOKENS.ink, fontSize: 14, cursor: 'pointer' }}>
-              {hi
-                ? <span style={{ fontFamily: TOKENS.devanagari }}>{q.hi}</span>
-                : <span>{q.en}</span>}
+                color: TOKENS.ink, cursor: 'pointer', textAlign: 'left', lineHeight: 1.2 }}>
+              <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: 14, fontWeight: 600 }}>
+                {hi ? q.hi : q.en}
+              </div>
+              <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit',
+                fontSize: 10.5, color: TOKENS.muted, marginTop: 2 }}>
+                {hi ? q.subHi : q.subEn}
+              </div>
             </button>
           );
         })}
