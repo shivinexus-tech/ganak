@@ -104,3 +104,49 @@ locked (108, "New question", no Cast); F5 time↔number toggle stays locked; lan
 toggle while locked preserved (Hindi "नया प्रश्न"); "New question" fully resets; `007`→`7`,
 `999` → hint + Cast disabled; number-mode footnote = KP-New, time-mode footnote = Lahiri.
 **No open P0/P1 from this pass.**
+
+---
+
+## Agent-2 re-verification — Codex, 2026-07-28 (halted on P1)
+
+**Independence:** The canonical table and live behavior were inspected before reading
+the Agent-1/earlier Agent-2 details in this file. This owner-directed re-verification
+was stopped after about 12 focused minutes because the brief requires an immediate stop
+on any P0/P1; the remaining 30-minute matrix was therefore not claimed as complete.
+
+**Baseline — all green:**
+
+```text
+prashna-249.cjs                 33/33 PASS
+prashna-249-chart.cjs           14/14 PASS
+prashna parity                  EXACT 198 values / 6 charts
+prashna-calc.js                 24/24 PASS
+parse-check kundli-app.tsx      clean
+npm run build                   132 modules, PASS
+```
+
+**Live checks completed before the stop:** English method-toggle copy was
+single-language and the one-line descriptions were correct; `007` became `7`; `250`,
+`999`, `0`, empty, a very long value, Devanagari digits and emoji kept Cast disabled.
+No console warning/error was captured. The rest of the requested lock/place/boundary/
+chip/layout/language/network matrix remains unverified in this halted run.
+
+### F8 · P1 — decimal and negative input silently become different valid numbers
+
+**Exact production repro** (`https://ganak.pages.dev/?screen=prashna`, 320px, English):
+
+1. Open **KP number method (1–249)**.
+2. Select **Marriage / relationship**.
+3. Enter `1.5` in **KP number (1 to 249)**.
+4. The field silently changes to `15`; **Cast the answer** becomes enabled.
+5. Reset the field and enter `-5`.
+6. The field silently changes to `5`; **Cast the answer** becomes enabled.
+
+**Why P1:** The first sincere number is the method's chart-defining input. These paths
+do not merely clean formatting; they silently select a different valid horary number and
+allow a different chart to be cast. This is the earlier F2 class still reproducible on
+the live build despite its recorded fix. Product code was not changed.
+
+**Closure:** blocked. Reopen the input fix, reject decimal/sign-bearing strings instead
+of removing punctuation, then have an independent agent rerun the complete 30+ minute
+matrix. Do not count this halted run as the closing independent pass.
