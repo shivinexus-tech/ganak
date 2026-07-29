@@ -1,7 +1,9 @@
 # Festival display-label adversarial fixture matrix
 
-Date: 2026-07-28  
-Lane: independent read-only audit for `CODEX-BUGBASH-FESTIVAL-LABELS-2026-07-28`  
+Date: 2026-07-28
+
+Lane: independent read-only audit for `CODEX-BUGBASH-FESTIVAL-LABELS-2026-07-28`
+
 Application source: read-only; this report is the only file owned by this lane.
 
 ## Verdict
