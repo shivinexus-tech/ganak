@@ -2,7 +2,7 @@
 
 import { TITHIS, moonSidMs, sunSidMs } from "./panchang";
 import { rev } from "./ephemeris";
-import { EKADASHI_NAMES, PRADOSH_NAMES_BY_DAY, scanPanchangCalendar } from "./festivals";
+import { EKADASHI_NAMES, PRADOSH_NAMES_BY_DAY, obsKind, scanPanchangCalendar } from "./festivals";
 import { FEST_NAME, OBS_NAME } from "../data/festival-meta";
 
 function searchUpcoming(query, fromMs, tz, maxN = 24, place = null) {
@@ -13,34 +13,35 @@ function searchUpcoming(query, fromMs, tz, maxN = 24, place = null) {
   const DAY = 86400000;
   const noon = (k) => { const d = new Date(fromMs + k * DAY + tz * 3600000); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12) - tz * 3600000; };
   
-  // Check if query matches an ekadashi variant name
-  let ekVariantMatch = null;
-  for (const [key, names] of Object.entries(EKADASHI_NAMES)) {
-    if (names.en.toLowerCase().includes(q) || names.hi.includes(qraw)) {
-      ekVariantMatch = key;
-      break;
-    }
-  }
+  const genericEkadashi = q === "ekadashi" || qraw === "एकादशी";
+  const genericPradosh = q === "pradosh" || q === "pradosh vrat" || qraw === "प्रदोष" || qraw === "प्रदोष व्रत";
+
+  // Preserve every matching named variant: an unqualified shared term such as
+  // "Putrada Ekadashi" must offer both canonical annual observances.
+  const ekVariantMatches = genericEkadashi ? [] : Object.entries(EKADASHI_NAMES)
+    .filter(([, names]) => names.en.toLowerCase().includes(q) || names.hi.includes(qraw))
+    .map(([key]) => key);
   
   // Check if query matches a pradosh variant
-  let pradoshDayMatch = null;
+  const pradoshDayMatches = [];
   for (const [dayNum, names] of Object.entries(PRADOSH_NAMES_BY_DAY)) {
     if (names.en.toLowerCase().includes(q) || names.hi.includes(qraw)) {
-      pradoshDayMatch = parseInt(dayNum);
-      break;
+      pradoshDayMatches.push(Number(dayNum));
     }
   }
   
   // If ekadashi variant or pradosh variant matched, use scanPanchangCalendar which has lunar context
-  if (ekVariantMatch || pradoshDayMatch !== null) {
+  if (genericEkadashi || genericPradosh || ekVariantMatches.length || pradoshDayMatches.length) {
     const r = scanPanchangCalendar(fromMs, tz, 430, 430, place);
     const out = [];
+    const pradoshKeys = ["pradosh_Sunday", "pradosh_Monday", "pradosh_Tuesday", "pradosh_Wednesday", "pradosh_Thursday", "pradosh_Friday", "pradosh_Saturday"];
     for (const fast of r.fasts) {
-      if (ekVariantMatch && fast.key === ekVariantMatch) {
-        const label = EKADASHI_NAMES[ekVariantMatch].en;
+      if ((genericEkadashi && obsKind(fast.key) === "ekadashi") || ekVariantMatches.includes(fast.key)) {
+        const label = EKADASHI_NAMES[fast.key]?.en || OBS_NAME.ekadashi.en;
         out.push({ ms: fast.ms, kind: "fast", key: fast.key, label });
-      } else if (pradoshDayMatch !== null && fast.key === `pradosh_${pradoshDayMatch}`) {
-        const label = PRADOSH_NAMES_BY_DAY[pradoshDayMatch].en;
+      } else if ((genericPradosh && obsKind(fast.key) === "pradosh") || pradoshDayMatches.some((day) => fast.key === pradoshKeys[day])) {
+        const day = pradoshKeys.indexOf(fast.key);
+        const label = PRADOSH_NAMES_BY_DAY[day]?.en || OBS_NAME.pradosh.en;
         out.push({ ms: fast.ms, kind: "fast", key: fast.key, label });
       }
     }

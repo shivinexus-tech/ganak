@@ -62,19 +62,30 @@ const tr = (lang, k) => (L[k] ? (L[k][lang] || L[k].en) : k);
 const trN = (lang, dict, key) => (dict[key] ? (dict[key][lang] || dict[key].en) : key);
 
 const obsLabel = (lang, obs) => {
-  // Handle pradosh_N keys directly
+  const safe = (key) => trN(lang, OBS_NAME, key);
+  if (!obs || !obs.key) return lang === "hi" ? "व्रत / पर्व" : "Observance";
+  // Canonical named variants (including pradosh_Monday…Sunday) already have
+  // reviewed bilingual labels. Resolve them before the legacy numeric fallback.
+  if (obs.key && OBS_NAME[obs.key]) return trN(lang, OBS_NAME, obs.key);
+  // Exact legacy pradosh_0…6 compatibility. Do not let parseInt accept suffix
+  // junk such as pradosh_1extra as a real weekday.
   if (obs.key && obs.key.startsWith("pradosh_")) {
-    const dayNum = parseInt(obs.key.split("_")[1]);
-    return PRADOSH_NAMES_BY_DAY[dayNum] ? (PRADOSH_NAMES_BY_DAY[dayNum][lang] || PRADOSH_NAMES_BY_DAY[dayNum].en) : obs.key;
+    const legacy = /^pradosh_([0-6])$/.exec(obs.key);
+    if (legacy) {
+      const names = PRADOSH_NAMES_BY_DAY[Number(legacy[1])];
+      return names[lang] || names.en;
+    }
+    return safe("pradosh");
   }
   // Handle ekadashi variants
   if (obs.baseKey === "ekadashi" && obs.isVariant && EKADASHI_NAMES[obs.key]) return EKADASHI_NAMES[obs.key][lang] || EKADASHI_NAMES[obs.key].en;
   if (obs.baseKey === "pradosh" && obs.isVariant) {
-    const dayNum = parseInt(obs.key.split("_")[1]);
-    return PRADOSH_NAMES_BY_DAY[dayNum] ? (PRADOSH_NAMES_BY_DAY[dayNum][lang] || PRADOSH_NAMES_BY_DAY[dayNum].en) : obs.key;
+    return safe("pradosh");
   }
+  if (/^[A-Za-z]+_(?:Shukla|Krishna)_11$/.test(obs.key)) return safe("ekadashi");
   // Fallback for generic keys
-  return trN(lang, OBS_NAME, obs.baseKey || obs.key);
+  if (obs.baseKey && OBS_NAME[obs.baseKey]) return safe(obs.baseKey);
+  return lang === "hi" ? "व्रत / पर्व" : "Observance";
 };
 
 export { L, tr, trN, obsLabel };

@@ -191,7 +191,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       {(() => {
         const p = todayP, DAY = 86400000, dayStart = p.anchor;
         const L2 = lang === "hi" ? "hi" : "en";
-        const obs = observancesFor(p.krishna, p.tithiDay, null, p.dow);
+        const obs = observancesFor(p.krishna, p.tithiDay, p.months?.amanta || null, p.dow);
         const OBS_GLOSS = { ekadashi: { en: "Fasting day for Vishnu", hi: "विष्णु का व्रत" }, purnima: { en: "Full moon", hi: "पूर्ण चंद्र" }, amavasya: { en: "New moon", hi: "नवचंद्र" }, pradosh: { en: "Evening fast for Shiva", hi: "शिव संध्या व्रत" }, sankashti: { en: "Fast for Ganesha", hi: "गणेश व्रत" }, masikShivaratri: { en: "Monthly Shivaratri", hi: "मासिक शिवरात्रि" }, kalashtami: { en: "Kala Bhairava day", hi: "काल भैरव दिवस" } };
         const fastObs = obs.find((o) => o.fasting) || obs[0];
         const nkIdx = NAKSHATRAS.indexOf(p.naks[0].name), nkLord = nkIdx >= 0 ? VIM_LORDS[nkIdx % 9] : null;
@@ -814,7 +814,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       {/* today — hero */}
       {(() => {
         const rise = todayP.rise, set = todayP.set;
-        const obs = observancesFor(todayP.krishna, todayP.tithiDay, null, todayP.dow);
+        const obs = observancesFor(todayP.krishna, todayP.tithiDay, todayP.months?.amanta || null, todayP.dow);
         const note = obs.length
           ? (isToday ? (lang === "hi" ? "आज " : "Today is ") : (lang === "hi" ? "इस तारीख़ को " : "This date is ")) + obsLabel(lang, obs[0]) + (obs[0].fasting ? (lang === "hi" ? " — व्रत का दिन" : " — a fasting day") : "")
           : todayP.naks[0].name + (lang === "hi" ? " नक्षत्र · " : " nakshatra · ") + todayP.tithis[0].name;
