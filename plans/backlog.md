@@ -552,28 +552,25 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       a round-4 independent audit (state/keyboard/entry-type matrix) passed and
       closed one gate gap (`e99a2e7`). **Still open before check-off:** owner
       live-URL sign-off only.
-- [ ] **PARKED (owner-reported 2026-07-29) — Fasts & Festivals row is a
-      confusing two-action control (reads as an EN/HI inconsistency).** Owner
-      observed: on one tap the row shows an inline preview then a further tap opens
-      the page; on another tap it goes straight to the page — and perceived this as
-      Hindi vs English behaving differently. **Root cause diagnosed 2026-07-29 (NOT
-      a language/rendering bug):** the F&F list row is structurally *identical* in
-      EN and HI — a wide name-link (`<a class="ff-row">` → navigates to
-      `/festival/<slug>` with the correct `lang`) plus a separate 46px chevron
-      button (`<button class="ff-toggle">` → expands the inline "quick details"
-      preview). Both languages verified identical on production (same DOM, same
-      hrefs). The perceived EN/HI difference was simply **which control was tapped**
-      — the chevron (expand → then "Open full guide") vs the name (direct navigate).
-      The dual-action row itself is the UX problem. **This is a product/UX decision
-      for the owner — one consistent behavior per row.** Options: (A) whole row
-      navigates to the page; drop the inline preview entirely (simplest, most
-      predictable); (B) whole row expands the inline preview; navigation only via an
-      explicit "Open full guide" button inside it; (C) keep both but make the two
-      targets visually unmistakable (e.g. a clearly separated, labelled "Details"
-      button). Implementation would touch the F&F list row in
-      `src/screens/MuhuratHub.tsx` (and mirror the choice in CalendarPage rows for
-      consistency) plus update `validation/festival-interaction.cjs`. Not yet
-      assigned; awaiting the owner's choice of A/B/C.
+- [x] **RESOLVED 2026-07-29 — Fasts & Festivals row: one consistent action
+      (owner chose Option A).** Owner reported the row behaved inconsistently
+      (sometimes an inline preview, sometimes straight to the page) and read it as
+      an EN/HI difference. **Root cause:** the row had two actions — a wide
+      name-link (navigate) plus a separate 46px chevron (expand inline preview);
+      identical in EN and HI, so the perceived language difference was just which
+      control was tapped. **The dual-action row was the UX problem.** Owner chose
+      **Option A: the whole row opens the canonical festival page; inline preview
+      dropped entirely** — now consistent with the CalendarPage rows, "Coming up"
+      rows and observance chip, which were already whole-row links. Implemented in
+      `src/screens/MuhuratHub.tsx` (removed the toggle + inline panel + `fexp`
+      state and now-orphaned imports/helpers) and the gate
+      `validation/festival-interaction.cjs` rewritten to assert no toggle /
+      aria-expanded remains and every festival/fast surface is a whole-row anchor.
+      The per-entry timing that the preview used to show (parana, arghya,
+      ghatasthapana, eclipse sutak, vrat vidhi) is unchanged on the dedicated
+      festival page the row now opens — one tap away, not lost. Verified EN/HI at
+      390×844: 0 toggles, whole-row links navigate (incl. eclipse/named-Ekadashi),
+      Back restores the list, 0 console errors. Gates + build green.
 - [x] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
       selection box directly on every dedicated festival/vrat page. Replace “Open
       this festival in the Daily Panchang to see the local timing referred to below.”
