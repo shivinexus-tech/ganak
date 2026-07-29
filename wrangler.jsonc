@@ -3,6 +3,9 @@
   "name": "ganak",
   "compatibility_date": "2026-07-22",
   "pages_build_output_dir": "./dist",
+  "vars": {
+    "VITE_CANONICAL_ORIGIN": "https://ganakapp.com"
+  },
   "kv_namespaces": [
     {
       "binding": "REGIONAL_CALENDAR_FLAGS",

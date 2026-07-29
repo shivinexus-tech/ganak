@@ -1,4 +1,4 @@
-export const DEFAULT_CANONICAL_ORIGIN = "https://ganak.pages.dev";
+export const DEFAULT_CANONICAL_ORIGIN = "https://ganakapp.com";
 
 const ROUTES = {
   daily: {

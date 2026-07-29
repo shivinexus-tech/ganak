@@ -305,15 +305,15 @@
       "recommendedAction": "Choose analytics and feedback providers, publish the matching privacy notice, configure endpoints, verify dashboard events and feedback delivery, then run a no-PII production network audit and independent privacy bug bash."
     },
     "39": {
-      "deliveryState": "Repository-ready — domain purchase and DNS pending",
-      "limitations": "Canonical origin configuration and SPA fallback exist, but no owner-approved branded domain, DNS, SSL or pages.dev redirect has been configured.",
-      "shortTermImpact": "Current pages.dev URLs remain valid; branded identity and canonical-domain consolidation are not delivered.",
-      "longTermImpact": "Without a single approved canonical domain, search and shared-link authority remain split when a branded domain is eventually introduced.",
-      "bugBashStatus": "Optional after external setup — repository gate passes; DNS/SSL/redirect/share-preview production matrix cannot run yet.",
+      "deliveryState": "90% — branded host and redirects live; canonical metadata deployment pending",
+      "limitations": "Cloudflare DNS, TLS and redirects are live, but the new checked-in canonical metadata still needs its production deployment and route/share verification. Search and social caches update externally.",
+      "shortTermImpact": "Visitors using pages.dev or www retain their exact route and language query while being consolidated onto ganakapp.com.",
+      "longTermImpact": "One HTTPS canonical host consolidates shared-link and search authority and prevents future hostname drift.",
+      "bugBashStatus": "External network checks pass for apex/www TLS and two path/query-preserving 301 vectors. Focused and full repository gates pass; post-deployment branded deep-link and metadata matrix remains.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-28 · Local canonical-deployment and route-metadata gates; current fallback is ganak.pages.dev",
+      "lastVerified": "2026-07-28 · Cloudflare TLS + 301 checks, canonical-deployment/page-context gates, full canonical suite and production build",
       "sourceConfidence": "Not applicable — deployment and DNS work",
-      "recommendedAction": "Owner selects and purchases the domain; attach it in Cloudflare, set VITE_CANONICAL_ORIGIN, configure pages.dev redirect, then verify HTTPS, deep links, language/query preservation, search/share metadata and error origin."
+      "recommendedAction": "Deploy the branded canonical configuration, then verify apex EN/HI deep links, canonical/Open Graph output, share behavior and error-reporting origin before closing."
     },
     "40": {
       "deliveryState": "Implemented locally — production verification pending",
