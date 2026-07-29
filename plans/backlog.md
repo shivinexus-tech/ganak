@@ -535,8 +535,11 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       `validation/festival-interaction.cjs` (166 keys + live engine emission
       coverage + 11 element-scoped failure fixtures, prove-the-guard verified).
       Live-verified EN/HI at 390×844 + 1280px; both audit agents PASS (gate
-      hardened after audit). **Still open before check-off:** commit/deploy and
-      EN/HI phone+desktop production smoke on `ganak.pages.dev` + owner live sign-off.
+      hardened after audit). **Shipped `main` `2e3b4c4`, Cloudflare-deployed and
+      production-verified on `ganak.pages.dev`:** HI phone + EN desktop F&F links,
+      259 former-dead full-year rows now links, real click → guide (lang+city
+      preserved) → Back restores the list, no overflow, zero console errors.
+      **Still open before check-off:** owner live-URL sign-off only.
 - [x] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
       selection box directly on every dedicated festival/vrat page. Replace “Open
       this festival in the Daily Panchang to see the local timing referred to below.”
