@@ -539,7 +539,11 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       production-verified on `ganak.pages.dev`:** HI phone + EN desktop F&F links,
       259 former-dead full-year rows now links, real click → guide (lang+city
       preserved) → Back restores the list, no overflow, zero console errors.
-      **Still open before check-off:** owner live-URL sign-off only.
+      A round-3 pass also caught + fixed two more daily-screen dead-ends (the
+      "Coming up" summary rows and the answer-first observance chip, `b8a4ef7`);
+      a round-4 independent audit (state/keyboard/entry-type matrix) passed and
+      closed one gate gap (`e99a2e7`). **Still open before check-off:** owner
+      live-URL sign-off only.
 - [x] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
       selection box directly on every dedicated festival/vrat page. Replace “Open
       this festival in the Daily Panchang to see the local timing referred to below.”
