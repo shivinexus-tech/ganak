@@ -52,6 +52,21 @@ for (const forbiddenHindi of [
 if (!source.includes("hi: 'कृष्णमूर्ति पद्धति अंक विधि (1–249)'")) {
   failures.push('Hindi number-method toggle must use कृष्णमूर्ति पद्धति, not Latin KP');
 }
+const questionBlock = source.match(/const QUESTIONS = \[([\s\S]*?)\n\];/)?.[1] || '';
+const questionRows = questionBlock.match(/\{ key:/g) || [];
+if (questionRows.length !== 12) {
+  failures.push(`expected 12 Prashna question rows, found ${questionRows.length}`);
+}
+if ((questionBlock.match(/subHi:/g) || []).length !== 12 ||
+    (questionBlock.match(/subEn:/g) || []).length !== 12) {
+  failures.push('every Prashna question box must have a smaller EN/HI explanation');
+}
+if (/hi:'[^']*\/|en:'[^']*\//.test(questionBlock)) {
+  failures.push('slash-separated Prashna question labels have returned');
+}
+if (!source.includes('{hi ? q.subHi : q.subEn}')) {
+  failures.push('Prashna question explanations are not rendered below their labels');
+}
 
 function expectedOrdinal(n) {
   const lastTwo = n % 100;
