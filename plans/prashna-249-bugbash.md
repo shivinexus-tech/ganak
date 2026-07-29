@@ -210,3 +210,77 @@ wait measured 1001ms). The logic is airtight, but the **final real-device double
 confirmation should be done by the resumed Agent-2 pass or the owner on a foreground device.**
 **Still open for closure:** that F9 real-tap confirmation + the remaining place/boundary/12-chip/
 Hindi/layout/F1–F6 regression matrix (Codex halted before it) + owner live-URL sign-off.
+
+---
+
+## Agent-2 continuation — Codex, 2026-07-28 (F9 onward; closing matrix)
+
+**Pre-flight (`CLAUDE-PRASHNA-249-ENGINE`): Stopped midway.** Claude Code remains the
+engine owner and the row remains `REVIEW`; the earlier Codex continuation stopped at
+F9 under the fresh-P1 rule. The owner supplied the merged F9 fix (`03341c0`) and
+explicitly resumed this testing/docs-only pass. Product source stayed read-only.
+
+**Required baseline — PASS on the current `main` tree:**
+
+```text
+prashna-249.cjs                 33/33 PASS
+prashna-249-chart.cjs           14/14 PASS
+prashna-249-input.cjs           4/4 PASS
+prashna parity                  EXACT 198 values / 6 charts
+parse-check kundli-app.tsx      clean
+npm run build                   132 modules, PASS
+```
+
+**F9 behavioral confirmation — PASS.** In the visible foreground in-app browser at
+320×844, a real double-click/tap action on **Cast the answer** for Marriage #108 left
+the answer intact: input `108`, `readOnly=true`, **New question** present, and
+**Houses judged** present. The replacement reset control did not consume the second tap.
+
+**Completed live matrix (`ganak.pages.dev`, canonically redirected to `ganakapp.com`):**
+
+- **All boundaries/splits vs `plans/prashna-249-table.md`:** 1, 22/23, 62/63,
+  105/106, 124/125, 145/146, 188/189, 228/229 and 249 all rendered the expected
+  sign, nakshatra lord, sub-lord and ascendant segment. Twins 33/116/199 exposed
+  only the P2 display discrepancy below; the engine anchors remained exact.
+- **All 12 chips:** each cast #108, retained its selected question identity and
+  showed the exact configured **Houses judged** list.
+- **Place paths:** blank and garbage city text did not replace the selected place;
+  Reykjavik cast successfully and the expanded chart visibly disclosed
+  `equal houses — high-latitude fallback`; Ushuaia cast successfully with the
+  southern-place name and #249 result. Place navigation did not leave an old result.
+- **Language:** EN→HI→EN mid-result preserved the locked #249 answer and read-only
+  field. The Hindi verdict, guidance and detail values rendered in Devanagari; no
+  English verdict badge leaked. The documented bilingual technical glosses remain
+  intentional (earlier F7). Devanagari-digit and emoji number inputs remained visible
+  but invalid with Cast disabled.
+- **Phone widths:** result screens at 320, 360 and 390px had
+  `documentElement.scrollWidth === innerWidth`; no horizontal overflow.
+- **F1–F6 regression:** F1 lock and deliberate reset PASS; F2 `1.5`, `-5`, 0,
+  250 and 999 stayed invalid while `007`→`7` PASS; F3 place transition cleared the
+  old session; F4 locked chip tap ignored; F5 mode toggle hid then restored the same
+  locked answer; F6 expanded number chart said `KP-New ayanamsa (KP number method)`.
+- **Console/network:** zero warning/error console entries throughout. The production
+  document and versioned app/Cloudflare assets loaded without a visible failed-request
+  state; no network failure surfaced in the page or console.
+
+### F11 · P2 — two exact twin ascendants display one minute low
+
+The canonical table and engine map all three structural twins to exactly
+`15°40′00″` within their signs. The live answer-card formatter renders:
+
+```text
+#33  → Vrishabha 15°39′   (should be 15°40′)
+#116 → Kanya 15°39′       (should be 15°40′)
+#199 → Makara 15°40′      (correct)
+```
+
+Sign, star, sub-lord and the underlying engine value are correct; this is a
+floating-point-to-minute display inconsistency at an exact boundary. It is **P2**:
+misleading by one displayed minute, but it does not select a different KP segment or
+change the judgment. No product fix was made in this bug-bash continuation.
+
+**Close-out:** the interrupted matrix is now complete. **No P0/P1 remains open from
+this pass.** F9 is behaviorally confirmed fixed. F11 remains open as P2 polish, and
+the existing owner live-URL sign-off plus primary-source/cusp-verification items remain
+outside this bug-bash closure; therefore the engine row should not be represented as
+fully quality/source-closed solely from this pass.
