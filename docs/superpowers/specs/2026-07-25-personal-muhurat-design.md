@@ -42,10 +42,15 @@ astrologer knowledge — answer-first, bilingual, honest.
 - Bilingual (en/hi) throughout, following the app-wide language toggle.
 - Birth details held in **URL prefs only, never stored** (project no-storage ban).
 
+**Placement (owner decision 2026-07-25):** a **dedicated route `/muhurat/personal`** and
+its own screen (mirroring `/muhurat/medical`), **not** an inline panel in MuhuratHub. This
+reverses the earlier inline note — chosen for clean isolation, since MuhuratHub is a dense
+1060-line file currently in review (rows #16/#17). The screen runs the unchanged
+`muhuratScanRange` itself and applies the overlay; no MuhuratHub edits at all.
+
 **Out (v1):**
-- No edits to `src/engine/muhurat.ts`, no edits to the in-review MuhuratHub finder
-  logic beyond an additive, isolated personalisation panel. A **new** engine file owns
-  all natal logic.
+- No edits to `src/engine/muhurat.ts` and **no edits to MuhuratHub**. A **new** engine file
+  and a **new** screen own all natal logic; the shell gets additive route wiring only.
 - No outcome score, no "guaranteed auspicious" claim, no per-user persistence.
 - No new astronomy. Every value comes from engines the app already computes and ships.
 - Medical Muhurat is untouched — it keeps its own dedicated `/muhurat/medical` overlay.
@@ -128,13 +133,16 @@ Pure overlay module. Never mutates a finder day's own fields. Exports:
 
 Written untyped to match the sibling engines (`muhurat.ts`, `medical-muhurat.ts`).
 
-### 4.2 UI — additive panel in `MuhuratHub`
+### 4.2 UI — dedicated screen `src/screens/PersonalMuhuratScreen.tsx`
 
-An opt-in collapsible section rendered *below* the existing finder controls, matching the
-medical screen's "Personalise" pattern (`MedicalMuhuratScreen.tsx:128`): birth date, birth
-time, and an **independent** birth-place input. Turning it on and supplying valid details
-re-partitions the already-computed result list; turning it off restores the untouched
-general list instantly. No new shared/nav/token files are edited.
+A self-contained screen on route `/muhurat/personal`, structured like `MedicalMuhuratScreen`:
+an activity `<select>` (the 10 general `MUH_CATS` keys), from/to dates, and a place input;
+plus an opt-in `<details>` "Personalise with your birth star" with birth date/time and an
+**independent** birth-place input. The screen calls `muhuratScanRange` itself; when birth
+details are confirmed it runs `natalAnchors` + `applyPersonalisation` over the result. With
+personalisation off it simply shows the finder output. The only shell touch is additive
+route wiring in `kundli-app.tsx` (import, `personalRoute`, hero/metadata/render, mode
+guards), exactly as `/muhurat/medical` is wired. No shared token/nav files change.
 
 ## 5. The graded filter (owner: "filter weak days out automatically")
 
@@ -211,14 +219,13 @@ RED → GREEN → prove-the-guard, mirroring `validation/medical-muhurat.cjs`:
 
 ## 9. Isolation / coordination
 
-- New lane, own branch `claude/personal-muhurat` + worktree; own allowed-file list:
+- New lane, own branch `claude/personal-muhurat`; own allowed-file list:
   `src/engine/personal-muhurat.ts` (new), `src/data/personal-muhurat-ui.ts` (new),
-  a new additive personalisation component, `validation/personal-muhurat.cjs` (new), and
-  the minimal `MuhuratHub` wiring for the opt-in panel.
-- **Not touched:** `src/engine/muhurat.ts`, shared shell/tokens/nav, the in-review
-  MuhuratHub finder logic (rows #16/#17), medical Muhurat. If the MuhuratHub wiring turns
-  out to overlap in-review work, coordinate with the owner before editing rather than
-  co-writing the file.
+  `src/screens/PersonalMuhuratScreen.tsx` (new), `validation/personal-muhurat.cjs` (new),
+  and additive route wiring in `src/kundli-app.tsx` (integration-owned shell — reserved).
+- **Not touched:** `src/engine/muhurat.ts`, shared tokens/nav, the in-review MuhuratHub
+  (rows #16/#17), medical Muhurat. The route-decision (§2) removes the MuhuratHub-overlap
+  risk entirely — no co-writing of that file.
 - Closeout follows the standing policy: update the acceptance register + sheet sync, run
   all canonical gates + build, browser/phone EN-HI smoke, then owner live-URL sign-off
   and a two-agent bug bash before any 100% closure (backlog bug-bash rule).
