@@ -848,8 +848,8 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                 <div style={{ marginTop: 4, padding: '9px 11px', background: TOKENS.amberSoft,
                   borderRadius: TOKENS.radius, border: `1px solid ${TOKENS.line}`, fontSize: 11.5, color: TOKENS.muted, lineHeight: 1.5 }}>
                   {hi
-                    ? 'यह कृष्णमूर्ति पद्धति अंक विधि है, इसके नए अयनांश पर — गणक की सामान्य लाहिरी परिपाटी से भिन्न। निर्णय के नियम प्रचलित कृष्णमूर्ति पद्धति पर आधारित हैं; कृष्णमूर्ति के मूल ग्रंथों से सत्यापन प्रगति पर है।'
-                    : 'This is the KP number method on the KP-New ayanamsa — distinct from Ganak’s usual Lahiri convention. The judgment rules follow widely-published KP practice; verification against Krishnamurti’s primary texts is in progress.'}
+                    ? 'यह कृष्णमूर्ति पद्धति अंक विधि है, इसके नए अयनांश पर — गणक की सामान्य लाहिरी परिपाटी से भिन्न। निर्णय के नियम के॰ एस॰ कृष्णमूर्ति के के॰पी॰ रीडर्स (मुख्यतः रीडर VI, होरारी ज्योतिष) से लिए गए हैं।'
+                    : 'This is the KP number method on the KP-New ayanamsa — distinct from Ganak’s usual Lahiri convention. The judgment rules are drawn from K.S. Krishnamurti’s KP Readers (principally Reader VI, Horary Astrology).'}
                 </div>
               )}
             </div>
