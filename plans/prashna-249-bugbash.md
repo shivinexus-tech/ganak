@@ -429,3 +429,102 @@ technical sign-off on `https://ganakapp.com/?screen=prashna`. F13 is unrelated P
 platform polish and is now resolved. The older `CLAUDE-PRASHNA-249-ENGINE` row remains `REVIEW` because
 its separate owner live-URL acceptance, numeric house-cusp cross-check and Reader
 II/VI page-pin are outside this bug-bash authority.
+
+---
+
+## External KP-New cusp cross-check (2026-07-29) — Claude Code · `CLAUDE-PRASHNA-249-CUSP-VERIFY`
+
+This closes the standing verification item *"KP-New cusp numeric cross-check"* on the
+`CLAUDE-PRASHNA-249-ENGINE` row. The cross-check ran to completion — and it **found a
+correctness bug (F14, P1)**, so the item cannot be signed off as "verified correct"
+until the bug is fixed. This is a STOP with exact numbers, not a pass.
+
+### Reference chosen and why it is trustworthy
+
+**Swiss Ephemeris** (npm package `sweph` 2.10.3, N-API binding to the Astrodienst C
+library), function `swe_houses_armc(ARMC, geolat, eps, 'P')`. It is the house-cusp
+engine behind astro.com and the large majority of professional KP/Vedic software; its
+Placidus implementation is the de-facto industry reference. `houses_armc` returns the
+**tropical** Placidus cusps as a pure function of `(ARMC, latitude, obliquity)` — no
+date, ephemeris or ayanamsa — which isolates exactly the Placidus semi-arc math under
+test and removes every ayanamsa-convention ambiguity (the obliquity is passed in
+explicitly). Ganak builds its cusps on the tropical sky and then subtracts the
+ayanamsa, so the identity checked is:
+
+>  Ganak sidereal cusp  +  KP-New ayanamsa(at the instant)  ==  Swiss Ephemeris tropical Placidus cusp
+
+For each chart the reference is fed Ganak's **own** reconstructed `(ARMC, eps, lat)`:
+`eps` and JD are standard published formulae, and the ARMC is obtained by an
+independent robust inversion of the standard ascendant equation. Swiss Ephemeris's
+returned ascendant is checked against the number's ascendant as a self-consistency
+guard on the reconstruction.
+
+### Fixed inputs and Ganak's cusps (the three pinned anchors — all CORRECT)
+
+Instant for all: **2026-07-24 10:00:00 UTC** (15:30 IST). eps = 23.435837°, KP-New
+ayanamsa = 24.137692°.
+
+| Input | Number | Place (lat) | Ganak sidereal cusps 1..12 | Worst Δ vs Swiss |
+|---|---|---|---|---|
+| A | 108 | New Delhi (28.6139) | 153.000, 180.891, 211.318, 242.882, 274.409, 304.854, 333.000, 0.891, 31.318, 62.882, 94.409, 124.854 | **0.0000″** |
+| B | 200 | New Delhi (28.6139) | 287.778, 328.248, 3.959, 32.279, 56.326, 79.969, 107.778, 148.248, 183.959, 212.279, 236.326, 259.969 | **0.0000″** |
+| C | 108 | London (51.5074) | 153.000, 176.533, 206.281, 242.138, 278.392, 308.780, 333.000, 356.533, 26.281, 62.138, 98.392, 128.780 | **0.0000″** |
+
+Tolerance: a few arc-minutes (task brief). Measured worst on these three: **0.0000″**.
+When the number→RAMC inversion converges, Ganak's Placidus cusp math is **exactly**
+correct against the industry reference. These three are pinned as GREEN anchors in
+`validation/prashna-249-chart.cjs` (§1b), guard proven by perturbation.
+
+### F14 (P1) — `PR_ramcForAsc` mis-converges for a latitude-dependent band of numbers
+
+A full sweep of all 1..249 at three latitudes (New Delhi, London, Sydney; 747 Placidus
+charts, high-lat equal-house cases excluded) found **72 charts** whose houses disagree
+with Swiss Ephemeris beyond tolerance — worst **276231″ ≈ 76.7°**. The offenders are
+contiguous, latitude-dependent number bands:
+
+- **New Delhi:** #39–53 (15 numbers)
+- **London:** #29–65 (37 numbers)
+- **Sydney:** #37–56 (20 numbers)
+
+**Worked example — #45, New Delhi.** The number's tropical ascendant is 89.027°. The
+RAMC that actually produces that ascendant is **345.26°** (→ MC 344.00°, cusp 2
+111.85°, cusp 11 17.95°). But Ganak's `PR_ramcForAsc` returns **RAMC ≈ 0°** (→ MC 0.00°,
+cusp 2 124.89°, cusp 11 34.70°). Swiss Ephemeris confirms Ganak's cusps are the correct
+Placidus cusps *for RAMC 0* — i.e. Ganak solved the Placidus geometry correctly but
+from the **wrong RAMC**. The ascendant (cusp 1) is still shown correctly because
+`PR_castNumber` pins it directly (`trop[1] = ascTrop`), so cusp 1 and its opposite
+cusp 7 stay right, but MC and cusps 2,3,11,12 (and their derived opposites 5,6,8,9) are
+built from the wrong RAMC and are **inconsistent with the pinned ascendant**.
+
+**Root cause.** `PR_ramcForAsc` (`src/screens/PrashnaScreen.tsx`, in the number-method
+region BELOW the frozen parity markers, ~lines 275–283) bisects `[0°,360°)` using the
+test `norm360(ascOf(mid) - target) < 180`. The ascendant is monotonic in RAMC over a
+full turn, but this wrap-around test collapses the interval toward the wrong boundary
+when the true RAMC lies in the "far" half relative to the midpoint — so it returns a
+wrong RAMC (often ≈0) instead of the true root. This is a classic wrap-unsafe
+bisection. The frozen Lahiri time engine is unaffected (it never inverts an ascendant;
+it computes RAMC from sidereal time), so Prashna parity is untouched.
+
+**Product impact.** `PR_judge` reads `chart.cusps[q.cusp]` to pick the cuspal sub-lord
+and `chart.cusps[h]` sign-lords to find significators. For an affected number, cusps
+other than 1/7 are wrong, so the sub-lord and significators — and therefore the
+**yes/no/mixed verdict** — are wrong for every question type whose judged cusp is not
+1 or 7 (career/10, money/11, health/6, education & property/4, children/5, disputes/6,
+lost/2, venture/10, general/1-ok). Only marriage (cusp 7) and "general" (cusp 1) are
+immune. The size of the affected band depends on latitude.
+
+### Verdict / STOP
+
+- **Placidus cusp MATH: externally VERIFIED correct** against Swiss Ephemeris (0.0000″
+  on every convergent chart; 675/747 charts). Three anchors pinned.
+- **Number→RAMC inversion: BROKEN (F14, P1)** for a latitude-dependent band; corrupts
+  houses 2–12 and the verdict for those numbers.
+- The verification item is therefore **NOT closed as passing.** Per the task's stop
+  rule I did **not** fudge anchors over the buggy band. The fix belongs in engine code
+  (`PR_ramcForAsc` → robust root-find, e.g. wrap-aware bracketing or a coarse-scan +
+  local refine) under the `CLAUDE-PRASHNA-249-ENGINE` lane, followed by a re-run of the
+  full-range cross-check (a `.scratch/` harness that does this is checked in evidence).
+
+Evidence harnesses (not shipped; `.scratch/` is gitignored): `prashna-cusp-compute.cjs`
++ `refcheck/prashna-cusp-swisseph.cjs` (3-input demo), `prashna-cusp-fullrange.cjs` +
+`refcheck/prashna-cusp-fullcheck.cjs` (full 1..249 × 3-latitude sweep).
