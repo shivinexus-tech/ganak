@@ -22,10 +22,23 @@ const { kpNumberToLagna } = eng;
 
 let pass = 0, fail = 0;
 const ok = (c, m) => { c ? pass++ : fail++; console.log(`${c ? 'PASS' : 'FAIL'}  ${m}`); };
+const norm360 = d => ((d % 360) + 360) % 360;
 
 const IST = (y, mo, d, h, mi) => Date.UTC(y, mo - 1, d, h, mi) - 330 * 60000;
 const DELHI = { lat: 28.6139, lon: 77.2090 };
 const ms = IST(2026, 7, 24, 15, 30);
+// Meeus JD(UT) for the fixed instant above — used to reconstruct the KP-New
+// ayanamsa at that moment so sidereal cusps can be compared against the
+// TROPICAL external reference (Swiss Ephemeris) below. Standard formula.
+function jdUTof(msv) {
+  const dt = new Date(msv);
+  let y = dt.getUTCFullYear(), mo = dt.getUTCMonth() + 1;
+  const day = dt.getUTCDate();
+  const hUT = dt.getUTCHours() + dt.getUTCMinutes() / 60 + dt.getUTCSeconds() / 3600;
+  if (mo <= 2) { y -= 1; mo += 12; }
+  const A = Math.floor(y / 100), B = 2 - A + Math.floor(A / 4);
+  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (mo + 1)) + day + B - 1524.5 + hUT / 24;
+}
 
 // 0. KP-New ayanamsa constant matches the published value --------------------
 console.log('--- KP-New ayanamsa constant (Balachandran 2003) ---');
@@ -43,6 +56,59 @@ for (const n of [1, 45, 108, 200, 249]) {
   const want = kpNumberToLagna(n);
   let d = Math.abs(chart.cusps[1] - want); if (d > 180) d = 360 - d;
   ok(d < 1e-6, `#${n}: cusp 1 = ${chart.cusps[1].toFixed(4)}° vs number ${want.toFixed(4)}°  (Δ ${d.toExponential(1)}°)`);
+}
+
+// 1b. EXTERNAL cusp cross-check vs Swiss Ephemeris ---------------------------
+// The task "KP-New cusp numeric cross-check" required validating Ganak's 12
+// Placidus house cusps against an INDEPENDENT reference. Reference chosen:
+// Swiss Ephemeris (npm `sweph`) `swe_houses_armc(ARMC, lat, eps, 'P')`, the
+// house engine behind Astrodienst (astro.com) and most professional KP/Vedic
+// software. It returns TROPICAL Placidus cusps as a pure function of (ARMC,
+// latitude, obliquity) — no time, ephemeris or ayanamsa — isolating exactly the
+// Placidus semi-arc math. Since Ganak computes cusps on the tropical sky then
+// shifts by the ayanamsa, the check is:  Ganak sidereal cusp + KP-New ayanamsa
+// == reference tropical cusp.  Full method + evidence:
+// plans/prashna-249-bugbash.md § "External KP-New cusp cross-check (2026-07-29)".
+//
+// The pinned numbers below are the Swiss Ephemeris tropical Placidus cusps for
+// the fixed instant `ms` above; each matched Ganak to 0.0000" when the number's
+// ascendant→RAMC inversion converges.
+//
+// ⚠️ STOP — VERIFICATION FOUND A BUG, NOT A CLEAN PASS. The full 1..249 sweep at
+// three latitudes (New Delhi/London/Sydney) showed 72 of 747 charts disagree
+// with Swiss Ephemeris by up to ~76°, in contiguous, latitude-dependent number
+// bands (Delhi #39–53, London #29–65, Sydney #37–56). Root cause: PR_ramcForAsc
+// (PrashnaScreen.tsx, in the number-method region BELOW the frozen parity
+// markers) is a wrap-around-unsafe bisection that mis-converges for numbers
+// whose tropical ascendant places the true RAMC in its blind half — it returns
+// the wrong RAMC, so cusps 2–12 (MC, intermediates and their opposites) are
+// built from that wrong RAMC and are INCONSISTENT with the correctly-pinned
+// ascendant. This corrupts the sub-lord-based verdict for affected numbers on
+// every question whose cusp ≠ 1/7. These anchors therefore cover only the
+// convergent numbers; the item is NOT closed as "verified correct". See the
+// bugbash note. Do NOT add anchors for the buggy bands until PR_ramcForAsc is
+// fixed (robust root-find), then re-run this cross-check across the full range.
+console.log('--- external Placidus cusp anchors (Swiss Ephemeris, KP-New tropical) ---');
+{
+  const T = (jdUTof(ms) + 72 / 86400 - 2451545) / 36525; // TT centuries (ΔT=72s)
+  const ayan = PR_kpNewAyan(T);
+  // Swiss Ephemeris tropical Placidus cusps 1..12 (independent reference).
+  const ANCHORS = [
+    { n: 108, lat: 28.6139, lon: 77.2090, trop: [177.137692, 205.028817, 235.455321, 267.019947, 298.546689, 328.991444, 357.137692, 25.028817, 55.455321, 87.019947, 118.546689, 148.991444] },
+    { n: 200, lat: 28.6139, lon: 77.2090, trop: [311.915469, 352.385789, 28.097112, 56.416353, 80.463206, 104.106895, 131.915469, 172.385789, 208.097112, 236.416353, 260.463206, 284.106895] },
+    { n: 108, lat: 51.5074, lon: -0.1278, trop: [177.137692, 200.671162, 230.418472, 266.275855, 302.529857, 332.918061, 357.137692, 20.671162, 50.418472, 86.275855, 122.529857, 152.918061] },
+  ];
+  const TOL = 0.02; // degrees (~72"); measured worst Δ on these anchors = 0.0000"
+  for (const A of ANCHORS) {
+    const c = PR_castNumber(ms, A.lat, A.lon, A.n);
+    let maxd = 0;
+    for (let h = 1; h <= 12; h++) {
+      let g = norm360(c.cusps[h] + ayan);          // Ganak sidereal → tropical
+      let dd = Math.abs(g - A.trop[h - 1]); if (dd > 180) dd = 360 - dd;
+      if (dd > maxd) maxd = dd;
+    }
+    ok(maxd < TOL, `#${A.n} @lat ${A.lat}: 12 cusps match Swiss Ephemeris KP-New Placidus (max Δ ${(maxd * 3600).toFixed(2)}″)`);
+  }
 }
 
 // 2. planets are the REAL sky in KP-New sidereal: a UNIFORM shift from the
