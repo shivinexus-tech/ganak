@@ -3,6 +3,7 @@
 // buildLifeReading behaviour. Includes non-vacuous self-tests so the safety guard
 // is proven to actually bite (AGENTS.md: prove guards non-vacuously).
 'use strict';
+const fs = require('node:fs');
 const { loadApp } = require('./_load-app.cjs');
 const { NAKSHATRA_TRAITS, SIGN_TRAITS, buildLifeReading } = loadApp('src/data/life-interpretation.ts');
 
@@ -58,6 +59,26 @@ const scan = (where, o) => { if (!o) return; for (const l of LANGS) { const s = 
 (NAKSHATRA_TRAITS || []).forEach((e, i) => { scan(`nak[${i}].nature`, e.nature); scan(`nak[${i}].strengths`, e.strengths); });
 (SIGN_TRAITS || []).forEach((e, i) => { for (const f of ['mind', 'relating', 'work', 'outward']) scan(`sign[${i}].${f}`, e[f]); });
 
+// 2b. Owner-rejected wording (review rounds 1–2). Not safety issues — stilted words
+// or bad collocations the owner struck out. Guarded so a later full rewrite can't
+// silently bring them back (which is exactly what happened once with अगुआई).
+const REJECTED = [
+  { name: 'अगुआ/अगुआई — use अग्रणी/नेतृत्व', re: /अगुआ/ },
+  { name: 'ऊष्म/ऊष्ण family — use गर्मजोशी', re: /ऊष्म|ऊष्ण/ },
+  { name: 'अभिव्यंजक — use खुलकर व्यक्त', re: /अभिव्यंजक/ },
+  { name: 'सर्वाधिक — use सबसे', re: /सर्वाधिक/ },
+  { name: 'प्रथम-छवि — use पहली छाप', re: /प्रथम-?छवि/ },
+  { name: 'बहादुर मन — bad collocation, use निडर/साहसी', re: /बहादुर\s*मन/ },
+  { name: 'विकास को पोषने — calque', re: /विकास\s*को\s*पोषने/ },
+  { name: 'द्वारा शासित — use से शासित', re: /द्वारा\s*शासित/ },
+  { name: 'EN "the tradition" — use "classical texts"', re: /\bthe tradition\b/i },
+  { name: 'EN "lean … toward" — use "associate … with"', re: /\blean\s+\w+\s+toward\b/i },
+];
+const scanRejected = (where, o) => { if (!o) return; for (const l of LANGS) { const s = String(o[l] || ''); for (const b of REJECTED) if (b.re.test(s)) fails.push(`${where}.${l}: REJECTED (${b.name}) — "${s.slice(0, 50)}"`); } };
+(NAKSHATRA_TRAITS || []).forEach((e, i) => { scanRejected(`nak[${i}].nature`, e.nature); scanRejected(`nak[${i}].strengths`, e.strengths); });
+(SIGN_TRAITS || []).forEach((e, i) => { for (const f of ['mind', 'relating', 'work', 'outward']) scanRejected(`sign[${i}].${f}`, e[f]); });
+for (const s of ['यह अगुआ नक्षत्र है', 'ऊष्मापूर्ण मन', 'बहादुर मन बताते हैं', 'the tradition links it']) if (!REJECTED.some((b) => b.re.test(s))) fails.push(`SELFTEST: rejected wording slipped through: "${s}"`);
+
 // 3. buildLifeReading behaviour
 const sample = buildLifeReading({ nak: 0, moonSign: 0, ascSign: 3 });
 if (!Array.isArray(sample) || sample.length !== 6) fails.push(`buildLifeReading must return 6 areas, got ${sample && sample.length}`);
@@ -88,6 +109,29 @@ const mustNot = [
 ];
 for (const s of mustMatch) if (!ALL_BANNED.some((b) => b.re.test(s))) fails.push(`SELFTEST: banned string slipped through: "${s}"`);
 for (const s of mustNot) { const h = ALL_BANNED.find((b) => b.re.test(s)); if (h) fails.push(`SELFTEST: good string wrongly flagged (${h.name}): "${s}"`); }
+
+// 5. Permanent UI wiring — the richer reading must remain answer-first and the
+// superseded one-line tables/section must not return.
+const chartSource = fs.readFileSync('src/screens/ChartScreen.tsx', 'utf8');
+const navSource = fs.readFileSync('src/components/JyotishPanelNav.tsx', 'utf8');
+for (const required of [
+  'import LifeInterpretationCard from "../components/LifeInterpretationCard"',
+  'import { buildLifeReading } from "../data/life-interpretation"',
+  '<Eyebrow id="reading" deva="फलादेश" en="Your reading" />',
+  'reading={buildLifeReading({',
+  'nak: r.moon.nak',
+  'moonSign: r.moon.sign',
+  'ascSign: r.ascSign',
+]) if (!chartSource.includes(required)) fails.push(`UI wiring missing: ${required}`);
+for (const obsolete of ['const NAK_NOTE', 'const SIGN_NOTE', 'A short reading']) {
+  if (chartSource.includes(obsolete)) fails.push(`obsolete Chart reading returned: ${obsolete}`);
+}
+const readingAt = chartSource.indexOf('<Eyebrow id="reading"');
+const chartAt = chartSource.indexOf('<Eyebrow id="chart"');
+if (readingAt < 0 || chartAt < 0 || readingAt > chartAt) fails.push('answer-first reading must render before the technical chart');
+const navReadingAt = navSource.indexOf('["#reading"');
+const navSummaryAt = navSource.indexOf('["#summary"');
+if (navReadingAt < 0 || navSummaryAt < 0 || navReadingAt > navSummaryAt) fails.push('Kundli navigation must list Reading before Summary');
 
 if (fails.length) {
   console.error(`✗ life-interpretation-copy: ${fails.length} issue(s):`);
