@@ -436,8 +436,10 @@ II/VI page-pin are outside this bug-bash authority.
 
 This closes the standing verification item *"KP-New cusp numeric cross-check"* on the
 `CLAUDE-PRASHNA-249-ENGINE` row. The cross-check ran to completion — and it **found a
-correctness bug (F14, P1)**, so the item cannot be signed off as "verified correct"
-until the bug is fixed. This is a STOP with exact numbers, not a pass.
+correctness bug (F14, P1)**. **F14 was FIXED on 2026-07-29** (branch
+`claude/prashna-249-f14-ramc`; see "### F14 — FIXED" below); after the fix the full
+1..249 × 3-latitude sweep matches Swiss Ephemeris to **0.0000″** on all 12 cusps for
+every chart (0 mis-converging). The cross-check is now a clean pass.
 
 ### Reference chosen and why it is trustworthy
 
@@ -475,7 +477,7 @@ When the number→RAMC inversion converges, Ganak's Placidus cusp math is **exac
 correct against the industry reference. These three are pinned as GREEN anchors in
 `validation/prashna-249-chart.cjs` (§1b), guard proven by perturbation.
 
-### F14 (P1) — `PR_ramcForAsc` mis-converges for a latitude-dependent band of numbers
+### F14 (P1) — `PR_ramcForAsc` mis-converges for a latitude-dependent band of numbers — FIXED 2026-07-29
 
 A full sweep of all 1..249 at three latitudes (New Delhi, London, Sydney; 747 Placidus
 charts, high-lat equal-house cases excluded) found **72 charts** whose houses disagree
@@ -513,18 +515,51 @@ other than 1/7 are wrong, so the sub-lord and significators — and therefore th
 lost/2, venture/10, general/1-ok). Only marriage (cusp 7) and "general" (cusp 1) are
 immune. The size of the affected band depends on latitude.
 
-### Verdict / STOP
+### Verdict (original STOP — now resolved)
 
 - **Placidus cusp MATH: externally VERIFIED correct** against Swiss Ephemeris (0.0000″
-  on every convergent chart; 675/747 charts). Three anchors pinned.
-- **Number→RAMC inversion: BROKEN (F14, P1)** for a latitude-dependent band; corrupts
-  houses 2–12 and the verdict for those numbers.
-- The verification item is therefore **NOT closed as passing.** Per the task's stop
-  rule I did **not** fudge anchors over the buggy band. The fix belongs in engine code
-  (`PR_ramcForAsc` → robust root-find, e.g. wrap-aware bracketing or a coarse-scan +
-  local refine) under the `CLAUDE-PRASHNA-249-ENGINE` lane, followed by a re-run of the
-  full-range cross-check (a `.scratch/` harness that does this is checked in evidence).
+  on every convergent chart; 675/747 charts at time of discovery). Three anchors pinned.
+- **Number→RAMC inversion: was BROKEN (F14, P1)** for a latitude-dependent band; corrupted
+  houses 2–12 and the verdict for those numbers. **Now FIXED — see below.**
+
+### F14 — FIXED (2026-07-29, `claude/prashna-249-f14-ramc`)
+
+**The fix.** `PR_ramcForAsc` was rewritten from the wrap-unsafe `lo=0,hi=360` bisection
+to a **wrap-safe coarse-scan + in-cell bisection**: RAMC is scanned in small (0.5°) steps
+to find the single wrap-free cell whose *forward* ascendant-arc contains the target
+(`norm360(target − ascOf(r0)) ≤ norm360(ascOf(r1) − ascOf(r0))`), then bisected inside
+that continuous, strictly-monotonic cell where no 360°→0° wrap can be straddled. A
+full-resolution nearest-RAMC fallback handles any near-circumpolar geometric edge so the
+function never returns a silently-wrong angle. The change is entirely BELOW the frozen
+parity markers; the Lahiri time engine and `prashna-parity` (EXACT 198/6) are untouched.
+
+**Why the old code failed (mechanism, London #29).** Target ascendant 64.14° needs
+RAMC ≈ 303.3°. The ascendant wraps 360°→0° near RAMC ≈ 262°, so on the first bisection
+step (mid = 180°, asc = 243.43°, `norm360(243.43 − 64.14) = 179.29 < 180` → `hi = 180`)
+the true root at 303° was discarded, and the search collapsed to RAMC ≈ 0°.
+
+**Post-fix evidence — the identical full sweep re-run against the fixed code:**
+
+```
+Checked 747 placidus charts against Swiss Ephemeris (tolerance 300"/5').
+Worst per-cusp diff overall: 0.0" (0.00') at #19 London
+All numbers agree within tolerance.
+```
+
+Worst per-cusp diff across the entire 1..249 × 3-latitude sweep is **0.0000″** (down from
+276231″ ≈ 76.7°); **0 charts mis-converging** (was 72). Standalone, the new root-find
+reproduces the target ascendant to 0.000000″ and matches an independent coarse-scan
+inversion of the RAMC to 0.000000″ on all 747 charts.
+
+**TDD anchors (RED→GREEN).** Three anchors inside the formerly-broken bands were added to
+`validation/prashna-249-chart.cjs` §1b — **#45 New Delhi, #40 London, #45 Sydney** — with
+their Swiss-Ephemeris-verified tropical cusps. On the pre-fix bisection they FAIL
+(max Δ 60313.75″/201094.06″/66080.60″ ≈ 16.75°/55.86°/18.36°) while the convergent #108/#200
+anchors still pass (17 pass / 3 fail); on the fix all pass (**20 pass / 0 fail**). Guard
+proven by perturbation (reverting the source → exactly those three fail).
 
 Evidence harnesses (not shipped; `.scratch/` is gitignored): `prashna-cusp-compute.cjs`
 + `refcheck/prashna-cusp-swisseph.cjs` (3-input demo), `prashna-cusp-fullrange.cjs` +
-`refcheck/prashna-cusp-fullcheck.cjs` (full 1..249 × 3-latitude sweep).
+`refcheck/prashna-cusp-fullcheck.cjs` (full 1..249 × 3-latitude sweep), plus the fix-side
+re-run harness `f14-fullrange-wt.cjs` and RED/GREEN checks `f14-algo-test.cjs` /
+`f14-red-cmp.cjs`.

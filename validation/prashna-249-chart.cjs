@@ -71,23 +71,22 @@ for (const n of [1, 45, 108, 200, 249]) {
 // plans/prashna-249-bugbash.md § "External KP-New cusp cross-check (2026-07-29)".
 //
 // The pinned numbers below are the Swiss Ephemeris tropical Placidus cusps for
-// the fixed instant `ms` above; each matched Ganak to 0.0000" when the number's
-// ascendant→RAMC inversion converges.
+// the fixed instant `ms` above; each matches Ganak to 0.0000".
 //
-// ⚠️ STOP — VERIFICATION FOUND A BUG, NOT A CLEAN PASS. The full 1..249 sweep at
-// three latitudes (New Delhi/London/Sydney) showed 72 of 747 charts disagree
-// with Swiss Ephemeris by up to ~76°, in contiguous, latitude-dependent number
+// F14 (P1) — FIXED 2026-07-29. The full 1..249 sweep at three latitudes
+// (New Delhi/London/Sydney) originally showed 72 of 747 charts disagree with
+// Swiss Ephemeris by up to ~76.7°, in contiguous, latitude-dependent number
 // bands (Delhi #39–53, London #29–65, Sydney #37–56). Root cause: PR_ramcForAsc
-// (PrashnaScreen.tsx, in the number-method region BELOW the frozen parity
-// markers) is a wrap-around-unsafe bisection that mis-converges for numbers
-// whose tropical ascendant places the true RAMC in its blind half — it returns
-// the wrong RAMC, so cusps 2–12 (MC, intermediates and their opposites) are
-// built from that wrong RAMC and are INCONSISTENT with the correctly-pinned
-// ascendant. This corrupts the sub-lord-based verdict for affected numbers on
-// every question whose cusp ≠ 1/7. These anchors therefore cover only the
-// convergent numbers; the item is NOT closed as "verified correct". See the
-// bugbash note. Do NOT add anchors for the buggy bands until PR_ramcForAsc is
-// fixed (robust root-find), then re-run this cross-check across the full range.
+// (PrashnaScreen.tsx, number-method region BELOW the frozen parity markers) was
+// a wrap-around-unsafe `lo=0,hi=360` bisection that straddled the 360°→0°
+// ascendant wrap and mis-converged (usually to RAMC≈0) for numbers whose true
+// RAMC fell in its blind half — so cusps 2–12 were built from the wrong RAMC and
+// were INCONSISTENT with the correctly-pinned ascendant, corrupting the
+// sub-lord verdict on every question whose cusp ≠ 1/7. Fixed with a wrap-safe
+// coarse-scan + in-cell bisection root-find. Post-fix, ALL 747 charts match
+// Swiss Ephemeris to 0.0000". The three band anchors below (Delhi #45, London
+// #40, Sydney #45) each land inside a formerly-broken band and are RED on the
+// old bisection / GREEN on the fix — they guard against any regression.
 console.log('--- external Placidus cusp anchors (Swiss Ephemeris, KP-New tropical) ---');
 {
   const T = (jdUTof(ms) + 72 / 86400 - 2451545) / 36525; // TT centuries (ΔT=72s)
@@ -97,6 +96,10 @@ console.log('--- external Placidus cusp anchors (Swiss Ephemeris, KP-New tropica
     { n: 108, lat: 28.6139, lon: 77.2090, trop: [177.137692, 205.028817, 235.455321, 267.019947, 298.546689, 328.991444, 357.137692, 25.028817, 55.455321, 87.019947, 118.546689, 148.991444] },
     { n: 200, lat: 28.6139, lon: 77.2090, trop: [311.915469, 352.385789, 28.097112, 56.416353, 80.463206, 104.106895, 131.915469, 172.385789, 208.097112, 236.416353, 260.463206, 284.106895] },
     { n: 108, lat: 51.5074, lon: -0.1278, trop: [177.137692, 200.671162, 230.418472, 266.275855, 302.529857, 332.918061, 357.137692, 20.671162, 50.418472, 86.275855, 122.529857, 152.918061] },
+    // F14 band anchors — inside the formerly-broken bands (RED pre-fix, GREEN post-fix):
+    { n: 45, lat: 28.6139, lon: 77.2090, trop: [89.026580, 111.848799, 135.821428, 164.002857, 197.946369, 234.822754, 269.026580, 291.848799, 315.821428, 344.002857, 17.946369, 54.822754] },
+    { n: 40, lat: 51.5074, lon: -0.1278, trop: [80.248803, 98.017897, 114.778195, 134.528972, 162.792483, 208.327857, 260.248803, 278.017897, 294.778195, 314.528972, 342.792483, 28.327857] },
+    { n: 45, lat: -33.8688, lon: 151.2093, trop: [89.026580, 124.541640, 163.020927, 197.194901, 224.562715, 247.409599, 269.026580, 304.541640, 343.020927, 17.194901, 44.562715, 67.409599] },
   ];
   const TOL = 0.02; // degrees (~72"); measured worst Δ on these anchors = 0.0000"
   for (const A of ANCHORS) {

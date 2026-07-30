@@ -269,17 +269,49 @@ function PR_judge(chart, q) {
 // kp-horary.ts; sourcing + disclaimer live in plans/prashna-249-ksk-verify.md.
 
 /* Invert the ascendant equation: find the RAMC (local sidereal time angle) that
-   makes the ascendant fall at targetAscTrop (tropical°) at latitude `lat`. The
-   ascendant increases monotonically with RAMC over a full turn, so a plain
-   bisection converges exactly and never gets stuck. */
+   makes the ascendant fall at targetAscTrop (tropical°) at latitude `lat`.
+
+   The ascendant is a monotonic-but-CIRCULAR function of RAMC: it increases
+   through one full turn as RAMC sweeps 0→360°, wrapping 360°→0° exactly once.
+   A naive `lo=0,hi=360` bisection on `norm360(asc(mid)-target)<180` straddles
+   that wrap — on its first step it can discard the half that holds the true
+   root, then collapse to a wrong RAMC (usually ≈0). That was F14: cusp 1 stayed
+   correct (pinned directly), but the MC and cusps 2–12 were built from the wrong
+   RAMC, diverging up to ~76.7° vs Swiss Ephemeris for a latitude-dependent band.
+
+   Wrap-safe fix: coarse-scan RAMC for the small, wrap-free cell whose FORWARD
+   ascendant-arc contains the target, then bisect inside that cell where the
+   ascendant is continuous and strictly monotonic — no wrap can be straddled.
+   Deterministic and fast (a few hundred cheap evals). Verified against Swiss
+   Ephemeris (swe_houses_armc, Placidus) to 0.0000″ across 1–249 × 3 latitudes. */
 function PR_ramcForAsc(targetAscTrop, eps, lat) {
   const ascOf = ramc => norm360(Math.atan2(cosD(ramc), -(sinD(ramc) * cosD(eps) + tanD(lat) * sinD(eps))) * R2D);
-  let lo = 0, hi = 360;
-  for (let i = 0; i < 60; i++) {
-    const mid = (lo + hi) / 2;
-    if (norm360(ascOf(mid) - targetAscTrop) < 180) hi = mid; else lo = mid;
+  const target = norm360(targetAscTrop);
+  const STEP = 0.5;                       // 720 samples: keeps each cell's asc-span « 180°
+  let r0 = 0, a0 = ascOf(0);
+  for (let k = 1; k <= 720; k++) {
+    const r1 = k * STEP, a1 = ascOf(r1 % 360);
+    const span = norm360(a1 - a0);        // forward asc-increase across this cell
+    const off = norm360(target - a0);     // forward distance from a0 to the target
+    if (span > 1e-9 && off <= span) {     // target lies inside this wrap-free cell
+      let lo = r0, hi = r1;
+      for (let i = 0; i < 60; i++) {
+        const mid = (lo + hi) / 2;
+        if (norm360(ascOf(mid) - a0) >= off) hi = mid; else lo = mid;
+      }
+      return norm360((lo + hi) / 2);
+    }
+    r0 = r1; a0 = a1;
   }
-  return (lo + hi) / 2;
+  // Geometric edge (e.g. near-circumpolar latitude where the ascendant is not
+  // cleanly monotonic across a coarse cell) — never return a silently-wrong
+  // angle: fall back to a full-resolution nearest-RAMC search. Deterministic.
+  let best = 0, bestD = Infinity;
+  for (let a = 0; a < 360; a += 0.01) {
+    let d = Math.abs(norm360(ascOf(a) - target)); if (d > 180) d = 360 - d;
+    if (d < bestD) { bestD = d; best = a; }
+  }
+  return best;
 }
 
 /* KP-New ayanamsa (Prof. K. Balachandran, KP & Astrology Year Book 2003) — the

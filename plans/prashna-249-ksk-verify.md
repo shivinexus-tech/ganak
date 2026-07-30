@@ -308,25 +308,30 @@ this fixes the disclosure's structure and voice only.
   for a fixed number+time+place; (3) the standing **two-agent bug bash** + owner live-URL
   approval (backlog closure contract); (4) the Reader II/VI page-pin still outstanding.
 
-## 2026-07-29 update — item (2) house-cusp cross-check DONE; found F14 (P1). STOP.
+## 2026-07-29 update — item (2) house-cusp cross-check DONE; F14 found AND FIXED. CLEAN.
 
 The numeric house-cusp cross-check (item 2 above) was run to completion against
 **Swiss Ephemeris** (`sweph` / `swe_houses_armc`, the astro.com reference house engine)
-for fixed number+time+place inputs, accounting for the KP-New ayanamsa offset. Outcome:
+for fixed number+time+place inputs, accounting for the KP-New ayanamsa offset. It first
+surfaced a P1 engine bug (F14), which has since been **FIXED**; the cross-check is now a
+clean pass. Outcome:
 
 - **Placidus cusp math is externally correct** — Ganak matches Swiss Ephemeris to
-  **0.0000″** on all 12 cusps for every chart where the ascendant→RAMC inversion
-  converges (675/747 across three latitudes). Three anchors pinned in
-  `validation/prashna-249-chart.cjs`.
-- **But `PR_ramcForAsc` mis-converges** for a latitude-dependent band of numbers
-  (Delhi #39–53, London #29–65, Sydney #37–56 — 72/747 charts), returning the wrong
-  RAMC so houses 2–12 (and the sub-lord verdict for non-1/7 cusps) are wrong there.
+  **0.0000″** on all 12 cusps for every chart, across the full 1..249 range at three
+  latitudes (747 Placidus charts). Six anchors pinned in
+  `validation/prashna-249-chart.cjs` (§1b), including three inside the formerly-broken
+  bands (#45 Delhi, #40 London, #45 Sydney).
+- **`PR_ramcForAsc` originally mis-converged** for a latitude-dependent band of numbers
+  (Delhi #39–53, London #29–65, Sydney #37–56 — 72/747 charts), returning the wrong RAMC
+  so houses 2–12 (and the sub-lord verdict for non-1/7 cusps) were wrong there. **FIXED
+  2026-07-29** (wrap-safe coarse-scan + in-cell bisection root-find; branch
+  `claude/prashna-249-f14-ramc`). Post-fix the full-range sweep is 0.0000″, 0 charts
+  mis-converging. Full root cause + evidence: `plans/prashna-249-bugbash.md` § F14.
 
-Item (2) is therefore **not** a clean pass — it surfaced a P1 engine bug (F14, full
-numbers in `plans/prashna-249-bugbash.md`). The cross-check tooling is done; the
-**fix + full-range re-run** must happen under the engine lane before the item, and the
-249 engine's 100%, can be signed off. Anchors over the buggy band were deliberately
-NOT pinned (no fudging to pass).
+Item (2) is therefore a **clean pass**: the KP-New house cusps are externally verified
+correct against the industry-reference Placidus engine across the whole 1..249 range.
+The remaining gates before 249-engine 100% are the non-cusp ones (owner live-URL
+sign-off, Reader II/VI page-pins) tracked elsewhere.
 
 ## Sources consulted
 
