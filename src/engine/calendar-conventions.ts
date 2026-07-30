@@ -129,8 +129,22 @@ export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: num
   /* Default = amanta (month + paksha + tithi). The old short form said
      "Ganak default · Ashadha", which led with branding and dropped the lunar day.
      The separate "amanta" switch rendered this identical string and was merged
-     into the default; its id still resolves here via CONVENTION_ALIASES. */
-  return lang === "hi" ? `अमान्त · ${panchang.months.amanta} · ${lunarDay}` : `Amanta · ${panchang.months.amanta} · ${lunarDay}`;
+     into the default; its id still resolves here via CONVENTION_ALIASES.
+
+     During the Krishna fortnight the Purnimanta month name runs one month ahead of
+     Amanta (e.g. Amanta Ashadha == Purnimanta Shravana/Sawan). In that ~2-week window
+     show BOTH names so a North-Indian (Purnimanta/Sawan) reader isn't surprised to still
+     see the Amanta month; outside it the two agree and we show one (owner, 2026-07-28). */
+  const amantaMonth = panchang.months.amanta, purnMonth = panchang.months.purnimanta;
+  const monthsDiffer = purnMonth && purnMonth !== amantaMonth;
+  if (lang === "hi") {
+    return monthsDiffer
+      ? `${amantaMonth} (अमान्त) / ${purnMonth} (पूर्णिमान्त) · ${lunarDay}`
+      : `अमान्त · ${amantaMonth} · ${lunarDay}`;
+  }
+  return monthsDiffer
+    ? `${amantaMonth} (Amanta) / ${purnMonth} (Purnimanta) · ${lunarDay}`
+    : `Amanta · ${amantaMonth} · ${lunarDay}`;
 }
 
 export function safeConvention(value: string | null,flags:RegionalCalendarFlags=DEFAULT_REGIONAL_CALENDAR_FLAGS): CalendarConventionId { return resolveConvention(value,flags).id; }
