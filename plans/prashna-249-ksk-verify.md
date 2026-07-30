@@ -1,10 +1,17 @@
 # P0-PRASHNA-249-KSK-VERIFY — primary-text citation index
 
-Status: **PAGE-PINNED 2026-07-29 — awaiting owner review.** Unblocks the 249-engine
-*sourcing gate*; does **not** authorise engine code (owner sign-off still required).
+Status: **PAGE-PINNED + PRINTED-FOLIO CONFIRMED 2026-07-29 — awaiting owner review.**
+Unblocks the 249-engine *sourcing gate*; does **not** authorise engine code (owner
+sign-off still required).
 **6/8 rules now Tier-1 page-pinned in Reader VI** (incl. the two most important, rules 2
 and 3, upgraded from web-corroborated), rule 8 partial, rule 7 an honest by-design
 adaptation; KP-New ayanamsa now has its own published citation. See the 2026-07-29 section.
+**Printed-folio confirmation (the one residual precision step) is now CLOSED for all 21
+Reader VI page-pins** — each scan leaf-index has been read against its actual page image
+and its printed folio recorded; see the "printed-folio confirmation pass" section below.
+The leaf→folio offset is **not constant** (it steps 19→15→10→8→9 across the volume, because
+this scanned PDF stitches two differently-typeset printings and drops some leaves), so every
+pin now carries its **own** confirmed printed folio rather than a single global offset.
 Dates: 2026-07-24 (first pass) · 2026-07-29 (page-pin pass). Owner instruction 2026-07-24:
 **Option 1 (book-strict) primary, Option 2 (web-corroborated) only as a labelled fallback
 where verified text is unreachable.**
@@ -48,17 +55,24 @@ Every rule below carries **one of two tiers**:
   the **scan page (leaf) index** and a verbatim snippet for every hit anywhere in the
   book — so rules that live deep in Reader VI are now locatable. Every page number
   below was obtained this way and carries a confirming quoted phrase.
-- **One honest caveat about the page numbers.** The index returns the **scan's own
-  page/leaf index** (its CONTENTS heading sits at index 2). Because a few front-matter
-  leaves precede the printed folio 1, the scan index runs somewhat **ahead of the
-  book's printed folio**. So each pin is a *directly reproducible locator* — open that
-  leaf in the archive.org reader and the quoted text is there — with the **printed-folio
-  number as the one residual precision step** (the same "located in the text, printed
-  page pending" standard the owner already accepted for rules 1/4/5/6 on 2026-07-24).
+- **The page-number caveat — now RESOLVED (2026-07-29 printed-folio pass).** The
+  search-inside index returns the **scan's own page/leaf index**; the scan index runs
+  **ahead of the book's printed folio**. That offset has now been measured directly by
+  opening every pinned leaf's page image and reading the folio printed on it. **The
+  offset is not a single constant** — it steps **19 → 15 → 10 → 8 → 9** as you go deeper,
+  because this scanned "Reader VI" PDF stitches together at least two differently-typeset
+  printings (a typewriter-set portion up to ~folio 97, a clean-serif portion from
+  ~folio 121) and drops a few leaves along the way. So there is **no global offset to
+  apply**; each pin instead carries its **own confirmed printed folio** (full table in the
+  "printed-folio confirmation pass" section). Every pin is still a *directly reproducible
+  locator* (open the leaf, the quoted text is there) **and** now an unambiguous
+  printed-folio citation.
 - **Two standing consequences of using a scan:** (a) "NOT FOUND" can still mean the OCR
   garbled the phrase (KP OCR is noisy — e.g. "constellation"→"eonstellation"), **not**
-  that Krishnamurti never wrote it; (b) the printed-folio confirmation against a
-  paginated copy remains the final tidy-up before the sourcing gate is closed 100%.
+  that Krishnamurti never wrote it; (b) ~~the printed-folio confirmation against a
+  paginated copy remains the final tidy-up~~ **DONE 2026-07-29** — printed folios read
+  directly off the page images for all 21 pins; the sourcing gate's precision step is
+  closed.
 
 ---
 
@@ -82,9 +96,11 @@ Every rule below carries **one of two tiers**:
 The engine rules are drawn from [prashna-249-findings.md](prashna-249-findings.md) §1–2
 and the existing screen logic (`src/screens/PrashnaScreen.tsx`).
 
-Page numbers are the **archive.org `kp-readers` scan-page index** (see the caveat in the
-provenance note — reproducible locator; printed folio runs a little behind). Each carries
-a short confirming quote (a few words, per the copyright rule — not a reproduction).
+Page numbers in this table are the **archive.org `kp-readers` scan-page/leaf index** (the
+reproducible locator). Each carries a short confirming quote (a few words, per the copyright
+rule — not a reproduction). **The confirmed PRINTED folio for every one of these leaf-index
+pins is now tabulated in the "printed-folio confirmation pass" section below** (e.g. leaf
+90 → printed p.75) — read that table for the citable folio; the offset is not constant.
 
 | # | Engine rule (what Ganak will do) | Tier | Where it traces to (page-pinned 2026-07-29) |
 |---|---|---|---|
@@ -172,11 +188,15 @@ constant is set to **KP-New (KPNA)**. Rationale, recorded:
    note). Remaining: wire the fork + its bilingual on-screen disclosure line when engine
    code starts.
 
-**Residual for a 100% book-strict close:** confirm the **printed folio** numbers against a
-paginated copy (the pins above are the scan's reproducible page/leaf index — text is there,
-folio number runs a little behind); and, if desired, hunt a verbatim rotational "12th-from"
-sentence for rule 8. The engine may now be described as **primary-text sourced** for rules
-1–6 (Reader VI, located + quoted); rules 7 (adaptation) and 8 (partial) stay disclosed.
+**Residual for a 100% book-strict close:** ~~confirm the **printed folio** numbers against a
+paginated copy~~ **DONE 2026-07-29** — printed folios read directly off the archive.org page
+images for all 21 Reader VI pins (mapping table below); no global offset (it steps
+19→15→10→8→9). Remaining nice-to-have only: if desired, hunt a verbatim rotational
+"12th-from" sentence for rule 8 — though folio 260 ("*For any action done by one, the 12th
+house therefrom is to undo it*") is close. The engine may now be described as
+**primary-text sourced, printed-folio-confirmed** for rules 1–6 (Reader VI, located +
+quoted + folio-verified); rules 7 (adaptation) and 8 (base meaning folio-confirmed p.121,
+rotational form standard-KP) stay disclosed.
 
 ---
 
@@ -208,7 +228,71 @@ horary doctrine is self-contained in Reader VI, with sub theory rooted in Reader
 **Net:** the sourcing gate moves from **4/8 located → 6/8 fully page-pinned + 1 partial +
 1 honest by-design adaptation.** The whole-verdict rule (3) and the why-249 rule (2) — the
 two that mattered most and were previously only web-corroborated — are now primary-text
-located and quoted. Only the printed-folio precision step remains.
+located and quoted. **The printed-folio precision step is now closed too — see the next
+section.**
+
+## 2026-07-29 — printed-folio confirmation pass (the residual precision step, now CLOSED)
+
+**What was done.** Each Reader VI page-pin above is a *scan leaf-index* (the archive.org
+BookReader's page-slider position). This pass opened the **actual page image** for every
+pinned leaf and read the **printed folio** printed on it, and re-confirmed the pinned
+doctrine phrase is on that page. Method: the item's own image endpoint
+`ia803207.us.archive.org/BookReader/BookReaderImages.php` against
+`J_KP reader_6_Horary Astrology_jp2.zip` (leaf `_NNNN.jp2`), cross-checked against the
+volume's `…_page_numbers.json` auto-detected folios. Copyright honored: folios + section
+names + ≤few-word confirming phrases only; no passage reproduced.
+
+**Key finding — there is NO single constant offset.** The leaf→folio gap *shrinks* as you
+go deeper (leaf 43 = folio 24, gap 19; leaf 90 = folio 75, gap 15; leaf 107 = folio 97,
+gap 10; leaf 129 = folio 121, gap 8; leaf 269 = folio 260, gap 9). A gap that *decreases*
+going forward cannot come from front-matter alone: this scanned "Reader VI" PDF stitches
+together **two differently-typeset printings** (a typewriter-set portion, folios ~24–97;
+a clean-serif reset, folios ~121 onward) and **drops several leaves** between them, so the
+leaf index outruns the folio by a varying amount. Therefore each pin carries its **own**
+confirmed printed folio (below); do not apply one global offset.
+
+**Confirmed mapping (all 21 Reader VI pins — leaf-index → PRINTED folio, doctrine re-verified):**
+
+| Rule | Scan leaf | → PRINTED folio | Doctrine confirmed on the page image |
+|---|---|---|---|
+| 6 | leaf 43 | **p.24** | "…serious and sincere, then only truth will come out; prediction will prove to be correct" ✅ |
+| 6 | leaf 66 | **p.47** | "Unless one is sincere, even Veda is not useful to him" ✅ |
+| 3 | leaf 90 | **p.75** | "…it is the sub-lord which decides whether the result is favourable or unfavourable" ✅ |
+| 2 | leaf 92 | **p.77** | "…the lord of the sub will be 249 instead of 243… they are 249 in number" ✅ |
+| 1 | leaf 107 | **p.97** | "…number 48 refers to Mercury sign, Rahu star, Jupiter sub, which commences at 8° 40′ in Gemini" ✅ *(auto-detector returned no folio here — page is a numeric table; read visually)* |
+| 8 | leaf 129 | **p.121** | "Twelfth house: Loss and impediments, restraint and limitation, waste and extravagance, expenses…" ✅ |
+| 4 | leaf 131 | **p.123** | Section heading "RULING PLANETS" + its definition ✅ |
+| 4 | leaf 146 | **p.138** | five-planet derivation ("…lord of the day… these five planets happen to be the ruling planets") ✅ |
+| 3 / 5 | leaf 154 | **p.146** | sub-lord of 7th cusp promise/denial + significators of 2/7/11 ✅ |
+| 3 / 7 | leaf 173 | **p.165** | worked chart "number 29… at Bombay… 5.30 P.M… 6-5-1969"; 7th-cusp sub-lord ✅ |
+| 4 | leaf 175 | **p.167** | "Ruling planets. They are the lords of the day, Moon sign, star and lagna at the moment of judgement" ✅ |
+| 3 / ayan. | leaf 176 | **p.168** | 3rd-cusp sub-lord; "…presuming 0° Cancer Nirayana rises in the East. Raphael Table of houses furnish Sayana position" ✅ |
+| 3 / 5 | leaf 199 | **p.191** | "If the sub-lord of the 5th cusp is deposited in the constellation of a planet who is the significator of the houses 7 and 11 then materialisation… is promised" ✅ |
+| 4 | leaf 209 | **p.201** | "…the ruling planets at the time of judgment and those at the time of fructification… are same. The ruling planets are the lords of the day, rasi, star and lagna at the moment of judgment" ✅ *(folio printed as a slightly garbled "201"; auto-detector returned none; read visually)* |
+| 7 | leaf 217 | **p.209** | worked chart "number 247… at Bombay at 6-30 P.M. I.S.T. on 26-3-1969" ✅ |
+| 1 | leaf 269 | **p.260** | "…taking the ascendant as 20° Libra-Nirayana which is the position for the number 139" ✅ (also, for rule 8: "For any action done by one, the 12th house therefrom is to undo it") |
+| 3 | leaf 272 | **p.263** | "…if the sub-lord of the 11th cusp is retrograde, success is denied. Ambition cannot be realised" ✅ |
+| 2 | leaf 278 | **p.269** | "The Zodiac is divided into 249 divisions as per Krishnamurti: There are 249 different combinations…" ✅ |
+| 5 | leaf 296 | **p.287** | "…if the same sub-lord is also a significator of houses 2 or 6 or 10 or 11, then promotion is promised" ✅ |
+| 1 | leaf 304 | **p.295** | "…this will be the lagna for the query. The cusps of the other houses… by referring to the Table of Houses by Raphael for the latitude of the place where the query is answered" ✅ |
+| 1 | leaf 305 | **p.296** | number-144 worked casting (Delhi latitude; Sayana cusps − Ayanamsa → Nirayana cusps) ✅ |
+
+**Cross-check note.** The archive.org auto-detected folios (`…_page_numbers.json`) matched
+the human read on **19 of 21** leaves; the two it missed (leaf 107, a numeric 249-table;
+leaf 209, a print-garbled "201") were read directly off the image. Every pinned doctrine
+phrase was found on its page — the leaf indexing is correct end to end.
+
+**Minor observation for the ayanamsa note (out of this pass's scope, flagged for owner).**
+The clean-serif reprint bound into this PDF *does* use the phrase "Krishnamurti ayanamsa"
+with a value ("…the ayanamsa is 23° 30′", printed folio 168) — a small nuance against the
+earlier note's "Reader VI names no numeric KP ayanamsa" (which was read off the
+typewriter-set printing). This does not change the KP-New engine decision; noted for
+accuracy only, not edited into the ayanamsa section.
+
+**Bottom line: the "printed-folio confirmation" residual is fully closed for Reader VI.**
+All 21 pins now read as unambiguous printed-folio citations (rule + Reader VI section +
+printed p.NN + confirming phrase). No Reader II/III *leaf-index* pins exist to convert —
+those volumes are cited only as general underlying-theory backing, not page-pinned.
 
 ## Disclaimer recommendation (shipped copy — for owner, do NOT self-edit engine code)
 
