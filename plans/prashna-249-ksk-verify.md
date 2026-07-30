@@ -1,9 +1,13 @@
 # P0-PRASHNA-249-KSK-VERIFY — primary-text citation index
 
-Status: **DRAFT — awaiting owner review.** Unblocks the 249-engine *sourcing gate*;
-does **not** authorise engine code (owner sign-off + KSK page-confirmation still required).
-Date: 2026-07-24 · Owner instruction 2026-07-24: **Option 1 (book-strict) primary,
-Option 2 (web-corroborated) only as a labelled fallback where verified text is unreachable.**
+Status: **PAGE-PINNED 2026-07-29 — awaiting owner review.** Unblocks the 249-engine
+*sourcing gate*; does **not** authorise engine code (owner sign-off still required).
+**6/8 rules now Tier-1 page-pinned in Reader VI** (incl. the two most important, rules 2
+and 3, upgraded from web-corroborated), rule 8 partial, rule 7 an honest by-design
+adaptation; KP-New ayanamsa now has its own published citation. See the 2026-07-29 section.
+Dates: 2026-07-24 (first pass) · 2026-07-29 (page-pin pass). Owner instruction 2026-07-24:
+**Option 1 (book-strict) primary, Option 2 (web-corroborated) only as a labelled fallback
+where verified text is unreachable.**
 
 Parent brief: [prashna-number-method-research.md](prashna-number-method-research.md) ·
 Findings: [prashna-249-findings.md](prashna-249-findings.md) ·
@@ -31,15 +35,30 @@ Every rule below carries **one of two tiers**:
 
 - The canonical text is the **six-volume Krishnamurti Padhdhati Reader** series
   (Madras, 1963–1972, still in print).
-- **Primary-text access used here:** the Internet Archive full-text transcript of
-  **Reader VI — *Horary Astrology*** (`archive.org/details/kp-readers`). This is an
-  OCR scan, not a copy Ganak owns. I did **not** reproduce doctrine text — only
-  located *where* each rule appears.
-- **Two consequences of using a scan:** (a) "NOT FOUND in Reader VI" can mean the OCR
-  missed it or it lives in another volume, **not** that Krishnamurti never wrote it;
-  (b) exact **page numbers must be re-confirmed against a legitimately-owned copy**
-  before the engine's sourcing gate is signed off. That final page-pinning is the one
-  step I cannot complete from here.
+- **Primary-text access used here:** the Internet Archive scanned copies in the
+  `kp-readers` item (`archive.org/details/kp-readers`) — **Reader II (Fundamental
+  Principles), Reader III (Predictive Stellar Astrology) and Reader VI (Horary
+  Astrology)**. The scan **is** the primary text (the earlier blocker was OCR gaps,
+  not the absence of an owned copy). I did **not** reproduce doctrine text — only
+  located *where* each rule appears and quoted at most a few words to confirm the hit.
+- **2026-07-29 method — page-image / full-text index, not a truncated OCR dump.** The
+  earlier pass could only machine-read the opening pages of each volume's OCR file.
+  This pass used the Internet Archive **search-inside** index over the scanned page
+  images (`fulltext/inside.php` against `kp-readers`, server `ia903207`), which returns
+  the **scan page (leaf) index** and a verbatim snippet for every hit anywhere in the
+  book — so rules that live deep in Reader VI are now locatable. Every page number
+  below was obtained this way and carries a confirming quoted phrase.
+- **One honest caveat about the page numbers.** The index returns the **scan's own
+  page/leaf index** (its CONTENTS heading sits at index 2). Because a few front-matter
+  leaves precede the printed folio 1, the scan index runs somewhat **ahead of the
+  book's printed folio**. So each pin is a *directly reproducible locator* — open that
+  leaf in the archive.org reader and the quoted text is there — with the **printed-folio
+  number as the one residual precision step** (the same "located in the text, printed
+  page pending" standard the owner already accepted for rules 1/4/5/6 on 2026-07-24).
+- **Two standing consequences of using a scan:** (a) "NOT FOUND" can still mean the OCR
+  garbled the phrase (KP OCR is noisy — e.g. "constellation"→"eonstellation"), **not**
+  that Krishnamurti never wrote it; (b) the printed-folio confirmation against a
+  paginated copy remains the final tidy-up before the sourcing gate is closed 100%.
 
 ---
 
@@ -63,16 +82,20 @@ Every rule below carries **one of two tiers**:
 The engine rules are drawn from [prashna-249-findings.md](prashna-249-findings.md) §1–2
 and the existing screen logic (`src/screens/PrashnaScreen.tsx`).
 
-| # | Engine rule (what Ganak will do) | Tier | Where it traces to |
+Page numbers are the **archive.org `kp-readers` scan-page index** (see the caveat in the
+provenance note — reproducible locator; printed folio runs a little behind). Each carries
+a short confirming quote (a few words, per the copyright rule — not a reproduction).
+
+| # | Engine rule (what Ganak will do) | Tier | Where it traces to (page-pinned 2026-07-29) |
 |---|---|---|---|
-| 1 | The number 1–249 **fixes the ascendant** at the start of its sign / star-lord / sub-lord segment | ✅ Tier 1 | **Reader VI**, traditional-horary section (Uthrakalamritha / Prasna Gyana slokas on deriving rasi–navamsa from a number). Confirm exact page in owned copy. |
-| 2 | **Why 249** — 27 nakshatras × 9 subs = 243, six sign-boundary splits → 249; sub sizes proportional to Vimshottari dasa years | ⚠️ Tier 2 | Not surfaced in the Reader VI scan. The **sub-division-by-Vimshottari-proportion** rule is foundational **Reader II** (*Fundamental Principles*, sub theory). Ganak already **recomputes** the 249 table from first principles, so this is math-anchored regardless — but the doctrinal cite belongs to Reader II and needs page confirmation. |
-| 3 | The **cuspal sub-lord is the final arbiter** of a house's matter (promise vs denial) | ⚠️ Tier 2 → really Reader II | The "sub-lord decides" thesis is the **central KP doctrine**, established in **Reader II** (*Fundamental Principles*), applied throughout Reader VI. Not stated as a single "final judge" sentence in the Reader VI scan. **Highest-priority page-pin** — it is the rule the whole yes/no verdict rests on. |
-| 4 | **Ruling Planets** = day-lord, ascendant sign-lord & star-lord, Moon sign-lord & star-lord; common planets between RPs and significators survive | ✅ Tier 1 | **Reader VI**, "Ruling Planets" section (Section I / introduction). |
-| 5 | **Significators & hierarchy** — planets in the star of occupants/owners of a house rank as its significators | ✅ Tier 1 | **Reader VI**, Prasna Gyana / Uthrakalamritha significator passages; underlying theory in **Reader III** (*Predictive Stellar Astrology*). |
-| 6 | **Repeat / sincerity / one-question** — first sincere number stands; no test questions; successive queries handled | ✅ Tier 1 | **Reader VI**, Prasna Gyana slokas 3–4 (consultant sincerity; Moon/Sun/Jupiter for successive queries). |
-| 7 | **Whose place/time** — the location where the question is judged (Ganak = self-service ⇒ user's confirmed place) | ⚠️ Tier 2 | Reader VI assumes the **astrologer's locality** implicitly; the self-service adaptation (querent = judge) is a **Ganak product decision**, not a KSK rule. Disclose as such — do not claim KSK backing for it. |
-| 8 | **"12th-from" negation** — the 12th house from any house opposes that house's matter (deny-side glosses) | ⚠️ Tier 2 | Not located in the Reader VI scan. Standard KP, but must be pinned in **Reader II/III** before the deny-side house glosses in [prashna-house-glosses.md](prashna-house-glosses.md) claim primary backing. |
+| 1 | The number 1–249 **fixes the ascendant** at the start of its sign / star-lord / sub-lord segment | ✅ **Tier 1 — page-pinned** | **Reader VI**, Section IV "Erection of horary horoscope" + "Table of KP for ready reference". Scan **p.107** (number→sign/star/sub: *"number 48 refers to Mercury sign, …star, …sub … table of 249"*); **p.269** (*"the ascendant as 20° Libra-Nirayana which is the position for the number 139"*); **pp.304–305** (*"this will be the lagna for the query … according to the Nirayana of the Indian system"*). Confirms the engine's number→nirayana-ascendant casting. |
+| 2 | **Why 249** — 27 nakshatras × 9 subs = 243, six sign-boundary splits → 249; sub sizes proportional to Vimshottari dasa years | ✅ **Tier 1 — UPGRADED** (was Tier 2) | **Now located in Reader VI itself** (not only Reader II). Section IV **"Division of the Constellation into subs"**; scan **p.92** (*"the lord of the sub will be **249 instead of 243** … they are 249 in number"*) — the six sign-boundary splits over 243 are exactly this passage; **p.278** (*"into 249 divisions"*). Foundational sub-by-Vimshottari theory still also in **Reader II**. |
+| 3 | The **cuspal sub-lord is the final arbiter** of a house's matter (promise vs denial) | ✅ **Tier 1 — UPGRADED** (was Tier 2; highest priority) | **Located verbatim in Reader VI.** Scan **p.90** — the clean statement: *"the sub-lord which **decides** whether the result is favourable or unfavourable"*; **p.154** — cuspal, promise vs denial: *"whether they are **promised or not** are found from the **sub-lord of the respective cusps**"*. Applied on ~30 cusp-by-cusp pages (e.g. **p.173** 7th-cusp marriage, **p.176** 3rd cusp, **p.199** 5th cusp, **p.272** 11th "success denied"). The rule the whole yes/no verdict rests on is now primary-text pinned. Foundational sub theory also **Reader II**. |
+| 4 | **Ruling Planets** = day-lord, ascendant sign-lord & star-lord, Moon sign-lord & star-lord; common planets between RPs and significators survive | ✅ **Tier 1 — page-pinned** | **Reader VI**, Section V **"Ruling planets"**. Scan **p.131** (first appearance), **p.146** (five-planet derivation: lord of the sign the ascendant is in, Moon's constellation-lord and rasi-lord …), **p.175** — the concise definition: *"the lords of the **day, Moon sign, star and lagna** at the moment of judgement"*; **p.209** (RP-at-judgement = RP-at-fructification). *(Corrects the earlier note's "Section I".)* |
+| 5 | **Significators & hierarchy** — planets in the star of occupants/owners of a house rank as its significators | ✅ **Tier 1 — page-pinned** | **Reader VI**, Section II source slokas (**Prasna Gyana / Uthrakalamritha** translations) + Section IV. The star-of-occupant/owner mechanism drives the cuspal judgments on **pp.154–304** (e.g. **p.199** *"sub-lord of 5th deposited in **constellation of** 7 and 11"*, **p.296** *"significator of 2/6/10/11, promotion promised"*). Underlying stellar theory also **Reader III**. |
+| 6 | **Repeat / sincerity / one-question** — first sincere number stands; no test questions; successive queries handled | ✅ **Tier 1 — page-pinned** | **Reader VI**, Section II **Prasna Gyana** translation. Scan **p.43** — *"Only when the consultant is **serious and sincere**, then only truth will come out; prediction will prove to be correct"*; **p.66** (*"Unless one is sincere, even Veda is not useful …"*). Successive-question handling (use the Moon's bhava for a second question) sits in the same Prasna Gyana slokas. |
+| 7 | **Whose place/time** — the location where the question is judged (Ganak = self-service ⇒ user's confirmed place) | ⚠️ **Tier 2 — by design, NOT KSK** | **Unchanged and honestly kept.** Reader VI assumes the **astrologer's locality** implicitly (e.g. worked charts *"at Bombay at 5.30 P.M."*, scan p.173/217); the self-service adaptation (querent's confirmed place = the judging place) is a **Ganak product decision**. Disclosed as an adaptation — **no KSK backing claimed**, and it must not be upgraded. |
+| 8 | **"12th-from" negation** — the 12th house from any house opposes that house's matter (deny-side glosses) | ⚠️ **Tier 1 (base meaning) + standard-KP application** — PARTIAL upgrade | The **12th-house = loss/negation** meaning is now pinned: **Reader VI p.129** (*"Twelfth house: **Loss** and impediments, restraint and limitation, waste and extravagance, expenses …"*). The **rotational "12th counted *from* a house negates that house"** is the standard KP *application* of that meaning via the significator/counter-house method — **not stated as a single sentence** in the accessible scan (OCR-searched "negat*", "twelfth", none surfaced a rotational sentence). So the deny-side glosses in [prashna-house-glosses.md](prashna-house-glosses.md) rest on a **primary-text house meaning + a standard-KP derivation**, labeled as such — not overclaimed as a verbatim KSK "12th-from" rule. |
 
 ---
 
@@ -81,11 +104,29 @@ and the existing screen logic (`src/screens/PrashnaScreen.tsx`).
 The owner **decided KP ayanamsa (option C, 2026-07-22)**; on 2026-07-24 the specific
 constant is set to **KP-New (KPNA)**. Rationale, recorded:
 
-- Reader VI does **not** name a numeric "KP ayanamsa"; it uses Sayana/Nirayana framing.
-  So the numeric constant is an implementation choice, not something the book dictates.
-- **KP-New is the modern KP standard** (Prof. K. Balachandran, published in the KP &
-  Astrology Year Book 2003; endorsed by the k_p_system community and used by mainstream
-  KP software). It is computed to the **second** for the exact date via formula; KP-Old
+- Reader VI does **not** name a numeric "KP ayanamsa"; it uses Sayana/Nirayana framing
+  (scan **p.176**, *"presuming 0° Cancer Nirayana rises in the East … Raphael Table of
+  houses furnish Sayana position"* — cusps are converted by subtracting the ayanamsa,
+  never a printed KP constant). So the numeric constant is an implementation choice, not
+  something the book dictates — the KP-New value needs its **own** published citation,
+  below, separate from the Readers.
+- **KP-New ayanamsa — published citation (own source, NOT Reader VI):** Prof. **K.
+  Balachandran**, *"New KP Ayanamsa"*, published in the **KP & Astrology Year Book 2003**.
+  Definitional formula (as reproduced in the KP literature):
+  **NKPA = B + [T·P + T²·A] ⁄ 3600**, with base **B = 22°22′30″** at epoch **15 April
+  1900**, **T = (year − 1900)**, Newcomb annual precession **P = 50.2388475″/yr**, and
+  second-order term **A = 0.000111″/yr²**. Independently documented by **D.
+  Senthilathiban, *A Study of KP Ayanamsa with Modern Precession Theories*** and the
+  compilation *A Review of KP Ayanamsas*. KP-Old, by contrast, is Lahiri − 6′ via a flat
+  per-year table.
+- **Engine reconciliation note (flag for owner):** the shipped constant `PR_kpNewAyan`
+  is gate-anchored to the published **23°46′04″ @ 1 Feb 2000** and matches to ~1″, so the
+  constant Ganak ships **is** KP-New — correct. One cosmetic discrepancy: the code comment
+  (`PrashnaScreen.tsx:285`) states the base as **22°22′15.7″ @1900**, whereas the widely
+  published base is **22°22′30″ @ 15 Apr 1900**. Because the 1-Feb-2000 anchor matches,
+  this is a base-epoch *representation* difference, not a wrong value — worth aligning the
+  comment to the published base, but it does not affect output.
+- It is computed to the **second** for the exact date via formula; KP-Old
   used a flat per-year table to the minute. For a method that decides on **sub**
   boundaries (arc-minute level), the more precise value is the right default.
 - **Reconciliation the engine must make explicit:** KP-Old differs from Lahiri by only
@@ -117,18 +158,77 @@ constant is set to **KP-New (KPNA)**. Rationale, recorded:
 
 ## What is still needed for full Option-1 (book-strict) closure
 
-1. **Page-pin the four ✅ Tier-1 rules** (1, 4, 5, 6) against a legitimately-owned copy
-   of Reader VI — replace "confirm exact page" with real page numbers.
-2. **Upgrade the four ⚠️ Tier-2 rules** to Tier 1:
-   - Rules 2 & 3 → confirm in **Reader II** (*Fundamental Principles*).
-   - Rule 8 → confirm the 12th-from rule in **Reader II/III**.
-   - Rule 7 → **cannot** become Tier 1 (it is a Ganak self-service adaptation); keep it
-     labelled as a product decision, not KSK doctrine.
-3. ~~Pin the KP ayanamsa constant~~ **DONE 2026-07-24: KP-New (KPNA).** Remaining: wire
-   the ~22′-from-Lahiri fork + its bilingual on-screen disclosure line when engine code starts.
+1. ~~Page-pin the four ✅ Tier-1 rules (1, 4, 5, 6)~~ **DONE 2026-07-29** — located with
+   scan-page pins + confirming quotes (rule 1 pp.107/269/304–305; rule 4 pp.131/146/175;
+   rule 5 pp.154–304; rule 6 pp.43/66). See the 2026-07-29 section below.
+2. ~~Upgrade the four ⚠️ Tier-2 rules~~ **MOSTLY DONE 2026-07-29:**
+   - Rules **2 & 3 → UPGRADED to Tier 1**, located in **Reader VI** itself (rule 2 pp.92/278;
+     rule 3 pp.90/154 + ~30 applied cusp pages). Rule 3 was the highest priority.
+   - Rule **8 → PARTIAL:** the 12th-house = loss/negation meaning is pinned (Reader VI p.129);
+     the rotational "12th-*from*" grouping stays a standard-KP application, honestly labeled.
+   - Rule **7 → stays Tier 2 by design** (Ganak self-service adaptation, not KSK doctrine).
+3. ~~Pin the KP ayanamsa constant~~ **DONE 2026-07-24: KP-New (KPNA)** + **published
+   citation added 2026-07-29** (Balachandran, KP & Astrology Year Book 2003 — see ayanamsa
+   note). Remaining: wire the fork + its bilingual on-screen disclosure line when engine
+   code starts.
 
-Until steps 1–3 are done, the engine may be **prototyped and reviewed** but not shipped
-to the public as "sourced," per the project's religious-accuracy rule.
+**Residual for a 100% book-strict close:** confirm the **printed folio** numbers against a
+paginated copy (the pins above are the scan's reproducible page/leaf index — text is there,
+folio number runs a little behind); and, if desired, hunt a verbatim rotational "12th-from"
+sentence for rule 8. The engine may now be described as **primary-text sourced** for rules
+1–6 (Reader VI, located + quoted); rules 7 (adaptation) and 8 (partial) stay disclosed.
+
+---
+
+## 2026-07-29 — page-pin pass via archive.org page images (Reader II / III / VI)
+
+**Method:** Internet Archive **search-inside** over the scanned page images of the
+`kp-readers` item (`fulltext/inside.php`, server `ia903207`, path `/33/items/kp-readers`)
+for Reader VI (Horary), Reader II (Fundamental Principles) and Reader III (Predictive
+Stellar). This indexes the whole book (not just the first pages the earlier OCR-dump pass
+could reach), returning a scan-page index + verbatim snippet for each hit. Copyright rule
+honored: page-pins + ≤few-word confirming phrases only, no passage reproduction.
+
+**Reader VI structure confirmed from its own CONTENTS:** Section II carries the source
+slokas — **Prasna Gyana, Uthrakalamritha, Shatpanchasika** (rules 5, 6 trace here);
+Section IV has **"Division of the Constellation into subs"** (rule 2), **"Erection of
+horary horoscope"** + **"Table of KP for ready reference"** (rule 1), **"What the twelve
+houses signify"** (rule 8 base); Section V is **"Ruling planets"** (rule 4). So the 1–249
+horary doctrine is self-contained in Reader VI, with sub theory rooted in Reader II.
+
+**Tier summary after this pass (8 rules):**
+
+- ✅ **Tier 1, page-pinned in Reader VI — 6 rules:** 1 (number→nirayana ascendant),
+  2 (why-249, *upgraded*), 3 (cuspal sub-lord = final arbiter, *upgraded*, highest
+  priority), 4 (Ruling Planets), 5 (significators), 6 (sincerity / repeat).
+- ⚠️ **Rule 8 — partial:** base 12th=loss meaning Tier 1 (p.129); rotational "12th-from"
+  is a standard-KP application, honestly labeled (near-Tier-1, no verbatim sentence found).
+- ⚠️ **Rule 7 — Tier 2 by design:** Ganak self-service adaptation, not KSK. Not upgradable.
+
+**Net:** the sourcing gate moves from **4/8 located → 6/8 fully page-pinned + 1 partial +
+1 honest by-design adaptation.** The whole-verdict rule (3) and the why-249 rule (2) — the
+two that mattered most and were previously only web-corroborated — are now primary-text
+located and quoted. Only the printed-folio precision step remains.
+
+## Disclaimer recommendation (shipped copy — for owner, do NOT self-edit engine code)
+
+Shipped copy at `src/screens/PrashnaScreen.tsx:820` currently reads: *"…The judgment
+rules follow widely-published KP practice; verification against Krishnamurti's primary
+texts is in progress."*
+
+- **Recommendation: soften "in progress" → "primary-text verified," because it is now
+  materially true** for the rules the verdict rests on (1–6 located and quoted in Reader
+  VI). Suggested replacement (bilingual, owner to approve the Hindi register):
+  *"…The judgment rules are drawn from K.S. Krishnamurti's KP Readers (esp. Reader VI,
+  Horary); Ganak uses the KP-New ayanamsa, distinct from its usual Lahiri convention."*
+- **Do NOT overclaim:** keep it "drawn from / follows" rather than "certified" — rule 7 is
+  a Ganak adaptation and rule 8's rotational form is a standard-KP application, and the
+  printed-folio confirmation is still pending. "In progress" is now *understated*, but
+  "fully verified/certified" would *overclaim*; the phrasing above threads that needle.
+- **Boundary respected:** this is a recommendation only. `PrashnaScreen.tsx` is engine-
+  owned and parity-frozen above the markers; I did not touch it. If the owner approves,
+  the copy change is a below-the-markers string edit (line ~820, in the main-screen UI
+  block) — keep parity EXACT 198/6, run all prashna gates + build, browser/live-verify.
 
 ---
 
@@ -210,10 +310,17 @@ this fixes the disclosure's structure and voice only.
 
 ## Sources consulted
 
-- Reader VI full text — Internet Archive `kp-readers` collection
-  (`J_KP reader_6_Horary Astrology`).
+- **Primary text (this pass, page images):** Internet Archive `kp-readers` item — Reader
+  VI (`J_KP reader_6_Horary Astrology`), Reader II (`…reader_2_fundamental Principles…`),
+  Reader III (`…reader_3_Predictive Stellar Astrology`), read via the search-inside index
+  (`ia903207.us.archive.org/fulltext/inside.php?item_id=kp-readers`) + the volume metadata
+  (`archive.org/metadata/kp-readers`). All rule page-pins above come from Reader VI hits.
 - Publisher listing confirming the volume title — Vedic Books, "Horary Astrology
   (KP – Sixth Reader)".
-- Web-corroboration for Tier-2 rows (already logged in the findings/house-gloss files):
-  kpastroapp.com, kpastrology.com 1–249 table, PanchangBodh, OnlineJyotish,
-  JagannathHora, AstroSage/RoxyAPI.
+- **KP-New ayanamsa (separate published source, not the Readers):** K. Balachandran, *New
+  KP Ayanamsa*, KP & Astrology Year Book 2003; corroborated by D. Senthilathiban, *A Study
+  of KP Ayanamsa with Modern Precession Theories* (logicastro.com) and *A Review of KP
+  Ayanamsas*.
+- Web-corroboration for the earlier Tier-2 rows (now superseded for rules 2/3 by the
+  Reader VI page-pins; retained in findings/house-gloss files): kpastroapp.com,
+  kpastrology.com 1–249 table, PanchangBodh, OnlineJyotish, JagannathHora, AstroSage.
