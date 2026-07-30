@@ -160,9 +160,16 @@ function PR_buildSubTable() {
   return rows;
 }
 const PR_SUBS = PR_buildSubTable();
+/* Boundary tolerance, in arcseconds. The 249 number method pins the ascendant
+   EXACTLY at a sub-segment start; the tropical round-trip in PR_castNumber lands
+   up to 8.5e-14 deg (3.1e-10 arcsec) below it, and a zero-tolerance half-open
+   test then returns the PREVIOUS sub. 1e-6 arcsec is ~3000x the worst observed
+   error and ~2.4e9x smaller than the shortest real sub (Sun, 2400 arcsec), so it
+   can only ever resolve float noise -- never a genuine position. */
+const PR_SUB_EPS = 1e-6;
 function PR_subOf(sid) {
   const s = norm360(sid) * 3600;
-  for (const r of PR_SUBS) if (s >= r.from && s < r.to) return r;
+  for (const r of PR_SUBS) if (s >= r.from - PR_SUB_EPS && s < r.to - PR_SUB_EPS) return r;
   return PR_SUBS[PR_SUBS.length - 1];
 }
 const PR_nakOf = sid => {
@@ -348,6 +355,12 @@ function PR_castNumber(ms, lat, lonE, number) {
   else for (const [h, off] of [[11, 300], [12, 330], [2, 30], [3, 60]]) trop[h] = norm360(ascTrop + off);
   for (const h of [4, 5, 6, 7, 8, 9]) trop[h] = norm360(trop[((h + 5) % 12) + 1] + 180);
   const cusps = trop.map((v, i) => i === 0 ? 0 : norm360(v - ayan)); // KP-New sidereal cusps
+  /* The number DEFINES the nirayana ascendant. Converting it to tropical for the
+     RAMC inversion and back is a lossy round-trip (up to 8.5e-14 deg), and the
+     result is pinned at a sub boundary where that error is decisive. Take cusp 1
+     from the table, not from the round-trip. Cusps 2-12 legitimately come from
+     Placidus and are generic reals, so they keep the computed values. */
+  cusps[1] = ascSid;
   const inHouse = lon => {
     for (let h = 1; h <= 12; h++) {
       const a = cusps[h], b = cusps[h === 12 ? 1 : h + 1];

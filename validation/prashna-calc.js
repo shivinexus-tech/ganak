@@ -226,9 +226,13 @@ function buildSubTable() { // exact integer arcseconds; split at sign edges
   return rows;
 }
 const SUB_TABLE = buildSubTable();
+/* Mirror of PR_subOf in src/screens/PrashnaScreen.tsx -- see the note there.
+   These two MUST stay behaviourally identical; validation/prashna-parity.js
+   proves it. */
+const SUB_EPS = 1e-6; // arcsec
 function subLordOf(sidLonDeg) {
   const s = ((sidLonDeg % 360) + 360) % 360 * 3600;
-  for (const r of SUB_TABLE) if (s >= r.from && s < r.to) return r;
+  for (const r of SUB_TABLE) if (s >= r.from - SUB_EPS && s < r.to - SUB_EPS) return r;
   return SUB_TABLE[SUB_TABLE.length - 1];
 }
 function nakOf(sidLonDeg) {
