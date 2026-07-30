@@ -30,33 +30,23 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Canonical validation gates
+      - name: All validation gates
+        # Runs the WHOLE validation/ suite (not just the AGENTS.md canonical subset), so
+        # every gate — e.g. regional-calendar-modes, doshas, utility-calculators — is a
+        # real safety net. Reports each gate then fails if any failed. The two arg-taking
+        # gates run explicitly; canonical-deployment is skipped (it checks the live site
+        # post-deploy) and the _helpers/hooks are skipped.
         run: |
-          set -euo pipefail
-          node validation/parse-check.js src/kundli-app.tsx
-          node validation/prashna-parity.js src/screens/PrashnaScreen.tsx
-          node validation/prashna-calc.js
-          node validation/muhurat-anchors.cjs
-          node validation/navratri-timings.cjs
-          node validation/navadurga-pages.cjs
-          node validation/sankranti-punya.cjs
-          node validation/panchaka-windows.cjs
-          node validation/hindi-devotional-language.cjs
-          node validation/hindi-worship-glossary.cjs
-          node validation/devotional-voice-english.cjs
-          node validation/festival-deeplinks.cjs
-          node validation/festival-page-coverage.cjs
-          node validation/major-festival-pages.cjs
-          node validation/durga-puja-pages.cjs
-          node validation/vedic-season-clock.cjs
-          node validation/page-context-header.cjs
-
-      - name: Prashna KP number-method gates
-        run: |
-          set -euo pipefail
-          node validation/prashna-249.cjs
-          node validation/prashna-249-chart.cjs
-          [ -f validation/prashna-249-input.cjs ] && node validation/prashna-249-input.cjs || true
-
-      - name: Production build
-        run: npm run build
+          fail=0
+          echo "== argument gates =="
+          node validation/parse-check.js src/kundli-app.tsx || { echo "FAIL parse-check"; fail=1; }
+          node validation/prashna-parity.js src/screens/PrashnaScreen.tsx || { echo "FAIL prashna-parity"; fail=1; }
+          echo "== self-contained gates =="
+          for g in validation/*.cjs validation/prashna-calc.js; do
+            b=$(basename "$g")
+            case "$b" in _*|canonical-deployment.cjs) echo "skip $b"; continue;; esac
+            if node "$g" >/dev/null 2>&1; then echo "ok   $b"; else echo "FAIL $b"; fail=1; fi
+          done
+          echo "== build =="
+          npm run build || { echo "FAIL build"; fail=1; }
+          exit $fail
