@@ -170,7 +170,7 @@ export default function KundliApp() {
         {/* hero */}
         <header className="rise" style={{ textAlign: "center", marginBottom: 36 }}>
           <h1 style={{ fontFamily: "Eczar, serif", fontWeight: 700, fontSize: 46, margin: "8px 0 6px", lineHeight: 1.08 }}>
-            <span style={{ color: C.gold }}>Ganak</span>
+            <span style={{ color: C.gold }}>{lang === "hi" ? "गणक" : "Ganak"}</span>
           </h1>
           <div style={{ fontFamily: "Eczar, serif", color: C.gold, fontSize: 15, letterSpacing: "0.18em" }}>{hero.eyebrow}</div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, margin: "10px 0 12px" }}>
