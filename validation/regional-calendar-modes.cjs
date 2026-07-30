@@ -68,7 +68,11 @@ r=resolveConvention('bengali-solar',{tamilSolar:true,bengaliSolar:false});if(r.i
 
 const daily=fs.readFileSync('src/screens/DailyScreen.tsx','utf8'),flags=fs.readFileSync('src/engine/regional-calendar-flags.ts','utf8'),fn=fs.readFileSync('functions/api/regional-calendar-flags.ts','utf8');
 for(const token of ['urlPrefPush("cal"','urlPrefPush("date"','popstate','loadRegionalCalendarFlags','temporarily disabled','अस्थायी रूप से बन्द','calendarLabel(calendarMode, todayP, todayP.rise'])if(!daily.includes(token))fail(`Daily state/recovery UI missing ${token}`);
-const shell=fs.readFileSync('src/kundli-app.tsx','utf8');for(const token of ['placeFromUrl','urlPrefsPush({city:next.label','window.addEventListener("popstate"'])if(!shell.includes(token))fail(`place URL/reload/Back preservation missing ${token}`);
+const shell=fs.readFileSync('src/kundli-app.tsx','utf8');for(const token of ['placeFromUrl','window.addEventListener("popstate"'])if(!shell.includes(token))fail(`place URL/reload/Back preservation missing ${token}`);
+// push-vs-replace for the city URL is a DEFERRED UX decision (backlog E-1.2, owner 2026-07-29):
+// does Back return to the previous city (pushState) or exit cleanly (replaceState)? Until decided,
+// accept EITHER — the gate still requires the city is written to the URL (reload preservation).
+if(!/urlPrefs(Push|Set)\(\{city:next\.label/.test(shell))fail('place URL city-preservation wiring missing');
 if(!flags.includes('cache:"no-store"')||/localStorage|sessionStorage/.test(flags))fail('runtime flags are cached/stored in browser');
 if(!fn.includes('REGIONAL_CALENDAR_FLAGS')||!fn.includes('cache-control')||!fn.includes('no-store'))fail('edge KV kill-switch endpoint incomplete');
 

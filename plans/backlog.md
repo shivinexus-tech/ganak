@@ -1130,6 +1130,14 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
   sidereal-first app; Western sits awkwardly beside it). Revisit the framing/placement/
   labelling — e.g. clearer "not our core method" separation, or a distinct section — as a
   product/UX decision. Not a removal; a presentation rethink.
+- **E-1.2 Back-button behaviour on city change — DEFERRED (owner, 2026-07-29).** Commit
+  `e63a38d` changed the place-URL write from `pushState` → `replaceState` (`setPanchPlace`
+  in `src/kundli-app.tsx`), so the browser Back button no longer returns to the previous
+  city (it exits the screen instead). Owner: **leave as-is for now, observe user behaviour,
+  decide later.** Trade-off: `pushState` = Back undoes the last city change but can pile up
+  history if many cities are tried; `replaceState` (current) = Back exits cleanly but no
+  city undo. The `regional-calendar-modes` gate now accepts either wiring so it no longer
+  blocks on this deferred choice. Revisit with usage data.
 
 ---
 
