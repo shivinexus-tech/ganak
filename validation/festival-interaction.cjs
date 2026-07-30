@@ -68,14 +68,6 @@ function usesRealAnchorNavigation(snip) {
   const jsOnlyNav = /onClick=\{\(\)\s*=>\s*(set[A-Z]|navigate|go\()/.test(snip) && !rowNavigatesByAnchor(snip);
   return rowNavigatesByAnchor(snip) && !jsOnlyNav;
 }
-// An expand control must announce and control its panel.
-function expandControlHasAria(snip) {
-  return /aria-expanded=/.test(snip) && /aria-controls=/.test(snip);
-}
-// A visible open-state affordance (chevron) exists.
-function hasVisibleAffordance(snip) {
-  return /rotate\(90deg\)/.test(snip) || /aria-hidden="true"[^>]*>[›▸▾▼]/.test(snip) || /[›▸▾▼]/.test(snip);
-}
 // A navigation href preserves language (and, when a city is known, the city).
 function hrefPreservesLang(snip) {
   return /lang/.test(snip);
@@ -87,18 +79,6 @@ function hrefPreservesLang(snip) {
  * otherwise hide. */
 function anchorBlockOk(block) {
   return /^<a\b/.test(block) && /href=\{festHref\(/.test(block) && /aria-label=/.test(block);
-}
-function toggleBlockOk(block) {
-  // must be a keyboard-native <button> (not a mouse-only div), announce + control
-  // its panel, carry an accessible name and a visible open-state chevron rotation
-  return /^<button\b/.test(block)
-    && /aria-expanded=\{open\}/.test(block)
-    && /aria-controls=\{panelId\}/.test(block)
-    && /aria-label=/.test(block)
-    && /rotate\(90deg\)/.test(block);
-}
-function inPanelGuideBilingual(block) {
-  return /Open full guide/.test(block) && /पूरी मार्गदर्शिका खोलें/.test(block);
 }
 function festHrefPreservesState(fnSrc) {
   return /p\.set\("lang"/.test(fnSrc) && /p\.set\("city"/.test(fnSrc);
@@ -122,36 +102,25 @@ if (calRow) {
 const calFestHref = CAL.match(/const festHref = \([\s\S]*?\n  \};/);
 check(calFestHref && festHrefPreservesState(calFestHref[0]), 'CalendarPage: festHref drops lang/city (lost state)');
 
-/* ---- 2. MuhuratHub Fasts & Festivals list ------------------------------- */
+/* ---- 2. MuhuratHub festival/fast surfaces (Option A: whole-row navigation) --
+ * The owner chose one consistent action per row: the WHOLE row opens the
+ * canonical page — no inline expansion, no separate toggle. So the gate must
+ * confirm the two-action pattern is gone (no ff-toggle, no aria-expanded) and
+ * every festival/fast surface is a whole-row anchor. */
 
 check(/festivalPathForKey/.test(HUB), 'MuhuratHub: does not import/use festivalPathForKey');
-// open must be a real boolean, else a collapsed toggle omits aria-expanded (null)
-check(/const open = Boolean\(/.test(HUB) || /const open = !!/.test(HUB), 'MuhuratHub: open state is not coerced to boolean (collapsed toggle would omit aria-expanded)');
-check(/scrollIntoView/.test(HUB), 'MuhuratHub: expanded panel is not revealed within the viewport');
-check(/<div id=\{panelId\} ref=\{openPanelRef\}/.test(HUB), 'MuhuratHub: controlled panel missing id={panelId}/ref (state/panel disagree)');
-// the old invisible whole-row toggle must be gone
-check(!/role="button"[\s\S]{0,120}onClick=\{\(\) => setFexp/.test(HUB), 'MuhuratHub: invisible whole-row toggle (role=button) still present');
-// every ff-row anchor (F&F list primary row + "Coming up" summary rows) must be a
-// real <a> that navigates via festHref with an accessible name
+// the two-action row is retired — no inline-expansion toggle may remain
+check(!/className="ff-toggle"/.test(HUB), 'MuhuratHub: a separate expand toggle still exists (row must be a single whole-row action)');
+check(!/aria-expanded/.test(HUB), 'MuhuratHub: an expand control (aria-expanded) still exists (inline expansion must be gone)');
+// every ff-row anchor (F&F list rows + "Coming up" rows + observance chip) must be
+// a real <a> that navigates via festHref with an accessible name
 const hubAnchors = HUB.match(/<a\b[^>]*className="ff-row"[\s\S]*?<\/a>/g) || [];
-check(hubAnchors.length >= 2, 'MuhuratHub: expected ff-row anchors for both the F&F list and the "Coming up" summary');
+check(hubAnchors.length >= 3, 'MuhuratHub: expected ff-row anchors for the F&F list, "Coming up" rows, and the observance chip');
 for (const a of hubAnchors) {
   check(anchorBlockOk(a), 'MuhuratHub: an ff-row anchor is missing festHref/aria-label');
 }
-// the F&F list primary row specifically opens the canonical page for its entry
-check(/href=\{festHref\(path\)\}/.test(HUB), 'MuhuratHub: F&F list primary row does not open the canonical festival page');
-// scope the quick-details toggle
-const hubToggle = HUB.match(/<button\b[^>]*className="ff-toggle"[\s\S]*?<\/button>/);
-check(!!hubToggle, 'MuhuratHub: quick-details toggle <button> not found');
-if (hubToggle) {
-  check(toggleBlockOk(hubToggle[0]), 'MuhuratHub: toggle is not a keyboard-native button with aria-expanded/aria-controls/name/open-chevron');
-}
-// scope the in-panel "Open full guide" link (must be distinct from the row aria-label)
-const hubGuide = HUB.match(/\{path && \(\s*<a href=\{festHref\(path\)\}[\s\S]*?<\/a>\s*\)\}/);
-check(!!hubGuide, 'MuhuratHub: no in-panel "Open full guide" link block');
-if (hubGuide) {
-  check(inPanelGuideBilingual(hubGuide[0]), 'MuhuratHub: in-panel guide link not bilingual');
-}
+// the F&F list row specifically opens the canonical page for its entry
+check(/href=\{festHref\(path\)\}/.test(HUB), 'MuhuratHub: F&F list row does not open the canonical festival page');
 const hubFestHref = HUB.match(/const festHref = \([\s\S]*?\n  \};/);
 check(hubFestHref && festHrefPreservesState(hubFestHref[0]), 'MuhuratHub: festHref drops lang/city (lost state)');
 // the "Coming up" summary rows (nextFast/nextFest) must open the canonical page too
@@ -211,26 +180,18 @@ try {
 const fixtures = [
   { name: 'static dead row', pass: rowNavigatesByAnchor('<div>{label}<span>{date}</span></div>') === false },
   { name: 'click-only row (no keyboard)', pass: rowIsKeyboardReachable('<div onClick={() => open()}>{label}</div>') === false },
-  { name: 'invisible expansion (no aria)', pass: expandControlHasAria('<button onClick={() => setFexp(x)}>{label}</button>') === false },
   { name: 'missing route', pass: coverageProblem('festival', '__no_such_festival_key__') !== null },
   { name: 'lost Hindi query href', pass: hrefPreservesLang('<a href={`/festival/${slug}`}>{label}</a>') === false },
   { name: 'stale Back-state (JS-only nav)', pass: usesRealAnchorNavigation('<div role="button" onClick={() => setCalView(null)}>{label}</div>') === false },
-  // element-scoped predicate fixtures — these are what B flagged as previously ungated
-  { name: 'toggle without aria/chevron', pass: toggleBlockOk('<button className="ff-toggle" onClick={x}>›</button>') === false },
-  { name: 'mouse-only div masquerading as toggle', pass: toggleBlockOk('<div aria-expanded={open} aria-controls={panelId} aria-label="x" onClick={x}>rotate(90deg)</div>') === false },
-  { name: 'chevron-less toggle', pass: toggleBlockOk('<button className="ff-toggle" aria-expanded={open} aria-controls={panelId} aria-label="x">flat</button>') === false },
-  { name: 'in-panel guide English-only', pass: inPanelGuideBilingual('<a href={festHref(path)}>Open full guide</a>') === false },
   { name: 'row anchor without festHref', pass: anchorBlockOk('<a href={`/festival/${slug}`} aria-label="x">{label}</a>') === false },
+  { name: 'anchor without accessible name', pass: anchorBlockOk('<a href={festHref(path)}>{label}</a>') === false },
 ];
 for (const f of fixtures) {
   check(f.pass, `fixture not caught: ${f.name}`);
 }
 // And the positive counterparts must pass, so the predicates aren't trivially strict.
 check(rowIsKeyboardReachable('<a href={festHref(path)}>{label}</a>'), 'fixture false-negative: real anchor rejected');
-check(expandControlHasAria('<button aria-expanded={open} aria-controls={panelId}>›</button>'), 'fixture false-negative: proper aria rejected');
 check(hrefPreservesLang('<a href={festHref(path)} data-lang>{label}</a>'), 'fixture false-negative: lang href rejected');
-check(toggleBlockOk('<button className="ff-toggle" aria-expanded={open} aria-controls={panelId} aria-label="x"><span>rotate(90deg)</span></button>'), 'fixture false-negative: valid toggle rejected');
-check(inPanelGuideBilingual('<a>Open full guide पूरी मार्गदर्शिका खोलें</a>'), 'fixture false-negative: bilingual guide rejected');
 check(anchorBlockOk('<a href={festHref(path)} aria-label="x">{label}</a>'), 'fixture false-negative: valid anchor rejected');
 
 /* ---- report ------------------------------------------------------------- */

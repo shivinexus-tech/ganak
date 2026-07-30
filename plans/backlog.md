@@ -267,6 +267,14 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
   - [x] Dedicated Sarvartha Siddhi, Amrita Siddhi, Ravi Yoga, Ravi/Guru Pushya,
         Dwipushkar, Tripushkar and Ganda Moola calculations/calendars.
   - [x] Ritu/season, solstice/equinox and Vedic/Ghati clock.
+  - [ ] **Direct date entry and better Panchang date picker.** The current calendar
+        popup forces month-by-month navigation, which is painful when checking a
+        far-future or past Panchang date. Add a direct typed date input plus a
+        year/month jump picker so a user can enter or select a specific date quickly.
+        The selected date must survive URL reload/Back/Forward, respect the selected
+        city/timezone, validate invalid dates visibly, and never reset unless the
+        user explicitly chooses today or changes the date. _(Backlog #58;
+        owner feedback 2026-07-29)_
   - [x] User-controlled lunar/Gregorian presentation, Amanta/Purnimanta switch and
         pre-launch Tamil Thirukanitha/Bengali Vishuddha Siddhanta calendar-base
         switches. Complete Tamil/Bengali-language journeys remain a separate
@@ -544,6 +552,25 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       a round-4 independent audit (state/keyboard/entry-type matrix) passed and
       closed one gate gap (`e99a2e7`). **Still open before check-off:** owner
       live-URL sign-off only.
+- [x] **RESOLVED 2026-07-29 — Fasts & Festivals row: one consistent action
+      (owner chose Option A).** Owner reported the row behaved inconsistently
+      (sometimes an inline preview, sometimes straight to the page) and read it as
+      an EN/HI difference. **Root cause:** the row had two actions — a wide
+      name-link (navigate) plus a separate 46px chevron (expand inline preview);
+      identical in EN and HI, so the perceived language difference was just which
+      control was tapped. **The dual-action row was the UX problem.** Owner chose
+      **Option A: the whole row opens the canonical festival page; inline preview
+      dropped entirely** — now consistent with the CalendarPage rows, "Coming up"
+      rows and observance chip, which were already whole-row links. Implemented in
+      `src/screens/MuhuratHub.tsx` (removed the toggle + inline panel + `fexp`
+      state and now-orphaned imports/helpers) and the gate
+      `validation/festival-interaction.cjs` rewritten to assert no toggle /
+      aria-expanded remains and every festival/fast surface is a whole-row anchor.
+      The per-entry timing that the preview used to show (parana, arghya,
+      ghatasthapana, eclipse sutak, vrat vidhi) is unchanged on the dedicated
+      festival page the row now opens — one tap away, not lost. Verified EN/HI at
+      390×844: 0 toggles, whole-row links navigate (incl. eclipse/named-Ekadashi),
+      Back restores the list, 0 console errors. Gates + build green.
 - [x] **P0 before go-live — place-aware festival pages.** Put the normal Ganak place
       selection box directly on every dedicated festival/vrat page. Replace “Open
       this festival in the Daily Panchang to see the local timing referred to below.”
@@ -842,6 +869,14 @@ Work:
       **gut the overloaded MuhuratHub** (it does ~10 jobs) into dedicated screens;
       fix "too many taps" / "unclear where features live" (owner's own words,
       confirmed by messaging audit). Do in-place in the Vite app — no rewrite.
+- [ ] **Global site search / guided input (before go-live):** a user who does not
+      know where a festival, vrat, muhurat, calculator or Panchang term lives should
+      not be clueless. Add a prominent search/input box that accepts English, Hindi,
+      Sanskrit/transliteration and common aliases, then routes to the right page or
+      shows clear suggestions. It should cover public festival pages, recurring
+      vrats, calculators, Muhurat needs, Panchang terms and help-style questions;
+      no dead-end results, no browser storage, and phone keyboard UX must be tested.
+      _(Backlog #59; owner feedback 2026-07-29)_
 - [ ] **Jyotish-zone hierarchy (Phase 1, before the chart reveal):** the 17 flat
       chart sub-sections (messaging audit finding) need grouping — Kundli / Dashas /
       Matching / Tools / Vault sub-navigation, not one flat list.

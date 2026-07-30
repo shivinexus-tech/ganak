@@ -84,7 +84,9 @@
     51,
     54,
     55,
-    56
+    56,
+    58,
+    59
   ],
   "sourceNotApplicableItemIds": [
     5,
@@ -107,7 +109,9 @@
     54,
     55,
     56,
-    57
+    57,
+    58,
+    59
   ],
   "sourceConfidenceByItem": {
     "1": "Drik Panchang's parallel English/Hindi 108-pada tables; all positional pairs regression-tested",
@@ -382,7 +386,9 @@
         42,
         43,
         44,
-        45
+        45,
+        58,
+        59
       ]
     },
     {
@@ -749,6 +755,16 @@
       "section": "Optional",
       "title": "sunSidMs performance investigation",
       "technicalComplexity": "Medium"
+    },
+    "58": {
+      "section": "P0",
+      "title": "Direct date entry and better Panchang date picker",
+      "technicalComplexity": "Medium"
+    },
+    "59": {
+      "section": "P0",
+      "title": "Global site search and guided “find what I need” input",
+      "technicalComplexity": "High"
     }
   }
 }

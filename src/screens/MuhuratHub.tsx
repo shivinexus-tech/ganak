@@ -1,20 +1,18 @@
 /* Muhurat hub UI — pure extraction (SPLIT-UI-03g). Wire deferred.
    Broad imports; unused ones are fine for now until wire trims. */
 
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { T } from "../components/tokens";
 import { fmtTime, fmtTimeD, fmtDeg } from "../components/format";
 import { tr, trN, obsLabel } from "../i18n";
 import { L } from "../i18n";
-import { CHOG_NAME, OBS_NAME, FEST_NAME, OBS_META, FEST_META } from "../data/festival-meta";
-import { VRAT_VIDHI } from "../data/vrat-vidhis";
-import VratVidhiCard from "../components/VratVidhiCard";
+import { CHOG_NAME, OBS_NAME, FEST_NAME } from "../data/festival-meta";
 import {
   SIGNS, NAKSHATRAS, TITHIS, YOGAS, zoneOffset, sunEvents, moonEvents,
 } from "../engine/panchang";
 import {
   dayMuhurat, findMuhurat, muhuratForDate, muhuratScanRange, muhuratShuddhi,
-  MUHURTA_RULES, vaishnavaEkadashi, vratDetail, NAK_HI, NAK_GOOD, dayScore,
+  MUHURTA_RULES, vaishnavaEkadashi, NAK_HI, NAK_GOOD, dayScore,
 } from "../engine/muhurat";
 import { dayHoras, analyzeHora, horaResultText, HORA_GLYPH, HORA_COLOR, HORA_NAME, HORA_NATURE, HORA_PLANET_KEYS, horaDetectPlanet, horaIntent, HORA_CLARIFY, HORA_ACTIVITY_MAP, horaWindowsForPlanet } from "../engine/hora";
 import { computeLagnaPanchaka, panchakaRem, PANCHAKA_TYPE } from "../engine/panchaka";
@@ -32,26 +30,10 @@ import { searchUpcoming } from "../engine/search-upcoming";
 import { planetGochar } from "../engine/gochar";
 import { fmtDur, eventDetail } from "../engine/transit-copy";
 import { observancesFor, scanPanchangCalendar, EKADASHI_NAMES, PRADOSH_NAMES_BY_DAY } from "../engine/festivals";
-import { chhathTimings } from "../engine/chhath";
-import { navratriTimings } from "../engine/navratri";
-import { eclipseDetail } from "../engine/eclipse";
 import { urlPrefGet, urlPrefPush } from "../components/url-prefs";
 import MuhuratActions from "../components/MuhuratActions";
 import { privacyEvent } from "../telemetry/privacy-events";
 
-const VRAT_VIDHI_KEY = Object.freeze({
-  chhathNahayKhay: "chhath",
-  chhathKharna: "chhath",
-  chhath: "chhath",
-  chhathUshaArghya: "chhath",
-  chaitraNavratri: "chaitraNavratri",
-  sharadNavratri: "sharadNavratri",
-  skandaSashtiBegins: "skandaSashtiBegins",
-  skandaSashtiSoorasamharam: "skandaSashtiSoorasamharam",
-  skandaSashtiThirukalyanam: "skandaSashtiThirukalyanam",
-  ayyappaMandalaBegins: "ayyappaMandalaBegins",
-  ayyappaMandalaPuja: "ayyappaMandalaPuja",
-});
 const SIGN_HI = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
 
 function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, onCal = () => {}, onChangeCity = () => {}, C, card }) {
@@ -63,24 +45,6 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   const [evKey, setEvKey] = useState("purchase");
   const [tab, setTab] = useState("fasting");
   const [fq, setFq] = useState("");
-  const [fexp, setFexp] = useState(null);
-  const fexpDetail = useMemo(() => {
-    if (!fexp) return null;
-    try {
-      if (fexp.timing === "navratri") return { navratri: navratriTimings(place, fexp.ms) };
-      if (fexp.timing === "chhath-sequence") return { chhath: chhathTimings(place, fexp.ms) };
-      if (fexp.timing === "grahan" && fexp.eclipseMs && fexp.key) return { grahan: eclipseDetail(place, fexp.eclipseMs, fexp.key) };
-      return vratDetail(place, ayanamsa, fexp.ms, fexp.timing);
-    } catch (e) { return null; }
-  }, [fexp, place, ayanamsa]);
-  // Reveal the inline "quick details" panel inside the phone viewport when it opens,
-  // so a tap is never a silent no-op below the fold.
-  const openPanelRef = useRef(null);
-  useEffect(() => {
-    if (fexp && openPanelRef.current && typeof openPanelRef.current.scrollIntoView === "function") {
-      openPanelRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    }
-  }, [fexp]);
   // Preserve language + selected city on the canonical festival page and Back trip
   // (URL query only — no localStorage/sessionStorage).
   const festHref = (path) => {
@@ -464,15 +428,15 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       <SecHead deva="व्रत एवं पर्व" en="Fasts & festivals" right={tab === "fasting" ? (
         <span style={{ display: "inline-flex", gap: 4 }}>
           {[["smarta", lang === "hi" ? "स्मार्त" : "Smarta"], ["vaishnava", "ISKCON"]].map(([v, l]) => (
-            <button key={v} onClick={() => { chooseTrad(v); setFexp(null); }} style={{ fontSize: T.fMicro, padding: "3px 9px", borderRadius: T.rPill, border: `1px solid ${trad === v ? C.gold : C.line}`, background: trad === v ? "rgba(168,106,18,.1)" : "transparent", color: trad === v ? C.gold : C.muted, cursor: "pointer" }}>{l}</button>
+            <button key={v} onClick={() => chooseTrad(v)} style={{ fontSize: T.fMicro, padding: "3px 9px", borderRadius: T.rPill, border: `1px solid ${trad === v ? C.gold : C.line}`, background: trad === v ? "rgba(168,106,18,.1)" : "transparent", color: trad === v ? C.gold : C.muted, cursor: "pointer" }}>{l}</button>
           ))}
         </span>
       ) : null} />
       <div style={{ ...card, padding: 0, overflow: "hidden" }}>
-        <style>{`.ff-row{transition:background .12s ease;} .ff-row:hover{background:rgba(168,106,18,.07);} .ff-row:focus-visible{outline:2px solid #A86A12;outline-offset:-2px;background:rgba(168,106,18,.10);} .ff-toggle:focus-visible{outline:2px solid #A86A12;outline-offset:-2px;} .ff-toggle:hover{background:rgba(168,106,18,.08) !important;color:${C.gold} !important;}`}</style>
+        <style>{`.ff-row{transition:background .12s ease;} .ff-row:hover{background:rgba(168,106,18,.07);} .ff-row:focus-visible{outline:2px solid #A86A12;outline-offset:-2px;background:rgba(168,106,18,.10);}`}</style>
         <div style={{ display: "flex", gap: 6, padding: "10px 12px 6px" }}>
           {[["fasting", "fastingTab"], ["festival", "festivalTab"]].map(([k, lbl]) => (
-            <button key={k} onClick={() => { setTab(k); setFexp(null); }} style={{ padding: "6px 14px", borderRadius: T.rPill, fontFamily: "Eczar, serif", fontSize: 13, cursor: "pointer", border: `1px solid ${tab === k ? C.gold : "transparent"}`, background: tab === k ? "rgba(168,106,18,.1)" : "transparent", color: tab === k ? C.gold : C.muted }}>{tr(lang, lbl)}</button>
+            <button key={k} onClick={() => setTab(k)} style={{ padding: "6px 14px", borderRadius: T.rPill, fontFamily: "Eczar, serif", fontSize: 13, cursor: "pointer", border: `1px solid ${tab === k ? C.gold : "transparent"}`, background: tab === k ? "rgba(168,106,18,.1)" : "transparent", color: tab === k ? C.gold : C.muted }}>{tr(lang, lbl)}</button>
           ))}
         </div>
         {tab === "fasting" && trad === "vaishnava" && (
@@ -499,139 +463,35 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           let lastMonth = null;
           return items.map((it) => {
             const kind = tab === "fasting" ? obsKind(it.key) : it.key;
-            const vidhiKey = VRAT_VIDHI_KEY[kind] || kind;
-            const meta = tab === "fasting" ? OBS_META[kind] : FEST_META[it.key];
             const name = tab === "fasting" ? obsLabel(lang, { key: it.key, baseKey: kind, isVariant: it.key !== kind }) : trN(lang, FEST_NAME, it.key);
             const mLbl = monthLbl(it.ms);
             const header = mLbl !== lastMonth ? <div style={{ ...T.label, color: C.muted, padding: "12px 12px 2px" }}>{mLbl}</div> : null;
             lastMonth = mLbl;
             const id = tab + ":" + it.key + ":" + it.ms;
-            // Boolean, never null — a collapsed toggle must render aria-expanded="false",
-            // not omit the attribute.
-            const open = Boolean(fexp && fexp.id === id);
-            const nextFexp = { id, key: it.key, ms: it.ms, eclipseMs: it.eclipseMs || null, timing: meta ? meta.timing : null, shifted: it.shifted, reason: it.reason };
             const path = festivalPathForKey(tab === "fasting" ? "fast" : "festival", it.key);
-            const panelId = "ff-panel-" + id.replace(/[^a-zA-Z0-9]+/g, "-");
-            const nameCell = (
-              <>
-                <span style={{ fontSize: 14, color: C.ivory, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
-                <span style={{ flexShrink: 0, fontSize: 12.5, color: C.muted, fontVariantNumeric: "tabular-nums" }}><span style={{ color: C.gold }}>{fmtDay(it.ms)}</span> · {away(it.ms)}</span>
-              </>
-            );
+            const dateCell = <span style={{ flexShrink: 0, fontSize: 12.5, color: C.muted, fontVariantNumeric: "tabular-nums" }}><span style={{ color: C.gold }}>{fmtDay(it.ms)}</span> · {away(it.ms)}</span>;
             return (
               <div key={id}>
                 {header}
-                <div style={{ borderTop: "1px solid #F3ECDC", background: open ? "rgba(168,106,18,.05)" : undefined }}>
-                  <div style={{ display: "flex", alignItems: "stretch" }}>
-                    {path ? (
-                      <a
-                        href={festHref(path)}
-                        className="ff-row"
-                        aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + name}
-                        style={{ flex: 1, minWidth: 0, textDecoration: "none", color: "inherit", padding: "10px 6px 10px 12px", display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}
-                      >
-                        {nameCell}
-                      </a>
-                    ) : (
-                      <div style={{ flex: 1, minWidth: 0, padding: "10px 6px 10px 12px", display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>
-                        <span style={{ flex: 1, minWidth: 0 }}>
-                          <span style={{ fontSize: 14, color: C.ivory, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
-                          <span style={{ fontSize: 11, color: C.sindoor }}>{lang === "hi" ? "पूरा पृष्ठ अभी उपलब्ध नहीं" : "Full page not available yet"}</span>
-                        </span>
-                        <span style={{ flexShrink: 0, fontSize: 12.5, color: C.muted, fontVariantNumeric: "tabular-nums" }}><span style={{ color: C.gold }}>{fmtDay(it.ms)}</span> · {away(it.ms)}</span>
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      className="ff-toggle"
-                      aria-expanded={open}
-                      aria-controls={panelId}
-                      aria-label={(open ? (lang === "hi" ? "त्वरित विवरण बंद करें: " : "Hide quick details: ") : (lang === "hi" ? "त्वरित विवरण दिखाएँ: " : "Show quick details: ")) + name}
-                      onClick={() => setFexp(open ? null : nextFexp)}
-                      style={{ flexShrink: 0, width: 46, border: "none", borderLeft: `1px solid ${C.line}`, background: open ? "rgba(168,106,18,.10)" : "transparent", color: open ? C.gold : C.muted, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-                    >
-                      <span aria-hidden="true" style={{ fontSize: 16, lineHeight: 1, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform .15s ease" }}>›</span>
-                    </button>
+                {path ? (
+                  <a
+                    href={festHref(path)}
+                    className="ff-row"
+                    aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + name}
+                    style={{ borderTop: "1px solid #F3ECDC", textDecoration: "none", color: "inherit", padding: "11px 12px", display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}
+                  >
+                    <span style={{ fontSize: 14, color: C.ivory, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
+                    <span style={{ display: "inline-flex", alignItems: "baseline", gap: 8, flexShrink: 0 }}>{dateCell}<span aria-hidden="true" style={{ color: C.muted, fontSize: 14 }}>›</span></span>
+                  </a>
+                ) : (
+                  <div style={{ borderTop: "1px solid #F3ECDC", padding: "11px 12px", display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>
+                    <span style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{ fontSize: 14, color: C.ivory, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
+                      <span style={{ fontSize: 11, color: C.sindoor }}>{lang === "hi" ? "पूरा पृष्ठ अभी उपलब्ध नहीं" : "Full page not available yet"}</span>
+                    </span>
+                    {dateCell}
                   </div>
-                  {open && (() => {
-                    const d = fexpDetail;
-                    return (
-                      <div id={panelId} ref={openPanelRef} style={{ padding: "0 12px 10px", marginTop: -2, paddingTop: 8, borderTop: "1px dashed #EBDFC6", display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-start" }}>
-                        {meta && meta.gloss && <div style={{ fontSize: T.fSmall, color: C.ivory }}>{meta.gloss[LL]}{meta.deity && <span style={{ color: C.muted }}> · {meta.deity[LL]}</span>}</div>}
-                        {d && d.info && <div style={{ fontSize: T.fMicro, color: C.muted }}>{d.info.lmonthName} · {d.info.krishna ? (lang === "hi" ? "कृष्ण पक्ष" : "Krishna Paksha") : (lang === "hi" ? "शुक्ल पक्ष" : "Shukla Paksha")} · {(lang === "hi" ? (NAK_HI[d.info.nak] || d.info.nakName) : d.info.nakName)}</div>}
-                        {d && d.chhath && (
-                          <div style={{ fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
-                            {d.chhath.sandhya && (
-                              <div>
-                                {lang === "hi" ? "संध्या अर्घ्य: " : "Sandhya arghya: "}
-                                {fmtTimeD(d.chhath.sandhya.start, d.chhath.tz, it.ms, lang)}–{fmtTimeD(d.chhath.sandhya.end, d.chhath.tz, it.ms, lang)}
-                              </div>
-                            )}
-                            {d.chhath.usha && (
-                              <div style={{ marginTop: d.chhath.sandhya ? 4 : 0 }}>
-                                {lang === "hi" ? "उषा अर्घ्य: " : "Usha arghya: "}
-                                {fmtTimeD(d.chhath.usha.start, d.chhath.tz, it.ms, lang)}–{fmtTimeD(d.chhath.usha.end, d.chhath.tz, it.ms, lang)}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        {d && d.navratri && d.navratri.ghatasthapana?.primary && (
-                          <div style={{ fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
-                            {lang === "hi" ? "घटस्थापना: " : "Ghatasthapana: "}
-                            {fmtTimeD(d.navratri.ghatasthapana.primary.start, d.navratri.tz, it.ms, lang)}–{fmtTimeD(d.navratri.ghatasthapana.primary.end, d.navratri.tz, it.ms, lang)}
-                          </div>
-                        )}
-                        {d && d.grahan && (
-                          <div style={{ fontSize: T.fSmall, color: d.grahan.visible ? "#1F7A4D" : C.sindoor, fontWeight: 600, background: d.grahan.visible ? "rgba(31,122,77,.07)" : "rgba(194,69,30,.06)", border: `1px solid ${d.grahan.visible ? "rgba(31,122,77,.22)" : "rgba(194,69,30,.25)"}`, borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
-                            <div>{d.grahan.visible ? (lang === "hi" ? "आपके शहर में दृश्य" : "Visible at your city") : (lang === "hi" ? "आपके शहर में दृश्य नहीं" : "Not visible at your city")}</div>
-                            {d.grahan.visibility && (
-                              <div style={{ color: C.ivory, fontWeight: 500, marginTop: 4 }}>
-                                {lang === "hi" ? "दृश्य अवधि: " : "Visible: "}
-                                {fmtTimeD(d.grahan.visibility.start, d.grahan.tz, it.ms, lang)}–{fmtTimeD(d.grahan.visibility.end, d.grahan.tz, it.ms, lang)}
-                              </div>
-                            )}
-                            {d.grahan.visible && d.grahan.sutakStart && d.grahan.moksha && (
-                              <div style={{ color: C.ivory, fontWeight: 500, marginTop: 4 }}>
-                                {lang === "hi" ? "सूतक: " : "Sutak: "}
-                                {fmtTimeD(d.grahan.sutakStart, d.grahan.tz, it.ms, lang)}
-                                {" · "}
-                                {lang === "hi" ? "मोक्ष " : "Moksha "}
-                                {fmtTimeD(d.grahan.moksha, d.grahan.tz, it.ms, lang)}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        {d && (d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars || d.lakshmiPuja) && (
-                          <div style={{ fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", borderRadius: T.rSm, padding: "5px 10px", fontVariantNumeric: "tabular-nums" }}>
-                            {d.lakshmiPuja && d.lakshmiPuja.primary
-                              ? <>{lang === "hi" ? "लक्ष्मी पूजा मुहूर्त: " : "Lakshmi Puja muhurat: "}{fmtTimeD(d.lakshmiPuja.primary.start, d.tz, it.ms, lang)}–{fmtTimeD(d.lakshmiPuja.primary.end, d.tz, it.ms, lang)}</>
-                              : d.parana ? <>{lang === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, it.ms, lang)}{lang === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {lang === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, it.ms, lang)}</span>}</>
-                              : d.moonrise != null ? <>{lang === "hi" ? "चंद्रोदय पर व्रत खोलें: " : "Break fast after moonrise: "}{fmtTimeD(d.moonrise, d.tz, it.ms, lang)}</>
-                              : d.nishita ? <>{lang === "hi" ? "निषीथ काल: " : "Nishita period: "}{fmtTimeD(d.nishita.start, d.tz, it.ms, lang)}–{fmtTimeD(d.nishita.end, d.tz, it.ms, lang)}</>
-                              : d.morning ? <>{lang === "hi" ? "प्रातः पूजा: " : "Morning puja: "}{fmtTimeD(d.morning.start, d.tz, it.ms, lang)}–{fmtTimeD(d.morning.end, d.tz, it.ms, lang)}</>
-                              : d.sunrise != null ? <>{lang === "hi" ? "प्रातः / सूर्योदय: " : "Morning — from sunrise: "}{fmtTimeD(d.sunrise, d.tz, it.ms, lang)}</>
-                              : d.stars ? <>{lang === "hi" ? "तारे दिखाई देने के बाद व्रत खोलें" : "Break the fast after the stars are visible"}</>
-                              : <>{lang === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, it.ms, lang)}</>}
-                            {d.lakshmiPuja && d.lakshmiPuja.pradosh && (
-                              <div style={{ color: C.ivory, fontWeight: 500, marginTop: 4 }}>
-                                {lang === "hi" ? "प्रदोष काल: " : "Pradosh Kaal: "}
-                                {fmtTimeD(d.lakshmiPuja.pradosh.start, d.tz, it.ms, lang)}–{fmtTimeD(d.lakshmiPuja.pradosh.end, d.tz, it.ms, lang)}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        {fexp && fexp.shifted && <div style={{ color: C.gold, fontSize: T.fMicro }}>{fexp.reason === "spans" ? (lang === "hi" ? "वैष्णव तिथि — दो अरुणोदय पर एकादशी; दूसरे दिन व्रत" : "Vaishnava date — Ekadashi at two dawns; observed on the second") : (lang === "hi" ? "वैष्णव तिथि — अरुणोदय पर दशमी होने से व्रत एक दिन आगे" : "Vaishnava date — Dashami touched arunodaya (dawn), so the fast shifts one day")}</div>}
-                        {meta && meta.rules && <div style={{ color: C.muted, fontSize: T.fMicro, fontStyle: "italic" }}>{meta.rules[LL]}</div>}
-                        {VRAT_VIDHI[vidhiKey] && <VratVidhiCard data={VRAT_VIDHI[vidhiKey]} lang={lang} C={C} />}
-                        {path && (
-                          <a href={festHref(path)} style={{ marginTop: 4, alignSelf: "stretch", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5, minHeight: 38, padding: "0 14px", borderRadius: T.rMd, border: `1px solid ${C.gold}`, background: "rgba(168,106,18,.08)", color: C.gold, textDecoration: "none", fontFamily: T.serif, fontSize: 13, fontWeight: 600 }}>
-                            {lang === "hi" ? "पूरी मार्गदर्शिका खोलें" : "Open full guide"} ›
-                          </a>
-                        )}
-                      </div>
-                    );
-                  })()}
-                </div>
+                )}
               </div>
             );
           });
