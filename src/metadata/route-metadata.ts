@@ -24,8 +24,9 @@ export function canonicalOrigin() {
   }
 }
 
-export function routeMetadata({ lang, mode, festival, utility, medical, muhurat }) {
+export function routeMetadata({ lang, mode, festival, utility, medical, muhurat, personal }) {
   const l = lang === "hi" ? "hi" : "en";
+  if (personal) return { title: l === "hi" ? "वैयक्तिक मुहूर्त — जन्म-नक्षत्र अनुसार | गणक" : "Personalised Muhurat — matched to your birth star | Ganak", description: l === "hi" ? "अपने जन्म-नक्षत्र और जन्म राशि (तारा एवं चन्द्र बल) के अनुकूल शुभ दिन; वैकल्पिक वैयक्तिकरण, जन्म-विवरण संग्रहीत नहीं।" : "Auspicious days matched to your birth star and Moon-sign (Tara & Chandra bala); optional personalisation, birth details never stored." };
   if (festival) {
     const label = festival.label?.[l] || festival.title?.[l] || festival.key;
     return {
