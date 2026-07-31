@@ -843,7 +843,8 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                 {hi ? v.q.hi : v.q.en}{isNum ? ` · ${hi ? 'अंक' : 'number'} ${result.number}` : ''}
               </div>
             </div>
-            {isNum && <NumberSetBox info={result.info} favor={v.q.favor} hi={hi} />}
+            {isNum && <NumberSetBox info={result.info} favor={v.q.favor} hi={hi}
+              cuspLabel={hi ? String(v.q.cusp) : englishOrdinal(v.q.cusp)} />}
             <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
               {buildPlain(v, lang).map((r, i) => (
                 <div key={i} style={{ fontSize: 14, lineHeight: 1.5,
@@ -903,8 +904,12 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                   gloss={hi ? 'इस क्षण पूर्व में उदित राशि' : 'the sign rising in the east at this moment'} />
                 <PrashnaChip label={hi ? 'नक्षत्र' : 'Nakshatra'} value={`${hi ? NAK_HI[result.chart.lagna.nak.idx] : result.chart.lagna.nak.en}-${result.chart.lagna.nak.pada}`}
                   gloss={hi ? 'उदित अंश जिस चन्द्र-नक्षत्र में पड़ता है' : 'the lunar mansion the rising degree falls in'} />
-                <PrashnaChip label={hi ? 'उप-स्वामी' : 'Sub-lord'} value={hi ? GRAHA_HI[v.cuspSub] : GRAHA_EN[v.cuspSub]}
-                  gloss={hi ? 'निर्णायक मत देने वाला सूक्ष्म स्वामी' : 'the fine-grained ruler that casts the deciding vote'} />
+                <PrashnaChip
+                  label={hi ? `${v.q.cusp} भाव उप-स्वामी` : `${englishOrdinal(v.q.cusp)} cusp sub-lord`}
+                  value={hi ? GRAHA_HI[v.cuspSub] : GRAHA_EN[v.cuspSub]}
+                  gloss={hi
+                    ? 'जिस भाव पर प्रश्न है उसका सूक्ष्म स्वामी — कृष्णमूर्ति पद्धति में यही निर्णायक मत देता है'
+                    : 'sub-lord of the house your question is about — in KP this is what casts the deciding vote'} />
               </div>
               {/* F10: the 5-column chart is intrinsically wider than a 320px phone, so it
                   scrolls inside its own container instead of pushing the whole page wide. */}
@@ -978,7 +983,7 @@ function NumRow({ label, value, gloss }) {
 
 /* "What your number set" — the owner-approved answer-card detail box. Every
    jargon term carries a plain-language gloss (plans/prashna-249-ksk-verify.md). */
-function NumberSetBox({ info, favor, hi }) {
+function NumberSetBox({ info, favor, hi, cuspLabel }) {
   const signName = hi ? RASHI_HI[info.sign] : RASHI_EN[info.sign];
   const nak = hi ? NAK_HI[info.nakshatra] : NAK_EN[info.nakshatra];
   const star = hi ? GRAHA_FULL_HI[info.starLord] : info.starLord;
@@ -992,8 +997,10 @@ function NumberSetBox({ info, favor, hi }) {
       <NumRow label={hi ? 'राशि · Sign' : 'Sign'} value={signName} />
       <NumRow label={hi ? 'नक्षत्र · Star' : 'Star'} value={`${nak} · ${star}`}
         gloss={hi ? 'जिस नक्षत्र में अंक गिरा' : 'the star your number fell into'} />
-      <NumRow label={hi ? 'उप-स्वामी · Sub lord' : 'Sub lord'} value={sub}
-        gloss={hi ? 'जो अंतिम निर्णय देता है (हाँ या नहीं)' : 'the planet that gives the final yes or no'} />
+      <NumRow label={hi ? 'लग्न उप-स्वामी · Ascendant sub lord' : 'Ascendant sub-lord'} value={sub}
+        gloss={hi
+          ? `प्रश्न सच्चा है या नहीं, यह इससे देखा जाता है। हाँ/नहीं का निर्णय ${cuspLabel} भाव के उप-स्वामी से होता है।`
+          : `shows whether the question is genuine and ripens at all — the yes/no itself is read from the ${cuspLabel} cusp sub-lord`} />
       <NumRow label={hi ? 'लग्न · Ascendant' : 'Ascendant'} value={`${signName} ${PR_fmtNumberDeg(info.signDeg)}`}
         gloss={hi ? 'जहाँ अंक ने कुण्डली स्थिर की' : 'where the number fixed your chart'} />
       <div style={{ borderTop: `1px solid ${TOKENS.line}`, marginTop: 4, paddingTop: 3 }}>
