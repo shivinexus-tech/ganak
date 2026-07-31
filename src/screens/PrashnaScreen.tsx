@@ -651,7 +651,11 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   const [customPlace, setCustomPlace] = useState(placeLabel);
   const [customWhen, setCustomWhen] = useState(''); // datetime-local, '' = now
 
+  /* `Number('')` and `Number('   ')` are 0, which is finite -- so a cleared
+     coordinate field silently read as latitude 0 and passed the range check.
+     Reject blank input before coercing so an empty field is invalid, not zero. */
   const numOr = (s, fallback) => {
+    if (typeof s !== 'string' || s.trim() === '') return fallback;
     const n = Number(s);
     return Number.isFinite(n) ? n : fallback;
   };
@@ -796,11 +800,14 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
       {/* Moment & place of judgment. Collapsed by default -- the lay flow reads
           "here, now" and never opens this. KP practitioners need it because the
           horary chart belongs to the judgment, not to the app's inherited city. */}
+      {/* F1/F4/F5: a cast number session is locked until "New question". These
+          inputs are guarded like the question chips so editing the judgment
+          moment or place cannot wipe a locked result while leaving it locked. */}
       <div style={{ border: `1.5px solid ${TOKENS.line}`, borderRadius: TOKENS.radius,
         background: TOKENS.card, padding: '8px 10px', marginBottom: 4 }}>
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
           <input type="checkbox" checked={useCustom}
-            onChange={e => { setUseCustom(e.target.checked); clearResult(); }} />
+            onChange={e => { if (numberLocked) return; setUseCustom(e.target.checked); clearResult(); }} />
           <span style={{ fontSize: 13, fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
             {hi ? 'निर्णय का समय और स्थान स्वयं चुनें' : 'Set the judgment moment & place myself'}
           </span>
@@ -813,7 +820,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         </div>
         {useCustom && (
           <div style={{ display: 'grid', gap: 6, marginTop: 8 }}>
-            <input value={customPlace} onChange={e => { setCustomPlace(e.target.value); clearResult(); }}
+            <input value={customPlace} onChange={e => { if (numberLocked) return; setCustomPlace(e.target.value); clearResult(); }}
               aria-label={hi ? 'स्थान का नाम' : 'Place name'}
               placeholder={hi ? 'स्थान का नाम' : 'Place name'}
               style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, boxSizing: 'border-box',
@@ -821,20 +828,26 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                 fontSize: 14, padding: '0 10px' }} />
             <div style={{ display: 'flex', gap: 6 }}>
               <input inputMode="decimal" value={customLat}
-                onChange={e => { setCustomLat(e.target.value); clearResult(); }}
+                onChange={e => { if (numberLocked) return; setCustomLat(e.target.value); clearResult(); }}
                 aria-label={hi ? 'अक्षांश' : 'Latitude'} placeholder={hi ? 'अक्षांश' : 'Latitude'}
                 style={{ flex: 1, minWidth: 0, height: TOKENS.ctrlH, borderRadius: TOKENS.radius,
                   boxSizing: 'border-box', background: TOKENS.bg, color: TOKENS.ink, fontSize: 14,
                   padding: '0 10px', border: `1.5px solid ${latValid ? TOKENS.line : TOKENS.sindoor}` }} />
               <input inputMode="decimal" value={customLon}
-                onChange={e => { setCustomLon(e.target.value); clearResult(); }}
+                onChange={e => { if (numberLocked) return; setCustomLon(e.target.value); clearResult(); }}
                 aria-label={hi ? 'देशान्तर' : 'Longitude'} placeholder={hi ? 'देशान्तर' : 'Longitude'}
                 style={{ flex: 1, minWidth: 0, height: TOKENS.ctrlH, borderRadius: TOKENS.radius,
                   boxSizing: 'border-box', background: TOKENS.bg, color: TOKENS.ink, fontSize: 14,
                   padding: '0 10px', border: `1.5px solid ${lonValid ? TOKENS.line : TOKENS.sindoor}` }} />
             </div>
+            {mode === 'number' && (
+              <div style={{ fontSize: 11, color: TOKENS.muted, fontStyle: 'italic' }}>
+                {hi ? 'अंक विधि में आपका अंक ही लग्न तय करता है, इसलिए भावों का विभाजन केवल अक्षांश से बनता है — देशान्तर इस कुण्डली को नहीं बदलता।'
+                    : 'In the number method your number fixes the ascendant, so only latitude shapes the house cusps — longitude does not change this chart.'}
+              </div>
+            )}
             <input type="datetime-local" value={customWhen}
-              onChange={e => { setCustomWhen(e.target.value); clearResult(); }}
+              onChange={e => { if (numberLocked) return; setCustomWhen(e.target.value); clearResult(); }}
               aria-label={hi ? 'निर्णय का समय' : 'Judgment time'}
               style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, boxSizing: 'border-box',
                 border: `1.5px solid ${TOKENS.line}`, background: TOKENS.bg, color: TOKENS.ink,
