@@ -135,7 +135,9 @@ async function finish() {
   if (!heroComponent.includes('onError={() => setFailed(true)}')) problems.push('FestivalRasterHero must handle load failure');
 
   const muhuratHub = fs.readFileSync(path.join(root, 'src/screens/MuhuratHub.tsx'), 'utf8');
-  if (!muhuratHub.includes('chhathTimings')) problems.push('MuhuratHub must wire chhathTimings for expand rows');
+  if (!muhuratHub.includes('festivalPathForKey')) problems.push('MuhuratHub must route festival rows through festivalPathForKey');
+  if (!muhuratHub.includes('festHref(path)')) problems.push('MuhuratHub must preserve language/place when opening festival pages');
+  if (muhuratHub.includes('chhathTimings')) problems.push('MuhuratHub should not duplicate Chhath timing UI; the dedicated festival page owns chhathTimings');
 
   if (problems.length) {
     console.error('festival-row-29.cjs FAIL');
