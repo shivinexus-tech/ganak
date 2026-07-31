@@ -1060,7 +1060,11 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         <div style={{ marginTop: 16 }}>
           {/* Verdict card — answer before data (or, in chart-first mode, tucked
               behind a disclosure so the chart and tables lead instead). */}
-          {chartFirst ? (
+          {/* Demote the plain-language verdict only when the chart is actually
+              leading. With the chart hidden there is nothing to lead with, so
+              collapsing the verdict too would leave the screen showing neither
+              an answer nor a chart. */}
+          {chartFirst && showFull ? (
             <details style={{ border: `1.5px solid ${TOKENS.line}`,
               borderRadius: TOKENS.radius, background: TOKENS.card, padding: '8px 10px' }}>
               <summary style={{ cursor: 'pointer', fontSize: 13, color: TOKENS.muted,
