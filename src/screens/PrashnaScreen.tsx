@@ -379,6 +379,47 @@ function PR_castNumber(ms, lat, lonE, number) {
   return { ms, number, ayanamsa: 'kp-new', lagna, planets, cusps, system: p ? 'placidus' : 'equal' };
 }
 
+/* ---- Practitioner derivations. Pure, below the frozen engine, reusing the
+   same PR_subOf / PR_SIGN_LORD the verdict uses -- so the table an astrologer
+   audits is literally the data the judgment ran on, not a parallel model. ---- */
+
+const PR_GRAHA_ORDER = ['Su','Mo','Ma','Me','Ju','Ve','Sa','Ra','Ke'];
+
+/* All twelve cuspal sub-lords. KP judges a question through the sub-lord of the
+   relevant cusp; a practitioner needs the whole set to audit the verdict. */
+function PR_cuspalTable(chart) {
+  const rows = [];
+  for (let h = 1; h <= 12; h++) {
+    const lon = chart.cusps[h];
+    const sl = PR_subOf(lon);
+    rows.push({ house: h, lon, sign: Math.floor(lon / 30), deg: lon % 30,
+      nak: PR_nakOf(lon), star: sl.star, sub: sl.sub });
+  }
+  return rows;
+}
+
+/* The standard KP four-fold significator grid for each house:
+     A  planets in the star of an occupant of the house
+     B  occupants of the house
+     C  planets in the star of the house's owner
+     D  the owner (lord of the sign the cusp falls in)
+   Rahu/Ketu are listed on their own star-lord footing like any other graha; the
+   agency-by-conjunction refinement is deliberately NOT applied here, because the
+   verdict engine does not apply it either and the grid must mirror the engine. */
+function PR_significatorGrid(chart) {
+  const rows = [];
+  for (let h = 1; h <= 12; h++) {
+    const B = chart.planets.filter(p => p.house === h).map(p => p.key);
+    const D = [PR_SIGN_LORD[Math.floor(chart.cusps[h] / 30)]];
+    const A = chart.planets.filter(p => B.includes(p.star)).map(p => p.key);
+    const C = chart.planets.filter(p => D.includes(p.star)).map(p => p.key);
+    const all = PR_GRAHA_ORDER.filter(k =>
+      A.includes(k) || B.includes(k) || C.includes(k) || D.includes(k));
+    rows.push({ house: h, A, B, C, D, all });
+  }
+  return rows;
+}
+
 // ------------------------------------------------------------ UI PIECES
 function PrashnaSecHead({ hiMode }) {
   return (
@@ -1139,4 +1180,4 @@ function NumberSetBox({ info, favor, hi, cuspLabel }) {
 export default PrashnaScreen;
 // Named exports for the validation gates (parity + number-mode chart). The
 // parity gate slices only the marked engine region, so these do not affect it.
-export { PR_cast, PR_castNumber, PR_judge, QUESTIONS, PR_kpNewAyan };
+export { PR_cast, PR_castNumber, PR_judge, QUESTIONS, PR_kpNewAyan, PR_cuspalTable, PR_significatorGrid };
