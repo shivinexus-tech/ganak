@@ -57,5 +57,21 @@ for (const [name, lat, lon] of PLACES) {
   }
 }
 
+/* Same boundary problem, one level up: the nakshatra. PR_nakOf floors with zero
+   tolerance, so an ascendant pinned exactly on a nakshatra/pada edge fell into
+   the PREVIOUS nakshatra -- and the chart then displayed a nakshatra whose lord
+   contradicted the star lord printed beside it. */
+console.log('--- live lagna nakshatra == 249 table nakshatra ---');
+for (const [name, lat, lon] of PLACES) {
+  for (const ms of TIMES) {
+    for (let n = 1; n <= 249; n++) {
+      const chart = PR_castNumber(ms, lat, lon, n);
+      const want = kpNumberInfo(n).nakshatra;
+      ok(chart.lagna.nak.idx === want,
+        `${name} #${n}: live lagna nak ${chart.lagna.nak.idx} != table ${want}`);
+    }
+  }
+}
+
 console.log(`\n${fail === 0 ? '✓' : '✗'} sublord-boundary: ${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);

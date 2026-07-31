@@ -172,9 +172,19 @@ function PR_subOf(sid) {
   for (const r of PR_SUBS) if (s >= r.from - PR_SUB_EPS && s < r.to - PR_SUB_EPS) return r;
   return PR_SUBS[PR_SUBS.length - 1];
 }
+/* Same boundary problem PR_SUB_EPS solves for the sub: the 249 method pins the
+   ascendant exactly on a nakshatra/pada boundary for some numbers, and norm360
+   alone lands ~6.6e-11 arcsec BELOW the exact value, so a zero-tolerance floor
+   returns the PREVIOUS nakshatra. Working in integer arcsec with the same
+   tolerance keeps the nakshatra, the pada and the sub-lord on one story --
+   before this, the chart showed a nakshatra whose lord contradicted the star
+   lord printed beside it. */
+const PR_NAK_ARCSEC = 48000;   // 13°20'
+const PR_PADA_ARCSEC = 12000;  // 3°20'
 const PR_nakOf = sid => {
-  const idx = Math.floor(norm360(sid) / (360/27)) % 27;
-  return { idx, pada: Math.floor((norm360(sid) % (360/27)) / (360/108)) + 1, en: NAK_EN[idx] };
+  const s = norm360(sid) * 3600 + PR_SUB_EPS;
+  const idx = Math.floor(s / PR_NAK_ARCSEC) % 27;
+  return { idx, pada: Math.floor((s % PR_NAK_ARCSEC) / PR_PADA_ARCSEC) + 1, en: NAK_EN[idx] };
 };
 function PR_sidAll(ms) {
   const { jdUT, T, Tut } = PR_time(ms);
@@ -450,9 +460,15 @@ function PR_shareCardCanvas(result, hi) {
   // Lagna + the deciding cuspal sub-lord -- the two numbers an astrologer reads first.
   y += 54; g.fillStyle = '#2A2419'; g.font = font(30, 600);
   const L = result.chart.lagna;
-  g.fillText(`${hi ? 'लग्न' : 'Lagna'}: ${(hi ? RASHI_HI : RASHI_EN)[L.sign]} ${fmtDeg(L.deg)}  ·  ${(hi ? NAK_HI[L.nak.idx] : L.nak.en)}-${L.nak.pada}`, PAD, y);
+  /* Number mode pins the lagna at an exact table degree; fmtDeg's rounding shows
+     31/249 of them one arcminute low, so the card must format it exactly the way
+     the in-app Lagna chip does or the two disagree on the same number. */
+  const lagnaDeg = result.mode === 'number' ? PR_fmtNumberDeg(L.deg) : fmtDeg(L.deg);
+  g.fillText(`${hi ? 'लग्न' : 'Lagna'}: ${(hi ? RASHI_HI : RASHI_EN)[L.sign]} ${lagnaDeg}  ·  ${(hi ? NAK_HI[L.nak.idx] : L.nak.en)}-${L.nak.pada}`, PAD, y);
   y += 42; g.fillStyle = '#9B2C2C';
-  g.fillText(`${result.verdict.q.cusp}${hi ? ' भाव उप-स्वामी' : ' cusp sub-lord'}: ${(hi ? GRAHA_HI : GRAHA_EN)[result.verdict.cuspSub]}`, PAD, y);
+  const cuspOrd = hi ? `${result.verdict.q.cusp}वें भाव उप-स्वामी`
+                     : `${englishOrdinal(result.verdict.q.cusp)} cusp sub-lord`;
+  g.fillText(`${cuspOrd}: ${(hi ? GRAHA_HI : GRAHA_EN)[result.verdict.cuspSub]}`, PAD, y);
 
   // Twelve cuspal sub-lords, two columns of six.
   y += 58; g.fillStyle = '#7A6E58'; g.font = font(22, 600);
@@ -476,6 +492,12 @@ function PR_shareCardCanvas(result, hi) {
   const lines = [
     `${hi ? 'समय' : 'Cast'}: ${result.askedAt.toLocaleString(hi ? 'hi-IN' : undefined)}`,
     `${hi ? 'स्थान' : 'Place'}: ${result.placeLabel}`,
+    /* In number mode the lagna comes from the table, not the sky, so only the
+       latitude reaches the chart -- say so next to the place we printed. */
+    ...(result.mode === 'number'
+      ? [hi ? 'भाव अक्षांश से बनते हैं; देशान्तर से नहीं'
+            : 'latitude shapes the cusps; longitude does not']
+      : []),
     `${hi ? 'अयनांश' : 'Ayanamsa'}: ${result.mode === 'number' ? 'KP-New' : 'Lahiri'} · ${hi ? 'मध्यम राहु/केतु' : 'mean Rahu/Ketu'}`,
     `${hi ? 'भाव' : 'Houses'}: ${result.chart.system === 'placidus' ? 'Placidus' : 'Equal (high-latitude fallback)'}`,
     `${hi ? 'सन्दर्भ' : 'Source'}: K.S. Krishnamurti, KP Reader VI`,
@@ -893,7 +915,8 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         </div>
       </div>
       {isNum && <NumberSetBox info={result.info} favor={v.q.favor} hi={hi}
-        cuspLabel={hi ? `${v.q.cusp}वें` : englishOrdinal(v.q.cusp)} />}
+        cuspLabel={hi ? `${v.q.cusp}वें` : englishOrdinal(v.q.cusp)}
+        cuspIsAscendant={v.q.cusp === 1} />}
       <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
         {buildPlain(v, lang).map((r, i) => (
           <div key={i} style={{ fontSize: 14, lineHeight: 1.5,
@@ -907,6 +930,15 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
             ? `${result.askedAt.toLocaleString('hi-IN')} को ${result.placeLabel} से पूछा गया। प्रश्न का निर्णय उसी क्षण और स्थान के लिए होता है, जब और जहाँ से आप पूछते हैं।`
             : `Cast for ${result.askedAt.toLocaleString()} at ${result.placeLabel}. Prashna is judged for the moment you ask, at the place you ask from.`}
         </Gloss>
+        {/* The line above names a place; in number mode only its latitude reaches
+            the chart, so the caveat must sit with it in the DEFAULT flow -- not
+            nested in an override panel most users never open. */}
+        {isNum && (
+          <div style={{ fontSize: 11, color: TOKENS.muted, fontStyle: 'italic' }}>
+            {hi ? 'अंक विधि में आपका अंक ही लग्न तय करता है, इसलिए भावों का विभाजन केवल अक्षांश से बनता है — देशान्तर इस कुण्डली को नहीं बदलता।'
+                : 'In the number method your number fixes the ascendant, so only latitude shapes the house cusps — longitude does not change this chart.'}
+          </div>
+        )}
         {isNum && (
           <div style={{ marginTop: 4, padding: '9px 11px', background: TOKENS.amberSoft,
             borderRadius: TOKENS.radius, border: `1px solid ${TOKENS.line}`, fontSize: 11.5, color: TOKENS.muted, lineHeight: 1.5 }}>
@@ -1015,12 +1047,9 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                   boxSizing: 'border-box', background: TOKENS.bg, color: TOKENS.ink, fontSize: 14,
                   padding: '0 10px', border: `1.5px solid ${lonValid ? TOKENS.line : TOKENS.sindoor}` }} />
             </div>
-            {mode === 'number' && (
-              <div style={{ fontSize: 11, color: TOKENS.muted, fontStyle: 'italic' }}>
-                {hi ? 'अंक विधि में आपका अंक ही लग्न तय करता है, इसलिए भावों का विभाजन केवल अक्षांश से बनता है — देशान्तर इस कुण्डली को नहीं बदलता।'
-                    : 'In the number method your number fixes the ascendant, so only latitude shapes the house cusps — longitude does not change this chart.'}
-              </div>
-            )}
+            {/* The longitude-inert disclosure used to live here, inside the override
+                panel the default flow never opens. It now renders with every
+                number-mode result instead -- see the result block below. */}
             <input type="datetime-local" value={customWhen}
               onChange={e => { if (numberLocked) return; setCustomWhen(e.target.value); clearResult(); }}
               aria-label={hi ? 'निर्णय का समय' : 'Judgment time'}
@@ -1251,7 +1280,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                     : `Star/Sub = nakshatra lord / KP sub-lord — the two-level rulership Prashna reads. House = the house the planet occupies (${result.chart.system === 'placidus' ? 'Placidus cusps, the KP standard' : 'equal houses — high-latitude fallback'}). Positions: ${isNum ? 'KP-New ayanamsa (KP number method)' : 'Lahiri ayanamsa — the same conventions as Drik Panchang defaults'}, mean Rahu/Ketu.`}
                 </Gloss>
               </div>
-              <CuspalTable chart={result.chart} hi={hi} judgedCusp={v.q.cusp} />
+              <CuspalTable chart={result.chart} hi={hi} judgedCusp={v.q.cusp} mode={result.mode} />
               <SignificatorGrid chart={result.chart} hi={hi} />
             </div>
           )}
@@ -1267,8 +1296,14 @@ const PR_SCROLLER = { overflowX: 'auto', WebkitOverflowScrolling: 'touch' };
 const PR_TH = { padding: '4px 6px', textAlign: 'left', whiteSpace: 'nowrap' };
 const PR_TD = { padding: '5px 6px', whiteSpace: 'nowrap' };
 
-function CuspalTable({ chart, hi, judgedCusp }) {
+function CuspalTable({ chart, hi, judgedCusp, mode }) {
   const rows = PR_cuspalTable(chart);
+  /* Cusp 1 is special in number mode: it is not a computed real, it IS the 249
+     table's exact degree, and fmtDeg's rounding shows 31/249 of those one
+     arcminute low. Row 1 therefore formats like the Lagna chip; cusps 2-12 are
+     ordinary reals where fmtDeg is the right renderer. */
+  const degOf = r => (mode === 'number' && r.house === 1)
+    ? PR_fmtNumberDeg(r.deg) : fmtDeg(r.deg);
   return (
     <div style={{ marginTop: 14 }}>
       <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase',
@@ -1293,7 +1328,7 @@ function CuspalTable({ chart, hi, judgedCusp }) {
                 <tr key={r.house} style={{ borderTop: `1px solid ${TOKENS.line}`,
                   background: on ? TOKENS.goldSoft : 'transparent' }}>
                   <td style={{ ...PR_TD, fontWeight: on ? 700 : 400 }}>{r.house}</td>
-                  <td style={PR_TD}>{(hi ? RASHI_HI : RASHI_EN)[r.sign]} {fmtDeg(r.deg)}</td>
+                  <td style={PR_TD}>{(hi ? RASHI_HI : RASHI_EN)[r.sign]} {degOf(r)}</td>
                   <td style={PR_TD}>{(hi ? NAK_HI[r.nak.idx] : r.nak.en)}-{r.nak.pada}</td>
                   <td style={PR_TD}>{(hi ? GRAHA_HI : GRAHA_EN)[r.star]}</td>
                   <td style={{ ...PR_TD, fontWeight: on ? 700 : 400 }}>
@@ -1346,8 +1381,11 @@ function SignificatorGrid({ chart, hi }) {
         </table>
       </div>
       <Gloss>
-        {hi ? 'A = भाव में स्थित ग्रह के नक्षत्र में बैठे ग्रह · B = भाव में स्थित ग्रह · C = भावेश के नक्षत्र में बैठे ग्रह · D = भावेश। कृष्णमूर्ति पद्धति का चतुर्विध क्रम, बलक्रम में।'
-            : 'A = planets in the star of an occupant · B = occupants · C = planets in the star of the house owner · D = the owner. The KP four-fold order, strongest first.'}
+        {/* The engine scores A and C alike (±2) and B and D alike (±1). The legend
+            used to claim the classical A > B > C > D ranking, which would send a
+            moderator hand-scoring the verdict to a different number than the app. */}
+        {hi ? 'A = भाव में स्थित ग्रह के नक्षत्र में बैठे ग्रह · B = भाव में स्थित ग्रह · C = भावेश के नक्षत्र में बैठे ग्रह · D = भावेश। गणक का निर्णय A और C को B तथा D से अधिक भार देता है, न कि परम्परागत A > B > C > D क्रम से — सारणी समूह दिखाती है, क्रम नहीं।'
+            : "A = planets in the star of an occupant · B = occupants · C = planets in the star of the house owner · D = the owner. Ganak's verdict weights A and C above B and D, rather than the classical A > B > C > D — the grid shows the groups, not a ranking."}
       </Gloss>
     </div>
   );
@@ -1378,7 +1416,7 @@ function NumRow({ label, value, gloss }) {
 
 /* "What your number set" — the owner-approved answer-card detail box. Every
    jargon term carries a plain-language gloss (plans/prashna-249-ksk-verify.md). */
-function NumberSetBox({ info, favor, hi, cuspLabel }) {
+function NumberSetBox({ info, favor, hi, cuspLabel, cuspIsAscendant }) {
   const signName = hi ? RASHI_HI[info.sign] : RASHI_EN[info.sign];
   const nak = hi ? NAK_HI[info.nakshatra] : NAK_EN[info.nakshatra];
   const star = hi ? GRAHA_FULL_HI[info.starLord] : info.starLord;
@@ -1392,10 +1430,17 @@ function NumberSetBox({ info, favor, hi, cuspLabel }) {
       <NumRow label={hi ? 'राशि · Sign' : 'Sign'} value={signName} />
       <NumRow label={hi ? 'नक्षत्र · Star' : 'Star'} value={`${nak} · ${star}`}
         gloss={hi ? 'जिस नक्षत्र में अंक गिरा' : 'the star your number fell into'} />
+      {/* On the "Other question" topic the judged cusp IS cusp 1, so pointing the
+          reader at "the 1st cusp sub-lord" sends them to this very planet and reads
+          as a contradiction against the chip beside it. Say they are the same. */}
       <NumRow label={hi ? 'लग्न उप-स्वामी · Ascendant sub lord' : 'Ascendant sub-lord'} value={sub}
-        gloss={hi
-          ? `प्रश्न सच्चा है या नहीं, यह इससे देखा जाता है। हाँ/नहीं का निर्णय ${cuspLabel} भाव के उप-स्वामी से होता है।`
-          : `shows whether the question is genuine and ripens at all — the yes/no itself is read from the ${cuspLabel} cusp sub-lord`} />
+        gloss={cuspIsAscendant
+          ? (hi
+            ? 'आपका प्रश्न लग्न पर ही विचारा गया है, इसलिए हाँ/नहीं का निर्णय भी यही ग्रह देता है'
+            : 'your question is judged on the ascendant itself, so this same planet also carries the yes/no')
+          : (hi
+            ? `प्रश्न सच्चा है या नहीं, यह इससे देखा जाता है। हाँ/नहीं का निर्णय ${cuspLabel} भाव के उप-स्वामी से होता है।`
+            : `shows whether the question is genuine and ripens at all — the yes/no itself is read from the ${cuspLabel} cusp sub-lord`)} />
       <NumRow label={hi ? 'लग्न · Ascendant' : 'Ascendant'} value={`${signName} ${PR_fmtNumberDeg(info.signDeg)}`}
         gloss={hi ? 'जहाँ अंक ने कुण्डली स्थिर की' : 'where the number fixed your chart'} />
       <div style={{ borderTop: `1px solid ${TOKENS.line}`, marginTop: 4, paddingTop: 3 }}>

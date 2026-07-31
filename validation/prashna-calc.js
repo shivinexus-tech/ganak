@@ -235,9 +235,15 @@ function subLordOf(sidLonDeg) {
   for (const r of SUB_TABLE) if (s >= r.from - SUB_EPS && s < r.to - SUB_EPS) return r;
   return SUB_TABLE[SUB_TABLE.length - 1];
 }
+/* Mirror of PR_nakOf in src/screens/PrashnaScreen.tsx -- see the note there.
+   These two MUST stay behaviourally identical; validation/prashna-parity.js
+   proves it. */
+const NAK_ARCSEC = 48000;   // 13°20'
+const PADA_ARCSEC = 12000;  // 3°20'
 function nakOf(sidLonDeg) {
-  const idx = Math.floor(norm360(sidLonDeg) / (360/27)) % 27;
-  const pada = Math.floor((norm360(sidLonDeg) % (360/27)) / (360/108)) + 1;
+  const s = norm360(sidLonDeg) * 3600 + SUB_EPS;
+  const idx = Math.floor(s / NAK_ARCSEC) % 27;
+  const pada = Math.floor((s % NAK_ARCSEC) / PADA_ARCSEC) + 1;
   return { idx, pada, en: NAK_EN[idx], hi: NAK_HI[idx], lord: GRAHA[idx % 9] };
 }
 
