@@ -766,7 +766,10 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'time',
           placeLabel: castPlaceLabel });
       }
-      setShowFull(false);
+      /* Chart-first must survive a cast: in Astrologer view the chart, cuspal
+         table and significator grid are the point, so casting opens them rather
+         than collapsing back to the answer-first layout. */
+      setShowFull(chartFirst);
     } catch (e) {
       if (typeof console !== "undefined") console.error("prashna cast failed:", e);
       setError(hi ? "गणना नहीं हो सकी — कृपया पुनः प्रयास करें।" : "Couldn't complete the calculation — please try again.");
@@ -855,7 +858,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
       <PrashnaSecHead hiMode={hi} />
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
-        <button onClick={() => { setChartFirst(f => !f); setShowFull(true); }}
+        <button onClick={() => { const next = !chartFirst; setChartFirst(next); setShowFull(next); }}
           aria-pressed={chartFirst}
           style={{ minHeight: 32, padding: '4px 10px', borderRadius: TOKENS.radius,
             border: `1.5px solid ${chartFirst ? TOKENS.gold : TOKENS.line}`,
