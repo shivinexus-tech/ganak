@@ -420,6 +420,73 @@ function PR_significatorGrid(chart) {
   return rows;
 }
 
+/* Self-contained share card. Canvas rather than DOM-to-image so it needs no
+   external library and no CSP-relevant network fetch; 1080x1350 (4:5) is the
+   aspect chat clients preview without cropping the disclosures. */
+function PR_shareCardCanvas(result, hi) {
+  const W = 1080, H = 1350, PAD = 64;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const g = cv.getContext('2d');
+  const font = (px, weight) => `${weight || 400} ${px}px -apple-system, "Segoe UI", "Noto Serif Devanagari", "Eczar", sans-serif`;
+
+  g.fillStyle = '#FBF7EF'; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#B8860B'; g.fillRect(0, 0, W, 10);
+
+  let y = PAD + 40;
+  g.fillStyle = '#2A2419'; g.font = font(52, 700);
+  g.fillText(hi ? 'प्रश्न कुण्डली' : 'Prashna chart', PAD, y);
+
+  y += 46; g.font = font(26); g.fillStyle = '#7A6E58';
+  const q = hi ? result.verdict.q.hi : result.verdict.q.en;
+  const modeTxt = result.mode === 'number'
+    ? (hi ? `कृष्णमूर्ति पद्धति अंक ${result.number}` : `KP number method · #${result.number}`)
+    : (hi ? 'समय आधारित होरारी' : 'Time-based horary');
+  g.fillText(`${q} · ${modeTxt}`, PAD, y);
+
+  y += 56; g.strokeStyle = '#E3DACA'; g.lineWidth = 2;
+  g.beginPath(); g.moveTo(PAD, y); g.lineTo(W - PAD, y); g.stroke();
+
+  // Lagna + the deciding cuspal sub-lord -- the two numbers an astrologer reads first.
+  y += 54; g.fillStyle = '#2A2419'; g.font = font(30, 600);
+  const L = result.chart.lagna;
+  g.fillText(`${hi ? 'लग्न' : 'Lagna'}: ${(hi ? RASHI_HI : RASHI_EN)[L.sign]} ${fmtDeg(L.deg)}  ·  ${(hi ? NAK_HI[L.nak.idx] : L.nak.en)}-${L.nak.pada}`, PAD, y);
+  y += 42; g.fillStyle = '#9B2C2C';
+  g.fillText(`${result.verdict.q.cusp}${hi ? ' भाव उप-स्वामी' : ' cusp sub-lord'}: ${(hi ? GRAHA_HI : GRAHA_EN)[result.verdict.cuspSub]}`, PAD, y);
+
+  // Twelve cuspal sub-lords, two columns of six.
+  y += 58; g.fillStyle = '#7A6E58'; g.font = font(22, 600);
+  g.fillText(hi ? 'बारहों भावों के उप-स्वामी' : 'CUSPAL SUB-LORDS', PAD, y);
+  y += 12;
+  const rows = PR_cuspalTable(result.chart);
+  g.font = font(24); const colW = (W - PAD * 2) / 2, rowH = 42;
+  rows.forEach((r, i) => {
+    const col = i < 6 ? 0 : 1, row = i % 6;
+    const x = PAD + col * colW, ry = y + 38 + row * rowH;
+    g.fillStyle = r.house === result.verdict.q.cusp ? '#9B2C2C' : '#2A2419';
+    g.font = font(24, r.house === result.verdict.q.cusp ? 700 : 400);
+    g.fillText(`${String(r.house).padStart(2, ' ')}  ${(hi ? RASHI_HI : RASHI_EN)[r.sign]} — ${(hi ? GRAHA_HI : GRAHA_EN)[r.sub]}`, x, ry);
+  });
+  y += 38 + rowH * 6;
+
+  // Disclosures -- the transparency astrologers actually check.
+  y += 28; g.strokeStyle = '#E3DACA';
+  g.beginPath(); g.moveTo(PAD, y); g.lineTo(W - PAD, y); g.stroke();
+  y += 36; g.font = font(21); g.fillStyle = '#7A6E58';
+  const lines = [
+    `${hi ? 'समय' : 'Cast'}: ${result.askedAt.toLocaleString(hi ? 'hi-IN' : undefined)}`,
+    `${hi ? 'स्थान' : 'Place'}: ${result.placeLabel}`,
+    `${hi ? 'अयनांश' : 'Ayanamsa'}: ${result.mode === 'number' ? 'KP-New' : 'Lahiri'} · ${hi ? 'मध्यम राहु/केतु' : 'mean Rahu/Ketu'}`,
+    `${hi ? 'भाव' : 'Houses'}: ${result.chart.system === 'placidus' ? 'Placidus' : 'Equal (high-latitude fallback)'}`,
+    `${hi ? 'सन्दर्भ' : 'Source'}: K.S. Krishnamurti, KP Reader VI`,
+  ];
+  lines.forEach((t, i) => g.fillText(t, PAD, y + i * 32));
+
+  g.font = font(26, 700); g.fillStyle = '#B8860B';
+  g.fillText('Ganak · ganak.pages.dev', PAD, H - PAD);
+  return cv;
+}
+
 // ------------------------------------------------------------ UI PIECES
 function PrashnaSecHead({ hiMode }) {
   return (
@@ -1085,6 +1152,34 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               border: `1.5px solid ${TOKENS.line}`, background: TOKENS.card, color: TOKENS.ink,
               fontSize: 14, cursor: 'pointer' }}>
             {showFull ? (hi ? 'विवरण छिपाएँ' : 'Hide details') : (hi ? 'विस्तृत प्रश्न कुण्डली' : 'Full Prashna chart')}
+          </button>
+
+          {/* Shareable card: what a moderator drops into the group. Self-contained
+              PNG so it needs no chart-reading UI to travel -- the disclosures an
+              astrologer checks (ayanamsa, node type, house system, cast moment
+              and place) travel with the image itself. */}
+          <button onClick={async () => {
+            try {
+              const cv = PR_shareCardCanvas(result, hi);
+              const blob = await new Promise(res => cv.toBlob(res, 'image/png'));
+              const file = new File([blob], 'ganak-prashna.png', { type: 'image/png' });
+              if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({ files: [file] });
+              } else {
+                // Desktop and older browsers: download instead of share.
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'ganak-prashna.png'; a.click();
+                URL.revokeObjectURL(url);
+              }
+            } catch (e) {
+              if (typeof console !== 'undefined') console.error('share card failed:', e);
+            }
+          }}
+            style={{ marginTop: 8, height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
+              border: `1.5px solid ${TOKENS.gold}`, background: TOKENS.card, color: TOKENS.ink,
+              fontSize: 14, cursor: 'pointer', fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
+            {hi ? 'कुण्डली कार्ड साझा करें' : 'Share chart card'}
           </button>
 
           {showFull && (
