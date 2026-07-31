@@ -22,6 +22,18 @@ import { urlPrefGet, urlPrefPush, urlPrefSet } from "../components/url-prefs";
 import HolidayOverlayCard, { HolidayOverlaySelect } from "../components/HolidayOverlayCard";
 import { holidayDatesForYear, resolveHolidayMode } from "../data/india-holidays";
 
+export function isValidISODate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) return false;
+  const [y, m, d] = value.split("-").map(Number);
+  if (y < 100 || y > 9999) return false;
+  const parsed = new Date(Date.UTC(y, m - 1, d));
+  return parsed.getUTCFullYear() === y && parsed.getUTCMonth() + 1 === m && parsed.getUTCDate() === d;
+}
+
+function isoDate(y, m, d) {
+  return `${String(y).padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+}
+
 export default function DailyScreen({ C, card, lang, place, onPlace }) {
   const [ayanamsa] = useState("lahiri");
   const [regionalFlags,setRegionalFlags]=useState(DEFAULT_REGIONAL_CALENDAR_FLAGS);
@@ -36,11 +48,6 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
   const [holidayMode, setHolidayMode] = useState(() => resolveHolidayMode(urlPrefGet("hol")));
   const chooseCalendarMode = (value) => { const next = resolveConvention(value,regionalFlags); setCalendarState(next); urlPrefPush("cal", next.id); };
   const chooseHolidayMode = (value) => { const next = resolveHolidayMode(value); setHolidayMode(next); urlPrefPush("hol", next); };
-  useEffect(() => {
-    const restore=()=>{ setCalendarState(resolveConvention(urlPrefGet("cal"),regionalFlags)); setHolidayMode(resolveHolidayMode(urlPrefGet("hol"))); const date=urlPrefGet("date");setPanchDate(validDate(date)?date:todayISO); };
-    window.addEventListener("popstate",restore); return()=>window.removeEventListener("popstate",restore);
-  },[regionalFlags]);
-  useEffect(()=>{ let active=true; loadRegionalCalendarFlags().then(flags=>{ if(!active)return; setRegionalFlags(flags); setCalendarState(resolveConvention(urlPrefGet("cal"),flags)); }); return()=>{active=false;}; },[]);
   const todayISO = (() => {
     const nowU = new Date();
     let off = null;
@@ -48,11 +55,28 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
     const d = off == null ? new Date(Date.now() - nowU.getTimezoneOffset() * 60000) : new Date(Date.now() + off * 3600000);
     return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
   })();
-  const validDate=(value)=>/^\d{4}-\d{2}-\d{2}$/.test(value||"")&&!Number.isNaN(Date.parse(value+"T00:00:00Z"));
-  const [panchDate, setPanchDate] = useState(() => {const value=urlPrefGet("date");return validDate(value)?value:todayISO;});
-  const choosePanchDate=(value)=>{setPanchDate(value);urlPrefPush("date",value);};
-  const [calOpen, setCalOpen] = useState(false);
-  const [calYM, setCalYM] = useState(null);
+  const initialUrlDate = urlPrefGet("date");
+  const [panchDate, setPanchDate] = useState(() => isValidISODate(initialUrlDate) ? initialUrlDate : todayISO);
+  const [dateDraft, setDateDraft] = useState(() => initialUrlDate || todayISO);
+  const [dateError, setDateError] = useState(() => initialUrlDate && !isValidISODate(initialUrlDate) ? "invalid" : "");
+  const choosePanchDate=(value)=>{
+    if (!isValidISODate(value)) { setDateDraft(value); setDateError("invalid"); return false; }
+    setPanchDate(value); setDateDraft(value); setDateError(""); urlPrefPush("date",value); return true;
+  };
+  useEffect(() => {
+    const restore=()=>{
+      setCalendarState(resolveConvention(urlPrefGet("cal"),regionalFlags));
+      setHolidayMode(resolveHolidayMode(urlPrefGet("hol")));
+      const date=urlPrefGet("date");
+      if (isValidISODate(date)) { setPanchDate(date); setDateDraft(date); setDateError(""); }
+      else if (date) { setDateDraft(date); setDateError("invalid"); setCalYM(panchDate.slice(0, 7)); setCalOpen(true); }
+      else { setPanchDate(todayISO); setDateDraft(todayISO); setDateError(""); setCalOpen(false); }
+    };
+    window.addEventListener("popstate",restore); return()=>window.removeEventListener("popstate",restore);
+  },[regionalFlags]);
+  useEffect(()=>{ let active=true; loadRegionalCalendarFlags().then(flags=>{ if(!active)return; setRegionalFlags(flags); setCalendarState(resolveConvention(urlPrefGet("cal"),flags)); }); return()=>{active=false;}; },[]);
+  const [calOpen, setCalOpen] = useState(() => Boolean(initialUrlDate && !isValidISODate(initialUrlDate)));
+  const [calYM, setCalYM] = useState(() => initialUrlDate && !isValidISODate(initialUrlDate) ? panchDate.slice(0, 7) : null);
   const [calView, setCalView] = useState(null);
   const [expandedEvent, setExpandedEvent] = useState(null);
   const [, setClockTick] = useState(0);
@@ -63,7 +87,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
   const prevTodayRef = React.useRef(todayISO);
   useEffect(() => {
     if (prevTodayRef.current !== todayISO) {
-      if (panchDate === prevTodayRef.current) {setPanchDate(todayISO);urlPrefSet("date",todayISO);}
+      if (panchDate === prevTodayRef.current) {setPanchDate(todayISO);setDateDraft(todayISO);setDateError("");urlPrefSet("date",todayISO);}
       prevTodayRef.current = todayISO;
     }
   }, [todayISO, panchDate]);
@@ -123,15 +147,36 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
               const MOL = lang === "hi" ? ["जनवरी", "फ़रवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्तूबर", "नवंबर", "दिसंबर"] : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
               const wd = new Date(baseUTC).getUTCDay();
               const dateLabel = `${WD[wd]}, ${pd} ${MO[pm - 1]} ${py}`;
-              const iso = (y, m, d) => `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-              const step = (delta) => { const dt = new Date(baseUTC); dt.setUTCDate(dt.getUTCDate() + delta); choosePanchDate(iso(dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate())); };
-              const shiftMonth = (delta) => { const [cy, cm] = calYM.split("-").map(Number); const dt = new Date(Date.UTC(cy, cm - 1 + delta, 1)); setCalYM(`${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, "0")}`); };
-              const openCal = () => { setCalYM(panchDate.slice(0, 7)); setCalOpen(true); };
+              const step = (delta) => { const dt = new Date(baseUTC); dt.setUTCDate(dt.getUTCDate() + delta); choosePanchDate(isoDate(dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate())); };
+              const shiftMonth = (delta) => {
+                const [cy, cm] = calYM.split("-").map(Number);
+                const nextMonthIndex = cy * 12 + cm - 1 + delta;
+                const y = Math.floor(nextMonthIndex / 12), m = nextMonthIndex % 12 + 1;
+                if (y < 100 || y > 9999) return;
+                setCalYM(`${String(y).padStart(4, "0")}-${String(m).padStart(2, "0")}`);
+              };
+              const openCal = () => { setCalYM(panchDate.slice(0, 7)); setDateDraft(panchDate); setDateError(""); setCalOpen(true); };
+              const jumpMonth = (nextYear, nextMonth) => {
+                const y = Number(nextYear), m = Number(nextMonth);
+                if (!Number.isInteger(y) || y < 100 || y > 9999 || !Number.isInteger(m) || m < 1 || m > 12) {
+                  setDateError("year"); return;
+                }
+                setDateError("");
+                setCalYM(`${String(y).padStart(4, "0")}-${String(m).padStart(2, "0")}`);
+              };
+              const applyDraft = (currentValue = dateDraft) => {
+                if (choosePanchDate(currentValue)) {
+                  setCalYM(currentValue.slice(0, 7));
+                  setCalOpen(false);
+                }
+              };
               const arrowBtn = { width: 42, padding: 0, height: "100%", cursor: "pointer", border: "none", background: "transparent", color: C.gold, fontSize: 18, fontWeight: 400, lineHeight: 1, fontFamily: T.body };
-              let grid = null, hdr = "";
+              let grid = null, hdr = "", canPagePrevious = true, canPageNext = true;
               if (calOpen && calYM) {
                 const [cy, cm] = calYM.split("-").map(Number);
                 hdr = `${MOL[cm - 1]} ${cy}`;
+                canPagePrevious = !(cy === 100 && cm === 1);
+                canPageNext = !(cy === 9999 && cm === 12);
                 const startDow = new Date(Date.UTC(cy, cm - 1, 1)).getUTCDay();
                 grid = [];
                 for (let i = 0; i < 42; i++) { const dt = new Date(Date.UTC(cy, cm - 1, 1 - startDow + i)); grid.push({ y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate(), inMonth: dt.getUTCMonth() + 1 === cm }); }
@@ -152,17 +197,66 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                       <>
                         <div onClick={() => setCalOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 40 }} />
                         <div style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, zIndex: 41, background: C.panel, border: `1px solid ${C.line}`, borderRadius: 14, boxShadow: "0 14px 36px rgba(60,40,10,.17)", padding: 14, width: 318, maxWidth: "calc(100vw - 40px)" }}>
+                          <form onSubmit={(e) => { e.preventDefault(); applyDraft(e.currentTarget.elements.namedItem("panchangDate")?.value || ""); }} style={{ marginBottom: 12 }}>
+                            <label htmlFor="panchang-direct-date" style={{ display: "block", color: C.ivory, fontSize: 12.5, fontWeight: 600, marginBottom: 5 }}>
+                              {lang === "hi" ? "सीधे तारीख़ लिखें" : "Enter a date directly"}
+                            </label>
+                            <div style={{ display: "flex", gap: 6 }}>
+                              <input
+                                id="panchang-direct-date"
+                                name="panchangDate"
+                                type="date"
+                                min="0100-01-01"
+                                max="9999-12-31"
+                                value={dateDraft}
+                                onChange={(e) => { setDateDraft(e.target.value); setDateError(""); }}
+                                aria-invalid={Boolean(dateError)}
+                                aria-describedby={dateError ? "panchang-date-error" : undefined}
+                                style={{ height: T.ctrlH, flex: 1, border: `1px solid ${dateError ? C.sindoor : C.line}`, borderRadius: T.rMd, background: "#FFFDF7", color: C.ivory, padding: "0 9px", fontFamily: T.body, fontSize: 13 }}
+                              />
+                              <button type="submit" style={{ height: T.ctrlH, border: "none", borderRadius: T.rMd, padding: "0 12px", cursor: "pointer", background: C.gold, color: "#FFF8EC", fontFamily: T.body, fontSize: 13, fontWeight: 600 }}>
+                                {lang === "hi" ? "दिखाएँ" : "Go"}
+                              </button>
+                            </div>
+                            <div style={{ color: C.muted, fontSize: 10.5, marginTop: 4 }}>
+                              {lang === "hi" ? "दिन-महीना-वर्ष चुनें या YYYY-MM-DD लिखें" : "Choose day, month and year, or type YYYY-MM-DD"}
+                            </div>
+                            {dateError && <div id="panchang-date-error" role="alert" style={{ color: C.sindoor, fontSize: 11.5, marginTop: 4 }}>
+                              {dateError === "year"
+                                ? (lang === "hi" ? "100 से 9999 के बीच सही वर्ष लिखें।" : "Enter a valid year from 100 to 9999.")
+                                : (lang === "hi" ? "सही तारीख़ लिखें — जैसे 2026-10-20।" : "Enter a real date, for example 2026-10-20.")}
+                            </div>}
+                          </form>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                            <button onClick={() => shiftMonth(-1)} style={{ ...arrowBtn, padding: "4px 12px", fontSize: 18 }} aria-label="Previous month">‹</button>
-                            <span style={{ fontFamily: "Eczar, serif", fontSize: 16, color: C.ivory }}>{hdr}</span>
-                            <button onClick={() => shiftMonth(1)} style={{ ...arrowBtn, padding: "4px 12px", fontSize: 18 }} aria-label="Next month">›</button>
+                            <button disabled={!canPagePrevious} onClick={() => shiftMonth(-1)} style={{ ...arrowBtn, padding: "4px 12px", fontSize: 18, opacity: canPagePrevious ? 1 : .3, cursor: canPagePrevious ? "pointer" : "default" }} aria-label={lang === "hi" ? "पिछला महीना" : "Previous month"}>‹</button>
+                            <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                              <select
+                                value={String(Number(calYM.slice(5, 7)))}
+                                onChange={(e) => jumpMonth(calYM.slice(0, 4), e.target.value)}
+                                aria-label={lang === "hi" ? "महीना चुनें" : "Choose month"}
+                                style={{ height: 34, maxWidth: 112, border: `1px solid ${C.line}`, borderRadius: T.rSm, background: "#FFFDF7", color: C.ivory, padding: "0 5px", fontFamily: T.body, fontSize: 12 }}
+                              >
+                                {MOL.map((month, index) => <option key={month} value={index + 1}>{month}</option>)}
+                              </select>
+                              <input
+                                type="number"
+                                min="100"
+                                max="9999"
+                                inputMode="numeric"
+                                value={Number(calYM.slice(0, 4))}
+                                onChange={(e) => jumpMonth(e.target.value, calYM.slice(5, 7))}
+                                aria-label={lang === "hi" ? "वर्ष लिखें" : "Enter year"}
+                                style={{ width: 72, height: 34, border: `1px solid ${dateError === "year" ? C.sindoor : C.line}`, borderRadius: T.rSm, background: "#FFFDF7", color: C.ivory, padding: "0 5px", fontFamily: T.body, fontSize: 12 }}
+                              />
+                            </div>
+                            <button disabled={!canPageNext} onClick={() => shiftMonth(1)} style={{ ...arrowBtn, padding: "4px 12px", fontSize: 18, opacity: canPageNext ? 1 : .3, cursor: canPageNext ? "pointer" : "default" }} aria-label={lang === "hi" ? "अगला महीना" : "Next month"}>›</button>
                           </div>
                           <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 2, marginBottom: 3 }}>
                             {WD1.map((w, i) => <div key={i} style={{ textAlign: "center", fontSize: 10.5, color: C.muted, fontWeight: 600, padding: "3px 0" }}>{w}</div>)}
                           </div>
                           <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 2 }}>
                             {grid.map((c, i) => {
-                              const cIso = iso(c.y, c.m, c.d);
+                              const cIso = isoDate(c.y, c.m, c.d);
                               const isT = cIso === todayISO, isSel = cIso === panchDate;
                               const hasFest = calMarks.fest.has(cIso), hasFast = calMarks.fast.has(cIso), hasHoliday = calMarks.holiday.has(cIso);
                               return (
