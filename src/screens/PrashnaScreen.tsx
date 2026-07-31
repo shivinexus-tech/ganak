@@ -1047,9 +1047,17 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                   boxSizing: 'border-box', background: TOKENS.bg, color: TOKENS.ink, fontSize: 14,
                   padding: '0 10px', border: `1.5px solid ${lonValid ? TOKENS.line : TOKENS.sindoor}` }} />
             </div>
-            {/* The longitude-inert disclosure used to live here, inside the override
-                panel the default flow never opens. It now renders with every
-                number-mode result instead -- see the result block below. */}
+            {/* Also rendered with every number-mode result (see the result block).
+                It belongs in BOTH places: there, because the default flow never
+                opens this panel; here, because someone typing into the Longitude
+                field above deserves to be told it will not move their chart
+                before they spend time on it. */}
+            {mode === 'number' && (
+              <div style={{ fontSize: 11, color: TOKENS.muted, fontStyle: 'italic' }}>
+                {hi ? 'अंक विधि में आपका अंक ही लग्न तय करता है, इसलिए भावों का विभाजन केवल अक्षांश से बनता है — देशान्तर इस कुण्डली को नहीं बदलता।'
+                    : 'In the number method your number fixes the ascendant, so only latitude shapes the house cusps — longitude does not change this chart.'}
+              </div>
+            )}
             <input type="datetime-local" value={customWhen}
               onChange={e => { if (numberLocked) return; setCustomWhen(e.target.value); clearResult(); }}
               aria-label={hi ? 'निर्णय का समय' : 'Judgment time'}
