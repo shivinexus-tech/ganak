@@ -703,19 +703,19 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   const nTyped = numberInput === '' ? null : Number(numberInput);
   const numberIsValid = /^\d+$/.test(numberInput) && Number.isInteger(nTyped) &&
     nTyped >= KP_NUMBER_MIN && nTyped <= KP_NUMBER_MAX;
-  const numOutOfRange = numberInput !== '' && !numberIsValid; // F2/F8: live hint for every invalid value
+  const numOutOfRange = mode === 'number' && numberInput !== '' && !numberIsValid; // F2/F8: live hint for every invalid value
   const canAsk = selected && (mode === 'time' || numberIsValid);
 
   /* The Cast button was disabled with no explanation whenever no topic was
      chosen -- a valid number plus a dead button and no hint. Name the one thing
-     that is missing, in priority order. */
+     that is missing, in priority order. The out-of-range case is deliberately
+     absent: the inline warning under the number input already owns that message,
+     and showing it twice in two wordings is worse than showing it once. */
   const blockReason = !selected
     ? (hi ? 'ऊपर से प्रश्न का विषय चुनें' : 'Choose what your question is about, above')
     : (mode === 'number' && numberInput === '')
       ? (hi ? `1 से ${KP_NUMBER_MAX} के बीच एक अंक दें` : `Enter a number from 1 to ${KP_NUMBER_MAX}`)
-      : numOutOfRange
-        ? (hi ? `अंक 1 से ${KP_NUMBER_MAX} के बीच होना चाहिए` : `The number must be between 1 and ${KP_NUMBER_MAX}`)
-        : null;
+      : null;
 
   return (
     <div style={{ background: TOKENS.bg, minHeight: '100%', padding: 16, color: TOKENS.ink,
