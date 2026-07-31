@@ -703,7 +703,11 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   const nTyped = numberInput === '' ? null : Number(numberInput);
   const numberIsValid = /^\d+$/.test(numberInput) && Number.isInteger(nTyped) &&
     nTyped >= KP_NUMBER_MIN && nTyped <= KP_NUMBER_MAX;
-  const numOutOfRange = mode === 'number' && numberInput !== '' && !numberIsValid; // F2/F8: live hint for every invalid value
+  /* F2/F8: live hint for every invalid value. The `mode === 'number'` guard is
+     enforced here rather than at the call sites because the button's `disabled`
+     expression consumes this flag OUTSIDE the number-mode JSX block -- without it,
+     a leftover number left the time-mode button dead with no visible field to fix. */
+  const numOutOfRange = mode === 'number' && numberInput !== '' && !numberIsValid;
   const canAsk = selected && (mode === 'time' || numberIsValid);
 
   /* The Cast button was disabled with no explanation whenever no topic was
@@ -792,7 +796,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               background: numberLocked ? TOKENS.goldSoft : TOKENS.card, color: TOKENS.ink,
               fontSize: 18, textAlign: 'center', letterSpacing: '0.05em' }} />
           {numOutOfRange && !numberLocked && (
-            <div style={{ marginTop: 4, fontSize: 12, color: TOKENS.sindoor }}>
+            <div id="pr-num-range" style={{ marginTop: 4, fontSize: 12, color: TOKENS.sindoor }}>
               {hi ? `परम्परा 1 से ${KP_NUMBER_MAX} तक का अंक ही स्वीकारती है।` : `The tradition only takes a number from 1 to ${KP_NUMBER_MAX}.`}
             </div>
           )}
@@ -820,7 +824,10 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
       ) : (
         <>
           <button onClick={ask} disabled={!canAsk || numOutOfRange}
-            aria-describedby={blockReason ? 'pr-cast-block' : undefined}
+            /* The button must always say WHY it is disabled. `blockReason` covers the
+               missing-prerequisite cases; the out-of-range case is owned by the inline
+               warning beside the number field, so point at that instead of repeating it. */
+            aria-describedby={blockReason ? 'pr-cast-block' : numOutOfRange ? 'pr-num-range' : undefined}
             style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
               border: 'none', background: (canAsk && !numOutOfRange) ? TOKENS.ink : TOKENS.line,
               color: (canAsk && !numOutOfRange) ? TOKENS.bg : TOKENS.muted, fontSize: 15, fontWeight: 600,
