@@ -641,6 +641,26 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   // F1/F4/F5: a cast number session is LOCKED independently of `result`, so nothing that
   // merely clears the result (chip change, mode toggle) can silently re-enable a recast.
   const [locked, setLocked] = useState(false);
+  /* KP horary is cast for the moment and place of JUDGMENT. A moderator may be
+     judging from a different city than the app's inherited place, or judging a
+     question that arrived at a specific earlier moment. Default stays "here,
+     now" so the lay flow is untouched; the override is opt-in. */
+  const [useCustom, setUseCustom] = useState(false);
+  const [customLat, setCustomLat] = useState(String(lat));
+  const [customLon, setCustomLon] = useState(String(lon));
+  const [customPlace, setCustomPlace] = useState(placeLabel);
+  const [customWhen, setCustomWhen] = useState(''); // datetime-local, '' = now
+
+  const numOr = (s, fallback) => {
+    const n = Number(s);
+    return Number.isFinite(n) ? n : fallback;
+  };
+  const castLat = useCustom ? numOr(customLat, lat) : lat;
+  const castLon = useCustom ? numOr(customLon, lon) : lon;
+  const castPlaceLabel = useCustom ? (customPlace.trim() || placeLabel) : placeLabel;
+  const latValid = !useCustom || (numOr(customLat, NaN) >= -90 && numOr(customLat, NaN) <= 90);
+  const lonValid = !useCustom || (numOr(customLon, NaN) >= -180 && numOr(customLon, NaN) <= 180);
+  const placeValid = latValid && lonValid;
   // F9: the "New question" button appears in the exact tap target the "Cast" button
   // just vacated, so a phone double-tap on Cast would land its 2nd tap on New question
   // and wipe the just-cast answer. Record when the cast locked, and ignore a reset that
@@ -660,13 +680,19 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   };
   // F3: a cast answer is judged for one place — a place change clears it and reopens the
   // number session (a new place is a genuinely changed circumstance).
-  useEffect(() => { setResult(null); setError(null); setLocked(false); }, [lat, lon, placeLabel]);
+  useEffect(() => { setResult(null); setError(null); setLocked(false); },
+    [castLat, castLon, castPlaceLabel]);
 
   const ask = () => {
     setError(null);
     try {
       const q = QUESTIONS.find(x => x.key === selected) || QUESTIONS[QUESTIONS.length - 1];
-      const ms = Date.now();
+      const ms = (useCustom && customWhen) ? new Date(customWhen).getTime() : Date.now();
+      if (!Number.isFinite(ms)) {
+        setError(hi ? 'निर्णय का समय समझ नहीं आया — कृपया पुनः चुनें।'
+                    : "Couldn't read that judgment time — please pick it again.");
+        return;
+      }
       if (mode === 'number') {
         if (!/^\d+$/.test(numberInput)) {
           setError(hi
@@ -681,13 +707,15 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
             : `Please enter a whole number between ${KP_NUMBER_MIN} and ${KP_NUMBER_MAX} — that is what the tradition prescribes.`);
           return;
         }
-        const chart = PR_castNumber(ms, lat, lon, n);
-        setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'number', number: n, info: kpNumberInfo(n) });
+        const chart = PR_castNumber(ms, castLat, castLon, n);
+        setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'number',
+          number: n, info: kpNumberInfo(n), placeLabel: castPlaceLabel });
         setLocked(true);
         lockedAtRef.current = Date.now(); // F9: start the double-tap guard window
       } else {
-        const chart = PR_cast(ms, lat, lon);
-        setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'time' });
+        const chart = PR_cast(ms, castLat, castLon);
+        setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'time',
+          placeLabel: castPlaceLabel });
       }
       setShowFull(false);
     } catch (e) {
@@ -708,7 +736,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
      expression consumes this flag OUTSIDE the number-mode JSX block -- without it,
      a leftover number left the time-mode button dead with no visible field to fix. */
   const numOutOfRange = mode === 'number' && numberInput !== '' && !numberIsValid;
-  const canAsk = selected && (mode === 'time' || numberIsValid);
+  const canAsk = selected && placeValid && (mode === 'time' || numberIsValid);
 
   /* The Cast button was disabled with no explanation whenever no topic was
      chosen -- a valid number plus a dead button and no hint. Name the one thing
@@ -717,6 +745,9 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
      and showing it twice in two wordings is worse than showing it once. */
   const blockReason = !selected
     ? (hi ? 'ऊपर से प्रश्न का विषय चुनें' : 'Choose what your question is about, above')
+    : !placeValid
+      ? (hi ? 'अक्षांश −90 से 90, देशान्तर −180 से 180 के बीच होना चाहिए'
+            : 'Latitude must be −90 to 90 and longitude −180 to 180')
     : (mode === 'number' && numberInput === '')
       ? (hi ? `1 से ${KP_NUMBER_MAX} के बीच एक अंक दें` : `Enter a number from 1 to ${KP_NUMBER_MAX}`)
       : null;
@@ -761,6 +792,60 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
             ? 'अभी प्रश्न पूछें — इसी क्षण का आकाश उत्तर देता है। यह प्रश्न कुण्डली (होरारी ज्योतिष) है: जन्म विवरण की आवश्यकता नहीं, केवल पूछने का क्षण और स्थान।'
             : 'Ask a question now — the sky at this very moment answers it. This is Prashna (horary astrology): no birth details needed, only the moment and place of asking.')}
       </Gloss>
+
+      {/* Moment & place of judgment. Collapsed by default -- the lay flow reads
+          "here, now" and never opens this. KP practitioners need it because the
+          horary chart belongs to the judgment, not to the app's inherited city. */}
+      <div style={{ border: `1.5px solid ${TOKENS.line}`, borderRadius: TOKENS.radius,
+        background: TOKENS.card, padding: '8px 10px', marginBottom: 4 }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+          <input type="checkbox" checked={useCustom}
+            onChange={e => { setUseCustom(e.target.checked); clearResult(); }} />
+          <span style={{ fontSize: 13, fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
+            {hi ? 'निर्णय का समय और स्थान स्वयं चुनें' : 'Set the judgment moment & place myself'}
+          </span>
+        </label>
+        <div style={{ fontSize: 11.5, color: TOKENS.muted, marginTop: 3,
+          fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
+          {useCustom
+            ? (hi ? 'कुण्डली इसी क्षण और स्थान के लिए बनेगी।' : 'The chart will be cast for exactly this moment and place.')
+            : (hi ? `अभी: ${placeLabel} · इसी क्षण` : `Now: ${placeLabel} · this moment`)}
+        </div>
+        {useCustom && (
+          <div style={{ display: 'grid', gap: 6, marginTop: 8 }}>
+            <input value={customPlace} onChange={e => { setCustomPlace(e.target.value); clearResult(); }}
+              aria-label={hi ? 'स्थान का नाम' : 'Place name'}
+              placeholder={hi ? 'स्थान का नाम' : 'Place name'}
+              style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, boxSizing: 'border-box',
+                border: `1.5px solid ${TOKENS.line}`, background: TOKENS.bg, color: TOKENS.ink,
+                fontSize: 14, padding: '0 10px' }} />
+            <div style={{ display: 'flex', gap: 6 }}>
+              <input inputMode="decimal" value={customLat}
+                onChange={e => { setCustomLat(e.target.value); clearResult(); }}
+                aria-label={hi ? 'अक्षांश' : 'Latitude'} placeholder={hi ? 'अक्षांश' : 'Latitude'}
+                style={{ flex: 1, minWidth: 0, height: TOKENS.ctrlH, borderRadius: TOKENS.radius,
+                  boxSizing: 'border-box', background: TOKENS.bg, color: TOKENS.ink, fontSize: 14,
+                  padding: '0 10px', border: `1.5px solid ${latValid ? TOKENS.line : TOKENS.sindoor}` }} />
+              <input inputMode="decimal" value={customLon}
+                onChange={e => { setCustomLon(e.target.value); clearResult(); }}
+                aria-label={hi ? 'देशान्तर' : 'Longitude'} placeholder={hi ? 'देशान्तर' : 'Longitude'}
+                style={{ flex: 1, minWidth: 0, height: TOKENS.ctrlH, borderRadius: TOKENS.radius,
+                  boxSizing: 'border-box', background: TOKENS.bg, color: TOKENS.ink, fontSize: 14,
+                  padding: '0 10px', border: `1.5px solid ${lonValid ? TOKENS.line : TOKENS.sindoor}` }} />
+            </div>
+            <input type="datetime-local" value={customWhen}
+              onChange={e => { setCustomWhen(e.target.value); clearResult(); }}
+              aria-label={hi ? 'निर्णय का समय' : 'Judgment time'}
+              style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, boxSizing: 'border-box',
+                border: `1.5px solid ${TOKENS.line}`, background: TOKENS.bg, color: TOKENS.ink,
+                fontSize: 14, padding: '0 10px' }} />
+            <div style={{ fontSize: 11, color: TOKENS.muted, fontStyle: 'italic' }}>
+              {hi ? 'समय खाली छोड़ें तो अभी का क्षण लिया जाएगा। समय आपके उपकरण के समयक्षेत्र में पढ़ा जाता है।'
+                  : 'Leave the time blank to use this moment. Time is read in your device’s timezone.'}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Question chips */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, margin: '14px 0' }}>
@@ -883,8 +968,8 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               ))}
               <Gloss>
                 {hi
-                  ? `${result.askedAt.toLocaleString('hi-IN')} को ${placeLabel} से पूछा गया। प्रश्न का निर्णय उसी क्षण और स्थान के लिए होता है, जब और जहाँ से आप पूछते हैं।`
-                  : `Cast for ${result.askedAt.toLocaleString()} at ${placeLabel}. Prashna is judged for the moment you ask, at the place you ask from.`}
+                  ? `${result.askedAt.toLocaleString('hi-IN')} को ${result.placeLabel} से पूछा गया। प्रश्न का निर्णय उसी क्षण और स्थान के लिए होता है, जब और जहाँ से आप पूछते हैं।`
+                  : `Cast for ${result.askedAt.toLocaleString()} at ${result.placeLabel}. Prashna is judged for the moment you ask, at the place you ask from.`}
               </Gloss>
               {isNum && (
                 <div style={{ marginTop: 4, padding: '9px 11px', background: TOKENS.amberSoft,
