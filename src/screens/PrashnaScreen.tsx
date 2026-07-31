@@ -706,6 +706,17 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   const numOutOfRange = numberInput !== '' && !numberIsValid; // F2/F8: live hint for every invalid value
   const canAsk = selected && (mode === 'time' || numberIsValid);
 
+  /* The Cast button was disabled with no explanation whenever no topic was
+     chosen -- a valid number plus a dead button and no hint. Name the one thing
+     that is missing, in priority order. */
+  const blockReason = !selected
+    ? (hi ? 'ऊपर से प्रश्न का विषय चुनें' : 'Choose what your question is about, above')
+    : (mode === 'number' && numberInput === '')
+      ? (hi ? `1 से ${KP_NUMBER_MAX} के बीच एक अंक दें` : `Enter a number from 1 to ${KP_NUMBER_MAX}`)
+      : numOutOfRange
+        ? (hi ? `अंक 1 से ${KP_NUMBER_MAX} के बीच होना चाहिए` : `The number must be between 1 and ${KP_NUMBER_MAX}`)
+        : null;
+
   return (
     <div style={{ background: TOKENS.bg, minHeight: '100%', padding: 16, color: TOKENS.ink,
       fontFamily: "-apple-system, 'Segoe UI', sans-serif" }}>
@@ -807,13 +818,23 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
           {hi ? 'नया प्रश्न' : 'New question'}
         </button>
       ) : (
-        <button onClick={ask} disabled={!canAsk || numOutOfRange}
-          style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
-            border: 'none', background: (canAsk && !numOutOfRange) ? TOKENS.ink : TOKENS.line,
-            color: (canAsk && !numOutOfRange) ? TOKENS.bg : TOKENS.muted, fontSize: 15, fontWeight: 600,
-            cursor: (canAsk && !numOutOfRange) ? 'pointer' : 'default' }}>
-          {mode === 'number' ? (hi ? 'उत्तर देखें' : 'Cast the answer') : (hi ? 'अभी पूछें' : 'Ask now')}
-        </button>
+        <>
+          <button onClick={ask} disabled={!canAsk || numOutOfRange}
+            aria-describedby={blockReason ? 'pr-cast-block' : undefined}
+            style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
+              border: 'none', background: (canAsk && !numOutOfRange) ? TOKENS.ink : TOKENS.line,
+              color: (canAsk && !numOutOfRange) ? TOKENS.bg : TOKENS.muted, fontSize: 15, fontWeight: 600,
+              cursor: (canAsk && !numOutOfRange) ? 'pointer' : 'default' }}>
+            {mode === 'number' ? (hi ? 'उत्तर देखें' : 'Cast the answer') : (hi ? 'अभी पूछें' : 'Ask now')}
+          </button>
+          {blockReason && (
+            <div id="pr-cast-block" role="status" style={{ marginTop: 6, fontSize: 12.5,
+              color: TOKENS.muted, textAlign: 'center',
+              fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
+              {blockReason}
+            </div>
+          )}
+        </>
       )}
 
       {error && (
