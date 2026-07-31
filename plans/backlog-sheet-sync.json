@@ -759,7 +759,16 @@
     "58": {
       "section": "P0",
       "title": "Direct date entry and better Panchang date picker",
-      "technicalComplexity": "Medium"
+      "technicalComplexity": "Medium",
+      "deliveryState": "Publicly delivered — owner acceptance pending",
+      "limitations": "Technical delivery and mandatory independent bug bash are complete; owner live-URL sign-off remains. Native date-control chrome varies by browser/phone OS; supported civil years are 0100–9999.",
+      "shortTermImpact": "Users can directly reach past/future Panchang dates now; the row stays below 100% until the owner accepts the live interaction.",
+      "longTermImpact": "The permanent 15-check validator guards strict dates, history parity, bilingual labels and year boundaries; reopen if device-specific feedback reveals a native-picker issue.",
+      "bugBashStatus": "Completed 2026-07-30 · independent `/root/date_picker_bugbash`; four P1/P2 boundary findings fixed before deployment",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-30 · local EN/HI desktop + 320px browser; production asset at ganakapp.com commit 4a47bc5",
+      "sourceConfidence": "Not applicable — technical UX work",
+      "recommendedAction": "Owner: open Ganak Panchang, try one distant date, and approve the live interaction; then mark Done/100%."
     },
     "59": {
       "section": "P0",
