@@ -19,30 +19,28 @@ let pass = 0, fail = 0;
 const ok = (c, m) => { c ? pass++ : fail++; console.log(`${c ? 'PASS' : 'FAIL'}  ${m}`); };
 
 // 1. No bare "Sub-lord" / "उप-स्वामी" label survives -- every one is qualified.
-const bareEn = /label=\{[^}]*['"`]Sub[- ]?lord['"`]/g;
+const bareEn = /label=\{[^}]*['"`]Sub[- ]?lord['"`]/;
 ok(!bareEn.test(src), 'no readout is labelled a bare "Sub-lord"');
-const bareHi = /['"`]उप-स्वामी['"`]\s*\}/g;
+const bareHi = /(['"`])उप-स्वामी\1/;
 ok(!bareHi.test(src), 'no readout is labelled a bare "उप-स्वामी"');
 
 // 2. The ascendant sub-lord names the ascendant.
 ok(/Ascendant sub-lord|लग्न उप-स्वामी/.test(src),
   'the 249-table sub-lord is labelled as the ASCENDANT sub-lord');
 
-// 3. A deciding-vote claim must never attach to the ASCENDANT sub-lord. That is
-//    the regression this gate exists to catch: the answer card once claimed the
-//    "final yes or no" for the 249-table ascendant sub-lord while the chip
-//    claimed the "deciding vote" for the question-cusp sub-lord, and the two
-//    contradicted in 82.5% of number x topic combinations.
-//    Deliberately NOT a proximity check against cuspSub: JSX splits an element
-//    across sibling prop lines, so line distance proves nothing. Assertion 4
-//    (the phrase never appears inside NumberSetBox) is the companion safeguard.
+// 3. No function that derives the ASCENDANT sub-lord may also claim the
+//    deciding vote. Block-scoped, not line-scoped, on purpose: the original bug
+//    read `const sub = ... info.subLord` and then claimed "the final yes or no"
+//    several lines later inside a JSX prop, so no single line carried both. A
+//    same-line test passes against the very bug this gate exists to catch.
 const DECIDING = /deciding vote|final yes or no|निर्णायक मत|अंतिम निर्णय/;
-const ASC_SOURCE = /info\.subLord|info\.starLord|lagna\.sub|lagna\.star/;
-const misattached = src.split('\n')
-  .map((line, i) => ({ line, n: i + 1 }))
-  .filter(({ line }) => DECIDING.test(line) && ASC_SOURCE.test(line));
+const ASC_SOURCE = /info\.subLord|info\.starLord|lagna\.sub\b|lagna\.star\b/;
+const blocks = src.split(/^(?=function\s+\w+)/m);
+const misattached = blocks
+  .filter(b => ASC_SOURCE.test(b) && DECIDING.test(b))
+  .map(b => (b.match(/^function\s+(\w+)/) || [null, '<module scope>'])[1]);
 ok(misattached.length === 0,
-  `no deciding-vote claim attaches to the ascendant sub-lord (offenders: ${misattached.map(s => s.n).join(', ') || 'none'})`);
+  `no ascendant-sub-lord block claims the deciding vote (offenders: ${misattached.join(', ') || 'none'})`);
 
 // 4. The ascendant sub-lord must NOT claim it -- KP gives the deciding vote to
 //    the cuspal sub-lord of the house judged.

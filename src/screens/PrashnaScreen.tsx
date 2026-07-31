@@ -844,7 +844,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               </div>
             </div>
             {isNum && <NumberSetBox info={result.info} favor={v.q.favor} hi={hi}
-              cuspLabel={hi ? String(v.q.cusp) : englishOrdinal(v.q.cusp)} />}
+              cuspLabel={hi ? `${v.q.cusp}वें` : englishOrdinal(v.q.cusp)} />}
             <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
               {buildPlain(v, lang).map((r, i) => (
                 <div key={i} style={{ fontSize: 14, lineHeight: 1.5,
@@ -905,7 +905,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                 <PrashnaChip label={hi ? 'नक्षत्र' : 'Nakshatra'} value={`${hi ? NAK_HI[result.chart.lagna.nak.idx] : result.chart.lagna.nak.en}-${result.chart.lagna.nak.pada}`}
                   gloss={hi ? 'उदित अंश जिस चन्द्र-नक्षत्र में पड़ता है' : 'the lunar mansion the rising degree falls in'} />
                 <PrashnaChip
-                  label={hi ? `${v.q.cusp} भाव उप-स्वामी` : `${englishOrdinal(v.q.cusp)} cusp sub-lord`}
+                  label={hi ? `${v.q.cusp}वें भाव उप-स्वामी` : `${englishOrdinal(v.q.cusp)} cusp sub-lord`}
                   value={hi ? GRAHA_HI[v.cuspSub] : GRAHA_EN[v.cuspSub]}
                   gloss={hi
                     ? 'जिस भाव पर प्रश्न है उसका सूक्ष्म स्वामी — कृष्णमूर्ति पद्धति में यही निर्णायक मत देता है'
