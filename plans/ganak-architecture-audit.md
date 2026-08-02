@@ -1,5 +1,27 @@
 # Ganak — Architecture & Data-Model Audit
 
+> ## ⚠️ CORRECTION — 2026-08-02, read this before §1.5, §1.7 and §5 Decisions 4–5
+>
+> **Parts of this audit were read from a stale working tree and are wrong.** The tree
+> changed under the audit mid-session (a live multi-agent repo), so the sections below
+> mix two different states. Corrected findings, all re-verified on the current HEAD:
+>
+> | Original claim | Actual state |
+> |---|---|
+> | "no colour tokens; palette defined twice; 80 hex values" | **WRONG.** [`src/styles/design-tokens.css`](src/styles/design-tokens.css) (239 lines) is a full semantic token system. [`src/components/ui-primitives.tsx`](src/components/ui-primitives.tsx) (249 lines) ships `Card`/`SectionHeader`/`Badge`/`DataRow`. [`validation/design-system-primitives.cjs`](validation/design-system-primitives.cjs) enforces **zero raw hex across all of `src/`** in 202 checks. Backlog #46 landed 2026-08-01 (`e81f69e`). |
+> | "no storage layer; storage rule contradicts requirements §11" | **WRONG — already resolved.** [`src/storage/approved-storage.ts`](src/storage/approved-storage.ts) exists with exactly the two stores this audit "recommended" (`preferences`, `savedCharts`), and `parse-check.js` enforces that no other file touches browser storage. **Decision 4 below was already made and implemented.** |
+> | "`window.storage` is the storage strategy" | **Half right.** The adapter exists, but **2 call sites were never migrated** — [`ChartVault.tsx:9`](src/components/ChartVault.tsx:9) and [`MuhuratHub.tsx:151-152`](src/screens/MuhuratHub.tsx:151) still call the non-existent `window.storage`. Saved charts and the saved tradition still silently no-op in production. The bug is real; the cause given below is not. |
+> | SEO / prerender / og:image / sitemap / robots findings (§1.2) | **CONFIRMED STILL TRUE** on current HEAD. `vite.config.ts` is still 6 lines; no `robots.txt`, no `sitemap.xml`, no `og:image` anywhere. **The #1 finding stands.** |
+> | "346 inline `lang === "hi"` ternaries" | **Understated — now 417.** Getting worse, not better. |
+> | "1,405 inline `style={{}}`" | Now 1,520 — but they no longer carry raw colours, so this is a much smaller problem than stated. |
+>
+> **Residual, verified:** 7 files still contain raw hex; **24 files still use the old
+> prop-drilled `C.gold`/`C.ivory` palette** alongside the new token system. The migration
+> is real but incomplete.
+>
+> **See [`ganak-gate-decay-rootcause.md`](ganak-gate-decay-rootcause.md)** for why a
+> 202-check gate exists, runs in CI, is currently failing, and shipped to production anyway.
+
 **Date:** 2026-07-30 · **Author:** Claude Code · **Type:** read-only audit, no code changed
 **Scope:** rendering model, data/domain model, state, module boundaries, build/deploy,
 structural bug patterns — assessed against the business goals in
