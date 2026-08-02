@@ -11,8 +11,18 @@ transition. Benchmark: Drik Panchang. Goal: beat it.
 Vite + React scaffold; `npm install` then `npm run dev` (Node 18+).
 
 **Design principle: answer-before-data.** A plain-language verdict always renders
-before the technical chart. Users are observant householders and curious diaspora,
-not practising astrologers. Every jargon term gets a plain-English gloss.
+before the technical chart. Every jargon term gets a plain-English gloss.
+
+**Audience — two segments, both real (owner, 2026-07-30; see
+`plans/ganak-redesign-requirements.md`).** Reach comes from observant householders
+and curious diaspora on the **free Panchang**. **Revenue comes from the serious
+Jyotish learner and, above all, the working practising astrologer** — the bankable
+payer, who expenses it as a business cost (§ "Jyotish willingness-to-pay"). Panchang
+free, Jyotish the paid depth/workspace layer; both launch under one Ganak nav.
+Answer-before-data serves the householder; it must never cap the depth, precision or
+range the practitioner needs. Do not plan as though practitioners are out of scope —
+without them Ganak is a calendar app competing with Drik Panchang on SEO, which is
+unwinnable and unmonetised.
 
 **Owner's standing UX principles (2026-07-17):** plain-language messages that help
 navigation; no state resets without a user action; the user must always be able to

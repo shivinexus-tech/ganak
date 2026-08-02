@@ -475,6 +475,23 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         Upanayana, with tradition and regional conventions stated.
   - [ ] Birth-chart-personalized Muhurat only after its method is sourced and
         validated; never silently mix natal filtering into the general finder.
+        **Built and deployed 2026-08-02** on its own route `/muhurat/personal` (owner chose
+        a dedicated screen over an inline MuhuratHub panel, so the in-review finder was
+        never touched). Opt-in only: with no birth details the general finder result renders
+        unchanged behind an explicit prompt — the "never silently mix" rule is structural,
+        not a convention. **Sourced method:** Tarabala + Chandrabala are the two hard filters
+        (they alone remove a day); Moon Bhinnashtakavarga bindus rank but never remove. All
+        three reuse already-shipped engines (`daily-windows.ts`, `classical.ts`), so
+        `muhurat.ts` is untouched. A `<3`-survivor fallback switches to annotate-only so the
+        list can never strand the user. **Honest provenance:** the owner-requested Adhanadi
+        special-nakshatra set {1,10,16,18,22,25} ships as a *labelled personal tradition, not
+        a classical muhurta rule* — it marks a day, never removes one — because the
+        primary-text hunt came back negative and found the technique documented for
+        transit/gochara rather than muhurta election (spec §3.1). Gate
+        `validation/personal-muhurat.cjs` (TDD + prove-the-guard); all canonical gates and
+        the production build re-run green after rebasing onto the design-system work. Spec:
+        `docs/superpowers/specs/2026-07-25-personal-muhurat-design.md`.
+        **Stays unchecked until:** owner live-URL sign-off and the two-agent bug bash.
   - [ ] Save/share/export the chosen Muhurat and create calendar reminders.
   - [x] Surgery/medical Muhurat under the separate Claude research brief
         `plans/claude-task-surgery-medical-muhurat.md`. It is strictly for optional
