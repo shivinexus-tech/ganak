@@ -27,6 +27,25 @@ Mandir personalizes by deity with wide language reach. Result: we miss the regio
 4. **Sourcing bar:** every aarti **cross-checked against ≥5 authentic sources** (DrikPanchang,
    Sri Mandir, reputable news/lyric sites, + a native-language source for regional scripts).
 5. **Reach all** audiences (diaspora + urban-India); learn, then pivot. **Audio deprioritised.**
+6. **Retroactive scope (2026-08-02):** of the 14 shipped Hindi aartis, **re-verify/correct only
+   Kunj Bihari** (the one with a caught error — now structurally fixed; do a final 5-source pass).
+   The other 13 stay as-is. The **≥5-source rule applies to all new aartis + all regional versions.**
+7. **Regional humility disclaimer + feedback box (2026-08-02):** every Marathi/Bengali/Gujarati
+   aarti page shows a special disclaimer — *"While we are trying our best, there may still be
+   errors in rendering. Please forgive us, and help us by correcting the wrong word"* — with a
+   **feedback input box** to submit the correction. This turns the native-accuracy risk into a
+   crowdsourced correction loop.
+8. **Completion rule (2026-08-02):** regional aarti work may be marked **95% complete** once build,
+   gate, render, disclaimer and feedback box are all done; the owner's **native review is the final
+   5%** (→ 100%). Ship at 95% (staged/live per the phasing), close to 100% after review.
+
+## Scope — per-language counts (planning, 2026-08-02)
+
+Net-new **region-distinct** aartis (before transliteration): **Marathi ~8–12** (Devanagari, lower
+risk), **Bengali ~6–10** (Durga/Kali focus; different script), **Gujarati ~8–12** (Jai Adya Shakti
++ core; different script) → **~22–34 native aartis.** "Both" adds transliterated pan-Indian
+renderings on top (ceiling = existing 14 + Phase-2 ~20 per language). Build native first; add
+transliterations by demand.
 
 ## Goals (measurable)
 
@@ -118,6 +137,19 @@ authentic sources** (DrikPanchang, Sri Mandir, ≥2 reputable news/lyric sites, 
   Bengali Unicode block), or Latin leaks into a native-script body.
 - [ ] Orthography rules per script applied (ॐ not ओम् for Devanagari; equivalent per script).
 
+**R3.5 — Regional humility disclaimer + correction feedback box.** Every non-Hindi rendering
+(mr/bn/gu) displays a short disclaimer and a way to report a wrong word — because we cannot
+natively guarantee regional-script accuracy, and the regional community *is* our proof-reader.
+*Acceptance:*
+- [ ] When an aarti is viewed in a regional language, a disclaimer shows near the verses:
+  EN "While we are trying our best, there may still be errors in rendering. Please forgive us,
+  and help us by correcting the wrong word." + a native-language equivalent.
+- [ ] A **feedback input box** (or "suggest a correction" control) captures the correction with
+  context (aarti slug + language + the user's text) and delivers it to the owner (endpoint/email —
+  see Open Questions), with a thank-you confirmation; no PII required.
+- [ ] The disclaimer/box appears **only** for regional languages, not for the Hindi rendering.
+- [ ] Submissions are rate-limited/spam-guarded at a basic level; failures degrade gracefully.
+
 **R4 — Vertical slice proven end-to-end.** Ship the model + toggle + gate on a small,
 representative set spanning all three new languages and both content types:
 - Ganesh: `hi` (have) + **`mr` native (Sukhkarta Dukhharta)** + `bn`/`gu` transliterated.
@@ -155,13 +187,13 @@ evaluate at 1 week, 1 month, 1 quarter; **pivot** on which languages/aartis actu
 
 ## Open Questions
 
-- **[owner]** Does the ≥5-source rule apply **retroactively** to the 14 shipped Hindi aartis, or
-  only to new/regional ones? (Blocking for scope sizing.)
-- **[owner/content]** **Native-script accuracy without a native reviewer is the biggest risk.**
-  Bengali/Gujarati text assembled from sources (the fetch tool refuses verbatim lyrics; we rely on
-  search snippets + cross-validation) needs a **native-language sanity check** before Green. Do we
-  have a Bengali/Gujarati reviewer, or does owner skim suffice with the ≥5-source + script-range
-  gate as the safety net? (Blocking for bn/gu GA.)
+- **[RESOLVED 2026-08-02]** Retroactive scope → **Kunj Bihari only**; ≥5-source rule applies to new
+  + all regional versions.
+- **[RESOLVED 2026-08-02]** Native-review risk → mitigated by the **regional disclaimer + feedback
+  box (R3.5)**, ≥5 sources incl. native, and the script-range gate; **owner native review is the
+  final 5%** (work marks 95% without it). A community feedback loop replaces a dedicated reviewer.
+- **[eng]** Where does the **correction feedback** land — a lightweight endpoint, the owner's email,
+  or a stored event queue? Must be spam-guarded and PII-free. (Blocking for R3.5 build.)
 - **[content/eng]** Transliteration method for the "same aarti transliterated": prefer a
   **source-published** regional version where one exists (DrikPanchang Marathi, etc.); only where
   none exists, use verified Indic script-conversion (never raw machine output). Confirm this order.

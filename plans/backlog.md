@@ -417,6 +417,32 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         the initial HTML (verified via `curl`/`view-source`, no JS); Lighthouse SEO and a
         crawler-view check pass; `canonical-deployment.cjs` and existing gates stay green;
         no regression to client interactivity/hydration. _(INFRA-SPA-PRERENDER; owner scope 2026-08-01)_
+  - [ ] **P2-FESTIVAL-AARTI-MULTILANG — Marathi / Bengali / Gujarati aartis.** Add regional-language
+        aartis, **both** native region texts (Marathi *Sukhkarta Dukhharta*, Bengali Durga/Kali,
+        Gujarati *Jai Adya Shakti* …) **and** transliterated pan-Indian ones, chosen via a
+        **per-aarti language toggle** independent of the app's EN/HI. PRD:
+        `docs/superpowers/specs/2026-08-01-aarti-multilang-phase2-prd.md`. Scope: ~8–12 Marathi,
+        ~6–10 Bengali, ~8–12 Gujarati native aartis (+ transliterations by demand). **Every aarti ×
+        language cross-checked against ≥5 authentic sources** (DrikPanchang, Sri Mandir, ≥2 news/
+        lyric sites, **≥1 native-language source** for mr/bn/gu). **Every regional page shows the
+        humility disclaimer + a "suggest a correction" feedback box** (native accuracy can't be
+        self-verified → crowdsource it). **Acceptance:** multi-lang data model (`langs:{hi,mr,bn,gu}`)
+        with Phase-1 aartis migrated no-visual-change; per-aarti toggle shows only available
+        languages, remembers choice, correct fonts, no 375px overflow; `festival-aarti.cjs` extended
+        to enforce ≥5 sources/lang + script-range per language + Latin-leak reject; disclaimer +
+        feedback box live on every regional rendering; vertical slice (Ganesh mr-native + bn/gu,
+        Durga bn-native) green + built. **Marathi ships confidently (Devanagari); Bengali/Gujarati
+        staged behind owner native review** (see review task). **Completion rule: mark 95% when
+        build/gate/render/disclaimer/feedback done; owner native review is the final 5% → 100%.**
+        Depends on P2-FESTIVAL-AARTI-FINDER for standalone regional URLs. _(P2-FESTIVAL-AARTI-MULTILANG; owner scope 2026-08-02)_
+  - [ ] **OWNER-AARTI-REGIONAL-REVIEW — owner native review of mr/bn/gu aartis (final 5%).** The
+        Bengali/Gujarati (different-script) and Marathi aartis need a native-eye pass the tools and
+        the owner's Hindi skim can't fully give. **Owner (or a native reviewer the owner lines up)**
+        reads each regional aarti for spelling/conjunct/wording errors before it moves 95% → 100%.
+        Crowdsourced corrections from the in-app feedback box feed this. **Acceptance:** each shipped
+        regional aarti has an owner/native sign-off recorded; corrections applied + redeployed;
+        status advanced to 100%. Until then those aartis stay at **95%** (live per phasing, flagged).
+        _(OWNER-AARTI-REGIONAL-REVIEW; owner action; owner scope 2026-08-02)_
   - [ ] **P0 owner-quality reset — audit and rewrite every festival/fast page.**
         Owner rejected the current festival and fast page quality on 2026-07-24;
         previous automated route/profile/katha gates no longer count as quality

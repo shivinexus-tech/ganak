@@ -441,7 +441,9 @@
         50,
         51,
         52,
-        53
+        53,
+        60,
+        61
       ]
     },
     {
@@ -807,6 +809,16 @@
       "section": "P0",
       "title": "Global site search and guided “find what I need” input",
       "technicalComplexity": "High"
+    },
+    "60": {
+      "section": "P2",
+      "title": "Aarti multi-language (Marathi/Bengali/Gujarati)",
+      "technicalComplexity": "High"
+    },
+    "61": {
+      "section": "P2",
+      "title": "Owner native review of regional aartis (aarti final 5%)",
+      "technicalComplexity": "Low"
     }
   }
 }
