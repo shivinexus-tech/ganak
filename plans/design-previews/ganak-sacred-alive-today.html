@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ganak · Sacred Bouquet Today</title>
+  <script>if (new URLSearchParams(location.search).get("mode") === "dark") document.documentElement.dataset.colorMode = "dark";</script>
+  <link rel="stylesheet" href="../../src/styles/design-tokens.css" />
+  <style>
+    * { box-sizing: border-box; }
+    html { background: color-mix(in srgb, var(--bg), var(--ink) 7%); }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 50% 0%, var(--surface), transparent 42%), var(--bg); }
+    .gallery { display: flex; align-items: flex-start; justify-content: center; gap: 3rem; padding: 3rem; min-width: max-content; }
+    .study { width: 22.94rem; }
+    .study-label { margin: 0 0 .75rem; color: var(--accent); font: 600 .75rem/1 var(--font-body-family); letter-spacing: .14em; text-transform: uppercase; }
+    .device { position: relative; width: 22.94rem; overflow: hidden; border: .0625rem solid var(--line); border-radius: 2rem; background: var(--bg); color: var(--ink); box-shadow: var(--elevation-3); }
+    .device::before { content: ""; position: absolute; inset: .35rem; z-index: 10; pointer-events: none; border: .0625rem solid color-mix(in srgb, var(--gold), transparent 35%); border-radius: 1.7rem; }
+    .screen { padding: 1.15rem 1rem 0; }
+    .topline { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .9rem; }
+    .brand { display: flex; align-items: center; gap: .55rem; }
+    .brand-mark { display: grid; place-items: center; width: 2rem; height: 2rem; border: .0625rem solid var(--gold); border-radius: 50%; color: var(--gold); background: var(--surface); font: 600 1.05rem/1 var(--font-display-family); box-shadow: var(--elevation-1); }
+    .brand strong { display: block; font: 700 1.28rem/1 var(--font-display-family); color: var(--ink); }
+    .brand small { display: block; margin-top: .18rem; color: var(--muted); font: 600 .58rem/1 var(--font-body-family); letter-spacing: .13em; text-transform: uppercase; }
+    .quiet-action { border: .0625rem solid var(--line); border-radius: 999rem; padding: .42rem .68rem; color: var(--accent); background: var(--surface); font: 600 .7rem/1 var(--font-body-family); }
+    .frame { display: flex; justify-content: space-between; align-items: end; gap: 1rem; padding: .15rem .15rem .8rem; }
+    .frame .place { color: var(--muted); font: 600 .72rem/1.2 var(--font-body-family); }
+    .frame .date { margin-top: .22rem; font: 600 .96rem/1.2 var(--font-display-family); }
+    .frame .calendar { color: var(--gold); font: 600 .65rem/1.2 var(--font-body-family); text-align: right; }
+    .lead { margin: 0 0 .75rem; padding: .72rem .85rem; border-block: .0625rem solid var(--line); color: var(--ink); font: 600 .86rem/1.35 var(--font-body-family); text-align: center; }
+    .lead b { color: var(--accent); }
+    .hero { overflow: hidden; border: .0625rem solid var(--line); border-radius: 1.15rem; background: var(--surface); box-shadow: var(--elevation-2); }
+    .hero-art { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--surface); }
+    .hero-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-art::after { content: ""; position: absolute; inset: auto 0 0; height: 18%; background: linear-gradient(transparent, color-mix(in srgb, var(--ink), transparent 55%)); }
+    .hero-copy { position: relative; padding: .9rem .95rem 1rem; }
+    .hero-copy::before, .hero-copy::after { content: "✦"; position: absolute; top: .62rem; color: var(--gold); font-size: .62rem; }
+    .hero-copy::before { left: .45rem; } .hero-copy::after { right: .45rem; }
+    .eyebrow { color: var(--accent); font: 700 .67rem/1 var(--font-body-family); letter-spacing: .11em; text-transform: uppercase; }
+    .hero h1 { margin: .34rem 0 .18rem; color: var(--ink); font: 700 1.48rem/1.16 var(--font-display-family); text-wrap: balance; }
+    .deva { display: block; color: var(--accent); font-size: 1.08rem; margin-top: .12rem; }
+    .meaning { margin: .38rem 0 .7rem; color: var(--muted); font: 400 .86rem/1.45 var(--font-body-family); }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .42rem; }
+    .chip { display: inline-flex; align-items: center; gap: .28rem; min-height: 1.85rem; border: .0625rem solid var(--line); border-radius: 999rem; padding: .32rem .62rem; background: var(--bg); color: var(--ink); font: 600 .67rem/1 var(--font-body-family); }
+    .chip.sacred { border-color: var(--accent); color: var(--accent); }
+    .chip.listen { margin-left: auto; border-color: var(--gold); color: var(--gold); background: var(--surface); }
+    .now-title { margin: 1rem .15rem .48rem; color: var(--muted); font: 700 .63rem/1 var(--font-body-family); letter-spacing: .13em; text-transform: uppercase; }
+    .now { display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border: .0625rem solid var(--line); border-radius: .95rem; background: var(--surface); box-shadow: var(--elevation-1); }
+    .window { min-height: 4.45rem; padding: .72rem .78rem; }
+    .window + .window { border-left: .0625rem solid var(--line); }
+    .window .state { display: flex; align-items: center; gap: .28rem; font: 700 .66rem/1 var(--font-body-family); }
+    .window.good .state { color: var(--good); } .window.bad .state { color: var(--bad); }
+    .window strong { display: block; margin: .38rem 0 .18rem; font: 600 .84rem/1.15 var(--font-display-family); }
+    .window time { color: var(--muted); font: 600 .7rem/1 var(--font-body-family); font-variant-numeric: tabular-nums; }
+    .nakshatra { display: flex; align-items: center; gap: .5rem; margin: .6rem .15rem 0; color: var(--muted); font: 400 .73rem/1.35 var(--font-body-family); }
+    .nakshatra i { color: var(--gold); font-style: normal; }
+    .section-title { display: flex; align-items: center; gap: .55rem; margin: 1.15rem .15rem .58rem; color: var(--accent); font: 700 .68rem/1 var(--font-body-family); letter-spacing: .11em; text-transform: uppercase; }
+    .section-title::after { content: ""; height: .0625rem; flex: 1; background: var(--line); }
+    .cards { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; }
+    .card { min-height: 6.15rem; padding: .78rem; border: .0625rem solid var(--line); border-radius: .9rem; background: var(--surface); box-shadow: var(--elevation-1); }
+    .card.wide { grid-column: 1 / -1; min-height: auto; }
+    .card-label { color: var(--muted); font: 700 .61rem/1 var(--font-body-family); letter-spacing: .09em; text-transform: uppercase; }
+    .card h2 { margin: .42rem 0 .22rem; color: var(--ink); font: 600 .94rem/1.22 var(--font-display-family); }
+    .card p { margin: 0; color: var(--muted); font: 400 .7rem/1.4 var(--font-body-family); }
+    .sunmoon { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .45rem; }
+    .sunmoon b { display: block; color: var(--gold); font: 600 .78rem/1.1 var(--font-display-family); }
+    .ask { display: flex; align-items: center; gap: .8rem; border-color: var(--accent); background: color-mix(in srgb, var(--accent), var(--surface) 95%); }
+    .ask-icon { display: grid; place-items: center; flex: 0 0 2.3rem; height: 2.3rem; border-radius: 50%; background: var(--accent); color: var(--surface); font: 700 1rem/1 var(--font-display-family); }
+    .ask h2 { margin: 0 0 .15rem; color: var(--accent); }
+    .coming { display: flex; justify-content: space-between; gap: .65rem; margin-top: .55rem; }
+    .coming span { flex: 1; padding: .52rem; border-radius: .55rem; background: var(--bg); color: var(--ink); font: 600 .68rem/1.25 var(--font-body-family); }
+    .coming small { display: block; margin-top: .16rem; color: var(--muted); font-weight: 400; }
+    .bottom-nav { display: grid; grid-template-columns: repeat(5, 1fr); margin-top: 1.1rem; padding: .68rem .65rem .82rem; border-top: .0625rem solid var(--line); background: color-mix(in srgb, var(--surface), transparent 2%); }
+    .nav-item { color: var(--muted); text-align: center; font: 600 .6rem/1.15 var(--font-body-family); }
+    .nav-item i { display: block; margin-bottom: .3rem; color: var(--gold); font: normal .9rem/1 var(--font-display-family); }
+    .nav-item.active { color: var(--accent); } .nav-item.active i { color: var(--accent); }
+    @media (max-width: 60rem) {
+      .gallery { flex-direction: column; min-width: 0; padding: 1rem; }
+      .study { width: min(22.94rem, calc(100vw - 2rem)); }
+      .device { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="gallery">
+    <section class="study" aria-label="Festival day theme study">
+      <p class="study-label">Festival day · sacred hero</p>
+      <article class="device" id="festival-screen">
+        <div class="screen">
+          <div class="topline">
+            <div class="brand"><span class="brand-mark">ग</span><span><strong>Ganak</strong><small>Panchang</small></span></div>
+            <span class="quiet-action">⚙ Personalize</span>
+          </div>
+          <div class="frame" aria-label="New Delhi · Sat 25 Jul 2026"><div><div class="place">New Delhi</div><div class="date">Sat, 25 July 2026</div></div><div class="calendar">Amanta lunar<br />Ashadha</div></div>
+          <p class="lead">Saturday · <b>Ekadashi · Shukla Paksha</b> · Fasting day</p>
+          <section class="hero">
+            <div class="hero-art"><img src="ganak-devshayani-vishnu-hero.webp" alt="Lord Vishnu reclining in cosmic sleep on Shesha, with Lakshmi" /></div>
+            <div class="hero-copy">
+              <div class="eyebrow">Today’s sacred observance</div>
+              <h1>Devshayani Ekadashi <span class="deva" lang="hi">देवशयनी एकादशी</span></h1>
+              <p class="meaning">Vishnu begins his cosmic sleep; Chaturmas begins. Keep the fast with a calm heart and offer Tulsi.</p>
+              <div class="hero-actions"><span class="chip sacred">✦ Fasting day</span><span class="chip">★ Follow</span><span class="chip listen">🔊 Listen</span></div>
+            </div>
+          </section>
+          <div class="now-title">What matters now</div>
+          <section class="now">
+            <div class="window good"><div class="state">✓ Auspicious</div><strong>Abhijit Muhurat</strong><time>12:00–12:54 PM</time></div>
+            <div class="window bad"><div class="state">⚠ Avoid</div><strong>Rahu Kalam</strong><time>9:03–10:45 AM</time></div>
+          </section>
+          <p class="nakshatra"><i>✦</i> Nakshatra Jyeshtha till 7:34 AM · Tithi Ekadashi till 11:35 AM</p>
+          <div class="section-title">At a glance</div>
+          <section class="cards">
+            <article class="card"><div class="card-label">Tithi & Nakshatra</div><h2>Ekadashi · Jyeshtha</h2><p>A day for restraint, prayer and inner clarity.</p></article>
+            <article class="card"><div class="card-label">Sun & Moon</div><div class="sunmoon"><span><b>☀ 5:40</b><p>7:16 PM</p></span><span><b>☾ 3:04</b><p>1:28 AM</p></span></div></article>
+            <article class="card wide ask"><span class="ask-icon">?</span><span><h2>Ask the moment</h2><p>Hold one clear question. Let today’s sky answer.</p></span></article>
+            <article class="card wide"><div class="card-label">Coming up</div><div class="coming"><span>Guru Purnima<small>4 days</small></span><span>Kamika Ekadashi<small>15 days</small></span></div></article>
+          </section>
+        </div>
+        <nav class="bottom-nav" aria-label="Primary"><span class="nav-item active"><i>◉</i>Today</span><span class="nav-item"><i>✦</i>Festivals</span><span class="nav-item"><i>☼</i>Muhurat</span><span class="nav-item"><i>?</i>Ask</span><span class="nav-item"><i>◇</i>Jyotish</span></nav>
+      </article>
+    </section>
+
+    <section class="study" aria-label="Ordinary day theme study">
+      <p class="study-label">Ordinary day · tithi meaning</p>
+      <article class="device" id="ordinary-screen">
+        <div class="screen">
+          <div class="topline">
+            <div class="brand"><span class="brand-mark">ग</span><span><strong>Ganak</strong><small>Panchang</small></span></div>
+            <span class="quiet-action">⚙ Personalize</span>
+          </div>
+          <div class="frame"><div><div class="place">New Delhi</div><div class="date">Sun, 2 August 2026</div></div><div class="calendar">Amanta lunar<br />Ashadha</div></div>
+          <p class="lead">Sunday · <b>Chaturthi · Krishna Paksha</b> · Ordinary day</p>
+          <section class="hero">
+            <div class="hero-art"><img src="ganak-ordinary-tithi-hero.webp" alt="A lotus, diya, crescent moon and stars framed by antique-gold flowers" /></div>
+            <div class="hero-copy">
+              <div class="eyebrow">The character of today</div>
+              <h1>Krishna Chaturthi <span class="deva" lang="hi">कृष्ण चतुर्थी</span></h1>
+              <p class="meaning">A quieter waning-moon day: simplify what is tangled, finish one practical task, and make space before beginning again.</p>
+              <div class="hero-actions"><span class="chip sacred">☾ Waning moon</span><span class="chip">☆ Keep this</span><span class="chip listen">🔊 Listen</span></div>
+            </div>
+          </section>
+          <div class="now-title">What matters now</div>
+          <section class="now">
+            <div class="window good"><div class="state">✓ Auspicious</div><strong>Next good window</strong><time>10:46 AM–12:27 PM</time></div>
+            <div class="window bad"><div class="state">⚠ Avoid</div><strong>Rahu Kalam</strong><time>5:30–7:11 PM</time></div>
+          </section>
+          <p class="nakshatra"><i>✦</i> Purva Bhadrapada till 9:36 PM · Chaturthi till 11:15 PM</p>
+          <div class="section-title">At a glance</div>
+          <section class="cards">
+            <article class="card"><div class="card-label">Tithi & Nakshatra</div><h2>Chaturthi · Purva Bhadrapada</h2><p>Clear obstacles with patience before pushing ahead.</p></article>
+            <article class="card"><div class="card-label">Sun & Moon</div><div class="sunmoon"><span><b>☀ 5:43</b><p>7:11 PM</p></span><span><b>☾ 9:20</b><p>8:56 AM</p></span></div></article>
+            <article class="card wide ask"><span class="ask-icon">?</span><span><h2>Ask the moment</h2><p>What needs your attention before this day ends?</p></span></article>
+            <article class="card wide"><div class="card-label">Coming up</div><div class="coming"><span>Kamika Ekadashi<small>7 days</small></span><span>Som Pradosh<small>8 days</small></span></div></article>
+          </section>
+        </div>
+        <nav class="bottom-nav" aria-label="Primary"><span class="nav-item active"><i>◉</i>Today</span><span class="nav-item"><i>✦</i>Festivals</span><span class="nav-item"><i>☼</i>Muhurat</span><span class="nav-item"><i>?</i>Ask</span><span class="nav-item"><i>◇</i>Jyotish</span></nav>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

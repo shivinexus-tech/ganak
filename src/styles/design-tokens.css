@@ -47,24 +47,24 @@
   --elevation-3: 0 0.875rem 2.25rem rgba(60, 40, 10, 0.16);
 
   /* BRAND COLOR VALUES START — future brand edits change RHS values only. */
-  --theme-bg-light: #FAF5EA;
-  --theme-surface-light: #FFFFFF;
-  --theme-ink-light: #3B3147;
-  --theme-muted-light: #70675F;
-  --theme-accent-light: #8A560D;
-  --theme-gold-light: #8A560D;
-  --theme-good-light: #1E6948;
-  --theme-bad-light: #A33C2E;
-  --theme-line-light: #D8CBAF;
-  --theme-bg-dark: #18151C;
-  --theme-surface-dark: #242027;
-  --theme-ink-dark: #FFF8EE;
-  --theme-muted-dark: #C8BFB4;
-  --theme-accent-dark: #E5AD55;
-  --theme-gold-dark: #E5AD55;
-  --theme-good-dark: #7ED5A7;
-  --theme-bad-dark: #FF9B8D;
-  --theme-line-dark: #5B5260;
+  --theme-bg-light: #FFF8ED;
+  --theme-surface-light: #FFFCF7;
+  --theme-ink-light: #34263A;
+  --theme-muted-light: #6D5962;
+  --theme-accent-light: #8E2F49;
+  --theme-gold-light: #78500F;
+  --theme-good-light: #356448;
+  --theme-bad-light: #A33E32;
+  --theme-line-light: #A98C72;
+  --theme-bg-dark: #211620;
+  --theme-surface-dark: #30212E;
+  --theme-ink-dark: #FFF7EA;
+  --theme-muted-dark: #D4C2C5;
+  --theme-accent-dark: #FF9DB0;
+  --theme-gold-dark: #F0C36C;
+  --theme-good-dark: #9AD8AE;
+  --theme-bad-dark: #FFAD9B;
+  --theme-line-dark: #897080;
   /* BRAND COLOR VALUES END — do not add or rename semantic slots. */
 
   /* Semantic layer — components use these names only. */
