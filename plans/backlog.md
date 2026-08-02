@@ -366,7 +366,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         "go live" 2026-07-28. Design `docs/superpowers/specs/2026-07-25-festival-aarti-section-design.md`;
         standard `plans/festival-aarti-standard.md`. _(P1-FESTIVAL-AARTI; owner scope 2026-07-25 — CLOSED)_
   - [ ] **Aarti Phase-2 — breadth (highest-demand aartis).** Add the ~20 highest-search
-        aartis Ganak lacks (Shani, Sai Baba, Santoshi Mata, Saraswati, Surya, Khatu
+        aartis Ganak lacks (Shani, Santoshi Mata, Saraswati, Surya, Ganga, Khatu
         Shyam, weekday aartis, etc.), **prioritised by search demand, not completeness**,
         in the existing `{refrain, cue, stanzas}` structure. Ranked list + tiers:
         `plans/aarti-phase2-priority.md`. Target "reach all" audiences (diaspora +
@@ -376,7 +376,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         sources with per-aarti citations; (b) `festival-aarti.cjs` extended to cover the
         new deity/standalone keys and green; (c) EN/HI render verified, no 375px
         overflow, 0 console errors; (d) owner skim sign-off. Note: several Tier-1 aartis
-        (Shani, Sai, Santoshi) are **deity** aartis not tied to one festival — they need
+        (Shani, Santoshi, Khatu Shyam) are **deity** aartis not tied to one festival — they need
         the standalone pages from the finder item below, not just a festival embed.
         _(P2-FESTIVAL-AARTI-BREADTH; owner scope 2026-08-01)_
   - [ ] **Aarti finder + dedicated per-aarti pages.** Today aartis are **inline-only**

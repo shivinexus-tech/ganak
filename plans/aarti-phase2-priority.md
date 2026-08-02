@@ -10,7 +10,7 @@ for, closing the gap toward ~35–40 where the demand concentrates (Goddesses, w
 deities, modern-popular deities). "Reach all" audiences (diaspora + urban-India); learn
 then pivot. **Audio deprioritised for now.**
 
-Many Tier-1 entries are **deity aartis not tied to one festival** (Shani, Sai, Santoshi…).
+Many Tier-1 entries are **deity aartis not tied to one festival** (Shani, Santoshi, Khatu Shyam…).
 They belong on their own `/aarti/<slug>` page (see `P2-FESTIVAL-AARTI-FINDER`), optionally
 surfaced by weekday, not forced onto a single festival guide.
 
@@ -25,12 +25,12 @@ aartis may stand alone.
 | # | Aarti (first line) | Deity | Demand driver |
 |---|--------------------|-------|---------------|
 | 1 | *Jai Jai Shri Shanidev* — जय जय श्री शनिदेव | Shani | Saturday vrat; very high, year-round |
-| 2 | *Aarti Sai Baba* — आरती साईं बाबा (Shirdi) | Sai Baba | Thursday; one of India's largest followings |
-| 3 | *Jai Santoshi Mata* — जय संतोषी माता | Santoshi Mata | Friday vrat; classic mass following |
-| 4 | *Jai Saraswati Mata* — जय सरस्वती माता | Saraswati | Basant Panchami; students, exams |
-| 5 | *Aarti Shri Surya* — जय जय जय आदित्य | Surya | Sunday, Chhath, Ratha Saptami |
-| 6 | *Shyam Baba aarti* — श्री श्याम आरती | Khatu Shyam | Fast-growing modern following (Sikar/North) |
-| 7 | *Vaishno Devi / Sherawali aarti* | Vaishno Devi | Navratri + year-round pilgrimage search |
+| 2 | *Jai Santoshi Mata* — जय संतोषी माता | Santoshi Mata | Friday vrat; classic mass following |
+| 3 | *Jai Saraswati Mata* — जय सरस्वती माता | Saraswati | Basant Panchami; students, exams |
+| 4 | *Aarti Shri Surya* — जय जय जय आदित्य | Surya | Sunday, Chhath, Ratha Saptami |
+| 5 | *Shyam Baba aarti* — श्री श्याम आरती | Khatu Shyam | Fast-growing modern following (Sikar/North) |
+| 6 | *Vaishno Devi / Sherawali aarti* | Vaishno Devi | Navratri + year-round pilgrimage search |
+| 7 | *Aarti Ganga Maiya* — ॐ जय गंगे माता | Ganga | Ganga aarti (Haridwar/Varanasi); very high search |
 
 ## Tier 2 — strong · festival/weekly · broad
 
@@ -41,9 +41,8 @@ aartis may stand alone.
 | 10 | *Kubera aarti* | Kubera | Dhanteras/Diwali wealth worship |
 | 11 | *Annapurna aarti* | Annapurna | Kitchen/food; Annakut, Margashirsha |
 | 12 | *Radha aarti* | Radha | Paired with Krishna; Radhashtami, Barsana |
-| 13 | *Ganga aarti* — ॐ जय गंगे माता | Ganga | Ganga Dussehra, Kartik snan; huge north |
-| 14 | *Weekday aartis (Mon–Sun set)* | Vaar devtas | Bundled "din ki aarti" search set |
-| 15 | *Kali aarti* | Kali | Kali Puja / Diwali night (Bengal + north) |
+| 13 | *Weekday aartis (Mon–Sun set)* | Vaar devtas | Bundled "din ki aarti" search set |
+| 14 | *Kali aarti* | Kali | Kali Puja / Diwali night (Bengal + north) |
 
 ## Tier 3 — regional / festival-specific · seasonal
 
