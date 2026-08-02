@@ -747,7 +747,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       **PARKED 2026-07-20** (owner): user feedback that IA feels broken + elder-friendly
       requirement captured under EPIC-IA; resume after Phase 1 launch blockers.
 - [ ] Design-system pass (universal Card, spacing scale, shared primitives) —
-      see **EPIC-DS**. Directly fixes the "visual inconsistency" pain.
+      see **EPIC-DS**. Directly fixes the "visual inconsistency" pain. Comfort-ready
+      tokens, presets and the Personalize hub are validated on the accessibility
+      feature branch; shared primitives, app-wide migration and production delivery
+      remain. _(Backlog #46; 40% as of 2026-08-01.)_
 
 **Still not required by the 2026-07-21 scope change:** accounts, cross-device data
 persistence, paid AI, Android/iOS store packaging, SDUI and paywalls. The backend
@@ -882,10 +885,16 @@ Work:
       Matching / Tools / Vault sub-navigation, not one flat list.
 
 ### EPIC-DS — Design-system discipline
-**Status: not started. Cross-cutting; Phase 1 polish (helps launch look coherent).**
+**Status: IN PROGRESS — comfort/accessibility foundation validated on feature branch,
+not yet merged or deployed (2026-08-01). Cross-cutting Phase 1 polish.**
 Targets the owner's own words: "visual inconsistency is hell a lot." The app already
 has a `T` design-token object, but values leak/hardcode everywhere — so this is
 *enforce + refactor*, not net-new.
+- [x] **Comfort foundation:** rem-based `--scale`/`--density`, semantic light/dark
+      roles with AA contrast, three visual presets, EN/HI Personalize hub,
+      first-run/parent setup, approved local-first preference adapter, contextual
+      Follow/Listen and independent accessibility/privacy bug bash. Feature commit
+      `8ee7f84`; integration with the parallel brand theme remains.
 - [ ] One **universal Card** component (density variants: comfortable/compact),
       no per-card overrides.
 - [ ] **Rigid spacing scale** — 4/8/12/16/20/24/32 only, no exceptions.
@@ -893,6 +902,9 @@ has a `T` design-token object, but values leak/hardcode everywhere — so this i
 - [ ] **Semantic color roles** (text, muted, saffron=devotional/festival,
       red=Rahu/warning, green=auspicious/Abhijit, blue=links).
 - [ ] Extract shared primitives: Card, DataRow, Badge, SectionHeader — used everywhere.
+- [ ] Finish legacy consumption: replace hard-coded light/sizing values, make
+      Guided/Expert alter relevant content, add Muhurat Listen after its active lane
+      releases, run the full route/language/viewport matrix, deploy and verify live.
 - Do in-place in the single file (or as it's split); no stack change.
 
 ### EPIC-PLATFORM — BFF / SDUI / Auth / Paywalls (DEFERRED — Phase 4 or later)
