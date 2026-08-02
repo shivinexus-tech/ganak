@@ -1,8 +1,10 @@
+import { analyticsConsentGranted } from "../storage/approved-storage";
+
 const ENDPOINT = String(import.meta.env?.VITE_ANALYTICS_ENDPOINT || "").trim();
 const ALLOWED = new Set(["page_view", "muhurat_search", "muhurat_share", "muhurat_export", "feedback_sent"]);
 
 export function privacyEvent(name, props = {}) {
-  if (!ENDPOINT || !ALLOWED.has(name) || typeof fetch !== "function") return;
+  if (!ENDPOINT || !analyticsConsentGranted() || !ALLOWED.has(name) || typeof fetch !== "function") return;
   const safe = {};
   for (const [key, value] of Object.entries(props)) {
     if (!["area", "action", "language", "outcome"].includes(key)) continue;

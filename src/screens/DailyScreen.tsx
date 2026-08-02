@@ -6,7 +6,7 @@ import { T } from "../components/tokens";
 import { fmtTime } from "../components/format";
 import PlaceInput from "../components/PlaceInput";
 import {
-  SIGNS, zoneOffset, PLANET_DEVA,
+  SIGNS, NAKSHATRAS, zoneOffset, PLANET_DEVA,
 } from "../engine/panchang";
 import { computeTodayPanchang } from "../engine/today-panchang";
 import { CalendarPage } from "./CalendarPage";
@@ -21,6 +21,15 @@ import { runRegionalCalendarShadow } from "../monitoring/regional-calendar-shado
 import { urlPrefGet, urlPrefPush, urlPrefSet } from "../components/url-prefs";
 import HolidayOverlayCard, { HolidayOverlaySelect } from "../components/HolidayOverlayCard";
 import { holidayDatesForYear, resolveHolidayMode } from "../data/india-holidays";
+import ReadAloudButton from "../accessibility/ReadAloudButton";
+import { NAK_HI } from "../engine/muhurat";
+
+const TITHI_HI = Object.freeze({
+  Pratipada: "प्रतिपदा", Dwitiya: "द्वितीया", Tritiya: "तृतीया", Chaturthi: "चतुर्थी",
+  Panchami: "पञ्चमी", Shashthi: "षष्ठी", Saptami: "सप्तमी", Ashtami: "अष्टमी",
+  Navami: "नवमी", Dashami: "दशमी", Ekadashi: "एकादशी", Dwadashi: "द्वादशी",
+  Trayodashi: "त्रयोदशी", Chaturdashi: "चतुर्दशी", Purnima: "पूर्णिमा", Amavasya: "अमावस्या",
+});
 
 export function isValidISODate(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) return false;
@@ -101,6 +110,24 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
       return computeTodayPanchang(place, ayanamsa, Date.UTC(py, pm - 1, pd, 12) - ptz * 3600000);
     } catch { return null; }
   }, [place, ayanamsa, panchDate, isPanchToday]);
+  const listenText = useMemo(() => {
+    if (!todayP) return [];
+    const tithi = lang === "hi" ? (TITHI_HI[todayP.tithis[0].name] || todayP.tithis[0].name) : todayP.tithis[0].name;
+    const nakIndex = NAKSHATRAS.indexOf(todayP.naks[0].name);
+    const nakshatra = lang === "hi" ? (NAK_HI[nakIndex] || todayP.naks[0].name) : todayP.naks[0].name;
+    if (lang === "hi") return [
+      `${place?.label || "चुने हुए स्थान"} के लिए आज ${tithi} तिथि और ${todayP.krishna ? "कृष्ण पक्ष" : "शुक्ल पक्ष"} है।`,
+      `नक्षत्र ${nakshatra} है।`,
+      todayP.abhijit ? `शुभ अभिजित मुहूर्त ${fmtTime(todayP.abhijit.start, todayP.tz)} से ${fmtTime(todayP.abhijit.end, todayP.tz)} तक है।` : "आज अभिजित मुहूर्त उपलब्ध नहीं है।",
+      todayP.rahu ? `सावधानी: राहु काल ${fmtTime(todayP.rahu.start, todayP.tz)} से ${fmtTime(todayP.rahu.end, todayP.tz)} तक है। महत्वपूर्ण आरम्भ इससे पहले या बाद में रखें।` : "राहु काल उपलब्ध नहीं है।",
+    ];
+    return [
+      `For ${place?.label || "your selected place"}, today is ${tithi}, ${todayP.paksha}.`,
+      `The Nakshatra is ${nakshatra}.`,
+      todayP.abhijit ? `Auspicious Abhijit Muhurat runs from ${fmtTime(todayP.abhijit.start, todayP.tz)} to ${fmtTime(todayP.abhijit.end, todayP.tz)}.` : "There is no Abhijit Muhurat today.",
+      todayP.rahu ? `Avoid important beginnings during Rahu Kalam, from ${fmtTime(todayP.rahu.start, todayP.tz)} to ${fmtTime(todayP.rahu.end, todayP.tz)}.` : "Rahu Kalam is unavailable.",
+    ];
+  }, [todayP, lang, place]);
   useEffect(()=>{ if(place&&todayP?.rise)runRegionalCalendarShadow(todayP,todayP.rise,place); },[place,todayP]);
   const calMarks = useMemo(() => {
     if (!calYM || !place) return { fest: new Set(), fast: new Set(), holiday: new Set() };
@@ -284,6 +311,9 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                 </div>
               );
             })()}
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end", margin: "-0.5rem 0 1rem" }}>
+            <ReadAloudButton text={listenText} lang={lang === "hi" ? "hi" : "en"} label={lang === "hi" ? "🔊 आज का पंचांग सुनें" : "🔊 Listen to today's Panchang"} />
           </div>
           {place && <div style={{ margin:"-12px 0 16px", display:"flex", alignItems:"flex-end", gap:10, flexWrap:"wrap" }}>
             <select value={calendarMode} onChange={(e) => chooseCalendarMode(e.target.value)} aria-label={lang === "hi" ? "कैलेंडर पद्धति" : "Calendar convention"} style={{ height:T.ctrlH, borderRadius:T.rMd, border:`1px solid ${C.line}`, background:"#FFFDF7", color:C.ivory, padding:"0 10px", fontFamily:T.body }}>

@@ -1,9 +1,10 @@
 /* Vrat vidhi card — pure extraction (SPLIT-UI-CONTENT-01). Wire deferred. */
 
 import React, { useState } from "react";
-import { T } from "./tokens";
+import { T, R as RT } from "./tokens";
 import { VRAT_VIDHI_LABELS } from "../data/vrat-vidhis";
 import { kathaParagraphs, parseKathaLine } from "../data/guide-katha-format";
+import ReadAloudButton from "../accessibility/ReadAloudButton";
 
 function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
   const [open, setOpen] = useState(initiallyOpen);
@@ -53,6 +54,11 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
       )}
     </div>
   ) : txt(data.puja);
+  const listenText = [
+    txt(data.verdict), txt(data.meaning),
+    ...(data.vidhi || []).map(txt),
+    txt(data.puja), txt(data.paran),
+  ].filter(Boolean);
   return (
     <div
       onClick={(e) => e.stopPropagation()}
@@ -72,6 +78,7 @@ function VratVidhiCard({ data, lang, C, initiallyOpen = false }) {
       </button>
       {open && (
         <div style={{ padding: "10px 11px 12px", borderTop: `1px solid ${C.line}`, display: "flex", flexDirection: "column", gap: 2 }}>
+          {listenText.length > 0 && <div style={{ marginTop: RT.s2 }}><ReadAloudButton text={listenText} lang={L} compact label={L === "hi" ? "🔊 विधि सुनें" : "🔊 Listen to the steps"} /></div>}
           {data.meaning && section(lbl("meaning"), txt(data.meaning))}
           {section(lbl("vidhi"), (
             <ol style={{ margin: 0, paddingLeft: 18 }}>

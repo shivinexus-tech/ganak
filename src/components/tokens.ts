@@ -1,14 +1,22 @@
 /* ---- design tokens: one source for type scale, spacing, sizing, radii, elevation ---- */
 const T = {
-  fDisplay: 23, fHeading: 19, fTitle: 16.5, fBody: 14.5, fSmall: 13, fLabel: 11.5, fMicro: 10.5,
+  fDisplay: "var(--font-display)", fHeading: "var(--font-heading)", fTitle: "var(--font-title)",
+  fBody: "var(--font-body)", fSmall: "var(--font-small)", fLabel: "var(--font-label)", fMicro: "var(--font-micro)",
+  // Legacy spacing remains numeric until the active Muhurat language lane releases
+  // its string-concatenated call sites. New comfort work uses R below.
   s1: 4, s2: 8, s3: 12, s4: 16, s5: 20, s6: 24, s7: 28, s8: 32,
-  ctrlH: 42, rSm: 8, rMd: 11, rLg: 14, rPill: 999,
-  iSm: 15, iMd: 18, iLg: 22,
-  e1: "0 1px 2px rgba(80,60,20,.06)",
-  e2: "0 6px 20px rgba(110,82,24,.10), 0 1px 2px rgba(80,60,20,.06)",
-  e3: "0 14px 36px rgba(60,40,10,.16)",
-  serif: "Eczar, serif", body: "Spectral, Georgia, serif",
-  label: { fontSize: 11.5, letterSpacing: ".16em", textTransform: "uppercase", fontFamily: "Spectral, Georgia, serif" },
+  ctrlH: "var(--control-height)", rSm: "var(--radius-sm)", rMd: "var(--radius-md)",
+  rLg: "var(--radius-lg)", rPill: "var(--radius-pill)",
+  iSm: "var(--icon-sm)", iMd: "var(--icon-md)", iLg: "var(--icon-lg)",
+  e1: "var(--elevation-1)", e2: "var(--elevation-2)", e3: "var(--elevation-3)",
+  serif: "var(--font-display-family)", body: "var(--font-body-family)",
+  label: { fontSize: "var(--font-label)", letterSpacing: ".16em", textTransform: "uppercase", fontFamily: "var(--font-body-family)" },
 };
 
-export { T };
+const R = {
+  ...T,
+  s1: "var(--space-1)", s2: "var(--space-2)", s3: "var(--space-3)", s4: "var(--space-4)",
+  s5: "var(--space-5)", s6: "var(--space-6)", s7: "var(--space-7)", s8: "var(--space-8)",
+};
+
+export { T, R };

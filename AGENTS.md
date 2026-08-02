@@ -30,8 +30,14 @@ tell what the app is doing. UI must follow the language toggle (hi/en) everywher
   reviews and merges branches sequentially, running all gates after every merge.
 - **No orphans.** After replacing anything, grep the old name; zero orphaned
   references is the standard. Diagnose structurally, don't patch the surface.
-- **No browser storage.** `localStorage` / `sessionStorage` are banned outright.
-  Small UI prefs may use URL query params (see `urlPrefGet`/`urlPrefSet`).
+- **Approved on-device storage only.** Application code must never call
+  `localStorage` / `sessionStorage` directly. Persistence is allowed only through
+  `src/storage/approved-storage.ts`, the single auditable adapter, and only in its
+  named `preferences` and `savedCharts` stores. `preferences` is local-first and
+  may contain non-sensitive comfort, language, place and follow choices; religious
+  preference data must never sync or enter analytics without explicit granular
+  consent. `savedCharts` is explicit-save only. Shared URL values still override a
+  saved default without silently rewriting it. No ad-hoc keys or feature storage.
 - **Phone-first, no console.** Errors must surface visibly in the UI. Silent
   failure is unacceptable. Ship complete code, never partial.
 - **Astronomy conventions: Lahiri ayanamsa, mean Rahu/Ketu** — matching Drik

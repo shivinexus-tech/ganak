@@ -2,12 +2,14 @@
    its existing click/expand behaviour; these routes are an additional entry path. */
 
 import React, { useEffect, useState } from "react";
-import { T } from "../components/tokens";
+import { T, R as RT } from "../components/tokens";
 import PlaceInput from "../components/PlaceInput";
 import { fmtTimeD } from "../components/format";
 import VratVidhiCard from "../components/VratVidhiCard";
 import NavadurgaDayGuide, { NavadurgaSeasonLinks } from "../components/NavadurgaDayGuide";
 import FestivalRasterHero from "../components/FestivalRasterHero";
+import ReadAloudButton from "../accessibility/ReadAloudButton";
+import { useComfort } from "../accessibility/ComfortProvider";
 import { VRAT_VIDHI } from "../data/vrat-vidhis";
 import { festivalRouteContentFor } from "../data/festival-route-content";
 import {
@@ -214,6 +216,7 @@ function RouteSpecificAnswer({ content, lang, C }) {
 }
 
 function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
+  const { preferences, toggleFollow } = useComfort();
   const L = lang === "hi" ? "hi" : "en";
   const isNavadurga = guide && guide.contentKind === "navadurga";
   const data = guide && guide.vidhiKey && !isNavadurga ? VRAT_VIDHI[guide.vidhiKey] : null;
@@ -232,6 +235,8 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
     ? (guide.sourceKind === "observance" ? OBS_META[guide.metaKey] : FEST_META[guide.metaKey])
     : null;
   const title = guide ? guide.title[L] : "";
+  const followKey = guide ? `festival:${guide.key}` : "";
+  const isFollowed = Boolean(followKey && preferences.following.includes(followKey));
   const homeHref = `/?lang=${L}&screen=daily`;
   const [localTiming, setLocalTiming] = useState({ status: "idle", hit: null, detail: null, punyaKala: null, tz: null, error: null });
   const [retryTick, setRetryTick] = useState(0);
@@ -308,6 +313,15 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
         grahan: { en: "Eclipse visibility and Sutak windows below are calculated for your city.", hi: "नीचे ग्रहण की दृश्यता और सूतक के समय आपके शहर के अनुसार हैं।" },
       }[meta.timing] || null)
     : null;
+  const localText = (value) => value && (value[L] || value.en) || "";
+  const festivalListenText = [
+    title,
+    localizedRouteContentField(routeContent, "verdict", L),
+    localizedRouteContentField(routeContent, "meaning", L),
+    data && localText(data.verdict),
+    data && localText(data.meaning),
+    ...((data && data.stories) || []).slice(0, 2).map(localText),
+  ].filter(Boolean);
 
   const d = localTiming.detail;
   const hit = localTiming.hit;
@@ -357,9 +371,14 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
             ? (L === "hi" ? "व्रत एवं पूजा मार्गदर्शिका" : "FASTING & WORSHIP GUIDE")
             : (L === "hi" ? "पर्व एवं व्रत परिचय" : "FESTIVAL & OBSERVANCE OVERVIEW")}
         </div>
-        <h2 id="festival-guide-title" style={{ margin: "0 0 5px", color: C.ivory, fontFamily: T.serif, fontSize: T.fHeading, lineHeight: 1.2 }}>
-          {title}
-        </h2>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: RT.s2, marginBottom: RT.s2 }}>
+          <h2 id="festival-guide-title" style={{ margin: 0, color: C.ivory, fontFamily: T.serif, fontSize: T.fHeading, lineHeight: 1.2 }}>
+            {title}
+          </h2>
+          <button type="button" className="comfort-control comfort-focus" aria-pressed={isFollowed} onClick={() => toggleFollow(followKey)} style={{ flexShrink: 0, border: `0.0625rem solid ${isFollowed ? C.gold : C.line}`, borderRadius: RT.rMd, background: C.panel, color: isFollowed ? C.gold : C.muted, padding: `0 ${RT.s3}`, cursor: "pointer", fontWeight: 700 }}>
+            <span aria-hidden="true">{isFollowed ? "★" : "☆"}</span> {isFollowed ? (L === "hi" ? "अनुसरण में" : "Following") : (L === "hi" ? "अनुसरण करें" : "Follow")}
+          </button>
+        </div>
         {isNavadurga && guide.form?.image ? (
           <img
             src={guide.form.image}
@@ -384,6 +403,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                 ? "गणक में अभी उपलब्ध पंचांग परिचय नीचे है। विस्तृत पूजा-विधि स्रोत और समीक्षा के बाद ही जोड़ी जाएगी।"
                 : "Below is the calendar description currently available in Ganak. Detailed worship guidance will be added only after it is sourced and reviewed.")}
         </p>
+        {festivalListenText.length > 0 && <div style={{ marginBottom: RT.s3 }}><ReadAloudButton text={festivalListenText} lang={L} /></div>}
 
         {routeContentComplete ? (
           <RouteSpecificAnswer content={routeContent} lang={lang} C={C} />

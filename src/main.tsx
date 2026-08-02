@@ -13,8 +13,11 @@ import "@fontsource/spectral/300.css";
 import "@fontsource/spectral/400.css";
 import "@fontsource/spectral/400-italic.css";
 import "@fontsource/spectral/600.css";
+import "./styles/design-tokens.css";
 
 import AppErrorBoundary from "./components/AppErrorBoundary";
+import { ComfortProvider } from "./accessibility/ComfortProvider";
+import AccessibilityRoot from "./accessibility/AccessibilityRoot";
 import { installGlobalErrorReporting, reportClientError } from "./monitoring/error-reporter";
 import KundliApp from "./kundli-app.tsx";
 
@@ -25,7 +28,11 @@ window.addEventListener("ganak:regional-calendar-shadow-error",((event:CustomEve
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AppErrorBoundary>
-      <KundliApp />
+      <ComfortProvider>
+        <AccessibilityRoot>
+          <KundliApp />
+        </AccessibilityRoot>
+      </ComfortProvider>
     </AppErrorBoundary>
   </React.StrictMode>
 );
