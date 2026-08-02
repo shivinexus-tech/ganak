@@ -28,10 +28,10 @@ export default function FeedbackCard({ lang, C, card }) {
         {lang === "hi" ? "प्रतिक्रिया दें" : "Send feedback"}
       </button>
       {open && <div>
-        <div style={{ fontSize: T.fSmall, color: C.muted, lineHeight: 1.5, marginBottom: 8 }}>{lang === "hi" ? "ईमेल न लिखें। संदेश और वर्तमान पृष्ठ ही भेजे जाते हैं।" : "Do not include email. Only your message and the current page are sent."}</div>
+        <div style={{ fontSize: T.fSmall, color: C.muted, lineHeight: 1.5, marginBottom: "0.5rem" }}>{lang === "hi" ? "ईमेल न लिखें। संदेश और वर्तमान पृष्ठ ही भेजे जाते हैं।" : "Do not include email. Only your message and the current page are sent."}</div>
         <textarea value={message} onChange={(e) => setMessage(e.target.value)} maxLength={2000} rows={4} style={{ width: "100%", border: `1px solid ${C.line}`, borderRadius: T.rMd, padding: 10, font: "inherit" }} />
-        <button onClick={send} style={{ marginTop: 8, minHeight: T.ctrlH, borderRadius: T.rMd, border: 0, padding: "8px 16px", background: C.gold, color: "#fff", cursor: "pointer" }}>{lang === "hi" ? "भेजें" : "Send"}</button>
-        {status && <div role="status" style={{ marginTop: 7, fontSize: T.fSmall, color: C.muted }}>{status}</div>}
+        <button onClick={send} style={{ marginTop: "0.5rem", minHeight: T.ctrlH, borderRadius: T.rMd, border: 0, padding: "0.5rem 1rem", background: C.gold, color: "var(--on-accent)", cursor: "pointer" }}>{lang === "hi" ? "भेजें" : "Send"}</button>
+        {status && <div role="status" style={{ marginTop: "0.4375rem", fontSize: T.fSmall, color: C.muted }}>{status}</div>}
       </div>}
     </div>
   );

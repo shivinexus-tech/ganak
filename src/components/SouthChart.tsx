@@ -18,7 +18,7 @@ function SouthChart({ title, ascSign, planets = [], showDeg, lagnaLabel = "LAGNA
     <div style={{ textAlign: "center" }}>
       <svg viewBox="0 0 400 400" style={{ width: "100%", maxWidth: 400 }}>
         {/* outer + grid */}
-        <rect x="0" y="0" width="400" height="400" fill="#FFFDF7" stroke={gold} strokeWidth="2" />
+        <rect x="0" y="0" width="400" height="400" fill="var(--surface-sunken)" stroke={gold} strokeWidth="2" />
         {[1, 2, 3].map((i) => (
           <React.Fragment key={i}>
             <line x1={i * S} y1="0" x2={i * S} y2="400" stroke={muted} strokeWidth="0.75" opacity="0.5" />
@@ -40,11 +40,11 @@ function SouthChart({ title, ascSign, planets = [], showDeg, lagnaLabel = "LAGNA
                 <path d={`M ${x} ${y} L ${x + 26} ${y} L ${x} ${y + 26} Z`} fill={gold} opacity="0.9" />
               )}
               {/* rashi number, top-left */}
-              <text x={x + 5} y={y + 14} fontSize="10" fill={isLagna ? "#FFFFFF" : muted} fontFamily="Spectral, serif">{sign + 1}</text>
+              <text x={x + 5} y={y + 14} fontSize="10" fill={isLagna ? "var(--surface-active)" : muted} fontFamily="var(--font-body-family)">{sign + 1}</text>
               {/* planets */}
               {here.map((p, i) => (
                 <text key={p.label + i} x={x + S / 2} y={y + 30 + i * 15} textAnchor="middle" fontSize="12.5"
-                  fill={p.retro ? sindoor : ivory} fontFamily="Eczar, serif">
+                  fill={p.retro ? sindoor : ivory} fontFamily="var(--font-display-family)">
                   {p.label}{p.retro ? "℞" : ""}{showDeg && p.deg != null ? ` ${fmtDeg(p.deg)}` : ""}
                 </text>
               ))}
@@ -52,7 +52,7 @@ function SouthChart({ title, ascSign, planets = [], showDeg, lagnaLabel = "LAGNA
           );
         })}
         {/* centre label (reference point; matches the North chart's lagnaLabel) */}
-        <text x="200" y="205" textAnchor="middle" fontSize="13" fill={gold} fontFamily="Eczar, serif" letterSpacing="0.12em">{lagnaLabel}</text>
+        <text x="200" y="205" textAnchor="middle" fontSize="13" fill={gold} fontFamily="var(--font-display-family)" letterSpacing="0.12em">{lagnaLabel}</text>
       </svg>
       <div style={{ fontSize: 11.5, letterSpacing: "0.18em", color: muted, marginTop: 8, textTransform: "uppercase", overflowWrap: "anywhere", padding: "0 8px" }}>{title}</div>
     </div>

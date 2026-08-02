@@ -9,7 +9,7 @@ import VratVidhiCard from "../components/VratVidhiCard";
 import NavadurgaDayGuide, { NavadurgaSeasonLinks } from "../components/NavadurgaDayGuide";
 import FestivalRasterHero from "../components/FestivalRasterHero";
 import ReadAloudButton from "../accessibility/ReadAloudButton";
-import { useComfort } from "../accessibility/ComfortProvider";
+import { useComfort, useDepth } from "../accessibility/ComfortProvider";
 import { VRAT_VIDHI } from "../data/vrat-vidhis";
 import { festivalRouteContentFor } from "../data/festival-route-content";
 import {
@@ -189,9 +189,9 @@ function RouteSpecificAnswer({ content, lang, C }) {
     <section
       aria-label={L === "hi" ? "इस पर्व का स्पष्ट उत्तर" : "Route-specific answer"}
       style={{
-        display: "grid", gap: 9, margin: "0 0 14px", padding: "13px 14px",
-        borderRadius: T.rMd, border: `1px solid ${C.gold}`,
-        background: "rgba(168,106,18,.08)",
+        display: "grid", gap: "0.5625rem", margin: "0 0 0.875rem", padding: "0.8125rem 0.875rem",
+        borderRadius: T.rMd, border: `0.0625rem solid ${C.gold}`,
+        background: "var(--surface-hover)",
       }}
     >
       <div style={{ ...T.label, color: C.gold }}>
@@ -217,6 +217,7 @@ function RouteSpecificAnswer({ content, lang, C }) {
 
 function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
   const { preferences, toggleFollow } = useComfort();
+  const { showPlainHelp, showExpert } = useDepth();
   const L = lang === "hi" ? "hi" : "en";
   const isNavadurga = guide && guide.contentKind === "navadurga";
   const data = guide && guide.vidhiKey && !isNavadurga ? VRAT_VIDHI[guide.vidhiKey] : null;
@@ -360,13 +361,13 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
     <main className="rise" aria-labelledby="festival-guide-title">
       <a
         href={homeHref}
-        style={{ display: "inline-flex", alignItems: "center", minHeight: T.ctrlH, padding: "0 14px", marginBottom: T.s3, border: `1px solid ${C.line}`, borderRadius: T.rMd, background: C.panel, color: C.ivory, textDecoration: "none", fontSize: T.fSmall }}
+        style={{ display: "inline-flex", alignItems: "center", minHeight: T.ctrlH, padding: "0 0.875rem", marginBottom: T.s3, border: `0.0625rem solid ${C.line}`, borderRadius: T.rMd, background: C.panel, color: C.ivory, textDecoration: "none", fontSize: T.fSmall }}
       >
         ‹ {L === "hi" ? "आज के पंचांग पर वापस जाएँ" : "Back to today's panchang"}
       </a>
 
-      <section style={{ ...card, padding: "20px", overflow: "hidden" }}>
-        <div style={{ ...T.label, color: C.gold, marginBottom: 6 }}>
+      <section style={{ ...card, padding: "1.25rem", overflow: "hidden" }}>
+        <div style={{ ...T.label, color: C.gold, marginBottom: "0.375rem" }}>
           {hasFullGuide
             ? (L === "hi" ? "व्रत एवं पूजा मार्गदर्शिका" : "FASTING & WORSHIP GUIDE")
             : (L === "hi" ? "पर्व एवं व्रत परिचय" : "FESTIVAL & OBSERVANCE OVERVIEW")}
@@ -387,14 +388,14 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
             height="900"
             loading="eager"
             decoding="async"
-            style={{ display: "block", width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: C.panel, marginBottom: 14 }}
+            style={{ display: "block", width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: T.rMd, border: `0.0625rem solid ${C.line}`, background: C.panel, marginBottom: "0.875rem" }}
           />
         ) : (
           (guide.vidhiKey || routeContent?.heroKey) && (
             <FestivalRasterHero imageKey={guide.vidhiKey || routeContent.heroKey} lang={lang} C={C} />
           )
         )}
-        <p style={{ margin: "0 0 14px", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55 }}>
+        <p style={{ margin: "0 0 0.875rem", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55 }}>
           {hasFullGuide
             ? (L === "hi"
                 ? (isNavadurga ? "पहले इस देवी और स्थानीय दिवस का स्पष्ट उत्तर, फिर क्रमबद्ध गृह-पूजा और आज का सप्तशती पाठ।" : "पहले संक्षिप्त उत्तर, फिर व्रत, पूजा, पारण और उद्यापन की पूरी विधि।")
@@ -404,6 +405,11 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                 : "Below is the calendar description currently available in Ganak. Detailed worship guidance will be added only after it is sourced and reviewed.")}
         </p>
         {festivalListenText.length > 0 && <div style={{ marginBottom: RT.s3 }}><ReadAloudButton text={festivalListenText} lang={L} /></div>}
+        {showPlainHelp && <p style={{ margin: `0 0 ${RT.s3}`, padding: `${RT.s3} ${RT.s3}`, borderRadius: RT.rMd, background: "var(--surface-raised)", border: "0.0625rem solid var(--line)", color: C.ivory, fontSize: T.fSmall, lineHeight: 1.55 }}>
+          {L === "hi"
+            ? "इस पृष्ठ पर पहले यह लिखा है कि पर्व कब है और क्या करना है। नीचे विधि क्रम से दी गई है — ऊपर से नीचे पढ़ते जाइए।"
+            : "This page tells you first when the festival falls and what to do. The steps below are in order — simply read from the top down."}
+        </p>}
 
         {routeContentComplete ? (
           <RouteSpecificAnswer content={routeContent} lang={lang} C={C} />
@@ -411,8 +417,8 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
           <div
             role="alert"
             style={{
-              margin: "0 0 14px", padding: "12px 13px", borderRadius: T.rMd,
-              border: `1px solid ${C.sindoor}`, background: "rgba(194,69,30,.08)",
+              margin: "0 0 0.875rem", padding: "0.75rem 0.8125rem", borderRadius: T.rMd,
+              border: `0.0625rem solid ${C.sindoor}`, background: "var(--bad-surface)",
               color: C.ivory, fontSize: T.fSmall, lineHeight: 1.55,
             }}
           >
@@ -422,15 +428,15 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
           </div>
         ) : null}
 
-        <div style={{ marginBottom: 14, padding: "12px 13px", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: "rgba(168,106,18,.06)" }}>
-          <div style={{ ...T.label, color: C.gold, marginBottom: 8 }}>
+        <div style={{ marginBottom: "0.875rem", padding: "0.75rem 0.8125rem", borderRadius: T.rMd, border: `0.0625rem solid ${C.line}`, background: "var(--surface-hover)" }}>
+          <div style={{ ...T.label, color: C.gold, marginBottom: "0.5rem" }}>
             {L === "hi" ? "आपके शहर का समय" : "LOCAL DATE & TIMING"}
           </div>
-          <div style={{ marginBottom: 10, maxWidth: 320 }}>
+          <div style={{ marginBottom: "0.625rem", maxWidth: "20rem" }}>
             <PlaceInput value={place} onPick={onPlace} C={C} lang={lang} />
           </div>
           {place && place.label && (
-            <div style={{ fontSize: T.fMicro, color: C.muted, marginBottom: 8, fontStyle: "italic" }}>
+            <div style={{ fontSize: T.fMicro, color: C.muted, marginBottom: "0.5rem", fontStyle: "italic" }}>
               {L === "hi" ? `सभी समय ${place.label} के अनुसार` : `All times shown for ${place.label}`}
             </div>
           )}
@@ -440,7 +446,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
             </div>
           )}
           {localTiming.status === "error" && (
-            <div style={{ display: "grid", gap: 8 }} role="alert">
+            <div style={{ display: "grid", gap: "0.5rem" }} role="alert">
               <div style={{ fontSize: T.fSmall, color: C.sindoor, lineHeight: 1.5 }}>
                 {L === "hi"
                   ? "इस स्थान के लिए तारीख़ निकाल नहीं सके। शहर फिर से चुनें या दोबारा कोशिश करें — मार्गदर्शिका यहीं रहेगी।"
@@ -450,8 +456,8 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                 type="button"
                 onClick={() => setRetryTick((n) => n + 1)}
                 style={{
-                  justifySelf: "start", height: T.ctrlH, padding: "0 14px", borderRadius: T.rMd,
-                  border: `1px solid ${C.gold}`, background: "rgba(168,106,18,.08)", color: C.gold,
+                  justifySelf: "start", height: T.ctrlH, padding: "0 0.875rem", borderRadius: T.rMd,
+                  border: `0.0625rem solid ${C.gold}`, background: "var(--surface-hover)", color: C.gold,
                   fontFamily: T.serif, fontSize: T.fSmall, cursor: "pointer",
                 }}
               >
@@ -467,15 +473,15 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
             </div>
           )}
           {localTiming.status === "ready" && hit && tz != null && !isNavadurga && (
-            <div style={{ display: "grid", gap: 6 }}>
+            <div style={{ display: "grid", gap: "0.375rem" }}>
               <div style={{ fontSize: T.fBody, color: C.ivory, lineHeight: 1.45 }}>
                 <strong style={{ color: C.gold }}>{formatLocalDate(hit.ms, tz, L)}</strong>
               </div>
               {navratri && (
                 <div style={{
-                  display: "grid", gap: 7, fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
-                  background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
-                  borderRadius: T.rSm, padding: "9px 10px", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
+                  display: "grid", gap: "0.4375rem", fontSize: T.fSmall, color: "var(--good)", fontWeight: 600,
+                  background: "var(--good-surface)", border: "0.0625rem solid var(--good-surface)",
+                  borderRadius: T.rSm, padding: "0.5625rem 0.625rem", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
                 }}>
                   {navratri.ghatasthapana.primary ? (
                     <div>
@@ -504,7 +510,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                       {clock(navratri.ghatasthapana.abhijit.start)}–{clock(navratri.ghatasthapana.abhijit.end)}
                     </div>
                   )}
-                  <div style={{ borderTop: `1px solid ${C.line}`, paddingTop: 7 }}>
+                  <div style={{ borderTop: `0.0625rem solid ${C.line}`, paddingTop: "0.4375rem" }}>
                     {L === "hi" ? "पूर्ण नौ-दिवसीय व्रत का पारण: " : "Full nine-day fast — parana: "}
                     {formatLocalDate(navratri.parana.start, tz, L)}, {clock(navratri.parana.start)} {L === "hi" ? "के बाद" : "onwards"}
                   </div>
@@ -513,9 +519,9 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
               )}
               {chhathSeq && (
                 <div style={{
-                  display: "grid", gap: 7, fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
-                  background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
-                  borderRadius: T.rSm, padding: "9px 10px", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
+                  display: "grid", gap: "0.4375rem", fontSize: T.fSmall, color: "var(--good)", fontWeight: 600,
+                  background: "var(--good-surface)", border: "0.0625rem solid var(--good-surface)",
+                  borderRadius: T.rSm, padding: "0.5625rem 0.625rem", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
                 }}>
                   {chhathSeq.days.map((day) => (
                     <div key={day.key} style={{ color: C.ivory, fontWeight: 500 }}>
@@ -538,9 +544,9 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
               )}
               {skandaSeq && (
                 <div style={{
-                  display: "grid", gap: 7, fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
-                  background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
-                  borderRadius: T.rSm, padding: "9px 10px", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
+                  display: "grid", gap: "0.4375rem", fontSize: T.fSmall, color: "var(--good)", fontWeight: 600,
+                  background: "var(--good-surface)", border: "0.0625rem solid var(--good-surface)",
+                  borderRadius: T.rSm, padding: "0.5625rem 0.625rem", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
                 }}>
                   <div style={{ color: C.muted, fontWeight: 500, fontSize: T.fMicro }}>
                     {L === "hi" ? "छह-दिवसीय कन्द षष्ठी क्रम" : "Six-day Kanda Sashti sequence"}
@@ -554,9 +560,9 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
               )}
               {ayyappaSeq && (
                 <div style={{
-                  display: "grid", gap: 7, fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
-                  background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
-                  borderRadius: T.rSm, padding: "9px 10px", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
+                  display: "grid", gap: "0.4375rem", fontSize: T.fSmall, color: "var(--good)", fontWeight: 600,
+                  background: "var(--good-surface)", border: "0.0625rem solid var(--good-surface)",
+                  borderRadius: T.rSm, padding: "0.5625rem 0.625rem", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
                 }}>
                   <div style={{ color: C.muted, fontWeight: 500, fontSize: T.fMicro }}>
                     {L === "hi" ? `41-दिवसीय मंडल-काल (${ayyappaSeq.spanDays} दिन)` : `41-day Mandala season (${ayyappaSeq.spanDays} days)`}
@@ -570,11 +576,11 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
               )}
               {grahan && (
                 <div style={{
-                  display: "grid", gap: 7, fontSize: T.fSmall, fontWeight: 600,
-                  background: grahan.visible ? "rgba(31,122,77,.07)" : "rgba(194,69,30,.06)",
-                  border: `1px solid ${grahan.visible ? "rgba(31,122,77,.22)" : "rgba(194,69,30,.25)"}`,
-                  color: grahan.visible ? "#1F7A4D" : C.sindoor,
-                  borderRadius: T.rSm, padding: "9px 10px", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
+                  display: "grid", gap: "0.4375rem", fontSize: T.fSmall, fontWeight: 600,
+                  background: grahan.visible ? "var(--good-surface)" : "var(--bad-surface)",
+                  border: `0.0625rem solid ${grahan.visible ? "var(--good-surface)" : "var(--bad-surface)"}`,
+                  color: grahan.visible ? "var(--good)" : C.sindoor,
+                  borderRadius: T.rSm, padding: "0.5625rem 0.625rem", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
                 }}>
                   <div style={{ color: C.ivory, fontWeight: 600 }}>
                     {grahan.visible
@@ -627,9 +633,9 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
               )}
               {lakshmiPuja && (
                 <div style={{
-                  display: "grid", gap: 7, fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
-                  background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
-                  borderRadius: T.rSm, padding: "9px 10px", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
+                  display: "grid", gap: "0.4375rem", fontSize: T.fSmall, color: "var(--good)", fontWeight: 600,
+                  background: "var(--good-surface)", border: "0.0625rem solid var(--good-surface)",
+                  borderRadius: T.rSm, padding: "0.5625rem 0.625rem", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
                 }}>
                   {lakshmiPuja.primary ? (
                     <div>
@@ -658,7 +664,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                 </div>
               )}
               {punyaKala && (
-                <div style={{ display: "grid", gap: 5, padding: "9px 10px", borderRadius: T.rSm, background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)", fontSize: T.fSmall, color: "#1F7A4D", fontVariantNumeric: "tabular-nums", lineHeight: 1.45 }}>
+                <div style={{ display: "grid", gap: "0.3125rem", padding: "0.5625rem 0.625rem", borderRadius: T.rSm, background: "var(--good-surface)", border: "0.0625rem solid var(--good-surface)", fontSize: T.fSmall, color: "var(--good)", fontVariantNumeric: "tabular-nums", lineHeight: 1.45 }}>
                   <div><strong>{L === "hi" ? "संक्रांति क्षण: " : "Sankranti moment: "}</strong>{formatLocalClock(punyaKala.ingress, tz, hit.ms, L)}</div>
                   <div><strong>{L === "hi" ? "पुण्य काल: " : "Punya Kala: "}</strong>{formatLocalClock(punyaKala.punya.start, punyaKala.tz, hit.ms, L)}–{formatLocalClock(punyaKala.punya.end, punyaKala.tz, hit.ms, L)}</div>
                   <div><strong>{L === "hi" ? "महा पुण्य काल: " : "Maha Punya Kala: "}</strong>{formatLocalClock(punyaKala.mahaPunya.start, punyaKala.tz, hit.ms, L)}–{formatLocalClock(punyaKala.mahaPunya.end, punyaKala.tz, hit.ms, L)}</div>
@@ -667,9 +673,9 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
               )}
               {d && !navratri && !lakshmiPuja && !chhathSeq && !skandaSeq && !ayyappaSeq && !grahan && (dayKala || d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars) && (
                 <div style={{
-                  fontSize: T.fSmall, color: "#1F7A4D", fontWeight: 600,
-                  background: "rgba(31,122,77,.07)", border: "1px solid rgba(31,122,77,.22)",
-                  borderRadius: T.rSm, padding: "7px 10px", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
+                  fontSize: T.fSmall, color: "var(--good)", fontWeight: 600,
+                  background: "var(--good-surface)", border: "0.0625rem solid var(--good-surface)",
+                  borderRadius: T.rSm, padding: "0.4375rem 0.625rem", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
                 }}>
                   {d.parana
                     ? <>{L === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, hit.ms)}{L === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {L === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, hit.ms)}</span>}</>
@@ -694,8 +700,14 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                 </div>
               )}
               {decidingLabel && !(d && (navratri || lakshmiPuja || chhathSeq || skandaSeq || ayyappaSeq || dayKala || d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars)) && (
-                <div style={{ fontSize: T.fMicro, color: C.muted }}>
+                <div className="technical-only" style={{ fontSize: T.fMicro, color: C.muted }}>
                   {L === "hi" ? "तिथि तय होने का आधार: " : "Date chosen by: "}{decidingLabel}
+                </div>
+              )}
+              {showExpert && (
+                <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: "0.25rem", fontVariantNumeric: "tabular-nums" }}>
+                  {(L === "hi" ? "गणना: लाहिरी अयनांश · मध्यम राहु/केतु · स्थानीय सूर्योदय आधार" : "Method: Lahiri ayanamsa · mean Rahu/Ketu · local sunrise basis")}
+                  {place?.label ? ` · ${place.label}` : ""}
                 </div>
               )}
               {timingText && (
@@ -722,9 +734,9 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
             )}
           </>
         ) : (
-          <div style={{ display: "grid", gap: 10 }}>
+          <div style={{ display: "grid", gap: "0.625rem" }}>
             {meta && meta.gloss && (
-              <div style={{ padding: "12px 13px", borderRadius: T.rMd, background: C.panel, border: `1px solid ${C.line}`, color: C.ivory, fontSize: T.fSmall, lineHeight: 1.55 }}>
+              <div style={{ padding: "0.75rem 0.8125rem", borderRadius: T.rMd, background: C.panel, border: `0.0625rem solid ${C.line}`, color: C.ivory, fontSize: T.fSmall, lineHeight: 1.55 }}>
                 {meta.gloss[L]}
               </div>
             )}

@@ -159,7 +159,7 @@ includesAll(speech, ["speechSynthesis", "SpeechSynthesisUtterance", '"hi-IN"', "
 const telemetry = read("src/telemetry/privacy-events.ts");
 includesAll(telemetry, ["analyticsConsentGranted()", "VITE_ANALYTICS_ENDPOINT"], "analytics consent gate");
 const placeInput = read("src/components/PlaceInput.tsx");
-includesAll(placeInput, ['background: C.panel || "#FFFDF7"', 'background: C.panel || "#FFFFFF"'], "semantic place input");
+includesAll(placeInput, ['background: C.panel || "var(--surface-sunken)"', 'background: C.panel || "var(--surface-active)"'], "semantic place input");
 expect(/function tokenHex\(name\)/.test(fs.readFileSync(__filename, "utf8")), "contrast gate must parse actual theme token values");
 
 const daily = read("src/screens/DailyScreen.tsx");

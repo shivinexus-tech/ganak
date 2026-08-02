@@ -116,41 +116,41 @@ export default function MuhuratActions({ result, category, categoryLabel, action
     privacyEvent("muhurat_export",{action:category,language:lang});
   };
   return (
-    <div className="no-print" style={{ marginTop: T.s3, paddingTop: T.s3, borderTop: `1px solid ${C.line}` }}>
-      <div style={{ ...T.label, color: C.muted, marginBottom: 7 }}>{lang === "hi" ? "सहेजें एवं साझा करें" : "SAVE & SHARE"}</div>
-      <div style={{ fontSize: T.fSmall, color: C.muted, lineHeight: 1.5, marginBottom: 8 }}>
+    <div className="no-print" style={{ marginTop: T.s3, paddingTop: T.s3, borderTop: `0.0625rem solid ${C.line}` }}>
+      <div style={{ ...T.label, color: C.muted, marginBottom: "0.4375rem" }}>{lang === "hi" ? "सहेजें एवं साझा करें" : "SAVE & SHARE"}</div>
+      <div style={{ fontSize: T.fSmall, color: C.muted, lineHeight: 1.5, marginBottom: "0.5rem" }}>
         {lang === "hi" ? "यह परिणाम किसी को भेजें या बाद में फिर खोलें।" : "Send this result to someone or open it again later."}
       </div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <button onClick={copyShare} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "8px 13px", border: `1px solid ${C.gold}`, background: "#FFF", color: C.gold, cursor: "pointer" }}>
+      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+        <button onClick={copyShare} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "0.5rem 0.8125rem", border: `0.0625rem solid ${C.gold}`, background: "var(--on-accent)", color: C.gold, cursor: "pointer" }}>
           {lang === "hi" ? "इस परिणाम का लिंक कॉपी करें" : "Copy link to this result"}
         </button>
-        <button onClick={() => setConfirmCity(true)} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "8px 13px", border: `1px solid ${C.line}`, background: "#FFF", color: C.ivory, cursor: "pointer" }}>
+        <button onClick={() => setConfirmCity(true)} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "0.5rem 0.8125rem", border: `0.0625rem solid ${C.line}`, background: "var(--on-accent)", color: C.ivory, cursor: "pointer" }}>
           {lang === "hi" ? "कैलेंडर में जोड़ें" : "Add to calendar"}
         </button>
       </div>
       {confirmCity && (
-        <div role="group" aria-label={lang === "hi" ? "कैलेंडर का शहर पक्का करें" : "Confirm calendar city"} style={{ marginTop: 10, padding: 12, borderRadius: T.rMd, border: `1px solid ${C.gold}`, background: "#FFF9ED" }}>
+        <div role="group" aria-label={lang === "hi" ? "कैलेंडर का शहर पक्का करें" : "Confirm calendar city"} style={{ marginTop: "0.625rem", padding: "0.75rem", borderRadius: T.rMd, border: `0.0625rem solid ${C.gold}`, background: "var(--surface-raised)" }}>
           <div style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.ivory }}>
             {lang === "hi" ? `${place.label} के लिए स्मरण जोड़ें?` : `Add this reminder for ${place.label}?`}
           </div>
-          <div style={{ fontSize: T.fSmall, color: C.muted, lineHeight: 1.5, marginTop: 3 }}>
+          <div style={{ fontSize: T.fSmall, color: C.muted, lineHeight: 1.5, marginTop: "0.1875rem" }}>
             {lang === "hi" ? "तारीख़ और मुहूर्त का समय इसी शहर के स्थानीय समय में है।" : "The date and Muhurat window use this city’s local time."}
           </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
-            <button onClick={exportCalendar} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "8px 13px", border: 0, background: C.gold, color: "#FFF", cursor: "pointer" }}>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.625rem" }}>
+            <button onClick={exportCalendar} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "0.5rem 0.8125rem", border: 0, background: C.gold, color: "var(--on-accent)", cursor: "pointer" }}>
               {lang === "hi" ? "हाँ, कैलेंडर में जोड़ें" : "Yes, add to calendar"}
             </button>
-            <button onClick={() => { setConfirmCity(false); onChangeCity(); }} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "8px 13px", border: `1px solid ${C.line}`, background: "#FFF", color: C.ivory, cursor: "pointer" }}>
+            <button onClick={() => { setConfirmCity(false); onChangeCity(); }} style={{ minHeight: T.ctrlH, borderRadius: T.rMd, padding: "0.5rem 0.8125rem", border: `0.0625rem solid ${C.line}`, background: "var(--on-accent)", color: C.ivory, cursor: "pointer" }}>
               {lang === "hi" ? "शहर बदलें" : "Change city"}
             </button>
           </div>
         </div>
       )}
-      <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5, marginTop: 7 }}>
+      <div style={{ fontSize: T.fMicro, color: C.muted, lineHeight: 1.5, marginTop: "0.4375rem" }}>
         {lang === "hi" ? "कोई ब्राउज़र संग्रह नहीं। स्मरण आपके कैलेंडर ऐप में रहता है।" : "No browser storage. The reminder stays in your calendar app."}
       </div>
-      {notice && <div role="status" style={{ fontSize: T.fSmall, color: C.gold, marginTop: 6 }}>{notice}</div>}
+      {notice && <div role="status" style={{ fontSize: T.fSmall, color: C.gold, marginTop: "0.375rem" }}>{notice}</div>}
     </div>
   );
 }

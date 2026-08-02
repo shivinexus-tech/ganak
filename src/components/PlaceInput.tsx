@@ -56,7 +56,7 @@ function PlaceInput({ value, onPick, C, lang = "en", onConfirmed, inputId }) {
   };
 
   return (
-    <div style={{ position: "relative", minWidth: 180, flex: "0 1 240px" }}>
+    <div style={{ position: "relative", minWidth: "11.25rem", flex: "0 1 240px" }}>
       <input
         id={inputId}
         value={q}
@@ -64,17 +64,17 @@ function PlaceInput({ value, onPick, C, lang = "en", onConfirmed, inputId }) {
         onFocus={(e) => { e.target.select(); setOpen(true); }}
         placeholder={lang === "hi" ? "शहर बदलें…" : "Change city…"}
         autoComplete="off"
-        style={{ width: "100%", height: T.ctrlH, boxSizing: "border-box", background: C.panel || "#FFFDF7", border: `1px solid ${C.line}`, borderRadius: T.rMd, color: C.ivory, padding: "0 12px", fontSize: 13.5, fontFamily: "Spectral, serif", outline: "none" }}
+        style={{ width: "100%", height: T.ctrlH, boxSizing: "border-box", background: C.panel || "var(--surface-sunken)", border: `0.0625rem solid ${C.line}`, borderRadius: T.rMd, color: C.ivory, padding: "0 0.75rem", fontSize: "var(--font-small)", fontFamily: "var(--font-body-family)", outline: "none" }}
       />
       {open && (sugs.length > 0 || busy) && (
-        <div style={{ position: "absolute", left: 0, right: 0, top: "100%", zIndex: 20, background: C.panel || "#FFFFFF", border: `1px solid ${C.gold}`, borderRadius: 8, marginTop: 4, overflow: "hidden", boxShadow: "0 12px 30px rgba(95,70,20,.18)" }}>
+        <div style={{ position: "absolute", left: 0, right: 0, top: "100%", zIndex: 20, background: C.panel || "var(--surface-active)", border: `0.0625rem solid ${C.gold}`, borderRadius: "0.5rem", marginTop: "0.25rem", overflow: "hidden", boxShadow: "0 12px 30px rgba(95,70,20,.18)" }}>
           {sugs.map((p) => (
             <button key={p.label + p.lat} className="sug" onClick={() => pick(p)}
-              style={{ display: "block", width: "100%", textAlign: "left", padding: "8px 12px", background: "transparent", border: "none", borderBottom: `1px solid ${C.line}`, color: C.ivory, fontFamily: "Spectral, serif", fontSize: 13, cursor: "pointer" }}>
+              style={{ display: "block", width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", background: "transparent", border: "none", borderBottom: `0.0625rem solid ${C.line}`, color: C.ivory, fontFamily: "var(--font-body-family)", fontSize: "var(--font-small)", cursor: "pointer" }}>
               {p.label}
             </button>
           ))}
-          {busy && <div style={{ padding: "8px 12px", color: C.muted, fontSize: 12 }}>{lang === "hi" ? "और स्थान खोजे जा रहे हैं…" : "Searching more places…"}</div>}
+          {busy && <div style={{ padding: "0.5rem 0.75rem", color: C.muted, fontSize: "var(--font-label)" }}>{lang === "hi" ? "और स्थान खोजे जा रहे हैं…" : "Searching more places…"}</div>}
         </div>
       )}
     </div>

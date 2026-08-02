@@ -82,6 +82,20 @@
   --focus: var(--accent);
   --bg-active: var(--bg);
   --surface-active: var(--surface);
+
+  /* Derived semantic surfaces. Architecture, not brand values: every one of these is
+   * computed from the slots above, so the later brand swap moves them automatically and
+   * legacy screens never need a raw colour again. */
+  --surface-sunken: color-mix(in srgb, var(--bg-active), var(--surface-active) 55%);
+  --surface-raised: color-mix(in srgb, var(--surface-active), var(--accent) 3%);
+  --surface-hover: color-mix(in srgb, var(--accent), var(--surface-active) 92%);
+  --accent-soft: color-mix(in srgb, var(--accent), var(--surface-active) 88%);
+  --accent-strong: color-mix(in srgb, var(--accent), var(--ink) 18%);
+  --accent-line: color-mix(in srgb, var(--accent), var(--line) 55%);
+  --line-soft: color-mix(in srgb, var(--line), var(--surface-active) 45%);
+  --on-accent: var(--surface);
+  --good-line: color-mix(in srgb, var(--good), var(--line) 45%);
+  --bad-line: color-mix(in srgb, var(--bad), var(--line) 45%);
 }
 
 html[data-comfort-preset="simple-large"] { --scale: 112.5%; --density: 0.1875rem; }
@@ -116,8 +130,14 @@ html[data-warmth="crisp"] {
   --surface-active: var(--surface);
 }
 
-html[data-depth="guided"] .expert-only { display: none !important; }
-html[data-depth="expert"] .guided-only { display: none !important; }
+/* Guidance depth is a three-step ladder, so every step must be defined — including the
+ * default "balanced". Screens drive this in React through useDepth(); these rules exist so
+ * static markup cannot land in a state where guided and expert copy render together. */
+html[data-depth="guided"] .expert-only,
+html[data-depth="balanced"] .expert-only { display: none !important; }
+html[data-depth="expert"] .guided-only,
+html[data-depth="balanced"] .guided-only { display: none !important; }
+html[data-depth="guided"] .technical-only { display: none !important; }
 
 body {
   margin: 0;
@@ -161,8 +181,16 @@ body {
   border: 0;
 }
 
+/* Increased contrast must win in light, dark and OS-auto alike. The dark selectors above are
+ * more specific than a bare :root, so this block restates them and relies on source order. */
 @media (prefers-contrast: more) {
-  :root { --line: currentColor; }
+  :root,
+  html[data-color-mode="light"],
+  html[data-color-mode="dark"],
+  html:not([data-color-mode="light"]) {
+    --line: currentColor;
+    --line-soft: currentColor;
+  }
   .comfort-focus:focus-visible,
   [data-comfort-focus]:focus-visible { outline-width: 0.25rem; }
 }

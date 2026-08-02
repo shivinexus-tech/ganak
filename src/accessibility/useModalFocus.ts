@@ -17,6 +17,22 @@ export function useModalFocus(open: boolean, onClose: () => void) {
     const initial = container.querySelector<HTMLElement>("[data-modal-autofocus]") || focusable()[0];
     initial?.focus();
 
+    // Trapping Tab is not enough: a screen-reader user can still swipe out of the dialog
+    // into the page behind it. Take the rest of the app out of the accessibility tree for
+    // as long as the dialog is open, and put it back exactly as it was on close.
+    const overlay = container.closest<HTMLElement>('[role="dialog"]') || container;
+    const siblings = Array.from(overlay.parentElement?.children || [])
+      .filter((element): element is HTMLElement => element instanceof HTMLElement && element !== overlay);
+    const restore = siblings.map((element) => ({
+      element,
+      hidden: element.getAttribute("aria-hidden"),
+      inert: element.hasAttribute("inert"),
+    }));
+    siblings.forEach((element) => {
+      element.setAttribute("aria-hidden", "true");
+      element.setAttribute("inert", "");
+    });
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
@@ -39,6 +55,11 @@ export function useModalFocus(open: boolean, onClose: () => void) {
     document.addEventListener("keydown", onKeyDown);
     return () => {
       document.removeEventListener("keydown", onKeyDown);
+      restore.forEach(({ element, hidden, inert }) => {
+        if (hidden == null) element.removeAttribute("aria-hidden");
+        else element.setAttribute("aria-hidden", hidden);
+        if (!inert) element.removeAttribute("inert");
+      });
       previous?.focus();
     };
   }, [open]);

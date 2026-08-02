@@ -10,6 +10,7 @@ import DiamondChart from "../components/DiamondChart";
 import SouthChart from "../components/SouthChart";
 import EastChart from "../components/EastChart";
 import { urlPrefGet, urlPrefSet } from "../components/url-prefs";
+import { useDepth } from "../accessibility/ComfortProvider";
 import { VARGAS, SPECIAL_CHARTS, SIGN_SHORT, PLANET_GLYPH } from "../data/chart-divisions";
 import { vargaSign } from "../engine/varga";
 import { SEVEN } from "../engine/classical";
@@ -39,9 +40,13 @@ const DASHA_NOTE = {
   Mercury: "intellect, commerce, communication; the mind quickens",
 };
 
-const PLANET_COLOR = { Sun: "#C05A0C", Moon: "#4E6E96", Mars: "#BB3A2A", Mercury: "#2C7D4F", Jupiter: "#9A7000", Venus: "#B3537F", Saturn: "#46588F", Rahu: "#6E5C82", Ketu: "#8A5A36" };
+const PLANET_COLOR = { Sun: "color-mix(in srgb, #C05A0C, var(--ink) 26%)", Moon: "color-mix(in srgb, #4E6E96, var(--ink) 26%)", Mars: "color-mix(in srgb, #BB3A2A, var(--ink) 26%)", Mercury: "color-mix(in srgb, #2C7D4F, var(--ink) 26%)", Jupiter: "color-mix(in srgb, #9A7000, var(--ink) 26%)", Venus: "color-mix(in srgb, #B3537F, var(--ink) 26%)", Saturn: "color-mix(in srgb, #46588F, var(--ink) 26%)", Rahu: "color-mix(in srgb, #6E5C82, var(--ink) 26%)", Ketu: "color-mix(in srgb, #8A5A36, var(--ink) 26%)" };
 
 export default function ChartScreen({ C, card, lang }) {
+  // Guidance depth. Guided keeps the chart and the plain reading; Balanced is unchanged;
+  // Expert additionally states the calculation basis. The chart itself, every date and
+  // every caution stay visible at all three depths.
+  const { showPlainHelp, showExpert, showTechnical } = useDepth();
   const hi = lang === "hi";
   const [form, setForm] = useState({ name: "", date: "1995-08-15", time: "06:30" });
   const [place, setPlace] = useState({ label: "New Delhi, India", lat: 28.61, lon: 77.21, zone: "Asia/Kolkata" });
@@ -173,11 +178,11 @@ export default function ChartScreen({ C, card, lang }) {
   }, [ayanamsa]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const inputStyle = {
-    width: "100%", boxSizing: "border-box", background: "#FFFDF7",
-    border: `1px solid ${C.line}`, borderRadius: 6, color: C.ivory,
-    padding: "10px 12px", fontSize: 15, fontFamily: "Spectral, serif", outline: "none",
+    width: "100%", boxSizing: "border-box", background: "var(--surface-sunken)",
+    border: `0.0625rem solid ${C.line}`, borderRadius: "0.375rem", color: C.ivory,
+    padding: "0.625rem 0.75rem", fontSize: "var(--font-body)", fontFamily: "var(--font-body-family)", outline: "none",
   };
-  const labelStyle = { ...T.label, color: C.muted, display: "block", marginBottom: 6 };
+  const labelStyle = { ...T.label, color: C.muted, display: "block", marginBottom: "0.375rem" };
 
   const Eyebrow = ({ deva, en, id }) => (
     <div id={id} style={{ display: "flex", alignItems: "baseline", gap: T.s3, margin: `${T.s8} 0 ${T.s4}`, borderBottom: `1px solid ${C.line}`, paddingBottom: T.s3, scrollMarginTop: 64 }}>
@@ -221,12 +226,12 @@ export default function ChartScreen({ C, card, lang }) {
   return (
     <>
       {r && (
-          <JyotishPanelNav lang={lang} C={C} />
+          <JyotishPanelNav lang={lang} C={C} showTechnical={showTechnical} />
       )}
           <>
         {/* birth details */}
-        <section className="rise2" style={{ ...card, padding: 24 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 14 }}>
+        <section className="rise2" style={{ ...card, padding: "1.5rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.875rem" }}>
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={labelStyle}>{lang === "hi" ? "नाम" : "Name"}</label>
               <input style={inputStyle} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={lang === "hi" ? "जैसे: प्रिया शर्मा" : "e.g. Priya Sharma"} />
@@ -249,25 +254,25 @@ export default function ChartScreen({ C, card, lang }) {
                 autoComplete="off"
               />
               {sugs.length > 0 && !place && (
-                <div style={{ position: "absolute", left: 0, right: 0, top: "100%", zIndex: 10, background: "#FFFFFF", border: `1px solid ${C.gold}`, borderRadius: 8, marginTop: 4, overflow: "hidden", boxShadow: "0 12px 30px rgba(95,70,20,.18)" }}>
+                <div style={{ position: "absolute", left: 0, right: 0, top: "100%", zIndex: 10, background: "var(--surface-active)", border: `0.0625rem solid ${C.gold}`, borderRadius: "0.5rem", marginTop: "0.25rem", overflow: "hidden", boxShadow: "0 12px 30px rgba(95,70,20,.18)" }}>
                   {sugs.map((p) => (
                     <button
                       key={p.label + p.lat}
                       onClick={() => choosePlace(p)}
                       className="sug"
-                      style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", background: "transparent", border: "none", borderBottom: `1px solid ${C.line}`, color: C.ivory, fontFamily: "Spectral, serif", fontSize: 14.5, cursor: "pointer" }}
+                      style={{ display: "block", width: "100%", textAlign: "left", padding: "0.625rem 0.875rem", background: "transparent", border: "none", borderBottom: `0.0625rem solid ${C.line}`, color: C.ivory, fontFamily: "var(--font-body-family)", fontSize: "var(--font-body)", cursor: "pointer" }}
                     >
                       {p.label}
-                      <span style={{ color: C.muted, fontSize: 12, marginLeft: 8 }}>
+                      <span style={{ color: C.muted, fontSize: "var(--font-label)", marginLeft: "0.5rem" }}>
                         {Math.abs(p.lat).toFixed(2)}°{p.lat >= 0 ? "N" : "S"}, {Math.abs(p.lon).toFixed(2)}°{p.lon >= 0 ? "E" : "W"}
                       </span>
                     </button>
                   ))}
-                  {searching && <div style={{ padding: "8px 14px", color: C.muted, fontSize: 12 }}>{lang === "hi" ? "और स्थान खोजे जा रहे हैं…" : "Searching more places…"}</div>}
+                  {searching && <div style={{ padding: "0.5rem 0.875rem", color: C.muted, fontSize: "var(--font-label)" }}>{lang === "hi" ? "और स्थान खोजे जा रहे हैं…" : "Searching more places…"}</div>}
                 </div>
               )}
               {place && (
-                <p style={{ color: C.muted, fontSize: 12.5, margin: "8px 0 0" }}>
+                <p style={{ color: C.muted, fontSize: "var(--font-small)", margin: "0.5rem 0 0" }}>
                   <span style={{ color: C.gold }}>✓</span>{" "}
                   {Math.abs(place.lat).toFixed(2)}°{place.lat >= 0 ? "N" : "S"}, {Math.abs(place.lon).toFixed(2)}°{place.lon >= 0 ? "E" : "W"}
                   {place.zone && <> · {place.zone}</>}
@@ -285,21 +290,21 @@ export default function ChartScreen({ C, card, lang }) {
               />
             </div>
           </div>
-          {err && <p style={{ color: C.sindoor, fontSize: 14, margin: "12px 0 0" }}><span aria-hidden="true">⚠ </span>{err}</p>}
-          <div style={{ marginTop: 16 }}>
+          {err && <p style={{ color: C.sindoor, fontSize: "var(--font-body)", margin: "0.75rem 0 0" }}><span aria-hidden="true">⚠ </span>{err}</p>}
+          <div style={{ marginTop: "1rem" }}>
             <label style={labelStyle}>{lang === "hi" ? "अयनांश" : "Ayanamsa"}</label>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 8, marginTop: 6 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.5rem", marginTop: "0.375rem" }}>
               {Object.entries(AYANAMSA).map(([k, v]) => (
                 <button key={k} onClick={() => setAyanamsa(k)}
-                  style={{ padding: "9px 10px", borderRadius: 8, cursor: "pointer", fontSize: 12.5, fontWeight: 600,
-                    border: ayanamsa === k ? "1.5px solid #A86A12" : "1px solid #D9CCAE",
-                    background: ayanamsa === k ? "rgba(168,106,18,.10)" : "#FBF6EC",
+                  style={{ padding: "0.5625rem 0.625rem", borderRadius: "0.5rem", cursor: "pointer", fontSize: "var(--font-small)", fontWeight: 600,
+                    border: ayanamsa === k ? "0.0938rem solid var(--accent)" : "0.0625rem solid var(--line)",
+                    background: ayanamsa === k ? "var(--accent-soft)" : "var(--surface-raised)",
                     color: ayanamsa === k ? C.gold : C.muted }}>
                   {v.label}
                 </button>
               ))}
             </div>
-            <p style={{ color: C.muted, fontSize: 11.5, margin: "6px 0 0", lineHeight: 1.5 }}>
+            <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "0.375rem 0 0", lineHeight: 1.5 }}>
               {lang === "hi"
                 ? "लाहिरी सरकारी/वैदिक मानक (डिफ़ॉल्ट) है। रमन इससे ~1°28′ भिन्न है; KP (कृष्णमूर्ति) ~5′48″ पहले — उप-स्वामी कार्य हेतु; ट्रू चित्रपक्ष चित्रा को ठीक 180° पर रखता है और व्यवहार में लाहिरी के समान रहता है।"
                 : "Lahiri is the government/Vedic standard (default). Raman differs by ~1°28′; KP (Krishnamurti) is ~5′48″ earlier — needed for sub-lord work; True Chitrapaksha fixes Spica at exactly 180° and in practice coincides with Lahiri."}
@@ -307,11 +312,11 @@ export default function ChartScreen({ C, card, lang }) {
           </div>
           <button
             onClick={generate}
-            className="castBtn" style={{ marginTop: 18, width: "100%", padding: "14px 0", background: `linear-gradient(180deg, #E08A22, #C9711A 55%, #B0610F)`, color: "#FFF8E9", border: "1px solid #D98E33", borderRadius: 9, fontFamily: "Eczar, serif", fontWeight: 700, fontSize: 17, letterSpacing: "0.07em", cursor: "pointer", boxShadow: "0 6px 18px rgba(168,106,18,.25)" }}
+            className="castBtn" style={{ marginTop: "1.125rem", width: "100%", padding: "0.875rem 0", background: `linear-gradient(180deg, var(--accent), var(--accent-strong) 55%, var(--accent))`, color: "var(--on-accent)", border: "0.0625rem solid var(--gold)", borderRadius: "0.5625rem", fontFamily: "var(--font-display-family)", fontWeight: 700, fontSize: "var(--font-title)", letterSpacing: "0.07em", cursor: "pointer", boxShadow: "0 6px 18px var(--accent-soft)" }}
           >
             {lang === "hi" ? "कुंडली बनाएँ" : "Cast the chart"}
           </button>
-          <p style={{ color: C.muted, fontSize: 12, margin: "10px 0 0", lineHeight: 1.5 }}>
+          <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "0.625rem 0 0", lineHeight: 1.5 }}>
             {lang === "hi"
               ? "UTC ऑफ़सेट जन्म स्थान और तिथि से स्वतः निकाला जाता है, ऐतिहासिक डेलाइट सेविंग सहित। सूर्य और चन्द्र आर्क-सेकंड परिशुद्धता वाले एफ़ेमेरिस (Meeus/VSOP) से, और पाँच तारा-ग्रह VSOP87 से (प्रकाश-काल, वार्षिक विपथन व नमन सहित) — लगभग आर्क-सेकंड तक सटीक स्थितियाँ।"
               : "The UTC offset is resolved automatically from the birth place and date, including historical daylight saving. Sun and Moon use an arc-second ephemeris (Meeus/VSOP), and the five star-planets use VSOP87 with light-time, annual aberration, and nutation — apparent positions accurate to about an arc-second, validated against Meeus's worked example (Venus) to 0.8″."}
@@ -330,30 +335,40 @@ export default function ChartScreen({ C, card, lang }) {
       {r && (
           <>
             {/* Save-as-PDF (print). Hidden in the printed output itself. */}
-            <div className="no-print" style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}>
-              <button onClick={() => window.print()} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 16px", borderRadius: 9, border: `1px solid ${C.gold}`, background: "#FFFDF7", color: C.gold, cursor: "pointer", fontFamily: "Spectral, serif", fontSize: 13 }}>
+            <div className="no-print" style={{ display: "flex", justifyContent: "flex-end", marginBottom: "0.375rem" }}>
+              <button onClick={() => window.print()} style={{ display: "inline-flex", alignItems: "center", gap: "0.4375rem", padding: "0.5rem 1rem", borderRadius: "0.5625rem", border: `0.0625rem solid ${C.gold}`, background: "var(--surface-sunken)", color: C.gold, cursor: "pointer", fontFamily: "var(--font-body-family)", fontSize: "var(--font-small)" }}>
                 ⬇ {hi ? "पीडीएफ़ सहेजें" : "Save as PDF"}
               </button>
             </div>
             {/* print-only report header (the on-screen form inputs are hidden in print) */}
-            <div className="print-only" style={{ textAlign: "center", marginBottom: 18, borderBottom: `2px solid ${C.gold}`, paddingBottom: 12 }}>
-              <div style={{ fontFamily: "Eczar, serif", fontSize: 26, color: C.gold }}>{((chartContext?.form || form).name) || (hi ? "जन्म कुंडली" : "Janma Kundli")}</div>
-              <div style={{ fontSize: 13.5, color: C.ivory, marginTop: 4 }}>{(chartContext?.form || form).date} · {(chartContext?.form || form).time} · {(chartContext?.place || place)?.label}</div>
-              <div style={{ fontSize: 11, color: C.muted, marginTop: 3, letterSpacing: ".08em" }}>{hi ? "अयनांश" : "Ayanamsa"}: {AYANAMSA[chartContext?.ayanamsa || ayanamsa]?.label || (chartContext?.ayanamsa || ayanamsa)} · Ganak · ganak.pages.dev</div>
+            <div className="print-only" style={{ textAlign: "center", marginBottom: "1.125rem", borderBottom: `0.125rem solid ${C.gold}`, paddingBottom: "0.75rem" }}>
+              <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-display)", color: C.gold }}>{((chartContext?.form || form).name) || (hi ? "जन्म कुंडली" : "Janma Kundli")}</div>
+              <div style={{ fontSize: "var(--font-small)", color: C.ivory, marginTop: "0.25rem" }}>{(chartContext?.form || form).date} · {(chartContext?.form || form).time} · {(chartContext?.place || place)?.label}</div>
+              <div style={{ fontSize: "var(--font-label)", color: C.muted, marginTop: "0.1875rem", letterSpacing: ".08em" }}>{hi ? "अयनांश" : "Ayanamsa"}: {AYANAMSA[chartContext?.ayanamsa || ayanamsa]?.label || (chartContext?.ayanamsa || ayanamsa)} · Ganak · ganak.pages.dev</div>
             </div>
 
             {/* identity strip */}
             <Eyebrow id="summary" deva="जन्म विवरण" en="Birth summary" />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
+            {showPlainHelp && <p style={{ margin: "0 0 0.75rem", padding: "0.625rem 0.75rem", borderRadius: T.rMd, background: "var(--surface-raised)", border: "0.0625rem solid var(--line)", color: C.ivory, fontSize: "var(--font-small)", lineHeight: 1.55 }}>
+              {hi
+                ? "सबसे ज़रूरी तीन बातें नीचे हैं — लग्न, चन्द्र राशि और जन्म नक्षत्र। बाक़ी विवरण नीचे क्रम से मिलेगा; पूरा पढ़ना आवश्यक नहीं।"
+                : "The three that matter most are just below — your Lagna, Moon sign and birth Nakshatra. Everything else follows in order; you do not have to read all of it."}
+            </p>}
+            {showExpert && <p style={{ margin: "0 0 0.75rem", color: C.muted, fontSize: "var(--font-label)", fontVariantNumeric: "tabular-nums" }}>
+              {(hi ? "गणना आधार: " : "Calculation basis: ")}
+              {(hi ? "अयनांश " : "ayanamsa ") + (AYANAMSA[ayanamsa]?.label || ayanamsa)}
+              {hi ? " · मध्यम राहु/केतु · पूर्ण-राशि भाव · भाव-संधि श्रीपति" : " · mean Rahu/Ketu · whole-sign houses · Sripati bhava cusps"}
+            </p>}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "0.75rem" }}>
               {[
                 [hi ? "लग्न" : "Lagna (Ascendant)", `${SIGNS[r.ascSign].split(" ")[0]} ${fmtDeg(r.ascDeg)}`],
                 [hi ? "राशि (चन्द्र राशि)" : "Rashi (Moon sign)", SIGNS[r.moon.sign].split(" ")[0]],
                 [hi ? "जन्म नक्षत्र" : "Janma Nakshatra", `${NAKSHATRAS[r.moon.nak]} · ${hi ? "पाद" : "pada"} ${r.moon.pada}`],
                 [hi ? "सूर्य राशि" : "Surya (Sun sign)", SIGNS[r.sun.sign].split(" ")[0]],
               ].map(([k, v]) => (
-                <div key={k} style={{ ...card, padding: "14px 16px" }}>
-                  <div style={{ ...T.label, color: C.muted, marginBottom: 6 }}>{k}</div>
-                  <div style={{ fontFamily: "Eczar, serif", fontSize: 17, color: C.gold, overflowWrap: "anywhere" }}>{v}</div>
+                <div key={k} style={{ ...card, padding: "0.875rem 1rem" }}>
+                  <div style={{ ...T.label, color: C.muted, marginBottom: "0.375rem" }}>{k}</div>
+                  <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-title)", color: C.gold, overflowWrap: "anywhere" }}>{v}</div>
                 </div>
               ))}
             </div>
@@ -372,45 +387,45 @@ export default function ChartScreen({ C, card, lang }) {
 
             {/* chart */}
             <Eyebrow id="chart" deva="षोडशवर्ग" en={`${curVarga.k} · ${curVarga.name}`} />
-            <div className="rise" style={{ ...card, padding: "20px 14px 18px" }}>
+            <div className="rise" style={{ ...card, padding: "1.25rem 0.875rem 1.125rem" }}>
               {/* reference lagna: contained segmented control, wraps 4→2×2 on narrow screens */}
-              <div style={{ margin: "0 4px 12px" }}>
-                <div style={{ ...T.label, color: C.muted, marginBottom: 7, textAlign: "center" }}>{hi ? "भावों की गणना यहाँ से" : "Houses counted from"}</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 4, background: "#F4ECD9", border: `1px solid ${C.line}`, borderRadius: 12, padding: 4 }}>
+              <div style={{ margin: "0 0.25rem 0.75rem" }}>
+                <div style={{ ...T.label, color: C.muted, marginBottom: "0.4375rem", textAlign: "center" }}>{hi ? "भावों की गणना यहाँ से" : "Houses counted from"}</div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.25rem", background: "var(--surface-sunken)", border: `0.0625rem solid ${C.line}`, borderRadius: "0.75rem", padding: "0.25rem" }}>
                   {REFS.map((rf) => (
                     <button key={rf.k} onClick={() => setRefPt(rf.k)}
-                      style={{ padding: "8px 4px", borderRadius: 9, cursor: "pointer", fontFamily: "Spectral, serif", fontSize: 12.5, lineHeight: 1.25, border: rf.k === refPt ? `1px solid ${C.gold}55` : "1px solid transparent", background: rf.k === refPt ? "#FFFFFF" : "transparent", color: rf.k === refPt ? C.gold : C.muted, boxShadow: rf.k === refPt ? "0 2px 8px rgba(110,82,24,.12)" : "none", fontWeight: rf.k === refPt ? 600 : 400 }}>
-                      <span style={{ fontFamily: "Eczar, serif", display: "block", fontSize: 13 }}>{rf.deva}</span>
+                      style={{ padding: "0.5rem 0.25rem", borderRadius: "0.5625rem", cursor: "pointer", fontFamily: "var(--font-body-family)", fontSize: "var(--font-small)", lineHeight: 1.25, border: rf.k === refPt ? `0.0625rem solid ${C.accentLine || "var(--accent-line)"}` : "0.0625rem solid transparent", background: rf.k === refPt ? "var(--surface-active)" : "transparent", color: rf.k === refPt ? C.gold : C.muted, boxShadow: rf.k === refPt ? "var(--elevation-1)" : "none", fontWeight: rf.k === refPt ? 600 : 400 }}>
+                      <span style={{ fontFamily: "var(--font-display-family)", display: "block", fontSize: "var(--font-small)" }}>{rf.deva}</span>
                       {hi ? rf.deva : rf.en}
                     </button>
                   ))}
                 </div>
               </div>
-              <div style={{ fontSize: 11.5, color: C.muted, textAlign: "center", margin: "0 4px 8px", fontStyle: "italic", lineHeight: 1.4 }}>
+              <div style={{ fontSize: "var(--font-label)", color: C.muted, textAlign: "center", margin: "0 0.25rem 0.5rem", fontStyle: "italic", lineHeight: 1.4 }}>
                 {lang === "hi" ? "षोडशवर्ग हर एक जीवन-क्षेत्र को विस्तार से दिखाते हैं — विवरण हेतु किसी भी वर्ग को दबाएँ।" : "Divisional charts each zoom into one area of life — tap any chart to see its focus."}
               </div>
               {/* varga strip: single horizontally-scrollable row, never overflows the card */}
-              <div className="hscroll" style={{ display: "flex", gap: 6, overflowX: "auto", padding: "2px 4px 8px", margin: "0 0 4px", WebkitOverflowScrolling: "touch" }}>
+              <div className="hscroll" style={{ display: "flex", gap: "0.375rem", overflowX: "auto", padding: "0.125rem 0.25rem 0.5rem", margin: "0 0 0.25rem", WebkitOverflowScrolling: "touch" }}>
                 {VARGAS.map((v) => (
                   <button key={v.k} className="chip" title={hi ? `${v.k} विभागीय कुंडली` : `${v.name} — ${v.theme}`}
                     onClick={(e) => { setVarga(v.k); try { e.currentTarget.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }); } catch {} }}
-                    style={{ flexShrink: 0, padding: "7px 14px", borderRadius: 18, cursor: "pointer", fontFamily: "Spectral, serif", fontSize: 13, letterSpacing: ".03em", border: `1px solid ${v.k === varga ? C.gold : C.line}`, background: v.k === varga ? "rgba(168,106,18,.12)" : "#FFFFFF", color: v.k === varga ? C.gold : C.muted, fontWeight: v.k === varga ? 600 : 400 }}>
+                    style={{ flexShrink: 0, padding: "0.4375rem 0.875rem", borderRadius: "1.125rem", cursor: "pointer", fontFamily: "var(--font-body-family)", fontSize: "var(--font-small)", letterSpacing: ".03em", border: `0.0625rem solid ${v.k === varga ? C.gold : C.line}`, background: v.k === varga ? "var(--accent-soft)" : "var(--surface-active)", color: v.k === varga ? C.gold : C.muted, fontWeight: v.k === varga ? 600 : 400 }}>
                     {v.k}
                   </button>
                 ))}
               </div>
-              <p style={{ textAlign: "center", color: C.gold, fontSize: 13, margin: "8px 0 2px", fontFamily: "Eczar, serif", letterSpacing: ".04em" }}>
+              <p style={{ textAlign: "center", color: C.gold, fontSize: "var(--font-small)", margin: "0.5rem 0 0.125rem", fontFamily: "var(--font-display-family)", letterSpacing: ".04em" }}>
                 {hi ? `${curVarga.k} विभागीय कुंडली — जीवन के इस क्षेत्र का सूक्ष्म अध्ययन` : `${curVarga.name} — ${curVarga.theme}`}
               </p>
-              {refNote && <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "2px 0 10px" }}>{refNote}</p>}
-              {!refNote && <div style={{ height: 10 }} />}
+              {refNote && <p style={{ textAlign: "center", color: C.muted, fontSize: "var(--font-label)", margin: "0.125rem 0 0.625rem" }}>{refNote}</p>}
+              {!refNote && <div style={{ height: "0.625rem" }} />}
               {/* chart-style switch — North diamond / South grid; choice persists in the URL */}
-              <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
-                <div style={{ display: "inline-flex", background: "#F1E9D5", borderRadius: 10, padding: 3, border: `1px solid ${C.line}` }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: "0.75rem" }}>
+                <div style={{ display: "inline-flex", background: "var(--surface-sunken)", borderRadius: "0.625rem", padding: "0.1875rem", border: `0.0625rem solid ${C.line}` }}>
                   {[["north", hi ? "उत्तर भारतीय" : "North"], ["south", hi ? "दक्षिण भारतीय" : "South"], ["east", hi ? "पूर्व भारतीय" : "East"]].map(([sk, slabel]) => (
                     <button key={sk} onClick={() => chooseStyle(sk)}
-                      style={{ padding: "6px 16px", borderRadius: 8, fontFamily: "Spectral, serif", fontSize: 12.5, cursor: "pointer", border: "none",
-                        background: chartStyle === sk ? C.panel || "#FFFFFF" : "transparent", color: chartStyle === sk ? C.gold : C.muted, fontWeight: chartStyle === sk ? 600 : 400 }}>
+                      style={{ padding: "0.375rem 1rem", borderRadius: "0.5rem", fontFamily: "var(--font-body-family)", fontSize: "var(--font-small)", cursor: "pointer", border: "none",
+                        background: chartStyle === sk ? C.panel || "var(--surface-active)" : "transparent", color: chartStyle === sk ? C.gold : C.muted, fontWeight: chartStyle === sk ? 600 : 400 }}>
                       {slabel}
                     </button>
                   ))}
@@ -442,7 +457,7 @@ export default function ChartScreen({ C, card, lang }) {
                 gold={C.gold} ivory={C.ivory} muted={C.muted} sindoor={C.sindoor}
               />
               )}
-              <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "8px 0 0" }}>
+              <p style={{ textAlign: "center", color: C.muted, fontSize: "var(--font-label)", margin: "0.5rem 0 0" }}>
                 {chartStyle === "east" ? (hi ? "राशियाँ स्थिर (मेष ऊपर, वामावर्त); भाव लग्न से" : "Signs fixed (Aries top, anti-clockwise); houses from the lagna") : chartStyle === "south" ? (hi ? "राशियाँ स्थिर हैं; भाव लग्न से गिने जाते हैं" : "Signs are fixed; houses are counted from the lagna") : (hi ? "हर भाव की संख्या उसकी राशि दिखाती है" : "Numbers mark the rashi in each house")} · <span style={{ color: C.sindoor }}>℞</span> {hi ? "वक्री" : "retrograde"}
                 {varga === "D2" && (hi ? " · होरा कुंडली में केवल कर्क (चन्द्र) और सिंह (सूर्य) राशियाँ होती हैं" : " · the Hora chart uses only Cancer (Moon) and Leo (Sun)")}
               </p>
@@ -451,16 +466,16 @@ export default function ChartScreen({ C, card, lang }) {
             {/* yogas */}
             <Eyebrow id="yogas" deva="योग" en={`Yogas detected · ${r.yogas.length}`} />
             {r.yogas.length === 0 ? (
-              <p style={{ color: C.muted, fontSize: 14 }}>{lang === "hi" ? "इस कुंडली में कोई प्रमुख शास्त्रीय योग नहीं मिला।" : "No major classical yogas were found in this chart."}</p>
+              <p style={{ color: C.muted, fontSize: "var(--font-body)" }}>{lang === "hi" ? "इस कुंडली में कोई प्रमुख शास्त्रीय योग नहीं मिला।" : "No major classical yogas were found in this chart."}</p>
             ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "0.75rem" }}>
                 {r.yogas.map((yg) => (
-                  <div key={yg.name} className="rise" style={{ ...card, padding: "14px 16px", borderLeft: `3px solid ${yg.kind === "good" ? C.gold : C.sindoor}` }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
-                      <span style={{ fontFamily: "Eczar, serif", fontSize: 15.5, color: yg.kind === "good" ? C.gold : C.sindoor }}>{yg.name}</span>
-                      <span style={{ fontSize: 9.5, letterSpacing: ".12em", textTransform: "uppercase", color: C.muted, whiteSpace: "nowrap" }}>{yg.kind === "good" ? (hi ? "शुभ" : "auspicious") : (hi ? "चुनौतीपूर्ण" : "challenging")}</span>
+                  <div key={yg.name} className="rise" style={{ ...card, padding: "0.875rem 1rem", borderLeft: `0.1875rem solid ${yg.kind === "good" ? C.gold : C.sindoor}` }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.5rem", marginBottom: "0.375rem", flexWrap: "wrap" }}>
+                      <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: yg.kind === "good" ? C.gold : C.sindoor }}>{yg.name}</span>
+                      <span style={{ fontSize: "var(--font-micro)", letterSpacing: ".12em", textTransform: "uppercase", color: C.muted, whiteSpace: "nowrap" }}>{yg.kind === "good" ? (hi ? "शुभ" : "auspicious") : (hi ? "चुनौतीपूर्ण" : "challenging")}</span>
                     </div>
-                    <div style={{ fontSize: 13.5, lineHeight: 1.55 }}>{hi ? "यह योग ग्रहों और भावों के एक विशेष संबंध से बनता है। इसका फल ग्रहबल, दशा और पूरी कुंडली के संदर्भ में देखें।" : yg.text}</div>
+                    <div style={{ fontSize: "var(--font-small)", lineHeight: 1.55 }}>{hi ? "यह योग ग्रहों और भावों के एक विशेष संबंध से बनता है। इसका फल ग्रहबल, दशा और पूरी कुंडली के संदर्भ में देखें।" : yg.text}</div>
                   </div>
                 ))}
               </div>
@@ -468,79 +483,79 @@ export default function ChartScreen({ C, card, lang }) {
 
             {/* planetary table */}
             <Eyebrow id="planets" deva="ग्रह स्थिति" en="Planetary positions (sidereal)" />
-            <div className="rise" style={{ ...card, padding: "14px 16px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10, marginBottom: 12 }}>
+            <div className="rise" style={{ ...card, padding: "0.875rem 1rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "0.625rem", marginBottom: "0.75rem" }}>
                 {[
                   { n: "Lagna", deva: "La", sign: r.ascSign, deg: r.ascDeg, nak: r.ascNak, house: 1 },
                   ...r.rows.map(p => ({ n: p.name, deva: PLANET_GLYPH[p.name], sign: p.sign, deg: p.deg, nak: p.nak, house: p.house, retro: p.retro, color: PLANET_COLOR[p.name] }))
                 ].map((p, i) => (
-                  <div key={p.n} style={{ background: "#FBF5E7", border: `1px solid ${C.line}`, borderRadius: 10, padding: "10px 12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 8 }}>
-                      <span style={{ width: 7, height: 7, borderRadius: 3, background: p.color || C.gold, flexShrink: 0 }} />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: C.ivory, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {p.n}{p.retro && <span style={{ color: C.sindoor, marginLeft: 2 }}>℞</span>}
+                  <div key={p.n} style={{ background: "var(--surface-raised)", border: `0.0625rem solid ${C.line}`, borderRadius: "0.625rem", padding: "0.625rem 0.75rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.4375rem", marginBottom: "0.5rem" }}>
+                      <span style={{ width: "0.4375rem", height: "0.4375rem", borderRadius: "0.1875rem", background: p.color || C.gold, flexShrink: 0 }} />
+                      <span style={{ fontSize: "var(--font-small)", fontWeight: 600, color: C.ivory, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {p.n}{p.retro && <span style={{ color: C.sindoor, marginLeft: "0.125rem" }}>℞</span>}
                       </span>
                     </div>
-                    <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.4 }}>
+                    <div style={{ fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.4 }}>
                       <div><span style={{ fontWeight: 600, color: C.ivory }}>{SIGNS[p.sign].split(" ")[0]}</span> {fmtDeg(p.deg)}</div>
-                      <div style={{ fontSize: 10.5, marginTop: 3 }}>{NAKSHATRAS[p.nak].split(" ")[0]}</div>
-                      <div style={{ fontSize: 10.5, marginTop: 2, color: C.gold }}>H{p.house}</div>
+                      <div style={{ fontSize: "var(--font-micro)", marginTop: "0.1875rem" }}>{NAKSHATRAS[p.nak].split(" ")[0]}</div>
+                      <div style={{ fontSize: "var(--font-micro)", marginTop: "0.125rem", color: C.gold }}>H{p.house}</div>
                     </div>
                   </div>
                 ))}
               </div>
-              <div style={{ textAlign: "center", color: C.muted, fontSize: 11, paddingTop: 10, borderTop: `1px solid ${C.line}` }}>
+              <div style={{ textAlign: "center", color: C.muted, fontSize: "var(--font-label)", paddingTop: "0.625rem", borderTop: `0.0625rem solid ${C.line}` }}>
                 {hi ? "अयनांश (लाहिरी)" : "Ayanamsa (Lahiri)"}: <span style={{ color: C.ivory, fontVariantNumeric: "tabular-nums" }}>{fmtDeg(r.ayan)}</span> · {hi ? "वक्री ग्रह" : "Retrograde"} ℞ <span style={{ color: C.sindoor }}>{hi ? "सिंदूरी रंग में" : "shown in vermillion"}</span>
               </div>
             </div>
 
             {/* KP sub-lords */}
             <Eyebrow id="kp" deva="के॰पी॰ उपस्वामी" en="KP sub-lords (Krishnamurti Paddhati)" />
-            <div className="rise" style={{ ...card, padding: "8px 4px", overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 360 }}>
+            <div className="rise" style={{ ...card, padding: "0.5rem 0.25rem", overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--font-small)", minWidth: "22.5rem" }}>
                 <thead>
-                  <tr style={{ color: C.muted, textAlign: "left", fontSize: 11, letterSpacing: ".05em", textTransform: "uppercase" }}>
-                    <th style={{ padding: "6px 10px" }}>{hi ? "ग्रह" : "Graha"}</th>
-                    <th style={{ padding: "6px 10px" }}>{hi ? "राशि" : "Sign"}</th>
-                    <th style={{ padding: "6px 10px" }}>{hi ? "नक्षत्र" : "Nakshatra"}</th>
-                    <th style={{ padding: "6px 10px" }}>{hi ? "नक्षत्र स्वामी" : "Star lord"}</th>
-                    <th style={{ padding: "6px 10px" }}>{hi ? "उप-स्वामी" : "Sub lord"}</th>
-                    <th style={{ padding: "6px 10px" }}>{hi ? "उप-उप स्वामी" : "Sub-sub"}</th>
+                  <tr style={{ color: C.muted, textAlign: "left", fontSize: "var(--font-label)", letterSpacing: ".05em", textTransform: "uppercase" }}>
+                    <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "ग्रह" : "Graha"}</th>
+                    <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "राशि" : "Sign"}</th>
+                    <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "नक्षत्र" : "Nakshatra"}</th>
+                    <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "नक्षत्र स्वामी" : "Star lord"}</th>
+                    <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "उप-स्वामी" : "Sub lord"}</th>
+                    <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "उप-उप स्वामी" : "Sub-sub"}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {r.rows.map((p) => (
-                    <tr key={p.name} style={{ borderTop: "1px solid #EBDFC6" }}>
-                      <td style={{ padding: "7px 10px", whiteSpace: "nowrap" }}>
+                    <tr key={p.name} style={{ borderTop: "0.0625rem solid var(--line-soft)" }}>
+                      <td style={{ padding: "0.4375rem 0.625rem", whiteSpace: "nowrap" }}>
                         <span style={{ color: PLANET_COLOR[p.name], fontWeight: 600 }}>{PLANET_GLYPH[p.name]}</span> {p.name}{p.retro ? <span style={{ color: C.sindoor }}> ℞</span> : ""}
                       </td>
-                      <td style={{ padding: "7px 10px", color: C.muted, whiteSpace: "nowrap" }}>{SIGN_SHORT[p.sign]} {fmtDeg(p.deg)}</td>
-                      <td style={{ padding: "7px 10px", color: C.muted, fontSize: 12 }}>{NAKSHATRAS[p.nak]}</td>
-                      <td style={{ padding: "7px 10px", color: PLANET_COLOR[p.kp.starLord] }}>{p.kp.starLord}</td>
-                      <td style={{ padding: "7px 10px", color: PLANET_COLOR[p.kp.subLord], fontWeight: 700 }}>{p.kp.subLord}</td>
-                      <td style={{ padding: "7px 10px", color: PLANET_COLOR[p.kp.subSub] }}>{p.kp.subSub}</td>
+                      <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, whiteSpace: "nowrap" }}>{SIGN_SHORT[p.sign]} {fmtDeg(p.deg)}</td>
+                      <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, fontSize: "var(--font-label)" }}>{NAKSHATRAS[p.nak]}</td>
+                      <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.starLord] }}>{p.kp.starLord}</td>
+                      <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.subLord], fontWeight: 700 }}>{p.kp.subLord}</td>
+                      <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.subSub] }}>{p.kp.subSub}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p style={{ color: C.muted, fontSize: 11.5, margin: "10px 0 0", lineHeight: 1.5 }}>
+            <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "0.625rem 0 0", lineHeight: 1.5 }}>
               {hi ? <>हर नक्षत्र (13°20′) को विंशोत्तरी अनुपात के नौ उप-भागों में बाँटा जाता है। KP में <span style={{ color: C.gold }}>उप-स्वामी</span> निर्णायक माना जाता है। {ayanamsa === "lahiri" ? "मानक KP उप-स्वामी देखने के लिए ऊपर कृष्णमूर्ति अयनांश चुनें।" : "गणना कृष्णमूर्ति अयनांश पर है।"}</> : <>Each nakshatra (13°20′) is split into nine Vimshottari-proportioned <em>subs</em>, starting from the star lord — the 249-division scheme. The <span style={{ color: C.gold }}>sub lord</span> is the deciding factor in KP. {ayanamsa === "lahiri" ? "You're on Lahiri ayanamsa; switch to KP (Krishnamurti) above for the canonical KP sub-lords." : "Computed on the KP (Krishnamurti) ayanamsa."}</>}
             </p>
 
-            <div style={{ ...T.label, color: C.muted, margin: "18px 0 8px" }}>
+            <div style={{ ...T.label, color: C.muted, margin: "1.125rem 0 0.5rem" }}>
               {hi ? "भाव-संधि उप-स्वामी" : "Cuspal sub-lords"} · {r.kpData.houseSystem}
             </div>
-            <div className="rise" style={{ ...card, padding: "8px 4px", overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 360 }}>
+            <div className="rise" style={{ ...card, padding: "0.5rem 0.25rem", overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--font-small)", minWidth: "22.5rem" }}>
                 <thead>
-                  <tr style={{ color: C.muted, textAlign: "left", fontSize: 11, letterSpacing: ".05em", textTransform: "uppercase" }}>
-                    <th style={{ padding: "6px 10px" }}>{hi ? "भाव" : "Bhava"}</th>
-                    <th style={{ padding: "6px 10px" }}>{hi ? "संधि" : "Cusp"}</th>
-                    <th style={{ padding: "6px 10px" }}>{hi ? "नक्षत्र" : "Nakshatra"}</th>
-                    <th style={{ padding: "6px 10px" }}>{hi ? "नक्षत्र स्वामी" : "Star"}</th>
-                    <th style={{ padding: "6px 10px" }}>{hi ? "उप-स्वामी" : "Sub"}</th>
-                    <th style={{ padding: "6px 10px" }}>{hi ? "उप-उप" : "Sub-sub"}</th>
+                  <tr style={{ color: C.muted, textAlign: "left", fontSize: "var(--font-label)", letterSpacing: ".05em", textTransform: "uppercase" }}>
+                    <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "भाव" : "Bhava"}</th>
+                    <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "संधि" : "Cusp"}</th>
+                    <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "नक्षत्र" : "Nakshatra"}</th>
+                    <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "नक्षत्र स्वामी" : "Star"}</th>
+                    <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "उप-स्वामी" : "Sub"}</th>
+                    <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "उप-उप" : "Sub-sub"}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -550,20 +565,20 @@ export default function ChartScreen({ C, card, lang }) {
                     const nakIdx = Math.floor(L / (360 / 27));
                     const angular = h === 1 || h === 4 || h === 7 || h === 10;
                     return (
-                      <tr key={h} style={{ borderTop: "1px solid #EBDFC6", background: angular ? "rgba(168,106,18,.04)" : "transparent" }}>
-                        <td style={{ padding: "7px 10px", fontFamily: "Eczar, serif", color: angular ? C.gold : C.ivory, whiteSpace: "nowrap" }}>{h}{h === 1 ? " (Asc)" : h === 10 ? " (MC)" : ""}</td>
-                        <td style={{ padding: "7px 10px", color: C.muted, whiteSpace: "nowrap" }}>{SIGN_SHORT[Math.floor(L / 30)]} {fmtDeg(L % 30)}</td>
-                        <td style={{ padding: "7px 10px", color: C.muted, fontSize: 12 }}>{NAKSHATRAS[nakIdx]}</td>
-                        <td style={{ padding: "7px 10px", color: PLANET_COLOR[sl.starLord] }}>{sl.starLord}</td>
-                        <td style={{ padding: "7px 10px", color: PLANET_COLOR[sl.subLord], fontWeight: 700 }}>{sl.subLord}</td>
-                        <td style={{ padding: "7px 10px", color: PLANET_COLOR[sl.subSub] }}>{sl.subSub}</td>
+                      <tr key={h} style={{ borderTop: "0.0625rem solid var(--line-soft)", background: angular ? "var(--surface-hover)" : "transparent" }}>
+                        <td style={{ padding: "0.4375rem 0.625rem", fontFamily: "var(--font-display-family)", color: angular ? C.gold : C.ivory, whiteSpace: "nowrap" }}>{h}{h === 1 ? " (Asc)" : h === 10 ? " (MC)" : ""}</td>
+                        <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, whiteSpace: "nowrap" }}>{SIGN_SHORT[Math.floor(L / 30)]} {fmtDeg(L % 30)}</td>
+                        <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, fontSize: "var(--font-label)" }}>{NAKSHATRAS[nakIdx]}</td>
+                        <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.starLord] }}>{sl.starLord}</td>
+                        <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.subLord], fontWeight: 700 }}>{sl.subLord}</td>
+                        <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.subSub] }}>{sl.subSub}</td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
             </div>
-            <p style={{ color: C.muted, fontSize: 11.5, margin: "10px 0 0", lineHeight: 1.5 }}>
+            <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "0.625rem 0 0", lineHeight: 1.5 }}>
               {hi ? <>भाव-संधियाँ {r.kpData.houseSystem === "Placidus" ? "KP के मानक प्लासिडस भाव-पद्धति" : "इस अक्षांश के लिए पॉर्फ़िरी विकल्प"} से निकली हैं। <span style={{ color: C.gold }}>भाव-संधि उप-स्वामी</span> बताता है कि उस भाव के विषय फलित होने की क्षमता रखते हैं। {ayanamsa === "lahiri" ? "मानक KP फल हेतु ऊपर कृष्णमूर्ति अयनांश चुनें।" : ""}</> : <>Cusps use {r.kpData.houseSystem === "Placidus" ? "the Placidus system (semi-arcs trisected in time) — the KP standard" : "a Porphyry fallback because Placidus is undefined at this latitude"}. The <span style={{ color: C.gold }}>cuspal sub-lord</span> is the cornerstone of KP analysis — it signifies whether the matters of that house will fructify. {ayanamsa === "lahiri" ? "Switch to KP ayanamsa above for canonical KP cusps." : ""}</>}
             </p>
 
@@ -572,22 +587,22 @@ export default function ChartScreen({ C, card, lang }) {
             {(() => {
               const RP = r.rulingPlanets;
               const Chip = ({ pl, dim }) => (
-                <span style={{ display: "inline-block", padding: "2px 7px", borderRadius: 6, fontSize: 12, fontWeight: 600, margin: "2px 3px 2px 0",
-                  color: dim ? C.muted : "#FFF8E9", background: dim ? "transparent" : PLANET_COLOR[pl], border: dim ? `1px solid ${PLANET_COLOR[pl]}` : "none" }}>
+                <span style={{ display: "inline-block", padding: "0.125rem 0.4375rem", borderRadius: "0.375rem", fontSize: "var(--font-label)", fontWeight: 600, margin: "0.125rem 0.1875rem 0.125rem 0",
+                  color: dim ? C.muted : "var(--on-accent)", background: dim ? "transparent" : PLANET_COLOR[pl], border: dim ? `0.0625rem solid ${PLANET_COLOR[pl]}` : "none" }}>
                   {pl}
                 </span>
               );
               const RPItem = ({ label, pl }) => (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, marginRight: 12, marginBottom: 4 }}>
-                  <span style={{ fontSize: 10.5, color: C.muted, textTransform: "uppercase", letterSpacing: ".04em" }}>{label}</span>
-                  <span style={{ color: PLANET_COLOR[pl], fontWeight: 700, fontSize: 13 }}>{pl}</span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3125rem", marginRight: "0.75rem", marginBottom: "0.25rem" }}>
+                  <span style={{ fontSize: "var(--font-micro)", color: C.muted, textTransform: "uppercase", letterSpacing: ".04em" }}>{label}</span>
+                  <span style={{ color: PLANET_COLOR[pl], fontWeight: 700, fontSize: "var(--font-small)" }}>{pl}</span>
                 </span>
               );
               return (
                 <div>
-                  <div className="rise" style={{ ...card, padding: "14px 16px", borderLeft: "3px solid #A86A12", marginBottom: 14 }}>
-                    <div style={{ ...T.label, color: C.gold, marginBottom: 8 }}>{hi ? "शासक ग्रह · जन्म क्षण" : "Ruling Planets · birth moment"}</div>
-                    <div style={{ display: "flex", flexWrap: "wrap", rowGap: 4 }}>
+                  <div className="rise" style={{ ...card, padding: "0.875rem 1rem", borderLeft: "0.1875rem solid var(--accent)", marginBottom: "0.875rem" }}>
+                    <div style={{ ...T.label, color: C.gold, marginBottom: "0.5rem" }}>{hi ? "शासक ग्रह · जन्म क्षण" : "Ruling Planets · birth moment"}</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", rowGap: "0.25rem" }}>
                       <RPItem label={hi ? "लग्न स्वामी" : "Asc lord"} pl={RP.ascSignLord} />
                       <RPItem label={hi ? "लग्न नक्षत्र" : "Asc star"} pl={RP.ascStarLord} />
                       <RPItem label={hi ? "लग्न उप" : "Asc sub"} pl={RP.ascSubLord} />
@@ -598,45 +613,45 @@ export default function ChartScreen({ C, card, lang }) {
                     </div>
                   </div>
 
-                  <div style={{ ...T.label, color: C.muted, margin: "4px 0 8px" }}>
+                  <div style={{ ...T.label, color: C.muted, margin: "0.25rem 0 0.5rem" }}>
                     {hi ? "भाव सूचक (सबसे प्रबल पहले)" : "House significators (strongest first)"}
                   </div>
-                  <div className="rise" style={{ ...card, padding: "8px 4px", overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 380 }}>
+                  <div className="rise" style={{ ...card, padding: "0.5rem 0.25rem", overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--font-small)", minWidth: "23.75rem" }}>
                       <thead>
-                        <tr style={{ color: C.muted, textAlign: "left", fontSize: 11, letterSpacing: ".05em", textTransform: "uppercase" }}>
-                          <th style={{ padding: "6px 10px" }}>{hi ? "भाव" : "Bhava"}</th>
-                          <th style={{ padding: "6px 10px" }}>{hi ? "स्थित ग्रह" : "Occupants"}</th>
-                          <th style={{ padding: "6px 10px" }}>{hi ? "स्वामी" : "Owner"}</th>
-                          <th style={{ padding: "6px 10px" }}>{hi ? "सूचक ग्रह" : "Significators"}</th>
+                        <tr style={{ color: C.muted, textAlign: "left", fontSize: "var(--font-label)", letterSpacing: ".05em", textTransform: "uppercase" }}>
+                          <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "भाव" : "Bhava"}</th>
+                          <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "स्थित ग्रह" : "Occupants"}</th>
+                          <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "स्वामी" : "Owner"}</th>
+                          <th style={{ padding: "0.375rem 0.625rem" }}>{hi ? "सूचक ग्रह" : "Significators"}</th>
                         </tr>
                       </thead>
                       <tbody>
                         {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
-                          <tr key={h} style={{ borderTop: "1px solid #EBDFC6", verticalAlign: "top" }}>
-                            <td style={{ padding: "8px 10px", fontFamily: "Eczar, serif", color: C.ivory }}>{h}</td>
-                            <td style={{ padding: "8px 10px", whiteSpace: "nowrap" }}>{r.kpSig.occupants[h].length ? r.kpSig.occupants[h].map((pl) => <Chip key={pl} pl={pl} />) : <span style={{ color: C.muted, fontSize: 12 }}>—</span>}</td>
-                            <td style={{ padding: "8px 10px" }}>{r.kpSig.owner[h] ? <Chip pl={r.kpSig.owner[h]} dim /> : "—"}</td>
-                            <td style={{ padding: "8px 10px" }}>{r.kpSig.ordered[h].map((pl) => <Chip key={pl} pl={pl} />)}</td>
+                          <tr key={h} style={{ borderTop: "0.0625rem solid var(--line-soft)", verticalAlign: "top" }}>
+                            <td style={{ padding: "0.5rem 0.625rem", fontFamily: "var(--font-display-family)", color: C.ivory }}>{h}</td>
+                            <td style={{ padding: "0.5rem 0.625rem", whiteSpace: "nowrap" }}>{r.kpSig.occupants[h].length ? r.kpSig.occupants[h].map((pl) => <Chip key={pl} pl={pl} />) : <span style={{ color: C.muted, fontSize: "var(--font-label)" }}>—</span>}</td>
+                            <td style={{ padding: "0.5rem 0.625rem" }}>{r.kpSig.owner[h] ? <Chip pl={r.kpSig.owner[h]} dim /> : "—"}</td>
+                            <td style={{ padding: "0.5rem 0.625rem" }}>{r.kpSig.ordered[h].map((pl) => <Chip key={pl} pl={pl} />)}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
-                  <div style={{ fontSize: 11, color: C.muted, marginTop: 6, fontStyle: "italic" }}>{lang === "hi" ? "— का अर्थ है कोई नहीं" : "— means none"}</div>
+                  <div style={{ fontSize: "var(--font-label)", color: C.muted, marginTop: "0.375rem", fontStyle: "italic" }}>{lang === "hi" ? "— का अर्थ है कोई नहीं" : "— means none"}</div>
 
-                  <div style={{ ...T.label, color: C.muted, margin: "18px 0 8px" }}>
+                  <div style={{ ...T.label, color: C.muted, margin: "1.125rem 0 0.5rem" }}>
                     {hi ? "हर ग्रह द्वारा सूचित भाव" : "Houses signified by each planet"}
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.5rem" }}>
                     {KP_PLANETS.map((pl) => (
-                      <div key={pl} className="rise" style={{ ...card, padding: "9px 12px", display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ color: PLANET_COLOR[pl], fontWeight: 700, fontSize: 13, minWidth: 52 }}>{PLANET_GLYPH[pl]} {pl.slice(0, 3)}</span>
-                        <span style={{ color: C.ivory, fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{r.kpSig.housesOf[pl].length ? r.kpSig.housesOf[pl].join(", ") : "—"}</span>
+                      <div key={pl} className="rise" style={{ ...card, padding: "0.5625rem 0.75rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <span style={{ color: PLANET_COLOR[pl], fontWeight: 700, fontSize: "var(--font-small)", minWidth: "3.25rem" }}>{PLANET_GLYPH[pl]} {pl.slice(0, 3)}</span>
+                        <span style={{ color: C.ivory, fontSize: "var(--font-small)", fontVariantNumeric: "tabular-nums" }}>{r.kpSig.housesOf[pl].length ? r.kpSig.housesOf[pl].join(", ") : "—"}</span>
                       </div>
                     ))}
                   </div>
-                  <p style={{ color: C.muted, fontSize: 11.5, margin: "12px 0 0", lineHeight: 1.5 }}>
+                  <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "0.75rem 0 0", lineHeight: 1.5 }}>
                     {hi ? <>ग्रह जिन भावों का सूचक है, अपनी दशा-भुक्ति में उनके विषय सक्रिय कर सकता है—विशेषतः जब वह शासक ग्रह भी हो। राहु-केतु अपने नक्षत्र और राशि स्वामियों के प्रतिनिधि की तरह भी फल देते हैं। {ayanamsa === "lahiri" ? "मानक KP सूचक हेतु कृष्णमूर्ति अयनांश चुनें।" : "गणना KP अयनांश पर है।"}</> : <>A planet promises the matters of every house it signifies; during its dasha/bhukti — especially when it is also a Ruling Planet — those houses fructify. Rahu and Ketu also act as agents of their star and sign lords (apply that nuance when judging the nodes). {ayanamsa === "lahiri" ? "Switch to KP ayanamsa above for canonical KP significators." : "Computed on the KP ayanamsa."}</>}
                   </p>
                 </div>
@@ -645,33 +660,34 @@ export default function ChartScreen({ C, card, lang }) {
 
             {/* jaimini karakas */}
             <Eyebrow id="karakas" deva="चर कारक" en="Jaimini chara karakas" />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "0.75rem" }}>
               {r.karakas.map((kk, i) => (
-                <div key={kk.role} style={{ ...card, padding: "13px 15px", border: `1px solid ${i === 0 ? C.gold : C.line}`, boxShadow: i === 0 ? `0 0 22px rgba(168,106,18,.14), ${card.boxShadow}` : card.boxShadow }}>
-                  <div style={{ ...T.label, color: i === 0 ? C.gold : C.muted, marginBottom: 6 }}>{kk.role}</div>
-                  <div style={{ fontSize: 15.5, display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: 4, background: PLANET_COLOR[kk.planet], boxShadow: `0 0 6px ${PLANET_COLOR[kk.planet]}55`, flexShrink: 0 }} />
+                <div key={kk.role} style={{ ...card, padding: "0.8125rem 0.9375rem", border: `0.0625rem solid ${i === 0 ? C.gold : C.line}`, boxShadow: i === 0 ? `0 0 22px var(--accent-soft), ${card.boxShadow}` : card.boxShadow }}>
+                  <div style={{ ...T.label, color: i === 0 ? C.gold : C.muted, marginBottom: "0.375rem" }}>{kk.role}</div>
+                  <div style={{ fontSize: "var(--font-body)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <span style={{ width: "0.5rem", height: "0.5rem", borderRadius: "0.25rem", background: PLANET_COLOR[kk.planet], boxShadow: `0 0 6px ${PLANET_COLOR[kk.planet]}55`, flexShrink: 0 }} />
                     {kk.planet}
-                    <span style={{ color: C.muted, fontSize: 12.5, fontVariantNumeric: "tabular-nums" }}>{fmtDeg(kk.deg)} {SIGNS[kk.sign].split(" ")[0]}</span>
+                    <span style={{ color: C.muted, fontSize: "var(--font-small)", fontVariantNumeric: "tabular-nums" }}>{fmtDeg(kk.deg)} {SIGNS[kk.sign].split(" ")[0]}</span>
                   </div>
-                  <div style={{ color: C.muted, fontSize: 12, marginTop: 5 }}>{hi ? "यह चर कारक जीवन के इस प्रमुख विषय और उससे जुड़ी सीख को दर्शाता है।" : kk.meaning}</div>
+                  <div style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.3125rem" }}>{hi ? "यह चर कारक जीवन के इस प्रमुख विषय और उससे जुड़ी सीख को दर्शाता है।" : kk.meaning}</div>
                 </div>
               ))}
             </div>
 
             {/* shadbala */}
+            {showTechnical && <>
             <Eyebrow id="shadbala" deva="षड्बल" en="Shadbala · six-fold strength" />
-            <div style={{ ...card, padding: "12px 16px", marginBottom: 12, background: "#FBF5E7" }}>
-              <p style={{ margin: 0, fontSize: 13.5, color: C.ivory, lineHeight: 1.55 }}>
+            <div style={{ ...card, padding: "0.75rem 1rem", marginBottom: "0.75rem", background: "var(--surface-raised)" }}>
+              <p style={{ margin: 0, fontSize: "var(--font-small)", color: C.ivory, lineHeight: 1.55 }}>
                 {lang === "hi"
                   ? <>षड्बल मापता है कि हर ग्रह अपने फल देने में कितना बलवान है। यहाँ सबसे बलवान <strong style={{ color: C.gold }}>{PLANET_DEVA[r.shadbala.ranked[0]]}</strong> है — इसके कारकत्व अपेक्षाकृत सहजता से फलित होते हैं; सबसे निर्बल <strong style={{ color: C.sindoor }}>{PLANET_DEVA[r.shadbala.ranked[6]]}</strong> है — इसके कारकत्व अधिक प्रयास माँग सकते हैं।</>
                   : <>Shadbala measures how much strength each planet has to deliver its results. Here <strong style={{ color: C.gold }}>{r.shadbala.ranked[0]}</strong> is strongest — its matters tend to come with more ease; <strong style={{ color: C.sindoor }}>{r.shadbala.ranked[6]}</strong> is weakest — its matters may take more effort.</>}
               </p>
             </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 12 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginBottom: "0.75rem" }}>
               {BALA_PARTS.map((b) => (
-                <span key={b.k} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11.5, color: C.muted }}>
-                  <span style={{ width: 10, height: 10, borderRadius: 3, background: b.color }} />
+                <span key={b.k} style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "var(--font-label)", color: C.muted }}>
+                  <span style={{ width: "0.625rem", height: "0.625rem", borderRadius: "0.1875rem", background: b.color }} />
                   {hi ? ({ sthana: "स्थान", dig: "दिग्", kala: "काल", cheshta: "चेष्टा", naisargika: "नैसर्गिक", drik: "दृक्" }[b.k] || b.label) : b.label} <span style={{ opacity: 0.7 }}>({hi ? ({ sthana: "स्थिति", dig: "दिशा", kala: "समय", cheshta: "गति", naisargika: "प्राकृतिक", drik: "दृष्टि" }[b.k] || b.note) : b.note})</span>
                 </span>
               ))}
@@ -679,29 +695,29 @@ export default function ChartScreen({ C, card, lang }) {
             {(() => {
               const maxR = Math.max(...SEVEN.map((p) => r.shadbala.perPlanet[p].totalR));
               return (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 12 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "0.75rem" }}>
                   {r.shadbala.ranked.map((p, rank) => {
                     const x = r.shadbala.perPlanet[p];
                     const strong = x.ratio >= 1;
                     return (
-                      <div key={p} className="rise" style={{ ...card, padding: "14px 16px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                          <span style={{ width: 9, height: 9, borderRadius: 5, background: PLANET_COLOR[p], flexShrink: 0 }} />
-                          <span style={{ fontFamily: "Eczar, serif", fontSize: 16, color: C.ivory }}>{PLANET_DEVA[p]} <span style={{ fontFamily: "Spectral, serif", fontSize: 14 }}>{p}</span></span>
-                          <span style={{ marginLeft: "auto", fontSize: 11, color: C.muted }}>#{rank + 1}</span>
-                          <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase", padding: "3px 8px", borderRadius: 10, color: strong ? "#3F7E2E" : C.sindoor, background: strong ? "rgba(63,126,46,.1)" : "rgba(194,69,30,.08)" }}>{strong ? (hi ? "प्रबल" : "strong") : (hi ? "निर्बल" : "weak")}</span>
+                      <div key={p} className="rise" style={{ ...card, padding: "0.875rem 1rem" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.625rem" }}>
+                          <span style={{ width: "0.5625rem", height: "0.5625rem", borderRadius: "0.3125rem", background: PLANET_COLOR[p], flexShrink: 0 }} />
+                          <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-title)", color: C.ivory }}>{PLANET_DEVA[p]} <span style={{ fontFamily: "var(--font-body-family)", fontSize: "var(--font-body)" }}>{p}</span></span>
+                          <span style={{ marginLeft: "auto", fontSize: "var(--font-label)", color: C.muted }}>#{rank + 1}</span>
+                          <span style={{ fontSize: "var(--font-micro)", fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase", padding: "0.1875rem 0.5rem", borderRadius: "0.625rem", color: strong ? "var(--good)" : C.sindoor, background: strong ? "rgba(63,126,46,.1)" : "var(--bad-surface)" }}>{strong ? (hi ? "प्रबल" : "strong") : (hi ? "निर्बल" : "weak")}</span>
                         </div>
-                        <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 10 }}>
-                          <span style={{ fontFamily: "Eczar, serif", fontSize: 26, color: C.gold, lineHeight: 1 }}>{x.totalR.toFixed(2)}</span>
-                          <span style={{ fontSize: 11.5, color: C.muted }}>{hi ? "रूप · अपेक्षित" : "Rupas · needs"} {x.required} · {(x.ratio * 100).toFixed(0)}%</span>
+                        <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem", marginBottom: "0.625rem" }}>
+                          <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-display)", color: C.gold, lineHeight: 1 }}>{x.totalR.toFixed(2)}</span>
+                          <span style={{ fontSize: "var(--font-label)", color: C.muted }}>{hi ? "रूप · अपेक्षित" : "Rupas · needs"} {x.required} · {(x.ratio * 100).toFixed(0)}%</span>
                         </div>
-                        <div style={{ display: "flex", height: 10, borderRadius: 5, overflow: "hidden", background: "#F1E9D5", marginBottom: 8 }}>
+                        <div style={{ display: "flex", height: "0.625rem", borderRadius: "0.3125rem", overflow: "hidden", background: "var(--surface-sunken)", marginBottom: "0.5rem" }}>
                           {BALA_PARTS.map((b) => {
                             const w = Math.max(0, x[b.k]) / 60 / maxR * 100;
                             return w > 0 ? <span key={b.k} title={`${b.label}: ${(x[b.k] / 60).toFixed(2)}`} style={{ width: `${w}%`, background: b.color }} /> : null;
                           })}
                         </div>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "3px 10px", fontSize: 11 }}>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.1875rem 0.625rem", fontSize: "var(--font-label)" }}>
                           {BALA_PARTS.map((b) => (
                             <span key={b.k} style={{ color: C.muted, display: "flex", justifyContent: "space-between" }}>
                               <span style={{ color: b.color }}>{b.label}</span>
@@ -715,30 +731,31 @@ export default function ChartScreen({ C, card, lang }) {
                 </div>
               );
             })()}
-            <p style={{ color: C.muted, fontSize: 11.5, margin: "12px 0 0", lineHeight: 1.5 }}>
+            <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "0.75rem 0 0", lineHeight: 1.5 }}>
               {hi ? <>बल रूप में है (1 रूप = 60 विरूप)। अपेक्षित न्यूनतम से ऊपर का ग्रह अपने कारकत्व देने में अधिक समर्थ माना जाता है। सबसे प्रबल: <span style={{ color: C.gold }}>{PLANET_DEVA[r.shadbala.ranked[0]]}</span> · सबसे निर्बल: <span style={{ color: C.sindoor }}>{PLANET_DEVA[r.shadbala.ranked[6]]}</span>। चेष्टा और कुछ काल उप-बल अन्य सॉफ़्टवेयर से थोड़ा भिन्न हो सकते हैं।</> : <>Strength in Rupas (1 Rupa = 60 Virupas). A planet clearing its required minimum is well-placed to deliver its significations. Strongest: <span style={{ color: C.gold }}>{r.shadbala.ranked[0]}</span> · weakest: <span style={{ color: C.sindoor }}>{r.shadbala.ranked[6]}</span>. Cheshta and some Kala sub-balas are modelled and may differ slightly from other software.</>}
             </p>
 
             {/* special lagnas & points */}
+            </>}
             <Eyebrow id="special" deva="विशेष लग्न व बिन्दु" en="Special lagnas & sensitive points" />
             {(() => {
               const SP = r.special;
               const hOf = (L) => ((Math.floor(L / 30) - r.ascSign + 12) % 12) + 1;
               const Tile = ({ item, accent }) => (
-                <div style={{ ...card, padding: "12px 14px", borderLeft: `3px solid ${accent}` }}>
-                  <div style={{ ...T.label, color: C.muted, marginBottom: 5 }}>{item.k}</div>
-                  <div style={{ fontFamily: "Eczar, serif", fontSize: 15.5, color: C.ivory, display: "flex", alignItems: "baseline", gap: 7, flexWrap: "wrap" }}>
-                    {SIGNS[Math.floor(item.v / 30)].split(" ")[0]} <span style={{ fontSize: 12.5, color: C.muted, fontVariantNumeric: "tabular-nums" }}>{fmtDeg(item.v % 30)}</span>
-                    <span style={{ fontSize: 11, color: C.gold }}>H{hOf(item.v)}</span>
-                    {item.pl && <span style={{ fontSize: 12, color: PLANET_COLOR[item.pl] }}>· {item.pl}</span>}
+                <div style={{ ...card, padding: "0.75rem 0.875rem", borderLeft: `0.1875rem solid ${accent}` }}>
+                  <div style={{ ...T.label, color: C.muted, marginBottom: "0.3125rem" }}>{item.k}</div>
+                  <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: C.ivory, display: "flex", alignItems: "baseline", gap: "0.4375rem", flexWrap: "wrap" }}>
+                    {SIGNS[Math.floor(item.v / 30)].split(" ")[0]} <span style={{ fontSize: "var(--font-small)", color: C.muted, fontVariantNumeric: "tabular-nums" }}>{fmtDeg(item.v % 30)}</span>
+                    <span style={{ fontSize: "var(--font-label)", color: C.gold }}>H{hOf(item.v)}</span>
+                    {item.pl && <span style={{ fontSize: "var(--font-label)", color: PLANET_COLOR[item.pl] }}>· {item.pl}</span>}
                   </div>
-                  <div style={{ color: C.muted, fontSize: 11.5, marginTop: 4 }}>{hi ? "यह विशेष बिंदु कुंडली के एक सूक्ष्म जीवन-विषय को दर्शाता है।" : item.note}</div>
+                  <div style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.25rem" }}>{hi ? "यह विशेष बिंदु कुंडली के एक सूक्ष्म जीवन-विषय को दर्शाता है।" : item.note}</div>
                 </div>
               );
               const Group = ({ title, items, accent }) => (
                 <>
-                  <div style={{ ...T.label, color: accent, margin: "16px 0 8px", fontWeight: 600 }}>{title}</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 10 }}>
+                  <div style={{ ...T.label, color: accent, margin: "1rem 0 0.5rem", fontWeight: 600 }}>{title}</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: "0.625rem" }}>
                     {items.map((it) => <Tile key={it.k} item={it} accent={accent} />)}
                   </div>
                 </>
@@ -746,13 +763,13 @@ export default function ChartScreen({ C, card, lang }) {
               return (
                 <div>
                   <Group title={hi ? "विशेष लग्न" : "Special Lagnas"} items={SP.lagnas} accent={C.gold} />
-                  <Group title={hi ? "संवेदनशील बिंदु" : "Sensitive Points"} items={SP.points} accent="#6E5C82" />
-                  <div style={{ ...card, padding: "12px 14px", marginTop: 10, borderLeft: `3px solid #2C7D4F`, display: "inline-block" }}>
-                    <span style={{ ...T.label, color: C.muted, marginRight: 8 }}>{hi ? "इन्दु लग्न (धन)" : "Indu Lagna (wealth)"}</span>
-                    <span style={{ fontFamily: "Eczar, serif", fontSize: 15.5, color: "#2C7D4F" }}>{SIGNS[SP.induSign].split(" ")[0]}</span>
+                  <Group title={hi ? "संवेदनशील बिंदु" : "Sensitive Points"} items={SP.points} accent="color-mix(in srgb, #6E5C82, var(--ink) 26%)" />
+                  <div style={{ ...card, padding: "0.75rem 0.875rem", marginTop: "0.625rem", borderLeft: `0.1875rem solid var(--good)`, display: "inline-block" }}>
+                    <span style={{ ...T.label, color: C.muted, marginRight: "0.5rem" }}>{hi ? "इन्दु लग्न (धन)" : "Indu Lagna (wealth)"}</span>
+                    <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: "color-mix(in srgb, #2C7D4F, var(--ink) 26%)" }}>{SIGNS[SP.induSign].split(" ")[0]}</span>
                   </div>
-                  <Group title={hi ? "उपग्रह · छाया बिंदु" : "Upagrahas · shadow sub-planets"} items={SP.upagrahas} accent="#C2451E" />
-                  <p style={{ color: C.muted, fontSize: 11.5, margin: "12px 0 0", lineHeight: 1.5 }}>
+                  <Group title={hi ? "उपग्रह · छाया बिंदु" : "Upagrahas · shadow sub-planets"} items={SP.upagrahas} accent="var(--bad)" />
+                  <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "0.75rem 0 0", lineHeight: 1.5 }}>
                     {hi ? "भाव, होरा और घटी लग्न सूर्योदय से आगे बढ़ते हैं। गुलिक दिन के शनि-शासित आठवें भाग में उदित लग्न है। श्री लग्न जैसे कुछ बिंदुओं के सूत्र परम्पराओं में थोड़ा बदलते हैं।" : "Bhava / Hora / Ghati lagnas advance from sunrise (1 sign per 5 / 2.5 / 1 ghatis). Gulika is the lagna rising during Saturn's eighth of the day. Some points (Sree Lagna especially) follow formulas that vary slightly between traditions."}
                   </p>
                 </div>
@@ -761,7 +778,7 @@ export default function ChartScreen({ C, card, lang }) {
 
             {/* bhava chalit + bhava bala */}
             <Eyebrow id="chalit" deva="भाव चलित" en="Bhava Chalit & Bhava Bala" />
-            <div className="rise" style={{ ...card, padding: "20px 14px 12px" }}>
+            <div className="rise" style={{ ...card, padding: "1.25rem 0.875rem 0.75rem" }}>
               <DiamondChart
                 title={hi ? "भाव चलित — वास्तविक भाव-संधि के अनुसार ग्रह" : "Bhava Chalit — planets by true house cusp"}
                 ascSign={r.ascSign}
@@ -771,7 +788,7 @@ export default function ChartScreen({ C, card, lang }) {
               {(() => {
                 const shifts = r.rows.filter((p) => p.house !== r.bhava.chalit[p.name]);
                 return shifts.length ? (
-                  <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "4px 0 0", lineHeight: 1.6 }}>
+                  <p style={{ textAlign: "center", color: C.muted, fontSize: "var(--font-label)", margin: "0.25rem 0 0", lineHeight: 1.6 }}>
                     {hi ? "राशि कुंडली से भाव बदला: " : "Shifted from the rasi chart: "}
                     {shifts.map((p, i) => (
                       <span key={p.name}>
@@ -781,56 +798,57 @@ export default function ChartScreen({ C, card, lang }) {
                     ))}
                   </p>
                 ) : (
-                  <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "4px 0 0" }}>{hi ? "किसी ग्रह का भाव नहीं बदला—भाव-संधियाँ राशियों के निकट हैं।" : "No planets shift house — cusps align closely with the signs."}</p>
+                  <p style={{ textAlign: "center", color: C.muted, fontSize: "var(--font-label)", margin: "0.25rem 0 0" }}>{hi ? "किसी ग्रह का भाव नहीं बदला—भाव-संधियाँ राशियों के निकट हैं।" : "No planets shift house — cusps align closely with the signs."}</p>
                 );
               })()}
             </div>
 
-            <div style={{ ...T.label, color: C.muted, margin: "18px 0 10px" }}>
+            <div style={{ ...T.label, color: C.muted, margin: "1.125rem 0 0.625rem" }}>
               {hi ? "भाव बल · भावों की शक्ति (रूप)" : "Bhava Bala · house strength (Rupas)"}
             </div>
             {(() => {
               const maxB = Math.max(...r.bhava.bhavaBala.map((b) => b.total));
               return (
-                <div style={{ display: "grid", gap: 8 }}>
+                <div style={{ display: "grid", gap: "0.5rem" }}>
                   {r.bhava.bhavaBala.map((b) => {
                     const strong = b.house === r.bhava.strongest, weak = b.house === r.bhava.weakest;
                     return (
-                      <div key={b.house} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <span style={{ width: 30, fontFamily: "Eczar, serif", fontSize: 14, color: strong ? C.gold : weak ? C.sindoor : C.ivory, flexShrink: 0 }}>H{b.house}</span>
-                        <span style={{ width: 54, fontSize: 11, color: C.muted, flexShrink: 0 }}>{SIGN_SHORT[b.sign]} · <span style={{ color: PLANET_COLOR[b.lord] }}>{PLANET_GLYPH[b.lord]}</span></span>
-                        <div style={{ flex: 1, height: 14, background: "#F1E9D5", borderRadius: 7, overflow: "hidden" }}>
-                          <div style={{ width: `${Math.max(4, b.total / maxB * 100)}%`, height: "100%", background: strong ? `linear-gradient(90deg, #E0A43B, #A86A12)` : weak ? "#C2451E" : "#B89A55", borderRadius: 7 }} />
+                      <div key={b.house} style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
+                        <span style={{ width: "1.875rem", fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: strong ? C.gold : weak ? C.sindoor : C.ivory, flexShrink: 0 }}>H{b.house}</span>
+                        <span style={{ width: "3.375rem", fontSize: "var(--font-label)", color: C.muted, flexShrink: 0 }}>{SIGN_SHORT[b.sign]} · <span style={{ color: PLANET_COLOR[b.lord] }}>{PLANET_GLYPH[b.lord]}</span></span>
+                        <div style={{ flex: 1, height: "0.875rem", background: "var(--surface-sunken)", borderRadius: "0.4375rem", overflow: "hidden" }}>
+                          <div style={{ width: `${Math.max(4, b.total / maxB * 100)}%`, height: "100%", background: strong ? `linear-gradient(90deg, var(--gold), var(--accent))` : weak ? "var(--bad)" : "var(--line)", borderRadius: "0.4375rem" }} />
                         </div>
-                        <span style={{ width: 38, textAlign: "right", fontSize: 12.5, fontVariantNumeric: "tabular-nums", color: strong ? C.gold : C.ivory, flexShrink: 0 }}>{b.total.toFixed(1)}</span>
+                        <span style={{ width: "2.375rem", textAlign: "right", fontSize: "var(--font-small)", fontVariantNumeric: "tabular-nums", color: strong ? C.gold : C.ivory, flexShrink: 0 }}>{b.total.toFixed(1)}</span>
                       </div>
                     );
                   })}
                 </div>
               );
             })()}
-            <p style={{ color: C.muted, fontSize: 11.5, margin: "12px 0 0", lineHeight: 1.5 }}>
+            <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "0.75rem 0 0", lineHeight: 1.5 }}>
               {hi ? <>भाव-संधियाँ श्रीपति पद्धति से निकली हैं। भाव बल में भाव-स्वामी का षड्बल, दिशा और प्राप्त दृष्टियाँ शामिल हैं। सबसे प्रबल भाव: <span style={{ color: C.gold }}>H{r.bhava.strongest}</span> · सबसे निर्बल: <span style={{ color: C.sindoor }}>H{r.bhava.weakest}</span>।</> : <>Cusps use the Sripati method (Lagna and Midheaven as 1st & 10th bhava-madhya, intermediate cusps trisected). Bhava Bala is led by each house lord's Shadbala, adjusted for the bhava's directional fitness and the aspects it receives. Strongest house: <span style={{ color: C.gold }}>H{r.bhava.strongest}</span> · weakest: <span style={{ color: C.sindoor }}>H{r.bhava.weakest}</span>.</>}
             </p>
 
             {/* ashtakavarga */}
+            {showTechnical && <>
             <Eyebrow id="av" deva="अष्टकवर्ग" en="Ashtakavarga" />
-            <div className="rise" style={{ ...card, padding: "20px 14px 16px" }}>
+            <div className="rise" style={{ ...card, padding: "1.25rem 0.875rem 1rem" }}>
               <DiamondChart
                 title={hi ? "सर्वाष्टकवर्ग · भाववार बिंदु" : "Sarvashtakavarga · bindus by house"}
                 ascSign={r.ascSign}
                 houseOfPlanet={Array.from({ length: 12 }, (_, h) => {
                   const v = r.av.sav[(r.ascSign + h) % 12];
-                  return { label: String(v), house: h + 1, color: v >= 30 ? "#3F7E2E" : v <= 24 ? "#B25425" : C.ivory };
+                  return { label: String(v), house: h + 1, color: v >= 30 ? "var(--good)" : v <= 24 ? "var(--bad)" : C.ivory };
                 })}
                 gold={C.gold} ivory={C.ivory} muted={C.muted} sindoor={C.sindoor}
               />
-              <p style={{ textAlign: "center", color: C.muted, fontSize: 12, margin: "8px 0 0" }}>
-                <span style={{ color: "#3F7E2E" }}>30+</span> {hi ? "प्रबल" : "strong"} · 25–29 {hi ? "औसत" : "average"} · <span style={{ color: "#B25425" }}>≤24</span> {hi ? "सहयोग अपेक्षित · कुल 337 — अधिक बिंदु वाले भावों में गोचर सामान्यतः बेहतर फल देते हैं" : "needs support · 337 total — transits through high-bindu houses tend to give better results"}
+              <p style={{ textAlign: "center", color: C.muted, fontSize: "var(--font-label)", margin: "0.5rem 0 0" }}>
+                <span style={{ color: "var(--good)" }}>30+</span> {hi ? "प्रबल" : "strong"} · 25–29 {hi ? "औसत" : "average"} · <span style={{ color: "var(--bad)" }}>≤24</span> {hi ? "सहयोग अपेक्षित · कुल 337 — अधिक बिंदु वाले भावों में गोचर सामान्यतः बेहतर फल देते हैं" : "needs support · 337 total — transits through high-bindu houses tend to give better results"}
               </p>
             </div>
-            <div className="rise2" style={{ ...card, padding: "8px 18px 12px", overflowX: "auto", marginTop: 12 }}>
-              <table style={{ minWidth: 560 }}>
+            <div className="rise2" style={{ ...card, padding: "0.5rem 1.125rem 0.75rem", overflowX: "auto", marginTop: "0.75rem" }}>
+              <table style={{ minWidth: "35rem" }}>
                 <thead>
                   <tr><th>Graha</th>{SIGN_SHORT.map((sn) => <th key={sn} style={{ textAlign: "center" }}>{sn}</th>)}<th style={{ textAlign: "center" }}>Σ</th></tr>
                 </thead>
@@ -838,7 +856,7 @@ export default function ChartScreen({ C, card, lang }) {
                   {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"].map((p) => (
                     <tr key={p}>
                       <td style={{ whiteSpace: "nowrap" }}>
-                        <span style={{ display: "inline-block", width: 7, height: 7, borderRadius: 4, background: PLANET_COLOR[p], marginRight: 8 }} />{PLANET_GLYPH[p]}
+                        <span style={{ display: "inline-block", width: "0.4375rem", height: "0.4375rem", borderRadius: "0.25rem", background: PLANET_COLOR[p], marginRight: "0.5rem" }} />{PLANET_GLYPH[p]}
                       </td>
                       {r.av.bav[p].map((v, i) => (
                         <td key={i} style={{ textAlign: "center", fontVariantNumeric: "tabular-nums", color: i === r.rows.find((q) => q.name === p).sign ? C.gold : C.ivory, fontWeight: i === r.rows.find((q) => q.name === p).sign ? 600 : 400 }}>{v}</td>
@@ -853,23 +871,24 @@ export default function ChartScreen({ C, card, lang }) {
                   </tr>
                 </tbody>
               </table>
-              <p style={{ color: C.muted, fontSize: 12, margin: "10px 0 4px" }}>{hi ? "सुनहरा खाना ग्रह की अपनी राशि दर्शाता है। भिन्नाष्टकवर्ग की हर पंक्ति राशि अनुसार उस ग्रह के बिंदु दिखाती है।" : "Gold cell marks each graha's own sign. Bhinnashtakavarga rows show every planet's bindus per sign."}</p>
+              <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "0.625rem 0 0.25rem" }}>{hi ? "सुनहरा खाना ग्रह की अपनी राशि दर्शाता है। भिन्नाष्टकवर्ग की हर पंक्ति राशि अनुसार उस ग्रह के बिंदु दिखाती है।" : "Gold cell marks each graha's own sign. Bhinnashtakavarga rows show every planet's bindus per sign."}</p>
             </div>
 
             {/* arudha padas */}
+            </>}
             <Eyebrow id="arudha" deva="आरूढ पद" en="Arudha padas" />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.75rem" }}>
               {r.arudhas.map((a, i) => {
                 const ARUDHA_MEAN = hi ? ["दिखाई देने वाली छवि और प्रतिष्ठा", "धन और वाणी", "भाई-बहन और साहस", "घर और सुख", "संतान और सृजन", "सेवा और संघर्ष", "साझेदारी", "आयु और परिवर्तन", "धर्म और भाग्य", "कर्म और प्रतिष्ठा", "लाभ और संबंध-जाल", "विवाह और जीवनसाथी"] : ["perceived image & status", "wealth & speech", "siblings & courage", "home & comforts", "children & creativity", "service & conflicts", "partnerships", "longevity & change", "dharma & fortune", "career & status", "gains & networks", "marriage & spouse"];
                 const special = a.h === 1 ? "AL" : a.h === 12 ? "UL" : a.h === 7 ? "A7" : null;
                 const hot = a.h === 1 || a.h === 12;
                 return (
-                  <div key={a.h} className="rise" style={{ ...card, padding: "12px 14px", border: `1px solid ${hot ? C.gold : C.line}` }}>
-                    <div style={{ ...T.label, color: hot ? C.gold : C.muted, marginBottom: 5 }}>
+                  <div key={a.h} className="rise" style={{ ...card, padding: "0.75rem 0.875rem", border: `0.0625rem solid ${hot ? C.gold : C.line}` }}>
+                    <div style={{ ...T.label, color: hot ? C.gold : C.muted, marginBottom: "0.3125rem" }}>
                       {a.h === 1 ? (hi ? "आरूढ़ लग्न" : "Arudha Lagna") : a.h === 12 ? (hi ? "उपपद" : "Upapada") : `A${a.h}`}{special && a.h !== 1 && a.h !== 12 ? "" : ""}
                     </div>
-                    <div style={{ fontFamily: "Eczar, serif", fontSize: 16, color: hot ? C.gold : C.ivory }}>{SIGNS[a.sign].split(" ")[0]}</div>
-                    <div style={{ color: C.muted, fontSize: 11.5, marginTop: 4 }}>{ARUDHA_MEAN[i]}</div>
+                    <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-title)", color: hot ? C.gold : C.ivory }}>{SIGNS[a.sign].split(" ")[0]}</div>
+                    <div style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.25rem" }}>{ARUDHA_MEAN[i]}</div>
                   </div>
                 );
               })}
@@ -903,19 +922,19 @@ export default function ChartScreen({ C, card, lang }) {
               ];
               return (
                 <>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0.75rem" }}>
                     {cards.map((cd) => (
-                      <div key={cd.id} className="rise" style={{ ...card, padding: "14px 16px", border: `1px solid ${cd.hot ? C.gold : C.line}` }}>
-                        <div style={{ ...T.label, color: cd.hot ? C.gold : C.muted, marginBottom: 6 }}>{cd.head}</div>
-                        <div style={{ fontFamily: "Eczar, serif", fontSize: 16, color: cd.hot ? C.gold : C.ivory, lineHeight: 1.35 }}>{cd.answer}</div>
-                        <div style={{ color: C.muted, fontSize: 12, marginTop: 6, lineHeight: 1.5 }}>{cd.detail}</div>
-                        <a href={`/calculator/${cd.id}?lang=${lang}`} style={{ display: "inline-block", marginTop: 8, fontSize: 12, color: C.gold, textDecoration: "none" }}>
+                      <div key={cd.id} className="rise" style={{ ...card, padding: "0.875rem 1rem", border: `0.0625rem solid ${cd.hot ? C.gold : C.line}` }}>
+                        <div style={{ ...T.label, color: cd.hot ? C.gold : C.muted, marginBottom: "0.375rem" }}>{cd.head}</div>
+                        <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-title)", color: cd.hot ? C.gold : C.ivory, lineHeight: 1.35 }}>{cd.answer}</div>
+                        <div style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.375rem", lineHeight: 1.5 }}>{cd.detail}</div>
+                        <a href={`/calculator/${cd.id}?lang=${lang}`} style={{ display: "inline-block", marginTop: "0.5rem", fontSize: "var(--font-label)", color: C.gold, textDecoration: "none" }}>
                           {hi ? "विस्तृत पृष्ठ →" : "Full page →"}
                         </a>
                       </div>
                     ))}
                   </div>
-                  <p style={{ margin: "10px 2px 0", color: C.muted, fontSize: 12.5, lineHeight: 1.6 }}>
+                  <p style={{ margin: "0.625rem 0.125rem 0", color: C.muted, fontSize: "var(--font-small)", lineHeight: 1.6 }}>
                     {hi
                       ? "ये पारम्परिक व्याख्यात्मक रचनाएँ हैं, स्पष्ट नियमों के साथ दिखाई गई हैं—किसी अनिष्ट या शाप की भविष्यवाणी नहीं। परम्पराएँ भिन्न होती हैं; किसी योग्य ज्योतिषी से परामर्श करें।"
                       : "These are traditional interpretive patterns shown with the exact rule that fired — not a prediction of harm or a curse. Traditions differ; please consult a qualified jyotishi."}
@@ -935,14 +954,14 @@ export default function ChartScreen({ C, card, lang }) {
             <BhriguModule rows={r.rows} ascSign={r.ascSign} birthMs={r.birthMs} tz={r.tz} C={C} card={card} lang={lang} />
 
             <Eyebrow id="dasha" deva="विंशोत्तरी दशा" en="Vimshottari dasha · maha to prana" />
-            <div className="rise" style={{ ...card, padding: "8px 18px 16px", overflowX: "auto" }}>
+            <div className="rise" style={{ ...card, padding: "0.5rem 1.125rem 1rem", overflowX: "auto" }}>
               <table>
                 <thead><tr><th>{hi ? "स्वामी" : "Lord"}</th><th>{hi ? "आरम्भ" : "From"}</th><th>{hi ? "अंत" : "To"}</th><th>{hi ? "वर्ष" : "Years"}</th></tr></thead>
                 <tbody>
                   {r.dashas.map((dsh) => {
                     const isNow = r.current && dsh.lord === r.current.lord && dsh.start === r.current.start;
                     return (
-                      <tr key={dsh.start} style={isNow ? { background: "rgba(168,106,18,.08)" } : null}>
+                      <tr key={dsh.start} style={isNow ? { background: "var(--surface-hover)" } : null}>
                         <td style={{ color: isNow ? C.gold : C.ivory, fontWeight: isNow ? 600 : 400 }}>
                           {dsh.lord}{isNow && (hi ? " · वर्तमान" : " · current")}
                         </td>
@@ -959,44 +978,44 @@ export default function ChartScreen({ C, card, lang }) {
                   {(() => {
                     const pct = Math.min(100, Math.max(0, ((Date.now() - r.current.start) / (r.current.end - r.current.start)) * 100));
                     return (
-                      <div style={{ margin: "16px 2px 4px" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: C.muted, letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 7 }}>
+                      <div style={{ margin: "1rem 0.125rem 0.25rem" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--font-micro)", color: C.muted, letterSpacing: ".14em", textTransform: "uppercase", marginBottom: "0.4375rem" }}>
                           <span>{r.current.lord} {hi ? "महादशा" : "mahadasha"}</span>
                           <span style={{ color: C.gold }}>{pct.toFixed(0)}% {hi ? "पूर्ण" : "elapsed"}</span>
                         </div>
-                        <div style={{ height: 6, background: "#F1E9D5", borderRadius: 3, overflow: "hidden", border: `1px solid ${C.line}` }}>
-                          <div style={{ width: `${pct}%`, height: "100%", background: `linear-gradient(90deg, ${C.gold}, #7E520C)`, borderRadius: 3 }} />
+                        <div style={{ height: "0.375rem", background: "var(--surface-sunken)", borderRadius: "0.1875rem", overflow: "hidden", border: `0.0625rem solid ${C.line}` }}>
+                          <div style={{ width: `${pct}%`, height: "100%", background: `linear-gradient(90deg, ${C.gold}, var(--accent-strong))`, borderRadius: "0.1875rem" }} />
                         </div>
                       </div>
                     );
                   })()}
-                  <p style={{ fontSize: 14, lineHeight: 1.6, color: C.ivory, margin: "16px 0 10px" }}>
+                  <p style={{ fontSize: "var(--font-body)", lineHeight: 1.6, color: C.ivory, margin: "1rem 0 0.625rem" }}>
                     {hi ? <>अभी <span style={{ color: C.gold }}>{r.current.lord} महादशा</span> चल रही है—यह अवधि उस ग्रह के कारकत्व, स्थिति और स्वामित्व वाले भावों को प्रमुख बनाती है।</> : <>The native runs <span style={{ color: C.gold }}>{r.current.lord} mahadasha</span> — a period classically associated with {DASHA_NOTE[r.current.lord]}.</>}
                   </p>
                   {r.curAntar && (
-                    <div style={{ margin: "18px 0 6px", padding: "13px 14px", borderRadius: 10, background: "rgba(168,106,18,.05)", border: `1px solid ${C.line}` }}>
-                      <div style={{ ...T.label, color: C.muted, marginBottom: 9 }}>{hi ? "अभी चल रहा क्रम · पाँचों स्तर" : "Running now · all five levels"}</div>
-                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "4px 6px" }}>
+                    <div style={{ margin: "1.125rem 0 0.375rem", padding: "0.8125rem 0.875rem", borderRadius: "0.625rem", background: "var(--surface-hover)", border: `0.0625rem solid ${C.line}` }}>
+                      <div style={{ ...T.label, color: C.muted, marginBottom: "0.5625rem" }}>{hi ? "अभी चल रहा क्रम · पाँचों स्तर" : "Running now · all five levels"}</div>
+                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.25rem 0.375rem" }}>
                         {[[hi ? "महा" : "Maha", r.current.lord], [hi ? "अंतर" : "Antar", r.curAntar.lord], [hi ? "प्रत्यंतर" : "Pratyantar", r.curPratya && r.curPratya.lord], [hi ? "सूक्ष्म" : "Sookshma", r.curSookshma && r.curSookshma.lord], [hi ? "प्राण" : "Prana", r.curPrana && r.curPrana.lord]].map(([lvl, lord], i) =>
                           lord ? (
                             <React.Fragment key={lvl}>
-                              {i > 0 && <span style={{ color: C.line, fontSize: 13 }}>›</span>}
+                              {i > 0 && <span style={{ color: C.line, fontSize: "var(--font-small)" }}>›</span>}
                               <span style={{ display: "inline-flex", flexDirection: "column", lineHeight: 1.25 }}>
-                                <span style={{ fontSize: 9, letterSpacing: ".1em", textTransform: "uppercase", color: C.muted }}>{lvl}</span>
-                                <span style={{ fontFamily: "Eczar, serif", fontSize: 15, color: C.gold }}>{lord}</span>
+                                <span style={{ fontSize: "var(--font-micro)", letterSpacing: ".1em", textTransform: "uppercase", color: C.muted }}>{lvl}</span>
+                                <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: C.gold }}>{lord}</span>
                               </span>
                             </React.Fragment>
                           ) : null
                         )}
                       </div>
                       {r.curPrana && (
-                        <div style={{ fontSize: 11.5, color: C.muted, marginTop: 9 }}>
+                        <div style={{ fontSize: "var(--font-label)", color: C.muted, marginTop: "0.5625rem" }}>
                           {hi ? "वर्तमान प्राण" : "Current prana"}: {r.curPrana.lord} · {fmtDateT(r.curPrana.start, r.tz, true)} – {fmtDateT(r.curPrana.end, r.tz, true)}
                         </div>
                       )}
                     </div>
                   )}
-                  <div style={{ ...T.label, color: C.muted, margin: "16px 0 4px" }}>
+                  <div style={{ ...T.label, color: C.muted, margin: "1rem 0 0.25rem" }}>
                     {r.current.lord} {hi ? "के भीतर अंतरदशाएँ — आगे के स्तर खोलने के लिए किसी अवधि को दबाएँ" : "Antardashas — tap any period to drill down"}
                   </div>
                   <DashaTree periods={r.antars} level={0} now={Date.now()} openD={openD} toggle={toggleD} C={C} tz={r.tz} lang={lang} />
@@ -1010,25 +1029,25 @@ export default function ChartScreen({ C, card, lang }) {
               const mw = marriageWindows(r);
               const fmtY = (t) => new Date(t + r.tz * 3600000).toLocaleDateString(hi ? "hi-IN" : "en-US", { month: "short", year: "numeric", timeZone: "UTC" });
               return (
-                <div className="rise" style={{ ...card, padding: "16px 20px" }}>
-                  <p style={{ fontSize: 13.5, lineHeight: 1.6, color: C.ivory, margin: "0 0 12px" }}>
+                <div className="rise" style={{ ...card, padding: "1rem 1.25rem" }}>
+                  <p style={{ fontSize: "var(--font-small)", lineHeight: 1.6, color: C.ivory, margin: "0 0 0.75rem" }}>
                     {hi
                       ? <>विवाह के कारक — शुक्र व गुरु, सप्तम भाव का स्वामी (<strong>{PLANET_DEVA[mw.seventhLord]}</strong>){mw.occ7.length ? <> तथा सप्तम में स्थित ग्रह</> : null} — जिन दशा-अवधियों में सक्रिय होते हैं, परम्परा उन्हें विवाह हेतु अनुकूल मानती है।</>
                       : <>Periods run by the marriage significators — Venus &amp; Jupiter, the 7th lord (<strong>{mw.seventhLord}</strong>){mw.occ7.length ? <> and planets in the 7th</> : null} — are traditionally seen as supportive for marriage.</>}
                   </p>
                   {mw.windows.length === 0 ? (
-                    <p style={{ color: C.muted, fontSize: 13 }}>{hi ? "आगामी बीस वर्षों में कोई स्पष्ट अनुकूल अवधि नहीं मिली।" : "No clearly supportive window found in the next twenty years."}</p>
+                    <p style={{ color: C.muted, fontSize: "var(--font-small)" }}>{hi ? "आगामी बीस वर्षों में कोई स्पष्ट अनुकूल अवधि नहीं मिली।" : "No clearly supportive window found in the next twenty years."}</p>
                   ) : (
-                    <div style={{ display: "grid", gap: 8 }}>
+                    <div style={{ display: "grid", gap: "0.5rem" }}>
                       {mw.windows.map((w, i) => (
-                        <div key={i} style={{ display: "flex", gap: 12, alignItems: "baseline", padding: "8px 2px", borderBottom: "1px solid #F1EADA" }}>
-                          <span style={{ color: C.gold, fontSize: 12.5, minWidth: 128, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{fmtY(w.start)} – {fmtY(w.end)}</span>
-                          <span style={{ fontSize: 13.5, color: C.ivory, flex: 1 }}>{hi ? `${PLANET_DEVA[w.maha]} / ${PLANET_DEVA[w.antar]} दशा` : `${w.maha} / ${w.antar} dasha`}</span>
+                        <div key={i} style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", padding: "0.5rem 0.125rem", borderBottom: "0.0625rem solid var(--line-soft)" }}>
+                          <span style={{ color: C.gold, fontSize: "var(--font-small)", minWidth: "8rem", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{fmtY(w.start)} – {fmtY(w.end)}</span>
+                          <span style={{ fontSize: "var(--font-small)", color: C.ivory, flex: 1 }}>{hi ? `${PLANET_DEVA[w.maha]} / ${PLANET_DEVA[w.antar]} दशा` : `${w.maha} / ${w.antar} dasha`}</span>
                         </div>
                       ))}
                     </div>
                   )}
-                  <p style={{ color: C.muted, fontSize: 11.5, marginTop: 12, lineHeight: 1.55 }}>
+                  <p style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.75rem", lineHeight: 1.55 }}>
                     {hi ? "यह भविष्यवाणी नहीं है। विवाह का वास्तविक समय गोचर (विशेषतः गुरु), नवांश, आयु, व्यक्तिगत इच्छा और अनेक कारकों पर निर्भर करता है। इसे किसी योग्य ज्योतिषी से पूरी कुंडली सहित समझें।" : "This is not a prediction. Actual timing depends on transits (especially Jupiter), the navamsa, age, personal choice and many other factors. Read it with the full chart and a qualified astrologer."}
                   </p>
                 </div>
@@ -1037,7 +1056,7 @@ export default function ChartScreen({ C, card, lang }) {
 
             {/* panchang */}
             <Eyebrow deva="पञ्चाङ्ग" en="Birth panchang" />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.75rem" }}>
               {[
                 [hi ? "वार" : "Vara", r.panchang.weekday],
                 [hi ? "तिथि" : "Tithi", `${r.panchang.paksha} ${r.panchang.tithiName}`],
@@ -1045,9 +1064,9 @@ export default function ChartScreen({ C, card, lang }) {
                 [hi ? "योग" : "Yoga", r.panchang.yoga],
                 [hi ? "करण" : "Karana", r.panchang.karana],
               ].map(([k, v]) => (
-                <div key={k} style={{ ...card, padding: "14px 16px" }}>
-                  <div style={{ ...T.label, color: C.muted, marginBottom: 6 }}>{k}</div>
-                  <div style={{ fontSize: 15 }}>{v}</div>
+                <div key={k} style={{ ...card, padding: "0.875rem 1rem" }}>
+                  <div style={{ ...T.label, color: C.muted, marginBottom: "0.375rem" }}>{k}</div>
+                  <div style={{ fontSize: "var(--font-body)" }}>{v}</div>
                 </div>
               ))}
             </div>

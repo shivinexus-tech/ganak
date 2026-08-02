@@ -191,4 +191,35 @@ export function useComfort() {
   return value;
 }
 
+/**
+ * Guided ↔ Expert, as a three-step ladder every screen can consume.
+ *
+ *                                   guided   balanced   expert
+ *   answer, warnings, dates, actions   ✓         ✓         ✓     (never gated, at any depth)
+ *   showTechnical  existing detail     –         ✓         ✓
+ *   showPlainHelp  extra plain words   ✓         –         –
+ *   showExpert     deeper derivation   –         –         ✓
+ *
+ * Balanced is deliberately identical to what shipped before this setting did anything, so
+ * turning the ladder on cannot silently remove content from the default preference. Guided
+ * simplifies and explains; Expert adds. Critical warnings, dates, actions and safety
+ * information are unconditional and must never be placed behind any of these flags.
+ *
+ * Reading the context directly (instead of useComfort) keeps screens renderable in the
+ * validation harnesses, which mount them without the provider.
+ */
+export function useDepth() {
+  const value = useContext(ComfortContext);
+  const depth = value?.preferences.depth || DEFAULT_PREFERENCES.depth;
+  return {
+    depth,
+    isGuided: depth === "guided",
+    isBalanced: depth === "balanced",
+    isExpert: depth === "expert",
+    showTechnical: depth !== "guided",
+    showPlainHelp: depth === "guided",
+    showExpert: depth === "expert",
+  };
+}
+
 export { PRESETS };

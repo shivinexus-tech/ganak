@@ -57,7 +57,11 @@ const JYOTISH_GROUPS = [
   },
 ];
 
-function JyotishPanelNav({ lang, C }) {
+// Anchors whose destination panel only exists above Guided depth. Guided must not offer a
+// link that scrolls to nothing — a dead-end is worse than a missing entry.
+const TECHNICAL_ANCHORS = new Set(["#shadbala", "#av"]);
+
+function JyotishPanelNav({ lang, C, showTechnical = true }) {
   const hi = lang === "hi";
   const showReading = SIGN_TRAITS.every((entry) => entry.status === "owner-verified");
   return (
@@ -75,7 +79,7 @@ function JyotishPanelNav({ lang, C }) {
         background: "rgba(250,245,234,.96)",
         backdropFilter: "blur(8px)",
         WebkitBackdropFilter: "blur(8px)",
-        border: `1px solid ${C.line}`,
+        border: `0.0625rem solid ${C.line}`,
         borderRadius: T.rLg,
         boxShadow: T.e2,
       }}
@@ -94,7 +98,7 @@ function JyotishPanelNav({ lang, C }) {
                 display: "flex",
                 alignItems: "center",
                 padding: `0 ${T.s4}`,
-                border: `1px solid ${C.line}`,
+                border: `0.0625rem solid ${C.line}`,
                 borderRadius: T.rMd,
                 background: C.panel,
                 color: C.gold,
@@ -110,16 +114,16 @@ function JyotishPanelNav({ lang, C }) {
               style={{
                 display: "grid",
                 gap: T.s1,
-                minWidth: 210,
+                minWidth: "13.125rem",
                 padding: T.s2,
                 marginTop: T.s1,
-                border: `1px solid ${C.line}`,
+                border: `0.0625rem solid ${C.line}`,
                 borderRadius: T.rMd,
                 background: C.panel,
                 boxShadow: T.e3,
               }}
             >
-              {group.items.filter(([href]) => showReading || href !== "#reading").map(([href, en, itemHi]) => (
+              {group.items.filter(([href]) => (showReading || href !== "#reading") && (showTechnical || !TECHNICAL_ANCHORS.has(href))).map(([href, en, itemHi]) => (
                 <a
                   key={href}
                   href={href}

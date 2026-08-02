@@ -23,7 +23,11 @@ function assert(ok, message) {
 assert(shell.includes('v === "prashna" || v === "daily" || v === "chart"'), "direct ?screen=chart URLs must survive reload");
 assert(shell.includes('["chart", lang === "hi" ? "ज्योतिष" : "Jyotish"]'), "Jyotish must be visible in the primary navigation in both languages");
 assert(shell.includes('mode === "chart"'), "the shell must render ChartScreen");
-assert(screen.includes("<JyotishPanelNav lang={lang} C={C} />"), "ChartScreen must use the grouped Jyotish navigation");
+assert(screen.includes("<JyotishPanelNav lang={lang} C={C}"), "ChartScreen must use the grouped Jyotish navigation");
+// Guided depth hides the two practitioner-only panels, so the nav must hide exactly those
+// entries too — an anchor that scrolls to nothing is the dead-end pattern this repo bans.
+assert(screen.includes("showTechnical={showTechnical}"), "the Jyotish nav must be told the current guidance depth");
+assert(nav.includes("TECHNICAL_ANCHORS") && nav.includes("showTechnical || !TECHNICAL_ANCHORS.has(href)"), "the Jyotish nav must drop anchors whose panel is hidden at guided depth");
 assert(screen.includes('lang === "hi" ? deva : en'), "section headings must follow the selected language instead of rendering both");
 
 const groups = ["kundli", "dashas", "matching", "tools", "vault"];
