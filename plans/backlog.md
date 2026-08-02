@@ -753,12 +753,12 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       and Simple & Large enlarges 95% of on-screen text instead of 60%. Universal
       Card/SectionHeader/Badge/DataRow primitives now cover all six launch screens;
       Guided <-> Expert materially changes content on all five launch journeys; Muhurat
-      has bilingual Listen. **Open:** deployment/live verification of the final primitive
-      adoption and an owner decision on the Cloudflare Web Analytics beacon,
+      has bilingual Listen. The final primitive adoption is deployed and live-verified.
+      **Open:** an owner decision on the Cloudflare Web Analytics beacon,
       which fires regardless of the in-app analytics consent — Ganak's own telemetry seam
       is fail-closed, but the beacon is injected by Cloudflare Pages at the edge and can
       only be turned off in the dashboard or disclosed in the footer.
-      _(Backlog #46; 90% as of 2026-08-01.)_
+      _(Backlog #46; 95% as of 2026-08-01.)_
 
 **Still not required by the 2026-07-21 scope change:** accounts, cross-device data
 persistence, paid AI, Android/iOS store packaging, SDUI and paywalls. The backend

@@ -133,15 +133,15 @@
   },
   "qualityOverrides": {
     "46": {
-      "deliveryState": "Core system is live; final universal-primitive adoption is built and fully validated locally pending integration and live verification",
-      "limitations": "Card/DataRow/Badge/SectionHeader now cover Today, Muhurat, Festival, Ask, Jyotish and Personalize locally. Closure still needs integration, production verification, owner live-URL sign-off, a human real-device screen-reader/audio/touch pass, and an owner decision on the Cloudflare Web Analytics beacon. Native dropdown option scaling remains browser-controlled.",
+      "deliveryState": "Comfort/accessibility and universal-primitives system deployed and production-verified across all six launch screens",
+      "limitations": "Closure still needs owner live-URL sign-off, a human real-device screen-reader/audio/touch pass, and an owner decision on the Cloudflare Web Analytics beacon. Native dropdown option scaling remains browser-controlled.",
       "shortTermImpact": "Production users can now choose larger/roomier presentation, use bilingual read-aloud, select light/dark behavior and review or clear remembered preferences without login.",
       "longTermImpact": "All launch screens now share the same primitive and semantic-token contracts, reducing one-off visual drift and making later comfort or brand-value changes consistent.",
       "bugBashStatus": "Required high-impact slice bug bash completed 2026-08-01. Independent review found and fixed fail-open telemetry, dark Place input, incomplete clear, deep-route state loss, competing TTS controls, exact-follow review, false AA fixtures, focus and touch-target defects. Production QA then passed at 390×844 in EN/HI with preset persistence, dark mode, read-aloud start/stop, no horizontal overflow and a clean console. A final full-route matrix remains mandatory before 100% closure.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-08-01 · final primitive adoption validated locally on codex/backlog46-primitives-followup: design-system-primitives 199, accessibility-comfort 278, Prashna parity EXACT 198/6 and calc 24/24, every canonical gate, build 144 modules, Sheet check and diff-check pass; production remains at prior verified deployment until integration",
+      "lastVerified": "2026-08-01 · production main 3333928 live on ganakapp.com; Festival, Ask, Jyotish and Personalize at 390px each show primitive-backed content with zero overflow and zero console warnings/errors; design-system-primitives 199, accessibility-comfort 278, Prashna parity EXACT 198/6 and calc 24/24, every canonical gate, build 144 modules, Sheet and diff checks pass",
       "sourceConfidence": "Not applicable — technical accessibility, UX and design-system work",
-      "recommendedAction": "Integrate and deploy the final four-screen primitive adoption, verify the six-route EN/HI phone matrix live, then obtain the owner and real-device human sign-offs; keep src/styles/design-tokens.css as the only token source."
+      "recommendedAction": "Obtain the owner live-URL decision, resolve the Cloudflare beacon policy, and complete the human real-device screen-reader/audio/touch pass; keep src/styles/design-tokens.css as the only token source."
     },
     "19": {
       "deliveryState": "Delivered and production-verified",
