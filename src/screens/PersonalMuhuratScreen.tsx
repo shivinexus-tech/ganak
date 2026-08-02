@@ -46,10 +46,15 @@ export default function PersonalMuhuratScreen({ lang, C, card, place, onPlace }:
   const plus = (days: number) => new Date(Date.now() + days * 864e5).toISOString().slice(0, 10);
   const [cat, setCat] = useState("wedding");
   const [from, setFrom] = useState(todayStr);
-  const [to, setTo] = useState(plus(60));
+  // 120 days by default: long enough that the default activity (wedding) still returns
+  // days during Chaturmas, short enough to stay ~2s. Users can widen to a full year.
+  const [to, setTo] = useState(plus(120));
   const [confirmed, setConfirmed] = useState(true); // shell place is pre-filled (New Delhi default)
   const [result, setResult] = useState<any | null>(null);
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const scanSeq = React.useRef(0);
   // Opt-in natal personalisation. Its own independent birth place.
   const [birthDate, setBirthDate] = useState("");
   const [birthTime, setBirthTime] = useState("12:00");
@@ -69,10 +74,22 @@ export default function PersonalMuhuratScreen({ lang, C, card, place, onPlace }:
   // Any input that feeds the calculation invalidates a shown result (no stale lists,
   // and no state reset without a user action). Depends on place PRIMITIVES, not identity.
   useEffect(() => {
+    scanSeq.current++; // abandon any in-flight chunked scan; its results are now stale
+    setBusy(false);
     setResult(null);
   }, [cat, from, to, place?.lat, place?.lon, place?.label, birthDate, birthTime, birthConfirmed, birthPlace]);
 
-  const run = () => {
+  /* A full year must be searchable: wedding and several other activities are barred for
+     ~4 months by Chaturmas/Devshayana, so a short cap can hide every valid day (a 120-day
+     Delhi wedding scan finds 6 days; a 365-day scan finds 122). A year of muhurat
+     astronomy is ~7s of work, which would freeze the tab if run in one go — so the scan is
+     chunked and yields to the browser between chunks, with visible progress. */
+  const MAX_RANGE_DAYS = 365;
+  // 60-day chunks: enough yields to keep the tab responsive and the progress bar moving,
+  // few enough that background-tab timer throttling (~1s per yield) cannot dominate.
+  const CHUNK_DAYS = 60;
+
+  const run = async () => {
     setError("");
     if (!confirmed || !place) { setResult(null); setError(hi ? "सुझावों में से एक स्थान चुनें।" : "Choose a place from the suggestions."); return; }
     const [fy, fm, fd] = from.split("-").map(Number);
@@ -80,17 +97,48 @@ export default function PersonalMuhuratScreen({ lang, C, card, place, onPlace }:
     if (!fy || !ty) { setError(hi ? "एक तिथि सीमा चुनें।" : "Pick a date range."); return; }
     const start = Date.UTC(fy, fm - 1, fd), end = Date.UTC(ty, tm - 1, td);
     if (end < start) { setResult(null); setError(hi ? "अंतिम तिथि आरंभ के बाद होनी चाहिए।" : "The end date must be on or after the start date."); return; }
-    if ((end - start) / 864e5 > 120) { setResult(null); setError(hi ? "कृपया लगभग 120 दिनों तक की सीमा चुनें।" : "Please choose a range of about 120 days or less."); return; }
+    if ((end - start) / 864e5 > MAX_RANGE_DAYS) { setResult(null); setError(hi ? `कृपया लगभग एक वर्ष (${MAX_RANGE_DAYS} दिन) तक की सीमा चुनें।` : `Please choose a range of about a year (${MAX_RANGE_DAYS} days) or less.`); return; }
     if (birthDate && birthDate > todayStr) { setResult(null); setError(hi ? "जन्म तिथि भविष्य की नहीं हो सकती।" : "Birth date cannot be in the future."); return; }
 
-    const scan = muhuratScanRange(place, "lahiri", { y: fy, m: fm, d: fd }, { y: ty, m: tm, d: td }, cat);
+    // Natal anchors first: cheap, and a failure here must not waste the whole scan.
     let anchors: any = null;
     if (birthDate && birthPlace && birthConfirmed) {
       const [by, bm, bd] = birthDate.split("-").map(Number);
       const [bhh, bmi] = birthTime.split(":").map(Number);
       if (by) anchors = natalAnchors(birthPlace, "lahiri", { y: by, m: bm, day: bd, hh: bhh || 0, mi: bmi || 0 });
     }
-    setResult({ scan, anchors });
+
+    const my = ++scanSeq.current;
+    setResult(null);
+    setBusy(true);
+    setProgress(0);
+    const totalDays = Math.round((end - start) / 864e5) + 1;
+    const days: any[] = [];
+    try {
+      for (let cur = start; cur <= end; cur += CHUNK_DAYS * 864e5) {
+        if (my !== scanSeq.current) return; // inputs changed — abandon this scan
+        const chunkEnd = Math.min(cur + (CHUNK_DAYS - 1) * 864e5, end);
+        const a = new Date(cur), b = new Date(chunkEnd);
+        days.push(...muhuratScanRange(
+          place, "lahiri",
+          { y: a.getUTCFullYear(), m: a.getUTCMonth() + 1, d: a.getUTCDate() },
+          { y: b.getUTCFullYear(), m: b.getUTCMonth() + 1, d: b.getUTCDate() },
+          cat,
+        ));
+        setProgress(Math.min(100, Math.round(((chunkEnd - start) / 864e5 + 1) / totalDays * 100)));
+        await new Promise((r) => setTimeout(r, 0)); // let the browser paint the progress
+      }
+    } catch (e: any) {
+      if (my !== scanSeq.current) return;
+      setBusy(false);
+      setError(hi ? "गणना पूरी नहीं हो सकी। कृपया छोटी अवधि आज़माएँ।" : "The calculation could not finish. Please try a shorter range.");
+      return;
+    }
+    if (my !== scanSeq.current) return;
+    // Chunking splits the engine's own ranking, so restore its order across the whole range.
+    days.sort((a, b) => (b.score || 0) - (a.score || 0) || a.rise - b.rise);
+    setBusy(false);
+    setResult({ scan: days, anchors });
   };
 
   const panel = { ...card, padding: 16, marginBottom: 14 };
@@ -198,10 +246,13 @@ export default function PersonalMuhuratScreen({ lang, C, card, place, onPlace }:
           </div>
         </details>
 
-        <button onClick={run} className="castBtn" style={{
-          marginTop: 14, width: "100%", height: 46, border: "none", borderRadius: 12, cursor: "pointer",
-          background: C.gold, color: "#fff", fontFamily: "Eczar, serif", fontSize: 16, fontWeight: 600,
-        }}>{hi ? "दिन खोजें" : "Find days"}</button>
+        <button onClick={run} disabled={busy} aria-busy={busy} className="castBtn" style={{
+          marginTop: 14, width: "100%", height: 46, border: "none", borderRadius: 12, cursor: busy ? "progress" : "pointer",
+          background: busy ? "var(--surface-hover, #D8CDB4)" : C.gold, color: busy ? C.ivory : "#fff",
+          fontFamily: "Eczar, serif", fontSize: 16, fontWeight: 600,
+        }}>{busy
+          ? (hi ? `खोज रहे हैं… ${progress}%` : `Searching… ${progress}%`)
+          : (hi ? "दिन खोजें" : "Find days")}</button>
         {error && <p role="alert" style={{ color: "#B4462A", fontSize: 13, margin: "10px 0 0" }}>{error}</p>}
       </div>
 
