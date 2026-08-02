@@ -747,10 +747,18 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       **PARKED 2026-07-20** (owner): user feedback that IA feels broken + elder-friendly
       requirement captured under EPIC-IA; resume after Phase 1 launch blockers.
 - [ ] Design-system pass (universal Card, spacing scale, shared primitives) —
-      see **EPIC-DS**. Directly fixes the "visual inconsistency" pain. Comfort-ready
-      tokens, presets and the Personalize hub are deployed on ganakapp.com;
-      shared primitives and the app-wide legacy migration remain.
-      _(Backlog #46; 55% as of 2026-08-01.)_
+      see **EPIC-DS**. Directly fixes the "visual inconsistency" pain. The app-wide
+      legacy migration is done and live: every screen now reads the single semantic
+      token source, so dark mode repaints the whole app instead of only the top bar,
+      and Simple & Large enlarges 95% of on-screen text instead of 60%. Universal
+      Card/SectionHeader/Badge/DataRow primitives exist and are adopted on Today and
+      Muhurat; Guided <-> Expert now materially changes content on all five launch
+      journeys; Muhurat has bilingual Listen. **Open:** primitive adoption on the other
+      four launch screens, and an owner decision on the Cloudflare Web Analytics beacon,
+      which fires regardless of the in-app analytics consent — Ganak's own telemetry seam
+      is fail-closed, but the beacon is injected by Cloudflare Pages at the edge and can
+      only be turned off in the dashboard or disclosed in the footer.
+      _(Backlog #46; 90% as of 2026-08-01.)_
 
 **Still not required by the 2026-07-21 scope change:** accounts, cross-device data
 persistence, paid AI, Android/iOS store packaging, SDUI and paywalls. The backend
