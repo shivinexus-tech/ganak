@@ -2,7 +2,7 @@
 // Bilingual, sourced to Brihat Parashara Hora Shastra + Phaladeepika, written as
 // ATTRIBUTION ("Classical texts associate…"), never as a second-person verdict.
 // Index order matches NAKSHATRAS / SIGNS in src/engine/panchang.ts.
-// Supersedes the old NAK_NOTE / SIGN_NOTE one-liners in ChartScreen.
+// Supersedes the former one-line reading tables in ChartScreen.
 
 type Bi = { en: string; hi: string };
 type Status = "sourced" | "owner-verified";

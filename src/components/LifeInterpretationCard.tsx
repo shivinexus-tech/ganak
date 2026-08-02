@@ -17,7 +17,7 @@ export default function LifeInterpretationCard({ reading, lang, C, card }) {
       ))}
       <p style={{ margin: "6px 0 0", color: C.muted, fontSize: 13, lineHeight: 1.6 }}>
         {L === "hi"
-          ? "परम्परा के भाव में — चिंतन और जिज्ञासा हेतु; किसी योग्य ज्योतिषी के परामर्श का विकल्प नहीं।"
+          ? "परम्परा के भाव में — आत्मचिंतन और जिज्ञासा हेतु; किसी योग्य ज्योतिषी के परामर्श का विकल्प नहीं।"
           : "Offered in the spirit of the tradition, for reflection and curiosity — not a substitute for your own judgment or a qualified jyotishi's reading."}
       </p>
     </div>

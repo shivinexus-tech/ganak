@@ -1,5 +1,6 @@
 import React from "react";
 import { T } from "./ui-style-contract";
+import { SIGN_TRAITS } from "../data/life-interpretation";
 
 const JYOTISH_GROUPS = [
   {
@@ -7,6 +8,7 @@ const JYOTISH_GROUPS = [
     en: "Kundli",
     hi: "कुंडली",
     items: [
+      ["#reading", "Reading", "फलादेश"],
       ["#summary", "Summary", "सार"],
       ["#chart", "Charts", "वर्ग कुंडली"],
       ["#planets", "Grahas", "ग्रह"],
@@ -17,7 +19,6 @@ const JYOTISH_GROUPS = [
       ["#av", "Ashtakavarga", "अष्टकवर्ग"],
       ["#arudha", "Arudha", "आरूढ़"],
       ["#doshas", "Doshas", "दोष"],
-      ["#reading", "Reading", "फलादेश"],
     ],
   },
   {
@@ -58,6 +59,7 @@ const JYOTISH_GROUPS = [
 
 function JyotishPanelNav({ lang, C }) {
   const hi = lang === "hi";
+  const showReading = SIGN_TRAITS.every((entry) => entry.status === "owner-verified");
   return (
     <nav
       aria-label={hi ? "ज्योतिष अनुभाग" : "Jyotish sections"}
@@ -117,7 +119,7 @@ function JyotishPanelNav({ lang, C }) {
                 boxShadow: T.e3,
               }}
             >
-              {group.items.map(([href, en, itemHi]) => (
+              {group.items.filter(([href]) => showReading || href !== "#reading").map(([href, en, itemHi]) => (
                 <a
                   key={href}
                   href={href}
