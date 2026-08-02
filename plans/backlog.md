@@ -356,39 +356,67 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         safe household guidance. Shipped 2026-07-24 with topocentric solar
         visibility, lunar moonrise overlap, no-Sutak handling for non-visible
         cities and EN/HI festival + MuhuratHub wiring.
-  - [ ] **Aarti section — full aarti lyrics on festival/vrat pages.** Add a
-        collapsible Devanagari aarti (with an English meaning line in EN mode) after
-        the Puja section of each relevant guide, rendering in both the in-app Fasts
-        & Festivals list and the standalone `/festival/...` routes. Design:
-        `docs/superpowers/specs/2026-07-25-festival-aarti-section-design.md`. Phase 1
-        = North Indian deity festivals & vrats; Phase 2 = remaining/regional.
-        _(P1-FESTIVAL-AARTI; owner scope 2026-07-25)_
-    - [ ] **Aarti content sourcing & proof-reading (the substantive work).** For each
-          aarti, cross-validate **2–3 authentic sources against each other** and enter
-          the most widely-sung standard Devanagari text with zero transcription errors.
-          Handle known challenges: regional/sampradaya **wording variants** (choose the
-          common version, add a non-prescriptive "your family's wording may differ"
-          note consistent with the app voice); **which aarti maps to each festival**
-          (editorial mapping; a festival may carry more than one); **Devanagari
-          orthography consistency** (ॐ vs ओम्, anusvara/chandrabindu, half-letters,
-          nukta — sources agree on words but differ on spelling); **provenance/
-          copyright** (confirm each is genuinely traditional/public-domain, not a
-          modern copyrighted arrangement) recorded per aarti in a citations doc like
-          the existing festival-guide research file. Must pass the new
-          `validation/festival-aarti.cjs` gate **and** the row-#29 quality bar
-          (independent EN/HI review, two-agent bug bash, production verification).
-          _(P1-FESTIVAL-AARTI-CONTENT; owner scope 2026-07-25)_
-    - [ ] **Aarti discoverability UI — find/open an aarti directly.** Beyond embedding
-          aartis in guides, add a direct way to reach one: a dedicated aarti
-          finder/index, input-driven navigation (user types/searches a deity or
-          festival → lands on its aarti), and stable per-aarti deep-links. Reuse the
-          existing search/route patterns; keep additive to current festival routes.
-          _(P1-FESTIVAL-AARTI-FINDER; owner scope 2026-07-25)_
-    - [ ] **Aarti SEO.** Per-aarti page titles, meta descriptions and structured data
-          so each aarti is search-discoverable (e.g. "Lakshmi Aarti — Om Jai Lakshmi
-          Mata"), consistent with the existing festival-page SEO work. Depends on the
-          finder/deep-link routes above.
-          _(P1-FESTIVAL-AARTI-SEO; owner scope 2026-07-25)_
+  - [x] **Aarti section (Phase 1) — DONE + DEPLOYED 2026-07-28.** 14 distinct aartis
+        across 16 North Indian festival/vrat guides (44 placements), rendered as a
+        collapsible after the Puja section on the in-app Fasts & Festivals list and the
+        standalone `/festival/...` routes. Refrain-once + gold-cue layout; deity-family
+        closer rule (Vishnu→Om Jai Jagdish Hare, Shiva/Shakti→Om Jai Shiv Omkara,
+        Hanuman→Rama); Devanagari + English meaning; per-aarti sources cross-validated;
+        gate `validation/festival-aarti.cjs` 16/44 green; production build green; owner
+        "go live" 2026-07-28. Design `docs/superpowers/specs/2026-07-25-festival-aarti-section-design.md`;
+        standard `plans/festival-aarti-standard.md`. _(P1-FESTIVAL-AARTI; owner scope 2026-07-25 — CLOSED)_
+  - [ ] **Aarti Phase-2 — breadth (highest-demand aartis).** Add the ~20 highest-search
+        aartis Ganak lacks (Shani, Sai Baba, Santoshi Mata, Saraswati, Surya, Khatu
+        Shyam, weekday aartis, etc.), **prioritised by search demand, not completeness**,
+        in the existing `{refrain, cue, stanzas}` structure. Ranked list + tiers:
+        `plans/aarti-phase2-priority.md`. Target "reach all" audiences (diaspora +
+        urban-India) — learn, then pivot (owner 2026-08-01). Audio sing-along
+        **deprioritised** for now (owner 2026-08-01). **Acceptance:** (a) all Tier-1 and
+        Tier-2 aartis from the priority list entered, each cross-validated against 2–3
+        sources with per-aarti citations; (b) `festival-aarti.cjs` extended to cover the
+        new deity/standalone keys and green; (c) EN/HI render verified, no 375px
+        overflow, 0 console errors; (d) owner skim sign-off. Note: several Tier-1 aartis
+        (Shani, Sai, Santoshi) are **deity** aartis not tied to one festival — they need
+        the standalone pages from the finder item below, not just a festival embed.
+        _(P2-FESTIVAL-AARTI-BREADTH; owner scope 2026-08-01)_
+  - [ ] **Aarti finder + dedicated per-aarti pages.** Today aartis are **inline-only**
+        inside festival pages — they have no URL of their own, so they are unlinkable
+        and near-invisible to search. Give every aarti a home. **Scope:** (a) a `/aarti`
+        index route grouping all aartis by deity/festival; (b) a per-aarti route
+        `/aarti/<slug>` (e.g. `/aarti/om-jai-shiv-omkara`), each a stable canonical URL;
+        (c) input/search navigation ("shiv" → the Shiv aarti), reusing the existing
+        place-search pattern; (d) deep links + cross-links (festival page ↔ its aartis'
+        pages). Additive — existing festival routes and the inline render stay.
+        **Acceptance:** every distinct aarti has a working standalone URL; `/aarti`
+        lists all and links to each; a deity/festival search term resolves to the right
+        aarti; the festival guide links out to each aarti's dedicated page; EN/HI, 0
+        console errors. Unblocks SEO below. _(P2-FESTIVAL-AARTI-FINDER; owner scope 2026-08-01)_
+  - [ ] **Aarti SEO** (depends on FINDER + the SPA-prerender unlock). Make the dedicated
+        aarti URLs actually rank. **Scope:** per-aarti `<title>` + meta description via
+        `src/metadata/route-metadata.ts` (e.g. "Om Jai Shiv Omkara — Shiv Aarti Lyrics
+        in Hindi | Ganak"); `schema.org` `CreativeWork`/`MusicComposition` JSON-LD per
+        aarti; one **canonical URL per aarti** (the same aarti appears on several
+        festivals — prevent duplicate-content dilution); a `sitemap.xml` entry per aarti
+        route. **Acceptance:** each aarti URL emits a unique title + description +
+        canonical + JSON-LD; sitemap includes every aarti route; structured data passes
+        Google's Rich Results test; the Devanagari verses are present in the
+        **prerendered HTML** (verify via `curl` of the built route, not just the browser).
+        Depends on P2-FESTIVAL-AARTI-FINDER (URLs) + INFRA-SPA-PRERENDER (crawlable HTML).
+        _(P2-FESTIVAL-AARTI-SEO; owner scope 2026-08-01)_
+  - [ ] **INFRA-SPA-PRERENDER — site-wide SEO unlock (bigger than aartis).** Ganak is a
+        pure client-rendered SPA (no SSR/SSG): the server ships a near-empty HTML shell
+        and JavaScript draws every page in the browser. Search engines, social scrapers
+        and AI answer-engines that read raw HTML before running JS see **blank pages** —
+        so *all* content (panchang, festivals, muhurat, aartis) is weakly indexed. Fix:
+        **prerender each route to static HTML at build time** (react-snap / a Vite
+        prerender step / Cloudflare rendering), so crawlers get full content while the JS
+        still hydrates for interactivity. This is a **cross-cutting infrastructure item,
+        not aarti-specific** — it unblocks organic discovery for the entire site; aartis
+        are one beneficiary. **Acceptance:** representative routes (`/`, a `/festival/...`
+        page, a future `/aarti/...` page, a calculator route) serve their real content in
+        the initial HTML (verified via `curl`/`view-source`, no JS); Lighthouse SEO and a
+        crawler-view check pass; `canonical-deployment.cjs` and existing gates stay green;
+        no regression to client interactivity/hydration. _(INFRA-SPA-PRERENDER; owner scope 2026-08-01)_
   - [ ] **P0 owner-quality reset — audit and rewrite every festival/fast page.**
         Owner rejected the current festival and fast page quality on 2026-07-24;
         previous automated route/profile/katha gates no longer count as quality

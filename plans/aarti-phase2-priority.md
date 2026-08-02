@@ -1,0 +1,67 @@
+# Aarti Phase-2 — Ranked Priority List (search-demand tiers)
+
+**Owner scope 2026-08-01.** Backlog: `P2-FESTIVAL-AARTI-BREADTH`.
+Standard/layout: `plans/festival-aarti-standard.md` (refrain-once + gold cue, deity-family
+closer, Devanagari + English meaning, `{refrain, cue, stanzas}` shape).
+
+**Principle:** add by **search demand, not completeness.** DrikPanchang carries ~81;
+Ganak has 14. We are NOT trying to match 81 — we add the aartis people actually search
+for, closing the gap toward ~35–40 where the demand concentrates (Goddesses, weekday
+deities, modern-popular deities). "Reach all" audiences (diaspora + urban-India); learn
+then pivot. **Audio deprioritised for now.**
+
+Many Tier-1 entries are **deity aartis not tied to one festival** (Shani, Sai, Santoshi…).
+They belong on their own `/aarti/<slug>` page (see `P2-FESTIVAL-AARTI-FINDER`), optionally
+surfaced by weekday, not forced onto a single festival guide.
+
+Each aarti still cross-validated against 2–3 sources with per-aarti citations, gated by
+`festival-aarti.cjs`, owner-skimmed. Closer follows the family rule; standalone deity
+aartis may stand alone.
+
+---
+
+## Tier 1 — highest search · everyday/weekly · pan-India (do first)
+
+| # | Aarti (first line) | Deity | Demand driver |
+|---|--------------------|-------|---------------|
+| 1 | *Jai Jai Shri Shanidev* — जय जय श्री शनिदेव | Shani | Saturday vrat; very high, year-round |
+| 2 | *Aarti Sai Baba* — आरती साईं बाबा (Shirdi) | Sai Baba | Thursday; one of India's largest followings |
+| 3 | *Jai Santoshi Mata* — जय संतोषी माता | Santoshi Mata | Friday vrat; classic mass following |
+| 4 | *Jai Saraswati Mata* — जय सरस्वती माता | Saraswati | Basant Panchami; students, exams |
+| 5 | *Aarti Shri Surya* — जय जय जय आदित्य | Surya | Sunday, Chhath, Ratha Saptami |
+| 6 | *Shyam Baba aarti* — श्री श्याम आरती | Khatu Shyam | Fast-growing modern following (Sikar/North) |
+| 7 | *Vaishno Devi / Sherawali aarti* | Vaishno Devi | Navratri + year-round pilgrimage search |
+
+## Tier 2 — strong · festival/weekly · broad
+
+| # | Aarti | Deity | Demand driver |
+|---|-------|-------|---------------|
+| 8 | *Aarti Shri Vishwakarma* | Vishwakarma | Vishwakarma Puja; workers/industry |
+| 9 | *Tulsi Mata aarti* — जय जय तुलसी माता | Tulsi | Kartik, Tulsi Vivah; daily Tulsi puja |
+| 10 | *Kubera aarti* | Kubera | Dhanteras/Diwali wealth worship |
+| 11 | *Annapurna aarti* | Annapurna | Kitchen/food; Annakut, Margashirsha |
+| 12 | *Radha aarti* | Radha | Paired with Krishna; Radhashtami, Barsana |
+| 13 | *Ganga aarti* — ॐ जय गंगे माता | Ganga | Ganga Dussehra, Kartik snan; huge north |
+| 14 | *Weekday aartis (Mon–Sun set)* | Vaar devtas | Bundled "din ki aarti" search set |
+| 15 | *Kali aarti* | Kali | Kali Puja / Diwali night (Bengal + north) |
+
+## Tier 3 — regional / festival-specific · seasonal
+
+| # | Aarti | Deity | Demand driver |
+|---|-------|-------|---------------|
+| 16 | *Chhathi Maiya aarti* (+ Surya) | Chhathi Maiya | Chhath — very high but seasonal, east/Bihar |
+| 17 | *Jagannath aarti* | Jagannath | Rath Yatra; Odisha + ISKCON |
+| 18 | *Murugan / Kartikeya aarti* | Kartikeya | Skanda Sashti; South + Maharashtra |
+| 19 | *Ayyappa aarti / Harivarasanam* | Ayyappa | Mandala–Makaravilakku; South |
+| 20 | *Vindhyavasini / Jwala / regional Devi* | Devi forms | Regional Shakti pilgrimage search |
+
+---
+
+## Sequencing note
+1. **Ship Tier 1 first** — biggest search return, and it forces the standalone-page
+   pattern (these aren't festival-bound), so it validates `P2-FESTIVAL-AARTI-FINDER`.
+2. **Tier 2** rounds out weekly/festival coverage.
+3. **Tier 3** is seasonal — schedule each ahead of its festival window.
+
+Reassess after Tier 1 ships using real search/analytics: double down on what pulls
+traffic, drop what doesn't (the "learn then pivot" rule). Do not pre-build all 20 blind.
