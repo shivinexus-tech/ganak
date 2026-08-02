@@ -1,7 +1,7 @@
 /* Birth-time rectification UI — pure extraction (SPLIT-UI-JYOTISH-03). Wire deferred. */
 
 import React, { useState, useMemo, useEffect } from "react";
-import { T } from "../components/tokens";
+import { T } from "../components/ui-style-contract";
 import { fmtDateT } from "../components/format";
 import { SIGN_SHORT } from "../data/chart-divisions";
 import { SIGNS, NAKSHATRAS, zoneOffset, SIGN_LORD } from "../engine/panchang";
@@ -80,7 +80,7 @@ function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
       </div>
 
       {/* sweep table */}
-      <div style={{ ...T.label, color: C.muted, margin: `${T.s5}px 0 ${T.s2}px` }}>{hi ? "समय परीक्षण · बदलाव चिह्नित" : "Sweep · transitions highlighted"}</div>
+      <div style={{ ...T.label, color: C.muted, margin: `${T.s5} 0 ${T.s2}` }}>{hi ? "समय परीक्षण · बदलाव चिह्नित" : "Sweep · transitions highlighted"}</div>
       <div style={{ ...card, padding: "4px 4px", maxHeight: 360, overflowY: "auto" }}>
         <div style={{ display: "grid", gridTemplateColumns: "62px 1fr 46px 46px 64px", gap: 6, padding: "7px 12px", ...T.label, color: C.muted, position: "sticky", top: 0, background: "#FBF5E7" }}>
           <span>{hi ? "समय" : "Time"}</span><span>{hi ? "लग्न" : "Lagna"}</span><span>D9</span><span>D60</span><span>{hi ? "उप" : "Sub"}</span>
@@ -99,7 +99,7 @@ function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
       </div>
 
       {/* event anchors */}
-      <div style={{ ...T.label, color: C.muted, margin: `${T.s5}px 0 ${T.s2}px` }}>{hi ? "जीवन-घटना आधार · दशा मिलान" : "Event anchors · dasha fit"}</div>
+      <div style={{ ...T.label, color: C.muted, margin: `${T.s5} 0 ${T.s2}` }}>{hi ? "जीवन-घटना आधार · दशा मिलान" : "Event anchors · dasha fit"}</div>
       <div style={{ ...card, padding: T.s4 }}>
         <div style={{ fontSize: 12, color: C.muted, marginBottom: 12, lineHeight: 1.5 }}>{hi ? "तिथि सहित जीवन-घटनाएँ जोड़ें। हर घटना के लिए चल रही महादशा–अंतर्दशा दिखाई जाएगी; ✓ बताता है कि वही ग्रह घटना-भाव का स्वामी भी है। कई स्वतंत्र घटनाओं में बना रहने वाला मेल समय को सीमित करने में सहायता करता है।" : "Add dated life events. For the candidate time above, each shows the running mahadasha–antardasha; a ✓ marks where that lord also rules the event's house. The fit that holds across all events points to the time."}</div>
         <div style={{ display: "flex", gap: 7, flexWrap: "wrap", marginBottom: 14, alignItems: "center" }}>

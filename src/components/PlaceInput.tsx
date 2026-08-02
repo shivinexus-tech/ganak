@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import { searchOffline, searchOnline } from "../data/places";
 
 /* ---------------- compact reusable place search ---------------- */

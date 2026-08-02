@@ -1,5 +1,5 @@
 import React from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import { heroArtForKey } from "../data/festival-hero-art";
 
 // Real festival hero: an AI-generated raster normalized to a 1280×480 WebP by

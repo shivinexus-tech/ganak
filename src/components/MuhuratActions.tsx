@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import { privacyEvent } from "../telemetry/privacy-events";
 
 function ymd(ms, tz) {

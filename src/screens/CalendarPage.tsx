@@ -1,7 +1,7 @@
 /* Calendar page — pure extraction (SPLIT-UI-03f). Wire deferred. */
 
 import React, { useState, useMemo } from "react";
-import { T } from "../components/tokens";
+import { T } from "../components/ui-style-contract";
 import { fmtTime } from "../components/format";
 import { tr, trN, obsLabel } from "../i18n";
 import { FEST_NAME } from "../data/festival-meta";

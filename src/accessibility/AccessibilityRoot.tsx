@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { R as T } from "../components/tokens";
+import { R as T } from "../components/ui-style-contract";
 import PersonalizeScreen from "../screens/PersonalizeScreen";
 import FirstRunComfortOffer from "./FirstRunComfortOffer";
 import { useComfort } from "./ComfortProvider";

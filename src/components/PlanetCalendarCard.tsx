@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import { PLANET_DEVA } from "../engine/panchang";
 import { retrogradeEvents, combustionEvents, planetStatesAt } from "../engine/planet-calendar";
 

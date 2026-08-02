@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { T } from "../components/tokens";
+import { T } from "../components/ui-style-contract";
 import { fmtDeg } from "../components/format";
 import { NAK_HI } from "../engine/muhurat";
 import { kpNumberToLagna, kpNumberInfo, KP_NUMBER_MIN, KP_NUMBER_MAX } from "../engine/kp-horary";

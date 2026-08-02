@@ -2,7 +2,7 @@
    Extracted from kundli-app.tsx (SHELL-FINISH-48H). Pure move. */
 
 import React, { useState, useEffect } from "react";
-import { T } from "../components/tokens";
+import { T } from "../components/ui-style-contract";
 import { fmtDeg, fmtDateT } from "../components/format";
 import { searchOffline, searchOnline } from "../data/places";
 import MatchMaker from "./MatchingScreen";
@@ -182,7 +182,7 @@ export default function ChartScreen({ C, card, lang }) {
   const labelStyle = { ...T.label, color: C.muted, display: "block", marginBottom: 6 };
 
   const Eyebrow = ({ deva, en, id }) => (
-    <div id={id} style={{ display: "flex", alignItems: "baseline", gap: T.s3, margin: `${T.s8}px 0 ${T.s4}px`, borderBottom: `1px solid ${C.line}`, paddingBottom: T.s3, scrollMarginTop: 64 }}>
+    <div id={id} style={{ display: "flex", alignItems: "baseline", gap: T.s3, margin: `${T.s8} 0 ${T.s4}`, borderBottom: `1px solid ${C.line}`, paddingBottom: T.s3, scrollMarginTop: 64 }}>
       <span style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fHeading }}>{lang === "hi" ? deva : en}</span>
     </div>
   );

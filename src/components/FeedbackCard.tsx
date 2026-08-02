@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import { privacyEvent } from "../telemetry/privacy-events";
 
 const ENDPOINT = String(import.meta.env?.VITE_FEEDBACK_ENDPOINT || "").trim();

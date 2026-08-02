@@ -1,5 +1,5 @@
 import React from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 
 const JYOTISH_GROUPS = [
   {
@@ -69,7 +69,7 @@ function JyotishPanelNav({ lang, C }) {
         display: "grid",
         gap: T.s2,
         padding: T.s3,
-        margin: `0 0 ${T.s4}px`,
+        margin: `0 0 ${T.s4}`,
         background: "rgba(250,245,234,.96)",
         backdropFilter: "blur(8px)",
         WebkitBackdropFilter: "blur(8px)",
@@ -91,7 +91,7 @@ function JyotishPanelNav({ lang, C }) {
                 minHeight: T.ctrlH,
                 display: "flex",
                 alignItems: "center",
-                padding: `0 ${T.s4}px`,
+                padding: `0 ${T.s4}`,
                 border: `1px solid ${C.line}`,
                 borderRadius: T.rMd,
                 background: C.panel,
@@ -125,7 +125,7 @@ function JyotishPanelNav({ lang, C }) {
                     minHeight: T.ctrlH,
                     display: "flex",
                     alignItems: "center",
-                    padding: `0 ${T.s3}px`,
+                    padding: `0 ${T.s3}`,
                     borderRadius: T.rSm,
                     color: C.ivory,
                     textDecoration: "none",

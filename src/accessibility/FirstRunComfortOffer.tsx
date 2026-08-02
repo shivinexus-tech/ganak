@@ -1,5 +1,5 @@
 import React from "react";
-import { R as T } from "../components/tokens";
+import { R as T } from "../components/ui-style-contract";
 import { useComfort } from "./ComfortProvider";
 import { useModalFocus } from "./useModalFocus";
 

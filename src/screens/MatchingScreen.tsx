@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { T } from "../components/tokens";
+import { T } from "../components/ui-style-contract";
 import PlaceInput from "../components/PlaceInput";
 import { zoneOffset } from "../engine/panchang";
 import { computeMatch } from "../engine/matching";

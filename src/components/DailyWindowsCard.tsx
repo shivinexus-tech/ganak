@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import { scanSpecialYogaCalendar } from "../engine/daily-windows";
 
 const NAK_TARA = ["Janma","Sampat","Vipat","Kshema","Pratyari","Sadhaka","Naidhana","Mitra","Parama Mitra"];

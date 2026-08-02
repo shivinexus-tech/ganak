@@ -37,8 +37,16 @@ function sourceFiles(dir) {
   });
 }
 
+function allFiles(dir) {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const full = path.join(dir, entry.name);
+    return entry.isDirectory() ? allFiles(full) : [full];
+  });
+}
+
 const css = read("src/styles/design-tokens.css");
 includesAll(css, [
+  "ONE authoritative token file", "BRAND COLOR VALUES START", "BRAND COLOR VALUES END",
   "--scale:", "--density:", "font-size: var(--scale)",
   "--bg:", "--surface:", "--ink:", "--accent:", "--gold:", "--good:", "--bad:", "--line:",
   'data-comfort-preset="simple-large"', 'data-comfort-preset="balanced"', 'data-comfort-preset="detailed"',
@@ -47,6 +55,32 @@ includesAll(css, [
 ], "token architecture");
 expect(!/\b\d+(?:\.\d+)?px\b/.test(css), "token architecture must use rem rather than px");
 includesAll(css, ["outline: 0.1875rem solid var(--focus)", ".comfort-range", ".comfort-choice"], "focus and touch targets");
+
+const tokenFiles = allFiles(path.join(root, "src"))
+  .map((file) => path.relative(root, file).split(path.sep).join("/"))
+  .filter((file) => /token/i.test(path.basename(file)));
+expect(
+  JSON.stringify(tokenFiles) === JSON.stringify(["src/styles/design-tokens.css"]),
+  `single-token-file contract violated: ${tokenFiles.join(", ")}`,
+);
+
+const brandBlockMatch = css.match(/BRAND COLOR VALUES START[\s\S]*?BRAND COLOR VALUES END/);
+expect(Boolean(brandBlockMatch), "brand colour values block must have explicit boundaries");
+const brandBlock = brandBlockMatch ? brandBlockMatch[0] : "";
+const expectedBrandSlots = [
+  "theme-bg-light", "theme-surface-light", "theme-ink-light", "theme-muted-light",
+  "theme-accent-light", "theme-gold-light", "theme-good-light", "theme-bad-light", "theme-line-light",
+  "theme-bg-dark", "theme-surface-dark", "theme-ink-dark", "theme-muted-dark",
+  "theme-accent-dark", "theme-gold-dark", "theme-good-dark", "theme-bad-dark", "theme-line-dark",
+];
+const actualBrandSlots = [...brandBlock.matchAll(/--([a-z0-9-]+):/g)].map((match) => match[1]);
+expect(JSON.stringify(actualBrandSlots) === JSON.stringify(expectedBrandSlots), "brand track must use the existing colour slots without adding or renaming them");
+expect(!/--theme-[a-z0-9-]+:/.test(css.replace(brandBlock, "")), "brand colour declarations must stay inside the values-only block");
+
+const styleContract = read("src/components/ui-style-contract.ts");
+includesAll(styleContract, ["single authoritative file", 's1: "var(--space-1)"', 'const R = T'], "component style projection");
+expect(!/(?:#[0-9A-Fa-f]{3,8}|\brgba?\(|\b\d+(?:\.\d+)?(?:px|rem|em)\b)/.test(styleContract), "component style projection must not define token values");
+expect(!allFiles(path.join(root, "src")).some((file) => /\.(?:ts|tsx)$/.test(file) && fs.readFileSync(file, "utf8").includes("components/tokens")), "legacy token-module imports must be removed");
 
 function tokenHex(name) {
   const match = css.match(new RegExp(`--${name}:\\s*(#[0-9A-Fa-f]{6})\\s*;`));

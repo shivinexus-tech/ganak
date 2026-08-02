@@ -2,7 +2,7 @@
    Uses the host preview API (window.storage) when present; prefs stay in the URL. */
 
 import React, { useState, useEffect } from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import { SIGN_SHORT } from "../data/chart-divisions";
 
 function ChartVault({ snapshot, result, onLoad, C, card, lang = "en" }) {

@@ -2,7 +2,7 @@
    Broad imports; unused ones are fine for now until wire trims. */
 
 import React, { useState, useMemo, useEffect } from "react";
-import { T } from "../components/tokens";
+import { T } from "../components/ui-style-contract";
 import { fmtTime, fmtTimeD, fmtDeg } from "../components/format";
 import { tr, trN, obsLabel } from "../i18n";
 import { L } from "../i18n";
@@ -164,7 +164,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   );
   const pill = (txt, color) => <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 11, background: color + "20", color, fontFamily: "Eczar, serif" }}>{txt}</span>;
   const SecHead = ({ deva, en, right }) => (
-    <div style={{ display: "flex", alignItems: "baseline", gap: T.s3, margin: `${T.s6}px 0 ${T.s3}px`, borderBottom: `1px solid ${C.line}`, paddingBottom: T.s2 }}>
+    <div style={{ display: "flex", alignItems: "baseline", gap: T.s3, margin: `${T.s6} 0 ${T.s3}`, borderBottom: `1px solid ${C.line}`, paddingBottom: T.s2 }}>
       <span style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fTitle }}>{deva}</span>
       <span style={{ ...T.label, color: C.muted }}>{en}</span>
       {right ? <span style={{ marginLeft: "auto" }}>{right}</span> : null}
@@ -209,7 +209,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         const dObj = new Date(dayStart + tz * 3600000);
         return (
           <div className="rise" style={{ ...card, padding: 0, overflow: "hidden", marginBottom: T.s4 }}>
-            <div style={{ background: "linear-gradient(135deg, #FCF4E0, #F5E8CD)", padding: T.s4 + "px " + T.s5 + "px " + T.s3 + "px" }}>
+            <div style={{ background: "linear-gradient(135deg, #FCF4E0, #F5E8CD)", padding: `${T.s4} ${T.s5} ${T.s3}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
                 <div>
                   <div style={{ ...T.label, color: C.muted }}>{isToday ? (lang === "hi" ? "आज" : "Today") : (lang === "hi" ? "चुनी हुई तारीख़" : "Selected date")}</div>
@@ -219,7 +219,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                 {isToday && <span style={{ fontSize: T.fSmall, padding: "5px 12px", borderRadius: T.rPill, background: natColor(nowState) + "1F", color: natColor(nowState), fontFamily: T.serif, fontWeight: 600, whiteSpace: "nowrap" }}>{nowState === "good" ? tr(lang, "auspiciousNow") : nowState === "bad" ? tr(lang, "cautionNow") : tr(lang, "neutralNow")}</span>}
               </div>
             </div>
-            <div style={{ padding: T.s3 + "px " + T.s5 + "px", borderTop: "1px solid " + C.line }}>
+            <div style={{ padding: `${T.s3} ${T.s5}`, borderTop: "1px solid " + C.line }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
                 <span style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.gold }}>{p.tithis[0].name}</span>
                 <span style={{ fontSize: T.fMicro, color: C.muted, fontVariantNumeric: "tabular-nums" }}>{p.tithis[0].end ? (lang === "hi" ? "तक " : "till ") + fmtT(p.tithis[0].end) : ""}</span>
@@ -262,7 +262,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                 );
               })()}
             </div>
-            <div style={{ padding: T.s3 + "px " + T.s5 + "px", borderTop: "1px solid " + C.line }}>
+            <div style={{ padding: `${T.s3} ${T.s5}`, borderTop: "1px solid " + C.line }}>
               <div style={{ ...T.label, color: C.muted, marginBottom: 7 }}>{isToday ? (lang === "hi" ? "आज के शुभ व अशुभ समय" : "Good & avoid times today") : (lang === "hi" ? "चुनी हुई तारीख़ के शुभ व अशुभ समय" : "Good & avoid times for this date")}</div>
               {goodW.map((x) => <div key={x[0]} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 0", fontVariantNumeric: "tabular-nums" }}>
                 <span style={{ color: "#1F7A4D", fontSize: T.fSmall, fontWeight: 700 }}>✓</span>
@@ -277,7 +277,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
               {isToday && curChogha && <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: 6 }}>{lang === "hi" ? "अभी चौघड़िया: " : "Now: "}<span style={{ color: natColor(curChogha.nat), fontWeight: 600 }}>{trN(lang, CHOG_NAME, curChogha.key)}</span></div>}
               {isToday && curLagnaW && <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: 4 }}>{lang === "hi" ? "उदय लग्न: " : "Udaya Lagna: "}<span style={{ color: C.ivory }}>{SIGNS[curLagnaW.sign]}</span>{curPanchW && <> · {lang === "hi" ? "पञ्चक: " : "Panchaka: "}<span style={{ color: curPanchW.shubha ? "#1F7A4D" : C.sindoor, fontWeight: 600 }}>{trN(lang, PANCHAKA_NAME, curPanchW.type)}{curPanchW.shubha ? " ✓" : " ✗"}</span></>}</div>}
             </div>
-            <div style={{ padding: T.s3 + "px " + T.s5 + "px", borderTop: "1px solid " + C.line, display: "flex", flexWrap: "wrap", gap: "6px " + T.s5 + "px" }}>
+            <div style={{ padding: `${T.s3} ${T.s5}`, borderTop: "1px solid " + C.line, display: "flex", flexWrap: "wrap", gap: `0.375rem ${T.s5}` }}>
               <div style={{ flex: "1 1 130px" }}>
                 <div style={{ fontSize: T.fMicro, color: C.muted }}>☀ {lang === "hi" ? "सूर्य" : "Sun"}</div>
                 <div style={{ fontSize: T.fSmall, color: C.ivory, fontVariantNumeric: "tabular-nums" }}>{p.rise ? fmtT(p.rise) : "—"} → {p.set ? fmtT(p.set) : "—"}</div>
@@ -291,7 +291,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                 <div style={{ fontSize: T.fSmall, color: C.ivory }}>{p.naks[0].name}{nkLord ? " · " + (lang === "hi" ? "स्वामी " : "ruler ") + trN(lang, HORA_NAME, nkLord) : ""}{p.naks[0].end ? " · " + (lang === "hi" ? "तक " : "till ") + fmtT(p.naks[0].end) : ""}</div>
               </div>
             </div>
-            {(nextFast || nextFest) && <div style={{ padding: T.s3 + "px " + T.s5 + "px", borderTop: "1px solid " + C.line, background: "rgba(168,106,18,.04)" }}>
+            {(nextFast || nextFest) && <div style={{ padding: `${T.s3} ${T.s5}`, borderTop: "1px solid " + C.line, background: "rgba(168,106,18,.04)" }}>
               <div style={{ ...T.label, color: C.muted, marginBottom: 6 }}>{lang === "hi" ? "आगामी" : "Coming up"}</div>
               {nextFast && comingRow("fast", nextFast, obsLabel(lang, { key: nextFast.key, baseKey: nextFast.key }), C.sindoor)}
               {nextFest && comingRow("festival", nextFest, trN(lang, FEST_NAME, nextFest.key), C.gold)}

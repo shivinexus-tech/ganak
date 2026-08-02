@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { T } from "./components/tokens";
+import { T } from "./components/ui-style-contract";
 import PrashnaScreen from "./screens/PrashnaScreen";
 import ChartScreen from "./screens/ChartScreen";
 import DailyScreen from "./screens/DailyScreen";

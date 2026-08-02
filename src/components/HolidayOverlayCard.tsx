@@ -1,5 +1,5 @@
 import React from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import {
   HOLIDAY_OVERLAY_MODES, INDIA_HOLIDAY_DATASET, holidaysForDate,
 } from "../data/india-holidays";

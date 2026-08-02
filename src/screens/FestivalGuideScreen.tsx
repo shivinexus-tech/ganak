@@ -2,7 +2,7 @@
    its existing click/expand behaviour; these routes are an additional entry path. */
 
 import React, { useEffect, useState } from "react";
-import { T, R as RT } from "../components/tokens";
+import { T, R as RT } from "../components/ui-style-contract";
 import PlaceInput from "../components/PlaceInput";
 import { fmtTimeD } from "../components/format";
 import VratVidhiCard from "../components/VratVidhiCard";

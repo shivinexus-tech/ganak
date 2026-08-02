@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import { computeVedicSeasonClock, TROPICAL_EVENTS } from "../engine/vedic-season-clock";
 
 export default function SeasonClockCard({ place, lang, ayanamsa = "lahiri", atMs, isToday = true, C, card }) {

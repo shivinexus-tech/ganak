@@ -1,5 +1,5 @@
 import React from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import {
   NAVRATRI_SEASONS, SAPTASHATI_PLAN, navadurgaEntriesForSeason,
 } from "../data/navadurga-pages";

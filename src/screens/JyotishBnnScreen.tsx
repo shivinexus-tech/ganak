@@ -1,7 +1,7 @@
 /* BNN + Bhrigu UI modules — pure extraction (SPLIT-UI-JYOTISH-02). Wire deferred. */
 
 import React, { useState, useMemo } from "react";
-import { T } from "../components/tokens";
+import { T } from "../components/ui-style-contract";
 import { fmtDateT } from "../components/format";
 import { SIGN_SHORT } from "../data/chart-divisions";
 import {
@@ -84,7 +84,7 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
       </div>
 
       {/* relation grid from reference */}
-      <div style={{ ...T.label, color: C.muted, margin: `${T.s5}px 0 ${T.s2}px` }}>
+      <div style={{ ...T.label, color: C.muted, margin: `${T.s5} 0 ${T.s2}` }}>
         {hi ? `${ref} के साथ संबंध` : `Combinations with ${ref}`} <span style={{ textTransform: "none", letterSpacing: 0 }}>— {hi ? "पारंपरिक कारकत्व" : BNN_KARAKA[ref]}</span>
       </div>
       <div style={{ ...card, padding: "6px 4px" }}>
@@ -110,7 +110,7 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
       </div>
 
       {/* core combinations */}
-      <div style={{ ...T.label, color: C.muted, margin: `${T.s5}px 0 ${T.s2}px` }}>{hi ? "सात मुख्य ग्रह-संबंध" : "Seven core combinations"}</div>
+      <div style={{ ...T.label, color: C.muted, margin: `${T.s5} 0 ${T.s2}` }}>{hi ? "सात मुख्य ग्रह-संबंध" : "Seven core combinations"}</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 8 }}>
         {bnn.coreCombos.map((c) => (
           <div key={c.pair.join()} style={{ ...card, padding: "11px 13px", borderLeft: `3px solid ${c.active ? "#1F7A4D" : C.line}`, opacity: c.active ? 1 : 0.6 }}>
@@ -134,7 +134,7 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
       )}
 
       {/* Jupiter transit timing */}
-      <div style={{ ...T.label, color: C.muted, margin: `${T.s5}px 0 ${T.s2}px` }}>{hi ? "गुरु गोचर · समय" : "Jupiter transit · timing"}</div>
+      <div style={{ ...T.label, color: C.muted, margin: `${T.s5} 0 ${T.s2}` }}>{hi ? "गुरु गोचर · समय" : "Jupiter transit · timing"}</div>
       <div style={{ fontSize: 12, color: C.muted, marginBottom: 8, lineHeight: 1.5 }}>
         {hi ? "वास्तविक गुरु गोचर — नई राशि में प्रवेश करते समय वह जन्मकुंडली के युति, त्रिकोण या विरोध वाले ग्रहों को सक्रिय करता है।" : "Real Jupiter transit — as it enters each sign it activates the natal planets it conjuncts, trines or opposes, bringing that combination into season."}{satNow != null && <> {hi ? "कर्म-घड़ी शनि अभी" : "Saturn, the fate-clock, currently transits"} <span style={{ color: C.gold }}>{SIGN_SHORT[satNow]}</span>{hi ? " में है।" : "."}</>}
       </div>
@@ -168,7 +168,7 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
       </div>
 
       {/* Tier C — hedged traditional reading (themes, not prediction) */}
-      <div style={{ ...T.label, color: C.muted, margin: `${T.s5}px 0 ${T.s2}px` }}>{hi ? `परंपरा इसे कैसे पढ़ती है · ${ref}` : `How the tradition reads this · ${ref}`}</div>
+      <div style={{ ...T.label, color: C.muted, margin: `${T.s5} 0 ${T.s2}` }}>{hi ? `परंपरा इसे कैसे पढ़ती है · ${ref}` : `How the tradition reads this · ${ref}`}</div>
       <div style={{ ...card, padding: "16px 18px", borderTop: `3px solid ${C.gold}` }}>
         <div style={{ fontSize: 13, color: C.ivory, lineHeight: 1.6 }}>
           {hi ? <><span style={{ fontFamily: "Eczar, serif", color: C.gold }}>{reading.self}</span> को संदर्भ मानकर बीएनएन परंपरा इन सक्रिय ग्रह-संबंधों को विषयों के रूप में पढ़ती है:</> : <>With <span style={{ fontFamily: "Eczar, serif", color: C.gold }}>{reading.self}</span> as the reference ({reading.selfKaraka}), BNN tradition reads its active combinations as these themes:</>}
@@ -242,7 +242,7 @@ function BhriguModule({ rows, ascSign, birthMs, tz, C, card, lang = "en" }) {
       </div>
 
       {/* BSP implements-rules */}
-      <div style={{ ...T.label, color: C.muted, margin: `${T.s5}px 0 ${T.s2}px` }}>{hi ? "भृगु सरल · सक्रियण नियम" : "Bhrigu Saral · implements-rules"} <span style={{ textTransform: "none", letterSpacing: 0, fontSize: 10.5 }}>({hi ? "प्रलेखित अंश" : "documented subset"})</span></div>
+      <div style={{ ...T.label, color: C.muted, margin: `${T.s5} 0 ${T.s2}` }}>{hi ? "भृगु सरल · सक्रियण नियम" : "Bhrigu Saral · implements-rules"} <span style={{ textTransform: "none", letterSpacing: 0, fontSize: 10.5 }}>({hi ? "प्रलेखित अंश" : "documented subset"})</span></div>
       <div style={sub}>{hi ? "प्रत्येक नियम उस आयु को दिखाता है जब ग्रह अपने से गिने विशेष भाव को सक्रिय करता है। यह संरचनात्मक मानचित्र है, घटना की निश्चित भविष्यवाणी नहीं।" : "Each rule fixes a year when a planet \"implements\" a particular house counted from itself. Shown as the house it lands on in this chart, with significations — a structural map, not an event forecast."}</div>
       <div style={{ ...card, padding: "4px 4px" }}>
         {bsp.map((r, i) => (
@@ -260,7 +260,7 @@ function BhriguModule({ rows, ascSign, birthMs, tz, C, card, lang = "en" }) {
       </div>
 
       {/* Jupiter symbolic progression */}
-      <div style={{ ...T.label, color: C.muted, margin: `${T.s5}px 0 ${T.s2}px` }}>{hi ? "गुरु प्रगति · प्रति वर्ष 1 राशि" : "Jupiter progression · 1 sign / year"}</div>
+      <div style={{ ...T.label, color: C.muted, margin: `${T.s5} 0 ${T.s2}` }}>{hi ? "गुरु प्रगति · प्रति वर्ष 1 राशि" : "Jupiter progression · 1 sign / year"}</div>
       <div style={sub}>{hi ? "यह बीएनएन के वास्तविक गोचर समय का प्रतीकात्मक साथी है: जन्म गुरु को हर आयु-वर्ष एक राशि आगे बढ़ाया जाता है। दोनों विधियों के अंतर को साधक साथ में तौलते हैं।" : "The symbolic counterpart to the real-transit timing in the BNN section: natal Jupiter advanced one sign per year of age. The two methods diverge — that divergence is itself a thing practitioners weigh."}</div>
       <div style={{ ...card, padding: "4px 4px", maxHeight: 320, overflowY: "auto" }}>
         {prog.timeline.map((p, i) => {

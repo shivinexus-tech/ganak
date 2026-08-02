@@ -2,7 +2,7 @@
    Extracted from kundli-app.tsx (SPLIT-UI-DAILY-SCREEN). Pure move. */
 
 import React, { useState, useMemo, useEffect } from "react";
-import { T } from "../components/tokens";
+import { T } from "../components/ui-style-contract";
 import { fmtTime } from "../components/format";
 import PlaceInput from "../components/PlaceInput";
 import {
