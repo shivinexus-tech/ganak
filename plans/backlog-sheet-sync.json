@@ -178,12 +178,12 @@
     },
     "4": {
       "deliveryState": "Integrated on main — release gated pending owner review",
-      "limitations": "The answer-first card and navigation hookup are complete, but all 12 sign entries still need owner review. The public Jyotish route therefore hides both the card and Reading link until every sign is owner-verified. EN/HI phone visual QA, release and production verification remain open; the local browser could not start in this pass because the approval service hit its usage limit.",
+      "limitations": "The answer-first card and current-main navigation hookup are complete, but all 12 sign entries still need owner review. The public Jyotish route therefore hides both the card and Reading link until every sign is owner-verified. Independent EN/HI phone visual QA, release and production verification remain open.",
       "shortTermImpact": "The implementation is ready behind an enforceable content-review gate, while current users remain protected from unreviewed interpretation copy.",
       "longTermImpact": "Once owner review and visual QA clear, Ganak can release a qualified six-area answer before the technical chart without another integration pass.",
       "bugBashStatus": "Required before this high-impact interpretation journey closes — deterministic copy/safety/release tests pass, but the independent EN/HI phone/desktop visual pass remains open.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-24 · PR #1 merged as 1326ab8; ChartScreen hookup complete; interpretation release gate, all canonical gates and production build pass; no released-card production evidence",
+      "lastVerified": "2026-08-01 · Recovered current-main hookup: interpretation release gate, Jyotish exposure mutation test, all canonical gates and production build pass; no released-card production evidence",
       "sourceConfidence": "BPHS and Phaladeepika attribution framework recorded in the feature plan; owner high-risk content review remains required",
       "recommendedAction": "Complete the 12-sign owner checklist, mark approved sign entries owner-verified, run the independent EN/HI phone/desktop bug bash, then release and verify production."
     },

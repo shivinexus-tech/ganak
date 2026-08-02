@@ -24,10 +24,8 @@ import { JyotishPanelNav } from "../components/JyotishPanelNav";
 import { BNNModule, BhriguModule } from "./JyotishBnnScreen";
 import { RectifyModule } from "./RectifyScreen";
 import { SIGNS, NAKSHATRAS, AYANAMSA, zoneOffset, PLANET_DEVA } from "../engine/panchang";
-
-const NAK_NOTE = ["Swift, pioneering, healing instincts; restless until in motion.", "Intense, creative, carries burdens with discipline and will.", "Sharp, purifying, cuts through illusion; natural critic and cook.", "Magnetic, fertile, drawn to beauty, comfort and growth.", "Curious seeker, gentle wanderer, always tracing a scent.", "Stormy depth; transformation through upheaval and inquiry.", "Renewal and return; optimistic, philosophical, expansive.", "Nourishing, dutiful, deeply caring; the nurturer's star.", "Penetrating insight, hypnotic charm, guards its inner world.", "Regal, ancestral pride, seeks honor and a throne of its own.", "Pleasure-loving, artistic, generous in love and leisure.", "Steady patron, kind contracts, friendship as dharma.", "Skilled hands, wit, craft; mastery through dexterity.", "Brilliant architect of beauty; dazzling, design-minded.", "Independent as wind; flexible, restless, self-made.", "Goal-locked ambition; triumph after sustained effort.", "Devoted friend, disciplined heart, success in foreign lands.", "Eldest's burden; protective, intense, occult-leaning.", "Root-cutter; radical truth-seeking, destroys to rebuild.", "Invincible declarations; early victories, proud spirit.", "Later victory; enduring, ethical, universally respected.", "The listener; learned, fame through knowledge and word.", "Wealthy rhythm; music, abundance, marches to its own drum.", "Hundred healers; secretive, mystical, vast like the void.", "Fierce ascetic fire; intensity hidden under calm.", "Deep wisdom of the serpent; compassion, slow sure progress.", "The nourishing fish; gentle completion, protector of travelers."];
-
-const SIGN_NOTE = ["fiery initiative, courage, a head-first approach to life", "steadfast patience, sensuality, devotion to comfort and worth", "quicksilver intellect, duality, endless curiosity", "tidal emotion, deep memory, fierce protectiveness of home", "solar dignity, generosity, a need to shine and lead", "discerning precision, service, the healer-analyst's eye", "harmonizing grace, diplomacy, life measured in relationships", "penetrating intensity, secrecy, the power to transform", "dharmic optimism, far horizons, the philosopher-archer", "mountain ambition, discipline, slow unstoppable ascent", "humanitarian vision, detachment, the reformer's mind", "boundless compassion, imagination, dissolving of edges"];
+import LifeInterpretationCard from "../components/LifeInterpretationCard";
+import { buildLifeReading, SIGN_TRAITS } from "../data/life-interpretation";
 
 const DASHA_NOTE = {
   Ketu: "detachment, spiritual turning points, sudden severances that liberate",
@@ -215,6 +213,9 @@ export default function ChartScreen({ C, card, lang }) {
   const vPlanetsSign = r
     ? r.rows.map((p) => ({ label: PLANET_GLYPH[p.name], sign: vargaSign(p.lon, varga), retro: p.retro, deg: p.deg }))
     : [];
+  // Jyotish is public. The integration may merge safely, but the interpretation
+  // stays unreleased until the owner has verified every high-risk sign entry.
+  const lifeInterpretationReady = SIGN_TRAITS.every((entry) => entry.status === "owner-verified");
 
 
   return (
@@ -356,6 +357,18 @@ export default function ChartScreen({ C, card, lang }) {
                 </div>
               ))}
             </div>
+
+            {lifeInterpretationReady && (
+              <>
+                <Eyebrow id="reading" deva="फलादेश" en="Your reading" />
+                <LifeInterpretationCard
+                  C={C}
+                  card={card}
+                  lang={lang}
+                  reading={buildLifeReading({ nak: r.moon.nak, moonSign: r.moon.sign, ascSign: r.ascSign })}
+                />
+              </>
+            )}
 
             {/* chart */}
             <Eyebrow id="chart" deva="षोडशवर्ग" en={`${curVarga.k} · ${curVarga.name}`} />
@@ -1039,21 +1052,6 @@ export default function ChartScreen({ C, card, lang }) {
               ))}
             </div>
 
-            {/* reading */}
-            <Eyebrow id="reading" deva="फलादेश" en="A short reading" />
-            <div className="rise" style={{ ...card, padding: "22px 24px", fontSize: 15.5, lineHeight: 1.75 }}>
-              <p style={{ margin: "0 0 14px" }}>
-                <span style={{ color: C.gold, fontFamily: "Eczar, serif" }}>{hi ? "लग्न" : "Lagna"} · </span>
-                {hi ? <><strong>{SIGNS[r.ascSign]}</strong> लग्न बाहरी व्यक्तित्व, जीवन की दिशा और परिस्थितियों से मिलने के ढंग को आकार देता है।</> : <>With <strong>{SIGNS[r.ascSign]}</strong> rising, the outer temperament carries {SIGN_NOTE[r.ascSign]}.</>}
-              </p>
-              <p style={{ margin: "0 0 14px" }}>
-                <span style={{ color: C.gold, fontFamily: "Eczar, serif" }}>{hi ? "चन्द्र" : "Chandra"} · </span>
-                {hi ? <><strong>{SIGNS[r.moon.sign]}</strong> राशि में <strong>{NAKSHATRAS[r.moon.nak]}</strong> नक्षत्र (पाद {r.moon.pada}) का चन्द्र मन, भावनात्मक आदतों और भीतर की प्रतिक्रिया-शैली को आकार देता है।</> : <>The Moon in <strong>{SIGNS[r.moon.sign]}</strong>, under <strong>{NAKSHATRAS[r.moon.nak]}</strong> nakshatra (pada {r.moon.pada}), shapes the inner life: {NAK_NOTE[r.moon.nak]}</>}
-              </p>
-              <p style={{ margin: 0, color: C.muted, fontSize: 13 }}>
-                {hi ? "यह परम्परा की भावना में आत्मचिंतन और जिज्ञासा के लिए है—अपने विवेक या योग्य ज्योतिषी के परामर्श का विकल्प नहीं।" : "Offered in the spirit of the tradition, for reflection and curiosity — not as a substitute for your own judgment or a qualified jyotishi's reading."}
-              </p>
-            </div>
           </>
       )}
     </>

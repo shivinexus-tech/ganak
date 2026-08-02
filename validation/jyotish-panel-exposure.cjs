@@ -7,8 +7,9 @@ const root = path.resolve(__dirname, "..");
 const shell = fs.readFileSync(path.join(root, "src/kundli-app.tsx"), "utf8");
 const screen = fs.readFileSync(path.join(root, "src/screens/ChartScreen.tsx"), "utf8");
 const nav = fs.readFileSync(path.join(root, "src/components/JyotishPanelNav.tsx"), "utf8");
+const lifeReading = fs.readFileSync(path.join(root, "src/components/LifeInterpretationCard.tsx"), "utf8");
 const localizedFiles = {
-  chart: fs.readFileSync(path.join(root, "src/screens/ChartScreen.tsx"), "utf8"),
+  chart: screen + "\n" + lifeReading,
   matching: fs.readFileSync(path.join(root, "src/screens/MatchingScreen.tsx"), "utf8"),
   rectify: fs.readFileSync(path.join(root, "src/screens/RectifyScreen.tsx"), "utf8"),
   bnn: fs.readFileSync(path.join(root, "src/screens/JyotishBnnScreen.tsx"), "utf8"),
