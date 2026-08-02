@@ -4,6 +4,7 @@ import { fmtDeg } from "../components/format";
 import { NAK_HI } from "../engine/muhurat";
 import { kpNumberToLagna, kpNumberInfo, KP_NUMBER_MIN, KP_NUMBER_MAX } from "../engine/kp-horary";
 import { useDepth } from "../accessibility/ComfortProvider";
+import { Card, DataRow } from "../components/ui-primitives";
 
 // ------------------------------------------------- PRASHNA TOKENS (app palette)
 const TOKENS = {
@@ -740,14 +741,13 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
       </Gloss>
 
       {showPlainHelp && (
-        <p style={{ margin: '0 0 0.75rem', padding: "0.625rem 0.75rem", borderRadius: TOKENS.radius,
-          background: "var(--surface-raised)", border: "0.0625rem solid var(--line)",
-          color: TOKENS.ink, fontSize: "var(--font-small)", lineHeight: 1.55 }}>
+        <Card as="aside" density="compact" tone="raised" elevated={false} style={{ margin: '0 0 0.75rem' }}>
           {hi
             ? 'बस इतना करना है: नीचे से अपना प्रश्न चुनें और उत्तर पढ़ें। उत्तर सरल भाषा में सबसे ऊपर आता है — कुण्डली देखना आवश्यक नहीं है।'
             : 'All you need to do is choose your question below and read the answer. The answer comes first, in plain words — you do not have to read the chart.'}
-        </p>
+        </Card>
       )}
+      <DataRow density="compact" label={hi ? "चुनी हुई विधि" : "Selected method"} value={mode === "number" ? (hi ? "अंक 1–249" : "Number 1–249") : (hi ? "इस क्षण से" : "Current moment")} />
 
       {/* Question chips */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: "0.5rem", margin: '14px 0' }}>

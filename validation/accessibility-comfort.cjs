@@ -141,10 +141,14 @@ includesAll(personalize, [
   "Appearance & comfort", "What you follow", "Place & language", "Sound", "Privacy & data",
   "रूप और आराम", "आप क्या मानते हैं", "स्थान और भाषा", "ध्वनि", "गोपनीयता और डेटा",
   "Simple & Large", "Balanced", "Detailed", "Set it up for a parent", "माता-पिता के लिए सेट करें",
-  "✓", "Auspicious", "⚠", "Avoid", "never synced or analyzed without separate explicit consent",
+  "Auspicious", "Avoid", "never synced or analyzed without separate explicit consent",
   "aria-label={label}", "aria-valuetext={output}", "useModalFocus",
   "Followed festivals", "Unfollow", "onClearPreferences",
 ], "Personalize hub");
+expect(
+  personalize.includes('<Badge tone="good">') && personalize.includes('<Badge tone="bad">'),
+  "Personalize must pair auspicious/avoid meaning with the universal accessible Badge glyph",
+);
 expect(!/Traditional\s*[↔-]|Modern\s*[↔-]/i.test(personalize), "held Traditional/Modern aesthetic slider must not ship");
 
 const firstRun = read("src/accessibility/FirstRunComfortOffer.tsx");

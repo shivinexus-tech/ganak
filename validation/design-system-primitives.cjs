@@ -91,6 +91,10 @@ expect(
 const ADOPTERS = {
   "src/screens/MuhuratHub.tsx": ["Badge", "Card", "DataRow", "SectionHeader"],
   "src/screens/DailyScreen.tsx": ["Card", "SectionHeader"],
+  "src/screens/FestivalGuideScreen.tsx": ["Badge", "Card", "DataRow", "SectionHeader"],
+  "src/screens/PrashnaScreen.tsx": ["Card", "DataRow"],
+  "src/screens/ChartScreen.tsx": ["Card", "SectionHeader"],
+  "src/screens/PersonalizeScreen.tsx": ["Badge", "Card", "SectionHeader"],
 };
 for (const [file, symbols] of Object.entries(ADOPTERS)) {
   const source = read(file);

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { R as T } from "../components/ui-style-contract";
 import PlaceInput from "../components/PlaceInput";
 import ReadAloudButton from "../accessibility/ReadAloudButton";
+import { Badge, Card, SectionHeader } from "../components/ui-primitives";
 import { useComfort } from "../accessibility/ComfortProvider";
 import { useModalFocus } from "../accessibility/useModalFocus";
 import { FESTIVAL_PAGE_ENTRIES } from "../data/festival-pages";
@@ -149,7 +150,7 @@ export default function PersonalizeScreen({ lang, C, place, onPlace, onLanguage,
   const [confirmClear, setConfirmClear] = useState(false);
   const [parentSetup, setParentSetup] = useState(false);
   const hi = lang === "hi";
-  const screenTitleRef = useRef<HTMLHeadingElement>(null);
+  const screenTitleRef = useRef<HTMLDivElement>(null);
   useEffect(() => { screenTitleRef.current?.focus(); }, []);
   const comfortLevel = useMemo(() => {
     let best = 0, distance = Infinity;
@@ -174,7 +175,7 @@ export default function PersonalizeScreen({ lang, C, place, onPlace, onLanguage,
       {parentSetup && <ParentSetup lang={lang} onClose={() => setParentSetup(false)} onLanguage={onLanguage} />}
       <div style={{ display: "flex", alignItems: "center", gap: T.s2 }}>
         <button type="button" className="comfort-control comfort-focus" onClick={onBack} style={{ border: "0.0625rem solid var(--line)", background: "var(--surface-active)", color: "var(--ink)", padding: `0 ${T.s3}`, cursor: "pointer" }}>← {hi ? "वापस" : "Back"}</button>
-        <div><h2 ref={screenTitleRef} tabIndex={-1} id="personalize-title" style={{ margin: 0, fontFamily: T.serif, fontSize: T.fDisplay }}>{hi ? "आपका गणक" : "Personalize Ganak"}</h2><p style={{ margin: "0.2rem 0 0", color: "var(--muted)", fontSize: T.fSmall }}>{hi ? "जो आपके लिए उपयोगी है, वही आगे रहे।" : "Keep what matters to you close at hand."}</p></div>
+        <div style={{ flex: 1 }} ref={screenTitleRef} tabIndex={-1} id="personalize-title"><SectionHeader hi="आपका गणक" en="PERSONALIZE GANAK" lang={lang} /><p style={{ margin: "0.2rem 0 0", color: "var(--muted)", fontSize: T.fSmall }}>{hi ? "जो आपके लिए उपयोगी है, वही आगे रहे।" : "Keep what matters to you close at hand."}</p></div>
       </div>
 
       <details open style={sectionStyle}>
@@ -187,7 +188,7 @@ export default function PersonalizeScreen({ lang, C, place, onPlace, onLanguage,
           <RangeRow label={hi ? "स्क्रीन की गर्माहट" : "Screen warmth"} minLabel={hi ? "साफ़" : "Crisp"} maxLabel={hi ? "कोमल" : "Soft"} value={warmthIndex} min={0} max={2} onChange={(index) => updatePreferences({ warmth: ["crisp", "balanced", "soft"][index] as any, preset: "custom" })} output={hi ? ["साफ़", "संतुलित", "कोमल"][warmthIndex] : ["Crisp", "Balanced", "Soft"][warmthIndex]} />
           <div style={{ display: "grid", gap: "0.4rem" }}><strong>{hi ? "रोशनी" : "Light & dark"}</strong><Segmented value={preferences.colorMode} onChange={(colorMode) => updatePreferences({ colorMode })} label={hi ? "रोशनी चुनें" : "Choose light mode"} options={[{ value: "auto", label: hi ? "अपने-आप" : "Auto" }, { value: "light", label: hi ? "उजला" : "Light" }, { value: "dark", label: hi ? "गहरा" : "Dark" }]} /></div>
           <RangeRow label={hi ? "मार्गदर्शन की गहराई" : "Guidance depth"} minLabel={hi ? "मार्गदर्शित" : "Guided"} maxLabel={hi ? "विशेषज्ञ" : "Expert"} value={depthIndex} min={0} max={2} onChange={(index) => updatePreferences({ depth: ["guided", "balanced", "expert"][index] as any, preset: "custom" })} output={hi ? ["सरल", "संतुलित", "विशेषज्ञ"][depthIndex] : ["Guided", "Balanced", "Expert"][depthIndex]} />
-          <div style={{ padding: T.s3, borderRadius: T.rMd, background: "var(--bg-active)", border: "0.0625rem solid var(--line)" }}><strong>{hi ? "रंग से अधिक स्पष्टता" : "Meaning beyond colour"}</strong><div style={{ display: "flex", flexWrap: "wrap", gap: T.s3, marginTop: T.s2 }}><span style={{ color: "var(--good)", fontWeight: 700 }}>✓ {hi ? "शुभ" : "Auspicious"}</span><span style={{ color: "var(--bad)", fontWeight: 700 }}>⚠ {hi ? "टालें" : "Avoid"}</span></div></div>
+          <Card density="compact" tone="sunken" elevated={false}><strong>{hi ? "रंग से अधिक स्पष्टता" : "Meaning beyond colour"}</strong><div style={{ display: "flex", flexWrap: "wrap", gap: T.s3, marginTop: T.s2 }}><Badge tone="good">{hi ? "शुभ" : "Auspicious"}</Badge><Badge tone="bad">{hi ? "टालें" : "Avoid"}</Badge></div></Card>
         </div>
       </details>
 

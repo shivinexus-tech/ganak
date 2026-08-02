@@ -9,6 +9,7 @@ import VratVidhiCard from "../components/VratVidhiCard";
 import NavadurgaDayGuide, { NavadurgaSeasonLinks } from "../components/NavadurgaDayGuide";
 import FestivalRasterHero from "../components/FestivalRasterHero";
 import ReadAloudButton from "../accessibility/ReadAloudButton";
+import { Badge, Card, DataRow, SectionHeader } from "../components/ui-primitives";
 import { useComfort, useDepth } from "../accessibility/ComfortProvider";
 import { VRAT_VIDHI } from "../data/vrat-vidhis";
 import { festivalRouteContentFor } from "../data/festival-route-content";
@@ -186,32 +187,28 @@ function RouteSpecificAnswer({ content, lang, C }) {
   const timingNote = localizedRouteContentField(content, "timingNote", L);
   const sourceBoundary = localizedRouteContentField(content, "sourceBoundary", L);
   return (
-    <section
+    <Card
       aria-label={L === "hi" ? "इस पर्व का स्पष्ट उत्तर" : "Route-specific answer"}
+      density="compact"
+      tone="accent"
+      elevated={false}
       style={{
-        display: "grid", gap: "0.5625rem", margin: "0 0 0.875rem", padding: "0.8125rem 0.875rem",
-        borderRadius: T.rMd, border: `0.0625rem solid ${C.gold}`,
-        background: "var(--surface-hover)",
+        display: "grid", gap: "0.5625rem", margin: "0 0 0.875rem",
       }}
     >
-      <div style={{ ...T.label, color: C.gold }}>
-        {L === "hi" ? "इस पर्व का स्पष्ट उत्तर" : "WHAT THIS OBSERVANCE MEANS FOR YOU"}
-      </div>
+      <SectionHeader hi="इस पर्व का स्पष्ट उत्तर" en="WHAT THIS OBSERVANCE MEANS FOR YOU" lang={L} density="compact" />
+      <Badge tone="accent" density="compact">{L === "hi" ? "स्पष्ट उत्तर" : "Clear answer"}</Badge>
       <div style={{ color: C.ivory, fontSize: T.fBody, lineHeight: 1.55, fontWeight: 650 }}>
         {verdict}
       </div>
       {meaning && <div style={{ color: C.ivory, fontSize: T.fSmall, lineHeight: 1.55 }}>{meaning}</div>}
-      {timingNote && (
-        <div style={{ color: C.muted, fontSize: T.fSmall, lineHeight: 1.5 }}>
-          <strong style={{ color: C.ivory }}>{L === "hi" ? "समय: " : "Timing: "}</strong>{timingNote}
-        </div>
-      )}
       {sourceBoundary && (
         <div style={{ color: C.muted, fontSize: T.fMicro, lineHeight: 1.5 }}>
           <strong style={{ color: C.ivory }}>{L === "hi" ? "परम्परा और स्रोत-सीमा: " : "Tradition and source boundary: "}</strong>{sourceBoundary}
         </div>
       )}
-    </section>
+      {timingNote && <DataRow density="compact" label={L === "hi" ? "समय" : "Timing"} value={timingNote} />}
+    </Card>
   );
 }
 

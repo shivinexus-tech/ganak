@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { T } from "../components/ui-style-contract";
+import { Card, SectionHeader } from "../components/ui-primitives";
 import { fmtDeg, fmtDateT } from "../components/format";
 import { searchOffline, searchOnline } from "../data/places";
 import MatchMaker from "./MatchingScreen";
@@ -226,11 +227,14 @@ export default function ChartScreen({ C, card, lang }) {
   return (
     <>
       {r && (
+        <Card density="compact" tone="sunken" elevated={false} style={{ padding: 0, marginBottom: T.s3 }}>
           <JyotishPanelNav lang={lang} C={C} showTechnical={showTechnical} />
+        </Card>
       )}
           <>
         {/* birth details */}
         <section className="rise2" style={{ ...card, padding: "1.5rem" }}>
+          <SectionHeader hi="जन्म विवरण" en="BIRTH DETAILS" lang={lang === "hi" ? "hi" : "en"} density="compact" />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.875rem" }}>
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={labelStyle}>{lang === "hi" ? "नाम" : "Name"}</label>

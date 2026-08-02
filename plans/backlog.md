@@ -751,10 +751,10 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       legacy migration is done and live: every screen now reads the single semantic
       token source, so dark mode repaints the whole app instead of only the top bar,
       and Simple & Large enlarges 95% of on-screen text instead of 60%. Universal
-      Card/SectionHeader/Badge/DataRow primitives exist and are adopted on Today and
-      Muhurat; Guided <-> Expert now materially changes content on all five launch
-      journeys; Muhurat has bilingual Listen. **Open:** primitive adoption on the other
-      four launch screens, and an owner decision on the Cloudflare Web Analytics beacon,
+      Card/SectionHeader/Badge/DataRow primitives now cover all six launch screens;
+      Guided <-> Expert materially changes content on all five launch journeys; Muhurat
+      has bilingual Listen. **Open:** deployment/live verification of the final primitive
+      adoption and an owner decision on the Cloudflare Web Analytics beacon,
       which fires regardless of the in-app analytics consent — Ganak's own telemetry seam
       is fail-closed, but the beacon is injected by Cloudflare Pages at the edge and can
       only be turned off in the dashboard or disclosed in the footer.
