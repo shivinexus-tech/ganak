@@ -14,7 +14,8 @@ import { MuhuratHub } from "./MuhuratHub";
 import { scanPanchangCalendar } from "../engine/festivals";
 import { planetGochar, PLANET_PERIOD_DAYS } from "../engine/gochar";
 import PlanetCalendarCard from "../components/PlanetCalendarCard";
-import { fmtDur, eventDetail } from "../engine/transit-copy";
+import { fmtDur, eventDetail, transitLabel } from "../engine/transit-copy";
+import { panchangTerm } from "../i18n/panchang-terms";
 import { CALENDAR_CONVENTIONS, DEFAULT_REGIONAL_CALENDAR_FLAGS, calendarLabel, conventionIsEnabled, resolveConvention } from "../engine/calendar-conventions";
 import { loadRegionalCalendarFlags } from "../engine/regional-calendar-flags";
 import { runRegionalCalendarShadow } from "../monitoring/regional-calendar-shadow";
@@ -318,6 +319,14 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
           <div style={{ display: "flex", justifyContent: "flex-end", margin: "-0.5rem 0 1rem" }}>
             <ReadAloudButton text={listenText} lang={lang === "hi" ? "hi" : "en"} label={lang === "hi" ? "🔊 आज का पंचांग सुनें" : "🔊 Listen to today's Panchang"} />
           </div>
+          {showExpert && <p style={{ margin: "0 0 1rem", padding: "0.625rem 0.75rem", borderRadius: T.rMd, background: "var(--surface-raised)", border: "0.0625rem solid var(--line)", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55, fontVariantNumeric: "tabular-nums" }}>
+            <strong style={{ color: C.ivory }}>{lang === "hi" ? "गणना आधार" : "Calculation basis"}</strong>{" · "}
+            {(lang === "hi" ? "लाहिरी अयनांश · मध्यम राहु/केतु · स्थानीय सूर्योदय आधार · UTC" : "Lahiri ayanamsa · mean Rahu/Ketu · local sunrise basis · UTC")}
+            {(todayP.tz >= 0 ? "+" : "") + todayP.tz}
+            {place?.label ? ` · ${place.label}` : ""}
+            {todayP.rise ? ` · ${lang === "hi" ? "सूर्योदय" : "sunrise"} ${fmtTime(todayP.rise, todayP.tz)}` : ""}
+            {todayP.set ? ` · ${lang === "hi" ? "सूर्यास्त" : "sunset"} ${fmtTime(todayP.set, todayP.tz)}` : ""}
+          </p>}
           {showPlainHelp && <p style={{ margin: "0 0 1rem", padding: "0.625rem 0.75rem", borderRadius: T.rMd, background: "var(--surface-raised)", border: "0.0625rem solid var(--line)", color: C.ivory, fontSize: T.fSmall, lineHeight: 1.55 }}>
             {lang === "hi"
               ? "पंचांग दिन के पाँच अंग बताता है। सबसे उपयोगी दो बातें नीचे हैं — कौन-सा समय शुभ है, और किस समय नया काम आरम्भ नहीं करना चाहिए।"
@@ -355,13 +364,15 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                 <div key={e2.t + e2.label} style={{ borderBottom: `0.0625rem solid var(--line-soft)`, padding: "0.625rem 0.125rem" }}>
                   <button
                     onClick={() => setExpandedEvent(isExp ? null : (e2.t + e2.label))}
-                    style={{ width: "100%", textAlign: "left", background: "none", border: "none", padding: 0, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.625rem" }}
+                    className="comfort-focus"
+                    aria-expanded={isExp}
+                    style={{ width: "100%", minHeight: T.ctrlH, textAlign: "left", background: "none", border: "none", padding: 0, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.625rem", flexWrap: "wrap" }}
                   >
                     <span style={{ fontSize: "var(--font-small)", display: "flex", gap: "0.875rem", alignItems: "baseline", flex: 1 }}>
                       <span style={{ color: C.gold, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap", minWidth: "5.75rem", fontSize: "var(--font-small)" }}>
                         {new Date(e2.t + todayP.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { month: "short", day: "numeric", timeZone: "UTC" })} · {fmtTime(e2.t, todayP.tz)}
                       </span>
-                      <span style={{ color: e2.label.includes("℞") ? C.sindoor : C.ivory, flex: 1, overflow: "hidden", textOverflow: "ellipsis" }}>{e2.label}</span>
+                      <span style={{ color: e2.label.includes("℞") ? C.sindoor : C.ivory, flex: 1, overflowWrap: "anywhere" }}>{transitLabel(lang, e2.label)}</span>
                     </span>
                     <span style={{ color: C.muted, fontSize: "var(--font-label)", whiteSpace: "nowrap", fontWeight: 500 }}>{ed.timeStr}</span>
                     <span style={{ color: C.muted, fontSize: "var(--font-small)", transform: isExp ? "rotate(180deg)" : "none", transition: "transform .2s" }}>▼</span>
@@ -395,7 +406,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                                 <div style={{ paddingBottom: "0.125rem", flex: 1 }}>
                                   <div style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem", alignItems: "baseline", flexWrap: "wrap" }}>
                                     <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: isCur ? C.gold : C.ivory, fontWeight: isCur ? 700 : 500 }}>
-                                      {SIGNS[x.sign].split(" ")[0]}
+                                      {panchangTerm(lang, "sign", SIGNS[x.sign].split(" ")[0])}
                                     </span>
                                     {dur && <span style={{ fontSize: "var(--font-label)", color: C.muted }}>{dur}</span>}
                                   </div>

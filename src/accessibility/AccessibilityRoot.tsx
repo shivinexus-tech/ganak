@@ -94,6 +94,15 @@ export default function AccessibilityRoot({ children }: { children: React.ReactN
 
   const screen = useMemo(() => urlValue("screen"), [routeTick]);
   const personalizeRoute = screen === "personalize";
+
+  // The shell only titles the screens it owns, so Personalize kept whatever title the
+  // previous route had left behind — including when it was deep-linked directly.
+  useEffect(() => {
+    if (!personalizeRoute) return;
+    const previous = document.title;
+    document.title = lang === "hi" ? "आपका गणक — रूप, आराम और गोपनीयता" : "Personalize Ganak — comfort, place and privacy";
+    return () => { document.title = previous; };
+  }, [personalizeRoute, lang]);
   const C = useMemo(() => ({
     bg: "var(--bg-active)", panel: "var(--surface-active)", line: "var(--line)",
     gold: "var(--gold)", accent: "var(--accent)", sindoor: "var(--bad)",

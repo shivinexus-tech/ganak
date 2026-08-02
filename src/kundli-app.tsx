@@ -10,6 +10,7 @@ import MedicalMuhuratScreen, { medicalMuhuratFromPath } from "./screens/MedicalM
 import FeedbackCard from "./components/FeedbackCard";
 import { applyRouteMetadata, routeMetadata } from "./metadata/route-metadata";
 import { privacyEvent } from "./telemetry/privacy-events";
+import { useComfort } from "./accessibility/ComfortProvider";
 import { FEST_NAME } from "./data/festival-meta";
 import { urlPrefGet, urlPrefSet, urlPrefsSet } from "./components/url-prefs";
 import {
@@ -69,6 +70,9 @@ function pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute = null, medi
 
 
 export default function KundliApp() {
+  // Choosing a city anywhere in the app is a deliberate user action, so it is remembered as
+  // the home place — it used to survive only in the URL and vanish on a plain reload.
+  const { updatePreferences } = useComfort();
   // The shared palette every screen receives. These are semantic custom properties, not
   // values: light/dark, warmth and the later brand swap all resolve in
   // src/styles/design-tokens.css, so no screen needs to know which mode it is in.
@@ -97,6 +101,11 @@ export default function KundliApp() {
   const utilityRoute = utilityFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const medicalRoute = medicalMuhuratFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const muhuratRoute = urlPrefGet("muhurat");
+  // A /festival/ path that matches no guide used to render the home screen silently, so a
+  // stale or mistyped shared link looked like it had worked. Say so instead.
+  const unknownFestivalPath = typeof window !== "undefined"
+    && /^\/festival\//.test(window.location.pathname)
+    && !directFestivalGuide;
   const hero = pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute, medicalRoute, muhuratRoute);
   useEffect(() => {
     const meta=routeMetadata({lang,mode,festival:directFestivalGuide,utility:utilityRoute,medical:medicalRoute,muhurat:muhuratRoute});
@@ -109,7 +118,7 @@ export default function KundliApp() {
   // Shared place: Daily and Prashna both read it; URL state preserves it across
   // regional-mode changes, reload and browser Back/Forward without storage.
   const [panchPlace, setPanchPlaceState] = useState(placeFromUrl);
-  const setPanchPlace=(next)=>{setPanchPlaceState(next);if(next)urlPrefsSet({city:next.label,lat:next.lat,lon:next.lon,zone:next.zone});};
+  const setPanchPlace=(next)=>{setPanchPlaceState(next);if(next){urlPrefsSet({city:next.label,lat:next.lat,lon:next.lon,zone:next.zone});updatePreferences({homePlace:{label:next.label,lat:next.lat,lon:next.lon,zone:next.zone}});}};
   useEffect(()=>{const restore=()=>setPanchPlaceState(placeFromUrl());window.addEventListener("popstate",restore);return()=>window.removeEventListener("popstate",restore);},[]);
   const panchEff = panchPlace || DEFAULT_PLACE;
 
@@ -197,10 +206,28 @@ export default function KundliApp() {
         {!directFestivalGuide && !utilityRoute && !medicalRoute && <div style={{ display: "flex", justifyContent: "center", marginBottom: T.s5 }}>
           <div role="group" aria-label={lang === "hi" ? "मुख्य भाग चुनें" : "Choose section"} style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", background: C.soft, borderRadius: T.rMd, padding: "0.1875rem", border: `0.0625rem solid ${C.line}` }}>
             {[["daily", lang === "hi" ? "आज · पंचांग" : "Daily"], ["prashna", lang === "hi" ? "प्रश्न" : "Prashna"], ["chart", lang === "hi" ? "ज्योतिष" : "Jyotish"]].map(([mk, label]) => (
-              <button key={mk} onClick={() => chooseMode(mk)} aria-pressed={mode === mk} style={{ minHeight: T.ctrlH, padding: `0 ${T.s5}`, borderRadius: T.rSm, fontFamily: T.serif, fontSize: T.fBody, cursor: "pointer", border: "none", background: mode === mk ? C.panel : "transparent", color: mode === mk ? C.gold : C.muted, fontWeight: mode === mk ? 600 : 400, boxShadow: mode === mk ? T.e1 : "none", transition: "all .15s" }}>{label}</button>
+              // The unselected label is a real, actionable control, so it carries full ink
+              // contrast rather than the muted tone; selection is gold + weight + elevation.
+              <button key={mk} onClick={() => chooseMode(mk)} className="comfort-focus" aria-pressed={mode === mk} aria-current={mode === mk ? "page" : undefined} style={{ minHeight: T.ctrlH, padding: `0 ${T.s5}`, borderRadius: T.rSm, fontFamily: T.serif, fontSize: T.fBody, cursor: "pointer", border: "none", background: mode === mk ? C.panel : "transparent", color: mode === mk ? C.gold : C.ivory, fontWeight: mode === mk ? 700 : 400, boxShadow: mode === mk ? T.e1 : "none", transition: "all .15s" }}>{label}</button>
             ))}
           </div>
         </div>}
+
+        {unknownFestivalPath && (
+          <div role="alert" style={{ ...card, padding: `${T.s5} ${T.s5}`, marginBottom: T.s5, borderColor: "var(--bad)" }}>
+            <div style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.ivory, marginBottom: T.s2 }}>
+              {lang === "hi" ? "यह पर्व-पृष्ठ नहीं मिला।" : "That festival page could not be found."}
+            </div>
+            <div style={{ fontSize: T.fSmall, color: C.muted, marginBottom: T.s3, lineHeight: 1.55 }}>
+              {lang === "hi"
+                ? "लिंक पुराना या ग़लत हो सकता है। नीचे आज का पंचांग है; व्रत एवं पर्व सूची से सही पृष्ठ खोलें।"
+                : "The link may be old or mistyped. Today's Panchang is below — open the right page from the Fasts and festivals list."}
+            </div>
+            <a href={`/?lang=${lang}&screen=daily`} className="comfort-focus" style={{ display: "inline-flex", alignItems: "center", minHeight: T.ctrlH, padding: `0 ${T.s4}`, borderRadius: T.rMd, border: `0.0625rem solid ${C.gold}`, color: C.gold, textDecoration: "none", fontWeight: 600 }}>
+              {lang === "hi" ? "आज का पंचांग खोलें" : "Open today's Panchang"}
+            </a>
+          </div>
+        )}
 
         {directFestivalGuide && (
           <FestivalGuideScreen

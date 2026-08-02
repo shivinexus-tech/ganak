@@ -16,10 +16,14 @@ import "@fontsource/spectral/600.css";
 import "./styles/design-tokens.css";
 
 import AppErrorBoundary from "./components/AppErrorBoundary";
-import { ComfortProvider } from "./accessibility/ComfortProvider";
+import { ComfortProvider, applyStoredPreferencesToRoot } from "./accessibility/ComfortProvider";
 import AccessibilityRoot from "./accessibility/AccessibilityRoot";
 import { installGlobalErrorReporting, reportClientError } from "./monitoring/error-reporter";
 import KundliApp from "./kundli-app.tsx";
+
+// Comfort preferences are applied to <html> before the first paint, so nobody sees the
+// default size flash past their chosen one and no frame is painted with mismatched tokens.
+applyStoredPreferencesToRoot();
 
 // Crash reports only (no analytics). No-ops until VITE_SENTRY_DSN is set at build time.
 installGlobalErrorReporting();

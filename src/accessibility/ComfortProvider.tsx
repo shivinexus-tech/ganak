@@ -123,18 +123,34 @@ function applyRootPreferences(preferences: GanakPreferences) {
   root.style.setProperty("--density", `${preferences.densityRem}rem`);
 }
 
-export function ComfortProvider({ children }: { children: React.ReactNode }) {
-  const [preferences, setPreferences] = useState<GanakPreferences>(DEFAULT_PREFERENCES);
-  const [ready, setReady] = useState(false);
-  const [storageError, setStorageError] = useState("");
-  const skipNextWrite = useRef(false);
+/**
+ * Apply the stored preferences to <html> BEFORE React's first paint.
+ *
+ * Doing this in an effect meant the first frame was always the 106.25% light default and
+ * then flipped: a visible reflow for anyone on Simple & Large, and — because the whole app
+ * styles itself with inline `var(--token)` references — a window in which the root custom
+ * properties and the painted colours disagreed. Reading synchronously at boot removes both.
+ */
+export function applyStoredPreferencesToRoot() {
+  if (typeof document === "undefined") return;
+  const result = approvedStorage.preferences.read(DEFAULT_PREFERENCES as unknown as Record<string, unknown>);
+  applyRootPreferences(sanitizePreferences(result.value));
+}
 
-  useEffect(() => {
-    const result = approvedStorage.preferences.read(DEFAULT_PREFERENCES as unknown as Record<string, unknown>);
-    setPreferences(sanitizePreferences(result.value));
-    setStorageError(result.ok ? "" : result.error);
-    setReady(true);
-  }, []);
+export function ComfortProvider({ children }: { children: React.ReactNode }) {
+  // Read the stored preferences synchronously, during the first render.
+  //
+  // This used to happen in a mount effect, which produced a three-step flicker: the page
+  // painted with the defaults, the effect pass re-applied the defaults to <html>, and only
+  // the following render applied what the user had actually chosen. Anything that mounted
+  // inside that window — the first-run dialog above all — was laid out against the wrong
+  // theme. Reading here means there is never a frame with the wrong size or colour mode.
+  const [stored] = useState(() => approvedStorage.preferences.read(DEFAULT_PREFERENCES as unknown as Record<string, unknown>));
+  const [preferences, setPreferences] = useState<GanakPreferences>(() => sanitizePreferences(stored.value));
+  const [ready] = useState(true);
+  const [storageError, setStorageError] = useState(stored.ok ? "" : stored.error);
+  // Loading is not a change: do not write the freshly read value straight back.
+  const skipNextWrite = useRef(true);
 
   useEffect(() => {
     applyRootPreferences(preferences);

@@ -60,7 +60,13 @@ export function useModalFocus(open: boolean, onClose: () => void) {
         else element.setAttribute("aria-hidden", hidden);
         if (!inert) element.removeAttribute("inert");
       });
-      previous?.focus();
+      // Returning focus to <body> means "start again from the top" for a keyboard user.
+      // Fall back to the page heading when there was no meaningful trigger to return to.
+      if (previous && previous !== document.body) previous.focus();
+      else {
+        const heading = document.querySelector<HTMLElement>("main, [role='main'], h1");
+        if (heading) { heading.setAttribute("tabindex", "-1"); heading.focus(); }
+      }
     };
   }, [open]);
 

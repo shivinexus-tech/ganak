@@ -151,7 +151,11 @@ const firstRun = read("src/accessibility/FirstRunComfortOffer.tsx");
 includesAll(firstRun, ["How would you like Ganak to look?", "गणक आपको कैसा दिखे?", "Simple & Large", "Balanced", "Not now", "useModalFocus", "data-modal-autofocus"], "first-run offer");
 
 const modalFocus = read("src/accessibility/useModalFocus.ts");
-includesAll(modalFocus, ['event.key === "Escape"', 'event.key !== "Tab"', "previous?.focus()", "data-modal-autofocus"], "modal focus management");
+includesAll(modalFocus, ['event.key === "Escape"', 'event.key !== "Tab"', "previous !== document.body", "data-modal-autofocus"], "modal focus management");
+// Escaping a dialog used to drop focus onto <body>, restarting a keyboard user at the top of
+// the document; and Tab-trapping alone still let a screen reader swipe out behind the dialog.
+expect(modalFocus.includes('querySelector<HTMLElement>("main'), "closing a modal must land focus on a real target, never on <body>");
+expect(modalFocus.includes('setAttribute("inert"'), "an open modal must take the rest of the app out of the accessibility tree");
 
 const speech = read("src/accessibility/ReadAloudButton.tsx");
 includesAll(speech, ["speechSynthesis", "SpeechSynthesisUtterance", '"hi-IN"', "🔊 सुनें", "🔊 Listen", "Read-aloud is unavailable", "ganak:tts-start", "ganak:tts-stop-all", "activeSpeechId"], "read aloud");

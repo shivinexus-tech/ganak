@@ -492,7 +492,7 @@ export default function ChartScreen({ C, card, lang }) {
                   <div key={p.n} style={{ background: "var(--surface-raised)", border: `0.0625rem solid ${C.line}`, borderRadius: "0.625rem", padding: "0.625rem 0.75rem" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.4375rem", marginBottom: "0.5rem" }}>
                       <span style={{ width: "0.4375rem", height: "0.4375rem", borderRadius: "0.1875rem", background: p.color || C.gold, flexShrink: 0 }} />
-                      <span style={{ fontSize: "var(--font-small)", fontWeight: 600, color: C.ivory, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <span style={{ fontSize: "var(--font-small)", fontWeight: 600, color: C.ivory, flex: 1, overflowWrap: "anywhere" }}>
                         {p.n}{p.retro && <span style={{ color: C.sindoor, marginLeft: "0.125rem" }}>℞</span>}
                       </span>
                     </div>

@@ -33,6 +33,7 @@ import { observancesFor, scanPanchangCalendar, EKADASHI_NAMES, PRADOSH_NAMES_BY_
 import { urlPrefGet, urlPrefPush } from "../components/url-prefs";
 import MuhuratActions from "../components/MuhuratActions";
 import { privacyEvent } from "../telemetry/privacy-events";
+import { panchangTerm } from "../i18n/panchang-terms";
 import ReadAloudButton from "../accessibility/ReadAloudButton";
 import { useDepth } from "../accessibility/ComfortProvider";
 import { Badge, Card, DataRow, SectionHeader } from "../components/ui-primitives";
@@ -209,7 +210,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           const p = festivalPathForKey(kind, item.key);
           const body = (<>
             <span style={{ width: "0.4375rem", height: "0.4375rem", borderRadius: "50%", background: dotColor, flexShrink: 0 }} />
-            <span style={{ flex: 1, minWidth: 0, fontSize: T.fSmall, color: C.ivory, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
+            <span style={{ flex: 1, minWidth: 0, fontSize: T.fSmall, color: C.ivory, overflowWrap: "anywhere" }}>{label}</span>
             <span style={{ fontSize: T.fMicro, color: C.gold, fontWeight: 600, flexShrink: 0 }}>{away(item.ms)}</span>
           </>);
           if (!p) return <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.125rem 0" }}>{body}</div>;
@@ -231,17 +232,17 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                 <div>
                   <div style={{ ...T.label, color: C.muted }}>{isToday ? (lang === "hi" ? "आज" : "Today") : (lang === "hi" ? "चुनी हुई तारीख़" : "Selected date")}</div>
                   <div style={{ fontFamily: T.serif, fontSize: T.fDisplay, color: C.ivory, lineHeight: 1.1 }}>{dObj.toLocaleDateString(L2 === "hi" ? "hi-IN" : "en-IN", { weekday: "long", timeZone: "UTC" })}</div>
-                  <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: "0.125rem" }}>{dObj.toLocaleDateString(L2 === "hi" ? "hi-IN" : "en-IN", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}{p.months ? " · " + p.months.amanta : ""}</div>
+                  <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: "0.125rem" }}>{dObj.toLocaleDateString(L2 === "hi" ? "hi-IN" : "en-IN", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}{p.months ? " · " + panchangTerm(L2, "month", p.months.amanta) : ""}</div>
                 </div>
                 {isToday && <span style={{ fontSize: T.fSmall, padding: "0.3125rem 0.75rem", borderRadius: T.rPill, background: `color-mix(in srgb, ${natColor(nowState)}, var(--surface-active) 88%)`, color: natColor(nowState), fontFamily: T.serif, fontWeight: 600, whiteSpace: "nowrap" }}>{nowState === "good" ? tr(lang, "auspiciousNow") : nowState === "bad" ? tr(lang, "cautionNow") : tr(lang, "neutralNow")}</span>}
               </div>
             </div>
             <div style={{ padding: `${T.s3} ${T.s5}`, borderTop: "0.0625rem solid " + C.line }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.625rem" }}>
-                <span style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.gold }}>{p.tithis[0].name}</span>
+                <span style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.gold }}>{panchangTerm(L2, "tithi", p.tithis[0].name)}</span>
                 <span style={{ fontSize: T.fMicro, color: C.muted, fontVariantNumeric: "tabular-nums" }}>{p.tithis[0].end ? (lang === "hi" ? "तक " : "till ") + fmtT(p.tithis[0].end) : ""}</span>
               </div>
-              <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: "0.125rem" }}>{p.paksha} · {lang === "hi" ? (p.krishna ? "कृष्ण (क्षीयमान)" : "शुक्ल (वर्धमान)") : (p.krishna ? "waning moon" : "waxing moon")} · {lang === "hi" ? "चंद्र दिवस " + p.tithiDay : "lunar day " + p.tithiDay}</div>
+              <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: "0.125rem" }}>{panchangTerm(L2, "paksha", p.paksha)} · {lang === "hi" ? (p.krishna ? "कृष्ण (क्षीयमान)" : "शुक्ल (वर्धमान)") : (p.krishna ? "waning moon" : "waxing moon")} · {lang === "hi" ? "चंद्र दिवस " + p.tithiDay : "lunar day " + p.tithiDay}</div>
               {obs.length > 0 && (() => {
                 const obsPath = festivalPathForKey("fast", fastObs.key);
                 const chipStyle = { marginTop: "0.5rem", display: "inline-flex", alignItems: "center", gap: "0.4375rem", padding: "0.3125rem 0.6875rem", borderRadius: T.rMd, background: fastObs.fasting ? "var(--bad-surface)" : "var(--surface-hover)", border: `0.0625rem solid color-mix(in srgb, ${fastObs.fasting ? C.sindoor : C.gold}, var(--surface-active) 70%)` };
@@ -288,7 +289,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                   label={L2 === "hi" ? "🔊 सुनें" : "🔊 Listen"}
                   text={muhuratSpeech(L2, {
                     headline: L2 === "hi"
-                      ? `${isToday ? "आज" : "इस दिन"} ${p.tithis[0].name} तिथि है।`
+                      ? `${isToday ? "आज" : "इस दिन"} ${panchangTerm("hi", "tithi", p.tithis[0].name)} तिथि है।`
                       : `${isToday ? "Today" : "On this date"} the tithi is ${p.tithis[0].name}.`,
                     good: goodW.map((x) => `${winName[x[0]][L2]} ${fmtT(x[1].start)} – ${fmtT(x[1].end)}`),
                     avoid: avoidW.map((x) => `${winName[x[0]][L2]} ${fmtT(x[1].start)} – ${fmtT(x[1].end)}`),
@@ -319,7 +320,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                   : "In plain words: begin anything auspicious during a ✓ time, and avoid starting something new during a ⚠ or ✗ time."}
               </p>}
               {isToday && curChogha && <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: "0.375rem" }}>{lang === "hi" ? "अभी चौघड़िया: " : "Now: "}<span style={{ color: natColor(curChogha.nat), fontWeight: 600 }}>{trN(lang, CHOG_NAME, curChogha.key)}</span></div>}
-              {isToday && curLagnaW && <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: "0.25rem" }}>{lang === "hi" ? "उदय लग्न: " : "Udaya Lagna: "}<span style={{ color: C.ivory }}>{SIGNS[curLagnaW.sign]}</span>{curPanchW && <> · {lang === "hi" ? "पञ्चक: " : "Panchaka: "}<span style={{ color: curPanchW.shubha ? "var(--good)" : C.sindoor, fontWeight: 600 }}>{trN(lang, PANCHAKA_NAME, curPanchW.type)}{curPanchW.shubha ? " ✓" : " ✗"}</span></>}</div>}
+              {isToday && curLagnaW && <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: "0.25rem" }}>{lang === "hi" ? "उदय लग्न: " : "Udaya Lagna: "}<span style={{ color: C.ivory }}>{panchangTerm(lang, "sign", SIGNS[curLagnaW.sign])}</span>{curPanchW && <> · {lang === "hi" ? "पञ्चक: " : "Panchaka: "}<span style={{ color: curPanchW.shubha ? "var(--good)" : C.sindoor, fontWeight: 600 }}>{trN(lang, PANCHAKA_NAME, curPanchW.type)}{curPanchW.shubha ? " ✓" : " ✗"}</span></>}</div>}
             </div>
             <div style={{ padding: `${T.s3} ${T.s5}`, borderTop: "0.0625rem solid " + C.line, display: "flex", flexWrap: "wrap", gap: `0.375rem ${T.s5}` }}>
               <div style={{ flex: "1 1 130px" }}>
@@ -332,7 +333,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
               </div>
               <div style={{ flex: "1 1 100%" }}>
                 <div style={{ fontSize: T.fMicro, color: C.muted }}>✦ {lang === "hi" ? "नक्षत्र" : "Nakshatra"}</div>
-                <div style={{ fontSize: T.fSmall, color: C.ivory }}>{p.naks[0].name}{nkLord ? " · " + (lang === "hi" ? "स्वामी " : "ruler ") + trN(lang, HORA_NAME, nkLord) : ""}{p.naks[0].end ? " · " + (lang === "hi" ? "तक " : "till ") + fmtT(p.naks[0].end) : ""}</div>
+                <div style={{ fontSize: T.fSmall, color: C.ivory }}>{panchangTerm(L2, "nakshatra", p.naks[0].name)}{nkLord ? " · " + (lang === "hi" ? "स्वामी " : "ruler ") + trN(lang, HORA_NAME, nkLord) : ""}{p.naks[0].end ? " · " + (lang === "hi" ? "तक " : "till ") + fmtT(p.naks[0].end) : ""}</div>
               </div>
             </div>
             {(nextFast || nextFest) && <div style={{ padding: `${T.s3} ${T.s5}`, borderTop: "0.0625rem solid " + C.line, background: "var(--surface-hover)" }}>
@@ -440,7 +441,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
               const live = isToday && nowMs != null && nowMs >= w.start && nowMs < w.end;
               return (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.4375rem 0.125rem", borderBottom: "0.0625rem solid var(--line-soft)", flexWrap: "wrap", background: live ? "var(--surface-hover)" : undefined }}>
-                  <span style={{ flex: "1 1 auto", fontFamily: T.serif, fontSize: "var(--font-body)", color: C.ivory }}>{SIGNS[w.sign]}{live ? " ●" : ""}</span>
+                  <span style={{ flex: "1 1 auto", fontFamily: T.serif, fontSize: "var(--font-body)", color: C.ivory }}>{panchangTerm(lang, "sign", SIGNS[w.sign])}{live ? " ●" : ""}</span>
                   <span style={{ fontSize: T.fSmall, color: C.muted, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{fmtTime(w.start, lp.tz)} – {fmtTime(w.end, lp.tz)}</span>
                   <span style={{ flex: "0 0 auto", textAlign: "right", fontSize: T.fMicro, fontWeight: 600, color: w.shubha ? "var(--good)" : C.sindoor }}>{shubhaGlyph(w.shubha)} {trN(lang, PANCHAKA_SHORT, w.type)}</span>
                 </div>
@@ -530,13 +531,13 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                     aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + name}
                     style={{ borderTop: "0.0625rem solid var(--line-soft)", textDecoration: "none", color: "inherit", padding: "0.6875rem 0.75rem", display: "flex", justifyContent: "space-between", gap: "0.625rem", alignItems: "baseline" }}
                   >
-                    <span style={{ fontSize: "var(--font-body)", color: C.ivory, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
+                    <span style={{ fontSize: "var(--font-body)", color: C.ivory, flex: 1, minWidth: 0, overflowWrap: "anywhere" }}>{name}</span>
                     <span style={{ display: "inline-flex", alignItems: "baseline", gap: "0.5rem", flexShrink: 0 }}>{dateCell}<span aria-hidden="true" style={{ color: C.muted, fontSize: "var(--font-body)" }}>›</span></span>
                   </a>
                 ) : (
                   <div style={{ borderTop: "0.0625rem solid var(--line-soft)", padding: "0.6875rem 0.75rem", display: "flex", justifyContent: "space-between", gap: "0.625rem", alignItems: "baseline" }}>
                     <span style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ fontSize: "var(--font-body)", color: C.ivory, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
+                      <span style={{ fontSize: "var(--font-body)", color: C.ivory, display: "block", overflowWrap: "anywhere" }}>{name}</span>
                       <span style={{ fontSize: "var(--font-label)", color: C.sindoor }}>{lang === "hi" ? "पूरा पृष्ठ अभी उपलब्ध नहीं" : "Full page not available yet"}</span>
                     </span>
                     {dateCell}
@@ -841,8 +842,8 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         const head = (
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.75rem", flexWrap: "wrap" }}>
             <div>
-              <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-heading)", color: C.ivory, lineHeight: 1.12 }}>{todayP.dateLabel}</div>
-              <div style={{ fontSize: "var(--font-small)", color: C.muted, marginTop: "0.125rem" }}>{todayP.tithis[0].name} · {todayP.paksha}</div>
+              <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-heading)", color: C.ivory, lineHeight: 1.12 }}>{lang === "hi" ? new Date(todayP.anchor + tz * 3600000).toLocaleDateString("hi-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }) : todayP.dateLabel}</div>
+              <div style={{ fontSize: "var(--font-small)", color: C.muted, marginTop: "0.125rem" }}>{panchangTerm(lang, "tithi", todayP.tithis[0].name)} · {panchangTerm(lang, "paksha", todayP.paksha)}</div>
             </div>
             {isToday ? pill(nowState === "good" ? tr(lang, "auspiciousNow") : nowState === "bad" ? tr(lang, "cautionNow") : tr(lang, "neutralNow"), nowState) : null}
           </div>
@@ -910,7 +911,7 @@ return (
           <div className="rise" style={{ ...card, borderRadius: T.rLg, padding: 0, overflow: "hidden", borderTop: `0.1875rem solid ${natColor(nowState)}` }}>
             <div style={{ background: "linear-gradient(135deg, var(--surface-raised), var(--surface-sunken))", padding: "1rem 1.25rem 0.25rem" }}>
               {head}
-              <svg viewBox={"0 0 " + AW + " " + AH} style={{ width: "100%", maxWidth: 380, display: "block", margin: "2px auto 0", cursor: "crosshair" }} onMouseMove={handleArcDrag} onMouseLeave={handleArcLeave} onTouchMove={handleArcDrag} onTouchEnd={handleArcLeave}>
+              <svg role="img" aria-label={lang === "hi" ? "आज का होरा चक्र — सूर्योदय से सूर्यास्त तक प्रत्येक ग्रह की होरा; विवरण नीचे सूची में है।" : "Today\u2019s planetary-hour dial — each hora from sunrise to sunset; the same information is listed below."} viewBox={"0 0 " + AW + " " + AH} style={{ width: "100%", maxWidth: 380, display: "block", margin: "2px auto 0", cursor: "crosshair" }} onMouseMove={handleArcDrag} onMouseLeave={handleArcLeave} onTouchMove={handleArcDrag} onTouchEnd={handleArcLeave}>
                 <line x1="8" y1={cy} x2={AW - 8} y2={cy} stroke="var(--line)" strokeWidth="1" />
                 {horas.map((h, i) => { const cur = curHoraIdx === i, sel = horaSel === i; return (
                   <g key={i}>
@@ -1077,7 +1078,7 @@ return (
             <span style={{ fontSize: T.fMicro, color: C.muted }}>{lang === "hi" ? "व्यक्तिगत सलाह — अपना लग्न:" : "Personalize — your ascendant:"}</span>
             <select value={horaAsc == null ? "" : horaAsc} onChange={(e) => setHoraAsc(e.target.value === "" ? null : parseInt(e.target.value))} style={{ fontSize: T.fMicro, padding: "0.3125rem 0.5rem", borderRadius: T.rSm, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.ivory, fontFamily: T.body, maxWidth: "11.25rem" }}>
               <option value="">{lang === "hi" ? "— चुनें —" : "— none —"}</option>
-              {SIGNS.map((sg, i) => <option key={i} value={i}>{sg}</option>)}
+              {SIGNS.map((sg, i) => <option key={i} value={i}>{panchangTerm(lang, "sign", sg)}</option>)}
             </select>
           </div>
           <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: "0.3125rem", fontStyle: "italic" }}>{lang === "hi" ? "लग्न नहीं पता? 'कुंडली' टैब में कुंडली बनाएँ।" : "Don't know it? Cast your chart in the Chart tab."}</div>

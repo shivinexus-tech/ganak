@@ -65,7 +65,16 @@ export default function ReadAloudButton({
   const [speechId] = useState(() => ++nextSpeechId);
   const runRef = useRef(0);
   const watchdogRef = useRef(0);
-  const content = useMemo(() => (Array.isArray(text) ? text : [text]).filter(Boolean).join("। "), [text]);
+  // Join with the sentence terminator of the language being spoken, and do not stack a
+  // danda on top of a full stop the caller already wrote.
+  const content = useMemo(() => {
+    const separator = lang === "hi" ? "। " : ". ";
+    return (Array.isArray(text) ? text : [text])
+      .filter(Boolean)
+      .map((part) => String(part).trim().replace(/[।.]+$/, ""))
+      .filter(Boolean)
+      .join(separator) + (lang === "hi" ? "।" : ".");
+  }, [text, lang]);
   const supported = typeof window !== "undefined" && "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
 
   const clearWatchdog = () => {

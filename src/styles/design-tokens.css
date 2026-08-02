@@ -149,6 +149,29 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * Form-control baseline. The user agent paints buttons, inputs and selects with its own
+ * `buttonface` / `buttontext` system colours, which are light-mode values. Any control that
+ * did not set its own colour therefore turned into black text on charcoal the moment dark
+ * mode reached the app. Inheriting the semantic tokens fixes the whole class at once, and
+ * it lives here rather than in the shell so the Personalize hub and the modals get it too.
+ */
+button {
+  color: inherit;
+  background-color: transparent;
+}
+
+input, select, textarea {
+  color: var(--ink);
+  background-color: var(--surface-active);
+}
+
+select option {
+  background: var(--surface-active);
+  color: var(--ink);
+  font-size: var(--font-body);
+}
+
 .comfort-control {
   min-height: var(--control-height);
   border-radius: var(--radius-md);
@@ -160,7 +183,13 @@ body {
   outline-offset: 0.125rem;
 }
 
-.comfort-range { min-height: var(--control-height); }
+/* A range input takes its height from its own appearance, so min-height alone left a target
+ * well under the shared control height. Set the box height explicitly instead. */
+.comfort-range {
+  min-height: var(--control-height);
+  block-size: var(--control-height);
+  inline-size: 100%;
+}
 .comfort-choice { min-height: var(--control-height); padding-block: var(--space-1); cursor: pointer; }
 .comfort-choice input[type="checkbox"] {
   inline-size: 1.25rem;
@@ -190,6 +219,10 @@ body {
   html:not([data-color-mode="light"]) {
     --line: currentColor;
     --line-soft: currentColor;
+    /* Increased contrast must raise TEXT contrast, not only borders. Secondary copy drops
+     * its de-emphasis entirely — that loss of hierarchy is exactly what the setting asks
+     * for, and it lifts every muted label to the full ink ratio. */
+    --muted: var(--ink);
   }
   .comfort-focus:focus-visible,
   [data-comfort-focus]:focus-visible { outline-width: 0.25rem; }
