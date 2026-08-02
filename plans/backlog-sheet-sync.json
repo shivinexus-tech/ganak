@@ -133,15 +133,15 @@
   },
   "qualityOverrides": {
     "46": {
-      "deliveryState": "Validated feature branch — not merged or publicly delivered",
-      "limitations": "The comfort-ready token architecture, presets, Personalize hub, local preference adapter and Today/festival/vidhi read-aloud are built. Legacy screens still hard-code light colors, sizing and one-off components; Guided/Expert has no full legacy-content consumption; Muhurat Listen waits for its active lane; the parallel brand theme must supply final values; merge, deployment and owner live sign-off remain.",
-      "shortTermImpact": "Current production users do not receive the new comfort controls yet. Once integrated, elders and other users can visibly choose larger/roomier presentation, use bilingual read-aloud and review or clear remembered preferences without login.",
+      "deliveryState": "Core comfort/accessibility system deployed and production-verified; broader design-system migration remains",
+      "limitations": "The single-token architecture, presets, Personalize hub, local preference adapter and Today/festival/vidhi read-aloud are live. Legacy screens still hard-code some light colors, sizing and one-off components; Guided/Expert has no full legacy-content consumption; Muhurat Listen waits for its active lane; universal Card/DataRow/Badge/SectionHeader primitives and the complete route matrix remain. The later brand palette is a values-only token swap and is not a delivery blocker.",
+      "shortTermImpact": "Production users can now choose larger/roomier presentation, use bilingual read-aloud, select light/dark behavior and review or clear remembered preferences without login.",
       "longTermImpact": "The root scale/density and semantic-color contracts make future comfort presets and light/dark styling inexpensive, but the benefit stays partial until legacy screens and shared primitives consume them consistently.",
-      "bugBashStatus": "Required high-impact slice bug bash completed 2026-08-01. Independent review found and fixed fail-open telemetry, dark Place input, incomplete clear, deep-route state loss, competing TTS controls, exact-follow review, false AA fixtures, focus and touch-target defects. A final full-route matrix remains mandatory before 100% closure.",
+      "bugBashStatus": "Required high-impact slice bug bash completed 2026-08-01. Independent review found and fixed fail-open telemetry, dark Place input, incomplete clear, deep-route state loss, competing TTS controls, exact-follow review, false AA fixtures, focus and touch-target defects. Production QA then passed at 390×844 in EN/HI with preset persistence, dark mode, read-aloud start/stop, no horizontal overflow and a clean console. A final full-route matrix remains mandatory before 100% closure.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-08-01 · feature commit 8ee7f84; local production preview EN/HI at 390×844, no horizontal overflow, minimum interactive targets ≥45.7px; accessibility-comfort 263, privacy/parse/canonical gates and build 140 modules pass",
+      "lastVerified": "2026-08-01 · production commit 9376836 live on ganakapp.com; EN/HI at 390×844, no horizontal overflow, Simple & Large persisted after reload, dark/read-aloud controls passed, console clean; accessibility-comfort 275, privacy/parse/canonical gates, build 140 modules and GitHub Tier A run 30727257043 pass",
       "sourceConfidence": "Not applicable — technical accessibility, UX and design-system work",
-      "recommendedAction": "Merge with the approved brand-theme values after the shared token owner review; wire Muhurat Listen and legacy Guided/Expert, color and spacing consumers; finish universal primitives; run the complete route/language/viewport matrix, deploy and obtain owner live sign-off."
+      "recommendedAction": "Keep src/styles/design-tokens.css as the only token source; let the brand track change only the existing color values. Next wire Muhurat Listen and legacy Guided/Expert/color consumers, finish universal primitives and run the complete route/language/viewport matrix."
     },
     "19": {
       "deliveryState": "Delivered and production-verified",
