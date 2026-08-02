@@ -734,6 +734,14 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
 - [ ] **Publish privacy/terms page** — draft at `plans/legal-privacy-terms-draft.md`;
       footer + fonts accurate _(CLAUDE-LAUNCH-PRIVACY MERGED)_. Needs owner contact
       email + counsel review before linking publicly.
+- [ ] **Owner chore (2026-08-02) — switch Cloudflare Web Analytics off for ganakapp.com.**
+      Cloudflare dashboard → **Web Analytics** → the `ganakapp.com` site → disable/remove it.
+      No agent can do this: it lives in the owner's Cloudflare account, not in the repo.
+      Until it is off, the site sends `POST /cdn-cgi/rum` on every page load while the
+      footer promises usage events only with consent. Verify afterwards by loading
+      ganakapp.com and confirming no `/cdn-cgi/rum` request in the browser network tab.
+      Revisit the decision when the app starts being shared and traffic numbers matter.
+      _(Backlog #46 owner decision; see also P0-ANALYTICS-PRIVACY.)_
 - [ ] **Owner chore:** one local `cd server && npm run smoke` (agents verified via
       browser; suite itself unrun as-written).
 - [x] Optional polish before launch: Muhurat window labels bilingual (E-0.7). _(CHIP-B)_
@@ -754,11 +762,21 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       Card/SectionHeader/Badge/DataRow primitives now cover all six launch screens;
       Guided <-> Expert materially changes content on all five launch journeys; Muhurat
       has bilingual Listen. The final primitive adoption is deployed and live-verified.
-      **Open:** an owner decision on the Cloudflare Web Analytics beacon,
-      which fires regardless of the in-app analytics consent — Ganak's own telemetry seam
-      is fail-closed, but the beacon is injected by Cloudflare Pages at the edge and can
-      only be turned off in the dashboard or disclosed in the footer.
-      _(Backlog #46; 95% as of 2026-08-01.)_
+      **Owner decision 2026-08-02 — Cloudflare Web Analytics goes OFF for now.** The
+      beacon fired on every load regardless of the in-app analytics consent, which broke
+      the footer's "anonymous usage events only when consented" claim. Ganak's own
+      telemetry seam is fail-closed and gate-proven; the beacon is injected by Cloudflare
+      Pages at the edge, so it can only be switched off in the dashboard. The owner's call:
+      there is no audience to measure yet, so switch it off and revisit when the app is
+      actually being shared. Footer copy stays as-is and becomes accurate once the switch
+      is flipped — see the owner chore below. _(P0-ANALYTICS-PRIVACY covers the wider
+      "no tracking" claim when real instrumentation lands.)_
+      **Parked 2026-08-02 (owner) — sequence right after the new prototype + theme track:**
+      (a) native `<option>` nodes will not scale inside the browser's own dropdown popup —
+      a platform limitation, closable only by replacing the native selects with a custom
+      listbox; (b) real-device human verification — screen-reader voicing, audible speech
+      quality and physical touch targets, which no agent can check without ears and a thumb.
+      _(Backlog #46; 95% as of 2026-08-02.)_
 
 **Still not required by the 2026-07-21 scope change:** accounts, cross-device data
 persistence, paid AI, Android/iOS store packaging, SDUI and paywalls. The backend
