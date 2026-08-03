@@ -1,12 +1,11 @@
-/* Chart vault / export / share — pure extraction (SPLIT-UI-CHART-04). Wire deferred.
-   Uses the host preview API (window.storage) when present; prefs stay in the URL. */
+/* Chart vault / export / share — persisted only through Ganak's approved adapter. */
 
 import React, { useState, useEffect } from "react";
 import { T } from "./ui-style-contract";
 import { SIGN_SHORT } from "../data/chart-divisions";
+import { approvedStorage } from "../storage/approved-storage";
 
 function ChartVault({ snapshot, result, onLoad, C, card, lang = "en" }) {
-  const store = (typeof window !== "undefined" && window.storage) ? window.storage : null;
   const [saved, setSaved] = useState([]);
   const [msg, setMsg] = useState("");
   const [imp, setImp] = useState("");
@@ -14,29 +13,32 @@ function ChartVault({ snapshot, result, onLoad, C, card, lang = "en" }) {
   const ready = !!(result && snapshot && snapshot.form && snapshot.place);
   const t = (en, hi) => (lang === "hi" ? hi : en);
 
-  const refresh = async () => {
-    if (!store) return;
-    try {
-      const res = await store.list("chart:");
-      const keys = (res && res.keys) || [];
-      const items = [];
-      for (const k of keys) { try { const r = await store.get(k); if (r && r.value) items.push(JSON.parse(r.value)); } catch (e) {} }
-      items.sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
-      setSaved(items);
-    } catch (e) {}
+  const refresh = () => {
+    const res = approvedStorage.savedCharts.read([]);
+    const items = Array.isArray(res.value) ? res.value.filter((item) => item && typeof item === "object") : [];
+    items.sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
+    setSaved(items);
+    return res.ok;
   };
   useEffect(() => { refresh(); }, []);
   const flash = (m) => { setMsg(m); setTimeout(() => setMsg(""), 2600); };
 
-  const saveCurrent = async () => {
-    if (!store) { flash("Saving isn't available in this preview — export or share still work."); return; }
+  const saveCurrent = () => {
     if (!ready) { flash(t("Cast a chart first.", "पहले कुंडली बनाएँ।")); return; }
     const id = "chart:" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     const name = (snapshot.form.name || "").trim() || snapshot.place.label || "Unnamed";
     const obj = { id, name, savedAt: Date.now(), form: snapshot.form, place: snapshot.place, tzOverride: snapshot.tzOverride, ayanamsa: snapshot.ayanamsa, summary: `${snapshot.form.date} ${snapshot.form.time} · ${snapshot.place.label}` };
-    try { await store.set(id, JSON.stringify(obj)); flash("Saved “" + name + "”."); await refresh(); } catch (e) { flash("Save failed."); }
+    const next = [obj, ...saved.filter((item) => item.id !== id)];
+    const written = approvedStorage.savedCharts.write(next);
+    if (written.ok) { setSaved(next); flash(t(`Saved “${name}”.`, `“${name}” सहेज दी गई।`)); }
+    else flash(t("This device couldn't save the chart. Export or share it instead.", "यह उपकरण कुंडली सहेज नहीं सका। इसके बजाय निर्यात या साझा करें।"));
   };
-  const remove = async (id) => { if (!store) return; try { await store.delete(id); await refresh(); flash(lang === "hi" ? "हटा दिया गया।" : "Removed."); setConfirmId(null); } catch (e) {} };
+  const remove = (id) => {
+    const next = saved.filter((item) => item.id !== id);
+    const written = approvedStorage.savedCharts.write(next);
+    if (written.ok) { setSaved(next); flash(lang === "hi" ? "हटा दिया गया।" : "Removed."); setConfirmId(null); }
+    else flash(t("Couldn't remove this chart on this device.", "इस उपकरण पर यह कुंडली हट नहीं सकी।"));
+  };
   const askRemove = (id) => {
     if (confirmId === id) { remove(id); return; }
     setConfirmId(id);
@@ -117,7 +119,7 @@ function ChartVault({ snapshot, result, onLoad, C, card, lang = "en" }) {
         </div>
       ) : (
         <div style={{ marginTop: "0.625rem", fontSize: "var(--font-label)", color: C.muted, fontStyle: "italic" }}>
-          {store ? t("No saved charts yet — cast one and press Save current.", "अभी कोई सहेजी कुंडली नहीं — एक बनाएँ और \"वर्तमान सहेजें\" दबाएँ।") : t("Saving isn't available in this preview. Export and Share still work here.", "इस प्रीव्यू में सहेजना उपलब्ध नहीं। निर्यात और साझा फिर भी काम करते हैं।")}
+          {t("No saved charts yet — cast one and press Save current.", "अभी कोई सहेजी कुंडली नहीं — एक बनाएँ और \"वर्तमान सहेजें\" दबाएँ।")}
         </div>
       )}
 

@@ -54,7 +54,7 @@ function SouthChart({ title, ascSign, planets = [], showDeg, lagnaLabel = "LAGNA
         {/* centre label (reference point; matches the North chart's lagnaLabel) */}
         <text x="200" y="205" textAnchor="middle" fontSize="13" fill={gold} fontFamily="var(--font-display-family)" letterSpacing="0.12em">{lagnaLabel}</text>
       </svg>
-      <div style={{ fontSize: 11.5, letterSpacing: "0.18em", color: muted, marginTop: 8, textTransform: "uppercase", overflowWrap: "anywhere", padding: "0 8px" }}>{title}</div>
+      <div style={{ fontSize: 11.5, letterSpacing: "0.18em", color: muted, marginTop: 8, textTransform: "uppercase", overflowWrap: "break-word", padding: "0 8px" }}>{title}</div>
     </div>
   );
 }

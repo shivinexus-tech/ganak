@@ -158,6 +158,10 @@ export default function KundliApp() {
         tbody tr:last-child td { border-bottom: none; }
         tbody tr:hover td { background: var(--surface-hover); }
         th { font-size: var(--font-label); letter-spacing: var(--label-letter-spacing); text-transform: uppercase; color: var(--muted); font-weight: 400; }
+        @media (max-width: 40rem) {
+          .utility-header { margin-bottom: var(--space-3) !important; justify-content: center !important; }
+          .comfort-preset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        }
 
         /* Print / Save-as-PDF: hide interactive chrome, show the report cleanly. */
         .print-only { display: none; }
@@ -179,7 +183,7 @@ export default function KundliApp() {
       `}</style>
 
       <div style={{ maxWidth: "47.5rem", margin: "0 auto", padding: `${T.s8} ${T.s5} 5rem` }}>
-        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", flexWrap: "wrap", gap: T.s2, marginBottom: `calc(-1 * ${T.s6})`, position: "relative", zIndex: 2 }}>
+        <div className="utility-header" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", flexWrap: "wrap", gap: T.s2, marginBottom: `calc(-1 * ${T.s6})`, position: "relative", zIndex: 2 }}>
           <span style={{ fontSize: T.fMicro, color: C.muted, letterSpacing: ".08em" }}>भाषा · Language</span>
           <span style={{ display: "inline-flex", border: `0.0625rem solid ${C.line}`, borderRadius: T.rPill, overflow: "hidden", background: C.panel }}>
             {[["hi", "हिन्दी"], ["en", "English"]].map(([v, l]) => (

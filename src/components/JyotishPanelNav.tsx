@@ -61,7 +61,7 @@ const JYOTISH_GROUPS = [
 // link that scrolls to nothing — a dead-end is worse than a missing entry.
 const TECHNICAL_ANCHORS = new Set(["#shadbala", "#av"]);
 
-function JyotishPanelNav({ lang, C, showTechnical = true }) {
+function JyotishPanelNav({ lang, C, showTechnical = true, activeGroup = "kundli", onSelectGroup = () => {} }) {
   const hi = lang === "hi";
   const showReading = SIGN_TRAITS.every((entry) => entry.status === "owner-verified");
   return (
@@ -93,6 +93,8 @@ function JyotishPanelNav({ lang, C, showTechnical = true }) {
         {JYOTISH_GROUPS.map((group) => (
           <details key={group.key} style={{ flex: "0 0 auto", position: "relative" }}>
             <summary
+              aria-current={activeGroup === group.key ? "page" : undefined}
+              onClick={() => onSelectGroup(group.key)}
               style={{
                 minHeight: T.ctrlH,
                 display: "flex",
@@ -100,7 +102,7 @@ function JyotishPanelNav({ lang, C, showTechnical = true }) {
                 padding: `0 ${T.s4}`,
                 border: `0.0625rem solid ${C.line}`,
                 borderRadius: T.rMd,
-                background: C.panel,
+                background: activeGroup === group.key ? C.accentSoft : C.panel,
                 color: C.gold,
                 cursor: "pointer",
                 fontFamily: T.serif,

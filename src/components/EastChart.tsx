@@ -64,7 +64,7 @@ function EastChart({ title, ascSign, planets = [], showDeg, lagnaLabel = "LAGNA"
         {/* centre reference label sits in the tiny gap around O; keep it subtle */}
         <text x="200" y="200" textAnchor="middle" fontSize="8.5" fill={gold} fontFamily="var(--font-display-family)" letterSpacing="0.08em" opacity="0.9">{lagnaLabel}</text>
       </svg>
-      <div style={{ fontSize: 11.5, letterSpacing: "0.18em", color: muted, marginTop: 8, textTransform: "uppercase", overflowWrap: "anywhere", padding: "0 8px" }}>{title}</div>
+      <div style={{ fontSize: 11.5, letterSpacing: "0.18em", color: muted, marginTop: 8, textTransform: "uppercase", overflowWrap: "break-word", padding: "0 8px" }}>{title}</div>
     </div>
   );
 }

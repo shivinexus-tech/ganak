@@ -118,7 +118,7 @@ function PresetCard({ id, active, lang, onChoose }: { id: "simple-large" | "bala
   return (
     <button type="button" className="comfort-focus" aria-pressed={active} onClick={onChoose} style={{ minHeight: "7.5rem", minWidth: 0, overflow: "hidden", display: "grid", alignContent: "space-between", gap: "0.5rem", textAlign: "left", padding: "0.75rem", borderRadius: T.rMd, border: `0.125rem solid ${active ? "var(--accent)" : "var(--line)"}`, background: "var(--surface-active)", color: "var(--ink)", cursor: "pointer" }}>
       <span aria-hidden="true" style={{ fontFamily: T.serif, fontSize: id === "simple-large" ? "1.75rem" : id === "detailed" ? "1.05rem" : "1.35rem", color: "var(--sacred, var(--accent))" }}>{copy.icon}</span>
-      <span style={{ minWidth: 0, overflowWrap: "anywhere" }}><strong style={{ display: "block", overflowWrap: "anywhere" }}>{lang === "hi" ? copy.hi : copy.en}</strong><small style={{ color: "var(--muted)", overflowWrap: "anywhere" }}>{lang === "hi" ? copy.hintHi : copy.hintEn}</small></span>
+      <span style={{ minWidth: 0, overflowWrap: "break-word" }}><strong style={{ display: "block", overflowWrap: "break-word" }}>{lang === "hi" ? copy.hi : copy.en}</strong><small style={{ color: "var(--muted)", overflowWrap: "break-word" }}>{lang === "hi" ? copy.hintHi : copy.hintEn}</small></span>
     </button>
   );
 }
@@ -173,15 +173,15 @@ export default function PersonalizeScreen({ lang, C, place, onPlace, onLanguage,
   return (
     <main aria-labelledby="personalize-title" style={{ display: "grid", gap: T.s3 }}>
       {parentSetup && <ParentSetup lang={lang} onClose={() => setParentSetup(false)} onLanguage={onLanguage} />}
-      <div style={{ display: "flex", alignItems: "center", gap: T.s2 }}>
+      <div style={{ display: "grid", gap: T.s2 }}>
         <button type="button" className="comfort-control comfort-focus" onClick={onBack} style={{ border: "0.0625rem solid var(--line)", background: "var(--surface-active)", color: "var(--ink)", padding: `0 ${T.s3}`, cursor: "pointer" }}>← {hi ? "वापस" : "Back"}</button>
-        <div style={{ flex: 1 }} ref={screenTitleRef} tabIndex={-1} id="personalize-title"><SectionHeader hi="आपका गणक" en="PERSONALIZE GANAK" lang={lang} /><p style={{ margin: "0.2rem 0 0", color: "var(--muted)", fontSize: T.fSmall }}>{hi ? "जो आपके लिए उपयोगी है, वही आगे रहे।" : "Keep what matters to you close at hand."}</p></div>
+        <div ref={screenTitleRef} tabIndex={-1} id="personalize-title"><SectionHeader hi="आपका गणक" en="PERSONALIZE GANAK" lang={lang} /><p style={{ margin: "0.2rem 0 0", color: "var(--muted)", fontSize: T.fSmall }}>{hi ? "जो आपके लिए उपयोगी है, वही आगे रहे।" : "Keep what matters to you close at hand."}</p></div>
       </div>
 
       <details open style={sectionStyle}>
         <summary className="comfort-focus" style={summaryStyle}><span>👓 {hi ? "रूप और आराम" : "Appearance & comfort"}</span><span aria-hidden="true">⌄</span></summary>
         <div style={{ display: "grid", gap: T.s4, padding: `0 ${T.s4} ${T.s4}` }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: T.s2 }}>
+          <div className="comfort-preset-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: T.s2 }}>
             {(["simple-large", "balanced", "detailed"] as const).map((id) => <PresetCard key={id} id={id} active={preferences.preset === id} lang={lang} onChoose={() => applyPreset(id)} />)}
           </div>
           <RangeRow label={hi ? "आकार और खुलापन" : "Size & room"} minLabel={hi ? "सघन" : "Compact"} maxLabel={hi ? "आरामदायक" : "Comfort"} value={comfortLevel} min={0} max={4} onChange={(index) => updatePreferences({ ...COMFORT_LEVELS[index], preset: "custom" })} output={`${Math.round(preferences.scalePercent)}%`} />
@@ -197,7 +197,7 @@ export default function PersonalizeScreen({ lang, C, place, onPlace, onLanguage,
         <div style={{ display: "grid", gap: T.s3, padding: `0 ${T.s4} ${T.s4}` }}>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: T.fSmall }}>{hi ? "चुने हुए पर्व और स्मरण इस डिवाइस पर याद रहते हैं—बाकी कभी छिपते नहीं।" : "Followed observances are remembered on this device; nothing else is hidden."}</p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: T.s2 }}>
-            {FOLLOW_CHOICES.map((choice) => { const active = preferences.following.includes(choice.key); return <button key={choice.key} type="button" className="comfort-control comfort-focus" aria-pressed={active} onClick={() => toggleFollow(choice.key)} style={{ display: "flex", alignItems: "center", gap: T.s2, padding: `0 ${T.s3}`, border: `0.0625rem solid ${active ? "var(--accent)" : "var(--line)"}`, background: active ? "color-mix(in srgb, var(--accent), var(--surface) 91%)" : "var(--surface-active)", color: "var(--ink)", cursor: "pointer", textAlign: "left" }}><span aria-hidden="true">{choice.icon}</span><span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere" }}>{hi ? choice.hi : choice.en}</span><span aria-hidden="true" style={{ color: active ? "var(--accent)" : "var(--muted)" }}>{active ? "★" : "☆"}</span></button>; })}
+            {FOLLOW_CHOICES.map((choice) => { const active = preferences.following.includes(choice.key); return <button key={choice.key} type="button" className="comfort-control comfort-focus" aria-pressed={active} onClick={() => toggleFollow(choice.key)} style={{ display: "flex", alignItems: "center", gap: T.s2, padding: `0 ${T.s3}`, border: `0.0625rem solid ${active ? "var(--accent)" : "var(--line)"}`, background: active ? "color-mix(in srgb, var(--accent), var(--surface) 91%)" : "var(--surface-active)", color: "var(--ink)", cursor: "pointer", textAlign: "left" }}><span aria-hidden="true">{choice.icon}</span><span style={{ flex: 1, minWidth: 0, overflowWrap: "break-word" }}>{hi ? choice.hi : choice.en}</span><span aria-hidden="true" style={{ color: active ? "var(--accent)" : "var(--muted)" }}>{active ? "★" : "☆"}</span></button>; })}
           </div>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: T.fMicro }}>{hi ? "यह धार्मिक पसंद संवेदनशील है। यह इसी डिवाइस पर रहती है और अलग स्पष्ट अनुमति के बिना साझा या विश्लेषित नहीं होती।" : "Religious preferences are sensitive. They remain on this device and are never synced or analyzed without separate explicit consent."}</p>
         </div>

@@ -207,8 +207,8 @@ export function DataRow({
   const body = (
     <>
       <span style={{ display: "grid", gap: "0.125rem", minWidth: 0, flex: "1 1 9rem" }}>
-        <span style={{ color: "var(--muted)", fontSize: "var(--font-small)", overflowWrap: "anywhere" }}>{label}</span>
-        {hint && <span style={{ color: "var(--muted)", fontSize: "var(--font-micro)", overflowWrap: "anywhere" }}>{hint}</span>}
+        <span style={{ color: "var(--muted)", fontSize: "var(--font-small)", overflowWrap: "break-word" }}>{label}</span>
+        {hint && <span style={{ color: "var(--muted)", fontSize: "var(--font-micro)", overflowWrap: "break-word" }}>{hint}</span>}
       </span>
       {badge}
       {value != null && (
@@ -216,7 +216,7 @@ export function DataRow({
           style={{
             color: toneInk(tone), fontSize: "var(--font-body)", fontWeight: 600,
             fontVariantNumeric: "tabular-nums", textAlign: "right",
-            flex: "0 1 auto", minWidth: 0, overflowWrap: "anywhere",
+            flex: "0 1 auto", minWidth: 0, overflowWrap: "break-word",
           }}
         >
           {value}

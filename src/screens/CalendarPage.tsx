@@ -90,7 +90,7 @@ function CalendarPage({ view, place, lang, onBack, C, card }) {
         style={{ display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.625rem 0.25rem", borderTop: border, textDecoration: "none", color: "inherit" }}
       >
         {dot(it)}
-        <span style={{ flex: 1, minWidth: 0, fontFamily: T.serif, fontSize: T.fBody, color: C.ivory, overflowWrap: "anywhere" }}>{labelOf(it)}</span>
+        <span style={{ flex: 1, minWidth: 0, fontFamily: T.serif, fontSize: T.fBody, color: C.ivory, overflowWrap: "break-word" }}>{labelOf(it)}</span>
         {dateSpan(it)}
         <span aria-hidden="true" style={{ flexShrink: 0, color: C.muted, fontSize: T.fBody }}>›</span>
       </a>

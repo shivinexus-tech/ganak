@@ -49,9 +49,9 @@ export default function ChartScreen({ C, card, lang }) {
   // every caution stay visible at all three depths.
   const { showPlainHelp, showExpert, showTechnical } = useDepth();
   const hi = lang === "hi";
-  const [form, setForm] = useState({ name: "", date: "1995-08-15", time: "06:30" });
-  const [place, setPlace] = useState({ label: "New Delhi, India", lat: 28.61, lon: 77.21, zone: "Asia/Kolkata" });
-  const [query, setQuery] = useState("New Delhi, India");
+  const [form, setForm] = useState({ name: "", date: "", time: "" });
+  const [place, setPlace] = useState(null);
+  const [query, setQuery] = useState("");
   const [sugs, setSugs] = useState([]);
   const [searching, setSearching] = useState(false);
   const [tzOverride, setTzOverride] = useState("");
@@ -64,6 +64,31 @@ export default function ChartScreen({ C, card, lang }) {
   const [chartStyle, setChartStyle] = useState(() => { const s = urlPrefGet("cstyle"); return s === "south" || s === "east" ? s : "north"; });
   const chooseStyle = (v) => { setChartStyle(v); urlPrefSet("cstyle", v); };
   const [err, setErr] = useState("");
+  const [casting, setCasting] = useState(false);
+  const [activePanel, setActivePanel] = useState("kundli");
+  const resultsRef = React.useRef(null);
+
+  useEffect(() => {
+    if (!result) return;
+    requestAnimationFrame(() => document.getElementById("summary")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }, [result]);
+
+  useEffect(() => {
+    const root = resultsRef.current;
+    if (!root) return;
+    const groupAt = {
+      summary: "kundli", reading: "kundli", chart: "kundli", yogas: "kundli", planets: "kundli",
+      karakas: "kundli", special: "kundli", chalit: "kundli", av: "kundli", arudha: "kundli",
+      doshas: "kundli", "birth-panchang": "kundli",
+      kp: "tools", ksig: "tools", shadbala: "tools", rectify: "tools",
+      bnn: "dashas", bhrigu: "dashas", dasha: "dashas", marriage: "dashas",
+    };
+    let group = null;
+    Array.from(root.children).forEach((child) => {
+      if (child.id && groupAt[child.id]) group = groupAt[child.id];
+      child.hidden = Boolean(group && group !== activePanel);
+    });
+  }, [activePanel, result, showTechnical, showPlainHelp, showExpert]);
 
   // Vimshottari drill-down: which sub-periods are expanded (keys "level:startMs").
   // Auto-opens the running antar/pratyantar/sookshma chain on each new cast.
@@ -136,7 +161,6 @@ export default function ChartScreen({ C, card, lang }) {
       const tz = c.tzOverride !== "" && c.tzOverride != null ? parseFloat(c.tzOverride) : zoneOffset(c.place.zone, y, m, day);
       setResult(computeKundli({ y, m, day, hh, mi, tz, lat: c.place.lat, lon: c.place.lon, ayanamsa: c.ayanamsa || "lahiri" }));
       setChartContext({ form: { ...c.form }, place: { ...c.place }, ayanamsa: c.ayanamsa || "lahiri" });
-      setTimeout(() => { const el = document.getElementById("summary"); if (el) el.scrollIntoView({ behavior: "smooth" }); }, 150);
     } catch (e) { setErr(lang === "hi" ? "यह सहेजी हुई कुंडली नहीं खुल सकी — शायद यह ख़राब है। कोई और सहेजी कुंडली आज़माएँ या विवरण फिर से भरें।" : "This saved chart couldn't be loaded — it may be corrupted. Try another saved chart, or re-enter the details."); }
   };
 
@@ -158,9 +182,18 @@ export default function ChartScreen({ C, card, lang }) {
     }
     const tz = tzOverride !== "" ? parseFloat(tzOverride) : zoneOffset(effPlace.zone, y, m, day);
     if (tz === null || isNaN(tz)) { setErr(lang === "hi" ? "इस स्थान का समय-क्षेत्र नहीं मिला — कृपया नीचे UTC ऑफ़सेट स्वयं भरें।" : "Couldn't resolve the timezone for this place — enter the UTC offset manually below."); return; }
-    setResult(computeKundli({ y, m, day, hh, mi, tz, lat: effPlace.lat, lon: effPlace.lon, ayanamsa }));
-    setChartContext({ form: { ...form }, place: { ...effPlace }, ayanamsa });
-    setTimeout(() => { const el = document.getElementById("summary"); if (el) el.scrollIntoView({ behavior: "smooth" }); }, 150);
+    setCasting(true);
+    setActivePanel("kundli");
+    requestAnimationFrame(() => {
+      try {
+        setResult(computeKundli({ y, m, day, hh, mi, tz, lat: effPlace.lat, lon: effPlace.lon, ayanamsa }));
+        setChartContext({ form: { ...form }, place: { ...effPlace }, ayanamsa });
+      } catch {
+        setErr(lang === "hi" ? "कुंडली नहीं बन सकी। विवरण जाँचकर फिर प्रयास करें।" : "The chart couldn't be cast. Check the details and try again.");
+      } finally {
+        setCasting(false);
+      }
+    });
   };
 
   // Changing the ayanamsa after a chart is cast recomputes it live from the same
@@ -228,7 +261,7 @@ export default function ChartScreen({ C, card, lang }) {
     <>
       {r && (
         <Card density="compact" tone="sunken" elevated={false} style={{ padding: 0, marginBottom: T.s3 }}>
-          <JyotishPanelNav lang={lang} C={C} showTechnical={showTechnical} />
+          <JyotishPanelNav lang={lang} C={C} showTechnical={showTechnical} activeGroup={activePanel} onSelectGroup={setActivePanel} />
         </Card>
       )}
           <>
@@ -316,10 +349,15 @@ export default function ChartScreen({ C, card, lang }) {
           </div>
           <button
             onClick={generate}
+            disabled={casting}
+            aria-describedby="cast-status"
             className="castBtn" style={{ marginTop: "1.125rem", width: "100%", padding: "0.875rem 0", background: `linear-gradient(180deg, var(--accent), var(--accent-strong) 55%, var(--accent))`, color: "var(--on-accent)", border: "0.0625rem solid var(--gold)", borderRadius: "0.5625rem", fontFamily: "var(--font-display-family)", fontWeight: 700, fontSize: "var(--font-title)", letterSpacing: "0.07em", cursor: "pointer", boxShadow: "0 6px 18px var(--accent-soft)" }}
           >
-            {lang === "hi" ? "कुंडली बनाएँ" : "Cast the chart"}
+            {casting ? (lang === "hi" ? "कुंडली बन रही है…" : "Casting your chart…") : (lang === "hi" ? "कुंडली बनाएँ" : "Cast the chart")}
           </button>
+          <div id="cast-status" role="status" aria-live="polite" style={{ minHeight: "1.4em", marginTop: T.s2, color: casting ? C.gold : C.muted, fontSize: T.fSmall, textAlign: "center" }}>
+            {casting ? (lang === "hi" ? "ग्रहों की स्थिति निकाली जा रही है।" : "Calculating planetary positions…") : result ? (lang === "hi" ? "कुंडली तैयार है। जन्म विवरण पर ले जाया गया।" : "Chart ready. Moved to Birth summary.") : ""}
+          </div>
           <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "0.625rem 0 0", lineHeight: 1.5 }}>
             {lang === "hi"
               ? "UTC ऑफ़सेट जन्म स्थान और तिथि से स्वतः निकाला जाता है, ऐतिहासिक डेलाइट सेविंग सहित। सूर्य और चन्द्र आर्क-सेकंड परिशुद्धता वाले एफ़ेमेरिस (Meeus/VSOP) से, और पाँच तारा-ग्रह VSOP87 से (प्रकाश-काल, वार्षिक विपथन व नमन सहित) — लगभग आर्क-सेकंड तक सटीक स्थितियाँ।"
@@ -327,17 +365,17 @@ export default function ChartScreen({ C, card, lang }) {
           </p>
         </section>
 
-        <div id="vault" style={{ scrollMarginTop: 72 }}>
+        {activePanel === "vault" && <div id="vault" style={{ scrollMarginTop: 72 }}>
           <ChartVault snapshot={{ form, place, tzOverride, ayanamsa }} result={result} onLoad={loadChart} C={C} card={card} lang={lang} />
-        </div>
+        </div>}
 
         {/* kundali matching */}
-        <Eyebrow id="match" deva="कुण्डली मिलान" en="Kundali matching · Guna Milan" />
-        <MatchMaker C={C} card={card} computeKundli={computeKundli} lang={lang} />
+        {activePanel === "matching" && <><Eyebrow id="match" deva="कुण्डली मिलान" en="Kundali matching · Guna Milan" />
+        <MatchMaker C={C} card={card} computeKundli={computeKundli} lang={lang} /></>}
           </>
 
-      {r && (
-          <>
+      {r && activePanel !== "matching" && activePanel !== "vault" && (
+          <div ref={resultsRef}>
             {/* Save-as-PDF (print). Hidden in the printed output itself. */}
             <div className="no-print" style={{ display: "flex", justifyContent: "flex-end", marginBottom: "0.375rem" }}>
               <button onClick={() => window.print()} style={{ display: "inline-flex", alignItems: "center", gap: "0.4375rem", padding: "0.5rem 1rem", borderRadius: "0.5625rem", border: `0.0625rem solid ${C.gold}`, background: "var(--surface-sunken)", color: C.gold, cursor: "pointer", fontFamily: "var(--font-body-family)", fontSize: "var(--font-small)" }}>
@@ -372,7 +410,7 @@ export default function ChartScreen({ C, card, lang }) {
               ].map(([k, v]) => (
                 <div key={k} style={{ ...card, padding: "0.875rem 1rem" }}>
                   <div style={{ ...T.label, color: C.muted, marginBottom: "0.375rem" }}>{k}</div>
-                  <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-title)", color: C.gold, overflowWrap: "anywhere" }}>{v}</div>
+                  <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-title)", color: C.gold, overflowWrap: "break-word" }}>{v}</div>
                 </div>
               ))}
             </div>
@@ -496,7 +534,7 @@ export default function ChartScreen({ C, card, lang }) {
                   <div key={p.n} style={{ background: "var(--surface-raised)", border: `0.0625rem solid ${C.line}`, borderRadius: "0.625rem", padding: "0.625rem 0.75rem" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.4375rem", marginBottom: "0.5rem" }}>
                       <span style={{ width: "0.4375rem", height: "0.4375rem", borderRadius: "0.1875rem", background: p.color || C.gold, flexShrink: 0 }} />
-                      <span style={{ fontSize: "var(--font-small)", fontWeight: 600, color: C.ivory, flex: 1, overflowWrap: "anywhere" }}>
+                      <span style={{ fontSize: "var(--font-small)", fontWeight: 600, color: C.ivory, flex: 1, overflowWrap: "break-word" }}>
                         {p.n}{p.retro && <span style={{ color: C.sindoor, marginLeft: "0.125rem" }}>℞</span>}
                       </span>
                     </div>
@@ -1059,7 +1097,7 @@ export default function ChartScreen({ C, card, lang }) {
             })()}
 
             {/* panchang */}
-            <Eyebrow deva="पञ्चाङ्ग" en="Birth panchang" />
+            <Eyebrow id="birth-panchang" deva="पञ्चाङ्ग" en="Birth panchang" />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.75rem" }}>
               {[
                 [hi ? "वार" : "Vara", r.panchang.weekday],
@@ -1075,7 +1113,7 @@ export default function ChartScreen({ C, card, lang }) {
               ))}
             </div>
 
-          </>
+          </div>
       )}
     </>
   );

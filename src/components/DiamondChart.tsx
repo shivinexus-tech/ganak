@@ -87,7 +87,7 @@ function DiamondChart({ title, ascSign, houseOfPlanet, showDeg, lagnaLabel = "LA
           );
         })}
       </svg>
-      <div style={{ fontSize: 11.5, letterSpacing: "0.18em", color: muted, marginTop: 8, textTransform: "uppercase", overflowWrap: "anywhere", padding: "0 8px" }}>{title}</div>
+      <div style={{ fontSize: 11.5, letterSpacing: "0.18em", color: muted, marginTop: 8, textTransform: "uppercase", overflowWrap: "break-word", padding: "0 8px" }}>{title}</div>
     </div>
   );
 }
