@@ -1,144 +1,78 @@
-/*
- * Standalone visual prototype. It consumes the production semantic token contract
- * and its comfort scale/density mechanics, but does not modify the live theme.
- */
+/* Fidelity prototype: the initial visual is the owner-approved Figma frame.
+ * No CSS interpretation of its art, icons, typography, colour or spatial system. */
 
 * { box-sizing: border-box; }
 
-.today-prototype {
-  --prototype-navy: color-mix(in srgb, var(--ink) 86%, var(--good));
-  --prototype-cream: var(--bg-active);
-  --prototype-gold: var(--gold);
-  --prototype-rose: var(--bad);
-  --prototype-sage: var(--good);
+.figma-faithful-prototype {
   min-block-size: 100dvh;
-  padding: var(--space-5);
+  margin: 0;
   background: var(--surface-sunken);
-  color: var(--ink);
-  font-family: var(--font-body-family);
 }
 
-.prototype-phone {
+.figma-faithful-phone {
   position: relative;
-  isolation: isolate;
-  inline-size: min(100%, 25.875rem);
-  min-block-size: 100dvh;
+  inline-size: min(100%, 25.375rem);
   margin-inline: auto;
-  overflow: hidden;
-  border: 0.125rem solid var(--prototype-gold);
-  border-radius: 1.375rem;
-  background: var(--prototype-cream);
+  background: var(--surface-active);
   box-shadow: var(--elevation-3);
 }
 
-.prototype-phone::before,
-.prototype-phone::after {
-  position: absolute;
-  z-index: -1;
-  content: "";
-  inset-block: 0;
-  inline-size: 1.2rem;
-  opacity: 0.95;
-  background:
-    radial-gradient(circle at 50% 1.1rem, var(--prototype-rose) 0 0.17rem, transparent 0.19rem),
-    radial-gradient(ellipse at 50% 2.6rem, var(--prototype-sage) 0 0.22rem, transparent 0.24rem),
-    repeating-linear-gradient(45deg, var(--prototype-gold) 0 0.06rem, transparent 0.07rem 0.27rem),
-    color-mix(in srgb, var(--accent-soft), var(--surface-active) 65%);
-  background-size: 1.2rem 3.8rem, 1.2rem 3.8rem, 0.5rem 0.5rem, auto;
-  border-inline: 0.0625rem solid var(--prototype-gold);
+.figma-faithful-artwork {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
 }
 
-.prototype-phone::before { inset-inline-start: 0; }
-.prototype-phone::after { inset-inline-end: 0; }
-
-.prototype-floral-rail {
+.figma-hotspot,
+.figma-hotspot-nav button {
   position: absolute;
   z-index: 1;
-  inset-block-start: 1rem;
-  display: grid;
-  gap: 6.25rem;
-  color: var(--prototype-rose);
-  font-size: 1.55rem;
-  line-height: 1;
-  text-shadow: 0.0625rem 0.0625rem 0 var(--surface);
-  pointer-events: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
 }
-.prototype-floral-rail span:nth-child(even) { color: var(--prototype-sage); font-size: 1.1rem; }
-.prototype-floral-rail span:nth-child(3) { color: var(--prototype-gold); }
-.prototype-floral-rail--left { inset-inline-start: 0.15rem; }
-.prototype-floral-rail--right { inset-inline-end: 0.15rem; }
 
-.prototype-header { padding: var(--space-5) 1.85rem var(--space-3); text-align: center; }
-.prototype-topline { display: flex; align-items: center; justify-content: space-between; min-block-size: var(--control-height); }
-.prototype-kicker { margin: 0; color: var(--muted); font-size: var(--font-label); font-weight: 600; letter-spacing: var(--label-letter-spacing); text-transform: var(--label-transform); }
-.prototype-language { min-inline-size: var(--control-height); min-block-size: var(--control-height); border: 0.0625rem solid var(--line); border-radius: var(--radius-pill); color: var(--accent); font-family: var(--font-body-family); font-weight: 600; cursor: pointer; }
-.prototype-header h1 { margin: var(--space-1) 0 0; color: var(--prototype-sage); font-family: var(--font-display-family); font-size: clamp(2rem, 8vw, 2.85rem); font-weight: 500; line-height: 1; }
-.prototype-ornament { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-3) auto var(--space-3); color: var(--prototype-gold); }
-.prototype-ornament span { block-size: 0.0625rem; flex: 1; background: var(--prototype-gold); }
-.prototype-ornament b { font-size: 1.1rem; line-height: 1; }
-.prototype-place-date { display: flex; align-items: center; justify-content: center; gap: var(--space-2); }
-.prototype-field { display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; min-block-size: var(--control-height); padding: 0.3rem 0; border: 0; color: var(--ink); font: inherit; font-size: var(--font-small); font-weight: 600; cursor: pointer; }
-.prototype-field .prototype-icon { inline-size: 1rem; block-size: 1rem; color: var(--accent); }
-.prototype-field .prototype-icon:last-child { inline-size: 0.75rem; }
-.prototype-separator { inline-size: 0.0625rem; block-size: 1.35rem; background: var(--line); }
+.figma-hotspot:focus-visible,
+.figma-hotspot-nav button:focus-visible {
+  outline: 0.1875rem solid var(--focus);
+  outline-offset: -0.1875rem;
+}
 
-.prototype-content { padding: 0 1.85rem 5.9rem; }
-.prototype-festival-copy { text-align: center; }
-.prototype-lunar-name { margin: 0; color: var(--muted); font-size: var(--font-small); font-weight: 600; }
-.prototype-festival-copy h2 { margin: 0.1rem 0 var(--space-1); color: var(--prototype-navy); font-family: var(--font-display-family); font-size: clamp(1.55rem, 7vw, 2rem); font-weight: 600; line-height: 1.12; }
-.prototype-festival-copy p { max-inline-size: 21rem; margin: 0 auto; color: var(--muted); font-size: var(--font-body); line-height: 1.48; }
-.prototype-festival-copy .prototype-expanded-copy { margin-block-start: var(--space-2); color: var(--ink); }
-.prototype-text-action { min-block-size: var(--control-height); margin-block-start: 0.1rem; padding: 0.25rem var(--space-2); border: 0; color: var(--accent); font: inherit; font-size: var(--font-body); font-weight: 600; cursor: pointer; }
+.figma-hotspot--place { inset: 11.3% auto auto 18%; inline-size: 28%; block-size: 3.4%; }
+.figma-hotspot--date { inset: 11.3% 18% auto auto; inline-size: 31%; block-size: 3.4%; }
+.figma-hotspot--read-more { inset: 24.5% 33% auto; inline-size: 34%; block-size: 3.2%; }
+.figma-hotspot--remind { inset: 88.5% 31% auto; inline-size: 38%; block-size: 3.6%; }
 
-.prototype-hero-arch { position: relative; margin: var(--space-2) -0.7rem 0; padding: 0.16rem; overflow: hidden; border-radius: 50% 50% 1.2rem 1.2rem / 15% 15% 1.2rem 1.2rem; background: var(--prototype-gold); }
-.prototype-hero-scallop { position: relative; overflow: hidden; aspect-ratio: 1.16 / 1; border-radius: inherit; background: var(--prototype-navy); }
-.prototype-hero-scallop img { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; object-position: 50% 47%; filter: saturate(1.06) contrast(1.02); }
-.prototype-hero-glow { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, transparent 62%, color-mix(in srgb, var(--prototype-navy), transparent 56%)); }
+.figma-hotspot-nav { position: absolute; z-index: 1; inset: 92.6% 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); block-size: 7.4%; }
+.figma-hotspot-nav button { position: relative; min-block-size: 100%; }
 
-.prototype-timing-panel { margin: -0.35rem -0.35rem 0; padding: var(--space-3) var(--space-3) var(--space-4); border: 0.1rem solid var(--prototype-gold); border-radius: var(--radius-lg); background: var(--prototype-navy); color: var(--surface); box-shadow: var(--elevation-2); }
-.prototype-timing-panel h2 { margin: 0 0 var(--space-2); color: var(--surface); font-family: var(--font-display-family); font-size: var(--font-heading); font-weight: 500; text-align: center; }
-.prototype-timing-grid { display: grid; grid-template-columns: 1fr 1fr; }
-.prototype-timing-grid > div { padding-inline: var(--space-2); }
-.prototype-timing-grid > div + div { border-inline-start: 0.0625rem solid color-mix(in srgb, var(--prototype-gold), transparent 25%); }
-.prototype-timing-grid p { display: flex; align-items: center; gap: 0.3rem; margin: 0; color: var(--surface); font-size: var(--font-label); font-weight: 600; line-height: 1.2; }
-.prototype-timing-grid .prototype-icon { inline-size: 1rem; block-size: 1rem; color: var(--prototype-gold); flex: 0 0 auto; }
-.prototype-timing-grid strong { display: block; margin-block-start: 0.16rem; color: var(--surface); font-family: var(--font-display-family); font-size: var(--font-heading); font-weight: 600; white-space: nowrap; }
+.figma-prototype-notice {
+  position: fixed;
+  z-index: 2;
+  inset-inline: 50%;
+  inset-block-end: max(var(--space-4), env(safe-area-inset-bottom));
+  inline-size: min(calc(100% - 2rem), 22rem);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  transform: translateX(-50%);
+  border-radius: var(--radius-md);
+  background: var(--ink);
+  color: var(--surface);
+  font-size: var(--font-small);
+  text-align: center;
+  box-shadow: var(--elevation-2);
+}
 
-.prototype-panchang { margin-block-start: var(--space-4); padding: var(--space-3) var(--space-3) var(--space-2); border: 0.0625rem solid var(--prototype-gold); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--surface-active), var(--accent-soft) 12%); }
-.prototype-section-head { display: flex; align-items: center; justify-content: space-between; padding-block-end: var(--space-1); border-block-end: 0.0625rem solid var(--line); color: var(--accent); }
-.prototype-section-head h2 { margin: 0; font-family: var(--font-display-family); font-size: var(--font-heading); font-weight: 600; }
-.prototype-section-head span { color: var(--gold); }
-.prototype-panchang dl { margin: 0; }
-.prototype-panchang dl > div { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr); align-items: center; gap: var(--space-2); min-block-size: 2.55rem; border-block-end: 0.0625rem solid var(--line-soft); }
-.prototype-panchang dl > div:last-child { border-block-end: 0; }
-.prototype-panchang dt, .prototype-panchang dd { display: flex; align-items: center; gap: 0.35rem; margin: 0; font-size: var(--font-small); line-height: 1.2; }
-.prototype-panchang dt { color: var(--ink); font-weight: 600; }
-.prototype-panchang dd { justify-content: flex-end; color: var(--muted); text-align: end; }
-.prototype-panchang .prototype-icon { inline-size: 0.95rem; block-size: 0.95rem; color: var(--accent); flex: 0 0 auto; }
-.prototype-panchang dd .prototype-icon { inline-size: 0.75rem; color: var(--gold); }
+.figma-dialog-backdrop { position: fixed; z-index: 3; inset: 0; display: grid; align-items: end; background: color-mix(in srgb, var(--ink), transparent 48%); }
+.figma-dialog { inline-size: min(100%, 31rem); margin-inline: auto; padding: var(--space-4) var(--space-5) max(var(--space-5), env(safe-area-inset-bottom)); border-radius: 1.25rem 1.25rem 0 0; background: var(--surface-active); box-shadow: var(--elevation-3); }
+.figma-dialog-handle { inline-size: 2.5rem; block-size: 0.25rem; margin: 0 auto var(--space-3); border-radius: var(--radius-pill); background: var(--line); }
+.figma-dialog h2 { margin: 0 0 var(--space-3); font-family: var(--font-display-family); font-size: var(--font-heading); }
+.figma-dialog label:not(.figma-dialog-choice) { display: grid; gap: var(--space-1); color: var(--muted); font-size: var(--font-small); font-weight: 600; }
+.figma-dialog input:not([type="radio"]) { min-block-size: var(--control-height); padding-inline: var(--space-3); border: 0.0625rem solid var(--line); border-radius: var(--radius-md); font: inherit; }
+.figma-dialog-choice { display: flex; align-items: center; gap: var(--space-2); min-block-size: var(--control-height); }
+.figma-dialog p { margin: var(--space-2) 0 0; color: var(--muted); font-size: var(--font-small); }
+.figma-dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-block-start: var(--space-5); }
+.figma-dialog-actions button { min-block-size: var(--control-height); padding-inline: var(--space-4); border: 0.0625rem solid var(--line); border-radius: var(--radius-pill); font: inherit; font-weight: 600; cursor: pointer; }
+.figma-dialog-save { background: var(--ink); color: var(--surface); }
 
-.prototype-remind { display: flex; align-items: center; justify-content: center; gap: var(--space-2); min-block-size: var(--control-height); inline-size: min(100%, 15rem); margin: var(--space-4) auto 0; padding: var(--space-1) var(--space-4); border: 0.1rem solid var(--prototype-gold); border-radius: var(--radius-pill); background: var(--prototype-navy); color: var(--surface); font-family: var(--font-body-family); font-size: var(--font-body); font-weight: 600; cursor: pointer; }
-.prototype-remind .prototype-icon { inline-size: 1.05rem; color: var(--prototype-gold); }
-.prototype-remind.is-set { background: var(--good); }
-.prototype-notice { margin: var(--space-2) 0 0; color: var(--muted); font-size: var(--font-small); text-align: center; }
-
-.prototype-nav { position: absolute; z-index: 2; inset-inline: 0; inset-block-end: 0; display: grid; grid-template-columns: repeat(5, 1fr); min-block-size: 5.25rem; padding: var(--space-2) 1.05rem calc(var(--space-2) + env(safe-area-inset-bottom)); border-block-start: 0.1rem solid var(--prototype-gold); border-radius: 1.2rem 1.2rem 0 0; background: var(--prototype-navy); color: var(--surface); }
-.prototype-nav button { display: grid; place-items: center; align-content: center; gap: 0.2rem; min-block-size: var(--control-height); padding: 0.12rem; border: 0; color: var(--surface); font: inherit; font-size: 0.68rem; line-height: 1.1; cursor: pointer; }
-.prototype-nav .prototype-icon { inline-size: 1.42rem; block-size: 1.42rem; stroke-width: 1.65; }
-.prototype-nav button.is-active { border-block-start: 0.12rem solid var(--prototype-gold); color: var(--surface); }
-.prototype-nav button.is-active .prototype-icon { color: var(--prototype-gold); filter: drop-shadow(0 0.08rem 0.12rem color-mix(in srgb, var(--gold), transparent 60%)); }
-
-.prototype-dialog-backdrop { position: fixed; z-index: 10; inset: 0; display: grid; align-items: end; background: color-mix(in srgb, var(--ink), transparent 45%); }
-.prototype-dialog { inline-size: min(100%, 31rem); margin-inline: auto; padding: var(--space-4) var(--space-5) max(var(--space-5), env(safe-area-inset-bottom)); border: 0.0625rem solid var(--line); border-radius: 1.2rem 1.2rem 0 0; background: var(--surface-active); box-shadow: var(--elevation-3); }
-.prototype-dialog-handle { inline-size: 2.6rem; block-size: 0.25rem; margin: 0 auto var(--space-3); border-radius: var(--radius-pill); background: var(--line); }
-.prototype-dialog h2 { margin: 0 0 var(--space-3); color: var(--ink); font-family: var(--font-display-family); font-size: var(--font-heading); }
-.prototype-dialog label:not(.prototype-radio) { display: grid; gap: var(--space-1); color: var(--muted); font-size: var(--font-small); font-weight: 600; }
-.prototype-dialog input:not([type="radio"]) { min-block-size: var(--control-height); padding-inline: var(--space-3); border: 0.0625rem solid var(--line); border-radius: var(--radius-md); font: inherit; }
-.prototype-radio { display: flex; align-items: center; gap: var(--space-2); min-block-size: var(--control-height); color: var(--ink); font-size: var(--font-body); }
-.prototype-dialog p { margin: var(--space-2) 0 0; color: var(--muted); font-size: var(--font-small); }
-.prototype-dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-block-start: var(--space-5); }
-.prototype-dialog-actions button { min-block-size: var(--control-height); padding-inline: var(--space-4); border: 0.0625rem solid var(--line); border-radius: var(--radius-pill); font: inherit; font-weight: 600; cursor: pointer; }
-.prototype-dialog-actions .prototype-dialog-save { border-color: var(--prototype-navy); background: var(--prototype-navy); color: var(--surface); }
-
-@media (max-width: 28rem) { .today-prototype { padding: 0; } .prototype-phone { inline-size: 100%; border-radius: 0; border-inline: 0; } }
-@media (prefers-reduced-motion: no-preference) { .prototype-remind, .prototype-nav button, .prototype-text-action { transition: transform 160ms ease, background-color 160ms ease; } .prototype-remind:active, .prototype-nav button:active, .prototype-text-action:active { transform: scale(0.97); } }
+@media (max-width: 25.375rem) { .figma-faithful-phone { inline-size: 100%; } }
