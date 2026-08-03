@@ -7,7 +7,6 @@ import FestivalGuideScreen, { festivalGuideFromPath } from "./screens/FestivalGu
 import UtilityCalculatorScreen from "./screens/UtilityCalculatorScreen";
 import { utilityFromPath } from "./data/utility-calculators";
 import MedicalMuhuratScreen, { medicalMuhuratFromPath } from "./screens/MedicalMuhuratScreen";
-import PersonalMuhuratScreen, { personalMuhuratFromPath } from "./screens/PersonalMuhuratScreen";
 import FeedbackCard from "./components/FeedbackCard";
 import { applyRouteMetadata, routeMetadata } from "./metadata/route-metadata";
 import { privacyEvent } from "./telemetry/privacy-events";
@@ -25,10 +24,9 @@ import {
    GANAK — shell: nav, shared prefs/place, screen compose
    ============================================================ */
 
-function pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute = null, medicalRoute = null, muhuratRoute = null, personalRoute = null) {
+function pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute = null, medicalRoute = null, muhuratRoute = null) {
   const hi = lang === "hi";
   if (utilityRoute) return { eyebrow: hi ? "ज्योतिष कैलकुलेटर" : "ASTROLOGY CALCULATORS", detail: hi ? "स्पष्ट उत्तर · पारदर्शी पद्धति · स्थायी लिंक" : "Clear answers · transparent methods · permanent links" };
-  if (personalRoute) return { eyebrow: hi ? "वैयक्तिक मुहूर्त" : "PERSONALISED MUHURAT", detail: hi ? "जन्म-नक्षत्र अनुसार शुभ दिन · तारा एवं चन्द्र बल · वैकल्पिक" : "Days matched to your birth star · Tara & Chandra bala · optional" };
   if (medicalRoute) return { eyebrow: hi ? "चिकित्सा मुहूर्त" : "MEDICAL MUHURAT", detail: hi ? "सुरक्षा प्रथम · केवल लचीली तिथियाँ · उपचार में कभी विलम्ब नहीं" : "Safety first · flexible dates only · never delay care" };
   if (directFestivalGuide) {
     const hasFullGuide = Boolean(directFestivalGuide.vidhiKey);
@@ -102,19 +100,18 @@ export default function KundliApp() {
   const directFestivalGuide = festivalGuideFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const utilityRoute = utilityFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const medicalRoute = medicalMuhuratFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
-  const personalRoute = personalMuhuratFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const muhuratRoute = urlPrefGet("muhurat");
   // A /festival/ path that matches no guide used to render the home screen silently, so a
   // stale or mistyped shared link looked like it had worked. Say so instead.
   const unknownFestivalPath = typeof window !== "undefined"
     && /^\/festival\//.test(window.location.pathname)
     && !directFestivalGuide;
-  const hero = pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute, medicalRoute, muhuratRoute, personalRoute);
+  const hero = pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute, medicalRoute, muhuratRoute);
   useEffect(() => {
-    const meta=routeMetadata({lang,mode,festival:directFestivalGuide,utility:utilityRoute,medical:medicalRoute,muhurat:muhuratRoute,personal:personalRoute});
+    const meta=routeMetadata({lang,mode,festival:directFestivalGuide,utility:utilityRoute,medical:medicalRoute,muhurat:muhuratRoute});
     applyRouteMetadata({...meta,lang,path:typeof window!=="undefined"?window.location.pathname:"/"});
-    privacyEvent("page_view",{area:directFestivalGuide?"festival":utilityRoute?"calculator":medicalRoute?"medical-muhurat":personalRoute?"personal-muhurat":muhuratRoute?"muhurat":mode,language:lang});
-  },[lang,mode,directFestivalGuide,utilityRoute,medicalRoute,personalRoute,muhuratRoute]);
+    privacyEvent("page_view",{area:directFestivalGuide?"festival":utilityRoute?"calculator":medicalRoute?"medical-muhurat":muhuratRoute?"muhurat":mode,language:lang});
+  },[lang,mode,directFestivalGuide,utilityRoute,medicalRoute,muhuratRoute]);
 
   const DEFAULT_PLACE = { label: "New Delhi, India", lat: 28.61, lon: 77.21, zone: "Asia/Kolkata" };
   const placeFromUrl=()=>{const label=urlPrefGet("city"),lat=Number(urlPrefGet("lat")),lon=Number(urlPrefGet("lon")),zone=urlPrefGet("zone");return label&&zone&&Number.isFinite(lat)&&Math.abs(lat)<=90&&Number.isFinite(lon)&&Math.abs(lon)<=180?{label,lat,lon,zone}:null;};
@@ -206,7 +203,7 @@ export default function KundliApp() {
           </p>
         </header>
 
-        {!directFestivalGuide && !utilityRoute && !medicalRoute && !personalRoute && <div style={{ display: "flex", justifyContent: "center", marginBottom: T.s5 }}>
+        {!directFestivalGuide && !utilityRoute && !medicalRoute && <div style={{ display: "flex", justifyContent: "center", marginBottom: T.s5 }}>
           <div role="group" aria-label={lang === "hi" ? "मुख्य भाग चुनें" : "Choose section"} style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", background: C.soft, borderRadius: T.rMd, padding: "0.1875rem", border: `0.0625rem solid ${C.line}` }}>
             {[["daily", lang === "hi" ? "आज · पंचांग" : "Daily"], ["prashna", lang === "hi" ? "प्रश्न" : "Prashna"], ["chart", lang === "hi" ? "ज्योतिष" : "Jyotish"]].map(([mk, label]) => (
               // The unselected label is a real, actionable control, so it carries full ink
@@ -247,17 +244,16 @@ export default function KundliApp() {
 
         {medicalRoute && <MedicalMuhuratScreen lang={lang} C={C} card={card} place={panchEff} onPlace={setPanchPlace} />}
 
-        {personalRoute && <PersonalMuhuratScreen lang={lang} C={C} card={card} place={panchEff} onPlace={setPanchPlace} />}
 
-        {!directFestivalGuide && !utilityRoute && !medicalRoute && !personalRoute && mode === "prashna" && (
+        {!directFestivalGuide && !utilityRoute && !medicalRoute && mode === "prashna" && (
           <PrashnaScreen lat={panchEff?.lat} lon={panchEff?.lon} placeLabel={panchEff?.label} lang={lang} />
         )}
 
-        {!directFestivalGuide && !utilityRoute && !medicalRoute && !personalRoute && mode === "daily" && (
+        {!directFestivalGuide && !utilityRoute && !medicalRoute && mode === "daily" && (
           <DailyScreen C={C} card={card} lang={lang} place={panchEff} onPlace={setPanchPlace} />
         )}
 
-        {!directFestivalGuide && !utilityRoute && !medicalRoute && !personalRoute && mode === "chart" && (
+        {!directFestivalGuide && !utilityRoute && !medicalRoute && mode === "chart" && (
           <ChartScreen C={C} card={card} lang={lang} />
         )}
 

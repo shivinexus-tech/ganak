@@ -18,6 +18,13 @@ import { dayHoras, analyzeHora, horaResultText, HORA_GLYPH, HORA_COLOR, HORA_NAM
 import { computeLagnaPanchaka, panchakaRem, PANCHAKA_TYPE } from "../engine/panchaka";
 import { obsKind } from "../engine/festivals";
 import { festivalPathForKey } from "../data/festival-pages";
+import PlaceInput from "../components/PlaceInput";
+import { natalAnchors, applyPersonalisation } from "../engine/personal-muhurat";
+import {
+  PM_NATAL_SECTION, PM_NATAL_HINT, PM_NATAL_UNCONFIRMED, PM_BIRTH_LABELS,
+  PM_COUNT, PM_BADGE, PM_SET_ASIDE_REASON, PM_SPECIAL_NAMES, PM_SPECIAL_CAUTION_NOTE,
+  PM_SPECIAL_CHIP, PM_ANNOTATE_NOTE, PM_RESULT_NOTE, PM_YOUR_STAR, PM_RASHIS,
+} from "../data/personal-muhurat-ui";
 import { vaishnavaEkadashiDay } from "../engine/muhurat";
 import { VIM_LORDS } from "../engine/dasha";
 import { MUH_CATS, EVENTS, MUHURAT_GUIDANCE, SAMSKARA_INPUTS, PURCHASE_ACTIONS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS } from "../data/muhurat-ui";
@@ -97,6 +104,15 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   const initialAction=()=>{const cat=validMuhuratKey(urlPrefGet("muhurat")),spec=PURCHASE_ACTIONS[cat],value=urlPrefGet("maction");return spec?.options.some((x)=>x.value===value)?value:(spec?.options[0]?.value||"");};
   const [purchaseAction,setPurchaseAction]=useState(initialAction);
   const [ans, setAns] = useState(null);
+  /* Opt-in birth-star personalisation (P0-MUHURAT-FULL-PARITY). Overlay only: with no birth
+     details the finder behaves exactly as before, which is what "never silently mix natal
+     filtering into the general finder" requires. Birth details are never stored. */
+  const [pmOpen, setPmOpen] = useState(false);
+  const [pmDate, setPmDate] = useState("");
+  const [pmTime, setPmTime] = useState("12:00");
+  const [pmPlace, setPmPlace] = useState(null);
+  const [pmPlaceOk, setPmPlaceOk] = useState(false);
+  const pmReady = Boolean(pmDate && pmPlace && pmPlaceOk);
   const chooseMfCat=(key)=>{ const next=validMuhuratKey(key); setMfCat(next); setMfErr(null); if(next) { urlPrefPush("muhurat",next); const first=PURCHASE_ACTIONS[next]?.options[0]?.value || ""; setPurchaseAction(first); if(first) urlPrefPush("maction",first); } if(ans&&next) findDays(null,null,next); };
   useEffect(()=>{ const restore=()=>setMfCat(validMuhuratKey(urlPrefGet("muhurat"))); window.addEventListener("popstate",restore); return()=>window.removeEventListener("popstate",restore); },[]);
   const finderTopPanchaka = useMemo(() => { try { if (!ans || !ans.days) return null; const top = ans.days.filter((d) => d.valid)[0]; return top ? computeLagnaPanchaka(place, "lahiri", top.rise) : null; } catch (e) { return null; } }, [ans, place]);
@@ -117,7 +133,14 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       try {
         const dd = muhuratScanRange(place, "lahiri", from, to, cat);
         const chosenAction=PURCHASE_ACTIONS[cat] ? purchaseAction : "";
-        setAns({ category: cat, days: dd, from: fromIso || mfFrom, to: toIso || mfTo, profile: SAMSKARA_INPUTS[cat] ? { ...(samskaraProfiles[cat] || {}) } : null, action: chosenAction });
+        // Natal anchors only when the user has opted in with complete birth details.
+        let anchors = null;
+        if (pmReady) {
+          const [by, bm, bd] = pmDate.split("-").map(Number);
+          const [bhh, bmi] = (pmTime || "12:00").split(":").map(Number);
+          if (by) anchors = natalAnchors(pmPlace, "lahiri", { y: by, m: bm, day: bd, hh: bhh || 0, mi: bmi || 0 });
+        }
+        setAns({ category: cat, days: dd, from: fromIso || mfFrom, to: toIso || mfTo, profile: SAMSKARA_INPUTS[cat] ? { ...(samskaraProfiles[cat] || {}) } : null, action: chosenAction, anchors });
         privacyEvent("muhurat_search",{action:cat,language:lang,outcome:dd.some((d)=>d.valid)?"found":"none"});
       } catch (e) {
         if (typeof console !== "undefined") console.error("muhurat scan failed:", e);
@@ -614,6 +637,32 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
               <div style={{ gridColumn:"1 / -1",fontSize: "var(--font-label)",color:C.muted,lineHeight:1.45 }}>{lang === "hi" ? "ये विवरण संस्कार-सन्दर्भ स्पष्ट करते हैं; परिणाम सामान्य पंचांग और संस्कार-विशिष्ट लग्न-शुद्धि है, पूर्ण जन्म-कुण्डली मुहूर्त नहीं।" : "These details clarify the ceremony context; results use general Panchang plus ceremony-specific lagna screening, not a full personalized natal election."}</div>
             </div>;
           })()}
+          {/* Opt-in birth-star personalisation. Collapsed by default so the general finder is
+              untouched for anyone who doesn't want it. */}
+          <details open={pmOpen} onToggle={(e) => setPmOpen(e.currentTarget.open)}
+            style={{ margin: "0.625rem 0", padding: "0.6875rem 0.75rem", borderRadius: T.rMd, background: "var(--surface-raised)", border: `0.0625rem solid ${C.line}` }}>
+            <summary style={{ cursor: "pointer", color: C.gold, fontFamily: T.serif, fontSize: "var(--font-small)" }}>
+              {PM_NATAL_SECTION[lang === "hi" ? "hi" : "en"]}
+            </summary>
+            <div style={{ fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.55, margin: "0.5rem 0 0.625rem" }}>
+              {PM_NATAL_HINT[lang === "hi" ? "hi" : "en"]}
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: "0.5rem" }}>
+              <label style={{ ...T.label, color: C.muted }}>{PM_BIRTH_LABELS.date[lang === "hi" ? "hi" : "en"]}
+                <input type="date" value={pmDate} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setPmDate(e.target.value)}
+                  style={{ display: "block", width: "100%", height: T.ctrlH, boxSizing: "border-box", marginTop: "0.25rem", padding: "0 0.5625rem", borderRadius: T.rMd, border: `0.0625rem solid ${C.line}`, background: "var(--surface-sunken)", color: C.ivory, fontFamily: T.body }} /></label>
+              <label style={{ ...T.label, color: C.muted }}>{PM_BIRTH_LABELS.time[lang === "hi" ? "hi" : "en"]}
+                <input type="time" value={pmTime} onChange={(e) => setPmTime(e.target.value)}
+                  style={{ display: "block", width: "100%", height: T.ctrlH, boxSizing: "border-box", marginTop: "0.25rem", padding: "0 0.5625rem", borderRadius: T.rMd, border: `0.0625rem solid ${C.line}`, background: "var(--surface-sunken)", color: C.ivory, fontFamily: T.body }} /></label>
+              <label style={{ ...T.label, color: C.muted, gridColumn: "1 / -1" }}>{PM_BIRTH_LABELS.place[lang === "hi" ? "hi" : "en"]}
+                <PlaceInput value={pmPlace} onPick={setPmPlace} onConfirmed={setPmPlaceOk} C={C} lang={lang} /></label>
+              {pmDate && !pmReady && (
+                <div role="note" style={{ gridColumn: "1 / -1", fontSize: "var(--font-label)", color: C.gold, lineHeight: 1.45 }}>
+                  {PM_NATAL_UNCONFIRMED[lang === "hi" ? "hi" : "en"]}
+                </div>
+              )}
+            </div>
+          </details>
           <button onClick={() => findDays()} disabled={!mfCat || mfBusy}
             style={{ width: "100%", height: T.ctrlH, boxSizing: "border-box", borderRadius: T.rMd, fontFamily: T.serif, fontSize: "var(--font-body)", cursor: mfCat && !mfBusy ? "pointer" : "default", border: "none", background: mfCat && !mfBusy ? "linear-gradient(180deg, var(--accent), var(--accent-strong))" : C.line, color: mfCat && !mfBusy ? "var(--on-accent)" : C.muted, fontWeight: 600 }}>
             {mfBusy ? (lang === "hi" ? "पंचांग देखा जा रहा है…" : "Checking the panchang…")
@@ -630,8 +679,27 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           )}
           {ans && (() => {
             const catInfo = MUH_CATS.find((c) => c.key === ans.category) || { hi: "", en: "" };
-            const allValid = ans.days.filter((d) => d.valid);
+            const scanValid = ans.days.filter((d) => d.valid);
+            // Birth-star overlay. Without anchors this is a no-op and `allValid` is exactly
+            // what the finder always produced. Tarabala + Chandrabala are the only filters
+            // that remove a day; Ashtakavarga strength ranks, and the Adhanadi caution marks.
+            const personal = ans.anchors ? applyPersonalisation(scanValid, ans.anchors) : null;
+            const allValid = personal ? personal.kept : scanValid;
             const days = allValid.slice(0, 8);
+            const pmSpecial = Object.fromEntries(PM_SPECIAL_NAMES.map((s) => [s.key, s]));
+            const pmBadges = (r) => {
+              if (!r || !r.fit) return null;
+              const f = r.fit, L = (o) => o[lang === "hi" ? "hi" : "en"];
+              const sp = f.specialCaution && pmSpecial[f.specialName];
+              return (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.3125rem", marginTop: "0.375rem" }}>
+                  <span style={{ fontSize: "var(--font-label)", padding: "0.0625rem 0.5rem", borderRadius: "0.625rem", background: `color-mix(in srgb, ${f.taraGood ? "var(--good)" : C.sindoor}, var(--surface-active) 88%)`, color: f.taraGood ? "var(--good)" : C.sindoor }}>{L(f.taraGood ? PM_BADGE.taraGood : PM_BADGE.taraBad)}</span>
+                  <span style={{ fontSize: "var(--font-label)", padding: "0.0625rem 0.5rem", borderRadius: "0.625rem", background: `color-mix(in srgb, ${f.chandraGood ? "var(--good)" : C.sindoor}, var(--surface-active) 88%)`, color: f.chandraGood ? "var(--good)" : C.sindoor }}>{L(f.chandraGood ? PM_BADGE.chandraGood : PM_BADGE.chandraBad)}</span>
+                  {f.strength != null && <span title={L(PM_BADGE.strength)} style={{ fontSize: "var(--font-label)", color: C.gold, letterSpacing: "0.0625rem" }}>{"●".repeat(f.strength) + "○".repeat(4 - f.strength)}</span>}
+                  {sp && <span title={L(PM_SPECIAL_CAUTION_NOTE)} style={{ fontSize: "var(--font-label)", padding: "0.0625rem 0.5rem", borderRadius: "0.625rem", background: "var(--surface-hover)", color: C.muted }}>⚑ {L(PM_SPECIAL_CHIP(sp, sp.ord))}</span>}
+                </div>
+              );
+            };
             const qual = (sc) => sc >= 5 ? { t: lang === "hi" ? "अति शुभ" : "Highly auspicious", c: "var(--good)" } : sc >= 3 ? { t: lang === "hi" ? "शुभ" : "Auspicious", c: C.gold } : sc >= 1 ? { t: lang === "hi" ? "सामान्य" : "Workable", c: "var(--accent)" } : { t: lang === "hi" ? "टालें" : "Better avoided", c: C.sindoor };
             const dl = (r) => new Date(r.rise + r.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
             const dlFull = (r) => new Date(r.rise + r.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
@@ -651,6 +719,30 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                 <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: C.ivory }}>
                   {(lang === "hi" ? "शुभ दिन · " : "Best days · ")}{lang === "hi" ? catInfo.hi : catInfo.en} <span style={{ color: C.muted, fontSize: "var(--font-small)" }}>· {fmtIso(ans.from || mfFrom)} – {fmtIso(ans.to || mfTo)}</span>
                 </div>
+                {personal && (
+                  <div style={{ marginTop: "0.5rem", padding: "0.5625rem 0.6875rem", borderRadius: T.rSm, background: "var(--accent-soft)", border: `0.0625rem solid var(--accent-line)`, fontSize: "var(--font-small)", lineHeight: 1.5, color: "var(--accent-strong)" }}>
+                    {ans.anchors.janmaSign >= 0 && ans.anchors.janmaSign <= 11 && (
+                      <div style={{ marginBottom: "0.1875rem" }}>{PM_YOUR_STAR[lang === "hi" ? "hi" : "en"]}: {PM_RASHIS[ans.anchors.janmaSign][lang === "hi" ? "hi" : "en"]}</div>
+                    )}
+                    <div>{personal.mode === "annotate"
+                      ? PM_ANNOTATE_NOTE[lang === "hi" ? "hi" : "en"]
+                      : PM_COUNT(personal.kept.length, scanValid.length)[lang === "hi" ? "hi" : "en"]}</div>
+                    {personal.mode === "filter" && personal.setAside.length > 0 && (
+                      <details style={{ marginTop: "0.25rem" }}>
+                        <summary style={{ cursor: "pointer", color: C.muted, fontSize: "var(--font-label)" }}>
+                          {lang === "hi" ? "टाले गए दिन देखें" : "See the days set aside"}
+                        </summary>
+                        <div style={{ marginTop: "0.25rem" }}>
+                          {personal.setAside.slice(0, 12).map((r, i) => (
+                            <div key={i} style={{ fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.5 }}>
+                              {dl(r)} — {(!r.fit.taraGood ? PM_SET_ASIDE_REASON.tara : PM_SET_ASIDE_REASON.chandra)[lang === "hi" ? "hi" : "en"]}
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    )}
+                  </div>
+                )}
                 {samskaraSpec && <div style={{ marginTop: "0.5rem",padding: "0.5625rem 0.6875rem",borderRadius:T.rSm,background:profileReady?"var(--good-surface)":"var(--surface-hover)",border:`0.0625rem solid ${profileReady?"var(--good-surface)":C.line}`,fontSize: "var(--font-small)",lineHeight:1.5,color:profileReady?"var(--good)":C.gold }}>{profileReady ? (lang === "hi" ? "संस्कार-सन्दर्भ दर्ज है। नीचे का निर्णय पंचांग व संस्कार-विशिष्ट निषेध/लग्न-काल पर आधारित है।" : "Ceremony context recorded. The verdict below applies the Panchang and ceremony-specific exclusions/lagna windows.") : (lang === "hi" ? "सन्दर्भ अधूरा है। दिन देख सकते हैं, पर शिशु की जन्म-तिथि और संस्कार-विशिष्ट विकल्प भरकर कुलाचार से पुष्टि करें।" : "Context is incomplete. You can review dates, but add the birth date and ceremony-specific choice, then confirm family custom.")}</div>}
                 {days.length === 0 ? (
                   <div style={{ fontSize: "var(--font-small)", color: C.muted, marginTop: "0.625rem", lineHeight: 1.6 }}>
@@ -663,7 +755,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                     {top && (
                       <div style={{ marginTop: "0.75rem", ...card, borderRadius: T.rSm, padding: "0.75rem 0.875rem", background: "var(--surface-raised)", border: `0.0938rem solid ${C.gold}` }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: T.s2, marginBottom: "0.1875rem" }}>
-                          <div style={{ ...T.label, color: C.gold }}>{lang === "hi" ? "सर्वोत्तम दिन" : "Best day"}</div>
+                          <div style={{ ...T.label, color: C.gold }}>{lang === "hi" ? "सर्वोत्तम दिन" : "Best day"}{pmBadges(top)}</div>
                           <ReadAloudButton
                             lang={lang === "hi" ? "hi" : "en"}
                             compact
@@ -758,9 +850,13 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                             <span style={{ minWidth: "5.75rem", fontFamily: "var(--font-display-family)", fontSize: "var(--font-small)", color: C.ivory }}>{dl(r)}</span>
                             <span style={{ fontSize: "var(--font-label)", padding: "0.0625rem 0.5625rem", borderRadius: "0.625rem", background: `color-mix(in srgb, ${Q.c}, var(--surface-active) 88%)`, color: Q.c, whiteSpace: "nowrap" }}>{Q.t}</span>
                             <span style={{ flex: 1, textAlign: "right", fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.4 }}>{r.factors.filter((f) => f.g).map((f) => lang === "hi" ? f.hi : f.en).join(" · ") || "—"}</span>
+                            {pmBadges(r)}
                           </div>
                         ); })}
                       </div>
+                    )}
+                    {personal && (
+                      <div style={{ fontSize: "var(--font-label)", color: C.muted, marginTop: "0.5rem", lineHeight: 1.5 }}>{PM_RESULT_NOTE[lang === "hi" ? "hi" : "en"]}</div>
                     )}
                     <div style={{ fontSize: "var(--font-label)", color: C.muted, marginTop: "0.5rem", fontStyle: "italic" }}>{SAMSKARA_INPUTS[ans.category] ? (lang === "hi" ? "केवल मास, तिथि, नक्षत्र, वार और संस्कार-विशिष्ट लग्न/कुण्डली शुद्धि पर खरे दिन दिखाए गए हैं।" : "Only dates passing month, tithi, nakshatra, weekday and Samskara-specific lagna/chart screening are shown.") : (lang === "hi" ? "केवल इस कार्य की तिथि, नक्षत्र, वार और समय-खिड़की शुद्धि पर खरे दिन दिखाए गए हैं।" : "Only dates passing this activity's tithi, nakshatra, weekday and clean-window shuddhi are shown.")}</div>
                     {whyList && (

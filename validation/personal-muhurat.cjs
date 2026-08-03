@@ -120,10 +120,21 @@ if (PM_SPECIAL_CAUTION_NOTE?.en && !/tradition/i.test(PM_SPECIAL_CAUTION_NOTE.en
 if (PM_SPECIAL_CAUTION_NOTE?.en && !/not a classical/i.test(PM_SPECIAL_CAUTION_NOTE.en)) fail('special caution copy must state it is NOT a classical muhurta rule');
 if (typeof PM_COUNT !== 'function') fail('PM_COUNT must be a function (kept,total)->{en,hi}');
 
-/* ---- 7. The screen never edits the general finder engine ------------------------- */
-const screenSrc = fs.readFileSync('src/screens/PersonalMuhuratScreen.tsx', 'utf8');
-if (/muhurat\.ts/.test(screenSrc) === false && !/muhuratScanRange/.test(screenSrc)) fail('screen must call muhuratScanRange (the unchanged finder)');
-if (/from ["']\.\.\/screens\/MuhuratHub["']/.test(screenSrc)) fail('personal screen must not import MuhuratHub');
+/* ---- 7. The overlay lives INSIDE the real finder, and stays opt-in ---------------- */
+/* Owner decision 2026-08-02: the dedicated /muhurat/personal route was deleted as a
+   redundant, unreachable duplicate of the Muhurat Finder. Personalisation now folds into
+   MuhuratHub. These assertions pin the properties that made the fold safe, so a future
+   edit cannot quietly turn the overlay back into a second finder or into a default. */
+const hub = fs.readFileSync('src/screens/MuhuratHub.tsx', 'utf8');
+if (!/applyPersonalisation/.test(hub)) fail('MuhuratHub must apply the natal overlay');
+if (!/natalAnchors/.test(hub)) fail('MuhuratHub must compute natal anchors');
+// Opt-in: anchors are only built when the user supplied complete birth details.
+if (!/pmReady/.test(hub)) fail('MuhuratHub must gate personalisation on complete birth details (pmReady)');
+if (!/anchors\s*=\s*null/.test(hub)) fail('MuhuratHub must default anchors to null (no birth details = untouched finder)');
+// The general path must remain the plain finder result.
+if (!/ans\.anchors\s*\?\s*applyPersonalisation/.test(hub)) fail('personalisation must be conditional on ans.anchors — the general finder must be untouched without birth details');
+// The deleted route must not come back without a deliberate decision.
+if (fs.existsSync('src/screens/PersonalMuhuratScreen.tsx')) fail('the redundant /muhurat/personal screen was deleted by owner decision — do not reintroduce it');
 
 if (failures) { console.error(`\n✗ personal-muhurat FAILED (${failures})`); process.exit(1); }
 console.log('✓ personal-muhurat PASSED (Tarabala/Chandrabala hard filters, Moon-BAV strength, Adhanadi soft caution, graded filter + annotate fallback, honest bilingual copy)');
