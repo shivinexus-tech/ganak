@@ -475,10 +475,14 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         Upanayana, with tradition and regional conventions stated.
   - [ ] Birth-chart-personalized Muhurat only after its method is sourced and
         validated; never silently mix natal filtering into the general finder.
-        **Built and deployed 2026-08-02** on its own route `/muhurat/personal` (owner chose
-        a dedicated screen over an inline MuhuratHub panel, so the in-review finder was
-        never touched). Opt-in only: with no birth details the general finder result renders
-        unchanged behind an explicit prompt — the "never silently mix" rule is structural,
+        **v1 route REJECTED by the owner 2026-08-02 and deleted; personalisation refolded
+        into the real Muhurat Finder.** The dedicated `/muhurat/personal` screen was a
+        strictly inferior duplicate of the finder (no save/share, no URL state, no Panchaka
+        windows, no blockers, no samskara, no guidance) and unreachable — zero inbound links.
+        See `plans/ganak-gate-decay-rootcause.md` for the root cause and
+        `validation/route-reachability.cjs` for the gate that now prevents it.
+        **Now shipped as an opt-in section inside MuhuratHub.** With no birth details the
+        finder is unchanged — the "never silently mix" rule is structural,
         not a convention. **Sourced method:** Tarabala + Chandrabala are the two hard filters
         (they alone remove a day); Moon Bhinnashtakavarga bindus rank but never remove. All
         three reuse already-shipped engines (`daily-windows.ts`, `classical.ts`), so
