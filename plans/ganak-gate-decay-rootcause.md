@@ -166,6 +166,125 @@ Ordered by leverage. Each is small; none is a refactor.
 
 ---
 
+---
+
+# Addendum, 2026-08-02 — the second root cause: *the product between the files*
+
+**Trigger:** the owner rejected `/muhurat/personal` on sight — an orphan page, unreachable
+from anywhere in the app, that duplicated the existing Muhurat Finder with fewer features.
+It had passed ~20 gates, a production build, EN/HI phone verification and a live deploy.
+The owner's question was the right one: *"what's causing these recurringly, not the first
+time this happened?"*
+
+## The first root cause did not explain it
+
+"Detection, not prevention" (above) explains **rule decay** — a rule exists, a gate catches
+the break, nothing stops it. It was confirmed again here: `PersonalMuhuratScreen.tsx` fails
+`design-system-primitives` (raw `#FFFDF7`, `#1F7A4D`, `#B4462A`) and **deployed to
+production anyway**, while ~20 other gates were run and pasted as green.
+
+But the orphan-and-redundant page was a different failure: **no rule existed to break.**
+
+## Evidence
+
+**1. Of 66 gates, none could detect an unreachable or duplicate feature.** Five mention
+navigation at all, and every one is hardcoded to a specific feature (`festival-interaction`,
+`jyotish-panel-exposure`). There was no generic check that a route is reachable.
+
+**2. It had already happened twice before, undetected.** A reachability sweep found **three**
+orphaned route families in production, built across three different sessions:
+
+| Route | Shipped | Inbound links |
+|---|---|---|
+| `/calculators` (12 calculators, closed at 100%) | 2026-07-22 | **none** |
+| `/muhurat/medical` | 2026-07-25 | **none** |
+| `/muhurat/personal` | 2026-08-02 | **none** |
+
+Each passed every gate. Each deployed green. None is reachable without being handed the URL.
+The 2026-07-22 closeout for the calculators even records *"Live catalogue exposed 12 links"*
+— true of the catalogue page, meaningless if nothing links to the catalogue.
+
+**3. The owner had already diagnosed this class — in prose, three times:**
+- *"a permanent URL is not complete merely because it resolves"*
+- *"route existence is not enough for closure"*
+- open bug: *"calendar & search festival rows are navigation dead-ends"*
+
+Same shape as the `i18n.ts` finding above: **prose cannot fail a build.**
+
+**4. The role that would have caught it was designed and never staffed.** `plans/backlog.md`
+still carries `- [ ] Integration lane — one designated integrator owns shared shell changes,
+reviews each branch…`. Twenty-three task-log rows claim "integration" ad hoc; nobody owns it
+standing.
+
+## Root cause #2
+
+**Every quality mechanism verifies an artifact in isolation. Nothing verifies the product.**
+
+Gates check files. `parse-check` checks a file. A bug bash checks a feature. The task log
+checks a task. Nothing asks the two questions that would have killed this feature before it
+was built:
+
+- *Can a user reach this?*
+- *Do we already have this, and is the new thing better?*
+
+The ownership model explains why. Concurrency safety comes from **exclusive file ownership** —
+excellent for avoiding merge conflicts, and precisely why nobody owns the **seams**:
+navigation, redundancy, coherence. Ten agents optimise their own files; the product between
+the files is unowned. The only integration test in the system is the owner, serially, last,
+after deploy — which is exactly how all three orphans reached production.
+
+Note the symmetry with the first root cause:
+
+| | Mechanism | Result |
+|---|---|---|
+| Rule exists, gate exists | detection without prevention | contained but unfixed |
+| Rule exists only in prose | no gate at all | **grows unopposed** |
+
+## A contributing behavioural cause (agent-side, worth recording)
+
+The placement decision — dedicated route vs. panel inside the existing finder — *was*
+surfaced to the owner, satisfying the `no-silent-parking` rule. But it was framed as an
+engineering-risk question (*"MuhuratHub is a dense 1060-line file, currently in review,
+higher merge-conflict risk"*) with the dedicated route recommended. That is a statement about
+build convenience, not user value, and the owner chose from that frame.
+
+Choosing a separate route then silently mutated the requirement — from *"add a filter to the
+finder"* to *"build a second finder"* — and the spec's own §1 (*"personalise the **existing**
+Muhurat finder"*) was never re-read afterwards. **Surfacing a decision in the wrong frame
+passes the letter of the rule and defeats its purpose.** A spec whose Goal and Placement
+contradict each other should fail self-review.
+
+## Fix shipped with this addendum
+
+`validation/route-reachability.cjs` — routes are **discovered, not hardcoded**: any
+`<name>FromPath(...)` the shell calls is picked up automatically, so a route added tomorrow
+is covered without editing the gate. A route counts as reachable only if something *other
+than its own screen* links to it, either directly (`href`) or through a path-builder
+(`festivalPathForKey`). Self-links don't count — a page linking to its own catalogue still
+leaves the user unable to get in.
+
+Verdicts verified by hand, 4/4 correct; guard proven by adding a real link and watching
+`/muhurat/personal` flip to reachable and back. It currently **fails on the three orphans
+above** — that is the gate working, not a defect.
+
+## Still open (owner decisions)
+
+1. **Make CI authoritative** — unchanged from the original analysis, still the highest-leverage
+   change, still requires branch protection + the Cloudflare setting. Blocked on the red
+   `design-system-primitives` gate being fixed first.
+2. **Fix the three orphans** — link them, or remove them. `/muhurat/personal` is pending an
+   owner decision to fold into MuhuratHub and delete the route.
+3. **Prior-art step in the spec workflow** — before building a user-facing feature, diff it
+   against what exists and record the comparison in the spec. Thirty seconds of that would
+   have killed the dedicated route.
+4. **Integration review at closeout** — performed by an agent that did *not* build the thing,
+   checking reachability, redundancy and parity against the incumbent.
+
+Items 3 and 4 depend on discipline, which is the thing that already failed. Item 2 of the
+original list and the gate above are mechanical, which is why they are worth more.
+
+---
+
 ## Process finding — this cost real accuracy
 
 The architecture audit ran against a working tree that **changed while it was being
