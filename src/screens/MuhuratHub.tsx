@@ -113,6 +113,11 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   const [pmPlace, setPmPlace] = useState(null);
   const [pmPlaceOk, setPmPlaceOk] = useState(false);
   const pmReady = Boolean(pmDate && pmPlace && pmPlaceOk);
+  /* Signature of the birth details a result was computed from. Stored on `ans` so the
+     "your selection changed" notice can also fire when the user adds, edits or removes
+     birth details after a search — otherwise the old un-personalised list stays on screen
+     looking like a finished answer. Empty string means "no personalisation". */
+  const pmSig = pmReady ? `${pmDate}|${pmTime}|${pmPlace.label}` : "";
   const chooseMfCat=(key)=>{ const next=validMuhuratKey(key); setMfCat(next); setMfErr(null); if(next) { urlPrefPush("muhurat",next); const first=PURCHASE_ACTIONS[next]?.options[0]?.value || ""; setPurchaseAction(first); if(first) urlPrefPush("maction",first); } if(ans&&next) findDays(null,null,next); };
   useEffect(()=>{ const restore=()=>setMfCat(validMuhuratKey(urlPrefGet("muhurat"))); window.addEventListener("popstate",restore); return()=>window.removeEventListener("popstate",restore); },[]);
   const finderTopPanchaka = useMemo(() => { try { if (!ans || !ans.days) return null; const top = ans.days.filter((d) => d.valid)[0]; return top ? computeLagnaPanchaka(place, "lahiri", top.rise) : null; } catch (e) { return null; } }, [ans, place]);
@@ -140,7 +145,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           const [bhh, bmi] = (pmTime || "12:00").split(":").map(Number);
           if (by) anchors = natalAnchors(pmPlace, "lahiri", { y: by, m: bm, day: bd, hh: bhh || 0, mi: bmi || 0 });
         }
-        setAns({ category: cat, days: dd, from: fromIso || mfFrom, to: toIso || mfTo, profile: SAMSKARA_INPUTS[cat] ? { ...(samskaraProfiles[cat] || {}) } : null, action: chosenAction, anchors });
+        setAns({ category: cat, days: dd, from: fromIso || mfFrom, to: toIso || mfTo, profile: SAMSKARA_INPUTS[cat] ? { ...(samskaraProfiles[cat] || {}) } : null, action: chosenAction, anchors, pmSig });
         privacyEvent("muhurat_search",{action:cat,language:lang,outcome:dd.some((d)=>d.valid)?"found":"none"});
       } catch (e) {
         if (typeof console !== "undefined") console.error("muhurat scan failed:", e);
@@ -672,7 +677,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           {mfErr && (
             <div style={{ marginTop: "0.625rem", padding: "0.625rem 0.75rem", borderRadius: T.rMd, background: "var(--bad-surface)", border: `0.0938rem solid ${C.sindoor}`, color: C.sindoor, fontSize: "var(--font-small)" }}>{mfErr}</div>
           )}
-          {ans && !mfBusy && (ans.from !== mfFrom || ans.to !== mfTo || ans.category !== mfCat) && (
+          {ans && !mfBusy && (ans.from !== mfFrom || ans.to !== mfTo || ans.category !== mfCat || (ans.pmSig || "") !== pmSig) && (
             <div style={{ marginTop: "0.625rem", padding: "0.5625rem 0.75rem", borderRadius: T.rMd, background: "var(--accent-soft)", border: `0.0625rem solid var(--accent-line)`, color: "var(--accent-strong)", fontSize: "var(--font-small)", lineHeight: 1.45 }}>
               {lang === "hi" ? "चुनाव बदल गया है — नए परिणामों हेतु \"शुभ दिन खोजें\" दबाएँ। नीचे पिछले परिणाम दिख रहे हैं।" : "Your selection changed — press \"Find good days\" to update. The results below are from your previous search."}
             </div>
@@ -732,8 +737,11 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                         <summary style={{ cursor: "pointer", color: C.muted, fontSize: "var(--font-label)" }}>
                           {lang === "hi" ? "टाले गए दिन देखें" : "See the days set aside"}
                         </summary>
-                        <div style={{ marginTop: "0.25rem" }}>
-                          {personal.setAside.slice(0, 12).map((r, i) => (
+                        {/* Every set-aside day is listed. This list exists to prove the filter
+                            is not hiding days arbitrarily, so a silent cap would defeat its
+                            only purpose — the count above must always match what renders. */}
+                        <div style={{ marginTop: "0.25rem", maxHeight: "18rem", overflowY: "auto" }}>
+                          {personal.setAside.map((r, i) => (
                             <div key={i} style={{ fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.5 }}>
                               {dl(r)} — {(!r.fit.taraGood ? PM_SET_ASIDE_REASON.tara : PM_SET_ASIDE_REASON.chandra)[lang === "hi" ? "hi" : "en"]}
                             </div>
