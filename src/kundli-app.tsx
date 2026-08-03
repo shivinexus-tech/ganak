@@ -263,8 +263,18 @@ export default function KundliApp() {
 
         <FeedbackCard lang={lang} C={C} card={card} />
 
-        {/* Footer stays accurate with or without optional telemetry endpoints. */}
+        {/* Footer stays accurate with or without optional telemetry endpoints.
+            The calculator catalogue is linked here so it is reachable from every screen —
+            it shipped as an orphan route (14 calculators, zero inbound links) and
+            validation/route-reachability.cjs now guards against that returning. */}
         <footer style={{ textAlign: "center", color: C.muted, fontSize: T.fLabel, marginTop: T.s8, letterSpacing: ".06em" }}>
+          <div style={{ marginBottom: T.s3 }}>
+            <a href={`/calculators?lang=${lang}`} className="comfort-focus" style={{ color: C.gold, textDecoration: "none", borderBottom: `0.0625rem solid ${C.line}`, paddingBottom: "0.125rem" }}>
+              {lang === "hi"
+                ? "ज्योतिष कैलकुलेटर — राशि, लग्न, नक्षत्र, मांगलिक और अन्य"
+                : "Astrology calculators — Rashi, Lagna, Nakshatra, Mangal Dosha and more"}
+            </a>
+          </div>
           {lang === "hi"
             ? "ॐ · गणना आपके डिवाइस पर · न खाता · शहर खोज ऑनलाइन · सेवा जुड़ने पर केवल अनाम उपयोग-घटनाएँ"
             : "ॐ · computed on your device · no account · city search online · anonymous usage events only when configured"}

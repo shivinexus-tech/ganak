@@ -167,9 +167,13 @@ for (const { varName, matcher } of matcherCalls) {
 
   let reachedBy = null;
 
-  // (a) a direct navigational link to the path from elsewhere
+  /* (a) a direct navigational link to the path from elsewhere.
+     The shell is NOT excluded here: it holds the global nav and footer, which is exactly
+     where a site-wide link belongs. Its route-matching lines can't false-positive because
+     every match must also carry a navigational attribute (href/pushState/...), and
+     `fooFromPath(window.location.pathname)` carries none. */
   for (const [file, text] of Object.entries(SRC)) {
-    if (own.has(file) || NON_NAVIGATIONAL.has(file) || file === SHELL) continue;
+    if (own.has(file) || NON_NAVIGATIONAL.has(file)) continue;
     for (const line of text.split('\n')) {
       if (line.includes(entry) && NAV.test(line)) { reachedBy = `direct link in ${file}`; break; }
     }
@@ -180,7 +184,7 @@ for (const { varName, matcher } of matcherCalls) {
   if (!reachedBy) {
     for (const b of buildersFor(entry)) {
       for (const [file, text] of Object.entries(SRC)) {
-        if (own.has(file) || file === b.file || NON_NAVIGATIONAL.has(file) || file === SHELL) continue;
+        if (own.has(file) || file === b.file || NON_NAVIGATIONAL.has(file)) continue;
         if (!text.includes(b.name)) continue;
         // used somewhere, and this file navigates
         if (NAV.test(text)) { reachedBy = `${b.name}() from ${file}`; break; }
