@@ -701,7 +701,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
 
   return (
     <div style={{ background: TOKENS.bg, minHeight: '100%', padding: "1rem", color: TOKENS.ink,
-      fontFamily: "-apple-system, 'Segoe UI', sans-serif" }}>
+      fontFamily: "var(--font-body-family)" }}>
       <PrashnaSecHead hiMode={hi} />
 
       {/* Method toggle — two named methods, never mixed (owner-approved).
@@ -750,12 +750,12 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
       <DataRow density="compact" label={hi ? "चुनी हुई विधि" : "Selected method"} value={mode === "number" ? (hi ? "अंक 1–249" : "Number 1–249") : (hi ? "इस क्षण से" : "Current moment")} />
 
       {/* Question chips */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: "0.5rem", margin: '14px 0' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: "0.5rem", margin: '14px 0' }}>
         {QUESTIONS.map(q => {
           const on = selected === q.key;
           return (
             <button key={q.key} onClick={() => { if (numberLocked) return; setSelected(q.key); clearResult(); }}
-              style={{ minHeight: TOKENS.ctrlH, borderRadius: TOKENS.radius, padding: '6px 12px',
+              style={{ minHeight: TOKENS.ctrlH, width: '100%', borderRadius: TOKENS.radius, padding: '6px 12px',
                 border: `0.0938rem solid ${on ? TOKENS.gold : TOKENS.line}`,
                 background: on ? TOKENS.goldSoft : TOKENS.card,
                 color: TOKENS.ink, cursor: 'pointer', textAlign: 'left', lineHeight: 1.2 }}>

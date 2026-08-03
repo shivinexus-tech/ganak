@@ -316,7 +316,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
               );
             })()}
           </div>
-          <div style={{ display: "flex", justifyContent: "flex-end", margin: "-0.5rem 0 1rem" }}>
+          <div style={{ display: "flex", justifyContent: "flex-start", margin: "-0.5rem 0 1rem" }}>
             <ReadAloudButton text={listenText} lang={lang === "hi" ? "hi" : "en"} label={lang === "hi" ? "🔊 आज का पंचांग सुनें" : "🔊 Listen to today's Panchang"} />
           </div>
           {showExpert && <p style={{ margin: "0 0 1rem", padding: "0.625rem 0.75rem", borderRadius: T.rMd, background: "var(--surface-raised)", border: "0.0625rem solid var(--line)", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55, fontVariantNumeric: "tabular-nums" }}>
@@ -333,9 +333,12 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
               : "The Panchang describes the five parts of the day. The two things most people need are just below — which times are auspicious, and which times to avoid starting something new."}
           </p>}
           {place && <div style={{ margin: "-0.75rem 0 1rem", display:"flex", alignItems:"flex-end", gap: "0.625rem", flexWrap:"wrap" }}>
-            <select value={calendarMode} onChange={(e) => chooseCalendarMode(e.target.value)} aria-label={lang === "hi" ? "कैलेंडर पद्धति" : "Calendar convention"} style={{ height:T.ctrlH, borderRadius:T.rMd, border:`0.0625rem solid ${C.line}`, background:"var(--surface-sunken)", color:C.ivory, padding: "0 0.625rem", fontFamily:T.body }}>
+            <label style={{ display: "grid", gap: T.s1, ...T.label, color: C.muted }}>
+              <span>{lang === "hi" ? "कैलेंडर पद्धति" : "CALENDAR SYSTEM"}</span>
+              <select value={calendarMode} onChange={(e) => chooseCalendarMode(e.target.value)} aria-label={lang === "hi" ? "कैलेंडर पद्धति" : "Calendar system"} style={{ height:T.ctrlH, borderRadius:T.rMd, border:`0.0625rem solid ${C.line}`, background:"var(--surface-sunken)", color:C.ivory, padding: "0 0.625rem", fontFamily:T.body }}>
               {CALENDAR_CONVENTIONS.filter(x => conventionIsEnabled(x.id,regionalFlags)).map(x => <option key={x.id} value={x.id}>{lang === "hi" ? x.hi : x.en}</option>)}
-            </select>
+              </select>
+            </label>
             <HolidayOverlaySelect mode={holidayMode} onMode={chooseHolidayMode} lang={lang} />
             <div style={{ fontSize:T.fMicro, color:C.muted, lineHeight:1.45, flex:"1 1 220px" }}>
               <div>{calendarLabel(calendarMode, todayP, todayP.rise, lang === "hi" ? "hi" : "en", place)}</div>
@@ -372,7 +375,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                       <span style={{ color: C.gold, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap", minWidth: "5.75rem", fontSize: "var(--font-small)" }}>
                         {new Date(e2.t + todayP.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { month: "short", day: "numeric", timeZone: "UTC" })} · {fmtTime(e2.t, todayP.tz)}
                       </span>
-                      <span style={{ color: e2.label.includes("℞") ? C.sindoor : C.ivory, flex: 1, overflowWrap: "anywhere" }}>{transitLabel(lang, e2.label)}</span>
+                      <span style={{ color: e2.label.includes("℞") ? C.sindoor : C.ivory, flex: 1, overflowWrap: "break-word" }}>{transitLabel(lang, e2.label)}</span>
                     </span>
                     <span style={{ color: C.muted, fontSize: "var(--font-label)", whiteSpace: "nowrap", fontWeight: 500 }}>{ed.timeStr}</span>
                     <span style={{ color: C.muted, fontSize: "var(--font-small)", transform: isExp ? "rotate(180deg)" : "none", transition: "transform .2s" }}>▼</span>

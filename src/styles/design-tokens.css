@@ -34,7 +34,7 @@
   --space-6: max(1.375rem, calc(1.5rem + var(--density)));
   --space-7: max(1.625rem, calc(1.75rem + var(--density)));
   --space-8: max(1.875rem, calc(2rem + var(--density)));
-  --control-height: max(2.625rem, calc(2.625rem + var(--density)));
+  --control-height: max(2.75rem, calc(2.75rem + var(--density)));
   --radius-sm: 0.5rem;
   --radius-md: 0.6875rem;
   --radius-lg: 0.875rem;

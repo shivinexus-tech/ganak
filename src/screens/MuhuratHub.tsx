@@ -233,12 +233,12 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           const p = festivalPathForKey(kind, item.key);
           const body = (<>
             <span style={{ width: "0.4375rem", height: "0.4375rem", borderRadius: "50%", background: dotColor, flexShrink: 0 }} />
-            <span style={{ flex: 1, minWidth: 0, fontSize: T.fSmall, color: C.ivory, overflowWrap: "anywhere" }}>{label}</span>
+            <span style={{ flex: 1, minWidth: 0, fontSize: T.fSmall, color: C.ivory, overflowWrap: "break-word" }}>{label}</span>
             <span style={{ fontSize: T.fMicro, color: C.gold, fontWeight: 600, flexShrink: 0 }}>{away(item.ms)}</span>
           </>);
-          if (!p) return <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.125rem 0" }}>{body}</div>;
+          if (!p) return <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", minHeight: T.ctrlH, padding: "0.125rem 0" }}>{body}</div>;
           return (
-            <a href={festHref(p)} className="ff-row" aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + label} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.1875rem 0.1875rem", borderRadius: "0.5rem", textDecoration: "none", color: "inherit" }}>
+            <a href={festHref(p)} className="ff-row" aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + label} style={{ display: "flex", alignItems: "center", gap: "0.5rem", minHeight: T.ctrlH, padding: "0.1875rem 0.1875rem", borderRadius: "0.5rem", textDecoration: "none", color: "inherit" }}>
               {body}
               <span aria-hidden="true" style={{ color: C.muted, fontSize: T.fSmall, flexShrink: 0 }}>›</span>
             </a>
@@ -418,7 +418,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
               {rows.map(([k, v], idx) => (
                 <div key={k + idx} style={{ display: "flex", justifyContent: "space-between", gap: "0.875rem", padding: "0.5rem 0.125rem", borderBottom: `0.0625rem solid var(--line-soft)`, fontSize: "var(--font-body)", alignItems: "baseline" }}>
                   <span style={{ color: C.muted, whiteSpace: "nowrap" }}>{k}</span>
-                  <span style={{ textAlign: "right", overflowWrap: "anywhere" }}>{v}</span>
+                  <span style={{ textAlign: "right", overflowWrap: "break-word" }}>{v}</span>
                 </div>
               ))}
             </div>
@@ -502,7 +502,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       <SecHead deva="व्रत एवं पर्व" en="Fasts & festivals" right={tab === "fasting" ? (
         <span style={{ display: "inline-flex", gap: "0.25rem" }}>
           {[["smarta", lang === "hi" ? "स्मार्त" : "Smarta"], ["vaishnava", "ISKCON"]].map(([v, l]) => (
-            <button key={v} onClick={() => chooseTrad(v)} style={{ fontSize: T.fMicro, padding: "0.1875rem 0.5625rem", borderRadius: T.rPill, border: `0.0625rem solid ${trad === v ? C.gold : C.line}`, background: trad === v ? "var(--accent-soft)" : "transparent", color: trad === v ? C.gold : C.muted, cursor: "pointer" }}>{l}</button>
+            <button key={v} onClick={() => chooseTrad(v)} style={{ minHeight: T.ctrlH, fontSize: T.fMicro, padding: `0 ${T.s3}`, borderRadius: T.rPill, border: `0.0625rem solid ${trad === v ? C.gold : C.line}`, background: trad === v ? "var(--accent-soft)" : "transparent", color: trad === v ? C.gold : C.muted, cursor: "pointer" }}>{l}</button>
           ))}
         </span>
       ) : null} />
@@ -510,7 +510,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         <style>{`.ff-row{transition:background .12s ease;} .ff-row:hover{background:var(--surface-hover);} .ff-row:focus-visible{outline:0.125rem solid var(--accent);outline-offset:-2px;background:var(--accent-soft);}`}</style>
         <div style={{ display: "flex", gap: "0.375rem", padding: "0.625rem 0.75rem 0.375rem" }}>
           {[["fasting", "fastingTab"], ["festival", "festivalTab"]].map(([k, lbl]) => (
-            <button key={k} onClick={() => setTab(k)} style={{ padding: "0.375rem 0.875rem", borderRadius: T.rPill, fontFamily: "var(--font-display-family)", fontSize: "var(--font-small)", cursor: "pointer", border: `0.0625rem solid ${tab === k ? C.gold : "transparent"}`, background: tab === k ? "var(--accent-soft)" : "transparent", color: tab === k ? C.gold : C.muted }}>{tr(lang, lbl)}</button>
+            <button key={k} onClick={() => setTab(k)} style={{ minHeight: T.ctrlH, padding: `0 ${T.s4}`, borderRadius: T.rPill, fontFamily: "var(--font-display-family)", fontSize: "var(--font-small)", cursor: "pointer", border: `0.0625rem solid ${tab === k ? C.gold : "transparent"}`, background: tab === k ? "var(--accent-soft)" : "transparent", color: tab === k ? C.gold : C.muted }}>{tr(lang, lbl)}</button>
           ))}
         </div>
         {tab === "fasting" && trad === "vaishnava" && (
@@ -554,13 +554,13 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                     aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + name}
                     style={{ borderTop: "0.0625rem solid var(--line-soft)", textDecoration: "none", color: "inherit", padding: "0.6875rem 0.75rem", display: "flex", justifyContent: "space-between", gap: "0.625rem", alignItems: "baseline" }}
                   >
-                    <span style={{ fontSize: "var(--font-body)", color: C.ivory, flex: 1, minWidth: 0, overflowWrap: "anywhere" }}>{name}</span>
+                    <span style={{ fontSize: "var(--font-body)", color: C.ivory, flex: 1, minWidth: 0, overflowWrap: "break-word" }}>{name}</span>
                     <span style={{ display: "inline-flex", alignItems: "baseline", gap: "0.5rem", flexShrink: 0 }}>{dateCell}<span aria-hidden="true" style={{ color: C.muted, fontSize: "var(--font-body)" }}>›</span></span>
                   </a>
                 ) : (
                   <div style={{ borderTop: "0.0625rem solid var(--line-soft)", padding: "0.6875rem 0.75rem", display: "flex", justifyContent: "space-between", gap: "0.625rem", alignItems: "baseline" }}>
                     <span style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ fontSize: "var(--font-body)", color: C.ivory, display: "block", overflowWrap: "anywhere" }}>{name}</span>
+                      <span style={{ fontSize: "var(--font-body)", color: C.ivory, display: "block", overflowWrap: "break-word" }}>{name}</span>
                       <span style={{ fontSize: "var(--font-label)", color: C.sindoor }}>{lang === "hi" ? "पूरा पृष्ठ अभी उपलब्ध नहीं" : "Full page not available yet"}</span>
                     </span>
                     {dateCell}
@@ -664,7 +664,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
             </div>
           </details>
           <button onClick={() => findDays()} disabled={!mfCat || mfBusy}
-            style={{ width: "100%", height: T.ctrlH, boxSizing: "border-box", borderRadius: T.rMd, fontFamily: T.serif, fontSize: "var(--font-body)", cursor: mfCat && !mfBusy ? "pointer" : "default", border: "none", background: mfCat && !mfBusy ? "linear-gradient(180deg, var(--accent), var(--accent-strong))" : C.line, color: mfCat && !mfBusy ? "var(--on-accent)" : C.muted, fontWeight: 600 }}>
+            style={{ width: "100%", height: T.ctrlH, boxSizing: "border-box", borderRadius: T.rMd, fontFamily: T.serif, fontSize: "var(--font-body)", cursor: mfCat && !mfBusy ? "pointer" : "default", border: "none", background: mfCat && !mfBusy ? "linear-gradient(180deg, var(--accent), var(--accent-strong))" : C.line, color: mfCat && !mfBusy ? "var(--on-accent)" : C.ivory, fontWeight: 600 }}>
             {mfBusy ? (lang === "hi" ? "पंचांग देखा जा रहा है…" : "Checking the panchang…")
               : !mfCat ? (lang === "hi" ? "पहले ऊपर कार्य चुनें" : "First pick an activity above")
               : (lang === "hi" ? "शुभ दिन खोजें" : "Find good days")}
@@ -1076,7 +1076,7 @@ return (
         {!horaResult && (
           <div style={{ display: "flex", gap: "0.375rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
             {[{ en: "Best hora for business", hi: "व्यापार के लिए होरा" }, { en: "Hora for travel", hi: "यात्रा के लिए होरा" }, { en: "Good time to study", hi: "अध्ययन का समय" }, { en: "Buying gold", hi: "सोना खरीदना" }, { en: "Marriage hora", hi: "विवाह होरा" }].map((ex, i) => (
-              <button key={i} type="button" onClick={() => { setHoraQuestion(ex.en); setHoraResult(analyzeHora(ex.en)); }} style={{ fontSize: T.fMicro, padding: "0.3125rem 0.625rem", borderRadius: T.rPill, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.muted, cursor: "pointer" }}>
+              <button key={i} type="button" onClick={() => { setHoraQuestion(ex.en); setHoraResult(analyzeHora(ex.en)); }} style={{ minHeight: T.ctrlH, fontSize: T.fMicro, padding: `0 ${T.s3}`, borderRadius: T.rPill, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.muted, cursor: "pointer" }}>
                 {ex[lang === "hi" ? "hi" : "en"]}
               </button>
             ))}
@@ -1118,7 +1118,7 @@ return (
                 <div style={{ fontSize: T.fSmall, color: C.ivory, marginBottom: "0.5rem" }}>{tree.q[LL]}</div>
                 <div style={{ display: "flex", gap: "0.375rem", flexWrap: "wrap" }}>
                   {tree.options.map((opt, i) => (
-                    <button key={i} type="button" onClick={() => setHoraResult({ status: "answer", intent: horaResult.intent || "general", planets: opt.planets, act: opt.act })} style={{ fontSize: T.fMicro, padding: "0.375rem 0.6875rem", borderRadius: T.rPill, border: `0.0625rem solid ${C.gold}`, background: C.panel, color: C.gold, cursor: "pointer", fontWeight: 500 }}>
+                    <button key={i} type="button" onClick={() => setHoraResult({ status: "answer", intent: horaResult.intent || "general", planets: opt.planets, act: opt.act })} style={{ minHeight: T.ctrlH, fontSize: T.fMicro, padding: `0 ${T.s3}`, borderRadius: T.rPill, border: `0.0625rem solid ${C.gold}`, background: C.panel, color: C.gold, cursor: "pointer", fontWeight: 500 }}>
                       {opt.label[LL]}
                     </button>
                   ))}
@@ -1132,7 +1132,7 @@ return (
                 <div style={{ fontSize: T.fSmall, color: C.muted, marginBottom: "0.5rem" }}>{lang === "hi" ? "इनमें से आज़माएँ:" : "Try one of these:"}</div>
                 <div style={{ display: "flex", gap: "0.375rem", flexWrap: "wrap" }}>
                   {[{ en: "business", hi: "व्यापार" }, { en: "travel", hi: "यात्रा" }, { en: "marriage", hi: "विवाह" }, { en: "study", hi: "अध्ययन" }, { en: "property", hi: "संपत्ति" }, { en: "health", hi: "स्वास्थ्य" }, { en: "worship", hi: "पूजा" }].map((ex, i) => (
-                    <button key={i} type="button" onClick={() => { setHoraQuestion(ex.en); setHoraResult(analyzeHora(ex.en)); }} style={{ fontSize: T.fMicro, padding: "0.3125rem 0.625rem", borderRadius: T.rPill, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.muted, cursor: "pointer" }}>{ex[LL]}</button>
+                    <button key={i} type="button" onClick={() => { setHoraQuestion(ex.en); setHoraResult(analyzeHora(ex.en)); }} style={{ minHeight: T.ctrlH, fontSize: T.fMicro, padding: `0 ${T.s3}`, borderRadius: T.rPill, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.muted, cursor: "pointer" }}>{ex[LL]}</button>
                   ))}
                 </div>
               </div>
@@ -1172,7 +1172,7 @@ return (
         <div style={{ marginTop: "0.625rem", paddingTop: "0.625rem", borderTop: `0.0625rem solid ${C.line}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
             <span style={{ fontSize: T.fMicro, color: C.muted }}>{lang === "hi" ? "व्यक्तिगत सलाह — अपना लग्न:" : "Personalize — your ascendant:"}</span>
-            <select value={horaAsc == null ? "" : horaAsc} onChange={(e) => setHoraAsc(e.target.value === "" ? null : parseInt(e.target.value))} style={{ fontSize: T.fMicro, padding: "0.3125rem 0.5rem", borderRadius: T.rSm, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.ivory, fontFamily: T.body, maxWidth: "11.25rem" }}>
+            <select value={horaAsc == null ? "" : horaAsc} onChange={(e) => setHoraAsc(e.target.value === "" ? null : parseInt(e.target.value))} style={{ minHeight: T.ctrlH, fontSize: T.fMicro, padding: `0 ${T.s2}`, borderRadius: T.rSm, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.ivory, fontFamily: T.body, maxWidth: "11.25rem" }}>
               <option value="">{lang === "hi" ? "— चुनें —" : "— none —"}</option>
               {SIGNS.map((sg, i) => <option key={i} value={i}>{panchangTerm(lang, "sign", sg)}</option>)}
             </select>

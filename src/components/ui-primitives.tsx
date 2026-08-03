@@ -14,7 +14,7 @@
  *  - Auspicious/avoid is NEVER colour-only: Badge always renders a glyph plus its text.
  *  - Bilingual-safe: nothing is width-clamped, labels wrap, values stay on their own line
  *    when Devanagari runs long.
- *  - Interactive variants meet the 42px (--control-height) touch target and show the shared
+ *  - Interactive variants meet the 44px (--control-height) touch target and show the shared
  *    token focus ring via .comfort-focus.
  */
 import React from "react";
