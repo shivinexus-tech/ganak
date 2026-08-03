@@ -108,8 +108,14 @@ function applyPersonalisation(days: any[], anchors: any) {
     return { mode: "annotate", kept: scored, setAside: [] };
   }
   const setAside = scored.filter((d) => !d.fit.coreOk);
+  /* Ranking priority (owner decision 2026-08-02): the finder's own muhurat QUALITY leads;
+     the personal Ashtakavarga strength only breaks ties between equally-good days.
+     Sorting by bindus first promoted days the finder itself labels "Better avoided" above
+     "Highly auspicious" ones — across 20 test charts, 30% got the wrong day in the
+     "Best day" card. Personalisation orders good days; it must never make a worse day
+     outrank a better one. */
   const kept = survivors.slice().sort(
-    (a, b) => (b.fit.moonBindu || 0) - (a.fit.moonBindu || 0) || (b.score || 0) - (a.score || 0) || a.rise - b.rise
+    (a, b) => (b.score || 0) - (a.score || 0) || (b.fit.moonBindu || 0) - (a.fit.moonBindu || 0) || a.rise - b.rise
   );
   return { mode: "filter", kept, setAside };
 }

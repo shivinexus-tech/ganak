@@ -101,6 +101,27 @@ if (res.mode === 'filter') {
   if (res.kept.length !== valid.length) fail('annotate mode must keep every candidate day');
 }
 
+  /* Ranking priority (owner decision 2026-08-02): the finder's own muhurat QUALITY leads;
+     the personal Ashtakavarga strength only breaks ties. Sorting by bindus first put days
+     the finder itself labels "Better avoided" above "Highly auspicious" ones — 30% of test
+     charts got the wrong day in the "Best day" card. A day Ganak considers worse must never
+     outrank a better one, so kept[] must be non-increasing by score. */
+  /* Uses a range/category KNOWN to return a mixed-quality kept list (Delhi travel over six
+     months). The short wedding fixture above does NOT exercise this — every surviving day
+     happens to share a score, so the assertion would pass on the broken sort. That vacuity
+     is exactly how the bug shipped: one happy-path sample proved nothing. */
+  const mixed = muhuratScanRange(DELHI, 'lahiri', ymd(2026, 8, 3), ymd(2027, 2, 28), 'travel').filter((d) => d.valid);
+  const mixedRes = applyPersonalisation(mixed, anchors);
+  if (mixedRes.mode !== 'filter') fail('ranking fixture did not reach filter mode — pick a range with more surviving days');
+  const scores = mixedRes.kept.map((d) => d.score || 0);
+  if (new Set(scores).size < 2) fail('ranking fixture is vacuous: every kept day has the same score, so ordering cannot be tested');
+  for (let i = 0; i < mixedRes.kept.length - 1; i++) {
+    if (scores[i] < scores[i + 1]) {
+      fail(`ranking inversion at ${i}: score ${scores[i]} ranked above score ${scores[i + 1]} — muhurat quality must lead, bindus only break ties`);
+      break;
+    }
+  }
+
 // The <3 fallback: a hand-built list of three !coreOk days must flip to annotate mode.
 const badDay = valid.length ? { ...valid[0] } : { rise: scan[0].rise, nak: scan[0].nak, tn: scan[0].tn };
 // force !coreOk by choosing a Janma that makes this day tara 1 (same star)
