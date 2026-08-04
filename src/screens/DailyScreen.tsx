@@ -166,9 +166,13 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
       )}
 
       {todayP && (
-        <>
-          <div className="rise" style={{ position: "relative", zIndex: calOpen ? 50 : 1, display: "flex", gap: "0.625rem", flexWrap: "wrap", alignItems: "center", marginBottom: "1.25rem" }}>
-            <div style={{ flex: "1 1 200px", minWidth: "11.25rem" }}><PlaceInput inputId="daily-place-input" value={place} onPick={onPlace} C={C} lang={lang} /></div>
+        <div className="daily-screen">
+          <aside className="daily-context">
+          <div className="rise" style={{ position: "relative", zIndex: calOpen ? 50 : 1, display: "grid", gap: T.s3, marginBottom: "1.125rem", padding: T.s3, background: "var(--surface-active)", border: `0.0625rem solid ${C.line}`, borderRadius: T.rLg, boxShadow: "var(--elevation-1)" }}>
+            <div>
+              <div style={{ ...T.label, color: C.muted, marginBottom: T.s1 }}>{lang === "hi" ? "स्थान" : "PLACE"}</div>
+              <PlaceInput inputId="daily-place-input" value={place} onPick={onPlace} C={C} lang={lang} />
+            </div>
             {(() => {
               const [py, pm, pd] = panchDate.split("-").map(Number);
               const baseUTC = Date.UTC(py, pm - 1, pd);
@@ -213,11 +217,13 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                 for (let i = 0; i < 42; i++) { const dt = new Date(Date.UTC(cy, cm - 1, 1 - startDow + i)); grid.push({ y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate(), inMonth: dt.getUTCMonth() + 1 === cm }); }
               }
               return (
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
-                  <div style={{ position: "relative" }}>
-                    <div style={{ display: "inline-flex", alignItems: "stretch", height: T.ctrlH, boxSizing: "border-box", border: `0.0625rem solid ${C.line}`, borderRadius: T.rMd, background: "var(--surface-sunken)", overflow: "hidden" }}>
+                <div style={{ display: "grid", gap: T.s1 }}>
+                  <div style={{ ...T.label, color: C.muted }}>{lang === "hi" ? "तारीख़" : "DATE"}</div>
+                  <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+                    <div style={{ position: "relative", width: "100%" }}>
+                      <div style={{ display: "inline-flex", alignItems: "stretch", width: "100%", height: T.ctrlH, boxSizing: "border-box", border: `0.0625rem solid ${C.line}`, borderRadius: T.rMd, background: "var(--surface-sunken)", overflow: "hidden" }}>
                       <button onClick={() => step(-1)} style={arrowBtn} aria-label={lang === "hi" ? "पिछला दिन" : "Previous day"}>‹</button>
-                      <button onClick={openCal} aria-label={lang === "hi" ? "तारीख़ चुनें" : "Choose date"} style={{ display: "inline-flex", alignItems: "center", gap: "0.4375rem", padding: "0 0.75rem", borderLeft: `0.0625rem solid ${C.line}`, borderRight: `0.0625rem solid ${C.line}`, background: calOpen ? "var(--surface-hover)" : "transparent", borderTop: "none", borderBottom: "none", cursor: "pointer", height: "100%" }}>
+                      <button onClick={openCal} aria-label={lang === "hi" ? "तारीख़ चुनें" : "Choose date"} style={{ display: "inline-flex", flex: 1, justifyContent: "center", alignItems: "center", gap: "0.4375rem", padding: "0 0.75rem", borderLeft: `0.0625rem solid ${C.line}`, borderRight: `0.0625rem solid ${C.line}`, background: calOpen ? "var(--surface-hover)" : "transparent", borderTop: "none", borderBottom: "none", cursor: "pointer", height: "100%" }}>
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="1.8" strokeLinecap="round" style={{ flexShrink: 0 }}><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="16" y1="2" x2="16" y2="6" /></svg>
                         <span style={{ fontFamily: T.body, fontSize: "var(--font-small)", fontWeight: 400, color: C.ivory, whiteSpace: "nowrap" }}>{dateLabel}</span>
                         <span style={{ color: C.gold, fontSize: "var(--font-label)", transform: calOpen ? "rotate(180deg)" : "none", transition: "transform .15s" }}>▾</span>
@@ -311,14 +317,14 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                       </>
                     )}
                   </div>
-                  {!isPanchToday && <button onClick={() => choosePanchDate(todayISO)} style={{ height: T.ctrlH, boxSizing: "border-box", padding: "0 1rem", borderRadius: T.rMd, fontFamily: T.serif, fontSize: "var(--font-small)", cursor: "pointer", border: `0.0625rem solid ${C.gold}`, background: "var(--surface-hover)", color: C.gold }}>{lang === "hi" ? "आज पर लौटें" : "Back to today"}</button>}
+                    {!isPanchToday && <button onClick={() => choosePanchDate(todayISO)} style={{ width: "100%", height: T.ctrlH, boxSizing: "border-box", padding: "0 1rem", borderRadius: T.rMd, fontFamily: T.serif, fontSize: "var(--font-small)", cursor: "pointer", border: `0.0625rem solid ${C.gold}`, background: "var(--surface-hover)", color: C.gold }}>{lang === "hi" ? "आज पर लौटें" : "Back to today"}</button>}
+                  </div>
                 </div>
               );
             })()}
           </div>
-          <div style={{ display: "flex", justifyContent: "flex-start", margin: "-0.5rem 0 1rem" }}>
-            <ReadAloudButton text={listenText} lang={lang === "hi" ? "hi" : "en"} label={lang === "hi" ? "🔊 आज का पंचांग सुनें" : "🔊 Listen to today's Panchang"} />
-          </div>
+          </aside>
+          <main className="daily-answer">
           {showExpert && <p style={{ margin: "0 0 1rem", padding: "0.625rem 0.75rem", borderRadius: T.rMd, background: "var(--surface-raised)", border: "0.0625rem solid var(--line)", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55, fontVariantNumeric: "tabular-nums" }}>
             <strong style={{ color: C.ivory }}>{lang === "hi" ? "गणना आधार" : "Calculation basis"}</strong>{" · "}
             {(lang === "hi" ? "लाहिरी अयनांश · मध्यम राहु/केतु · स्थानीय सूर्योदय आधार · UTC" : "Lahiri ayanamsa · mean Rahu/Ketu · local sunrise basis · UTC")}
@@ -332,24 +338,37 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
               ? "पंचांग दिन के पाँच अंग बताता है। सबसे उपयोगी दो बातें नीचे हैं — कौन-सा समय शुभ है, और किस समय नया काम आरम्भ नहीं करना चाहिए।"
               : "The Panchang describes the five parts of the day. The two things most people need are just below — which times are auspicious, and which times to avoid starting something new."}
           </p>}
-          {place && <div style={{ margin: "-0.75rem 0 1rem", display:"flex", alignItems:"flex-end", gap: "0.625rem", flexWrap:"wrap" }}>
-            <label style={{ display: "grid", gap: T.s1, ...T.label, color: C.muted }}>
-              <span>{lang === "hi" ? "कैलेंडर पद्धति" : "CALENDAR SYSTEM"}</span>
-              <select value={calendarMode} onChange={(e) => chooseCalendarMode(e.target.value)} aria-label={lang === "hi" ? "कैलेंडर पद्धति" : "Calendar system"} style={{ height:T.ctrlH, borderRadius:T.rMd, border:`0.0625rem solid ${C.line}`, background:"var(--surface-sunken)", color:C.ivory, padding: "0 0.625rem", fontFamily:T.body }}>
-              {CALENDAR_CONVENTIONS.filter(x => conventionIsEnabled(x.id,regionalFlags)).map(x => <option key={x.id} value={x.id}>{lang === "hi" ? x.hi : x.en}</option>)}
-              </select>
-            </label>
-            <HolidayOverlaySelect mode={holidayMode} onMode={chooseHolidayMode} lang={lang} />
-            <div style={{ fontSize:T.fMicro, color:C.muted, lineHeight:1.45, flex:"1 1 220px" }}>
-              <div>{calendarLabel(calendarMode, todayP, todayP.rise, lang === "hi" ? "hi" : "en", place)}</div>
-              <div style={{ fontStyle:"italic" }}>{lang === "hi" ? `समय ${place.label} के अनुसार · दूसरा कैलेंडर चुनने से केवल तारीख़ का नाम बदलता है, समय वही रहता है` : `Times shown for ${place.label} · choosing a different calendar only changes how the date is named, the timings stay the same`}</div>
-              {(calendarMode==="tamil-solar"||calendarMode==="bengali-solar")&&<div className="technical-only" style={{marginTop: "0.1875rem",fontStyle:"normal"}}>{calendarMode==="tamil-solar"?(lang==="hi"?"तिरुकणित · सूर्य का निरयण राशि-प्रवेश और तमिल सूर्यास्त नियम":"Thirukanitha · sidereal solar ingress with the Tamil sunset rule"):(lang==="hi"?"विशुद्ध सिद्धान्त · सूर्य का निरयण राशि-प्रवेश और बंगाल सूर्योदय नियम":"Vishuddha Siddhanta · sidereal solar ingress with the Bengal sunrise rule")}</div>}
-              {calendarState.recoveredFrom && <div role="status" style={{ marginTop: "0.1875rem",color:C.sindoor,fontStyle:"normal" }}>{calendarState.reason === "disabled" ? (lang === "hi" ? "यह क्षेत्रीय पद्धति अस्थायी रूप से बन्द है; आपकी तिथि, स्थान और भाषा रखते हुए गणक मानक दिखाया गया है।" : "That regional mode is temporarily disabled; Ganak default is shown without losing your date, place or language.") : (lang === "hi" ? "यह कैलेंडर पद्धति समर्थित नहीं है; गणक मानक दिखाया गया है।" : "That calendar mode is unsupported; Ganak default is shown.")}</div>}
-            </div>
-          </div>}
-          <HolidayOverlayCard isoDate={panchDate} mode={holidayMode} onMode={chooseHolidayMode} lang={lang} C={C} card={card} />
           <MuhuratHub todayP={todayP} place={place} lang={lang} ayanamsa={ayanamsa} isToday={isPanchToday} onCal={setCalView} onChangeCity={focusPlaceInput} C={C} card={card} />
-
+          <div style={{ display: "flex", justifyContent: "flex-start", margin: "0.875rem 0 1rem" }}>
+            <ReadAloudButton text={listenText} lang={lang === "hi" ? "hi" : "en"} label={lang === "hi" ? "🔊 आज का पंचांग सुनें" : "🔊 Listen to today's Panchang"} />
+          </div>
+          </main>
+          <aside className="daily-preferences">
+          {place && <details style={{ margin: "0 0 1rem", padding: `${T.s2} ${T.s3}`, background: "var(--surface-active)", border: `0.0625rem solid ${C.line}`, borderRadius: T.rLg }}>
+            <summary style={{ minHeight: T.ctrlH, display: "flex", alignItems: "center", cursor: "pointer", color: C.ivory, fontFamily: T.serif, fontSize: "var(--font-small)", fontWeight: 700 }}>
+              {lang === "hi" ? "कैलेंडर और अवकाश विकल्प" : "Calendar & holiday preferences"}
+            </summary>
+            <div style={{ display: "grid", gap: T.s3, paddingTop: T.s3 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(12rem, 1fr))", gap: T.s3, alignItems: "end" }}>
+                <label style={{ display: "grid", gap: T.s1, ...T.label, color: C.muted }}>
+                  <span>{lang === "hi" ? "कैलेंडर पद्धति" : "CALENDAR SYSTEM"}</span>
+                  <select value={calendarMode} onChange={(e) => chooseCalendarMode(e.target.value)} aria-label={lang === "hi" ? "कैलेंडर पद्धति" : "Calendar system"} style={{ height:T.ctrlH, borderRadius:T.rMd, border:`0.0625rem solid ${C.line}`, background:"var(--surface-sunken)", color:C.ivory, padding: "0 0.625rem", fontFamily:T.body }}>
+                    {CALENDAR_CONVENTIONS.filter(x => conventionIsEnabled(x.id,regionalFlags)).map(x => <option key={x.id} value={x.id}>{lang === "hi" ? x.hi : x.en}</option>)}
+                  </select>
+                </label>
+                <HolidayOverlaySelect mode={holidayMode} onMode={chooseHolidayMode} lang={lang} />
+              </div>
+              <div style={{ fontSize:T.fMicro, color:C.muted, lineHeight:1.45 }}>
+                <div>{calendarLabel(calendarMode, todayP, todayP.rise, lang === "hi" ? "hi" : "en", place)}</div>
+                <div style={{ fontStyle:"italic" }}>{lang === "hi" ? `समय ${place.label} के अनुसार · दूसरा कैलेंडर चुनने से केवल तारीख़ का नाम बदलता है, समय वही रहता है` : `Times shown for ${place.label} · choosing a different calendar only changes how the date is named, the timings stay the same`}</div>
+                {(calendarMode==="tamil-solar"||calendarMode==="bengali-solar")&&<div className="technical-only" style={{marginTop: "0.1875rem",fontStyle:"normal"}}>{calendarMode==="tamil-solar"?(lang==="hi"?"तिरुकणित · सूर्य का निरयण राशि-प्रवेश और तमिल सूर्यास्त नियम":"Thirukanitha · sidereal solar ingress with the Tamil sunset rule"):(lang==="hi"?"विशुद्ध सिद्धान्त · सूर्य का निरयण राशि-प्रवेश और बंगाल सूर्योदय नियम":"Vishuddha Siddhanta · sidereal solar ingress with the Bengal sunrise rule")}</div>}
+                {calendarState.recoveredFrom && <div role="status" style={{ marginTop: "0.1875rem",color:C.sindoor,fontStyle:"normal" }}>{calendarState.reason === "disabled" ? (lang === "hi" ? "यह क्षेत्रीय पद्धति अस्थायी रूप से बन्द है; आपकी तिथि, स्थान और भाषा रखते हुए गणक मानक दिखाया गया है।" : "That regional mode is temporarily disabled; Ganak default is shown without losing your date, place or language.") : (lang === "hi" ? "यह कैलेंडर पद्धति समर्थित नहीं है; गणक मानक दिखाया गया है।" : "That calendar mode is unsupported; Ganak default is shown.")}</div>}
+              </div>
+            </div>
+          </details>}
+          <HolidayOverlayCard isoDate={panchDate} mode={holidayMode} onMode={chooseHolidayMode} lang={lang} C={C} card={card} />
+          </aside>
+          <div className="daily-secondary">
           <Card className="rise2" style={{ marginTop: "0.75rem" }}>
             <SectionHeader
               hi="आगामी ग्रह गोचर"
@@ -439,7 +458,8 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
             })}
           </Card>
           <PlanetCalendarCard tz={todayP.tz} placeLabel={place && place.label} lang={lang} C={C} card={card} />
-        </>
+          </div>
+        </div>
       )}
     </>
   );
