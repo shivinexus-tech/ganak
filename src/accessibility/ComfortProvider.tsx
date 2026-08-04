@@ -45,9 +45,9 @@ type ComfortContextValue = {
 };
 
 const PRESETS = Object.freeze({
-  "simple-large": { scalePercent: 112.5, densityRem: 0.1875, depth: "guided" as ContentDepth, warmth: "soft" as Warmth },
-  balanced: { scalePercent: 106.25, densityRem: 0.0625, depth: "balanced" as ContentDepth, warmth: "balanced" as Warmth },
-  detailed: { scalePercent: 100, densityRem: -0.0625, depth: "expert" as ContentDepth, warmth: "crisp" as Warmth },
+  "simple-large": { scalePercent: 118.75, densityRem: 0.1875, depth: "guided" as ContentDepth, warmth: "soft" as Warmth },
+  balanced: { scalePercent: 112.5, densityRem: 0.0625, depth: "balanced" as ContentDepth, warmth: "balanced" as Warmth },
+  detailed: { scalePercent: 106.25, densityRem: -0.0625, depth: "expert" as ContentDepth, warmth: "crisp" as Warmth },
 });
 
 export const DEFAULT_PREFERENCES: GanakPreferences = Object.freeze({

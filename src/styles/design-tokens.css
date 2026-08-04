@@ -8,7 +8,7 @@
 
 :root {
   /* Comfortable-by-default. Browser/user default font size remains the baseline. */
-  --scale: 106.25%;
+  --scale: 112.5%;
   --density: 0.0625rem;
   font-size: var(--scale);
 
@@ -21,7 +21,7 @@
   --font-label: 0.8125rem;
   --font-micro: 0.75rem;
   --font-display-family: Eczar, serif;
-  --font-body-family: Spectral, Georgia, serif;
+  --font-body-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --label-letter-spacing: 0.16em;
   --label-transform: uppercase;
 
@@ -47,15 +47,15 @@
   --elevation-3: 0 0.875rem 2.25rem rgba(60, 40, 10, 0.16);
 
   /* BRAND COLOR VALUES START — future brand edits change RHS values only. */
-  --theme-bg-light: #FAF5EA;
+  --theme-bg-light: #F8F9FC;
   --theme-surface-light: #FFFFFF;
-  --theme-ink-light: #3B3147;
-  --theme-muted-light: #70675F;
-  --theme-accent-light: #8A560D;
-  --theme-gold-light: #8A560D;
-  --theme-good-light: #1E6948;
-  --theme-bad-light: #A33C2E;
-  --theme-line-light: #D8CBAF;
+  --theme-ink-light: #1B1B1F;
+  --theme-muted-light: #44474E;
+  --theme-accent-light: #684900;
+  --theme-gold-light: #684900;
+  --theme-good-light: #146C43;
+  --theme-bad-light: #B3261E;
+  --theme-line-light: #C4C7C5;
   --theme-bg-dark: #18151C;
   --theme-surface-dark: #242027;
   --theme-ink-dark: #FFF8EE;
@@ -98,9 +98,9 @@
   --bad-line: color-mix(in srgb, var(--bad), var(--line) 45%);
 }
 
-html[data-comfort-preset="simple-large"] { --scale: 112.5%; --density: 0.1875rem; }
-html[data-comfort-preset="balanced"] { --scale: 106.25%; --density: 0.0625rem; }
-html[data-comfort-preset="detailed"] { --scale: 100%; --density: -0.0625rem; }
+html[data-comfort-preset="simple-large"] { --scale: 118.75%; --density: 0.1875rem; }
+html[data-comfort-preset="balanced"] { --scale: 112.5%; --density: 0.0625rem; }
+html[data-comfort-preset="detailed"] { --scale: 106.25%; --density: -0.0625rem; }
 
 html[data-color-mode="dark"] {
   --bg: var(--theme-bg-dark); --surface: var(--theme-surface-dark);
@@ -146,7 +146,94 @@ body {
   font-family: var(--font-body-family);
   line-height: 1.5;
   text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+/* Preview-only override (CODEX-WEB-READABILITY-PREVIEW-2026-08-03): the existing shell
+ * paints decorative radial gradients inline. Keep the Material-style light surface flat while
+ * the owner reviews this isolated worktree; the production shell is untouched. */
+#root > div { background: var(--bg-active) !important; }
+
+/* Preview-only mobile rhythm: the legacy shell's brand header consumed more of the first
+ * viewport than the day itself. Keep its visual hierarchy, but spend that space on the
+ * user's answer rather than empty decoration. */
+@media (max-width: 40rem) {
+  .utility-header { margin-bottom: var(--space-3) !important; }
+  header.rise { margin-bottom: var(--space-5) !important; }
+  header.rise h1 { font-size: 2.375rem !important; }
+}
+
+/* Preview-only desktop composition. The legacy web shell is a single narrow stack at every
+ * breakpoint, which leaves a large browser feeling like a magnified phone. On wider screens,
+ * preserve the existing Daily content and behaviour but give the answer a reading column and
+ * put place/date plus low-frequency preferences in a quiet utility column. */
+@media (min-width: 64rem) {
+  /* AccessibilityRoot and the legacy app shell both use anonymous inline max-width
+   * wrappers. Match that actual contract instead of depending on their DOM depth: the
+   * prior selector only reached the Personalize bar, leaving the page at phone width. */
+  #root div[style*="max-width: 47.5rem"] {
+    max-width: 74rem !important;
+    padding-inline: var(--space-6) !important;
+  }
+
+  #root .utility-header {
+    margin-bottom: calc(-1 * var(--space-4)) !important;
+  }
+
+  #root header.rise {
+    max-width: 46rem;
+    margin-inline: auto;
+    margin-bottom: var(--space-6) !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  #root header.rise h1 {
+    font-size: 2.5rem !important;
+    margin-top: var(--space-2) !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  /* The current document carries a legacy decorative keyline around the whole wordmark.
+   * On a website it reads as a stray empty input, so the desktop utility pass returns the
+   * brand header to type and one quiet devotional divider. */
+  #root header.rise > h1,
+  #root header.rise > h1 * {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .daily-screen {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(20rem, 0.8fr);
+    grid-template-areas:
+      "answer context"
+      "answer preferences"
+      "secondary secondary";
+    gap: var(--space-5);
+    align-items: start;
+  }
+
+  .daily-answer { grid-area: answer; min-width: 0; }
+  .daily-context { grid-area: context; position: sticky; top: var(--space-5); }
+  .daily-preferences { grid-area: preferences; min-width: 0; }
+  .daily-secondary {
+    grid-area: secondary;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+    align-items: start;
+  }
+
+  .daily-context > .rise { margin-bottom: 0 !important; }
+  .daily-secondary > * { margin-top: 0 !important; }
 }
 
 /*
