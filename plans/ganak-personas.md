@@ -52,7 +52,23 @@ differences labelled, never presented as universal. Print/share matters — outp
 families.
 **Ganak's aim:** credibility. This persona's rejection is fatal to trust.
 
-## P4 · Working astrologer
+## P4 · Serious Jyotish learner
+
+**Wants:** to understand *how* the result was reached, not only what it says. Studies the craft —
+reads the technical panels, opens divisional charts, compares methods, checks Ganak's working
+against what they are learning.
+**Knows:** the vocabulary and some method; actively building competence. Will spot a hand-wave.
+**Named as a revenue segment in AGENTS.md** alongside P5 — do not merge the two. A learner wants
+**explanation and transparency**; a working astrologer wants **speed and correctness**. Optimising
+for one degrades the other: hiding method to save taps fails P4; adding teaching prose to every
+result slows P5.
+**Design constraints that apply:** method and convention must be visible and sourced; jargon gets
+a gloss without the depth being removed; "answer-before-data" must never mean "answer instead of
+data". Progressive disclosure suits this persona better than either extreme.
+**Ganak's aim:** the segment that grows into P5, and the one most likely to trust — and later pay
+for — depth.
+
+## P5 · Working astrologer
 
 **Wants:** repeat chart work for clients — cast, check several doshas, compare, move to the next
 person. Depth over simplicity: divisional charts, dashas, Ashtakavarga, KP.
@@ -61,14 +77,15 @@ hand-holding.
 **Design constraints that apply:** repetition is the cost centre — retyping birth details per
 tool per client is the dominant friction. Saved charts matter. **Owner decision 2026-08-03: up
 to 5 saved charts**, saved only when the user chooses to (never silently).
-**Ganak's aim:** the bankable segment long-term; today, the segment whose usage teaches the most.
+**Ganak's aim:** the bankable segment long-term (AGENTS.md: *"above all, the working practising
+astrologer — the bankable payer"*); today, the segment whose usage teaches the most.
 
 ---
 
 ## Rules for specs
 
 1. **Name exactly one primary persona** (a secondary is allowed, clearly marked).
-2. **Do not borrow constraints across personas.** Elder-friendly is P1's. Applying it to P2/P4
+2. **Do not borrow constraints across personas.** Elder-friendly is P1's. Applying it to P2/P4/P5
    tooling is the error this file exists to prevent. If a constraint feels inherited, say which
    persona it came from and why it transfers.
 3. **If the persona isn't in this file, stop and ask the owner.** Do not invent one.
