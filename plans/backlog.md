@@ -825,13 +825,18 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       published). Optionally run `bootstrap-plan` first — it is read-only and lists exactly
       which cells are stale. No agent can dispatch this: the sandbox has no GitHub
       credentials. _(Backlog #46 closeout evidence.)_
-- [ ] **Owner chore (2026-08-02) — switch Cloudflare Web Analytics off for ganakapp.com.**
-      Cloudflare dashboard → **Web Analytics** → the `ganakapp.com` site → disable/remove it.
-      No agent can do this: it lives in the owner's Cloudflare account, not in the repo.
-      Until it is off, the site sends `POST /cdn-cgi/rum` on every page load while the
-      footer promises usage events only with consent. Verify afterwards by loading
-      ganakapp.com and confirming no `/cdn-cgi/rum` request in the browser network tab.
-      Revisit the decision when the app starts being shared and traffic numbers matter.
+- [x] **Owner chore (2026-08-02) — switch Cloudflare Web Analytics off for ganakapp.com.**
+      **DONE 2026-08-05, owner disabled RUM in the Cloudflare dashboard; agent-verified live
+      the same day.** The beacon had been injected at the edge on every page load regardless
+      of the in-app analytics consent, contradicting the footer's "anonymous usage events
+      only when consented". **Live evidence:** the first fetch of ganakapp.com still carried
+      `static.cloudflareinsights.com/beacon.min.js` from Cloudflare's own edge cache; a
+      cache-bypassing fetch, the `?lang=hi` route and a subsequent plain fetch of `/` all
+      returned **zero** beacon scripts, zero `/cdn-cgi/rum` requests and no
+      `cloudflareinsights`/`cf-beacon` string anywhere in the document. The footer claim is
+      now accurate with no copy change. Reversible: re-enabling is a dashboard toggle, and
+      at that point the footer must be updated to disclose it in the same change.
+      Revisit when the app starts being shared and traffic numbers matter.
       _(Backlog #46 owner decision; see also P0-ANALYTICS-PRIVACY.)_
 - [ ] **Owner chore:** one local `cd server && npm run smoke` (agents verified via
       browser; suite itself unrun as-written).
@@ -853,7 +858,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       Card/SectionHeader/Badge/DataRow primitives now cover all six launch screens;
       Guided <-> Expert materially changes content on all five launch journeys; Muhurat
       has bilingual Listen. The final primitive adoption is deployed and live-verified.
-      **Owner decision 2026-08-02 — Cloudflare Web Analytics goes OFF for now.** The
+      **Owner decision 2026-08-02, executed and verified 2026-08-05 — Cloudflare Web Analytics is OFF.** The
       beacon fired on every load regardless of the in-app analytics consent, which broke
       the footer's "anonymous usage events only when consented" claim. Ganak's own
       telemetry seam is fail-closed and gate-proven; the beacon is injected by Cloudflare
