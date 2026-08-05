@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { T } from "./ui-style-contract";
 import { privacyEvent } from "../telemetry/privacy-events";
 
-const ENDPOINT = String(import.meta.env?.VITE_FEEDBACK_ENDPOINT || "").trim();
+const ENDPOINT = String(import.meta.env?.VITE_FEEDBACK_ENDPOINT || "/api/feedback").trim();
 
 export default function FeedbackCard({ lang, C, card }) {
   const [open, setOpen] = useState(false);
@@ -13,7 +13,7 @@ export default function FeedbackCard({ lang, C, card }) {
     if (text.length < 5) return setStatus(lang === "hi" ? "कृपया थोड़ा और लिखें।" : "Please add a little more detail.");
     if (!ENDPOINT) return setStatus(lang === "hi" ? "प्रतिक्रिया सेवा अभी जुड़ी नहीं है।" : "The feedback service is not connected yet.");
     try {
-      const res = await fetch(ENDPOINT, { method: "POST", credentials: "omit", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: text.slice(0, 2000), path: location.pathname }) });
+      const res = await fetch(ENDPOINT, { method: "POST", credentials: "omit", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "general", suggestion: text.slice(0, 2000), route: location.pathname }) });
       if (!res.ok) throw new Error("feedback failed");
       setMessage("");
       setStatus(lang === "hi" ? "धन्यवाद—प्रतिक्रिया भेजी गई।" : "Thank you—feedback sent.");
