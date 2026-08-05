@@ -28,3 +28,34 @@ export function buildFeedbackRow(body: any):
     },
   };
 }
+
+interface Env { SUPABASE_URL: string; SUPABASE_SERVICE_KEY: string; }
+const JSON_HEADERS = { 'Content-Type': 'application/json' };
+
+export const onRequestPost = async ({ request, env }: { request: Request; env: Env }) => {
+  let body: unknown;
+  try { body = await request.json(); } catch { return new Response('{"ok":false}', { status: 400, headers: JSON_HEADERS }); }
+
+  const built = buildFeedbackRow(body);
+  if (!built.ok) {
+    // Honeypot spam: pretend success so bots get no signal; store nothing.
+    if ((built as any).spam) return new Response('{"ok":true}', { status: 200, headers: JSON_HEADERS });
+    return new Response('{"ok":false}', { status: 400, headers: JSON_HEADERS });
+  }
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) {
+    // Safe no-op until the owner creates the project + sets secrets.
+    return new Response('{"ok":false,"error":"not configured"}', { status: 503, headers: JSON_HEADERS });
+  }
+  const res = await fetch(`${env.SUPABASE_URL}/rest/v1/feedback`, {
+    method: 'POST',
+    headers: {
+      apikey: env.SUPABASE_SERVICE_KEY,
+      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify(built.row),
+  });
+  if (!res.ok) return new Response('{"ok":false}', { status: 502, headers: JSON_HEADERS });
+  return new Response('{"ok":true}', { status: 200, headers: JSON_HEADERS });
+};
