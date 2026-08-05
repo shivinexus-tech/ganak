@@ -3,6 +3,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const src=fs.readFileSync('src/telemetry/privacy-events.ts','utf8');
+assert(src.includes('analyticsConsentGranted()'),'telemetry must require explicit stored analytics consent');
 for(const event of ['page_view','muhurat_search','muhurat_share','muhurat_export','feedback_sent']) assert(src.includes(event),`event dictionary missing ${event}`);
 for(const forbidden of ['email','city','lat','lon','query','birth','userId','localStorage','sessionStorage','document.cookie']) assert(!src.includes(forbidden),`telemetry contains forbidden field/storage token ${forbidden}`);
 assert(src.includes('credentials: "omit"'),'telemetry must omit credentials');

@@ -1,7 +1,7 @@
 /* Calendar page — pure extraction (SPLIT-UI-03f). Wire deferred. */
 
 import React, { useState, useMemo } from "react";
-import { T } from "../components/tokens";
+import { T } from "../components/ui-style-contract";
 import { fmtTime } from "../components/format";
 import { tr, trN, obsLabel } from "../i18n";
 import { FEST_NAME } from "../data/festival-meta";
@@ -51,17 +51,17 @@ function CalendarPage({ view, place, lang, onBack, C, card }) {
     return `${path}?${p.toString()}`;
   };
 
-  const dot = (it) => <span style={{ width: 7, height: 7, borderRadius: "50%", background: it.kind === "festival" ? C.gold : C.sindoor, flexShrink: 0 }} />;
+  const dot = (it) => <span style={{ width: "0.4375rem", height: "0.4375rem", borderRadius: "50%", background: it.kind === "festival" ? C.gold : C.sindoor, flexShrink: 0 }} />;
   const dateSpan = (it) => <span style={{ fontSize: T.fSmall, color: C.gold, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{fmtFull(it.ms)}</span>;
 
   const Row = ({ it, first }) => {
-    const border = first ? "none" : `1px solid ${C.line}`;
+    const border = first ? "none" : `0.0625rem solid ${C.line}`;
     // Tithi-only rows are informational, never a dedicated page — keep them plainly
     // non-interactive so they don't look like a broken button (and never route a
     // bare tithi to an unrelated festival).
     if (it.kind === "tithi") {
       return (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 4px", borderTop: border }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.625rem 0.25rem", borderTop: border }}>
           {dot(it)}
           <span style={{ flex: 1, fontFamily: T.serif, fontSize: T.fBody, color: C.ivory }}>{labelOf(it)}</span>
           {dateSpan(it)}
@@ -72,7 +72,7 @@ function CalendarPage({ view, place, lang, onBack, C, card }) {
     // A festival/fast with no canonical page must fail visibly, never silently.
     if (!path) {
       return (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 4px", borderTop: border }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.625rem 0.25rem", borderTop: border }}>
           {dot(it)}
           <span style={{ flex: 1, minWidth: 0, fontFamily: T.serif, fontSize: T.fBody, color: C.ivory }}>
             {labelOf(it)}
@@ -87,10 +87,10 @@ function CalendarPage({ view, place, lang, onBack, C, card }) {
         href={festHref(path)}
         className="fest-row"
         aria-label={`${labelOf(it)} — ${fmtFull(it.ms)}`}
-        style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 4px", borderTop: border, textDecoration: "none", color: "inherit" }}
+        style={{ display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.625rem 0.25rem", borderTop: border, textDecoration: "none", color: "inherit" }}
       >
         {dot(it)}
-        <span style={{ flex: 1, minWidth: 0, fontFamily: T.serif, fontSize: T.fBody, color: C.ivory, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{labelOf(it)}</span>
+        <span style={{ flex: 1, minWidth: 0, fontFamily: T.serif, fontSize: T.fBody, color: C.ivory, overflowWrap: "break-word" }}>{labelOf(it)}</span>
         {dateSpan(it)}
         <span aria-hidden="true" style={{ flexShrink: 0, color: C.muted, fontSize: T.fBody }}>›</span>
       </a>
@@ -99,31 +99,31 @@ function CalendarPage({ view, place, lang, onBack, C, card }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 60, background: C.bg, overflowY: "auto" }}>
-      <style>{`.fest-row{border-radius:8px;transition:background .12s ease;} .fest-row:hover{background:rgba(168,106,18,.08);} .fest-row:hover span[aria-hidden]{color:${C.gold};} .fest-row:focus-visible{outline:2px solid #A86A12;outline-offset:-2px;background:rgba(168,106,18,.10);}`}</style>
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 18px 60px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, position: "sticky", top: 0, background: C.bg, padding: "14px 0 12px", zIndex: 2, borderBottom: `1px solid ${C.line}`, marginBottom: 18 }}>
-          <button onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "9px 15px", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: C.panel, color: C.ivory, cursor: "pointer", fontFamily: T.serif, fontSize: T.fSmall }}>‹ {tr(lang, "backLabel")}</button>
+      <style>{`.fest-row{border-radius:8px;transition:background .12s ease;} .fest-row:hover{background:var(--surface-hover);} .fest-row:hover span[aria-hidden]{color:${C.gold};} .fest-row:focus-visible{outline:0.125rem solid var(--accent);outline-offset:-2px;background:var(--accent-soft);}`}</style>
+      <div style={{ maxWidth: "42.5rem", margin: "0 auto", padding: "0 1.125rem 3.75rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", position: "sticky", top: 0, background: C.bg, padding: "0.875rem 0 0.75rem", zIndex: 2, borderBottom: `0.0625rem solid ${C.line}`, marginBottom: "1.125rem" }}>
+          <button onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: "0.3125rem", padding: "0.5625rem 0.9375rem", borderRadius: T.rMd, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.ivory, cursor: "pointer", fontFamily: T.serif, fontSize: T.fSmall }}>‹ {tr(lang, "backLabel")}</button>
           <span style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.gold }}>{view.type === "year" ? `${tr(lang, "calTitle")}${yearData ? " · " + yearData.year : ""}` : tr(lang, "searchTitle")}</span>
         </div>
 
         {view.type === "search" && (
-          <div style={{ marginBottom: 20 }}>
-            <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder={tr(lang, "searchPlaceholder")} style={{ width: "100%", boxSizing: "border-box", padding: "12px 15px", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: C.panel, color: C.ivory, fontFamily: T.body, fontSize: T.fBody }} />
-            <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: 7 }}>{tr(lang, "searchHint")}</div>
+          <div style={{ marginBottom: "1.25rem" }}>
+            <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder={tr(lang, "searchPlaceholder")} style={{ width: "100%", boxSizing: "border-box", padding: "0.75rem 0.9375rem", borderRadius: T.rMd, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.ivory, fontFamily: T.body, fontSize: T.fBody }} />
+            <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: "0.4375rem" }}>{tr(lang, "searchHint")}</div>
           </div>
         )}
 
         {view.type === "year" && yearData && yearData.byMonth.map((items, mi) => items.length === 0 ? null : (
-          <div key={mi} style={{ marginBottom: 16 }}>
-            <div style={{ ...T.label, color: C.muted, marginBottom: 5 }}>{MO[mi]}</div>
-            <div style={{ ...card, padding: "4px 14px" }}>{items.map((it, i) => <Row key={i} it={it} first={i === 0} />)}</div>
+          <div key={mi} style={{ marginBottom: "1rem" }}>
+            <div style={{ ...T.label, color: C.muted, marginBottom: "0.3125rem" }}>{MO[mi]}</div>
+            <div style={{ ...card, padding: "0.25rem 0.875rem" }}>{items.map((it, i) => <Row key={i} it={it} first={i === 0} />)}</div>
           </div>
         ))}
-        {view.type === "year" && yearData && <div style={{ fontSize: T.fMicro, color: C.muted, fontStyle: "italic", padding: "2px 2px 14px", lineHeight: 1.5 }}>{tr(lang, "regionalNote")}</div>}
+        {view.type === "year" && yearData && <div style={{ fontSize: T.fMicro, color: C.muted, fontStyle: "italic", padding: "0.125rem 0.125rem 0.875rem", lineHeight: 1.5 }}>{tr(lang, "regionalNote")}</div>}
 
         {view.type === "search" && (results == null || results.length === 0
-          ? <div style={{ color: C.muted, fontStyle: "italic", fontSize: T.fBody, padding: "16px 2px" }}>{q.trim() ? tr(lang, "noResults") : tr(lang, "searchHint")}</div>
-          : <div style={{ ...card, padding: "4px 14px" }}>{results.map((it, i) => <Row key={i} it={it} first={i === 0} />)}</div>
+          ? <div style={{ color: C.muted, fontStyle: "italic", fontSize: T.fBody, padding: "1rem 0.125rem" }}>{q.trim() ? tr(lang, "noResults") : tr(lang, "searchHint")}</div>
+          : <div style={{ ...card, padding: "0.25rem 0.875rem" }}>{results.map((it, i) => <Row key={i} it={it} first={i === 0} />)}</div>
         )}
       </div>
     </div>

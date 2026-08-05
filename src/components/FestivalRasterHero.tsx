@@ -1,5 +1,5 @@
 import React from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import { heroArtForKey } from "../data/festival-hero-art";
 
 // Real festival hero: an AI-generated raster normalized to a 1280×480 WebP by
@@ -27,7 +27,7 @@ function FestivalRasterHero({ imageKey, lang, C }) {
       loading="eager"
       decoding="async"
       onError={() => setFailed(true)}
-      style={{ display: "block", width: "100%", height: "auto", aspectRatio: "8 / 3", objectFit: "cover", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: C.panel, marginBottom: 14 }}
+      style={{ display: "block", width: "100%", height: "auto", aspectRatio: "8 / 3", objectFit: "cover", borderRadius: T.rMd, border: `0.0625rem solid ${C.line}`, background: C.panel, marginBottom: "0.875rem" }}
     />
   );
 }

@@ -8,7 +8,7 @@
 //   1. TSX/JSX parses clean               (syntax)
 //   2. No duplicate top-level definitions (the recurring failure mode)
 //   3. No orphaned references             (used but never defined/imported)
-//   4. No localStorage / sessionStorage   (standing architectural constraint)
+//   4. Browser storage only through the approved adapter
 //   5. No internal notes in vrat copy      (research instructions stay in plans)
 //   6. cutBlock registration              (every component before `export
 //      default` appears in validation/build-engine.js, if that file exists)
@@ -85,6 +85,10 @@ let exportDefaultLine = Infinity;
 sf.forEachChild(n => { if (ts.isExportAssignment(n) || (n.modifiers || []).some(m => m.kind === ts.SyntaxKind.DefaultKeyword)) exportDefaultLine = Math.min(exportDefaultLine, lineOf(n)); });
 
 function walk(node, isTop) {
+  if ((ts.isTypeAliasDeclaration(node) || ts.isInterfaceDeclaration(node)) && node.name)
+    addDecl(node.name.text, node, isTop);
+  if (ts.isTypeParameterDeclaration(node) && node.name)
+    addDecl(node.name.text, node, false);
   if (ts.isFunctionDeclaration(node) && node.name) {
     addDecl(node.name.text, node, isTop);
     if (isTop && /^[A-Z]/.test(node.name.text) && lineOf(node) < exportDefaultLine && containsJsx(node.body))
@@ -105,7 +109,14 @@ function walk(node, isTop) {
 
   if (ts.isIdentifier(node)) {
     const p = node.parent;
+    let typeParent = p;
+    let isTypeOnly = false;
+    while (typeParent && typeParent !== sf) {
+      if (ts.isTypeNode(typeParent)) { isTypeOnly = true; break; }
+      typeParent = typeParent.parent;
+    }
     const isPropName    = p && ts.isPropertyAccessExpression(p) && p.name === node;
+    const isImportProp  = p && ts.isImportSpecifier(p) && p.propertyName === node;
     const isObjKey      = p && (ts.isPropertyAssignment(p) || ts.isPropertySignature(p)) && p.name === node;
     const isDeclName    = p && (ts.isFunctionDeclaration(p) || ts.isClassDeclaration(p) || ts.isVariableDeclaration(p)
                               || ts.isParameter(p) || ts.isBindingElement(p) || ts.isImportSpecifier(p)
@@ -114,7 +125,7 @@ function walk(node, isTop) {
     const isMetaName    = p && ts.isMetaProperty(p) && p.name === node;
     const isIntrinsic   = p && (ts.isJsxOpeningElement(p) || ts.isJsxSelfClosingElement(p) || ts.isJsxClosingElement(p))
                             && p.tagName === node && /^[a-z]/.test(node.text);
-    if (!isPropName && !isObjKey && !isDeclName && !isJsxAttr && !isMetaName && !isIntrinsic) {
+    if (!isPropName && !isImportProp && !isTypeOnly && !isObjKey && !isDeclName && !isJsxAttr && !isMetaName && !isIntrinsic) {
       if (!referenced.has(node.text)) referenced.set(node.text, []);
       referenced.get(node.text).push(lineOf(node));
     }
@@ -136,19 +147,43 @@ const GLOBALS = new Set(['console','window','document','navigator','Math','Date'
 'parseInt','parseFloat','isNaN','isFinite','encodeURIComponent','decodeURIComponent','setTimeout','clearTimeout',
 'setInterval','clearInterval','requestAnimationFrame','cancelAnimationFrame','fetch','structuredClone','queueMicrotask',
 'undefined','NaN','Infinity','globalThis','module','require','process','exports','__dirname','arguments',
-'Blob','URL','btoa','atob','URLSearchParams','history','location',
+'Blob','URL','btoa','atob','URLSearchParams','history','location','SpeechSynthesisUtterance',
 'React','ReactDOM','useState','useEffect','useMemo','useCallback','useRef','useReducer','useContext','Fragment','Suspense']);
 for (const [name, lines] of referenced) {
   if (declaredAt.has(name) || GLOBALS.has(name)) continue;
   failures.push(`ORPHAN  '${name}' referenced at line ${lines[0]} but never defined or imported`);
 }
 
-// --------------------------------------------------------- 4. NO STORAGE
-src.split('\n').forEach((ln, i) => {
-  const code = ln.replace(/\/\/.*$/, '').replace(/\/\*.*?\*\//g, '');
-  if (/\b(localStorage|sessionStorage)\b/.test(code))
-    failures.push(`STORAGE  line ${i + 1}: browser storage is banned in this project`);
-});
+// ------------------------------------------ 4. APPROVED STORAGE ADAPTER ONLY
+// The owner approved two auditable on-device stores. Direct browser-storage calls
+// anywhere else remain a release blocker. Scan all source files so running this
+// gate against the shell cannot miss a violation hidden in a feature module.
+{
+  const adapter = path.normalize('src/storage/approved-storage.ts');
+  const root = process.cwd();
+  const sourceRoot = path.join(root, 'src');
+  const scan = (dir) => {
+    if (!fs.existsSync(dir)) return [];
+    return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) return scan(full);
+      return /\.(?:js|jsx|ts|tsx)$/.test(entry.name) ? [full] : [];
+    });
+  };
+  for (const file of scan(sourceRoot)) {
+    const rel = path.normalize(path.relative(root, file));
+    const body = fs.readFileSync(file, 'utf8');
+    body.split('\n').forEach((ln, i) => {
+      const code = ln.replace(/\/\/.*$/, '').replace(/\/\*.*?\*\//g, '');
+      if (!/\b(localStorage|sessionStorage)\b/.test(code)) return;
+      if (rel !== adapter) {
+        failures.push(`STORAGE  ${rel}:${i + 1}: use ${adapter}; direct browser storage is banned`);
+      } else if (/\bsessionStorage\b/.test(code)) {
+        failures.push(`STORAGE  ${rel}:${i + 1}: the approved adapter may use localStorage only`);
+      }
+    });
+  }
+}
 
 // ---------------------------------------- 5. NO INTERNAL NOTES IN VRAT COPY
 {
@@ -204,4 +239,4 @@ if (failures.length) {
   console.error('');
   process.exit(1);
 }
-console.log(`✓ parse-check clean: ${target}  (syntax, no duplicates, no orphans, no browser storage, no internal vrat notes${enginePath ? ', cutBlock registered' : ''})`);
+console.log(`✓ parse-check clean: ${target}  (syntax, no duplicates, no orphans, approved storage adapter only, no internal vrat notes${enginePath ? ', cutBlock registered' : ''})`);

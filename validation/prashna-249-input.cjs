@@ -59,8 +59,10 @@ check(
 
 // F10: the 5-column full chart is wider than a 320px phone; it must scroll inside its
 // own container rather than push the whole page into horizontal overflow.
+// The min-width moved from a fixed 300px to the equivalent 18.75rem so the comfort scale
+// reaches it (backlog #46); either unit satisfies the guard, the scroll container does not.
 check(
-  /overflowX: 'auto'[\s\S]{0,160}<table style=\{\{ width: '100%', minWidth: 300/.test(source),
+  /overflowX: 'auto'[\s\S]{0,160}<table style=\{\{ width: '100%', minWidth: (?:300\b|"18\.75rem")/.test(source),
   'F10: the full-chart table is wrapped in a horizontal-scroll container'
 );
 

@@ -132,6 +132,17 @@
     "47": "Mixed textual, institutional and regional sources across the launch corpus; future batches require their own classification"
   },
   "qualityOverrides": {
+    "46": {
+      "deliveryState": "Comfort/accessibility and universal-primitives system deployed and production-verified across all six launch screens",
+      "limitations": "Closure still needs owner live-URL sign-off, a human real-device screen-reader/audio/touch pass, and an owner decision on the Cloudflare Web Analytics beacon. Native dropdown option scaling remains browser-controlled.",
+      "shortTermImpact": "Production users can now choose larger/roomier presentation, use bilingual read-aloud, select light/dark behavior and review or clear remembered preferences without login.",
+      "longTermImpact": "All launch screens now share the same primitive and semantic-token contracts, reducing one-off visual drift and making later comfort or brand-value changes consistent.",
+      "bugBashStatus": "Required high-impact slice bug bash completed 2026-08-01. Independent review found and fixed fail-open telemetry, dark Place input, incomplete clear, deep-route state loss, competing TTS controls, exact-follow review, false AA fixtures, focus and touch-target defects. Production QA then passed at 390×844 in EN/HI with preset persistence, dark mode, read-aloud start/stop, no horizontal overflow and a clean console. A final full-route matrix remains mandatory before 100% closure.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-08-01 · production main 3333928 live on ganakapp.com; Festival, Ask, Jyotish and Personalize at 390px each show primitive-backed content with zero overflow and zero console warnings/errors; design-system-primitives 199, accessibility-comfort 278, Prashna parity EXACT 198/6 and calc 24/24, every canonical gate, build 144 modules, Sheet and diff checks pass",
+      "sourceConfidence": "Not applicable — technical accessibility, UX and design-system work",
+      "recommendedAction": "Obtain the owner live-URL decision, resolve the Cloudflare beacon policy, and complete the human real-device screen-reader/audio/touch pass; keep src/styles/design-tokens.css as the only token source."
+    },
     "19": {
       "deliveryState": "Delivered and production-verified",
       "limitations": "None in the owner-approved conservative medical Muhurat scope. R9 body-part rules and procedure-specific outcome logic remain intentionally excluded.",
@@ -167,12 +178,12 @@
     },
     "4": {
       "deliveryState": "Integrated on main — release gated pending owner review",
-      "limitations": "The answer-first card and navigation hookup are complete, but all 12 sign entries still need owner review. The public Jyotish route therefore hides both the card and Reading link until every sign is owner-verified. EN/HI phone visual QA, release and production verification remain open; the local browser could not start in this pass because the approval service hit its usage limit.",
+      "limitations": "The answer-first card and current-main navigation hookup are complete, but all 12 sign entries still need owner review. The public Jyotish route therefore hides both the card and Reading link until every sign is owner-verified. Independent EN/HI phone visual QA, release and production verification remain open.",
       "shortTermImpact": "The implementation is ready behind an enforceable content-review gate, while current users remain protected from unreviewed interpretation copy.",
       "longTermImpact": "Once owner review and visual QA clear, Ganak can release a qualified six-area answer before the technical chart without another integration pass.",
       "bugBashStatus": "Required before this high-impact interpretation journey closes — deterministic copy/safety/release tests pass, but the independent EN/HI phone/desktop visual pass remains open.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-07-24 · PR #1 merged as 1326ab8; ChartScreen hookup complete; interpretation release gate, all canonical gates and production build pass; no released-card production evidence",
+      "lastVerified": "2026-08-01 · Recovered current-main hookup: interpretation release gate, Jyotish exposure mutation test, all canonical gates and production build pass; no released-card production evidence",
       "sourceConfidence": "BPHS and Phaladeepika attribution framework recorded in the feature plan; owner high-risk content review remains required",
       "recommendedAction": "Complete the 12-sign owner checklist, mark approved sign entries owner-verified, run the independent EN/HI phone/desktop bug bash, then release and verify production."
     },
@@ -197,28 +208,6 @@
       "lastVerified": "2026-07-28 · Code merged on main from Cursor commit 34bdd47; production verification still pending after this coordination pass",
       "sourceConfidence": "Primary government holiday source; non-religious overlay",
       "recommendedAction": "Run Codex-owned EN/HI phone/desktop discovery, URL-restoration and calendar-marker bug-bash verification, then verify production before marking 100%."
-    },
-    "25": {
-      "deliveryState": "Time-based Prashna polish delivered; 249 number engine not started",
-      "limitations": "Current screen is time-based only. KP 1–249 number method, Q1b mode switch and KSK primary-text verification remain open.",
-      "shortTermImpact": "Users get the improved time-based Prashna with plain-language verdicts and bilingual polish, but not the planned number method yet.",
-      "longTermImpact": "Without KSK verification and the 249 engine, Ganak cannot match the full KP horary workflow the owner approved.",
-      "bugBashStatus": "Completed 2026-07-22 — `CURSOR-BUGBASH-PRASHNA` (~35 min); F1–F4 fixed and production-verified in `fc82a52`.",
-      "qualityRisk": "Amber",
-      "lastVerified": "2026-07-22 · Production after `fc82a52`; port 5199 parity EXACT, prashna-copy gate green",
-      "sourceConfidence": "KP horary research complete; KSK primary-text judgment layer not yet verified",
-      "recommendedAction": "Complete `P0-PRASHNA-249-KSK-VERIFY`, then implement Q1b and the 249 number engine as a clearly labelled alternative to time-based Prashna."
-    },
-    "29": {
-      "deliveryState": "Done — production verified",
-      "limitations": "Several human-reviewed raster iconography/crop refinements remain documented as P1 follow-ups; all P0 route, content, timing and runtime hero contracts are complete.",
-      "shortTermImpact": "All 181 festival routes now provide an answer-first bilingual experience; 108 formerly empty or generic named routes have distinct guidance and every route renders an owned or reviewed parent hero.",
-      "longTermImpact": "Route-derived semantic, devotional, identity, timing, raster-decode, duplicate and runtime-wiring gates protect the complete festival corpus from returning to generic or technically-only coverage.",
-      "bugBashStatus": "Five iterative audit/fix rounds completed with three agents, followed by `CODEX-BUGBASH-FESTIVAL-LABELS-2026-07-28` with two independent audits. The follow-up fixed raw Pradosh keys, generic/named Pradosh and Ekadashi search, safe malformed-key fallback and Daily/Hora named identity.",
-      "qualityRisk": "Green",
-      "lastVerified": "2026-07-28 · Production `ganak.pages.dev` at live commit fa9857f: generic Hindi Pradosh search returns reviewed weekday labels and HI 390×844 Guru Pradosh shows the correct title/answer with zero raw keys, alerts, console warnings/errors or horizontal overflow",
-      "sourceConfidence": "Reviewed family-specific devotional corpus with explicit per-route tradition/source boundaries; specialised initiated rites remain clearly outside household guidance",
-      "recommendedAction": "No P0 corrective action required; schedule the documented P1 iconography/crop refinements as a separate visual-polish batch."
     },
     "14": {
       "deliveryState": "Delivered — production verification pending",
@@ -263,6 +252,39 @@
       "lastVerified": "2026-07-28 · Merged code present on main from 11083dd; latest evidence remains local :5303 smoke and focused gates; not production-verified",
       "sourceConfidence": "Published 2026 New Delhi Bhoomi/business/travel/document rule tables plus activity-specific clean-window regression gates",
       "recommendedAction": "Have Claude Code run the reserved second bug bash, fix any findings, then verify the deployed production route before marking 100%."
+    },
+    "19": {
+      "deliveryState": "Delivered and production-verified",
+      "limitations": "None in the owner-approved conservative medical Muhurat scope. R9 body-part rules and procedure-specific outcome logic remain intentionally excluded.",
+      "shortTermImpact": "Users have a safety-gated cultural timing tool for clinician-approved flexible care, with truthful handling of high-latitude daylight limits.",
+      "longTermImpact": "Dedicated engine boundaries, outcome-claim checks and DST/polar/range regressions prevent this safety-sensitive feature from drifting into generic Muhurat or medical advice.",
+      "bugBashStatus": "Completed 2026-07-28 — independent Codex pass found and fixed F4 P1 safety order, F5 P2 polar empty-state and F6 P2 future-birth bypass; production EN/HI phone verification passed.",
+      "qualityRisk": "Green",
+      "lastVerified": "2026-07-28 · Production bundle index-D8DzyB5u.js after PR #4 / 557664c; EN/HI 320px, safety/confirmation/F1–F3, zero overflow and zero console warnings/errors",
+      "sourceConfidence": "Primary/textual Muhurta sources and B.V. Raman rule review; Drik Panchang timing/date anchors; lineage-variable factors disclosed and not prescribed",
+      "recommendedAction": "No corrective action required; retain the dedicated engine, safety-first source-order guard, outcome-claim ban and independent medical-risk bug-bash requirement for future scope changes."
+    },
+    "25": {
+      "deliveryState": "Time-based Prashna polish delivered; 249 number engine not started",
+      "limitations": "Current screen is time-based only. KP 1–249 number method, Q1b mode switch and KSK primary-text verification remain open.",
+      "shortTermImpact": "Users get the improved time-based Prashna with plain-language verdicts and bilingual polish, but not the planned number method yet.",
+      "longTermImpact": "Without KSK verification and the 249 engine, Ganak cannot match the full KP horary workflow the owner approved.",
+      "bugBashStatus": "Completed 2026-07-22 — `CURSOR-BUGBASH-PRASHNA` (~35 min); F1–F4 fixed and production-verified in `fc82a52`.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-22 · Production after `fc82a52`; port 5199 parity EXACT, prashna-copy gate green",
+      "sourceConfidence": "KP horary research complete; KSK primary-text judgment layer not yet verified",
+      "recommendedAction": "Complete `P0-PRASHNA-249-KSK-VERIFY`, then implement Q1b and the 249 number engine as a clearly labelled alternative to time-based Prashna."
+    },
+    "29": {
+      "deliveryState": "Done — production verified",
+      "limitations": "Several human-reviewed raster iconography/crop refinements remain documented as P1 follow-ups; all P0 route, content, timing and runtime hero contracts are complete.",
+      "shortTermImpact": "All 181 festival routes now provide an answer-first bilingual experience; 108 formerly empty or generic named routes have distinct guidance and every route renders an owned or reviewed parent hero.",
+      "longTermImpact": "Route-derived semantic, devotional, identity, timing, raster-decode, duplicate and runtime-wiring gates protect the complete festival corpus from returning to generic or technically-only coverage.",
+      "bugBashStatus": "Five iterative audit/fix rounds completed with three agents, followed by `CODEX-BUGBASH-FESTIVAL-LABELS-2026-07-28` with two independent audits. The follow-up fixed raw Pradosh keys, generic/named Pradosh and Ekadashi search, safe malformed-key fallback and Daily/Hora named identity.",
+      "qualityRisk": "Green",
+      "lastVerified": "2026-07-28 · Production `ganak.pages.dev` at live commit fa9857f: generic Hindi Pradosh search returns reviewed weekday labels and HI 390×844 Guru Pradosh shows the correct title/answer with zero raw keys, alerts, console warnings/errors or horizontal overflow",
+      "sourceConfidence": "Reviewed family-specific devotional corpus with explicit per-route tradition/source boundaries; specialised initiated rites remain clearly outside household guidance",
+      "recommendedAction": "No P0 corrective action required; schedule the documented P1 iconography/crop refinements as a separate visual-polish batch."
     },
     "31": {
       "deliveryState": "Implemented locally — production verification pending",
@@ -329,6 +351,17 @@
       "lastVerified": "2026-07-28 · live deployment e6afa4e; EN/HI production title/canonical/Open Graph/hero matrix; page-context, route-metadata, canonical-deployment, full canonical suite and build pass",
       "sourceConfidence": "Not applicable — technical route identity and metadata",
       "recommendedAction": "Keep every new route in the registry/gates and repeat the representative production matrix after route-system changes."
+    },
+    "46": {
+      "deliveryState": "Design-system pass deployed and production-verified across every launch screen; the remaining work is owner-side only — one Cloudflare dashboard switch, the live-URL sign-off and a human real-device pass",
+      "limitations": "Every screen now reads the single semantic token source, so dark mode repaints the whole app and 95% of on-screen text follows the comfort scale. Universal Card/SectionHeader/Badge/DataRow primitives are adopted on all six launch screens. Guided/Expert materially changes content on all five launch journeys and Muhurat has bilingual Listen. Two items are parked by the owner on 2026-08-02 to be sequenced immediately after the new prototype and theme track: sixteen native <option> nodes will not scale inside the browser dropdown popup, a platform limitation closable only by replacing the native selects with a custom listbox; and native screen-reader voicing, audible-speech quality and physical-touch verification, which still needs a human on a real device. The Cloudflare Web Analytics beacon fired on every load regardless of the in-app analytics consent: Ganak's own telemetry seam is fail-closed and gate-proven, but that beacon is injected by Cloudflare Pages at the edge. The owner decided on 2026-08-02 to switch it OFF in the Cloudflare dashboard rather than disclose it in the footer, because there is no audience to measure yet; the decision is to be revisited once the app is actually being shared. That switch cannot be made from the repository and is recorded as an owner chore in plans/backlog.md. The later brand palette is a values-only token swap and is not a delivery blocker.",
+      "shortTermImpact": "Dark mode, Simple & Large and Guided/Expert now do what the Personalize hub promises across the whole app rather than on a single screen; Hindi Today no longer leaks English month, tithi, paksha, rashi and nakshatra strings; Muhurat can be listened to; and an unmatched city search or an unknown festival link says so instead of failing silently.",
+      "longTermImpact": "With no raw colour or px value left in the screens, the later brand palette becomes a values-only swap with zero rework, and any future comfort dimension is a root-level change. A permanent gate now fails the build if a raw hex, a px type size or an undefined guidance-depth step comes back.",
+      "bugBashStatus": "Required high-impact bug bash completed 2026-08-01: a genuinely independent agent ran 38 continuous minutes (19:19:57–19:58:07 PDT) against production and filed 20 findings (1 P0, 5 P1, 8 P2, 6 P3) with measured evidence. 19 are fixed and re-verified in a browser, with a per-finding disposition recorded in plans/audits/backlog46-bugbash-2026-08-01.md. The one exception is the Cloudflare beacon, which is a dashboard setting rather than a code change. The complete route/language/viewport matrix is now recorded in plans/audits/backlog46-route-language-viewport-matrix.md.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-08-02 · production main 3333928 (docs fa40c2e) live on ganakapp.com; primitive-backed Festival, Ask, Jyotish and Personalize verified at 390px with zero horizontal overflow and zero console messages; 390px EN and 320px HI Today clean; Simple & Large root font 18px; dark mode rgb(24,21,28) with zero low-contrast text nodes; design-system-primitives 199 checks, accessibility-comfort 278, privacy-events, parse-check, Prashna parity EXACT 198/6 and calc 24/24, every canonical gate and the production build pass. Owner decisions recorded 2026-08-02: Cloudflare Web Analytics to be switched off; native-dropdown scaling and the real-device human pass parked behind the prototype/theme track.",
+      "sourceConfidence": "Not applicable — technical accessibility, UX and design-system work",
+      "recommendedAction": "Owner to disable Web Analytics for ganakapp.com in the Cloudflare dashboard (decided 2026-08-02) and confirm no /cdn-cgi/rum request remains on a live load, then give the live-URL sign-off. Keep src/styles/design-tokens.css as the only token source and let the brand track change only the existing colour values. Book the human real-device screen-reader, audio and touch pass, and the custom-listbox replacement for the native selects, immediately after the new prototype and theme track."
     }
   },
   "dashboard": {
@@ -408,7 +441,9 @@
         50,
         51,
         52,
-        53
+        53,
+        60,
+        61
       ]
     },
     {
@@ -759,12 +794,31 @@
     "58": {
       "section": "P0",
       "title": "Direct date entry and better Panchang date picker",
-      "technicalComplexity": "Medium"
+      "technicalComplexity": "Medium",
+      "deliveryState": "Publicly delivered — owner acceptance pending",
+      "limitations": "Technical delivery and mandatory independent bug bash are complete; owner live-URL sign-off remains. Native date-control chrome varies by browser/phone OS; supported civil years are 0100–9999.",
+      "shortTermImpact": "Users can directly reach past/future Panchang dates now; the row stays below 100% until the owner accepts the live interaction.",
+      "longTermImpact": "The permanent 15-check validator guards strict dates, history parity, bilingual labels and year boundaries; reopen if device-specific feedback reveals a native-picker issue.",
+      "bugBashStatus": "Completed 2026-07-30 · independent `/root/date_picker_bugbash`; four P1/P2 boundary findings fixed before deployment",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-07-30 · local EN/HI desktop + 320px browser; production asset at ganakapp.com commit 4a47bc5",
+      "sourceConfidence": "Not applicable — technical UX work",
+      "recommendedAction": "Owner: open Ganak Panchang, try one distant date, and approve the live interaction; then mark Done/100%."
     },
     "59": {
       "section": "P0",
       "title": "Global site search and guided “find what I need” input",
       "technicalComplexity": "High"
+    },
+    "60": {
+      "section": "P2",
+      "title": "Aarti multi-language (Marathi/Bengali/Gujarati)",
+      "technicalComplexity": "High"
+    },
+    "61": {
+      "section": "P2",
+      "title": "Owner native review of regional aartis (aarti final 5%)",
+      "technicalComplexity": "Low"
     }
   }
 }

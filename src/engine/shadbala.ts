@@ -25,12 +25,12 @@ const NF = {
 const VARGA7 = ["D1", "D2", "D3", "D7", "D9", "D12", "D30"];
 const CHESHTA_SPD = { Mars: [0.79, -0.40], Mercury: [2.20, -1.40], Jupiter: [0.24, -0.14], Venus: [1.26, -0.63], Saturn: [0.13, -0.08] };
 const BALA_PARTS = [
-  { k: "sthana", label: "Sthana", note: "positional", color: "#A86A12" },
-  { k: "dig", label: "Dig", note: "directional", color: "#C2451E" },
-  { k: "kala", label: "Kala", note: "temporal", color: "#2C7D4F" },
-  { k: "cheshta", label: "Cheshta", note: "motional", color: "#46588F" },
-  { k: "naisargika", label: "Naisargika", note: "natural", color: "#9A7000" },
-  { k: "drik", label: "Drik", note: "aspectual", color: "#6E5C82" },
+  { k: "sthana", label: "Sthana", note: "positional", color: "color-mix(in srgb, #A86A12, var(--ink) 26%)" },
+  { k: "dig", label: "Dig", note: "directional", color: "color-mix(in srgb, #C2451E, var(--ink) 26%)" },
+  { k: "kala", label: "Kala", note: "temporal", color: "color-mix(in srgb, #2C7D4F, var(--ink) 26%)" },
+  { k: "cheshta", label: "Cheshta", note: "motional", color: "color-mix(in srgb, #46588F, var(--ink) 26%)" },
+  { k: "naisargika", label: "Naisargika", note: "natural", color: "color-mix(in srgb, #9A7000, var(--ink) 26%)" },
+  { k: "drik", label: "Drik", note: "aspectual", color: "color-mix(in srgb, #6E5C82, var(--ink) 26%)" },
 ];
 
 function naturalRel(A, B) {

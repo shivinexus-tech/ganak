@@ -1,6 +1,7 @@
 /* Calendar labels are an interpretation-only layer. They consume the canonical
    Panchang result and never feed a value back into astronomy or festival rules. */
 import { solveCross, sunEvents, sunSidMs, zoneOffset } from "./panchang";
+import { panchangTerm } from "../i18n/panchang-terms";
 
 export type CalendarConventionId = "canonical" | "gregorian" | "amanta" | "north-purnimanta" | "tamil-solar" | "bengali-solar";
 export type RegionalCalendarFlags = { tamilSolar: boolean; bengaliSolar: boolean };
@@ -116,10 +117,14 @@ export function conventionIsEnabled(id:CalendarConventionId,flags:RegionalCalend
   return !!mode?.enabled && (!mode.flag || flags[mode.flag]);
 }
 
+/* The engine keeps month and paksha names in one canonical language so the calculations
+   can key off them; the Hindi reader must still see them in Devanagari, so they are
+   transliterated here at the presentation edge and nowhere inside the astronomy. */
 export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: number, lang: "hi" | "en", place?:Place) {
   if (id === "gregorian") return new Date(atMs+(panchang.tz||0)*3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-IN", { day:"numeric", month:"long", year:"numeric", timeZone:"UTC" });
-  const lunarDay=`${panchang.paksha} ${panchang.tithiNum}`;
-  if (id === "north-purnimanta") return lang === "hi" ? `पूर्णिमान्त · ${panchang.months.purnimanta} · ${lunarDay}` : `Purnimanta · ${panchang.months.purnimanta} · ${lunarDay}`;
+  const term=(kind:any,value:any)=>panchangTerm(lang,kind,value);
+  const lunarDay=`${term("paksha",panchang.paksha)} ${panchang.tithiNum}`;
+  if (id === "north-purnimanta") return lang === "hi" ? `पूर्णिमान्त · ${term("month",panchang.months.purnimanta)} · ${lunarDay}` : `Purnimanta · ${term("month",panchang.months.purnimanta)} · ${lunarDay}`;
   if((id==="tamil-solar"||id==="bengali-solar")&&place){
     const d=regionalCalendarDate(id,panchang,atMs,place);
     const month=lang==="hi"?d.monthHi:d.monthEn;
@@ -135,7 +140,7 @@ export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: num
      Amanta (e.g. Amanta Ashadha == Purnimanta Shravana/Sawan). In that ~2-week window
      show BOTH names so a North-Indian (Purnimanta/Sawan) reader isn't surprised to still
      see the Amanta month; outside it the two agree and we show one (owner, 2026-07-28). */
-  const amantaMonth = panchang.months.amanta, purnMonth = panchang.months.purnimanta;
+  const amantaMonth = term("month", panchang.months.amanta), purnMonth = panchang.months.purnimanta ? term("month", panchang.months.purnimanta) : panchang.months.purnimanta;
   const monthsDiffer = purnMonth && purnMonth !== amantaMonth;
   if (lang === "hi") {
     return monthsDiffer

@@ -59,40 +59,40 @@ export default class AppErrorBoundary extends React.Component {
         style={{
           minHeight: "100vh",
           boxSizing: "border-box",
-          padding: "48px 22px 80px",
-          background: "#FAF5EA",
-          color: "#3B3147",
-          fontFamily: "Spectral, Georgia, serif",
+          padding: "3rem 1.375rem 5rem",
+          background: "var(--bg-active)",
+          color: "var(--ink)",
+          fontFamily: "var(--font-body-family)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           textAlign: "center",
         }}
       >
-        <div style={{ fontFamily: "Eczar, serif", color: "#A86A12", fontSize: 14, letterSpacing: "0.28em", marginBottom: 12 }}>
+        <div style={{ fontFamily: "var(--font-display-family)", color: "var(--accent)", fontSize: "var(--font-body)", letterSpacing: "0.28em", marginBottom: "0.75rem" }}>
           Ganak
         </div>
-        <h1 style={{ fontFamily: "Eczar, serif", fontSize: 28, fontWeight: 700, margin: "0 0 12px", color: "#C2451E" }}>
+        <h1 style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-display)", fontWeight: 700, margin: "0 0 0.75rem", color: "var(--bad)" }}>
           {title}
         </h1>
-        <p style={{ maxWidth: 420, fontSize: 16, lineHeight: 1.55, color: "#8C8173", margin: "0 0 28px" }}>
+        <p style={{ maxWidth: "26.25rem", fontSize: "var(--font-title)", lineHeight: 1.55, color: "var(--muted)", margin: "0 0 1.75rem" }}>
           {body}
         </p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.625rem", justifyContent: "center" }}>
           <button
             type="button"
             onClick={this.retry}
             style={{
-              height: 42,
-              padding: "0 22px",
-              borderRadius: 11,
+              height: "2.625rem",
+              padding: "0 1.375rem",
+              borderRadius: "0.6875rem",
               border: "none",
               cursor: "pointer",
-              fontFamily: "Eczar, serif",
-              fontSize: 15,
+              fontFamily: "var(--font-display-family)",
+              fontSize: "var(--font-body)",
               fontWeight: 600,
-              background: "#A86A12",
-              color: "#FAF5EA",
+              background: "var(--accent)",
+              color: "var(--bg-active)",
             }}
           >
             {retryLbl}
@@ -103,15 +103,15 @@ export default class AppErrorBoundary extends React.Component {
               try { location.reload(); } catch (e) { /* ignore */ }
             }}
             style={{
-              height: 42,
-              padding: "0 22px",
-              borderRadius: 11,
-              border: "1px solid #E7DDC6",
+              height: "2.625rem",
+              padding: "0 1.375rem",
+              borderRadius: "0.6875rem",
+              border: "0.0625rem solid var(--line)",
               cursor: "pointer",
-              fontFamily: "Eczar, serif",
-              fontSize: 15,
-              background: "#fff",
-              color: "#3B3147",
+              fontFamily: "var(--font-display-family)",
+              fontSize: "var(--font-body)",
+              background: "var(--on-accent)",
+              color: "var(--ink)",
             }}
           >
             {reloadLbl}

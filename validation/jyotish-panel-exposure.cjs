@@ -7,8 +7,9 @@ const root = path.resolve(__dirname, "..");
 const shell = fs.readFileSync(path.join(root, "src/kundli-app.tsx"), "utf8");
 const screen = fs.readFileSync(path.join(root, "src/screens/ChartScreen.tsx"), "utf8");
 const nav = fs.readFileSync(path.join(root, "src/components/JyotishPanelNav.tsx"), "utf8");
+const lifeReading = fs.readFileSync(path.join(root, "src/components/LifeInterpretationCard.tsx"), "utf8");
 const localizedFiles = {
-  chart: fs.readFileSync(path.join(root, "src/screens/ChartScreen.tsx"), "utf8"),
+  chart: screen + "\n" + lifeReading,
   matching: fs.readFileSync(path.join(root, "src/screens/MatchingScreen.tsx"), "utf8"),
   rectify: fs.readFileSync(path.join(root, "src/screens/RectifyScreen.tsx"), "utf8"),
   bnn: fs.readFileSync(path.join(root, "src/screens/JyotishBnnScreen.tsx"), "utf8"),
@@ -22,7 +23,11 @@ function assert(ok, message) {
 assert(shell.includes('v === "prashna" || v === "daily" || v === "chart"'), "direct ?screen=chart URLs must survive reload");
 assert(shell.includes('["chart", lang === "hi" ? "ज्योतिष" : "Jyotish"]'), "Jyotish must be visible in the primary navigation in both languages");
 assert(shell.includes('mode === "chart"'), "the shell must render ChartScreen");
-assert(screen.includes("<JyotishPanelNav lang={lang} C={C} />"), "ChartScreen must use the grouped Jyotish navigation");
+assert(screen.includes("<JyotishPanelNav lang={lang} C={C}"), "ChartScreen must use the grouped Jyotish navigation");
+// Guided depth hides the two practitioner-only panels, so the nav must hide exactly those
+// entries too — an anchor that scrolls to nothing is the dead-end pattern this repo bans.
+assert(screen.includes("showTechnical={showTechnical}"), "the Jyotish nav must be told the current guidance depth");
+assert(nav.includes("TECHNICAL_ANCHORS") && nav.includes("showTechnical || !TECHNICAL_ANCHORS.has(href)"), "the Jyotish nav must drop anchors whose panel is hidden at guided depth");
 assert(screen.includes('lang === "hi" ? deva : en'), "section headings must follow the selected language instead of rendering both");
 
 const groups = ["kundli", "dashas", "matching", "tools", "vault"];

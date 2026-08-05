@@ -1,3 +1,4 @@
+import { panchangTerm } from "../i18n/panchang-terms";
 /* Transit duration + event gloss helpers (SPLIT-UI-CHART-05). Wire deferred. */
 
 function fmtDur(ms) {
@@ -36,4 +37,23 @@ function eventDetail(ev, now) {
   return { desc, timeStr, days, hours };
 }
 
-export { fmtDur, EVENT_DESC, eventDetail };
+/* The engine builds these labels in one canonical language so the rules can key off them.
+   Hindi readers still need Devanagari, so the transliteration happens here, in the
+   interpretation layer, and never inside the astronomy. Unrecognised labels pass through
+   unchanged rather than disappearing. */
+function transitLabel(lang, label) {
+  const text = String(label || "");
+  if (lang !== "hi") return text;
+  let out = text
+    .replace(/^Surya enters /, "सूर्य प्रवेश ")
+    .replace(/Purnima — full moon/, "पूर्णिमा — पूर्ण चन्द्र")
+    .replace(/Amavasya — new moon/, "अमावस्या — नव चन्द्र")
+    .replace(/ turns retrograde ℞/, " वक्री ℞")
+    .replace(/ turns direct/, " मार्गी")
+    .replace(/ · Sankranti$/, " · संक्रांति")
+    .replace(/ enters /, " प्रवेश ");
+  out = panchangTerm("hi", "sign", out);
+  return out;
+}
+
+export { fmtDur, EVENT_DESC, eventDetail, transitLabel };

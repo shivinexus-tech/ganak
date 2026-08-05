@@ -35,7 +35,7 @@ function EastChart({ title, ascSign, planets = [], showDeg, lagnaLabel = "LAGNA"
   return (
     <div style={{ textAlign: "center" }}>
       <svg viewBox="0 0 400 400" style={{ width: "100%", maxWidth: 400 }}>
-        <rect x="0" y="0" width="400" height="400" fill="#FFFDF7" stroke={gold} strokeWidth="2" />
+        <rect x="0" y="0" width="400" height="400" fill="var(--surface-sunken)" stroke={gold} strokeWidth="2" />
         {/* lagna compartment tint (drawn first, under the frame lines) */}
         {ascSign != null && <polygon points={pts(EAST_SIGNS[ascSign].poly)} fill={gold} opacity="0.12" />}
         {/* frame: diamond + both diagonals */}
@@ -51,10 +51,10 @@ function EastChart({ title, ascSign, planets = [], showDeg, lagnaLabel = "LAGNA"
           return (
             <g key={sign}>
               {/* rashi number just above the cluster */}
-              <text x={cx} y={cy - n * 6 - 2} textAnchor="middle" fontSize="9" fill={isLagna ? gold : muted} fontFamily="Spectral, serif">{sign + 1}</text>
+              <text x={cx} y={cy - n * 6 - 2} textAnchor="middle" fontSize="9" fill={isLagna ? gold : muted} fontFamily="var(--font-body-family)">{sign + 1}</text>
               {here.map((p, i) => (
                 <text key={p.label + i} x={cx} y={cy + 6 + (i - (n - 1) / 2) * 12} textAnchor="middle" fontSize="10.5"
-                  fill={p.retro ? sindoor : ivory} fontFamily="Eczar, serif">
+                  fill={p.retro ? sindoor : ivory} fontFamily="var(--font-display-family)">
                   {p.label}{p.retro ? "℞" : ""}{showDeg && p.deg != null ? ` ${fmtDeg(p.deg)}` : ""}
                 </text>
               ))}
@@ -62,9 +62,9 @@ function EastChart({ title, ascSign, planets = [], showDeg, lagnaLabel = "LAGNA"
           );
         })}
         {/* centre reference label sits in the tiny gap around O; keep it subtle */}
-        <text x="200" y="200" textAnchor="middle" fontSize="8.5" fill={gold} fontFamily="Eczar, serif" letterSpacing="0.08em" opacity="0.9">{lagnaLabel}</text>
+        <text x="200" y="200" textAnchor="middle" fontSize="8.5" fill={gold} fontFamily="var(--font-display-family)" letterSpacing="0.08em" opacity="0.9">{lagnaLabel}</text>
       </svg>
-      <div style={{ fontSize: 11.5, letterSpacing: "0.18em", color: muted, marginTop: 8, textTransform: "uppercase", overflowWrap: "anywhere", padding: "0 8px" }}>{title}</div>
+      <div style={{ fontSize: 11.5, letterSpacing: "0.18em", color: muted, marginTop: 8, textTransform: "uppercase", overflowWrap: "break-word", padding: "0 8px" }}>{title}</div>
     </div>
   );
 }

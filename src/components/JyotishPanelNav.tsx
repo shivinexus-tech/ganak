@@ -1,5 +1,6 @@
 import React from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
+import { SIGN_TRAITS } from "../data/life-interpretation";
 
 const JYOTISH_GROUPS = [
   {
@@ -7,6 +8,7 @@ const JYOTISH_GROUPS = [
     en: "Kundli",
     hi: "कुंडली",
     items: [
+      ["#reading", "Reading", "फलादेश"],
       ["#summary", "Summary", "सार"],
       ["#chart", "Charts", "वर्ग कुंडली"],
       ["#planets", "Grahas", "ग्रह"],
@@ -17,7 +19,6 @@ const JYOTISH_GROUPS = [
       ["#av", "Ashtakavarga", "अष्टकवर्ग"],
       ["#arudha", "Arudha", "आरूढ़"],
       ["#doshas", "Doshas", "दोष"],
-      ["#reading", "Reading", "फलादेश"],
     ],
   },
   {
@@ -56,8 +57,13 @@ const JYOTISH_GROUPS = [
   },
 ];
 
-function JyotishPanelNav({ lang, C }) {
+// Anchors whose destination panel only exists above Guided depth. Guided must not offer a
+// link that scrolls to nothing — a dead-end is worse than a missing entry.
+const TECHNICAL_ANCHORS = new Set(["#shadbala", "#av"]);
+
+function JyotishPanelNav({ lang, C, showTechnical = true, activeGroup = "kundli", onSelectGroup = () => {} }) {
   const hi = lang === "hi";
+  const showReading = SIGN_TRAITS.every((entry) => entry.status === "owner-verified");
   return (
     <nav
       aria-label={hi ? "ज्योतिष अनुभाग" : "Jyotish sections"}
@@ -69,11 +75,11 @@ function JyotishPanelNav({ lang, C }) {
         display: "grid",
         gap: T.s2,
         padding: T.s3,
-        margin: `0 0 ${T.s4}px`,
+        margin: `0 0 ${T.s4}`,
         background: "rgba(250,245,234,.96)",
         backdropFilter: "blur(8px)",
         WebkitBackdropFilter: "blur(8px)",
-        border: `1px solid ${C.line}`,
+        border: `0.0625rem solid ${C.line}`,
         borderRadius: T.rLg,
         boxShadow: T.e2,
       }}
@@ -87,14 +93,16 @@ function JyotishPanelNav({ lang, C }) {
         {JYOTISH_GROUPS.map((group) => (
           <details key={group.key} style={{ flex: "0 0 auto", position: "relative" }}>
             <summary
+              aria-current={activeGroup === group.key ? "page" : undefined}
+              onClick={() => onSelectGroup(group.key)}
               style={{
                 minHeight: T.ctrlH,
                 display: "flex",
                 alignItems: "center",
-                padding: `0 ${T.s4}px`,
-                border: `1px solid ${C.line}`,
+                padding: `0 ${T.s4}`,
+                border: `0.0625rem solid ${C.line}`,
                 borderRadius: T.rMd,
-                background: C.panel,
+                background: activeGroup === group.key ? C.accentSoft : C.panel,
                 color: C.gold,
                 cursor: "pointer",
                 fontFamily: T.serif,
@@ -108,16 +116,16 @@ function JyotishPanelNav({ lang, C }) {
               style={{
                 display: "grid",
                 gap: T.s1,
-                minWidth: 210,
+                minWidth: "13.125rem",
                 padding: T.s2,
                 marginTop: T.s1,
-                border: `1px solid ${C.line}`,
+                border: `0.0625rem solid ${C.line}`,
                 borderRadius: T.rMd,
                 background: C.panel,
                 boxShadow: T.e3,
               }}
             >
-              {group.items.map(([href, en, itemHi]) => (
+              {group.items.filter(([href]) => (showReading || href !== "#reading") && (showTechnical || !TECHNICAL_ANCHORS.has(href))).map(([href, en, itemHi]) => (
                 <a
                   key={href}
                   href={href}
@@ -125,7 +133,7 @@ function JyotishPanelNav({ lang, C }) {
                     minHeight: T.ctrlH,
                     display: "flex",
                     alignItems: "center",
-                    padding: `0 ${T.s3}px`,
+                    padding: `0 ${T.s3}`,
                     borderRadius: T.rSm,
                     color: C.ivory,
                     textDecoration: "none",

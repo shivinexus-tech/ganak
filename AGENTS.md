@@ -11,8 +11,18 @@ transition. Benchmark: Drik Panchang. Goal: beat it.
 Vite + React scaffold; `npm install` then `npm run dev` (Node 18+).
 
 **Design principle: answer-before-data.** A plain-language verdict always renders
-before the technical chart. Users are observant householders and curious diaspora,
-not practising astrologers. Every jargon term gets a plain-English gloss.
+before the technical chart. Every jargon term gets a plain-English gloss.
+
+**Audience — two segments, both real (owner, 2026-07-30; see
+`plans/ganak-redesign-requirements.md`).** Reach comes from observant householders
+and curious diaspora on the **free Panchang**. **Revenue comes from the serious
+Jyotish learner and, above all, the working practising astrologer** — the bankable
+payer, who expenses it as a business cost (§ "Jyotish willingness-to-pay"). Panchang
+free, Jyotish the paid depth/workspace layer; both launch under one Ganak nav.
+Answer-before-data serves the householder; it must never cap the depth, precision or
+range the practitioner needs. Do not plan as though practitioners are out of scope —
+without them Ganak is a calendar app competing with Drik Panchang on SEO, which is
+unwinnable and unmonetised.
 
 **Owner's standing UX principles (2026-07-17):** plain-language messages that help
 navigation; no state resets without a user action; the user must always be able to
@@ -30,8 +40,14 @@ tell what the app is doing. UI must follow the language toggle (hi/en) everywher
   reviews and merges branches sequentially, running all gates after every merge.
 - **No orphans.** After replacing anything, grep the old name; zero orphaned
   references is the standard. Diagnose structurally, don't patch the surface.
-- **No browser storage.** `localStorage` / `sessionStorage` are banned outright.
-  Small UI prefs may use URL query params (see `urlPrefGet`/`urlPrefSet`).
+- **Approved on-device storage only.** Application code must never call
+  `localStorage` / `sessionStorage` directly. Persistence is allowed only through
+  `src/storage/approved-storage.ts`, the single auditable adapter, and only in its
+  named `preferences` and `savedCharts` stores. `preferences` is local-first and
+  may contain non-sensitive comfort, language, place and follow choices; religious
+  preference data must never sync or enter analytics without explicit granular
+  consent. `savedCharts` is explicit-save only. Shared URL values still override a
+  saved default without silently rewriting it. No ad-hoc keys or feature storage.
 - **Phone-first, no console.** Errors must surface visibly in the UI. Silent
   failure is unacceptable. Ship complete code, never partial.
 - **Astronomy conventions: Lahiri ayanamsa, mean Rahu/Ketu** — matching Drik

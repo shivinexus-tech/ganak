@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import { computeVedicSeasonClock, TROPICAL_EVENTS } from "../engine/vedic-season-clock";
 
 export default function SeasonClockCard({ place, lang, ayanamsa = "lahiri", atMs, isToday = true, C, card }) {
@@ -55,7 +55,7 @@ export default function SeasonClockCard({ place, lang, ayanamsa = "lahiri", atMs
         </div>
       )}
       {tropical && tropicalMeta && (
-        <div style={{ marginTop: 10, padding: "10px 12px", borderRadius: T.rSm, background: "#FBF5E7", fontSize: 12.5, lineHeight: 1.55 }}>
+        <div style={{ marginTop: 10, padding: "10px 12px", borderRadius: T.rSm, background: "var(--surface-raised)", fontSize: 12.5, lineHeight: 1.55 }}>
           <div style={{ color: C.gold, marginBottom: 3 }}>{lang === "hi" ? "अगला वैश्विक खगोलीय बिंदु" : "Next global astronomical point"}</div>
           <div style={{ color: C.ivory }}>{lang === "hi" ? tropical.hi : tropical.en} · {fmtDate(tropical.ms)}</div>
           <div style={{ color: C.muted, marginTop: 4 }}>{lang === "hi" ? tropicalMeta.glossHi : tropicalMeta.glossEn}</div>

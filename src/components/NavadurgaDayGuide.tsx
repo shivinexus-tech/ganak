@@ -1,5 +1,5 @@
 import React from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import {
   NAVRATRI_SEASONS, SAPTASHATI_PLAN, navadurgaEntriesForSeason,
 } from "../data/navadurga-pages";
@@ -25,11 +25,11 @@ function NavadurgaSeasonLinks({ parentKey, activeDay = null, lang, C }) {
   const entries = navadurgaEntriesForSeason(parentKey);
   if (!entries.length) return null;
   return (
-    <nav aria-label={L === "hi" ? "नवदुर्गा के नौ दिन" : "Nine Navadurga days"} style={{ marginTop: 16 }}>
-      <div style={{ ...T.label, color: C.gold, marginBottom: 8 }}>
+    <nav aria-label={L === "hi" ? "नवदुर्गा के नौ दिन" : "Nine Navadurga days"} style={{ marginTop: "1rem" }}>
+      <div style={{ ...T.label, color: C.gold, marginBottom: "0.5rem" }}>
         {L === "hi" ? "नवदुर्गा · सभी नौ दिवस" : "NAVADURGA · ALL NINE DAYS"}
       </div>
-      <div className="hscroll" style={{ display: "flex", gap: 7, overflowX: "auto", paddingBottom: 4 }}>
+      <div className="hscroll" style={{ display: "flex", gap: "0.4375rem", overflowX: "auto", paddingBottom: "0.25rem" }}>
         {entries.map((entry) => (
           <a
             key={entry.path}
@@ -37,10 +37,10 @@ function NavadurgaSeasonLinks({ parentKey, activeDay = null, lang, C }) {
             aria-current={activeDay === entry.day ? "page" : undefined}
             style={{
               flex: "0 0 auto", minHeight: T.ctrlH, display: "inline-flex", alignItems: "center",
-              padding: "0 12px", borderRadius: T.rMd, textDecoration: "none", fontSize: T.fSmall,
-              border: `1px solid ${activeDay === entry.day ? C.gold : C.line}`,
+              padding: "0 0.75rem", borderRadius: T.rMd, textDecoration: "none", fontSize: T.fSmall,
+              border: `0.0625rem solid ${activeDay === entry.day ? C.gold : C.line}`,
               color: activeDay === entry.day ? C.gold : C.ivory,
-              background: activeDay === entry.day ? "rgba(168,106,18,.10)" : C.panel,
+              background: activeDay === entry.day ? "var(--accent-soft)" : C.panel,
             }}
           >
             {entry.day}. {entry.form.name[L].replace(/^Maa |^माँ /, "")}
@@ -57,7 +57,7 @@ function LocalNavadurgaDate({ dateInfo, form, lang, C }) {
   if (!dateInfo) return null;
   if (dateInfo.status === "skipped") {
     return (
-      <div role="status" style={{ padding: "11px 12px", borderRadius: T.rMd, border: `1px solid ${C.gold}`, background: "rgba(168,106,18,.08)", color: C.ivory, fontSize: T.fSmall, lineHeight: 1.55 }}>
+      <div role="status" style={{ padding: "0.6875rem 0.75rem", borderRadius: T.rMd, border: `0.0625rem solid ${C.gold}`, background: "var(--surface-hover)", color: C.ivory, fontSize: T.fSmall, lineHeight: 1.55 }}>
         <strong style={{ color: C.gold }}>{L === "hi" ? "इस वर्ष अलग सूर्योदय-दिवस नहीं" : "No separate sunrise day this year"}</strong><br />
         {L === "hi"
           ? `${tithi} इस स्थानीय नवरात्रि में किसी सूर्योदय पर अलग से प्रचलित नहीं है। इसलिए गणक ${form.name.hi} को किसी दूसरी तारीख़ पर चुपचाप नहीं खिसकाता। अपनी कुल या मंदिर-परम्परा में संयुक्त पूजन का नियम मानें।`
@@ -67,15 +67,15 @@ function LocalNavadurgaDate({ dateInfo, form, lang, C }) {
   }
   const dates = dateInfo.dates.map((civil) => localDate(civil, L));
   return (
-    <div role="status" style={{ padding: "11px 12px", borderRadius: T.rMd, border: "1px solid rgba(31,122,77,.25)", background: "rgba(31,122,77,.07)", color: C.ivory, fontSize: T.fSmall, lineHeight: 1.55 }}>
-      <strong style={{ color: "#1F7A4D" }}>
+    <div role="status" style={{ padding: "0.6875rem 0.75rem", borderRadius: T.rMd, border: "0.0625rem solid var(--good-surface)", background: "var(--good-surface)", color: C.ivory, fontSize: T.fSmall, lineHeight: 1.55 }}>
+      <strong style={{ color: "var(--good)" }}>
         {dateInfo.status === "repeated"
           ? (L === "hi" ? "यह पूजा दो सूर्योदय-दिवसों पर है" : "This worship spans two sunrise days")
           : (L === "hi" ? "इस देवी का स्थानीय दिवस" : "Local day for this Goddess")}
       </strong><br />
       {dates.join(L === "hi" ? " और " : " and ")} · {tithi}
       {dateInfo.status === "repeated" && (
-        <div style={{ color: C.muted, marginTop: 4 }}>
+        <div style={{ color: C.muted, marginTop: "0.25rem" }}>
           {L === "hi"
             ? "तिथि दोनों सूर्योदयों पर रहती है; गणक दोनों तारीख़ें दिखाता है।"
             : "The tithi prevails at both sunrises, so Ganak shows both dates."}
@@ -113,12 +113,12 @@ function NavadurgaDayGuide({ guide, dateInfo, lang, C }) {
       ];
 
   return (
-    <div style={{ display: "grid", gap: 16 }}>
+    <div style={{ display: "grid", gap: "1rem" }}>
       <NavadurgaSeasonLinks parentKey={guide.parentKey} activeDay={form.day} lang={lang} C={C} />
 
       {/* Hero image now renders at the top of FestivalGuideScreen; keep the answer card here. */}
-      <div style={{ padding: "14px 15px", borderRadius: T.rLg, border: `1px solid ${C.line}`, background: "linear-gradient(145deg, rgba(194,69,30,.07), rgba(168,106,18,.08))" }}>
-        <div style={{ ...T.label, color: C.sindoor, marginBottom: 7 }}>
+      <div style={{ padding: "0.875rem 0.9375rem", borderRadius: T.rLg, border: `0.0625rem solid ${C.line}`, background: "linear-gradient(145deg, var(--bad-surface), var(--surface-hover))" }}>
+        <div style={{ ...T.label, color: C.sindoor, marginBottom: "0.4375rem" }}>
           {L === "hi" ? `पहले उत्तर · दिवस ${form.day}` : `ANSWER FIRST · DAY ${form.day}`}
         </div>
         <p style={{ margin: 0, color: C.ivory, fontSize: T.fBody, lineHeight: 1.62 }}>{form.identity[L]}</p>
@@ -126,28 +126,28 @@ function NavadurgaDayGuide({ guide, dateInfo, lang, C }) {
 
       <LocalNavadurgaDate dateInfo={dateInfo} form={form} lang={lang} C={C} />
 
-      <section style={{ padding: "13px 14px", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: C.panel }}>
-        <div style={{ ...T.label, color: C.gold, marginBottom: 7 }}>{L === "hi" ? "देवी के इस स्वरूप का वर्णन" : "Description of this form of Goddess"}</div>
+      <section style={{ padding: "0.8125rem 0.875rem", borderRadius: T.rMd, border: `0.0625rem solid ${C.line}`, background: C.panel }}>
+        <div style={{ ...T.label, color: C.gold, marginBottom: "0.4375rem" }}>{L === "hi" ? "देवी के इस स्वरूप का वर्णन" : "Description of this form of Goddess"}</div>
         <p style={{ margin: 0, color: C.ivory, fontSize: T.fSmall, lineHeight: 1.6 }}>{form.iconography[L]}</p>
-        <p style={{ margin: "8px 0 0", color: C.muted, fontSize: T.fMicro, lineHeight: 1.5 }}>
+        <p style={{ margin: "0.5rem 0 0", color: C.muted, fontSize: T.fMicro, lineHeight: 1.5 }}>
           {L === "hi" ? "चित्र गणक के लिए बनाया गया मौलिक भक्तिपूर्ण निरूपण है; यह किसी मंदिर-मूर्ति की प्रतिलिपि नहीं है।" : "This is an original devotional illustration commissioned for Ganak, not a copy of a temple murti."}
         </p>
       </section>
 
       <section>
-        <div style={{ ...T.label, color: C.gold, marginBottom: 9 }}>{L === "hi" ? "सरल गृह-पूजा · क्रम से" : "SIMPLE HOUSEHOLD PUJA · STEP BY STEP"}</div>
-        <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 9, color: C.ivory, fontSize: T.fSmall, lineHeight: 1.6 }}>
+        <div style={{ ...T.label, color: C.gold, marginBottom: "0.5625rem" }}>{L === "hi" ? "सरल गृह-पूजा · क्रम से" : "SIMPLE HOUSEHOLD PUJA · STEP BY STEP"}</div>
+        <ol style={{ margin: 0, paddingLeft: "1.375rem", display: "grid", gap: "0.5625rem", color: C.ivory, fontSize: T.fSmall, lineHeight: 1.6 }}>
           {steps.map((step, index) => <li key={index}>{step}</li>)}
         </ol>
       </section>
 
-      <section style={{ padding: "14px", borderRadius: T.rLg, border: `1px solid ${C.gold}`, background: "rgba(168,106,18,.07)" }}>
-        <div style={{ ...T.label, color: C.gold, marginBottom: 7 }}>{L === "hi" ? "आज का दुर्गा सप्तशती पाठ" : "TODAY'S DURGA SAPTASHATI READING"}</div>
+      <section style={{ padding: "0.875rem", borderRadius: T.rLg, border: `0.0625rem solid ${C.gold}`, background: "var(--surface-hover)" }}>
+        <div style={{ ...T.label, color: C.gold, marginBottom: "0.4375rem" }}>{L === "hi" ? "आज का दुर्गा सप्तशती पाठ" : "TODAY'S DURGA SAPTASHATI READING"}</div>
         <div style={{ color: C.ivory, fontSize: T.fBody, lineHeight: 1.55 }}>
           <strong>{L === "hi" ? `अध्याय ${reading.chapters}` : `Chapter${reading.chapters.includes("–") ? "s" : ""} ${reading.chapters}`}</strong>
           <span style={{ color: C.muted }}> · {reading.focus[L]}</span>
         </div>
-        <p style={{ margin: "9px 0 0", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55 }}>
+        <p style={{ margin: "0.5625rem 0 0", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55 }}>
           {L === "hi"
             ? "यह घर में विश्वसनीय संस्कृत पाठ, अर्थ सहित संस्करण या श्रवण के लिए एक प्रलेखित नौ-दिवसीय क्रम है। आपके प्रामाणिक संस्करण या गुरु का क्रम अलग हो तो उसे मानें।"
             : "This is one documented nine-day arrangement for reading a trusted Sanskrit text, a translation, or listening at home. If your trusted edition or teacher gives a different order, follow that order."}
@@ -156,8 +156,8 @@ function NavadurgaDayGuide({ guide, dateInfo, lang, C }) {
 
       {form.day === 1 && (
         <section>
-          <div style={{ ...T.label, color: C.gold, marginBottom: 8 }}>{L === "hi" ? "पूरे नौ दिनों की पाठ-योजना" : "COMPLETE NINE-DAY READING PLAN"}</div>
-          <div style={{ overflowX: "auto", border: `1px solid ${C.line}`, borderRadius: T.rMd }}>
+          <div style={{ ...T.label, color: C.gold, marginBottom: "0.5rem" }}>{L === "hi" ? "पूरे नौ दिनों की पाठ-योजना" : "COMPLETE NINE-DAY READING PLAN"}</div>
+          <div style={{ overflowX: "auto", border: `0.0625rem solid ${C.line}`, borderRadius: T.rMd }}>
             <table>
               <thead><tr><th>{L === "hi" ? "दिवस" : "Day"}</th><th>{L === "hi" ? "अध्याय" : "Chapter(s)"}</th><th>{L === "hi" ? "विषय" : "Focus"}</th></tr></thead>
               <tbody>{SAPTASHATI_PLAN.map((item) => (
@@ -165,7 +165,7 @@ function NavadurgaDayGuide({ guide, dateInfo, lang, C }) {
               ))}</tbody>
             </table>
           </div>
-          <p style={{ margin: "9px 0 0", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55 }}>
+          <p style={{ margin: "0.5625rem 0 0", color: C.muted, fontSize: T.fSmall, lineHeight: 1.55 }}>
             {L === "hi"
               ? "मन्त्र-रूप चण्डी-पारायण में बीज-मन्त्र, न्यास, पूर्वाङ्ग, होम और क्रम परम्परा अनुसार बदलते हैं। वह दीक्षित/गुरु-निर्देशित विधि है; ऊपर की योजना सरल पाठ या श्रवण के लिए है।"
               : "In mantra-form Chandi parayana, bija insertion, nyasa, preliminary texts, homa and sequence vary by lineage. That is initiated or teacher-led practice; the plan above is for straightforward reading or listening."}
@@ -173,14 +173,14 @@ function NavadurgaDayGuide({ guide, dateInfo, lang, C }) {
         </section>
       )}
 
-      <section style={{ padding: "12px 13px", borderRadius: T.rMd, border: `1px solid ${C.line}`, background: "rgba(59,49,71,.04)" }}>
-        <div style={{ ...T.label, color: C.gold, marginBottom: 6 }}>{season.name[L]}</div>
+      <section style={{ padding: "0.75rem 0.8125rem", borderRadius: T.rMd, border: `0.0625rem solid ${C.line}`, background: "rgba(59,49,71,.04)" }}>
+        <div style={{ ...T.label, color: C.gold, marginBottom: "0.375rem" }}>{season.name[L]}</div>
         <p style={{ margin: 0, color: C.muted, fontSize: T.fSmall, lineHeight: 1.55 }}>{season.context[L]}</p>
       </section>
 
-      <details style={{ borderTop: `1px solid ${C.line}`, paddingTop: 10 }}>
+      <details style={{ borderTop: `0.0625rem solid ${C.line}`, paddingTop: "0.625rem" }}>
         <summary style={{ cursor: "pointer", color: C.gold, fontSize: T.fSmall }}>{L === "hi" ? "स्रोत-आधार देखें" : "See source basis"}</summary>
-        <ul style={{ margin: "9px 0 0", paddingLeft: 20, color: C.muted, fontSize: T.fMicro, lineHeight: 1.65 }}>
+        <ul style={{ margin: "0.5625rem 0 0", paddingLeft: "1.25rem", color: C.muted, fontSize: T.fMicro, lineHeight: 1.65 }}>
           <li><a href="https://sanskritdocuments.org/doc_devii/durgAkavach-kn.pdf" target="_blank" rel="noreferrer" style={{ color: C.gold }}>Devi Kavacha · Navadurga names</a></li>
           <li><a href={`https://www.drikpanchang.com/hindu-goddesses/parvati/durga/navdurga-${form.sourceSlug || form.slug}.html`} target="_blank" rel="noreferrer" style={{ color: C.gold }}>Drik Panchang · {form.name.en} iconography and prarthana</a></li>
           <li><a href="https://www.artofliving.org/in-en/navratri/durga-saptashati-a-glorious-song-to-the-divine-mother" target="_blank" rel="noreferrer" style={{ color: C.gold }}>Durga Saptashati · nine-day chapter arrangement</a></li>

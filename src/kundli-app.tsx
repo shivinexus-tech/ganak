@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { T } from "./components/tokens";
+import { T } from "./components/ui-style-contract";
 import PrashnaScreen from "./screens/PrashnaScreen";
 import ChartScreen from "./screens/ChartScreen";
 import DailyScreen from "./screens/DailyScreen";
@@ -10,6 +10,7 @@ import MedicalMuhuratScreen, { medicalMuhuratFromPath } from "./screens/MedicalM
 import FeedbackCard from "./components/FeedbackCard";
 import { applyRouteMetadata, routeMetadata } from "./metadata/route-metadata";
 import { privacyEvent } from "./telemetry/privacy-events";
+import { useComfort } from "./accessibility/ComfortProvider";
 import { FEST_NAME } from "./data/festival-meta";
 import { urlPrefGet, urlPrefSet, urlPrefsSet } from "./components/url-prefs";
 import {
@@ -69,13 +70,22 @@ function pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute = null, medi
 
 
 export default function KundliApp() {
+  // Choosing a city anywhere in the app is a deliberate user action, so it is remembered as
+  // the home place — it used to survive only in the URL and vanish on a plain reload.
+  const { updatePreferences } = useComfort();
+  // The shared palette every screen receives. These are semantic custom properties, not
+  // values: light/dark, warmth and the later brand swap all resolve in
+  // src/styles/design-tokens.css, so no screen needs to know which mode it is in.
   const C = {
-    bg: "#FAF5EA", panel: "#FFFFFF", line: "#E7DDC6",
-    gold: "#A86A12", sindoor: "#C2451E", ivory: "#3B3147", muted: "#8C8173",
+    bg: "var(--bg-active)", panel: "var(--surface-active)", line: "var(--line)",
+    gold: "var(--gold)", sindoor: "var(--bad)", ivory: "var(--ink)", muted: "var(--muted)",
+    good: "var(--good)", accent: "var(--accent)", soft: "var(--surface-sunken)",
+    hover: "var(--surface-hover)", accentSoft: "var(--accent-soft)", lineSoft: "var(--line-soft)",
+    onAccent: "var(--on-accent)",
   };
   const card = {
-    background: "linear-gradient(180deg, #FFFFFF 0%, #FFFCF3 100%)",
-    border: `1px solid ${C.line}`,
+    background: "var(--surface-active)",
+    border: `0.0625rem solid ${C.line}`,
     borderRadius: T.rLg,
     boxShadow: T.e2,
   };
@@ -91,6 +101,11 @@ export default function KundliApp() {
   const utilityRoute = utilityFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const medicalRoute = medicalMuhuratFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
   const muhuratRoute = urlPrefGet("muhurat");
+  // A /festival/ path that matches no guide used to render the home screen silently, so a
+  // stale or mistyped shared link looked like it had worked. Say so instead.
+  const unknownFestivalPath = typeof window !== "undefined"
+    && /^\/festival\//.test(window.location.pathname)
+    && !directFestivalGuide;
   const hero = pageHeroCopy(lang, mode, directFestivalGuide, utilityRoute, medicalRoute, muhuratRoute);
   useEffect(() => {
     const meta=routeMetadata({lang,mode,festival:directFestivalGuide,utility:utilityRoute,medical:medicalRoute,muhurat:muhuratRoute});
@@ -103,12 +118,12 @@ export default function KundliApp() {
   // Shared place: Daily and Prashna both read it; URL state preserves it across
   // regional-mode changes, reload and browser Back/Forward without storage.
   const [panchPlace, setPanchPlaceState] = useState(placeFromUrl);
-  const setPanchPlace=(next)=>{setPanchPlaceState(next);if(next)urlPrefsSet({city:next.label,lat:next.lat,lon:next.lon,zone:next.zone});};
+  const setPanchPlace=(next)=>{setPanchPlaceState(next);if(next){urlPrefsSet({city:next.label,lat:next.lat,lon:next.lon,zone:next.zone});updatePreferences({homePlace:{label:next.label,lat:next.lat,lon:next.lon,zone:next.zone}});}};
   useEffect(()=>{const restore=()=>setPanchPlaceState(placeFromUrl());window.addEventListener("popstate",restore);return()=>window.removeEventListener("popstate",restore);},[]);
   const panchEff = panchPlace || DEFAULT_PLACE;
 
   return (
-    <div style={{ minHeight: "100vh", background: `radial-gradient(1100px 700px at 85% -8%, rgba(200,122,28,.08), transparent 60%), radial-gradient(900px 700px at -12% 35%, rgba(106,90,200,.05), transparent 55%), ${C.bg}`, color: C.ivory, fontFamily: "Spectral, Georgia, serif" }}>
+    <div style={{ minHeight: "100vh", background: `radial-gradient(68.75rem 43.75rem at 85% -8%, color-mix(in srgb, var(--accent), transparent 92%), transparent 60%), radial-gradient(56.25rem 43.75rem at -12% 35%, color-mix(in srgb, var(--accent), transparent 95%), transparent 55%), ${C.bg}`, color: C.ivory, fontFamily: T.body }}>
       <style>{`
         html { scroll-behavior: smooth; }
         *, *::before, *::after { box-sizing: border-box; min-width: 0; }
@@ -128,16 +143,25 @@ export default function KundliApp() {
           * { transition: none !important; }
         }
         input, select, button { transition: border-color .15s ease, box-shadow .15s ease, background .15s ease, transform .1s ease, color .15s ease; }
-        input:focus, select:focus, button:focus-visible { border-color: #A86A12 !important; box-shadow: 0 0 0 3px rgba(168,106,18,.22); outline: none; }
-        .castBtn:hover { filter: brightness(1.07); box-shadow: 0 8px 24px rgba(168,106,18,.32); }
-        .castBtn:active { transform: translateY(1px); }
-        .chip:hover { border-color: #A86A1266 !important; color: #A86A12 !important; }
-        .sug:hover { background: rgba(168,106,18,.10) !important; }
+        /* One focus treatment for the whole app: the token ring, which also thickens under
+           the OS "increase contrast" setting. Never outline:none. */
+        input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+          outline: 0.1875rem solid var(--focus); outline-offset: 0.125rem;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+        .castBtn:hover { filter: brightness(1.07); box-shadow: var(--elevation-3); }
+        .castBtn:active { transform: translateY(0.0625rem); }
+        .chip:hover { border-color: var(--accent-line) !important; color: var(--accent) !important; }
+        .sug:hover { background: var(--surface-hover) !important; }
         table { border-collapse: collapse; width: 100%; }
-        td, th { padding: 10px 8px; border-bottom: 1px solid #EBE2CE; text-align: left; font-size: 14px; }
+        td, th { padding: var(--space-3) var(--space-2); border-bottom: 0.0625rem solid var(--line-soft); text-align: left; font-size: var(--font-body); }
         tbody tr:last-child td { border-bottom: none; }
-        tbody tr:hover td { background: rgba(168,106,18,.05); }
-        th { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #8C8173; font-weight: 400; }
+        tbody tr:hover td { background: var(--surface-hover); }
+        th { font-size: var(--font-label); letter-spacing: var(--label-letter-spacing); text-transform: uppercase; color: var(--muted); font-weight: 400; }
+        @media (max-width: 40rem) {
+          .utility-header { margin-bottom: var(--space-3) !important; justify-content: center !important; }
+          .comfort-preset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        }
 
         /* Print / Save-as-PDF: hide interactive chrome, show the report cleanly. */
         .print-only { display: none; }
@@ -158,38 +182,56 @@ export default function KundliApp() {
         }
       `}</style>
 
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: "40px 20px 80px" }}>
-        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 8, marginBottom: -18, position: "relative", zIndex: 2 }}>
+      <div style={{ maxWidth: "47.5rem", margin: "0 auto", padding: `${T.s8} ${T.s5} 5rem` }}>
+        <div className="utility-header" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", flexWrap: "wrap", gap: T.s2, marginBottom: `calc(-1 * ${T.s6})`, position: "relative", zIndex: 2 }}>
           <span style={{ fontSize: T.fMicro, color: C.muted, letterSpacing: ".08em" }}>भाषा · Language</span>
-          <span style={{ display: "inline-flex", border: `1px solid ${C.line}`, borderRadius: T.rPill, overflow: "hidden", background: C.panel }}>
+          <span style={{ display: "inline-flex", border: `0.0625rem solid ${C.line}`, borderRadius: T.rPill, overflow: "hidden", background: C.panel }}>
             {[["hi", "हिन्दी"], ["en", "English"]].map(([v, l]) => (
-              <button key={v} onClick={() => chooseLang(v)} aria-label={v === "hi" ? "हिन्दी चुनें" : "Switch to English"} style={{ padding: "5px 13px", border: "none", cursor: "pointer", fontFamily: "Eczar, serif", fontSize: 12.5, background: lang === v ? "rgba(168,106,18,.12)" : "transparent", color: lang === v ? C.gold : C.muted, fontWeight: lang === v ? 600 : 400 }}>{l}</button>
+              <button key={v} onClick={() => chooseLang(v)} aria-label={v === "hi" ? "हिन्दी चुनें" : "Switch to English"} aria-pressed={lang === v} style={{ padding: `${T.s2} ${T.s3}`, minHeight: T.ctrlH, border: "none", cursor: "pointer", fontFamily: T.serif, fontSize: T.fSmall, background: lang === v ? C.accentSoft : "transparent", color: lang === v ? C.gold : C.muted, fontWeight: lang === v ? 600 : 400 }}>{l}</button>
             ))}
           </span>
         </div>
         {/* hero */}
-        <header className="rise" style={{ textAlign: "center", marginBottom: 36 }}>
-          <h1 style={{ fontFamily: "Eczar, serif", fontWeight: 700, fontSize: 46, margin: "8px 0 6px", lineHeight: 1.08 }}>
+        <header className="rise" style={{ textAlign: "center", marginBottom: T.s8 }}>
+          <h1 style={{ fontFamily: T.serif, fontWeight: 700, fontSize: "2.875rem", margin: `${T.s2} 0 ${T.s1}`, lineHeight: 1.08 }}>
             <span style={{ color: C.gold }}>{lang === "hi" ? "गणक" : "Ganak"}</span>
           </h1>
-          <div style={{ fontFamily: "Eczar, serif", color: C.gold, fontSize: 15, letterSpacing: "0.18em" }}>{hero.eyebrow}</div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, margin: "10px 0 12px" }}>
-            <span style={{ height: 1, width: 64, background: `linear-gradient(90deg, transparent, ${C.gold}99)` }} />
-            <span style={{ color: C.gold, fontSize: 13 }}>ॐ</span>
-            <span style={{ height: 1, width: 64, background: `linear-gradient(270deg, transparent, ${C.gold}99)` }} />
+          <div style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fSmall, letterSpacing: "0.18em" }}>{hero.eyebrow}</div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: T.s3, margin: `${T.s3} 0` }}>
+            <span style={{ height: "0.0625rem", width: "4rem", background: "linear-gradient(90deg, transparent, var(--accent-line))" }} />
+            <span style={{ color: C.gold, fontSize: T.fSmall }}>ॐ</span>
+            <span style={{ height: "0.0625rem", width: "4rem", background: "linear-gradient(270deg, transparent, var(--accent-line))" }} />
           </div>
-          <p style={{ color: C.muted, fontSize: 14.5, margin: 0, letterSpacing: ".02em" }}>
+          <p style={{ color: C.muted, fontSize: T.fBody, margin: 0, letterSpacing: ".02em" }}>
             {hero.detail}
           </p>
         </header>
 
         {!directFestivalGuide && !utilityRoute && !medicalRoute && <div style={{ display: "flex", justifyContent: "center", marginBottom: T.s5 }}>
-          <div style={{ display: "inline-flex", background: "#F1E9D5", borderRadius: T.rMd, padding: 3, border: `1px solid ${C.line}` }}>
+          <div role="group" aria-label={lang === "hi" ? "मुख्य भाग चुनें" : "Choose section"} style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", background: C.soft, borderRadius: T.rMd, padding: "0.1875rem", border: `0.0625rem solid ${C.line}` }}>
             {[["daily", lang === "hi" ? "आज · पंचांग" : "Daily"], ["prashna", lang === "hi" ? "प्रश्न" : "Prashna"], ["chart", lang === "hi" ? "ज्योतिष" : "Jyotish"]].map(([mk, label]) => (
-              <button key={mk} onClick={() => chooseMode(mk)} style={{ padding: "9px 26px", borderRadius: T.rSm, fontFamily: T.serif, fontSize: T.fBody, cursor: "pointer", border: "none", background: mode === mk ? C.panel : "transparent", color: mode === mk ? C.gold : C.muted, fontWeight: mode === mk ? 600 : 400, boxShadow: mode === mk ? T.e1 : "none", transition: "all .15s" }}>{label}</button>
+              // The unselected label is a real, actionable control, so it carries full ink
+              // contrast rather than the muted tone; selection is gold + weight + elevation.
+              <button key={mk} onClick={() => chooseMode(mk)} className="comfort-focus" aria-pressed={mode === mk} aria-current={mode === mk ? "page" : undefined} style={{ minHeight: T.ctrlH, padding: `0 ${T.s5}`, borderRadius: T.rSm, fontFamily: T.serif, fontSize: T.fBody, cursor: "pointer", border: "none", background: mode === mk ? C.panel : "transparent", color: mode === mk ? C.gold : C.ivory, fontWeight: mode === mk ? 700 : 400, boxShadow: mode === mk ? T.e1 : "none", transition: "all .15s" }}>{label}</button>
             ))}
           </div>
         </div>}
+
+        {unknownFestivalPath && (
+          <div role="alert" style={{ ...card, padding: `${T.s5} ${T.s5}`, marginBottom: T.s5, borderColor: "var(--bad)" }}>
+            <div style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.ivory, marginBottom: T.s2 }}>
+              {lang === "hi" ? "यह पर्व-पृष्ठ नहीं मिला।" : "That festival page could not be found."}
+            </div>
+            <div style={{ fontSize: T.fSmall, color: C.muted, marginBottom: T.s3, lineHeight: 1.55 }}>
+              {lang === "hi"
+                ? "लिंक पुराना या ग़लत हो सकता है। नीचे आज का पंचांग है; व्रत एवं पर्व सूची से सही पृष्ठ खोलें।"
+                : "The link may be old or mistyped. Today's Panchang is below — open the right page from the Fasts and festivals list."}
+            </div>
+            <a href={`/?lang=${lang}&screen=daily`} className="comfort-focus" style={{ display: "inline-flex", alignItems: "center", minHeight: T.ctrlH, padding: `0 ${T.s4}`, borderRadius: T.rMd, border: `0.0625rem solid ${C.gold}`, color: C.gold, textDecoration: "none", fontWeight: 600 }}>
+              {lang === "hi" ? "आज का पंचांग खोलें" : "Open today's Panchang"}
+            </a>
+          </div>
+        )}
 
         {directFestivalGuide && (
           <FestivalGuideScreen
@@ -206,6 +248,7 @@ export default function KundliApp() {
 
         {medicalRoute && <MedicalMuhuratScreen lang={lang} C={C} card={card} place={panchEff} onPlace={setPanchPlace} />}
 
+
         {!directFestivalGuide && !utilityRoute && !medicalRoute && mode === "prashna" && (
           <PrashnaScreen lat={panchEff?.lat} lon={panchEff?.lon} placeLabel={panchEff?.label} lang={lang} />
         )}
@@ -220,8 +263,18 @@ export default function KundliApp() {
 
         <FeedbackCard lang={lang} C={C} card={card} />
 
-        {/* Footer stays accurate with or without optional telemetry endpoints. */}
-        <footer style={{ textAlign: "center", color: C.muted, fontSize: 12, marginTop: 56, letterSpacing: ".06em" }}>
+        {/* Footer stays accurate with or without optional telemetry endpoints.
+            The calculator catalogue is linked here so it is reachable from every screen —
+            it shipped as an orphan route (14 calculators, zero inbound links) and
+            validation/route-reachability.cjs now guards against that returning. */}
+        <footer style={{ textAlign: "center", color: C.muted, fontSize: T.fLabel, marginTop: T.s8, letterSpacing: ".06em" }}>
+          <div style={{ marginBottom: T.s3 }}>
+            <a href={`/calculators?lang=${lang}`} className="comfort-focus" style={{ color: C.gold, textDecoration: "none", borderBottom: `0.0625rem solid ${C.line}`, paddingBottom: "0.125rem" }}>
+              {lang === "hi"
+                ? "ज्योतिष कैलकुलेटर — राशि, लग्न, नक्षत्र, मांगलिक और अन्य"
+                : "Astrology calculators — Rashi, Lagna, Nakshatra, Mangal Dosha and more"}
+            </a>
+          </div>
           {lang === "hi"
             ? "ॐ · गणना आपके डिवाइस पर · न खाता · शहर खोज ऑनलाइन · सेवा जुड़ने पर केवल अनाम उपयोग-घटनाएँ"
             : "ॐ · computed on your device · no account · city search online · anonymous usage events only when configured"}

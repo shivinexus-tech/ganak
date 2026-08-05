@@ -356,39 +356,93 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         safe household guidance. Shipped 2026-07-24 with topocentric solar
         visibility, lunar moonrise overlap, no-Sutak handling for non-visible
         cities and EN/HI festival + MuhuratHub wiring.
-  - [ ] **Aarti section — full aarti lyrics on festival/vrat pages.** Add a
-        collapsible Devanagari aarti (with an English meaning line in EN mode) after
-        the Puja section of each relevant guide, rendering in both the in-app Fasts
-        & Festivals list and the standalone `/festival/...` routes. Design:
-        `docs/superpowers/specs/2026-07-25-festival-aarti-section-design.md`. Phase 1
-        = North Indian deity festivals & vrats; Phase 2 = remaining/regional.
-        _(P1-FESTIVAL-AARTI; owner scope 2026-07-25)_
-    - [ ] **Aarti content sourcing & proof-reading (the substantive work).** For each
-          aarti, cross-validate **2–3 authentic sources against each other** and enter
-          the most widely-sung standard Devanagari text with zero transcription errors.
-          Handle known challenges: regional/sampradaya **wording variants** (choose the
-          common version, add a non-prescriptive "your family's wording may differ"
-          note consistent with the app voice); **which aarti maps to each festival**
-          (editorial mapping; a festival may carry more than one); **Devanagari
-          orthography consistency** (ॐ vs ओम्, anusvara/chandrabindu, half-letters,
-          nukta — sources agree on words but differ on spelling); **provenance/
-          copyright** (confirm each is genuinely traditional/public-domain, not a
-          modern copyrighted arrangement) recorded per aarti in a citations doc like
-          the existing festival-guide research file. Must pass the new
-          `validation/festival-aarti.cjs` gate **and** the row-#29 quality bar
-          (independent EN/HI review, two-agent bug bash, production verification).
-          _(P1-FESTIVAL-AARTI-CONTENT; owner scope 2026-07-25)_
-    - [ ] **Aarti discoverability UI — find/open an aarti directly.** Beyond embedding
-          aartis in guides, add a direct way to reach one: a dedicated aarti
-          finder/index, input-driven navigation (user types/searches a deity or
-          festival → lands on its aarti), and stable per-aarti deep-links. Reuse the
-          existing search/route patterns; keep additive to current festival routes.
-          _(P1-FESTIVAL-AARTI-FINDER; owner scope 2026-07-25)_
-    - [ ] **Aarti SEO.** Per-aarti page titles, meta descriptions and structured data
-          so each aarti is search-discoverable (e.g. "Lakshmi Aarti — Om Jai Lakshmi
-          Mata"), consistent with the existing festival-page SEO work. Depends on the
-          finder/deep-link routes above.
-          _(P1-FESTIVAL-AARTI-SEO; owner scope 2026-07-25)_
+  - [x] **Aarti section (Phase 1) — DONE + DEPLOYED 2026-07-28.** 14 distinct aartis
+        across 16 North Indian festival/vrat guides (44 placements), rendered as a
+        collapsible after the Puja section on the in-app Fasts & Festivals list and the
+        standalone `/festival/...` routes. Refrain-once + gold-cue layout; deity-family
+        closer rule (Vishnu→Om Jai Jagdish Hare, Shiva/Shakti→Om Jai Shiv Omkara,
+        Hanuman→Rama); Devanagari + English meaning; per-aarti sources cross-validated;
+        gate `validation/festival-aarti.cjs` 16/44 green; production build green; owner
+        "go live" 2026-07-28. Design `docs/superpowers/specs/2026-07-25-festival-aarti-section-design.md`;
+        standard `plans/festival-aarti-standard.md`. _(P1-FESTIVAL-AARTI; owner scope 2026-07-25 — CLOSED)_
+  - [ ] **Aarti Phase-2 — breadth (highest-demand aartis).** Add the ~20 highest-search
+        aartis Ganak lacks (Shani, Santoshi Mata, Saraswati, Surya, Ganga, Khatu
+        Shyam, weekday aartis, etc.), **prioritised by search demand, not completeness**,
+        in the existing `{refrain, cue, stanzas}` structure. Ranked list + tiers:
+        `plans/aarti-phase2-priority.md`. Target "reach all" audiences (diaspora +
+        urban-India) — learn, then pivot (owner 2026-08-01). Audio sing-along
+        **deprioritised** for now (owner 2026-08-01). **Acceptance:** (a) all Tier-1 and
+        Tier-2 aartis from the priority list entered, each cross-validated against 2–3
+        sources with per-aarti citations; (b) `festival-aarti.cjs` extended to cover the
+        new deity/standalone keys and green; (c) EN/HI render verified, no 375px
+        overflow, 0 console errors; (d) owner skim sign-off. Note: several Tier-1 aartis
+        (Shani, Santoshi, Khatu Shyam) are **deity** aartis not tied to one festival — they need
+        the standalone pages from the finder item below, not just a festival embed.
+        _(P2-FESTIVAL-AARTI-BREADTH; owner scope 2026-08-01)_
+  - [ ] **Aarti finder + dedicated per-aarti pages.** Today aartis are **inline-only**
+        inside festival pages — they have no URL of their own, so they are unlinkable
+        and near-invisible to search. Give every aarti a home. **Scope:** (a) a `/aarti`
+        index route grouping all aartis by deity/festival; (b) a per-aarti route
+        `/aarti/<slug>` (e.g. `/aarti/om-jai-shiv-omkara`), each a stable canonical URL;
+        (c) input/search navigation ("shiv" → the Shiv aarti), reusing the existing
+        place-search pattern; (d) deep links + cross-links (festival page ↔ its aartis'
+        pages). Additive — existing festival routes and the inline render stay.
+        **Acceptance:** every distinct aarti has a working standalone URL; `/aarti`
+        lists all and links to each; a deity/festival search term resolves to the right
+        aarti; the festival guide links out to each aarti's dedicated page; EN/HI, 0
+        console errors. Unblocks SEO below. _(P2-FESTIVAL-AARTI-FINDER; owner scope 2026-08-01)_
+  - [ ] **Aarti SEO** (depends on FINDER + the SPA-prerender unlock). Make the dedicated
+        aarti URLs actually rank. **Scope:** per-aarti `<title>` + meta description via
+        `src/metadata/route-metadata.ts` (e.g. "Om Jai Shiv Omkara — Shiv Aarti Lyrics
+        in Hindi | Ganak"); `schema.org` `CreativeWork`/`MusicComposition` JSON-LD per
+        aarti; one **canonical URL per aarti** (the same aarti appears on several
+        festivals — prevent duplicate-content dilution); a `sitemap.xml` entry per aarti
+        route. **Acceptance:** each aarti URL emits a unique title + description +
+        canonical + JSON-LD; sitemap includes every aarti route; structured data passes
+        Google's Rich Results test; the Devanagari verses are present in the
+        **prerendered HTML** (verify via `curl` of the built route, not just the browser).
+        Depends on P2-FESTIVAL-AARTI-FINDER (URLs) + INFRA-SPA-PRERENDER (crawlable HTML).
+        _(P2-FESTIVAL-AARTI-SEO; owner scope 2026-08-01)_
+  - [ ] **INFRA-SPA-PRERENDER — site-wide SEO unlock (bigger than aartis).** Ganak is a
+        pure client-rendered SPA (no SSR/SSG): the server ships a near-empty HTML shell
+        and JavaScript draws every page in the browser. Search engines, social scrapers
+        and AI answer-engines that read raw HTML before running JS see **blank pages** —
+        so *all* content (panchang, festivals, muhurat, aartis) is weakly indexed. Fix:
+        **prerender each route to static HTML at build time** (react-snap / a Vite
+        prerender step / Cloudflare rendering), so crawlers get full content while the JS
+        still hydrates for interactivity. This is a **cross-cutting infrastructure item,
+        not aarti-specific** — it unblocks organic discovery for the entire site; aartis
+        are one beneficiary. **Acceptance:** representative routes (`/`, a `/festival/...`
+        page, a future `/aarti/...` page, a calculator route) serve their real content in
+        the initial HTML (verified via `curl`/`view-source`, no JS); Lighthouse SEO and a
+        crawler-view check pass; `canonical-deployment.cjs` and existing gates stay green;
+        no regression to client interactivity/hydration. _(INFRA-SPA-PRERENDER; owner scope 2026-08-01)_
+  - [ ] **P2-FESTIVAL-AARTI-MULTILANG — Marathi / Bengali / Gujarati aartis.** Add regional-language
+        aartis, **both** native region texts (Marathi *Sukhkarta Dukhharta*, Bengali Durga/Kali,
+        Gujarati *Jai Adya Shakti* …) **and** transliterated pan-Indian ones, chosen via a
+        **per-aarti language toggle** independent of the app's EN/HI. PRD:
+        `docs/superpowers/specs/2026-08-01-aarti-multilang-phase2-prd.md`. Scope: ~8–12 Marathi,
+        ~6–10 Bengali, ~8–12 Gujarati native aartis (+ transliterations by demand). **Every aarti ×
+        language cross-checked against ≥5 authentic sources** (DrikPanchang, Sri Mandir, ≥2 news/
+        lyric sites, **≥1 native-language source** for mr/bn/gu). **Every regional page shows the
+        humility disclaimer + a "suggest a correction" feedback box** (native accuracy can't be
+        self-verified → crowdsource it). **Acceptance:** multi-lang data model (`langs:{hi,mr,bn,gu}`)
+        with Phase-1 aartis migrated no-visual-change; per-aarti toggle shows only available
+        languages, remembers choice, correct fonts, no 375px overflow; `festival-aarti.cjs` extended
+        to enforce ≥5 sources/lang + script-range per language + Latin-leak reject; disclaimer +
+        feedback box live on every regional rendering; vertical slice (Ganesh mr-native + bn/gu,
+        Durga bn-native) green + built. **Marathi ships confidently (Devanagari); Bengali/Gujarati
+        staged behind owner native review** (see review task). **Completion rule: mark 95% when
+        build/gate/render/disclaimer/feedback done; owner native review is the final 5% → 100%.**
+        Depends on P2-FESTIVAL-AARTI-FINDER for standalone regional URLs. _(P2-FESTIVAL-AARTI-MULTILANG; owner scope 2026-08-02)_
+  - [ ] **OWNER-AARTI-REGIONAL-REVIEW — owner native review of mr/bn/gu aartis (final 5%).** The
+        Bengali/Gujarati (different-script) and Marathi aartis need a native-eye pass the tools and
+        the owner's Hindi skim can't fully give. **Owner (or a native reviewer the owner lines up)**
+        reads each regional aarti for spelling/conjunct/wording errors before it moves 95% → 100%.
+        Crowdsourced corrections from the in-app feedback box feed this. **Acceptance:** each shipped
+        regional aarti has an owner/native sign-off recorded; corrections applied + redeployed;
+        status advanced to 100%. Until then those aartis stay at **95%** (live per phasing, flagged).
+        _(OWNER-AARTI-REGIONAL-REVIEW; owner action; owner scope 2026-08-02)_
   - [ ] **P0 owner-quality reset — audit and rewrite every festival/fast page.**
         Owner rejected the current festival and fast page quality on 2026-07-24;
         previous automated route/profile/katha gates no longer count as quality
@@ -421,6 +475,27 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         Upanayana, with tradition and regional conventions stated.
   - [ ] Birth-chart-personalized Muhurat only after its method is sourced and
         validated; never silently mix natal filtering into the general finder.
+        **v1 route REJECTED by the owner 2026-08-02 and deleted; personalisation refolded
+        into the real Muhurat Finder.** The dedicated `/muhurat/personal` screen was a
+        strictly inferior duplicate of the finder (no save/share, no URL state, no Panchaka
+        windows, no blockers, no samskara, no guidance) and unreachable — zero inbound links.
+        See `plans/ganak-gate-decay-rootcause.md` for the root cause and
+        `validation/route-reachability.cjs` for the gate that now prevents it.
+        **Now shipped as an opt-in section inside MuhuratHub.** With no birth details the
+        finder is unchanged — the "never silently mix" rule is structural,
+        not a convention. **Sourced method:** Tarabala + Chandrabala are the two hard filters
+        (they alone remove a day); Moon Bhinnashtakavarga bindus rank but never remove. All
+        three reuse already-shipped engines (`daily-windows.ts`, `classical.ts`), so
+        `muhurat.ts` is untouched. A `<3`-survivor fallback switches to annotate-only so the
+        list can never strand the user. **Honest provenance:** the owner-requested Adhanadi
+        special-nakshatra set {1,10,16,18,22,25} ships as a *labelled personal tradition, not
+        a classical muhurta rule* — it marks a day, never removes one — because the
+        primary-text hunt came back negative and found the technique documented for
+        transit/gochara rather than muhurta election (spec §3.1). Gate
+        `validation/personal-muhurat.cjs` (TDD + prove-the-guard); all canonical gates and
+        the production build re-run green after rebasing onto the design-system work. Spec:
+        `docs/superpowers/specs/2026-07-25-personal-muhurat-design.md`.
+        **Stays unchecked until:** owner live-URL sign-off and the two-agent bug bash.
   - [ ] Save/share/export the chosen Muhurat and create calendar reminders.
   - [x] Surgery/medical Muhurat under the separate Claude research brief
         `plans/claude-task-surgery-medical-muhurat.md`. It is strictly for optional
@@ -734,6 +809,14 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
 - [ ] **Publish privacy/terms page** — draft at `plans/legal-privacy-terms-draft.md`;
       footer + fonts accurate _(CLAUDE-LAUNCH-PRIVACY MERGED)_. Needs owner contact
       email + counsel review before linking publicly.
+- [ ] **Owner chore (2026-08-02) — switch Cloudflare Web Analytics off for ganakapp.com.**
+      Cloudflare dashboard → **Web Analytics** → the `ganakapp.com` site → disable/remove it.
+      No agent can do this: it lives in the owner's Cloudflare account, not in the repo.
+      Until it is off, the site sends `POST /cdn-cgi/rum` on every page load while the
+      footer promises usage events only with consent. Verify afterwards by loading
+      ganakapp.com and confirming no `/cdn-cgi/rum` request in the browser network tab.
+      Revisit the decision when the app starts being shared and traffic numbers matter.
+      _(Backlog #46 owner decision; see also P0-ANALYTICS-PRIVACY.)_
 - [ ] **Owner chore:** one local `cd server && npm run smoke` (agents verified via
       browser; suite itself unrun as-written).
 - [x] Optional polish before launch: Muhurat window labels bilingual (E-0.7). _(CHIP-B)_
@@ -747,7 +830,28 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       **PARKED 2026-07-20** (owner): user feedback that IA feels broken + elder-friendly
       requirement captured under EPIC-IA; resume after Phase 1 launch blockers.
 - [ ] Design-system pass (universal Card, spacing scale, shared primitives) —
-      see **EPIC-DS**. Directly fixes the "visual inconsistency" pain.
+      see **EPIC-DS**. Directly fixes the "visual inconsistency" pain. The app-wide
+      legacy migration is done and live: every screen now reads the single semantic
+      token source, so dark mode repaints the whole app instead of only the top bar,
+      and Simple & Large enlarges 95% of on-screen text instead of 60%. Universal
+      Card/SectionHeader/Badge/DataRow primitives now cover all six launch screens;
+      Guided <-> Expert materially changes content on all five launch journeys; Muhurat
+      has bilingual Listen. The final primitive adoption is deployed and live-verified.
+      **Owner decision 2026-08-02 — Cloudflare Web Analytics goes OFF for now.** The
+      beacon fired on every load regardless of the in-app analytics consent, which broke
+      the footer's "anonymous usage events only when consented" claim. Ganak's own
+      telemetry seam is fail-closed and gate-proven; the beacon is injected by Cloudflare
+      Pages at the edge, so it can only be switched off in the dashboard. The owner's call:
+      there is no audience to measure yet, so switch it off and revisit when the app is
+      actually being shared. Footer copy stays as-is and becomes accurate once the switch
+      is flipped — see the owner chore below. _(P0-ANALYTICS-PRIVACY covers the wider
+      "no tracking" claim when real instrumentation lands.)_
+      **Parked 2026-08-02 (owner) — sequence right after the new prototype + theme track:**
+      (a) native `<option>` nodes will not scale inside the browser's own dropdown popup —
+      a platform limitation, closable only by replacing the native selects with a custom
+      listbox; (b) real-device human verification — screen-reader voicing, audible speech
+      quality and physical touch targets, which no agent can check without ears and a thumb.
+      _(Backlog #46; 95% as of 2026-08-02.)_
 
 **Still not required by the 2026-07-21 scope change:** accounts, cross-device data
 persistence, paid AI, Android/iOS store packaging, SDUI and paywalls. The backend
@@ -882,10 +986,17 @@ Work:
       Matching / Tools / Vault sub-navigation, not one flat list.
 
 ### EPIC-DS — Design-system discipline
-**Status: not started. Cross-cutting; Phase 1 polish (helps launch look coherent).**
+**Status: IN PROGRESS — comfort/accessibility foundation deployed and production-
+verified on ganakapp.com (2026-08-01); broader Phase 1 polish remains.**
 Targets the owner's own words: "visual inconsistency is hell a lot." The app already
 has a `T` design-token object, but values leak/hardcode everywhere — so this is
 *enforce + refactor*, not net-new.
+- [x] **Comfort foundation:** rem-based `--scale`/`--density`, semantic light/dark
+      roles with AA contrast, three visual presets, EN/HI Personalize hub,
+      first-run/parent setup, approved local-first preference adapter, contextual
+      Follow/Listen and independent accessibility/privacy bug bash. Production commit
+      `9376836`; `src/styles/design-tokens.css` is the sole token source. The brand
+      track may later change only existing colour values; that swap is not a blocker.
 - [ ] One **universal Card** component (density variants: comfortable/compact),
       no per-card overrides.
 - [ ] **Rigid spacing scale** — 4/8/12/16/20/24/32 only, no exceptions.
@@ -893,6 +1004,9 @@ has a `T` design-token object, but values leak/hardcode everywhere — so this i
 - [ ] **Semantic color roles** (text, muted, saffron=devotional/festival,
       red=Rahu/warning, green=auspicious/Abhijit, blue=links).
 - [ ] Extract shared primitives: Card, DataRow, Badge, SectionHeader — used everywhere.
+- [ ] Finish legacy consumption: replace hard-coded light/sizing values, make
+      Guided/Expert alter relevant content, add Muhurat Listen after its active lane
+      releases, and run the full route/language/viewport matrix.
 - Do in-place in the single file (or as it's split); no stack change.
 
 ### EPIC-PLATFORM — BFF / SDUI / Auth / Paywalls (DEFERRED — Phase 4 or later)

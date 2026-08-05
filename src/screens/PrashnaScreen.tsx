@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import { T } from "../components/tokens";
+import { T } from "../components/ui-style-contract";
 import { fmtDeg } from "../components/format";
 import { NAK_HI } from "../engine/muhurat";
 import { kpNumberToLagna, kpNumberInfo, KP_NUMBER_MIN, KP_NUMBER_MAX } from "../engine/kp-horary";
+import { useDepth } from "../accessibility/ComfortProvider";
+import { Card, DataRow } from "../components/ui-primitives";
 
 // ------------------------------------------------- PRASHNA TOKENS (app palette)
 const TOKENS = {
-  bg: "#FAF5EA", card: "#FFFFFF", ink: "#3B3147", muted: "#8C8173",
-  line: "#E7DDC6", gold: "#A86A12", goldSoft: "#FBF1DA",
-  sindoor: "#C2451E", sindoorSoft: "#FBE7E1", amber: "#B26A00", amberSoft: "#FDF3E0",
+  bg: "var(--bg-active)", card: "var(--surface-active)", ink: "var(--ink)", muted: "var(--muted)",
+  line: "var(--line)", gold: "var(--accent)", goldSoft: "var(--accent-soft)",
+  sindoor: "var(--bad)", sindoorSoft: "var(--bad-surface)", amber: "var(--accent-strong)", amberSoft: "var(--accent-soft)",
   ctrlH: T.ctrlH, radius: T.rMd,
   devanagari: "Eczar, 'Noto Serif Devanagari', serif",
 };
@@ -440,38 +442,48 @@ function PR_shareCardCanvas(result, hi) {
   const g = cv.getContext('2d');
   const font = (px, weight) => `${weight || 400} ${px}px -apple-system, "Segoe UI", "Noto Serif Devanagari", "Eczar", sans-serif`;
 
-  g.fillStyle = '#FBF7EF'; g.fillRect(0, 0, W, H);
-  g.fillStyle = '#B8860B'; g.fillRect(0, 0, W, 10);
+  /* The card is a standalone PNG that travels into chat apps, so it always paints the
+     LIGHT brand palette whatever colour mode the sender is in. A canvas cannot resolve
+     CSS variables, so read the fixed `*-light` token values from the one token source
+     instead of restating brand hexes here -- a brand edit then reaches this card too. */
+  const root = getComputedStyle(document.documentElement);
+  const brand = name => root.getPropertyValue(name).trim();
+  const PAPER = brand('--theme-bg-light'), INK = brand('--theme-ink-light');
+  const GOLD = brand('--theme-gold-light'), MUTED = brand('--theme-muted-light');
+  const LINE = brand('--theme-line-light'), FLAG = brand('--theme-bad-light');
+
+  g.fillStyle = PAPER; g.fillRect(0, 0, W, H);
+  g.fillStyle = GOLD; g.fillRect(0, 0, W, 10);
 
   let y = PAD + 40;
-  g.fillStyle = '#2A2419'; g.font = font(52, 700);
+  g.fillStyle = INK; g.font = font(52, 700);
   g.fillText(hi ? 'प्रश्न कुण्डली' : 'Prashna chart', PAD, y);
 
-  y += 46; g.font = font(26); g.fillStyle = '#7A6E58';
+  y += 46; g.font = font(26); g.fillStyle = MUTED;
   const q = hi ? result.verdict.q.hi : result.verdict.q.en;
   const modeTxt = result.mode === 'number'
     ? (hi ? `कृष्णमूर्ति पद्धति अंक ${result.number}` : `KP number method · #${result.number}`)
     : (hi ? 'समय आधारित होरारी' : 'Time-based horary');
   g.fillText(`${q} · ${modeTxt}`, PAD, y);
 
-  y += 56; g.strokeStyle = '#E3DACA'; g.lineWidth = 2;
+  y += 56; g.strokeStyle = LINE; g.lineWidth = 2;
   g.beginPath(); g.moveTo(PAD, y); g.lineTo(W - PAD, y); g.stroke();
 
   // Lagna + the deciding cuspal sub-lord -- the two numbers an astrologer reads first.
-  y += 54; g.fillStyle = '#2A2419'; g.font = font(30, 600);
+  y += 54; g.fillStyle = INK; g.font = font(30, 600);
   const L = result.chart.lagna;
   /* Number mode pins the lagna at an exact table degree; fmtDeg's rounding shows
      31/249 of them one arcminute low, so the card must format it exactly the way
      the in-app Lagna chip does or the two disagree on the same number. */
   const lagnaDeg = result.mode === 'number' ? PR_fmtNumberDeg(L.deg) : fmtDeg(L.deg);
   g.fillText(`${hi ? 'लग्न' : 'Lagna'}: ${(hi ? RASHI_HI : RASHI_EN)[L.sign]} ${lagnaDeg}  ·  ${(hi ? NAK_HI[L.nak.idx] : L.nak.en)}-${L.nak.pada}`, PAD, y);
-  y += 42; g.fillStyle = '#9B2C2C';
+  y += 42; g.fillStyle = FLAG;
   const cuspOrd = hi ? `${result.verdict.q.cusp}वें भाव उप-स्वामी`
                      : `${englishOrdinal(result.verdict.q.cusp)} cusp sub-lord`;
   g.fillText(`${cuspOrd}: ${(hi ? GRAHA_HI : GRAHA_EN)[result.verdict.cuspSub]}`, PAD, y);
 
   // Twelve cuspal sub-lords, two columns of six.
-  y += 58; g.fillStyle = '#7A6E58'; g.font = font(22, 600);
+  y += 58; g.fillStyle = MUTED; g.font = font(22, 600);
   g.fillText(hi ? 'बारहों भावों के उप-स्वामी' : 'CUSPAL SUB-LORDS', PAD, y);
   y += 12;
   const rows = PR_cuspalTable(result.chart);
@@ -479,16 +491,16 @@ function PR_shareCardCanvas(result, hi) {
   rows.forEach((r, i) => {
     const col = i < 6 ? 0 : 1, row = i % 6;
     const x = PAD + col * colW, ry = y + 38 + row * rowH;
-    g.fillStyle = r.house === result.verdict.q.cusp ? '#9B2C2C' : '#2A2419';
+    g.fillStyle = r.house === result.verdict.q.cusp ? FLAG : INK;
     g.font = font(24, r.house === result.verdict.q.cusp ? 700 : 400);
     g.fillText(`${String(r.house).padStart(2, ' ')}  ${(hi ? RASHI_HI : RASHI_EN)[r.sign]} — ${(hi ? GRAHA_HI : GRAHA_EN)[r.sub]}`, x, ry);
   });
   y += 38 + rowH * 6;
 
   // Disclosures -- the transparency astrologers actually check.
-  y += 28; g.strokeStyle = '#E3DACA';
+  y += 28; g.strokeStyle = LINE;
   g.beginPath(); g.moveTo(PAD, y); g.lineTo(W - PAD, y); g.stroke();
-  y += 36; g.font = font(21); g.fillStyle = '#7A6E58';
+  y += 36; g.font = font(21); g.fillStyle = MUTED;
   const lines = [
     `${hi ? 'समय' : 'Cast'}: ${result.askedAt.toLocaleString(hi ? 'hi-IN' : undefined)}`,
     `${hi ? 'स्थान' : 'Place'}: ${result.placeLabel}`,
@@ -504,7 +516,7 @@ function PR_shareCardCanvas(result, hi) {
   ];
   lines.forEach((t, i) => g.fillText(t, PAD, y + i * 32));
 
-  g.font = font(26, 700); g.fillStyle = '#B8860B';
+  g.font = font(26, 700); g.fillStyle = GOLD;
   g.fillText('Ganak · ganak.pages.dev', PAD, H - PAD);
   return cv;
 }
@@ -512,7 +524,7 @@ function PR_shareCardCanvas(result, hi) {
 // ------------------------------------------------------------ UI PIECES
 function PrashnaSecHead({ hiMode }) {
   return (
-    <div style={{ marginBottom: 10 }}>
+    <div style={{ marginBottom: "0.625rem" }}>
       <div style={{ fontFamily: hiMode ? TOKENS.devanagari : 'inherit',
         fontSize: hiMode ? 20 : 11, letterSpacing: hiMode ? undefined : '0.14em',
         textTransform: hiMode ? undefined : 'uppercase', color: hiMode ? TOKENS.ink : TOKENS.muted,
@@ -523,7 +535,7 @@ function PrashnaSecHead({ hiMode }) {
   );
 }
 function Gloss({ children }) {
-  return <div style={{ fontSize: 13, color: TOKENS.muted, fontStyle: 'italic', lineHeight: 1.45 }}>{children}</div>;
+  return <div style={{ fontSize: "var(--font-small)", color: TOKENS.muted, fontStyle: 'italic', lineHeight: 1.45 }}>{children}</div>;
 }
 
 const VERDICT_STYLE = {
@@ -761,13 +773,17 @@ function PR_fmtNumberDeg(deg) {
 
 // ------------------------------------------------------------ MAIN SCREEN
 function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', lang = 'en' }) {
+  // Guidance depth: Expert opens the astrologer-facing chart straight away, Guided adds a
+  // plain-language orientation line. The verdict and every warning are identical at all
+  // three depths — only how much supporting calculation is on screen changes.
+  const { showPlainHelp, showExpert } = useDepth();
   const hi = lang === 'hi';
   const [mode, setMode] = useState('time'); // 'time' | 'number'
   const [selected, setSelected] = useState(null);
   const [numberInput, setNumberInput] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [showFull, setShowFull] = useState(false);
+  const [showFull, setShowFull] = useState(showExpert);
   /* Chart-first is the astrologer's reading order: the chart and the cuspal
      tables lead, and the plain-language verdict collapses to a secondary line.
      Answer-first stays the default -- the lay devotee flow is unchanged. */
@@ -897,29 +913,29 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
      devotee flow, tucked behind a disclosure for the astrologer flow. */
   const verdictCard = !v ? null : (
     <div style={{ background: TOKENS.card, borderRadius: TOKENS.radius,
-      border: `1.5px solid ${vs.color}`, overflow: 'hidden' }}>
+      border: `0.0938rem solid ${vs.color}`, overflow: 'hidden' }}>
       <div style={{ background: vs.soft, padding: '14px 16px' }}>
         {isNum ? (
           <>
             <span style={{ display: 'inline-block', background: vs.color, color: TOKENS.card,
-              fontSize: 11.5, fontWeight: 600, padding: '2px 10px', borderRadius: 20, marginBottom: 8 }}>
+              fontSize: "var(--font-label)", fontWeight: 600, padding: '2px 10px', borderRadius: "1.25rem", marginBottom: "0.5rem" }}>
               {hi ? vs.badge.hi : vs.badge.en}
             </span>
-            <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: 18, fontWeight: 600, color: TOKENS.ink, lineHeight: 1.3 }}>{hi ? vs.hi : vs.en}</div>
+            <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: "var(--font-heading)", fontWeight: 600, color: TOKENS.ink, lineHeight: 1.3 }}>{hi ? vs.hi : vs.en}</div>
           </>
         ) : (
-          <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: 28, color: vs.color, lineHeight: 1.1 }}>{hi ? vs.hi : vs.en}</div>
+          <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: "var(--font-display)", color: vs.color, lineHeight: 1.1 }}>{hi ? vs.hi : vs.en}</div>
         )}
-        <div style={{ fontSize: 13, color: TOKENS.muted, marginTop: 6 }}>
+        <div style={{ fontSize: "var(--font-small)", color: TOKENS.muted, marginTop: "0.375rem" }}>
           {hi ? v.q.hi : v.q.en}{isNum ? ` · ${hi ? 'अंक' : 'number'} ${result.number}` : ''}
         </div>
       </div>
       {isNum && <NumberSetBox info={result.info} favor={v.q.favor} hi={hi}
         cuspLabel={hi ? `${v.q.cusp}वें` : englishOrdinal(v.q.cusp)}
         cuspIsAscendant={v.q.cusp === 1} />}
-      <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: "0.5rem" }}>
         {buildPlain(v, lang).map((r, i) => (
-          <div key={i} style={{ fontSize: 14, lineHeight: 1.5,
+          <div key={i} style={{ fontSize: "var(--font-body)", lineHeight: 1.5,
             color: r.tone === 'good' ? TOKENS.ink : r.tone === 'bad' ? TOKENS.sindoor : TOKENS.ink,
             fontWeight: r.tone === 'lead' ? 600 : 400 }}>
             {r.text}
@@ -934,14 +950,14 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
             the chart, so the caveat must sit with it in the DEFAULT flow -- not
             nested in an override panel most users never open. */}
         {isNum && (
-          <div style={{ fontSize: 11, color: TOKENS.muted, fontStyle: 'italic' }}>
+          <div style={{ fontSize: "var(--font-micro)", color: TOKENS.muted, fontStyle: 'italic' }}>
             {hi ? 'अंक विधि में आपका अंक ही लग्न तय करता है, इसलिए भावों का विभाजन केवल अक्षांश से बनता है — देशान्तर इस कुण्डली को नहीं बदलता।'
                 : 'In the number method your number fixes the ascendant, so only latitude shapes the house cusps — longitude does not change this chart.'}
           </div>
         )}
         {isNum && (
-          <div style={{ marginTop: 4, padding: '9px 11px', background: TOKENS.amberSoft,
-            borderRadius: TOKENS.radius, border: `1px solid ${TOKENS.line}`, fontSize: 11.5, color: TOKENS.muted, lineHeight: 1.5 }}>
+          <div style={{ marginTop: "0.25rem", padding: '9px 11px', background: TOKENS.amberSoft,
+            borderRadius: TOKENS.radius, border: `0.0625rem solid ${TOKENS.line}`, fontSize: "var(--font-label)", color: TOKENS.muted, lineHeight: 1.5 }}>
             {hi
               ? 'यह कृष्णमूर्ति पद्धति अंक विधि है, इसके नए अयनांश पर — गणक की सामान्य लाहिरी परिपाटी से भिन्न। निर्णय के नियम के॰ एस॰ कृष्णमूर्ति के के॰पी॰ रीडर्स (मुख्यतः रीडर VI, होरारी ज्योतिष) से लिए गए हैं।'
               : 'This is the KP number method on the KP-New ayanamsa — distinct from Ganak’s usual Lahiri convention. The judgment rules are drawn from K.S. Krishnamurti’s KP Readers (principally Reader VI, Horary Astrology).'}
@@ -952,8 +968,8 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   );
 
   return (
-    <div style={{ background: TOKENS.bg, minHeight: '100%', padding: 16, color: TOKENS.ink,
-      fontFamily: "-apple-system, 'Segoe UI', sans-serif" }}>
+    <div style={{ background: TOKENS.bg, minHeight: '100%', padding: "1rem", color: TOKENS.ink,
+      fontFamily: "var(--font-body-family)" }}>
       <PrashnaSecHead hiMode={hi} />
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
@@ -962,7 +978,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
           style={{ minHeight: 32, padding: '4px 10px', borderRadius: TOKENS.radius,
             border: `1.5px solid ${chartFirst ? TOKENS.gold : TOKENS.line}`,
             background: chartFirst ? TOKENS.goldSoft : TOKENS.card, color: TOKENS.ink,
-            fontSize: 12, cursor: 'pointer', fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
+            fontSize: "var(--font-micro)", cursor: 'pointer', fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
           {chartFirst ? (hi ? 'सामान्य दृश्य' : 'Plain view')
                       : (hi ? 'ज्योतिषी दृश्य' : 'Astrologer view')}
         </button>
@@ -970,7 +986,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
 
       {/* Method toggle — two named methods, never mixed (owner-approved).
           Follows the language switch (single language), each with a short description. */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+      <div style={{ display: 'flex', gap: "0.5rem", marginBottom: "0.75rem" }}>
         {[
           { key: 'time',
             hi: 'इस क्षण से पूछें',       en: 'Ask from this moment',
@@ -985,10 +1001,10 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
           return (
             <button key={m.key} onClick={() => switchMode(m.key)}
               style={{ flex: 1, minHeight: TOKENS.ctrlH, padding: '8px 10px', borderRadius: TOKENS.radius, textAlign: 'left',
-                border: `1.5px solid ${on ? TOKENS.gold : TOKENS.line}`,
+                border: `0.0938rem solid ${on ? TOKENS.gold : TOKENS.line}`,
                 background: on ? TOKENS.goldSoft : TOKENS.card, color: TOKENS.ink, cursor: 'pointer', lineHeight: 1.3 }}>
-              <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: 15, fontWeight: 600 }}>{hi ? m.hi : m.en}</div>
-              <div style={{ fontSize: 11, color: TOKENS.muted, marginTop: 3, lineHeight: 1.35 }}>{hi ? m.descHi : m.descEn}</div>
+              <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: "var(--font-body)", fontWeight: 600 }}>{hi ? m.hi : m.en}</div>
+              <div style={{ fontSize: "var(--font-label)", color: TOKENS.muted, marginTop: "0.1875rem", lineHeight: 1.35 }}>{hi ? m.descHi : m.descEn}</div>
             </button>
           );
         })}
@@ -1015,11 +1031,11 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
           <input type="checkbox" checked={useCustom}
             onChange={e => { if (numberLocked) return; setUseCustom(e.target.checked); clearResult(); }} />
-          <span style={{ fontSize: 13, fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
+          <span style={{ fontSize: "var(--font-small)", fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
             {hi ? 'निर्णय का समय और स्थान स्वयं चुनें' : 'Set the judgment moment & place myself'}
           </span>
         </label>
-        <div style={{ fontSize: 11.5, color: TOKENS.muted, marginTop: 3,
+        <div style={{ fontSize: "var(--font-micro)", color: TOKENS.muted, marginTop: 3,
           fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
           {useCustom
             ? (hi ? 'कुण्डली इसी क्षण और स्थान के लिए बनेगी।' : 'The chart will be cast for exactly this moment and place.')
@@ -1032,19 +1048,19 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               placeholder={hi ? 'स्थान का नाम' : 'Place name'}
               style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, boxSizing: 'border-box',
                 border: `1.5px solid ${TOKENS.line}`, background: TOKENS.bg, color: TOKENS.ink,
-                fontSize: 14, padding: '0 10px' }} />
+                fontSize: "var(--font-body)", padding: '0 10px' }} />
             <div style={{ display: 'flex', gap: 6 }}>
               <input inputMode="decimal" value={customLat}
                 onChange={e => { if (numberLocked) return; setCustomLat(e.target.value); clearResult(); }}
                 aria-label={hi ? 'अक्षांश' : 'Latitude'} placeholder={hi ? 'अक्षांश' : 'Latitude'}
                 style={{ flex: 1, minWidth: 0, height: TOKENS.ctrlH, borderRadius: TOKENS.radius,
-                  boxSizing: 'border-box', background: TOKENS.bg, color: TOKENS.ink, fontSize: 14,
+                  boxSizing: 'border-box', background: TOKENS.bg, color: TOKENS.ink, fontSize: "var(--font-body)",
                   padding: '0 10px', border: `1.5px solid ${latValid ? TOKENS.line : TOKENS.sindoor}` }} />
               <input inputMode="decimal" value={customLon}
                 onChange={e => { if (numberLocked) return; setCustomLon(e.target.value); clearResult(); }}
                 aria-label={hi ? 'देशान्तर' : 'Longitude'} placeholder={hi ? 'देशान्तर' : 'Longitude'}
                 style={{ flex: 1, minWidth: 0, height: TOKENS.ctrlH, borderRadius: TOKENS.radius,
-                  boxSizing: 'border-box', background: TOKENS.bg, color: TOKENS.ink, fontSize: 14,
+                  boxSizing: 'border-box', background: TOKENS.bg, color: TOKENS.ink, fontSize: "var(--font-body)",
                   padding: '0 10px', border: `1.5px solid ${lonValid ? TOKENS.line : TOKENS.sindoor}` }} />
             </div>
             {/* Also rendered with every number-mode result (see the result block).
@@ -1053,7 +1069,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                 field above deserves to be told it will not move their chart
                 before they spend time on it. */}
             {mode === 'number' && (
-              <div style={{ fontSize: 11, color: TOKENS.muted, fontStyle: 'italic' }}>
+              <div style={{ fontSize: "var(--font-micro)", color: TOKENS.muted, fontStyle: 'italic' }}>
                 {hi ? 'अंक विधि में आपका अंक ही लग्न तय करता है, इसलिए भावों का विभाजन केवल अक्षांश से बनता है — देशान्तर इस कुण्डली को नहीं बदलता।'
                     : 'In the number method your number fixes the ascendant, so only latitude shapes the house cusps — longitude does not change this chart.'}
               </div>
@@ -1063,8 +1079,8 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               aria-label={hi ? 'निर्णय का समय' : 'Judgment time'}
               style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, boxSizing: 'border-box',
                 border: `1.5px solid ${TOKENS.line}`, background: TOKENS.bg, color: TOKENS.ink,
-                fontSize: 14, padding: '0 10px' }} />
-            <div style={{ fontSize: 11, color: TOKENS.muted, fontStyle: 'italic' }}>
+                fontSize: "var(--font-body)", padding: '0 10px' }} />
+            <div style={{ fontSize: "var(--font-micro)", color: TOKENS.muted, fontStyle: 'italic' }}>
               {hi ? 'समय खाली छोड़ें तो अभी का क्षण लिया जाएगा। समय आपके उपकरण के समयक्षेत्र में पढ़ा जाता है।'
                   : 'Leave the time blank to use this moment. Time is read in your device’s timezone.'}
             </div>
@@ -1072,21 +1088,30 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         )}
       </div>
 
+      {showPlainHelp && (
+        <Card as="aside" density="compact" tone="raised" elevated={false} style={{ margin: '0 0 0.75rem' }}>
+          {hi
+            ? 'बस इतना करना है: नीचे से अपना प्रश्न चुनें और उत्तर पढ़ें। उत्तर सरल भाषा में सबसे ऊपर आता है — कुण्डली देखना आवश्यक नहीं है।'
+            : 'All you need to do is choose your question below and read the answer. The answer comes first, in plain words — you do not have to read the chart.'}
+        </Card>
+      )}
+      <DataRow density="compact" label={hi ? "चुनी हुई विधि" : "Selected method"} value={mode === "number" ? (hi ? "अंक 1–249" : "Number 1–249") : (hi ? "इस क्षण से" : "Current moment")} />
+
       {/* Question chips */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, margin: '14px 0' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: "0.5rem", margin: '14px 0' }}>
         {QUESTIONS.map(q => {
           const on = selected === q.key;
           return (
             <button key={q.key} onClick={() => { if (numberLocked) return; setSelected(q.key); clearResult(); }}
-              style={{ minHeight: TOKENS.ctrlH, borderRadius: TOKENS.radius, padding: '6px 12px',
-                border: `1.5px solid ${on ? TOKENS.gold : TOKENS.line}`,
+              style={{ minHeight: TOKENS.ctrlH, width: '100%', borderRadius: TOKENS.radius, padding: '6px 12px',
+                border: `0.0938rem solid ${on ? TOKENS.gold : TOKENS.line}`,
                 background: on ? TOKENS.goldSoft : TOKENS.card,
                 color: TOKENS.ink, cursor: 'pointer', textAlign: 'left', lineHeight: 1.2 }}>
-              <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: 14, fontWeight: 600 }}>
+              <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: "var(--font-body)", fontWeight: 600 }}>
                 {hi ? q.hi : q.en}
               </div>
               <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit',
-                fontSize: 10.5, color: TOKENS.muted, marginTop: 2 }}>
+                fontSize: "var(--font-micro)", color: TOKENS.muted, marginTop: "0.125rem" }}>
                 {hi ? q.subHi : q.subEn}
               </div>
             </button>
@@ -1096,17 +1121,17 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
 
       {/* Number entry — only in KP number mode */}
       {mode === 'number' && (
-        <div style={{ marginBottom: 10 }}>
+        <div style={{ marginBottom: "0.625rem" }}>
           <input inputMode="numeric" value={numberInput} readOnly={numberLocked}
             onChange={e => { setNumberInput(PR_normalizeNumberInput(e.target.value)); clearResult(); }}
             placeholder={hi ? '1 से 249 के बीच अंक' : 'a number from 1 to 249'}
             aria-label={hi ? 'कृष्णमूर्ति पद्धति अंक (1 से 249)' : 'KP number (1 to 249)'}
             style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%', boxSizing: 'border-box',
-              border: `1.5px solid ${numOutOfRange ? TOKENS.sindoor : TOKENS.line}`,
+              border: `0.0938rem solid ${numOutOfRange ? TOKENS.sindoor : TOKENS.line}`,
               background: numberLocked ? TOKENS.goldSoft : TOKENS.card, color: TOKENS.ink,
-              fontSize: 18, textAlign: 'center', letterSpacing: '0.05em' }} />
+              fontSize: "var(--font-heading)", textAlign: 'center', letterSpacing: '0.05em' }} />
           {numOutOfRange && !numberLocked && (
-            <div id="pr-num-range" style={{ marginTop: 4, fontSize: 12, color: TOKENS.sindoor }}>
+            <div id="pr-num-range" style={{ marginTop: "0.25rem", fontSize: "var(--font-label)", color: TOKENS.sindoor }}>
               {hi ? `परम्परा 1 से ${KP_NUMBER_MAX} तक का अंक ही स्वीकारती है।` : `The tradition only takes a number from 1 to ${KP_NUMBER_MAX}.`}
             </div>
           )}
@@ -1127,8 +1152,8 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
       {numberLocked ? (
         <button onClick={newQuestion}
           style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
-            border: `1.5px solid ${TOKENS.gold}`, background: TOKENS.card, color: TOKENS.ink,
-            fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
+            border: `0.0938rem solid ${TOKENS.gold}`, background: TOKENS.card, color: TOKENS.ink,
+            fontSize: "var(--font-body)", fontWeight: 600, cursor: 'pointer' }}>
           {hi ? 'नया प्रश्न' : 'New question'}
         </button>
       ) : (
@@ -1140,12 +1165,12 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
             aria-describedby={blockReason ? 'pr-cast-block' : numOutOfRange ? 'pr-num-range' : undefined}
             style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
               border: 'none', background: (canAsk && !numOutOfRange) ? TOKENS.ink : TOKENS.line,
-              color: (canAsk && !numOutOfRange) ? TOKENS.bg : TOKENS.muted, fontSize: 15, fontWeight: 600,
+              color: (canAsk && !numOutOfRange) ? TOKENS.bg : TOKENS.muted, fontSize: "var(--font-body)", fontWeight: 600,
               cursor: (canAsk && !numOutOfRange) ? 'pointer' : 'default' }}>
             {mode === 'number' ? (hi ? 'उत्तर देखें' : 'Cast the answer') : (hi ? 'अभी पूछें' : 'Ask now')}
           </button>
           {blockReason && (
-            <div id="pr-cast-block" role="status" style={{ marginTop: 6, fontSize: 12.5,
+            <div id="pr-cast-block" role="status" style={{ marginTop: "0.375rem", fontSize: "var(--font-label)",
               color: TOKENS.muted, textAlign: 'center',
               fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
               {blockReason}
@@ -1155,13 +1180,13 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
       )}
 
       {error && (
-        <div style={{ marginTop: 14, padding: 12, borderRadius: TOKENS.radius,
-          background: TOKENS.sindoorSoft, border: `1.5px solid ${TOKENS.sindoor}`,
-          color: TOKENS.sindoor, fontSize: 14 }}>{error}</div>
+        <div style={{ marginTop: "0.875rem", padding: "0.75rem", borderRadius: TOKENS.radius,
+          background: TOKENS.sindoorSoft, border: `0.0938rem solid ${TOKENS.sindoor}`,
+          color: TOKENS.sindoor, fontSize: "var(--font-body)" }}>{error}</div>
       )}
 
       {result && !error && result.mode === mode && (
-        <div style={{ marginTop: 16 }}>
+        <div style={{ marginTop: "1rem" }}>
           {/* Verdict card — answer before data (or, in chart-first mode, tucked
               behind a disclosure so the chart and tables lead instead). */}
           {/* Demote the plain-language verdict only when the chart is actually
@@ -1169,13 +1194,13 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               collapsing the verdict too would leave the screen showing neither
               an answer nor a chart. */}
           {chartFirst && showFull ? (
-            <details style={{ border: `1.5px solid ${TOKENS.line}`,
+            <details style={{ border: `0.0938rem solid ${TOKENS.line}`,
               borderRadius: TOKENS.radius, background: TOKENS.card, padding: '8px 10px' }}>
-              <summary style={{ cursor: 'pointer', fontSize: 13, color: TOKENS.muted,
+              <summary style={{ cursor: 'pointer', fontSize: "var(--font-small)", color: TOKENS.muted,
                 fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
                 {hi ? 'सरल भाषा में उत्तर' : 'Plain-language reading'}
               </summary>
-              <div style={{ marginTop: 10 }}>{verdictCard}</div>
+              <div style={{ marginTop: "0.625rem" }}>{verdictCard}</div>
             </details>
           ) : verdictCard}
 
@@ -1185,9 +1210,9 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               rather than between the verdict and the way out. Owner-approved
               2026-07-22 (Q1a). */}
           <button onClick={() => setShowFull(s => !s)}
-            style={{ marginTop: 12, height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
-              border: `1.5px solid ${TOKENS.line}`, background: TOKENS.card, color: TOKENS.ink,
-              fontSize: 14, cursor: 'pointer' }}>
+            style={{ marginTop: "0.75rem", height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
+              border: `0.0938rem solid ${TOKENS.line}`, background: TOKENS.card, color: TOKENS.ink,
+              fontSize: "var(--font-body)", cursor: 'pointer' }}>
             {showFull ? (hi ? 'विवरण छिपाएँ' : 'Hide details') : (hi ? 'विस्तृत प्रश्न कुण्डली' : 'Full Prashna chart')}
           </button>
 
@@ -1215,29 +1240,29 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
           }}
             style={{ marginTop: 8, height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
               border: `1.5px solid ${TOKENS.gold}`, background: TOKENS.card, color: TOKENS.ink,
-              fontSize: 14, cursor: 'pointer', fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
+              fontSize: "var(--font-body)", cursor: 'pointer', fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
             {hi ? 'कुण्डली कार्ड साझा करें' : 'Share chart card'}
           </button>
 
           {showFull && (
-            <div style={{ marginTop: 10, background: TOKENS.card, borderRadius: TOKENS.radius,
-              border: `1.5px solid ${TOKENS.line}`, padding: 12 }}>
+            <div style={{ marginTop: "0.625rem", background: TOKENS.card, borderRadius: TOKENS.radius,
+              border: `0.0938rem solid ${TOKENS.line}`, padding: "0.75rem" }}>
               {/* Astrologer's reasoning: house numbers, significations, sub-lord.
                   Tier 2 by design — tier 1 says the same thing in plain words. */}
-              <div style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase',
-                  color: TOKENS.muted, marginBottom: 6 }}>
+              <div style={{ marginBottom: "0.75rem" }}>
+                <div style={{ fontSize: "var(--font-label)", letterSpacing: '0.12em', textTransform: 'uppercase',
+                  color: TOKENS.muted, marginBottom: "0.375rem" }}>
                   {hi ? 'निर्णय कैसे हुआ' : 'How this was judged'}
                 </div>
                 {buildReasons(v, lang).map((r, i) => (
-                  <div key={i} style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 4,
+                  <div key={i} style={{ fontSize: "var(--font-small)", lineHeight: 1.5, marginBottom: "0.25rem",
                     color: r.tone === 'bad' ? TOKENS.sindoor : TOKENS.ink,
                     fontWeight: r.tone === 'lead' ? 600 : 400 }}>
                     {r.text}
                   </div>
                 ))}
               </div>
-              <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: "0.5rem", marginBottom: "0.75rem", flexWrap: 'wrap' }}>
                 <PrashnaChip label={hi ? 'लग्न' : 'Lagna'} value={`${hi ? RASHI_HI[result.chart.lagna.sign] : RASHI_EN[result.chart.lagna.sign]} ${isNum ? PR_fmtNumberDeg(result.chart.lagna.deg) : fmtDeg(result.chart.lagna.deg)}`}
                   gloss={hi ? 'इस क्षण पूर्व में उदित राशि' : 'the sign rising in the east at this moment'} />
                 <PrashnaChip label={hi ? 'नक्षत्र' : 'Nakshatra'} value={`${hi ? NAK_HI[result.chart.lagna.nak.idx] : result.chart.lagna.nak.en}-${result.chart.lagna.nak.pada}`}
@@ -1252,7 +1277,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               {/* F10: the 5-column chart is intrinsically wider than a 320px phone, so it
                   scrolls inside its own container instead of pushing the whole page wide. */}
               <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-              <table style={{ width: '100%', minWidth: 300, borderCollapse: 'collapse', fontSize: 13 }}>
+              <table style={{ width: '100%', minWidth: "18.75rem", borderCollapse: 'collapse', fontSize: "var(--font-small)" }}>
                 <thead>
                   <tr style={{ color: TOKENS.muted, textAlign: 'left' }}>
                     <th style={{ padding: '4px 2px' }}>{hi ? 'ग्रह' : 'Graha'}</th><th>{hi ? 'राशि' : 'Rashi'}</th>
@@ -1261,13 +1286,13 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                 </thead>
                 <tbody>
                   {result.chart.planets.map(p => (
-                    <tr key={p.key} style={{ borderTop: `1px solid ${TOKENS.line}` }}>
+                    <tr key={p.key} style={{ borderTop: `0.0625rem solid ${TOKENS.line}` }}>
                       <td style={{ padding: '5px 2px' }}>
                         {hi
                           ? <span style={{ fontFamily: TOKENS.devanagari }}>{GRAHA_HI[p.key]}</span>
                           : <span>{GRAHA_EN[p.key]}</span>}
                         {p.retro && p.key !== 'Ra' && p.key !== 'Ke' &&
-                          <span style={{ color: TOKENS.sindoor, fontSize: 11 }}> Rx</span>}
+                          <span style={{ color: TOKENS.sindoor, fontSize: "var(--font-label)" }}> Rx</span>}
                       </td>
                       <td>{hi ? RASHI_HI[p.sign] : RASHI_EN[p.sign]} {fmtDeg(p.deg)}</td>
                       <td>{hi ? NAK_HI[p.nak.idx] : p.nak.en}-{p.nak.pada}</td>
@@ -1278,10 +1303,10 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                 </tbody>
               </table>
               </div>
-              <div style={{ marginTop: 8, fontSize: 11.5, color: TOKENS.muted }}>
+              <div style={{ marginTop: "0.5rem", fontSize: "var(--font-label)", color: TOKENS.muted }}>
                 {hi ? "Rx = वक्री, आकाश में पीछे चलता प्रतीत होता है" : "Rx = retrograde, appears to move backward in the sky"}
               </div>
-              <div style={{ marginTop: 8 }}>
+              <div style={{ marginTop: "0.5rem" }}>
                 <Gloss>
                   {hi
                     ? `तारा/उप = नक्षत्र स्वामी / कृष्णमूर्ति पद्धति का उप-स्वामी — प्रश्न इसी दो-स्तरीय स्वामित्व को पढ़ता है। भाव = ग्रह का भाव (${result.chart.system === 'placidus' ? 'प्लेसिडस भाव — कृष्णमूर्ति पद्धति का मानक' : 'समान भाव — उच्च अक्षांश विकल्प'})। स्थितियाँ: ${isNum ? 'कृष्णमूर्ति पद्धति का नया अयनांश (अंक विधि)' : 'लाहिरी अयनांश — द्रिक पंचांग की मानक परिपाटी'}, मध्यम राहु/केतु।`
@@ -1314,12 +1339,12 @@ function CuspalTable({ chart, hi, judgedCusp, mode }) {
     ? PR_fmtNumberDeg(r.deg) : fmtDeg(r.deg);
   return (
     <div style={{ marginTop: 14 }}>
-      <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase',
+      <div style={{ fontSize: "var(--font-label)", letterSpacing: '0.12em', textTransform: 'uppercase',
         color: TOKENS.muted, marginBottom: 6 }}>
         {hi ? 'बारहों भावों के उप-स्वामी' : 'All twelve cuspal sub-lords'}
       </div>
       <div style={PR_SCROLLER}>
-        <table style={{ width: '100%', minWidth: 320, borderCollapse: 'collapse', fontSize: 12.5 }}>
+        <table style={{ width: '100%', minWidth: 320, borderCollapse: 'collapse', fontSize: "var(--font-micro)" }}>
           <thead>
             <tr style={{ color: TOKENS.muted }}>
               <th style={PR_TH}>{hi ? 'भाव' : 'Cusp'}</th>
@@ -1362,12 +1387,12 @@ function SignificatorGrid({ chart, hi }) {
   const cell = list => list.length ? list.map(nm).join(', ') : '—';
   return (
     <div style={{ marginTop: 14 }}>
-      <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase',
+      <div style={{ fontSize: "var(--font-label)", letterSpacing: '0.12em', textTransform: 'uppercase',
         color: TOKENS.muted, marginBottom: 6 }}>
         {hi ? 'भाव-कारक सारणी' : 'Significators'}
       </div>
       <div style={PR_SCROLLER}>
-        <table style={{ width: '100%', minWidth: 340, borderCollapse: 'collapse', fontSize: 12 }}>
+        <table style={{ width: '100%', minWidth: 340, borderCollapse: 'collapse', fontSize: "var(--font-micro)" }}>
           <thead>
             <tr style={{ color: TOKENS.muted }}>
               <th style={PR_TH}>{hi ? 'भाव' : 'H'}</th>
@@ -1401,11 +1426,11 @@ function SignificatorGrid({ chart, hi }) {
 
 function PrashnaChip({ label, value, gloss }) {
   return (
-    <div style={{ background: TOKENS.card, border: `1.5px solid ${TOKENS.line}`,
-      borderRadius: TOKENS.radius, padding: '8px 12px', minWidth: 120 }}>
-      <div style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: TOKENS.muted }}>{label}</div>
-      <div style={{ fontSize: 15, marginTop: 2 }}>{value}</div>
-      <div style={{ fontSize: 11, color: TOKENS.muted, fontStyle: 'italic', marginTop: 2 }}>{gloss}</div>
+    <div style={{ background: TOKENS.card, border: `0.0938rem solid ${TOKENS.line}`,
+      borderRadius: TOKENS.radius, padding: '8px 12px', minWidth: "7.5rem" }}>
+      <div style={{ fontSize: "var(--font-label)", letterSpacing: '0.1em', textTransform: 'uppercase', color: TOKENS.muted }}>{label}</div>
+      <div style={{ fontSize: "var(--font-body)", marginTop: "0.125rem" }}>{value}</div>
+      <div style={{ fontSize: "var(--font-label)", color: TOKENS.muted, fontStyle: 'italic', marginTop: "0.125rem" }}>{gloss}</div>
     </div>
   );
 }
@@ -1413,11 +1438,11 @@ function PrashnaChip({ label, value, gloss }) {
 function NumRow({ label, value, gloss }) {
   return (
     <div style={{ padding: '3px 0' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
-        <span style={{ fontSize: 13, color: TOKENS.muted }}>{label}</span>
-        <span style={{ fontSize: 13, textAlign: 'right' }}>{value}</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: "0.625rem" }}>
+        <span style={{ fontSize: "var(--font-small)", color: TOKENS.muted }}>{label}</span>
+        <span style={{ fontSize: "var(--font-small)", textAlign: 'right' }}>{value}</span>
       </div>
-      {gloss && <div style={{ fontSize: 11, color: TOKENS.muted, fontStyle: 'italic' }}>{gloss}</div>}
+      {gloss && <div style={{ fontSize: "var(--font-label)", color: TOKENS.muted, fontStyle: 'italic' }}>{gloss}</div>}
     </div>
   );
 }
@@ -1431,8 +1456,8 @@ function NumberSetBox({ info, favor, hi, cuspLabel, cuspIsAscendant }) {
   const sub = hi ? GRAHA_FULL_HI[info.subLord] : info.subLord;
   return (
     <div style={{ margin: '0 16px', padding: '10px 12px', background: TOKENS.bg,
-      borderRadius: TOKENS.radius, border: `1px solid ${TOKENS.line}` }}>
-      <div style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: TOKENS.muted, marginBottom: 4 }}>
+      borderRadius: TOKENS.radius, border: `0.0625rem solid ${TOKENS.line}` }}>
+      <div style={{ fontSize: "var(--font-label)", letterSpacing: '0.1em', textTransform: 'uppercase', color: TOKENS.muted, marginBottom: "0.25rem" }}>
         {hi ? 'आपके अंक ने क्या तय किया' : 'What your number set'}
       </div>
       <NumRow label={hi ? 'राशि · Sign' : 'Sign'} value={signName} />
@@ -1451,7 +1476,7 @@ function NumberSetBox({ info, favor, hi, cuspLabel, cuspIsAscendant }) {
             : `shows whether the question is genuine and ripens at all — the yes/no itself is read from the ${cuspLabel} cusp sub-lord`)} />
       <NumRow label={hi ? 'लग्न · Ascendant' : 'Ascendant'} value={`${signName} ${PR_fmtNumberDeg(info.signDeg)}`}
         gloss={hi ? 'जहाँ अंक ने कुण्डली स्थिर की' : 'where the number fixed your chart'} />
-      <div style={{ borderTop: `1px solid ${TOKENS.line}`, marginTop: 4, paddingTop: 3 }}>
+      <div style={{ borderTop: `0.0625rem solid ${TOKENS.line}`, marginTop: "0.25rem", paddingTop: "0.1875rem" }}>
         <NumRow label={hi ? 'विचारित भाव · Houses judged' : 'Houses judged'} value={favor.join(' · ')} />
       </div>
     </div>

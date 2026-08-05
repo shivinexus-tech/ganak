@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { T } from "./tokens";
+import { T } from "./ui-style-contract";
 import { searchOffline, searchOnline } from "../data/places";
 
 /* ---------------- compact reusable place search ---------------- */
@@ -55,26 +55,48 @@ function PlaceInput({ value, onPick, C, lang = "en", onConfirmed, inputId }) {
     setOpen(false);
   };
 
+  // ARIA 1.2 combobox wiring. Without it a screen-reader user gets an unlabelled text box
+  // and is never told that suggestions appeared.
+  const listId = `${inputId || "place"}-suggestions`;
+  const statusId = `${inputId || "place"}-status`;
+  const searched = q.trim().length >= 2 && !busy;
+  const noMatch = open && searched && sugs.length === 0;
+  const popupOpen = open && (sugs.length > 0 || busy);
+
   return (
-    <div style={{ position: "relative", minWidth: 180, flex: "0 1 240px" }}>
+    <div style={{ position: "relative", minWidth: "11.25rem", flex: "0 1 240px" }}>
       <input
         id={inputId}
         value={q}
         onChange={(e) => onChange(e.target.value)}
         onFocus={(e) => { e.target.select(); setOpen(true); }}
         placeholder={lang === "hi" ? "शहर बदलें…" : "Change city…"}
+        aria-label={lang === "hi" ? "शहर खोजें" : "Search for a city"}
+        role="combobox"
+        aria-expanded={popupOpen}
+        aria-controls={listId}
+        aria-describedby={noMatch ? statusId : undefined}
+        aria-autocomplete="list"
         autoComplete="off"
-        style={{ width: "100%", height: T.ctrlH, boxSizing: "border-box", background: "#FFFDF7", border: `1px solid ${C.line}`, borderRadius: T.rMd, color: C.ivory, padding: "0 12px", fontSize: 13.5, fontFamily: "Spectral, serif", outline: "none" }}
+        style={{ width: "100%", height: T.ctrlH, boxSizing: "border-box", background: C.panel || "var(--surface-sunken)", border: `0.0625rem solid ${noMatch ? "var(--bad)" : C.line}`, borderRadius: T.rMd, color: C.ivory, padding: "0 0.75rem", fontSize: "var(--font-small)", fontFamily: "var(--font-body-family)" }}
       />
-      {open && (sugs.length > 0 || busy) && (
-        <div style={{ position: "absolute", left: 0, right: 0, top: "100%", zIndex: 20, background: "#FFFFFF", border: `1px solid ${C.gold}`, borderRadius: 8, marginTop: 4, overflow: "hidden", boxShadow: "0 12px 30px rgba(95,70,20,.18)" }}>
+      {popupOpen && (
+        <div id={listId} role="listbox" aria-label={lang === "hi" ? "मिलते-जुलते स्थान" : "Matching places"} style={{ position: "absolute", left: 0, right: 0, top: "100%", zIndex: 20, background: C.panel || "var(--surface-active)", border: `0.0625rem solid ${C.gold}`, borderRadius: "0.5rem", marginTop: "0.25rem", overflow: "hidden", boxShadow: "var(--elevation-3)" }}>
           {sugs.map((p) => (
-            <button key={p.label + p.lat} className="sug" onClick={() => pick(p)}
-              style={{ display: "block", width: "100%", textAlign: "left", padding: "8px 12px", background: "transparent", border: "none", borderBottom: `1px solid ${C.line}`, color: C.ivory, fontFamily: "Spectral, serif", fontSize: 13, cursor: "pointer" }}>
+            <button key={p.label + p.lat} className="sug comfort-focus" role="option" aria-selected="false" onClick={() => pick(p)}
+              style={{ display: "block", width: "100%", minHeight: T.ctrlH, textAlign: "left", padding: "0.5rem 0.75rem", background: "transparent", border: "none", borderBottom: `0.0625rem solid ${C.line}`, color: C.ivory, fontFamily: "var(--font-body-family)", fontSize: "var(--font-small)", cursor: "pointer" }}>
               {p.label}
             </button>
           ))}
-          {busy && <div style={{ padding: "8px 12px", color: C.muted, fontSize: 12 }}>{lang === "hi" ? "और स्थान खोजे जा रहे हैं…" : "Searching more places…"}</div>}
+          {busy && <div style={{ padding: "0.5rem 0.75rem", color: C.muted, fontSize: "var(--font-label)" }}>{lang === "hi" ? "और स्थान खोजे जा रहे हैं…" : "Searching more places…"}</div>}
+        </div>
+      )}
+      {/* An unmatched search used to do nothing at all — no list, no message, no spinner. */}
+      {noMatch && (
+        <div id={statusId} role="status" style={{ marginTop: "0.25rem", color: "var(--bad)", fontSize: "var(--font-label)", lineHeight: 1.45 }}>
+          {lang === "hi"
+            ? "इस नाम का कोई स्थान नहीं मिला। नज़दीकी बड़े शहर का नाम आज़माएँ।"
+            : "No place found with that name. Try the nearest larger city."}
         </div>
       )}
     </div>

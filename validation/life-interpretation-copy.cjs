@@ -3,6 +3,7 @@
 // buildLifeReading behaviour. Includes non-vacuous self-tests so the safety guard
 // is proven to actually bite (AGENTS.md: prove guards non-vacuously).
 'use strict';
+const fs = require('fs');
 const { loadApp } = require('./_load-app.cjs');
 const { NAKSHATRA_TRAITS, SIGN_TRAITS, buildLifeReading } = loadApp('src/data/life-interpretation.ts');
 
@@ -70,7 +71,19 @@ else {
 const oob = buildLifeReading({ nak: 99, moonSign: 0, ascSign: 0 });
 if (!Array.isArray(oob) || oob.length !== 0) fails.push(`buildLifeReading out-of-range must return [], got ${oob && oob.length}`);
 
-// 4. Non-vacuous self-tests — in BOTH languages, both directions.
+// 4. Release guard. Jyotish is already public, so sourced-but-unreviewed prose
+// must not render merely because the component is integrated.
+const chartSource = fs.readFileSync('src/screens/ChartScreen.tsx', 'utf8');
+const navSource = fs.readFileSync('src/components/JyotishPanelNav.tsx', 'utf8');
+if (!chartSource.includes('SIGN_TRAITS.every((entry) => entry.status === "owner-verified")'))
+  fails.push('ChartScreen must gate interpretation on all sign entries being owner-verified');
+if (!chartSource.includes('{lifeInterpretationReady && ('))
+  fails.push('ChartScreen interpretation card must remain conditional on owner review');
+if (!navSource.includes('SIGN_TRAITS.every((entry) => entry.status === "owner-verified")') ||
+    !navSource.includes('showReading || href !== "#reading"'))
+  fails.push('Jyotish navigation must hide Reading before owner review');
+
+// 5. Non-vacuous self-tests — in BOTH languages, both directions.
 const mustMatch = [
   'you will suffer from diabetes', 'indicates a short life', 'you will surely become rich',
   'your marriage will fail', 'misfortune will follow unless you wear a gem', 'you are ugly and overweight',

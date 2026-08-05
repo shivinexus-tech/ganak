@@ -30,8 +30,8 @@ function DiamondChart({ title, ascSign, houseOfPlanet, showDeg, lagnaLabel = "LA
       <svg viewBox="-14 -14 428 428" style={{ width: "100%", maxWidth: 400 }}>
         <defs>
           <radialGradient id="chartbg" cx="50%" cy="42%" r="75%">
-            <stop offset="0%" stopColor="#FFF8E9" />
-            <stop offset="100%" stopColor="#F7EDD7" />
+            <stop offset="0%" stopColor="var(--on-accent)" />
+            <stop offset="100%" stopColor="var(--surface-sunken)" />
           </radialGradient>
           <radialGradient id="lagnaGlow" cx="50%" cy="50%" r="62%">
             <stop offset="0%" stopColor={gold} stopOpacity="0.20" />
@@ -64,11 +64,11 @@ function DiamondChart({ title, ascSign, houseOfPlanet, showDeg, lagnaLabel = "LA
           return (
             <g key={h}>
               <text x={g.num[0]} y={g.num[1]} textAnchor="middle" dominantBaseline="middle"
-                fontSize="11.5" fill={gold} fillOpacity="0.85" fontFamily="Eczar, serif">{sign}</text>
+                fontSize="11.5" fill={gold} fillOpacity="0.85" fontFamily="var(--font-display-family)">{sign}</text>
               {rows.map((row, ri) => (
                 <text key={ri} x={g.pc[0]} y={g.pc[1] + ri * 15 - (rows.length - 1) * 7.5}
                   textAnchor="middle" dominantBaseline="middle" fontSize="13" fontWeight="600"
-                  fontFamily="Spectral, serif" style={{ letterSpacing: ".02em" }}>
+                  fontFamily="var(--font-body-family)" style={{ letterSpacing: ".02em" }}>
                   {row.map((p, pi) => (
                     <tspan key={pi}>
                       {pi > 0 && <tspan> </tspan>}
@@ -81,13 +81,13 @@ function DiamondChart({ title, ascSign, houseOfPlanet, showDeg, lagnaLabel = "LA
               ))}
               {h === 0 && (
                 <text x="200" y="26" textAnchor="middle" fontSize="9" fill={gold} fillOpacity="0.8"
-                  letterSpacing="3" fontFamily="Spectral, serif">{lagnaLabel}</text>
+                  letterSpacing="3" fontFamily="var(--font-body-family)">{lagnaLabel}</text>
               )}
             </g>
           );
         })}
       </svg>
-      <div style={{ fontSize: 11.5, letterSpacing: "0.18em", color: muted, marginTop: 8, textTransform: "uppercase", overflowWrap: "anywhere", padding: "0 8px" }}>{title}</div>
+      <div style={{ fontSize: 11.5, letterSpacing: "0.18em", color: muted, marginTop: 8, textTransform: "uppercase", overflowWrap: "break-word", padding: "0 8px" }}>{title}</div>
     </div>
   );
 }
