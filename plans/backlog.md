@@ -513,6 +513,12 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         2026-07-28:** independent Codex bug bash fixed safety-wall order, polar
         no-sunrise copy and bypassed future birth dates; PR #4 merged as `557664c`;
         production EN/HI 320px verification passed with zero overflow or console errors.
+        **Honesty note (2026-08-05):** that 100% closure covered the feature but not its
+        discoverability — the route had zero inbound links and was reachable only by
+        typing the URL, for eleven days. `validation/route-reachability.cjs` caught it;
+        a bilingual footer link beside the calculator catalogue fixed it in `1b9e8b6`.
+        Closing an item as delivered while it is unreachable is the failure mode that
+        gate now exists to prevent. See `plans/ganak-gate-decay-rootcause.md`.
       _(P0-MUHURAT-FULL-PARITY; owner scope 2026-07-21; v1 built 2026-07-25)_
   - [x] **Independent review + bug bash of the medical Muhurat feature** — completed by a
         different agent (Cursor/Codex) than the builder (Claude Code). Second
