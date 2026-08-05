@@ -7,7 +7,7 @@ const config = JSON.parse(await readFile(new URL("../plans/backlog-sheet-sync.js
 const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md", import.meta.url), "utf8");
 const base = parseRegister(markdown, config, "test base");
 
-assert.equal(base.rows.size, 59);
+assert.equal(base.rows.size, 61);
 assert.equal(sheetRow(base.rows.get("1")).length, 19);
 assert.equal(base.rows.get("58").section, "P0");
 assert.equal(base.rows.get("58").metadata.title, "Direct date entry and better Panchang date picker");
@@ -15,8 +15,8 @@ assert.equal(base.rows.get("59").section, "P0");
 assert.equal(base.rows.get("59").metadata.title, "Global site search and guided “find what I need” input");
 assert.equal(base.rows.get("46").section, "P1");
 assert.equal(base.rows.get("46").metadata.title, "Design-system pass");
-assert.equal(sheetRow(base.rows.get("46"))[4], "90%");
-assert.equal(base.rows.get("46").quality.deliveryState, "Design-system pass deployed and production-verified; primitive adoption on four launch screens and one owner decision remain");
+assert.equal(sheetRow(base.rows.get("46"))[4], "95%");
+assert.equal(base.rows.get("46").quality.deliveryState, "Design-system pass deployed and production-verified across every launch screen; the remaining work is owner-side only — one Cloudflare dashboard switch, the live-URL sign-off and a human real-device pass");
 assert.equal(base.rows.get("46").quality.qualityRisk, "Amber");
 assert.match(base.rows.get("46").quality.limitations, /Cloudflare Web Analytics beacon/);
 assert.match(base.rows.get("46").quality.bugBashStatus, /38 continuous minutes/);
@@ -166,8 +166,8 @@ assert.throws(
 );
 assert.equal(
   parseRegister(preAutomationMarkdown, config, "bootstrap historical fixture", { allowMetadataTitleMismatch: true }).rows.size,
-  59,
+  61,
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 
-console.log("Backlog Sheet sync gate: PASS — 59 rows; 19-column quality/action contract, legacy-header migration, dashboard formula guard, high-impact bug-bash/RAG policy, API limitation/impact disclosure, verification/source confidence, changed-cell targeting, idempotence, conflict refusal, metadata guard and explicit bootstrap planning verified.");
+console.log("Backlog Sheet sync gate: PASS — 61 rows; 19-column quality/action contract, legacy-header migration, dashboard formula guard, high-impact bug-bash/RAG policy, API limitation/impact disclosure, verification/source confidence, changed-cell targeting, idempotence, conflict refusal, metadata guard and explicit bootstrap planning verified.");
