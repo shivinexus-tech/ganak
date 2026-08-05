@@ -639,7 +639,16 @@ export { buildBootstrapChanges, buildChanges, parseRegister, sheetRow, validateD
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((error) => {
-    console.error(`Backlog Sheet sync failed: ${error.message}`);
+    const message = `Backlog Sheet sync failed: ${error.message}`;
+    console.error(message);
+    // GitHub serves Actions *logs* only to signed-in users, but it shows job
+    // *annotations* publicly. Emitting the reason as a workflow error makes a failed
+    // publish diagnosable from the run summary alone — previously the only public
+    // signal was "Process completed with exit code 1", which says nothing.
+    if (process.env.GITHUB_ACTIONS === "true") {
+      const oneLine = message.replace(/\r?\n/g, " ").replace(/::/g, ":;").slice(0, 900);
+      console.log(`::error title=Backlog Sheet sync::${oneLine}`);
+    }
     process.exitCode = 1;
   });
 }
