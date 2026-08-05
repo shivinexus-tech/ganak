@@ -57,20 +57,26 @@ Publisher:
 - `.github/workflows/sync-backlog-sheet.yml`
 - `scripts/sync-backlog-sheet.mjs`
 
-The publisher is deliberately incremental. It compares the pushed commit with its
-trusted Git base and updates only cells changed in Git. If the same live cell was
-changed independently, it fails with a three-way conflict instead of overwriting
-either version. Deletes and cross-tab moves also fail for explicit review.
+The publisher treats the repository register as the source of truth and the Google
+Sheet as a projection. On every normal sync it reconciles the live Sheet to the
+current register: changed cells are updated, missing in-scope rows are appended,
+and the Sheet grid is expanded before new rows are written. This is deliberate
+self-healing for missed publishes — if an earlier workflow failed, the next push
+does not stay wedged behind a stale `github.event.before` base.
 
-An explicitly reviewed failed batch can be replayed with the manual workflow's
-`base_sha` input. This is a recovery control, not a full-sheet overwrite: the same
-three-way conflict checks still apply to every changed cell.
+Deletes, unknown live IDs and cross-tab moves still fail for explicit review. Those
+change row identity or placement and should not be guessed by automation.
+
+An explicitly reviewed failed batch can still be replayed with the manual
+workflow's `base_sha` input, but routine recovery should not need it. The default
+incremental operation can repair a stale live Sheet directly from the repository
+register.
 
 The manual workflow also has `bootstrap-plan` and `bootstrap-apply` operations for
 the one-time initial baseline only. Plan lists every stale cell without writing;
-apply aligns those listed cells to the reviewed repository register. It refuses
-unknown IDs, missing rows and tab moves. Routine agent runs must use the default
-incremental operation, which retains three-way conflict protection.
+apply aligns those listed cells and missing rows to the reviewed repository
+register. It refuses unknown IDs and tab moves. Routine agent runs must use the
+default incremental operation.
 
 ## Google/GitHub connection
 
@@ -121,7 +127,7 @@ which value is current.
 
 ## Local validation and troubleshooting
 
-`--check` requires no network or credentials. It verifies all 57 IDs, exact titles,
+`--check` requires no network or credentials. It verifies all 61 IDs, exact titles,
 sections, ordering and technical-complexity values.
 
 The GitHub publisher verifies the spreadsheet title, all six tab names and the
@@ -132,8 +138,9 @@ header by adding the recommendation/action column. Common failures are intention
   `main` ref and the service account's Workload Identity User binding.
 - **403 from Google Sheets** — share the Sheet with the service-account
   `client_email` as Editor and confirm the Sheets API is enabled.
-- **Three-way conflict** — the same cell changed both in Git and directly in the
-  Sheet; reconcile that one row rather than overwriting the full register.
+- **Unexpected live ID / tab mismatch** — the Sheet contains a row that is not in
+  the register, or a row lives under a different tab than the register. Review
+  before changing row identity or placement.
 - **Title/ID/section mismatch** — update the Markdown row and sync metadata together.
 
 Official references:

@@ -370,7 +370,7 @@ async function validateLiveDashboard(config) {
 async function readLiveSheet(config) {
   const metadata = await sheetsRequest(
     config,
-    "?fields=properties.title,sheets.properties(title,sheetId,gridProperties(columnCount))",
+    "?fields=properties.title,sheets.properties(title,sheetId,gridProperties(rowCount,columnCount))",
   );
   if (metadata.properties?.title !== config.spreadsheetTitle) {
     fail(`Refusing to sync spreadsheet titled “${metadata.properties?.title || "unknown"}”; expected “${config.spreadsheetTitle}”`);
@@ -380,6 +380,7 @@ async function readLiveSheet(config) {
     sheet.properties?.title,
     {
       sheetId: sheet.properties?.sheetId,
+      rowCount: sheet.properties?.gridProperties?.rowCount || 0,
       columnCount: sheet.properties?.gridProperties?.columnCount || 0,
     },
   ]));
@@ -434,7 +435,7 @@ async function readLiveSheet(config) {
       });
     });
   });
-  return { liveBySection, liveById, headerMigrations };
+  return { liveBySection, liveById, headerMigrations, tabInfo: liveTabs };
 }
 
 function buildChanges(base, head, live, config) {
@@ -503,17 +504,24 @@ function buildChanges(base, head, live, config) {
 }
 
 function buildBootstrapChanges(head, live) {
+  return buildReconciliationChanges(head, live);
+}
+
+function buildReconciliationChanges(head, live) {
   const changes = [...(live.headerMigrations || [])];
 
   for (const id of live.liveById.keys()) {
-    if (!head.rows.has(id)) fail(`Live Sheet contains unexpected backlog ID ${id}; reconcile it explicitly before bootstrapping`);
+    if (!head.rows.has(id)) fail(`Live Sheet contains unexpected backlog ID ${id}; reconcile it explicitly before syncing`);
   }
 
   for (const [id, row] of head.rows) {
     const liveRow = live.liveById.get(id);
-    if (!liveRow) fail(`Live Sheet is missing backlog ID ${id}; bootstrap will not guess row placement`);
+    if (!liveRow) {
+      changes.push({ kind: "append", after: row });
+      continue;
+    }
     if (liveRow.section !== row.section) {
-      fail(`Backlog ID ${id} is in ${liveRow.section} live but ${row.section} in Git; bootstrap will not move rows`);
+      fail(`Backlog ID ${id} is in ${liveRow.section} live but ${row.section} in Git; tab moves require an explicit migration`);
     }
     const wanted = sheetRow(row);
     wanted.forEach((value, sheetIndex) => {
@@ -526,18 +534,36 @@ function buildBootstrapChanges(head, live) {
   return changes;
 }
 
+function buildSyncChanges(base, head, live, config) {
+  const reconciliationChanges = buildReconciliationChanges(head, live);
+  let strictChanges;
+  try {
+    strictChanges = buildChanges(base, head, live, config);
+  } catch {
+    return reconciliationChanges;
+  }
+  if (JSON.stringify(strictChanges) === JSON.stringify(reconciliationChanges)) {
+    return strictChanges;
+  }
+  return reconciliationChanges;
+}
+
 function printBootstrapPlan(changes) {
-  console.log(`Backlog Sheet bootstrap plan: ${changes.length} stale cell${changes.length === 1 ? "" : "s"} would be aligned to the repository register.`);
+  console.log(`Backlog Sheet bootstrap plan: ${changes.length} cell/row update${changes.length === 1 ? "" : "s"} would be aligned to the repository register.`);
   for (const change of changes) {
     if (change.kind === "header") {
       console.log(`- Sheet header · ${change.sheetName}!${columnLetter(change.sheetIndex)}1 · ${change.value}`);
+      continue;
+    }
+    if (change.kind === "append") {
+      console.log(`- ID ${change.after.id} · append row · ${change.after.metadata.title}`);
       continue;
     }
     console.log(`- ID ${change.liveRow.id} · ${SHEET_COLUMNS[change.sheetIndex]} · ${change.liveRow.sheetName}!${columnLetter(change.sheetIndex)}${change.liveRow.rowNumber}`);
   }
 }
 
-async function applyChanges(changes, live, config) {
+function planDimensionExpansions(changes, live, config) {
   const columnExpansionRequests = changes
     .filter((change) => change.kind === "header" && change.additionalColumns > 0)
     .map((change) => ({
@@ -547,10 +573,41 @@ async function applyChanges(changes, live, config) {
         length: change.additionalColumns,
       },
     }));
-  if (columnExpansionRequests.length) {
+
+  const appendCountsBySection = new Map();
+  for (const change of changes) {
+    if (change.kind !== "append") continue;
+    appendCountsBySection.set(change.after.section, (appendCountsBySection.get(change.after.section) || 0) + 1);
+  }
+
+  const rowExpansionRequests = [];
+  for (const tab of config.tabs) {
+    const appendCount = appendCountsBySection.get(tab.section) || 0;
+    if (!appendCount) continue;
+    const tabInfo = live.tabInfo?.get(tab.sheetName);
+    if (!tabInfo) fail(`Live spreadsheet metadata is missing tab “${tab.sheetName}”`);
+    const existingRows = Math.max(1, (live.liveBySection.get(tab.section) || []).length);
+    const requiredRows = existingRows + appendCount;
+    const additionalRows = Math.max(0, requiredRows - tabInfo.rowCount);
+    if (!additionalRows) continue;
+    rowExpansionRequests.push({
+      appendDimension: {
+        sheetId: tabInfo.sheetId,
+        dimension: "ROWS",
+        length: additionalRows,
+      },
+    });
+  }
+
+  return [...columnExpansionRequests, ...rowExpansionRequests];
+}
+
+async function applyChanges(changes, live, config) {
+  const dimensionExpansionRequests = planDimensionExpansions(changes, live, config);
+  if (dimensionExpansionRequests.length) {
     await sheetsRequest(config, ":batchUpdate", {
       method: "POST",
-      body: JSON.stringify({ requests: columnExpansionRequests }),
+      body: JSON.stringify({ requests: dimensionExpansionRequests }),
     });
   }
 
@@ -590,7 +647,7 @@ async function applyChanges(changes, live, config) {
     method: "POST",
     body: JSON.stringify({ valueInputOption: "RAW", data }),
   });
-  console.log(`Backlog Sheet sync: published ${data.length} changed cell/row update${data.length === 1 ? "" : "s"}.`);
+  console.log(`Backlog Sheet sync: published ${data.length} changed cell/row update${data.length === 1 ? "" : "s"} from the repository register.`);
 }
 
 async function main() {
@@ -631,11 +688,20 @@ async function main() {
     // comparison, while the new metadata supplies complexity and tab mapping.
     allowMetadataTitleMismatch: !baseConfigText,
   });
-  const changes = buildChanges(base, head, live, config);
+  const changes = buildSyncChanges(base, head, live, config);
   await applyChanges(changes, live, config);
 }
 
-export { buildBootstrapChanges, buildChanges, parseRegister, sheetRow, validateDashboardContract };
+export {
+  buildBootstrapChanges,
+  buildChanges,
+  buildReconciliationChanges,
+  buildSyncChanges,
+  parseRegister,
+  planDimensionExpansions,
+  sheetRow,
+  validateDashboardContract,
+};
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((error) => {
