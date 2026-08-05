@@ -1283,3 +1283,16 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
 - **Android route** — cost ladder explained (2026-07-18): PWA $0 → Capacitor
   (Play $25 once, Apple $99/yr) → RN rewrite (skip). Recommendation: PWA first,
   Capacitor when stores + push are wanted. Awaiting owner confirm.
+- [ ] **P2 · BUG — `/favicon.ico` serves the SPA HTML page instead of an image.**
+      Ganak is a single-page app, so the host's catch-all rewrites nearly every path to
+      `index.html` (this is what makes deep links like `/muhurat/medical` and
+      `/calculator/...` work). Side effect: `/favicon.ico` — which browsers auto-request
+      expecting an **image** — also gets the HTML page back, so no proper tab/bookmark
+      icon renders and a wrong `content-type` (`text/html` where `image/*` is expected)
+      is served. Site-wide hosting config only; **does NOT affect Prashna or any
+      calculator/feature**. **Fix:** add a real `favicon.ico` (and an `apple-touch-icon`
+      + small PNG set) under `public/`, reference them from `index.html`, and exclude
+      `/favicon.ico` and other static-asset paths from the SPA catch-all so Cloudflare
+      Pages serves the file directly. **Verify:** the deployed `https://ganak.pages.dev/favicon.ico`
+      returns `image/x-icon` (or `image/png`), not `text/html`. Low risk, no feature
+      code. _(found during the Prashna 249 folio/closure work 2026-07-29; unrelated P2)_
