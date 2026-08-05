@@ -809,6 +809,16 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
 - [ ] **Publish privacy/terms page** — draft at `plans/legal-privacy-terms-draft.md`;
       footer + fonts accurate _(CLAUDE-LAUNCH-PRIVACY MERGED)_. Needs owner contact
       email + counsel review before linking publicly.
+- [ ] **Owner chore (2026-08-05) — one-click replay of the Google Sheet sync.**
+      The publication workflow failed on every push from `fa40c2e` to `b5e8b2f`, so the
+      cells changed in those commits (including the #46 owner decisions) never reached the
+      Sheet. The gate that blocked it is fixed in `ff7417f`, but a normal push-triggered run
+      diffs against the *previous* main tip, so those cells would be skipped for ever.
+      Recover them once: **Actions → "Sync backlog acceptance register" → Run workflow →
+      operation `incremental`, base_sha `3333928`** (the last revision that actually
+      published). Optionally run `bootstrap-plan` first — it is read-only and lists exactly
+      which cells are stale. No agent can dispatch this: the sandbox has no GitHub
+      credentials. _(Backlog #46 closeout evidence.)_
 - [ ] **Owner chore (2026-08-02) — switch Cloudflare Web Analytics off for ganakapp.com.**
       Cloudflare dashboard → **Web Analytics** → the `ganakapp.com` site → disable/remove it.
       No agent can do this: it lives in the owner's Cloudflare account, not in the repo.
