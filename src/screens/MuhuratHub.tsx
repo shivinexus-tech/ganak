@@ -583,6 +583,18 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       </div>
       {/* muhurat finder */}
       <SecHead deva="मुहूर्त खोज" en="Muhurat finder" />
+      {/* Sub-tabs: the everyday celebratory finder vs the dedicated, safety-gated medical
+          timing tool. Medical is never a chip in the grid (that would read as casual and
+          skip its safety wall); it gets its own tab that routes to /muhurat/medical. */}
+      <div role="tablist" aria-label={lang === "hi" ? "मुहूर्त प्रकार" : "Muhurat type"} style={{ display: "flex", gap: "0.375rem", marginBottom: "0.625rem", flexWrap: "wrap" }}>
+        <span role="tab" aria-selected="true" style={{ height: T.ctrlH, boxSizing: "border-box", display: "inline-flex", alignItems: "center", padding: "0 0.8125rem", borderRadius: T.rMd, fontFamily: T.body, fontSize: "var(--font-small)", fontWeight: 600, border: `0.0938rem solid ${C.gold}`, background: "var(--accent-soft)", color: C.gold }}>
+          {lang === "hi" ? "सामान्य मुहूर्त" : "Everyday muhurat"}
+        </span>
+        <a role="tab" aria-selected="false" href={`/muhurat/medical?lang=${lang}`} className="comfort-focus" style={{ height: T.ctrlH, boxSizing: "border-box", display: "inline-flex", alignItems: "center", gap: "0.375rem", padding: "0 0.8125rem", borderRadius: T.rMd, textDecoration: "none", fontFamily: T.body, fontSize: "var(--font-small)", border: `0.0938rem solid ${C.line}`, background: "var(--surface-sunken)", color: C.ivory }}>
+          {lang === "hi" ? "चिकित्सा समय" : "Medical timing"}
+          <span aria-hidden="true" style={{ color: C.muted }}>›</span>
+        </a>
+      </div>
       <div id="muhurat-finder" style={{ ...card, padding: T.s4 }}>
         <div style={{ marginBottom: "1rem" }}>
           <div style={{ fontSize: "var(--font-small)", color: C.muted, marginBottom: "0.5rem", fontStyle: "italic" }}>
