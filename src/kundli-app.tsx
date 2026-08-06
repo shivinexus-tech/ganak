@@ -194,7 +194,7 @@ export default function KundliApp() {
         {/* hero */}
         <header className="rise" style={{ textAlign: "center", marginBottom: T.s8 }}>
           <h1 style={{ fontFamily: T.serif, fontWeight: 700, fontSize: "2.875rem", margin: `${T.s2} 0 ${T.s1}`, lineHeight: 1.08 }}>
-            <span style={{ color: C.gold }}>{lang === "hi" ? "गणक" : "Ganak"}</span>
+            <a href={`/?lang=${lang}`} aria-label={lang === "hi" ? "गणक — मुखपृष्ठ" : "Ganak — home"} style={{ color: C.gold, textDecoration: "none" }}>{lang === "hi" ? "गणक" : "Ganak"}</a>
           </h1>
           <div style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fSmall, letterSpacing: "0.18em" }}>{hero.eyebrow}</div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: T.s3, margin: `${T.s3} 0` }}>
