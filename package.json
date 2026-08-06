@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "prerender": "node scripts/prerender.mjs",
+    "build:seo": "vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
     "festival-images": "node scripts/process-festival-images.mjs"
   },
@@ -19,6 +21,7 @@
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^30.0.1",
     "sharp": "^0.35.3",
     "typescript": "^5.7.2",
     "vite": "^6.0.7"
