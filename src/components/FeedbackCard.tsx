@@ -35,7 +35,7 @@ export default function FeedbackCard({ lang, C, card }) {
         <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" value={hp} onChange={(e) => setHp(e.target.value)} style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
         <textarea value={message} onChange={(e) => setMessage(e.target.value)} maxLength={2000} rows={4} style={{ width: "100%", border: `1px solid ${C.line}`, borderRadius: T.rMd, padding: 10, font: "inherit" }} />
         <button onClick={send} style={{ marginTop: "0.5rem", minHeight: T.ctrlH, borderRadius: T.rMd, border: 0, padding: "0.5rem 1rem", background: C.gold, color: "var(--on-accent)", cursor: "pointer" }}>{lang === "hi" ? "भेजें" : "Send"}</button>
-        {status && <div role="status" aria-live="polite" style={{ marginTop: "0.5rem", fontSize: statusKind === "ok" ? "1rem" : T.fSmall, fontWeight: statusKind === "ok" ? 700 : 600, color: statusKind === "ok" ? "#1F7A4D" : statusKind === "err" ? C.sindoor : C.muted, ...(statusKind === "ok" ? { background: "rgba(31,122,77,.10)", border: "1px solid rgba(31,122,77,.35)", borderRadius: T.rMd, padding: "8px 10px" } : {}) }}>{statusKind === "ok" ? "✓ " : ""}{status}</div>}
+        {status && <div role="status" aria-live="polite" style={{ marginTop: "0.5rem", fontSize: statusKind === "ok" ? "1rem" : T.fSmall, fontWeight: statusKind === "ok" ? 700 : 600, color: statusKind === "ok" ? "var(--good)" : statusKind === "err" ? C.sindoor : C.muted, ...(statusKind === "ok" ? { background: "var(--good-surface)", border: "0.0625rem solid var(--good-line)", borderRadius: T.rMd, padding: "0.5rem 0.625rem" } : {}) }}>{statusKind === "ok" ? "✓ " : ""}{status}</div>}
       </div>}
     </div>
   );
