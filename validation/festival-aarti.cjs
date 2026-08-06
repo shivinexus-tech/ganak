@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 'use strict';
 
-/* Festival aarti gate: every COVERED guide has a well-formed aartis array —
-   Devanagari, multi-line, correct orthography, expected first-line anchors.
-   Standard: plans/festival-aarti-standard.md §5. COVERED grows per content batch. */
+/* Festival aarti gate: every COVERED guide has a well-formed aartis array. Each aarti
+   now carries a multi-language `langs` map (hi/mr/bn/gu/roman); each rendering is a
+   {refrain, cue, stanzas} AartiScript validated by its own script range — Devanagari for
+   hi/mr, Bengali for bn, Gujarati for gu — with no Latin and no cross-script leak. The hi
+   rendering keeps the Phase-1 orthography + first-line anchor checks. Standard:
+   plans/festival-aarti-standard.md §5; model: docs/superpowers/specs/2026-08-01-aarti-multilang-phase2-prd.md (R1–R4). */
 
 const assert = require('node:assert');
 const { loadApp } = require('./_load-app.cjs');
@@ -15,6 +18,7 @@ const COVERED = [
   'masikShivaratri', 'pradosh', 'karvaChauth', 'ahoiAshtami', 'hartalikaTeej', 'purnima',
 ];
 
+// Anchors are the Hindi refrain first line (catches a wrong/swapped aarti).
 const ANCHORS = {
   diwali: ['जय गणेश', 'ॐ जय लक्ष्मी माता', 'ॐ जय जगदीश हरे'],
   dhanteras: ['जय गणेश', 'ॐ जय लक्ष्मी माता', 'ॐ जय जगदीश हरे'],
@@ -34,10 +38,26 @@ const ANCHORS = {
   purnima: ['जय गणेश', 'जय लक्ष्मीरमणा', 'ॐ जय जगदीश हरे'],
 };
 
-const DEVANAGARI = /[ऀ-ॿ]/;
+// Script ranges. Devanagari EXCLUDES the shared danda । (U+0964) and double danda ॥
+// (U+0965), which are used across all Indic scripts and are allowed in every rendering.
+const DEVANAGARI = /[ऀ-ॣ०-ॿ]/;
+const BENGALI = /[ঀ-৿]/;
+const GUJARATI = /[઀-૿]/;
 const LATIN = /[A-Za-z]/;
+
+// Per-language: the script that MUST appear, and the scripts that must NOT leak in.
+const SCRIPT_RULE = {
+  hi: { name: 'Devanagari', must: DEVANAGARI, forbid: { Bengali: BENGALI, Gujarati: GUJARATI } },
+  mr: { name: 'Devanagari', must: DEVANAGARI, forbid: { Bengali: BENGALI, Gujarati: GUJARATI } },
+  bn: { name: 'Bengali', must: BENGALI, forbid: { Devanagari: DEVANAGARI, Gujarati: GUJARATI } },
+  gu: { name: 'Gujarati', must: GUJARATI, forbid: { Devanagari: DEVANAGARI, Bengali: BENGALI } },
+};
+const KNOWN_LANGS = new Set(['hi', 'mr', 'bn', 'gu', 'roman']);
+
 const nonEmptyLines = (v) => String(v).split('\n').map((s) => s.trim()).filter(Boolean);
 const firstLine = (v) => nonEmptyLines(v)[0] || '';
+
+let scriptCount = 0;
 
 for (const key of COVERED) {
   const guide = VRAT_VIDHI[key];
@@ -50,23 +70,43 @@ for (const key of COVERED) {
   list.forEach((a, i) => {
     assert(a.title && a.title.en && a.title.hi, `${key}[${i}]: title {en,hi} required`);
     assert(a.intro && a.intro.en && a.intro.hi, `${key}[${i}]: intro {en,hi} required`);
-    assert(typeof a.refrain === 'string' && a.refrain.trim(), `${key}[${i}]: refrain required`);
-    assert(typeof a.cue === 'string' && a.cue.trim(), `${key}[${i}]: cue required`);
-    assert(Array.isArray(a.stanzas) && a.stanzas.length > 0, `${key}[${i}]: stanzas must be a non-empty array`);
+    assert(typeof a.slug === 'string' && a.slug.trim(), `${key}[${i}]: slug required`);
+    assert(a.langs && typeof a.langs === 'object', `${key}[${i}]: langs map required`);
+    assert(a.primaryLang && a.langs[a.primaryLang], `${key}[${i}]: primaryLang must exist in langs`);
 
-    // All sung text = refrain + cue + every stanza. Validate as a whole.
-    const parts = [a.refrain, a.cue, ...a.stanzas];
-    const allText = parts.join('\n');
-    assert(DEVANAGARI.test(allText), `${key}[${i}]: text must contain Devanagari`);
-    assert(!/ओम्/.test(allText), `${key}[${i}]: use ॐ, not ओम्`);
-    assert(!LATIN.test(allText), `${key}[${i}]: aarti text must be Devanagari only (no Latin)`);
+    const langKeys = Object.keys(a.langs);
+    assert(langKeys.length > 0, `${key}[${i}]: at least one language required`);
 
-    // Refrain (opening) is the first-line anchor; total sung lines are substantial.
-    assert(firstLine(a.refrain).includes(anchors[i]), `${key}[${i}]: refrain must start with "${anchors[i]}"`);
-    assert(nonEmptyLines(allText).length >= 4, `${key}[${i}]: aarti must have >= 4 lines`);
-    // The cue is a short refrain marker, not a full stanza.
-    assert(nonEmptyLines(a.cue).length === 1, `${key}[${i}]: cue must be a single short line`);
+    // The Hindi rendering carries the Phase-1 anchor for this guide slot.
+    assert(a.langs.hi, `${key}[${i}]: langs.hi required (guide anchor + backward-safe)`);
+    assert(firstLine(a.langs.hi.refrain).includes(anchors[i]), `${key}[${i}]: hi refrain must start with "${anchors[i]}"`);
+
+    for (const lang of langKeys) {
+      assert(KNOWN_LANGS.has(lang), `${key}[${i}]: unknown language "${lang}"`);
+      if (lang === 'roman') continue; // Roman (P1) is Latin transliteration; skip script checks.
+      const rule = SCRIPT_RULE[lang];
+      assert(rule, `${key}[${i}].${lang}: no script rule defined`);
+      const s = a.langs[lang];
+      assert(typeof s.refrain === 'string' && s.refrain.trim(), `${key}[${i}].${lang}: refrain required`);
+      assert(typeof s.cue === 'string' && s.cue.trim(), `${key}[${i}].${lang}: cue required`);
+      assert(Array.isArray(s.stanzas) && s.stanzas.length > 0, `${key}[${i}].${lang}: stanzas must be a non-empty array`);
+
+      const parts = [s.refrain, s.cue, ...s.stanzas];
+      const allText = parts.join('\n');
+      assert(rule.must.test(allText), `${key}[${i}].${lang}: text must contain ${rule.name} script`);
+      assert(!LATIN.test(allText), `${key}[${i}].${lang}: aarti text must be ${rule.name} only (no Latin)`);
+      for (const [otherName, otherRe] of Object.entries(rule.forbid)) {
+        assert(!otherRe.test(allText), `${key}[${i}].${lang}: ${otherName} script leaked into ${lang} text`);
+      }
+      // Orthography: Devanagari renderings use ॐ, never ओम्.
+      if (rule.must === DEVANAGARI) assert(!/ओम्/.test(allText), `${key}[${i}].${lang}: use ॐ, not ओम्`);
+
+      assert(nonEmptyLines(allText).length >= 4, `${key}[${i}].${lang}: aarti must have >= 4 lines`);
+      assert(nonEmptyLines(s.cue).length === 1, `${key}[${i}].${lang}: cue must be a single short line`);
+      scriptCount += 1;
+    }
   });
 }
 
-console.log(`festival-aarti: OK (${COVERED.length} guide(s), ${COVERED.reduce((n, k) => n + VRAT_VIDHI[k].aartis.length, 0)} aartis)`);
+const totalAartis = COVERED.reduce((n, k) => n + VRAT_VIDHI[k].aartis.length, 0);
+console.log(`festival-aarti: OK (${COVERED.length} guide(s), ${totalAartis} aarti slots, ${scriptCount} language renderings)`);
