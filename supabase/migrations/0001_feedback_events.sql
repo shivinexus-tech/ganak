@@ -27,5 +27,5 @@ create table if not exists public.events (
 -- The service role key used by the Function BYPASSES RLS, so Function inserts still work.
 alter table public.feedback enable row level security;
 alter table public.events   enable row level security;
-revoke all on public.feedback from anon, authenticated;
-revoke all on public.events   from anon, authenticated;
+revoke all on public.feedback from anon, authenticated, public;
+revoke all on public.events   from anon, authenticated, public;
