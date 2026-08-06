@@ -7,6 +7,7 @@ import FestivalGuideScreen, { festivalGuideFromPath } from "./screens/FestivalGu
 import UtilityCalculatorScreen from "./screens/UtilityCalculatorScreen";
 import { utilityFromPath } from "./data/utility-calculators";
 import MedicalMuhuratScreen, { medicalMuhuratFromPath } from "./screens/MedicalMuhuratScreen";
+import Breadcrumbs from "./components/Breadcrumbs";
 import FeedbackCard from "./components/FeedbackCard";
 import { applyRouteMetadata, routeMetadata } from "./metadata/route-metadata";
 import { privacyEvent } from "./telemetry/privacy-events";
@@ -191,6 +192,15 @@ export default function KundliApp() {
             ))}
           </span>
         </div>
+        {/* Breadcrumb — only on standalone deep-linked pages, where the Daily/Prashna/Jyotish
+            tabs are hidden. Gives a discoverable way up/home (NN/g: a clickable logo alone is not). */}
+        {(directFestivalGuide || utilityRoute || medicalRoute) && (
+          <Breadcrumbs
+            ctx={{ medical: !!medicalRoute, utility: utilityRoute, festival: directFestivalGuide }}
+            lang={lang}
+            C={C}
+          />
+        )}
         {/* hero */}
         <header className="rise" style={{ textAlign: "center", marginBottom: T.s8 }}>
           <h1 style={{ fontFamily: T.serif, fontWeight: 700, fontSize: "2.875rem", margin: `${T.s2} 0 ${T.s1}`, lineHeight: 1.08 }}>
