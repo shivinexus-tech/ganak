@@ -50,3 +50,61 @@ jobs:
           echo "== build =="
           npm run build || { echo "FAIL build"; fail=1; }
           exit $fail
+
+  # ------------------------------------------------------------------ promote on green only
+  #
+  # THE PROBLEM THIS SOLVES
+  # Cloudflare Pages deploys off the `main` BRANCH, not off the CHECK RESULT. So a red main
+  # shipped: /muhurat/medical was unreachable in production for 11 days while route-reachability
+  # correctly failed on every push. The gates were never the problem — nothing consumed their
+  # verdict. See plans/ganak-gate-decay-rootcause.md.
+  #
+  # THE DESIGN
+  # `main` stays the integration branch that agents push to. A separate `production` branch is
+  # fast-forwarded to a commit ONLY after every gate and the build pass. Cloudflare watches
+  # `production` instead of `main`. `needs: gates` enforces the ordering: this job cannot start
+  # unless the gates step exited 0.
+  #
+  # WHY THIS RATHER THAN DEPLOYING FROM CI WITH WRANGLER (branch ci/deploy-on-green)
+  #   1. wrangler.jsonc binds a KV namespace (REGIONAL_CALENDAR_FLAGS) and VITE_CANONICAL_ORIGIN.
+  #      Cloudflare's own build applies those. Publishing a prebuilt dist from CI risks a runtime
+  #      missing its KV binding — a silent production regression, which is the failure class
+  #      being fixed here, not one to introduce.
+  #   2. Zero new secrets. This uses the automatic GITHUB_TOKEN. The wrangler route needs a
+  #      Cloudflare API token created, stored and rotated by hand.
+  #   3. Rollback is `git push --force origin <good-sha>:production` — visible, in git, no
+  #      dashboard. Re-promotion afterwards still fast-forwards normally.
+  #   4. Branch preview deploys for other branches keep working untouched.
+  # Accepted trade-off: Cloudflare rebuilds the commit rather than publishing the exact bytes CI
+  # verified. Same commit, deterministic `vite build`. If byte-exact publishing is ever required,
+  # ci/deploy-on-green is the stricter alternative — at the cost of items 1-4 above.
+  #
+  # ⚠️ INERT UNTIL ONE DASHBOARD CHANGE IS MADE (nothing breaks meanwhile; main just keeps
+  #    deploying as it does today):
+  #      Cloudflare Pages -> the `ganak` project -> Settings -> Builds & deployments ->
+  #      Production branch: change `main` to `production`.
+  #    Until then Cloudflare still watches main and this job only maintains the branch.
+  promote:
+    needs: gates
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Fast-forward production to this verified commit
+        run: |
+          # Plain (non-force) push: git refuses anything that is not a fast-forward, so this
+          # can never rewrite production or publish a commit that skipped the gates.
+          if git push origin "${GITHUB_SHA}:refs/heads/production"; then
+            echo "promoted ${GITHUB_SHA} to production"
+            echo "✅ Promoted \`${GITHUB_SHA}\` to \`production\` — gates green." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::error::Could not fast-forward production to ${GITHUB_SHA}."
+            echo "This means production has commits that main does not — usually a manual rollback."
+            echo "Fix: git push --force origin ${GITHUB_SHA}:refs/heads/production (after confirming main is the intended state)."
+            exit 1
+          fi
