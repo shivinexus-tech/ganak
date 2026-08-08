@@ -142,10 +142,28 @@ for (const f of files) {
   }
 }
 
-/* A legacy name that no longer matches a file is stale — it would silently exempt nothing, or
-   worse, mask a rename. Report it so the list stays honest. */
+/* A LEGACY name with no matching file has TWO possible causes needing OPPOSITE remedies, and
+   the gate cannot tell them apart from the working tree alone:
+
+     ROT           — the spec was renamed or deleted, so this entry now exempts nothing (or
+                     worse, masks a rename).            Remedy: delete the entry.
+     NOT YET HERE  — the spec is real but lives on a branch that has not landed yet.
+                     Remedy: land the file. Do NOT delete the entry.
+
+   It fails rather than guessing, which is correct. But the message used to say only "remove
+   the stale entry" — actively wrong advice in the second case, and following it would delete
+   an exemption that is about to be needed. So the message now names both causes.
+
+   Consequence, stated here because this is where someone will hit it: a spec that needs
+   grandfathering must arrive in the SAME commit that adds its LEGACY entry. Adding the name
+   first turns main red; adding the file first turns main red too, because the ungrandfathered
+   spec then fails the five checks. They are one atomic change, by design. */
 for (const name of LEGACY) {
-  if (!legacySeen.has(name)) fail(`LEGACY lists "${name}" but no such spec exists — remove the stale entry`);
+  if (!legacySeen.has(name)) {
+    fail(`LEGACY lists "${name}" but ${SPEC_DIR} has no such file.\n` +
+      `        If the spec was renamed or deleted -> remove this LEGACY entry.\n` +
+      `        If the spec has not landed on this branch yet -> add the file in this same commit; do NOT remove the entry.`);
+  }
 }
 
 console.log(`personas defined: ${personaIds.map((p) => p.id).join(', ')}`);
