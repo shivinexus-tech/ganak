@@ -81,7 +81,53 @@ const REQUIRED = [
     test: (t) => /(taps?|clicks?|forms?|steps?)\b[^\n]{0,80}(target|today|→|->)|fewer (clicks|taps|steps)|zero (typing|forms)/i.test(t) },
 ];
 
-if (!fs.existsSync(SPEC_DIR)) { console.log('✓ spec-journey PASSED (no spec directory yet)'); process.exit(0); }
+/* ---- non-vacuous self-tests: prove every validator bites, on EVERY run ----
+
+   Why this block exists. The REQUIRED tests above only execute as a side effect of a
+   non-legacy spec being present. Today all five specs are grandfathered, so `checked` is 0
+   and not one validator runs — yet the gate still printed PASS and claimed it had verified
+   all five properties. Proven by mutation: forcing every `test` to return true left the gate
+   exiting 0 with its full success message. A broken regex, a bad refactor, or a stray
+   `true ||` would ship green and CI would never notice.
+
+   AGENTS.md: "Evidence before assertions." A PASS must carry evidence that the detectors
+   work, independently of whether any spec happens to exercise them. Fixtures run
+   unconditionally and in BOTH directions — the known-bad text must be rejected by every
+   validator, the known-good text accepted by every one — because a validator that flags
+   everything is as useless as one that flags nothing. Pattern follows the mustMatch/mustNot
+   self-tests in validation/life-interpretation-copy.cjs.
+
+   BAD_SPEC is the exact probe that once slipped past an earlier keyword-only `journey`
+   check (see the note on that rule above). It is automated here so that bug cannot recur. */
+const BAD_SPEC = 'A design with no user and no journey.';
+const GOOD_SPEC = [
+  '# Self-test fixture — not a real spec',
+  'Primary persona: P1.',
+  '## Journey',
+  '1. The user opens the app.',
+  '2. The user reads the answer.',
+  '## Walking it against the code',
+  'Step 2 is broken today — verified in `src/screens/DailyScreen.tsx`.',
+  '## What already exists',
+  'The Panchang engine already exists and is reused here.',
+  '## Success',
+  'Three taps today → one tap; fewer taps overall.',
+].join('\n');
+
+for (const r of REQUIRED) {
+  if (r.test(BAD_SPEC)) {
+    fail(`self-test: "${r.key}" ACCEPTED the known-bad fixture — this validator no longer bites`);
+  }
+  if (!r.test(GOOD_SPEC)) {
+    fail(`self-test: "${r.key}" REJECTED the known-good fixture — this validator is over-strict and would block a compliant spec`);
+  }
+}
+
+if (!fs.existsSync(SPEC_DIR)) {
+  if (failures) { console.error(`\n✗ spec-journey FAILED (${failures}) — self-tests broken`); process.exit(1); }
+  console.log('✓ spec-journey PASSED (no spec directory yet; self-tests green)');
+  process.exit(0);
+}
 
 const files = fs.readdirSync(SPEC_DIR).filter((f) => f.endsWith('.md'));
 let checked = 0;
