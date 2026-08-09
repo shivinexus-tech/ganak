@@ -81,7 +81,53 @@ const REQUIRED = [
     test: (t) => /(taps?|clicks?|forms?|steps?)\b[^\n]{0,80}(target|today|→|->)|fewer (clicks|taps|steps)|zero (typing|forms)/i.test(t) },
 ];
 
-if (!fs.existsSync(SPEC_DIR)) { console.log('✓ spec-journey PASSED (no spec directory yet)'); process.exit(0); }
+/* ---- non-vacuous self-tests: prove every validator bites, on EVERY run ----
+
+   Why this block exists. The REQUIRED tests above only execute as a side effect of a
+   non-legacy spec being present. Today all five specs are grandfathered, so `checked` is 0
+   and not one validator runs — yet the gate still printed PASS and claimed it had verified
+   all five properties. Proven by mutation: forcing every `test` to return true left the gate
+   exiting 0 with its full success message. A broken regex, a bad refactor, or a stray
+   `true ||` would ship green and CI would never notice.
+
+   AGENTS.md: "Evidence before assertions." A PASS must carry evidence that the detectors
+   work, independently of whether any spec happens to exercise them. Fixtures run
+   unconditionally and in BOTH directions — the known-bad text must be rejected by every
+   validator, the known-good text accepted by every one — because a validator that flags
+   everything is as useless as one that flags nothing. Pattern follows the mustMatch/mustNot
+   self-tests in validation/life-interpretation-copy.cjs.
+
+   BAD_SPEC is the exact probe that once slipped past an earlier keyword-only `journey`
+   check (see the note on that rule above). It is automated here so that bug cannot recur. */
+const BAD_SPEC = 'A design with no user and no journey.';
+const GOOD_SPEC = [
+  '# Self-test fixture — not a real spec',
+  'Primary persona: P1.',
+  '## Journey',
+  '1. The user opens the app.',
+  '2. The user reads the answer.',
+  '## Walking it against the code',
+  'Step 2 is broken today — verified in `src/screens/DailyScreen.tsx`.',
+  '## What already exists',
+  'The Panchang engine already exists and is reused here.',
+  '## Success',
+  'Three taps today → one tap; fewer taps overall.',
+].join('\n');
+
+for (const r of REQUIRED) {
+  if (r.test(BAD_SPEC)) {
+    fail(`self-test: "${r.key}" ACCEPTED the known-bad fixture — this validator no longer bites`);
+  }
+  if (!r.test(GOOD_SPEC)) {
+    fail(`self-test: "${r.key}" REJECTED the known-good fixture — this validator is over-strict and would block a compliant spec`);
+  }
+}
+
+if (!fs.existsSync(SPEC_DIR)) {
+  if (failures) { console.error(`\n✗ spec-journey FAILED (${failures}) — self-tests broken`); process.exit(1); }
+  console.log('✓ spec-journey PASSED (no spec directory yet; self-tests green)');
+  process.exit(0);
+}
 
 const files = fs.readdirSync(SPEC_DIR).filter((f) => f.endsWith('.md'));
 let checked = 0;
@@ -96,10 +142,28 @@ for (const f of files) {
   }
 }
 
-/* A legacy name that no longer matches a file is stale — it would silently exempt nothing, or
-   worse, mask a rename. Report it so the list stays honest. */
+/* A LEGACY name with no matching file has TWO possible causes needing OPPOSITE remedies, and
+   the gate cannot tell them apart from the working tree alone:
+
+     ROT           — the spec was renamed or deleted, so this entry now exempts nothing (or
+                     worse, masks a rename).            Remedy: delete the entry.
+     NOT YET HERE  — the spec is real but lives on a branch that has not landed yet.
+                     Remedy: land the file. Do NOT delete the entry.
+
+   It fails rather than guessing, which is correct. But the message used to say only "remove
+   the stale entry" — actively wrong advice in the second case, and following it would delete
+   an exemption that is about to be needed. So the message now names both causes.
+
+   Consequence, stated here because this is where someone will hit it: a spec that needs
+   grandfathering must arrive in the SAME commit that adds its LEGACY entry. Adding the name
+   first turns main red; adding the file first turns main red too, because the ungrandfathered
+   spec then fails the five checks. They are one atomic change, by design. */
 for (const name of LEGACY) {
-  if (!legacySeen.has(name)) fail(`LEGACY lists "${name}" but no such spec exists — remove the stale entry`);
+  if (!legacySeen.has(name)) {
+    fail(`LEGACY lists "${name}" but ${SPEC_DIR} has no such file.\n` +
+      `        If the spec was renamed or deleted -> remove this LEGACY entry.\n` +
+      `        If the spec has not landed on this branch yet -> add the file in this same commit; do NOT remove the entry.`);
+  }
 }
 
 console.log(`personas defined: ${personaIds.map((p) => p.id).join(', ')}`);
