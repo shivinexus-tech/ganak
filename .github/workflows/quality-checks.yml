@@ -99,12 +99,27 @@ jobs:
         run: |
           # Plain (non-force) push: git refuses anything that is not a fast-forward, so this
           # can never rewrite production or publish a commit that skipped the gates.
-          if git push origin "${GITHUB_SHA}:refs/heads/production"; then
+          if out=$(git push origin "${GITHUB_SHA}:refs/heads/production" 2>&1); then
             echo "promoted ${GITHUB_SHA} to production"
             echo "✅ Promoted \`${GITHUB_SHA}\` to \`production\` — gates green." >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "::error::Could not fast-forward production to ${GITHUB_SHA}."
-            echo "This means production has commits that main does not — usually a manual rollback."
-            echo "Fix: git push --force origin ${GITHUB_SHA}:refs/heads/production (after confirming main is the intended state)."
-            exit 1
+            exit 0
           fi
+          echo "$out"
+          # The two failures look nothing alike and need different fixes, so name which one
+          # this is rather than guessing. A misdiagnosed CI failure is how red gates start
+          # getting ignored.
+          case "$out" in
+            *403*|*"Write access"*|*"permission"*|*"denied to github-actions"*)
+              echo "::error::promote could not push: the Actions token is read-only."
+              echo "Fix (one setting, no code change): GitHub -> Settings -> Actions -> General"
+              echo "  -> Workflow permissions -> select 'Read and write permissions' -> Save."
+              echo "The job already requests contents:write, but the repository default caps it." ;;
+            *"non-fast-forward"*|*"fetch first"*|*"rejected"*)
+              echo "::error::promote could not fast-forward production to ${GITHUB_SHA}."
+              echo "production has commits main does not — usually a manual rollback."
+              echo "Fix, after confirming main is the intended state:"
+              echo "  git push --force origin ${GITHUB_SHA}:refs/heads/production" ;;
+            *)
+              echo "::error::promote failed for an unrecognised reason — see the git output above." ;;
+          esac
+          exit 1
