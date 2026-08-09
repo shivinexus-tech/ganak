@@ -1,13 +1,21 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-import { buildBootstrapChanges, buildChanges, parseRegister, sheetRow, validateDashboardContract } from "../scripts/sync-backlog-sheet.mjs";
+import {
+  buildBootstrapChanges,
+  buildChanges,
+  buildSyncChanges,
+  parseRegister,
+  planDimensionExpansions,
+  sheetRow,
+  validateDashboardContract,
+} from "../scripts/sync-backlog-sheet.mjs";
 
 const config = JSON.parse(await readFile(new URL("../plans/backlog-sheet-sync.json", import.meta.url), "utf8"));
 const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md", import.meta.url), "utf8");
 const base = parseRegister(markdown, config, "test base");
 
-assert.equal(base.rows.size, 59);
+assert.equal(base.rows.size, 61);
 assert.equal(sheetRow(base.rows.get("1")).length, 19);
 assert.equal(base.rows.get("58").section, "P0");
 assert.equal(base.rows.get("58").metadata.title, "Direct date entry and better Panchang date picker");
@@ -15,8 +23,8 @@ assert.equal(base.rows.get("59").section, "P0");
 assert.equal(base.rows.get("59").metadata.title, "Global site search and guided “find what I need” input");
 assert.equal(base.rows.get("46").section, "P1");
 assert.equal(base.rows.get("46").metadata.title, "Design-system pass");
-assert.equal(sheetRow(base.rows.get("46"))[4], "90%");
-assert.equal(base.rows.get("46").quality.deliveryState, "Design-system pass deployed and production-verified; primitive adoption on four launch screens and one owner decision remain");
+assert.equal(sheetRow(base.rows.get("46"))[4], "95%");
+assert.equal(base.rows.get("46").quality.deliveryState, "Design-system pass deployed and production-verified across every launch screen; the remaining work is owner-side only — one Cloudflare dashboard switch, the live-URL sign-off and a human real-device pass");
 assert.equal(base.rows.get("46").quality.qualityRisk, "Amber");
 assert.match(base.rows.get("46").quality.limitations, /Cloudflare Web Analytics beacon/);
 assert.match(base.rows.get("46").quality.bugBashStatus, /38 continuous minutes/);
@@ -92,6 +100,7 @@ function makeLive(parsed) {
   const liveBySection = new Map(config.tabs.map((tab) => [tab.section, [
     ["#", "Backlog item", "Effort", "Technical / coding complexity", "Progress", "Remaining AI time", "Dependencies", "Why it may take longer", "Acceptance criteria", "Definition of done / closure evidence", "Delivery state", "Limitations / pending work", "Short-term impact", "Long-term impact", "Bug-bash status / evidence", "Quality risk (RAG)", "Last verified · environment", "Source confidence", "Recommendation / action items"],
   ]]));
+  const tabInfo = new Map();
   for (const tab of config.tabs) {
     let rowNumber = 2;
     for (const row of parsed.rowsBySection.get(tab.section)) {
@@ -100,8 +109,23 @@ function makeLive(parsed) {
       liveBySection.get(tab.section).push([...cells]);
       rowNumber += 1;
     }
+    tabInfo.set(tab.sheetName, {
+      sheetId: 1000 + tabInfo.size,
+      rowCount: liveBySection.get(tab.section).length,
+      columnCount: 19,
+    });
   }
-  return { liveById, liveBySection, headerMigrations: [] };
+  return { liveById, liveBySection, headerMigrations: [], tabInfo };
+}
+
+function removeLiveRow(live, id) {
+  const liveRow = live.liveById.get(id);
+  assert.ok(liveRow, `fixture must contain live row ${id}`);
+  live.liveById.delete(id);
+  const rows = live.liveBySection.get(liveRow.section);
+  const index = rows.findIndex((cells) => cells[0] === id);
+  assert.ok(index >= 0, `fixture section must contain live row ${id}`);
+  rows.splice(index, 1);
 }
 
 const live = makeLive(base);
@@ -123,6 +147,50 @@ assert.deepEqual(
   "an explicitly requested bootstrap must identify every stale live cell against the repository",
 );
 assert.deepEqual(buildBootstrapChanges(head, alreadyPublished), [], "bootstrap must be idempotent after alignment");
+
+const missedPublish = makeLive(base);
+removeLiveRow(missedPublish, "60");
+removeLiveRow(missedPublish, "61");
+missedPublish.liveById.get("46").cells[4] = "55%";
+const selfHealChanges = buildSyncChanges(base, base, missedPublish, config);
+assert.deepEqual(
+  selfHealChanges
+    .filter((change) => change.kind === "append")
+    .map((change) => change.after.id),
+  ["60", "61"],
+  "incremental sync must append repository rows missing from a stale live Sheet",
+);
+assert.ok(
+  selfHealChanges.some((change) => (
+    change.kind === "cell"
+    && change.liveRow.id === "46"
+    && change.sheetIndex === 4
+    && change.value === "95%"
+  )),
+  "incremental sync must repair stale live cells even when the Git base already contains the new value",
+);
+assert.throws(
+  () => buildChanges(base, base, missedPublish, config),
+  /Live Sheet is missing existing backlog ID 60/,
+  "the permanent regression fixture must exercise the exact stale-Sheet wedge that broke the workflow",
+);
+
+const crampedMissedPublish = makeLive(base);
+removeLiveRow(crampedMissedPublish, "60");
+removeLiveRow(crampedMissedPublish, "61");
+for (const tab of config.tabs) {
+  const rowCount = crampedMissedPublish.liveBySection.get(tab.section).length;
+  crampedMissedPublish.tabInfo.get(tab.sheetName).rowCount = rowCount;
+}
+const rowExpansionRequests = planDimensionExpansions(
+  buildSyncChanges(base, base, crampedMissedPublish, config),
+  crampedMissedPublish,
+  config,
+).filter((request) => request.appendDimension?.dimension === "ROWS");
+assert.ok(
+  rowExpansionRequests.length >= 1,
+  "append recovery must expand the live Sheet row grid before writing missing rows",
+);
 
 const legacyHeaderLive = makeLive(base);
 legacyHeaderLive.headerMigrations.push({
@@ -166,8 +234,8 @@ assert.throws(
 );
 assert.equal(
   parseRegister(preAutomationMarkdown, config, "bootstrap historical fixture", { allowMetadataTitleMismatch: true }).rows.size,
-  59,
+  61,
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 
-console.log("Backlog Sheet sync gate: PASS — 59 rows; 19-column quality/action contract, legacy-header migration, dashboard formula guard, high-impact bug-bash/RAG policy, API limitation/impact disclosure, verification/source confidence, changed-cell targeting, idempotence, conflict refusal, metadata guard and explicit bootstrap planning verified.");
+console.log("Backlog Sheet sync gate: PASS — 61 rows; 19-column quality/action contract, legacy-header migration, dashboard formula guard, high-impact bug-bash/RAG policy, API limitation/impact disclosure, verification/source confidence, changed-cell targeting, stale-Sheet self-heal, row-grid expansion, idempotence, strict conflict detector, metadata guard and explicit bootstrap planning verified.");

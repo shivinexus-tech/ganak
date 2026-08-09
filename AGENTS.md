@@ -72,10 +72,34 @@ node validation/major-festival-pages.cjs              # reviewed major festivals
 node validation/durga-puja-pages.cjs                  # six Bengal Durga Puja pages stay substantive and bilingual
 node validation/vedic-season-clock.cjs                # Ritu boundaries, ghati rollover and equinox/solstice anchors
 node validation/page-context-header.cjs               # route-specific hero; no cross-section copy leaks
+node validation/spec-journey.cjs                      # every new spec names a persona + walks the journey
+node validation/route-reachability.cjs                # no orphan routes — every route linked from inside the app
 ```
 Never claim work is done without pasting the passing output. Evidence before
 assertions. If a gate fails, fix the cause — never weaken a gate to pass it
 (whitelisting a genuine browser global in parse-check is the one allowed exception).
+
+## Before writing a spec — name the user, walk the journey
+
+**Mandatory. Enforced by `validation/spec-journey.cjs`.**
+
+Ganak has 60+ gates proving the maths and the copy, and until 2026-08-03 none that asked the two
+questions a spec lives or dies on: **who is this for**, and **what are they trying to do**. The
+cost was concrete: a calculator spec optimised for the elder-friendly constraint that belongs to
+the Panchang householder, applied it to dosha tools whose user is the astrology enthusiast, and
+never noticed that the owner's own journey could not start — nothing in the app showed those
+tools existed.
+
+Every spec must, in this order, before any design:
+
+1. **Name one primary persona** from [`plans/ganak-personas.md`](plans/ganak-personas.md).
+   Do not invent one; do not borrow another persona's constraints without saying so.
+2. **Write the journey** as ordered steps, end to end.
+3. **Walk that journey against the code** — mark each step works / broken / missing, with file
+   evidence. This is the step that turns a plausible spec into a true one.
+4. **Inventory what already exists** that serves the journey before designing anything new.
+5. **State success in user steps** — taps and forms — not in gate metrics. "Reachable" is not a
+   user outcome.
 
 ## Workflow
 - **Check before you edit.** Read `plans/task-log.md` and

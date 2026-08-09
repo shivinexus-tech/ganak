@@ -513,6 +513,12 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         2026-07-28:** independent Codex bug bash fixed safety-wall order, polar
         no-sunrise copy and bypassed future birth dates; PR #4 merged as `557664c`;
         production EN/HI 320px verification passed with zero overflow or console errors.
+        **Honesty note (2026-08-05):** that 100% closure covered the feature but not its
+        discoverability — the route had zero inbound links and was reachable only by
+        typing the URL, for eleven days. `validation/route-reachability.cjs` caught it;
+        a bilingual footer link beside the calculator catalogue fixed it in `1b9e8b6`.
+        Closing an item as delivered while it is unreachable is the failure mode that
+        gate now exists to prevent. See `plans/ganak-gate-decay-rootcause.md`.
       _(P0-MUHURAT-FULL-PARITY; owner scope 2026-07-21; v1 built 2026-07-25)_
   - [x] **Independent review + bug bash of the medical Muhurat feature** — completed by a
         different agent (Cursor/Codex) than the builder (Claude Code). Second
@@ -809,13 +815,28 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
 - [ ] **Publish privacy/terms page** — draft at `plans/legal-privacy-terms-draft.md`;
       footer + fonts accurate _(CLAUDE-LAUNCH-PRIVACY MERGED)_. Needs owner contact
       email + counsel review before linking publicly.
-- [ ] **Owner chore (2026-08-02) — switch Cloudflare Web Analytics off for ganakapp.com.**
-      Cloudflare dashboard → **Web Analytics** → the `ganakapp.com` site → disable/remove it.
-      No agent can do this: it lives in the owner's Cloudflare account, not in the repo.
-      Until it is off, the site sends `POST /cdn-cgi/rum` on every page load while the
-      footer promises usage events only with consent. Verify afterwards by loading
-      ganakapp.com and confirming no `/cdn-cgi/rum` request in the browser network tab.
-      Revisit the decision when the app starts being shared and traffic numbers matter.
+- [ ] **Owner chore (2026-08-05) — one-click replay of the Google Sheet sync.**
+      The publication workflow failed on every push from `fa40c2e` to `b5e8b2f`, so the
+      cells changed in those commits (including the #46 owner decisions) never reached the
+      Sheet. The gate that blocked it is fixed in `ff7417f`, but a normal push-triggered run
+      diffs against the *previous* main tip, so those cells would be skipped for ever.
+      Recover them once: **Actions → "Sync backlog acceptance register" → Run workflow →
+      operation `incremental`, base_sha `3333928`** (the last revision that actually
+      published). Optionally run `bootstrap-plan` first — it is read-only and lists exactly
+      which cells are stale. No agent can dispatch this: the sandbox has no GitHub
+      credentials. _(Backlog #46 closeout evidence.)_
+- [x] **Owner chore (2026-08-02) — switch Cloudflare Web Analytics off for ganakapp.com.**
+      **DONE 2026-08-05, owner disabled RUM in the Cloudflare dashboard; agent-verified live
+      the same day.** The beacon had been injected at the edge on every page load regardless
+      of the in-app analytics consent, contradicting the footer's "anonymous usage events
+      only when consented". **Live evidence:** the first fetch of ganakapp.com still carried
+      `static.cloudflareinsights.com/beacon.min.js` from Cloudflare's own edge cache; a
+      cache-bypassing fetch, the `?lang=hi` route and a subsequent plain fetch of `/` all
+      returned **zero** beacon scripts, zero `/cdn-cgi/rum` requests and no
+      `cloudflareinsights`/`cf-beacon` string anywhere in the document. The footer claim is
+      now accurate with no copy change. Reversible: re-enabling is a dashboard toggle, and
+      at that point the footer must be updated to disclose it in the same change.
+      Revisit when the app starts being shared and traffic numbers matter.
       _(Backlog #46 owner decision; see also P0-ANALYTICS-PRIVACY.)_
 - [ ] **Owner chore:** one local `cd server && npm run smoke` (agents verified via
       browser; suite itself unrun as-written).
@@ -837,7 +858,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       Card/SectionHeader/Badge/DataRow primitives now cover all six launch screens;
       Guided <-> Expert materially changes content on all five launch journeys; Muhurat
       has bilingual Listen. The final primitive adoption is deployed and live-verified.
-      **Owner decision 2026-08-02 — Cloudflare Web Analytics goes OFF for now.** The
+      **Owner decision 2026-08-02, executed and verified 2026-08-05 — Cloudflare Web Analytics is OFF.** The
       beacon fired on every load regardless of the in-app analytics consent, which broke
       the footer's "anonymous usage events only when consented" claim. Ganak's own
       telemetry seam is fail-closed and gate-proven; the beacon is injected by Cloudflare
@@ -1273,3 +1294,16 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
 - **Android route** — cost ladder explained (2026-07-18): PWA $0 → Capacitor
   (Play $25 once, Apple $99/yr) → RN rewrite (skip). Recommendation: PWA first,
   Capacitor when stores + push are wanted. Awaiting owner confirm.
+- [ ] **P2 · BUG — `/favicon.ico` serves the SPA HTML page instead of an image.**
+      Ganak is a single-page app, so the host's catch-all rewrites nearly every path to
+      `index.html` (this is what makes deep links like `/muhurat/medical` and
+      `/calculator/...` work). Side effect: `/favicon.ico` — which browsers auto-request
+      expecting an **image** — also gets the HTML page back, so no proper tab/bookmark
+      icon renders and a wrong `content-type` (`text/html` where `image/*` is expected)
+      is served. Site-wide hosting config only; **does NOT affect Prashna or any
+      calculator/feature**. **Fix:** add a real `favicon.ico` (and an `apple-touch-icon`
+      + small PNG set) under `public/`, reference them from `index.html`, and exclude
+      `/favicon.ico` and other static-asset paths from the SPA catch-all so Cloudflare
+      Pages serves the file directly. **Verify:** the deployed `https://ganak.pages.dev/favicon.ico`
+      returns `image/x-icon` (or `image/png`), not `text/html`. Low risk, no feature
+      code. _(found during the Prashna 249 folio/closure work 2026-07-29; unrelated P2)_

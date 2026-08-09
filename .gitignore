@@ -11,3 +11,7 @@ festival-images-src/
 .claude/settings.local.json
 .superpowers/
 .worktrees/
+
+# Supabase local secrets + exported feedback (never commit)
+.dev.vars
+feedback/*.jsonl

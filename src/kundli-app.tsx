@@ -7,6 +7,7 @@ import FestivalGuideScreen, { festivalGuideFromPath } from "./screens/FestivalGu
 import UtilityCalculatorScreen from "./screens/UtilityCalculatorScreen";
 import { utilityFromPath } from "./data/utility-calculators";
 import MedicalMuhuratScreen, { medicalMuhuratFromPath } from "./screens/MedicalMuhuratScreen";
+import Breadcrumbs from "./components/Breadcrumbs";
 import FeedbackCard from "./components/FeedbackCard";
 import { applyRouteMetadata, routeMetadata } from "./metadata/route-metadata";
 import { privacyEvent } from "./telemetry/privacy-events";
@@ -191,10 +192,19 @@ export default function KundliApp() {
             ))}
           </span>
         </div>
+        {/* Breadcrumb — only on standalone deep-linked pages, where the Daily/Prashna/Jyotish
+            tabs are hidden. Gives a discoverable way up/home (NN/g: a clickable logo alone is not). */}
+        {(directFestivalGuide || utilityRoute || medicalRoute) && (
+          <Breadcrumbs
+            ctx={{ medical: !!medicalRoute, utility: utilityRoute, festival: directFestivalGuide }}
+            lang={lang}
+            C={C}
+          />
+        )}
         {/* hero */}
         <header className="rise" style={{ textAlign: "center", marginBottom: T.s8 }}>
           <h1 style={{ fontFamily: T.serif, fontWeight: 700, fontSize: "2.875rem", margin: `${T.s2} 0 ${T.s1}`, lineHeight: 1.08 }}>
-            <span style={{ color: C.gold }}>{lang === "hi" ? "गणक" : "Ganak"}</span>
+            <a href={`/?lang=${lang}`} aria-label={lang === "hi" ? "गणक — मुखपृष्ठ" : "Ganak — home"} style={{ color: C.gold, textDecoration: "none" }}>{lang === "hi" ? "गणक" : "Ganak"}</a>
           </h1>
           <div style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fSmall, letterSpacing: "0.18em" }}>{hero.eyebrow}</div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: T.s3, margin: `${T.s3} 0` }}>
@@ -264,15 +274,23 @@ export default function KundliApp() {
         <FeedbackCard lang={lang} C={C} card={card} />
 
         {/* Footer stays accurate with or without optional telemetry endpoints.
-            The calculator catalogue is linked here so it is reachable from every screen —
-            it shipped as an orphan route (14 calculators, zero inbound links) and
-            validation/route-reachability.cjs now guards against that returning. */}
+            The calculator catalogue and the medical Muhurat finder are linked here so both
+            are reachable from every screen — each shipped as an orphan route with zero
+            inbound links, and validation/route-reachability.cjs now guards against that
+            returning. Medical Muhurat is named for what it is (optional timing around
+            already-approved, non-urgent care) so the link itself cannot read as medical
+            advice; the route's own safety wall still gates everything behind it. */}
         <footer style={{ textAlign: "center", color: C.muted, fontSize: T.fLabel, marginTop: T.s8, letterSpacing: ".06em" }}>
-          <div style={{ marginBottom: T.s3 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: `${T.s2} ${T.s4}`, marginBottom: T.s3 }}>
             <a href={`/calculators?lang=${lang}`} className="comfort-focus" style={{ color: C.gold, textDecoration: "none", borderBottom: `0.0625rem solid ${C.line}`, paddingBottom: "0.125rem" }}>
               {lang === "hi"
                 ? "ज्योतिष कैलकुलेटर — राशि, लग्न, नक्षत्र, मांगलिक और अन्य"
                 : "Astrology calculators — Rashi, Lagna, Nakshatra, Mangal Dosha and more"}
+            </a>
+            <a href={`/muhurat/medical?lang=${lang}`} className="comfort-focus" style={{ color: C.gold, textDecoration: "none", borderBottom: `0.0625rem solid ${C.line}`, paddingBottom: "0.125rem" }}>
+              {lang === "hi"
+                ? "चिकित्सा मुहूर्त — पहले से तय, अत्यावश्यक-रहित उपचार के लिए वैकल्पिक समय"
+                : "Medical Muhurat — optional timing for already-planned, non-urgent care"}
             </a>
           </div>
           {lang === "hi"
