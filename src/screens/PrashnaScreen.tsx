@@ -5,6 +5,7 @@ import { NAK_HI } from "../engine/muhurat";
 import { kpNumberToLagna, kpNumberInfo, KP_NUMBER_MIN, KP_NUMBER_MAX } from "../engine/kp-horary";
 import { useDepth } from "../accessibility/ComfortProvider";
 import { Card, DataRow } from "../components/ui-primitives";
+import FeedbackCard from "../components/FeedbackCard";
 
 // ------------------------------------------------- PRASHNA TOKENS (app palette)
 const TOKENS = {
@@ -1315,6 +1316,30 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               </div>
               <CuspalTable chart={result.chart} hi={hi} judgedCusp={v.q.cusp} mode={result.mode} />
               <SignificatorGrid chart={result.chart} hi={hi} />
+
+              {/* Practitioner review request. This view shipped WITHOUT a practising
+                  astrologer having checked the cuspal sub-lords or the significator grid —
+                  the owner shipped deliberately to gather that review from real users. Saying
+                  so on the page is the honest form of that decision, and it is the only way
+                  the correctness question actually gets answered.
+
+                  Placed here, directly under the two tables in question, and opened by
+                  default: an astrologer will not think to open a collapsed "Send feedback"
+                  link at the foot of the page to report that our maths is wrong. Ask, and
+                  they answer. Reuses the site-wide feedback path — same endpoint, same
+                  honeypot, same no-PII rule — so it adds no new way for data to leave. */}
+              <div style={{ marginTop: T.s4 }}>
+                <FeedbackCard
+                  lang={hi ? 'hi' : 'en'}
+                  C={{ gold: TOKENS.gold, muted: TOKENS.muted, line: TOKENS.line, ivory: TOKENS.ink, sindoor: TOKENS.sindoor }}
+                  card={{ background: TOKENS.card, border: `0.0938rem solid ${TOKENS.gold}`, borderRadius: TOKENS.radius }}
+                  defaultOpen
+                  label={hi ? '⚖️ ज्योतिषियों से — क्या यह गणना सही है?' : '⚖️ Astrologers — is this reading correct?'}
+                  prompt={hi
+                    ? 'यह अभ्यासी-दृष्टि नई है और अभी किसी ज्योतिषी द्वारा जाँची नहीं गई। यदि आप के॰पी॰ पद्धति जानते हैं: क्या ऊपर के भाव उप-स्वामी और भाव-कारक सही हैं? जो ग़लत लगे, कृपया भाव-संख्या सहित बताएँ — हम उसी आधार पर सुधार करेंगे।'
+                    : 'This practitioner view is new and has not yet been checked by a working astrologer. If you read KP: are the cuspal sub-lords and significators above correct? Name the house number and what you expected — that is what we will correct against.'}
+                />
+              </div>
             </div>
           )}
         </div>
