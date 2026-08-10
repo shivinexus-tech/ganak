@@ -636,6 +636,13 @@ does not foreclose it.
 ### Decision 2 — Does Phase 0 (SEO/share infrastructure) ship *before* the UI redesign?
 *Blocks: sequencing of everything.*
 
+> **RESOLVED — owner, 2026-08-09: yes, SEO before the redesign.** The recommendation below
+> is accepted as written. Register rows 62 → 26 → 63 are now sequenced ahead of the brand/UI
+> redesign track; row 64 (Hindi URL structure) must be answered before row 63 submits, since
+> changing URLs after submission forces re-indexing. The in-flight redesign branch
+> (`claude/brand-color-swap`) is not cancelled — it yields priority, and because Phase 0
+> touches only build tooling and `public/` it can continue in parallel without collision.
+
 **Recommendation: yes — Phase 0 and Phase 1 first, then the redesign.** Reasons: (a) it is
 the #1 strategy risk and it is currently at 0%; (b) it touches build tooling and `public/`,
 so it **cannot collide** with the redesign's screen work and can run genuinely in parallel;

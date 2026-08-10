@@ -1295,6 +1295,18 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
 
 ## Decisions — resolved (owner, 2026-07-18)
 
+- ✅ **SEO/share infrastructure ships BEFORE the UI redesign (owner, 2026-08-09).**
+  Resolves `plans/ganak-architecture-audit.md` Decision 2, which had been open since the
+  audit. Order: register row **62** (build-time per-route HTML head — the audit's #1
+  finding, previously only the `INFRA-SPA-PRERENDER` bullet below and absent from the
+  Sheet) → row **26** (sitemap, `robots.txt`, the 10 legacy `301`s, share cards) → row
+  **63** (Search Console, owner-only). Row **64** (Hindi URL structure) must be answered
+  before row 63 submits — changing URLs after submission forces re-indexing.
+  The redesign track is **not cancelled**: Phase 0 touches only build tooling and
+  `public/`, so it cannot collide with screen work and the two can run in parallel.
+  Rationale on the evidence: all ~199 routes currently serve one identical HTML shell
+  declaring `canonical="https://ganakapp.com/"`, so redesigned screens built on the
+  client-only model would need reworking once prerendering lands.
 - ✅ **Launch bar** — baseline now, grow after (see Phase 1 note).
 - ✅ **Investment ceiling** — small budget, ~$10–50/mo. Bites only at Phase 4;
   Phase 1 stays on free tiers. Apple Dev ($99/yr ≈ $8/mo) and a small
