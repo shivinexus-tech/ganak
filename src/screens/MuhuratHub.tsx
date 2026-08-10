@@ -16,6 +16,7 @@ import {
 } from "../engine/muhurat";
 import { dayHoras, nightHoras, analyzeHora, horaResultText, HORA_GLYPH, HORA_COLOR, HORA_NAME, HORA_NATURE, HORA_PLANET_KEYS, horaDetectPlanet, horaIntent, HORA_CLARIFY, HORA_ACTIVITY_MAP, horaWindowsForPlanet } from "../engine/hora";
 import { adjudicate, nextCleanWindow } from "../engine/hora-verdict";
+import { approvedStorage } from "../storage/approved-storage";
 import { computeLagnaPanchaka, panchakaRem, PANCHAKA_TYPE } from "../engine/panchaka";
 import { obsKind } from "../engine/festivals";
 import { festivalPathForKey } from "../data/festival-pages";
@@ -65,6 +66,11 @@ function muhuratSpeech(lang, { headline, good = [], avoid = [], note = "" }) {
 
 const SIGN_HI = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
 
+// Storage key for the practitioner "show blocked horas" toggle (Finding 2 — see
+// its useState initializer below for why this rides in approvedStorage's shared
+// "preferences" bucket and what that trades off).
+const HORA_SHOW_BLOCKED_KEY = "horaShowBlocked";
+
 function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, onCal = () => {}, onChangeCity = () => {}, C, card }) {
   const { showPlainHelp, showExpert } = useDepth();
   const tz = todayP.tz;
@@ -99,7 +105,33 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   // instead of silently hiding them. Default OFF — the default behaviour is a
   // hard block: a favourable hora that falls inside Rahu Kaal/Gulika/Yamaganda
   // is never offered as a clean recommendation.
-  const [showBlockedHoras, setShowBlockedHoras] = useState(false);
+  //
+  // Persisted via approvedStorage.preferences (the project's single approved
+  // on-device store — see src/storage/approved-storage.ts) so a practitioner
+  // working chart after chart does not re-tick it every visit. That store's
+  // "preferences" bucket is a generic Record<string, unknown>, but in practice
+  // it is read/written end-to-end by ComfortProvider (src/accessibility/
+  // ComfortProvider.tsx) as one closed-shape GanakPreferences object:
+  // ComfortProvider's own write REPLACES the whole bucket with only its 13
+  // known fields every time any comfort/accessibility setting changes, so a
+  // foreign key added here (horaShowBlocked) survives a plain reload but can
+  // be silently dropped back to the default the next time the user touches
+  // an unrelated comfort setting. That is a known, reported limitation, not
+  // silently swallowed: it never corrupts ComfortProvider's own data (this
+  // code always merges before writing), it only ever degrades to today's
+  // pre-fix behaviour (defaults back to off), and closing it properly means
+  // adding a real GanakPreferences field in ComfortProvider.tsx, which is
+  // outside this task's file allowlist.
+  const [showBlockedHoras, setShowBlockedHorasState] = useState(() => {
+    const stored = approvedStorage.preferences.read({});
+    return stored.ok && stored.value && stored.value[HORA_SHOW_BLOCKED_KEY] === true;
+  });
+  const setShowBlockedHoras = (value) => {
+    setShowBlockedHorasState(value);
+    const current = approvedStorage.preferences.read({});
+    const base = current.ok && current.value && typeof current.value === "object" ? current.value : {};
+    approvedStorage.preferences.write({ ...base, [HORA_SHOW_BLOCKED_KEY]: value });
+  };
   const [showPanch, setShowPanch] = useState(false);
   const [dragMs, setDragMs] = useState(null);  // dragged time on arc
   const isoAtOffset = (days) => new Date(Date.now() + tz * 3600000 + days * 86400000).toISOString().slice(0, 10);
@@ -273,13 +305,29 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
     const v = adjudicate({ start: w.start, end: w.end }, horaCtx);
     if (v.status === "blocked" && !showBlockedHoras) return null;
     const isNow = isToday && Date.now() >= w.start && Date.now() < w.end;
+    // Finding 3: Rahu Kaal, Gulika and Yamaganda are computed by dividing DAYLIGHT
+    // into eighths — there is no night belt for a night hora to collide with, so
+    // every night window adjudicates "clean" and this badge would only ever say
+    // "Clear": true, but informationally empty, and it implies a check ran that
+    // found nothing wrong. For night windows only, show the Choghadiya grade
+    // instead — real information after dark, already computed by the same
+    // adjudicate() call above (R4, graded from choghaNight via horaCtx.chogha).
+    // Day windows below are completely unchanged.
+    const isNight = w.period === "night";
+    const gradeTone = v.grade === "good" ? "good" : v.grade === "bad" ? "bad" : "default";
     return (
       <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", fontVariantNumeric: "tabular-nums", opacity: v.status === "blocked" ? 0.55 : 1 }}>
         <span style={{ fontSize: T.fSmall, color: C.ivory, fontWeight: isNow ? 700 : 400 }}>{fmtT(w.start)} – {fmtT(w.end)}</span>
         <span style={{ fontSize: T.fMicro, color: C.muted }}>{w.period === "day" ? (lang === "hi" ? "दिन" : "day") : (lang === "hi" ? "रात" : "night")}</span>
-        <Badge tone={v.status === "clean" ? "good" : v.status === "partial" ? "warn" : "bad"} density="compact">
-          {v.status === "clean" ? (lang === "hi" ? "स्पष्ट" : "Clear") : v.status === "partial" ? (lang === "hi" ? "आंशिक रूप से बाधित" : "Partly blocked") : (lang === "hi" ? "बाधित" : "Blocked")}
-        </Badge>
+        {isNight ? (
+          <Badge tone={gradeTone} density="compact">
+            {v.gradeKey ? trN(lang, CHOG_NAME, v.gradeKey) : (lang === "hi" ? "सामान्य" : "Neutral")}
+          </Badge>
+        ) : (
+          <Badge tone={v.status === "clean" ? "good" : v.status === "partial" ? "warn" : "bad"} density="compact">
+            {v.status === "clean" ? (lang === "hi" ? "स्पष्ट" : "Clear") : v.status === "partial" ? (lang === "hi" ? "आंशिक रूप से बाधित" : "Partly blocked") : (lang === "hi" ? "बाधित" : "Blocked")}
+          </Badge>
+        )}
         {v.status === "partial" && v.usable[0] && (
           <span style={{ fontSize: T.fMicro, color: C.gold }}>{lang === "hi" ? "प्रयोग करें " : "use "}{fmtT(v.usable[0].start)}–{fmtT(v.usable[0].end)}</span>
         )}
@@ -290,6 +338,18 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       </div>
     );
   };
+
+  // Shown once per rendered list of hora windows that includes a night entry
+  // (Finding 3), not repeated on every row — explains once why the belt check
+  // differs after dark instead of leaving the reader to infer it from a badge
+  // that quietly changed meaning.
+  const nightApplicabilityNote = (wins) => !wins.some((w) => w.period === "night") ? null : (
+    <div style={{ fontSize: T.fMicro, color: C.muted, fontStyle: "italic", marginTop: "0.3125rem" }}>
+      {lang === "hi"
+        ? "राहु काल, गुलिक काल व यमगण्ड केवल दिन में होते हैं — रात में लागू नहीं होते; रात्रि अवधियों के लिए इसके बजाय चौघड़िया श्रेणी दिखाई गई है।"
+        : "Rahu Kalam, Gulika and Yamaganda are daytime periods and don't apply at night — night windows show the Choghadiya grade instead."}
+    </div>
+  );
 
   // Never dead-end: when every window for a planet is blocked (or the answer's
   // intent was "avoid"), point at the next window that actually has usable time.
@@ -1295,7 +1355,10 @@ return (
                     {nextCleanBlock(p)}
                   </>
                 ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.3125rem" }}>{rows}</div>
+                  <>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.3125rem" }}>{rows}</div>
+                    {nightApplicabilityNote(wins)}
+                  </>
                 )}
                 <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: "0.4375rem" }}>{lang === "hi" ? "उपयुक्त: " : "Good for: "}{HORA_NATURE[p][LL]}</div>
               </div>
@@ -1346,20 +1409,35 @@ return (
                 </div>
               )}
               {horaResult.status === "answer" && horaResult.intent !== "avoid" && todayP.rise != null && todayP.set != null && (() => {
-                const tp = hr.planets[0];
-                const wins = horaWindowsForPlanet(tp, todayP.dow, todayP.rise, todayP.set, nextRise);
-                if (!wins.length) return null;
-                const rows = wins.map((w, i) => horaVerdictRow(w, i, tp));
-                const anyVisible = rows.some((r) => r !== null);
+                // Finding 1: the answer names EVERY planet in hr.planets (e.g. "Venus &
+                // Jupiter hora are favourable for marriage") but used to time only
+                // hr.planets[0] — Jupiter would be named and never timed. Every named
+                // planet now gets its own compact heading + window list below, reusing
+                // horaVerdictRow (not a second renderer) for each. A planet whose windows
+                // are all blocked still gets its heading and the "all blocked" line —
+                // it must not silently vanish from the list.
+                const groups = hr.planets
+                  .map((tp) => ({ tp, wins: horaWindowsForPlanet(tp, todayP.dow, todayP.rise, todayP.set, nextRise) }))
+                  .filter((g) => g.wins.length > 0);
+                if (!groups.length) return null;
                 return (
-                  <div style={{ marginTop: "0.5rem" }}>
-                    <div style={{ fontSize: T.fMicro, color: HORA_COLOR[tp], fontWeight: 600, marginBottom: "0.3125rem" }}>{HORA_GLYPH[tp]} {HORA_NAME[tp][LL]} {lang === "hi" ? "होरा आज" : "hora today"}</div>
-                    {anyVisible ? (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>{rows}</div>
-                    ) : (
-                      <div style={{ fontSize: T.fMicro, color: C.muted }}>{lang === "hi" ? "आज की सभी अवधि बाधित हैं।" : "Every window today is blocked."}</div>
-                    )}
-                    {!anyVisible && nextCleanBlock(tp)}
+                  <div style={{ marginTop: "0.5rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    {groups.map((g) => {
+                      const rows = g.wins.map((w, i) => horaVerdictRow(w, i, g.tp));
+                      const anyVisible = rows.some((r) => r !== null);
+                      return (
+                        <div key={g.tp}>
+                          <div style={{ fontSize: T.fMicro, color: HORA_COLOR[g.tp], fontWeight: 600, marginBottom: "0.3125rem" }}>{HORA_GLYPH[g.tp]} {HORA_NAME[g.tp][LL]} {lang === "hi" ? "होरा आज" : "hora today"}</div>
+                          {anyVisible ? (
+                            <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>{rows}</div>
+                          ) : (
+                            <div style={{ fontSize: T.fMicro, color: C.muted }}>{lang === "hi" ? "आज की सभी अवधि बाधित हैं।" : "Every window today is blocked."}</div>
+                          )}
+                          {!anyVisible && nextCleanBlock(g.tp)}
+                        </div>
+                      );
+                    })}
+                    {nightApplicabilityNote(groups.flatMap((g) => g.wins))}
                   </div>
                 );
               })()}

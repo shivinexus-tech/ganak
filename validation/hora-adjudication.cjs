@@ -9,6 +9,7 @@ const { dayHoras, horaWindowsForPlanet, nightHoras, HORA_ORDER, DAY_LORD, horaRe
 const { muhuratForDate } = loadApp('src/engine/muhurat.ts');
 const { trikonaLords, personalHoraWindows } = loadApp('src/engine/personal-hora.ts');
 const { windowOverlapsDomain } = loadApp('src/components/TimingLanes.tsx');
+const { CHOG_NAME } = loadApp('src/data/festival-meta.ts');
 let failures = 0;
 const fail = (m) => { failures++; console.error('FAIL ' + m); };
 const W = (s, e) => ({ start: s, end: e });
@@ -522,12 +523,12 @@ for (const city of M1_CITIES) {
     // belt — the core promise the whole branch exists to keep, now checked
     // against real computed data across a full year rather than synthetic
     // fixtures only.
-    const dayHs = dayHoras(tp.dow, tp.rise, tp.set).map((h) => ({ h, chogha: tp.choghaDay || [] }));
-    const nightHs = nightHoras(tp.dow, tp.set, tp.nextRise).map((h) => ({ h, chogha: tp.choghaNight || [] }));
+    const dayHs = dayHoras(tp.dow, tp.rise, tp.set).map((h) => ({ h, chogha: tp.choghaDay || [], period: 'day' }));
+    const nightHs = nightHoras(tp.dow, tp.set, tp.nextRise).map((h) => ({ h, chogha: tp.choghaNight || [], period: 'night' }));
     const allHs = [...dayHs, ...nightHs];
     if (allHs.length !== 24) fail(`M1 ${city.label} day ${i}: expected 24 real horas, got ${allHs.length}`);
     const ctx = { rahu: tp.rahu, gulika: tp.gulika, yama: tp.yama, abhijit: tp.abhijit };
-    for (const { h, chogha } of allHs) {
+    for (const { h, chogha, period } of allHs) {
       let v;
       try { v = adjudicate({ start: h.start, end: h.end }, Object.assign({}, ctx, { chogha })); }
       catch (e) { fail(`M1 ${city.label} day ${i}: adjudicate threw on a real hora: ${e.message}`); continue; }
@@ -536,6 +537,21 @@ for (const city of M1_CITIES) {
         if (m1Intersects(u, tp.rahu)) fail(`M1 ${city.label} day ${i}: a usable span intersects Rahu Kaal`);
         if (m1Intersects(u, tp.gulika)) fail(`M1 ${city.label} day ${i}: a usable span intersects Gulika`);
         if (m1Intersects(u, tp.yama)) fail(`M1 ${city.label} day ${i}: a usable span intersects Yamaganda`);
+      }
+      // Finding 3 (fix-three-gaps, 2026-08-10): Rahu Kaal/Gulika/Yamaganda are
+      // computed by dividing DAYLIGHT into eighths, so a night hora has no
+      // belt to ever collide with. Run against a full real-data year (the
+      // same loop M1 already runs) rather than synthetic fixtures, so this
+      // protects the actual invariant MuhuratHub.tsx's night badge relies on:
+      // it never has to render "Blocked" or name a belt after dark.
+      if (period === 'night') {
+        if (v.status === 'blocked') fail(`M1/F3 ${city.label} day ${i}: a real night hora adjudicated 'blocked' — Rahu Kaal/Gulika/Yamaganda are daytime-only and cannot block a night window`);
+        if (v.blockedBy.length) fail(`M1/F3 ${city.label} day ${i}: a real night hora named a blocking belt (${v.blockedBy.join(',')}) — belts do not apply at night`);
+        // v.gradeKey is exactly what MuhuratHub.tsx's night badge looks up in
+        // CHOG_NAME (the bilingual Amrit/Labh/Shubh/Char/Udveg/Kaal/Rog
+        // vocabulary) — an uncovered key would fall through to an
+        // untranslated raw string in the UI instead of a real Choghadiya name.
+        if (v.gradeKey != null && !(v.gradeKey in CHOG_NAME)) fail(`M1/F3 ${city.label} day ${i}: real night gradeKey "${v.gradeKey}" has no CHOG_NAME translation`);
       }
     }
   }
@@ -613,6 +629,111 @@ if (!muhuratSrc.includes('{horaResult.status === "answer" && horaResult.intent !
 // screen it already scans; closing 5 needs a positive assertion of what the
 // avoid-intent sentence must say, not more banned substrings to dodge, which
 // is a wording decision for whoever owns that copy, not a mechanical fix.
+
+// ============================================================================
+// fix-three-gaps (2026-08-10) — Findings 1 and 3, source-level assertions on
+// MuhuratHub.tsx. Both defects are UI-side (the engine already returned the
+// right data — hr.planets and grade/gradeKey — the screen just wasn't using
+// all of it), so the assertions below follow the M5 idiom above: read the
+// real source text and pin the exact shape of the fix, not a synthetic
+// re-implementation that could silently drift from what actually ships.
+
+// Finding 1: a multi-planet answer ("Venus & Jupiter hora are favourable for
+// marriage") used to time only hr.planets[0] — Jupiter named, never timed.
+// The fix maps over every planet in hr.planets; pin both that the mapped
+// shape exists and that the old single-index shape is gone.
+if (!/hr\.planets\s*\n?\s*\.map\(\(tp\) => \(\{ tp, wins: horaWindowsForPlanet\(tp, todayP\.dow, todayP\.rise, todayP\.set, nextRise\) \}\)\)/.test(muhuratSrc))
+  fail('MuhuratHub.tsx: the answer-branch timing block must map horaWindowsForPlanet over every planet in hr.planets, not just one (Finding 1)');
+if (/const tp = hr\.planets\[0\];\s*\n\s*const wins = horaWindowsForPlanet\(tp,/.test(muhuratSrc))
+  fail('MuhuratHub.tsx: the answer-branch timing block still times only hr.planets[0] — Finding 1 regression (a named planet would go untimed again)');
+
+// Finding 1: reuse horaVerdictRow rather than a second renderer — both real
+// list sites (the single-planet "timing" status branch and the per-planet
+// group loop in the "answer" status branch) must call the same helper.
+const verdictRowCallSites = (muhuratSrc.match(/horaVerdictRow\(w, i, /g) || []).length;
+if (verdictRowCallSites < 2)
+  fail(`MuhuratHub.tsx: expected horaVerdictRow to be reused by both hora window list sites, found only ${verdictRowCallSites} call site(s) (Finding 1)`);
+
+// Finding 3: the night badge must read grade/gradeKey through the real
+// bilingual CHOG_NAME vocabulary (Amrit/Labh/Shubh/Char/Udveg/Kaal/Rog), not
+// invented text.
+if (!/trN\(lang, CHOG_NAME, v\.gradeKey\)/.test(muhuratSrc))
+  fail('MuhuratHub.tsx: horaVerdictRow must render the night grade via trN(lang, CHOG_NAME, v.gradeKey) (Finding 3)');
+
+// Finding 3: the day-hora Clear/Partly-blocked/Blocked badge text must be
+// byte-for-byte unchanged — the night branch is required to be an ADDITION
+// alongside the day path, never a replacement of it ("Day horas keep exactly
+// their current behaviour").
+if (!/v\.status === "clean" \? \(lang === "hi" \? "स्पष्ट" : "Clear"\) : v\.status === "partial" \? \(lang === "hi" \? "आंशिक रूप से बाधित" : "Partly blocked"\) : \(lang === "hi" \? "बाधित" : "Blocked"\)/.test(muhuratSrc))
+  fail('MuhuratHub.tsx: the existing day-hora status badge text must be byte-for-byte unchanged (Finding 3 must not alter day behaviour)');
+
+// Finding 3: the night explainer line must exist and actually be consulted
+// by both real list sites (not dead code defined but never called).
+if (!/const nightApplicabilityNote = \(wins\) =>/.test(muhuratSrc))
+  fail('MuhuratHub.tsx: nightApplicabilityNote helper is missing (Finding 3 — the once-per-list explainer line)');
+// (the arrow-function definition reads "nightApplicabilityNote = (wins) =>",
+// not "nightApplicabilityNote(" — that substring only matches real calls)
+const nightNoteCallSites = (muhuratSrc.match(/nightApplicabilityNote\(/g) || []).length;
+if (nightNoteCallSites < 2)
+  fail(`MuhuratHub.tsx: nightApplicabilityNote must be called by both hora window list sites, found ${nightNoteCallSites} call site(s) (Finding 3)`);
+
+// ============================================================================
+// fix-three-gaps (2026-08-10) — Finding 2, engine-level assertions on
+// src/storage/approved-storage.ts, the project's single approved on-device
+// store. Node has no window/localStorage, so a fake one is installed only for
+// this block (and removed after) to exercise the real module, not a
+// re-implementation of its read/write semantics.
+{
+  const storageMod = loadApp('src/storage/approved-storage.ts');
+  const fakeLocalStorage = (() => {
+    let data = {};
+    return {
+      getItem: (k) => (Object.prototype.hasOwnProperty.call(data, k) ? data[k] : null),
+      setItem: (k, v) => { data[k] = String(v); },
+      removeItem: (k) => { delete data[k]; },
+      clear: () => { data = {}; },
+    };
+  })();
+  const hadWindow = 'window' in global;
+  const savedWindow = global.window;
+  global.window = { localStorage: fakeLocalStorage };
+
+  // Merge-safe write: the exact read-then-spread-then-write pattern
+  // MuhuratHub.tsx uses to add horaShowBlocked to the shared "preferences"
+  // bucket must not clobber a pre-existing unrelated key already there.
+  storageMod.approvedStorage.preferences.write({ existingKey: 'keepme' });
+  let cur = storageMod.approvedStorage.preferences.read({});
+  storageMod.approvedStorage.preferences.write(Object.assign({}, cur.value, { horaShowBlocked: true }));
+  cur = storageMod.approvedStorage.preferences.read({});
+  if (cur.value.existingKey !== 'keepme') fail('approvedStorage.preferences: a merge-safe write must preserve a pre-existing unrelated key (Finding 2)');
+  if (cur.value.horaShowBlocked !== true) fail('approvedStorage.preferences: a merge-safe write must persist the new key (Finding 2)');
+
+  // Reload proof: this is the literal Finding 2 complaint — the toggle must
+  // survive a plain read-after-write with nothing else touching storage
+  // in between.
+  cur = storageMod.approvedStorage.preferences.read({});
+  if (cur.value.horaShowBlocked !== true) fail('approvedStorage.preferences: horaShowBlocked did not survive a read after write (Finding 2 — the toggle forgetting itself on reload)');
+
+  // DOCUMENTED, NOT FIXED (reported in the fix report and in the comment
+  // above showBlockedHoras's useState in MuhuratHub.tsx): approvedStorage's
+  // "preferences" bucket is a single whole-object store end-to-end owned by
+  // ComfortProvider.tsx, which REPLACES it wholesale — not merges — every
+  // time any comfort/accessibility setting changes. This pins that today's
+  // module genuinely behaves that way (a write shaped like ComfortProvider's
+  // own, with no spread of the existing value, drops horaShowBlocked back to
+  // undefined) so the risk is demonstrated, not asserted from memory. This is
+  // a deliberate "pin the known limitation" check, same idiom as the
+  // nightHoras-without-nextRise NaN assertion above: if this ever stops
+  // reproducing, approved-storage.ts's write() semantics changed for the
+  // better, and both this assertion and the MuhuratHub.tsx comment describing
+  // the old clobber risk need updating together, not left to silently drift.
+  storageMod.approvedStorage.preferences.write({ scalePercent: 106.25, colorMode: 'auto' }); // shaped like ComfortProvider's own unconditional whole-object write
+  cur = storageMod.approvedStorage.preferences.read({});
+  if (cur.value.horaShowBlocked !== undefined)
+    fail('DOCUMENTATION CHECK (Finding 2): approvedStorage.preferences.write no longer replaces the bucket wholesale — horaShowBlocked survived a ComfortProvider-shaped write. If this is a deliberate improvement, update this assertion and the persistence-risk comment in MuhuratHub.tsx together, rather than leaving them describing a risk that no longer exists.');
+
+  if (hadWindow) global.window = savedWindow; else delete global.window;
+}
 
 if (failures) { console.error(`hora-adjudication: ${failures} failure(s)`); process.exit(1); }
 console.log('hora-adjudication: PASS');
