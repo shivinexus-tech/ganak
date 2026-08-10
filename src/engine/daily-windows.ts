@@ -6,12 +6,10 @@ import {
   solveCross, sunEvents, sunSidMs, zoneOffset,
 } from "./panchang";
 import { rev } from "./ephemeris";
+import { panchangTermAt, SIGN_EN_WESTERN } from "../i18n/panchang-terms";
 
 const DAY = 86400000;
 const NW = 360 / 27;
-const NAK_HI = ["अश्विनी","भरणी","कृत्तिका","रोहिणी","मृगशिरा","आर्द्रा","पुनर्वसु","पुष्य","आश्लेषा","मघा","पूर्वाफाल्गुनी","उत्तराफाल्गुनी","हस्त","चित्रा","स्वाति","विशाखा","अनुराधा","ज्येष्ठा","मूल","पूर्वाषाढ़ा","उत्तराषाढ़ा","श्रवण","धनिष्ठा","शतभिषा","पूर्वाभाद्रपदा","उत्तराभाद्रपदा","रेवती"];
-const SIGN_EN = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
-const SIGN_HI = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
 
 const karanaName = (halfTithi: number) => {
   const k = ((halfTithi % 60) + 60) % 60;
@@ -178,16 +176,16 @@ const DISHA: Record<number, { en:string; hi:string }> = {
 function chandraBala(currentSign: number, waxing: boolean) {
   const base = new Set([1,3,6,7,10,11]);
   const extra = waxing ? [2,5,9] : [4,8,12];
-  return SIGN_EN.map((en, birthSign) => {
+  return SIGN_EN_WESTERN.map((en, birthSign) => {
     const distance = ((currentSign - birthSign + 12) % 12) + 1;
-    return { birthSign, en, hi:SIGN_HI[birthSign], good:base.has(distance) || extra.includes(distance), distance };
+    return { birthSign, en, hi:panchangTermAt("hi", "sign", birthSign), good:base.has(distance) || extra.includes(distance), distance };
   });
 }
 
 function taraBala(currentNak: number) {
   return NAKSHATRAS.map((en, birthNak) => {
     const tara = ((currentNak - birthNak + 27) % 9) + 1;
-    return { birthNak, en, hi:NAK_HI[birthNak], good:![1,3,5,7].includes(tara), tara };
+    return { birthNak, en, hi:panchangTermAt("hi", "nakshatra", birthNak), good:![1,3,5,7].includes(tara), tara };
   });
 }
 

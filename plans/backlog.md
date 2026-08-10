@@ -1272,6 +1272,34 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
 
 ## E. Repo debt & small follow-ups
 
+- [ ] **#65 — Screen snapshot verification: prove what a reader SEES, not just the
+      maths (2026-08-10).** Ganak has 85 gates that prove calculation and structure and
+      **none** that prove rendered output. Every language defect this month escaped all
+      of them and was caught only by a person looking: the Devanagari leak on the English
+      gochar line; `SecHead` pinned to `lang="hi"` so three headings stayed Hindi in
+      English mode; and four raw `NAKSHATRAS[...]` sites that showed `Shatabhisha` in
+      Hindi — the last of which survived both a 16-table migration *and* its own
+      purpose-built gate, because those sites consulted no table for a table-scanning
+      gate to find. The owner cannot open ~40 screens in two languages after every
+      change, so most screens sit at *"the gates pass and nobody looked"* — the honest
+      current status of Dashakoota and the dosha pages.
+      **Approach (zero new dependencies):** render each screen's text with
+      `react-dom/server` (already a dependency) through `validation/_load-app.cjs`
+      (already the gates' TSX bundler), commit the text as a baseline per screen per
+      language, and fail a gate on any diff. Post-interaction surfaces get a second tier
+      that composes the real engine with the real display helpers at pinned inputs.
+      A frozen clock keeps it deterministic, honouring the standing rule against golden
+      files pinned to the real sky (`validation/prashna-practitioner.cjs`).
+      **Scope boundary, to be stated in the gate's own output:** this proves TEXT, never
+      layout — overflow and contrast at 375px still need a human.
+      **Prior art checked 2026-08-10: none.** `playwright` was only ever an accidental
+      unused package entry (removed 2026-07-28, `9150a58`); the surviving smoke suites
+      cover the API proxy, not the UI.
+      Spec `docs/superpowers/specs/2026-08-10-screen-snapshot-verification-design.md`;
+      plan `docs/superpowers/plans/2026-08-10-screen-snapshot-verification.md`.
+      Does **not** replace `TEST-STD-CALCULATORS` or the two-agent bug bash — it removes
+      their mechanical half so human time goes to judgement. _(VERIFY-SNAPSHOTS)_
+
 - **E-0.6 Chart deep-gloss Hindi translation** — advanced sub-section paragraphs
   (KP, Ashtakavarga, BNN, Bhrigu, Special Lagnas, Dasha levels) still English-only.
   Specialist-Hindi pass. Gates Phase 2's chart reveal.
@@ -1313,6 +1341,41 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
 
 ## Decisions — resolved (owner, 2026-07-18)
 
+- ✅ **URL structure decided (owner, 2026-08-10): real paths per product area, `/hi/` for Hindi.**
+  Settles register rows 64 and 66 together, because they are one decision. Shape:
+  `/prashna`, `/jyotish`, `/hi/prashna`, `/hi/festival/diwali` … — 396 sitemap URLs,
+  reciprocal `hreflang` per pair, old `?screen=` and `?lang=hi` kept working as redirects.
+  **Decided against on evidence, not by default:** subdomain (`hi.ganakapp.com`) splits the
+  authority of a three-week-old domain; keeping query parameters is what Google marks
+  "not recommended" and makes a shared WhatsApp link unreadable as Hindi.
+  **Honest confidence split:** the product-path half is near-certain — AstroSage, Drik
+  Panchang and Prokerala are unanimous on descriptive paths per product area, and Ganak
+  is the outlier with none. The language half is a judgement call — the market is split,
+  and AstroSage ranks #1 for a Hindi Diwali query on a `?language=hi` URL. `/hi/` is
+  chosen because a new domain should follow the recommended shape rather than rely on
+  authority it does not have.
+  **Root-cause correction:** Hindi is not invisible because it is a query parameter — it is
+  invisible because `applyRouteMetadata()` canonicalises to `pathname`, so `?lang=hi`
+  declares itself a duplicate of English. That bug is fixed either way.
+  **Also decided:** Latin slugs, not Devanagari (percent-encoding wrecks shared links); and
+  **no auto-redirect by browser language** — Google advises against it, and it would leave
+  Googlebot, which crawls from the US, never seeing the Hindi pages at all.
+  **Resolved 2026-08-10:** the path is **`/kundli`**, not `/jyotish` — it is the term Indians
+  actually search, and what Prokerala and AstroSage both name the same route. Settled before
+  row 63 submits, which was the whole constraint. The visible nav label stays "Jyotish" under
+  the frozen 2026-08-09 brand decision; URL and label are allowed to differ.
+- ✅ **SEO/share infrastructure ships BEFORE the UI redesign (owner, 2026-08-09).**
+  Resolves `plans/ganak-architecture-audit.md` Decision 2, which had been open since the
+  audit. Order: register row **62** (build-time per-route HTML head — the audit's #1
+  finding, previously only the `INFRA-SPA-PRERENDER` bullet below and absent from the
+  Sheet) → row **26** (sitemap, `robots.txt`, the 10 legacy `301`s, share cards) → row
+  **63** (Search Console, owner-only). Row **64** (Hindi URL structure) must be answered
+  before row 63 submits — changing URLs after submission forces re-indexing.
+  The redesign track is **not cancelled**: Phase 0 touches only build tooling and
+  `public/`, so it cannot collide with screen work and the two can run in parallel.
+  Rationale on the evidence: all ~199 routes currently serve one identical HTML shell
+  declaring `canonical="https://ganakapp.com/"`, so redesigned screens built on the
+  client-only model would need reworking once prerendering lands.
 - ✅ **Launch bar** — baseline now, grow after (see Phase 1 note).
 - ✅ **Investment ceiling** — small budget, ~$10–50/mo. Bites only at Phase 4;
   Phase 1 stays on free tiers. Apple Dev ($99/yr ≈ $8/mo) and a small

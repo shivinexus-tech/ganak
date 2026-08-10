@@ -5,8 +5,9 @@ import { useModalFocus } from "./useModalFocus";
 
 export default function FirstRunComfortOffer({ lang, onParentSetup }: { lang: "hi" | "en"; onParentSetup: () => void }) {
   const { preferences, ready, applyPreset, dismissFirstRun } = useComfort();
-  const dialogRef = useModalFocus(ready && !preferences.firstRunComplete, dismissFirstRun);
-  if (!ready || preferences.firstRunComplete) return null;
+  const dialogRef = useModalFocus(ready && !!preferences.homePlace && !preferences.firstRunComplete, dismissFirstRun);
+  // Place comes first: do not stack two first-run dialogs or let Delhi flash behind them.
+  if (!ready || !preferences.homePlace || preferences.firstRunComplete) return null;
   const hi = lang === "hi";
 
   const choose = (preset: "simple-large" | "balanced") => {
@@ -45,7 +46,7 @@ export default function FirstRunComfortOffer({ lang, onParentSetup }: { lang: "h
           {hi ? "गणक आपको कैसा दिखे?" : "How would you like Ganak to look?"}
         </h2>
         <p style={{ margin: "0.4rem 0 1rem", color: "var(--muted)", fontSize: T.fBody }}>
-          {hi ? "नमूना देखकर चुनें। बाद में “अपना बनाएँ · Personalize” में बदल सकते हैं।" : "Choose by looking at the samples. You can change this later in Personalize."}
+          {hi ? "नमूना देखकर चुनें। बाद में “अपना बनाएँ” में बदल सकते हैं।" : "Choose by looking at the samples. You can change this later in Personalize."}
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "0.75rem" }}>
           {sample("simple-large", true)}

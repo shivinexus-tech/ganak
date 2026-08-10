@@ -1,3 +1,4 @@
+import { SIGN_ORDER, signName } from "../i18n/panchang-terms";
 /* Copy + labels for the birth-chart-personalised Muhurat screen (/muhurat/personal).
    Bilingual (EN/HI). See docs/superpowers/specs/2026-07-25-personal-muhurat-design.md.
 
@@ -146,19 +147,6 @@ export const PM_YOUR_STAR = {
 };
 
 /* Rashi (Moon sign) names, index 0..11 (Aries → Pisces). */
-export const PM_RASHIS = [
-  { en: "Aries", hi: "मेष" }, { en: "Taurus", hi: "वृषभ" }, { en: "Gemini", hi: "मिथुन" },
-  { en: "Cancer", hi: "कर्क" }, { en: "Leo", hi: "सिंह" }, { en: "Virgo", hi: "कन्या" },
-  { en: "Libra", hi: "तुला" }, { en: "Scorpio", hi: "वृश्चिक" }, { en: "Sagittarius", hi: "धनु" },
-  { en: "Capricorn", hi: "मकर" }, { en: "Aquarius", hi: "कुम्भ" }, { en: "Pisces", hi: "मीन" },
-];
+export const PM_RASHIS = SIGN_ORDER.map((_, i) => ({ en: signName("en", i), hi: signName("hi", i) }));
 
 /* Nakshatra Devanagari, keyed by English name (matches the finder's nakName). */
-export const PM_NAK_HI: { [k: string]: string } = {
-  Ashwini: "अश्विनी", Bharani: "भरणी", Krittika: "कृत्तिका", Rohini: "रोहिणी", Mrigashira: "मृगशिरा",
-  Ardra: "आर्द्रा", Punarvasu: "पुनर्वसु", Pushya: "पुष्य", Ashlesha: "आश्लेषा", Magha: "मघा",
-  "Purva Phalguni": "पूर्वाफाल्गुनी", "Uttara Phalguni": "उत्तराफाल्गुनी", Hasta: "हस्त", Chitra: "चित्रा",
-  Swati: "स्वाति", Vishakha: "विशाखा", Anuradha: "अनुराधा", Jyeshtha: "ज्येष्ठा", Mula: "मूल",
-  "Purva Ashadha": "पूर्वाषाढ़ा", "Uttara Ashadha": "उत्तराषाढ़ा", Shravana: "श्रवण", Dhanishta: "धनिष्ठा",
-  Shatabhisha: "शतभिषा", "Purva Bhadrapada": "पूर्वाभाद्रपदा", "Uttara Bhadrapada": "उत्तराभाद्रपदा", Revati: "रेवती",
-};

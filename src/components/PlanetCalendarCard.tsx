@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { T } from "./ui-style-contract";
-import { PLANET_DEVA } from "../engine/panchang";
+import { panchangTerm } from "../i18n/panchang-terms";
 import { retrogradeEvents, combustionEvents, planetStatesAt } from "../engine/planet-calendar";
 
 /* Consolidated 12-month planetary calendar: retrograde/direct stations and
@@ -18,7 +18,7 @@ function PlanetCalendarCard({ tz, placeLabel, lang, C, card }: any) {
     now: planetStatesAt(fromMs),
   } : null), [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const pname = (p: string) => (hi ? PLANET_DEVA[p] || p : p);
+  const pname = (p: string) => panchangTerm(hi ? "hi" : "en", "planet", p);
   const fmtD = (t: number) => new Date(t + tz * 3600000).toLocaleDateString(hi ? "hi-IN" : "en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 
   const nowRetro = data ? data.now.filter((s: any) => s.retro).map((s: any) => pname(s.planet)) : [];

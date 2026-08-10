@@ -43,6 +43,41 @@ project's own rule:
 from inside the astronomy layer. Fixing the two lines cosmetically would leave the
 violation in place; this spec fixes the boundary.
 
+## The user and their journey
+
+**Primary persona: P1 · Panchang householder / diaspora** — opens Ganak in English to
+see what the sky is doing this week. Secondary: **P2 · Astrology enthusiast**, who
+reads this card most often.
+
+The journey, walked against the code as it stands today:
+
+1. Opens `/` in English. **Works today.**
+2. Scrolls past today's tithi to *Upcoming planetary events*. **Works today.**
+3. Reads the next transit line. **BROKEN** — the row reads `शुक्र Venus enters Kanya`.
+   Evidence: `src/engine/panchang.ts:205` concatenates `PLANET_DEVA[p]` into the label
+   unconditionally; `src/screens/DailyScreen.tsx:363` renders `e2.label` verbatim, so
+   the screen cannot correct it.
+4. Switches to Hindi to see whether that reads better. **ALSO BROKEN** — the row becomes
+   `शुक्र Venus प्रवेश कन्या`. Evidence: `src/engine/transit-copy.ts:46` returns early
+   for English and never translates the planet name for Hindi.
+5. Taps a row to expand the gloss. **Works today** — `eventDetail` keys off the label.
+
+Steps 3 and 4 are the whole defect: the reader cannot get one clean language out of
+this card in either mode.
+
+## What already exists (reuse before building)
+
+- **`src/i18n/panchang-terms.ts`** — the shared bilingual lookup, with `sign`,
+  `nakshatra`, `tithi`, `paksha` and `month` tables and a documented rule that the
+  engine speaks one canonical language and localisation happens at the edge. It is
+  missing only a `planet` table.
+- **`src/engine/transit-copy.ts`** — the edge layer already exists and is already
+  wired into DailyScreen. It needs the planet case, not a redesign.
+- **`eventDetail`** already produces the expandable gloss; nothing there changes.
+
+Because both pieces exist, this is a small correction to one function, not new
+infrastructure.
+
 ## Goals
 
 1. Every line of the Upcoming planetary events card renders in exactly one script —
@@ -149,6 +184,14 @@ event names; fold into Spec B's sweep rather than here.
 
 This is a correctness fix on a pre-revenue surface; user telemetry is not the right
 instrument. Verification is mechanical and visual:
+
+**In user steps** — the measure that matters, taken on the journey above:
+
+| Journey step | Today | Target |
+|---|---|---|
+| Steps that render a mixed-script line (EN) | 1 of 5 | **0 of 5** |
+| Steps that render a mixed-script line (HI) | 1 of 5 | **0 of 5** |
+| Taps needed to reach one clean language | impossible — no tap fixes it | **zero typing, zero extra taps** |
 
 **Leading (same day):**
 - `validation/transit-event-language.cjs` red → green.

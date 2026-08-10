@@ -41,5 +41,22 @@ async function searchOnline(q) {
   }));
 }
 
+function nearestCity(lat, lon) {
+  if (!Number.isFinite(lat) || Math.abs(lat) > 90 || !Number.isFinite(lon) || Math.abs(lon) > 180) return null;
+  let best = null, bestDistance = Infinity;
+  for (const [label, cityLat, cityLon, zoneIndex] of CITY_DB) {
+    const dLat = (cityLat - lat) * Math.PI / 180;
+    const dLon = (cityLon - lon) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2
+      + Math.cos(lat * Math.PI / 180) * Math.cos(cityLat * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+    const distance = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = { label, lat, lon, zone: ZONES[zoneIndex] };
+    }
+  }
+  return best;
+}
 
-export { ZONES, CITY_DB, searchOffline, searchOnline };
+
+export { ZONES, CITY_DB, searchOffline, searchOnline, nearestCity };

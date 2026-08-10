@@ -8,8 +8,8 @@ import {
 import { ayyappaMandalaFor } from "./festivals";
 import { lakshmiPujaTimings } from "./lakshmi-puja";
 import { computeLagnaPanchaka } from "./panchaka";
+import { panchangTermAt } from "../i18n/panchang-terms";
 
-const NAK_HI = ['अश्विनी','भरणी','कृत्तिका','रोहिणी','मृगशिरा','आर्द्रा','पुनर्वसु','पुष्य','आश्लेषा','मघा','पूर्वाफाल्गुनी','उत्तराफाल्गुनी','हस्त','चित्रा','स्वाति','विशाखा','अनुराधा','ज्येष्ठा','मूल','पूर्वाषाढ़ा','उत्तराषाढ़ा','श्रवण','धनिष्ठा','शतभिषा','पूर्वाभाद्रपदा','उत्तराभाद्रपदा','रेवती'];
 
 /* ---------------- muhurat search over a date range (deterministic) ----------------
    Coarse pass scores every day by tithi + nakshatra (cheap, longitude only); the top
@@ -149,7 +149,7 @@ function muhuratForDate(place, ayanamsa, y, m, day) {
 }
 function dayScore(info, category) {
   const f = []; let s = 0;
-  const nakHi = NAK_HI[info.nak] || info.nakName;
+  const nakHi = panchangTermAt("hi", "nakshatra", info.nak) || info.nakName;
   const rule = MUHURTA_RULES[category] || null;
   const categoryAuspNak = rule?.auspNak || AUSP_NAK;
   // tithi
@@ -346,7 +346,7 @@ function muhuratShuddhi(info, category) {
   const nakOK = (s) => !rule.auspNak || rule.auspNak.has(s.nak);
   const tithiOK = (s) => (!rule.goodTithi || rule.goodTithi.has(s.tithiNum)) && !(rule.noAmavasya && s.tn === 29);
   if (!smp.some((s) => nakOK(s) && tithiOK(s))) {
-    if (!smp.some(nakOK)) b.push({ en: info.nakName + " nakshatra (not used)", hi: (NAK_HI[info.nak] || info.nakName) + " नक्षत्र (अनुपयुक्त)" });
+    if (!smp.some(nakOK)) b.push({ en: info.nakName + " nakshatra (not used)", hi: (panchangTermAt("hi", "nakshatra", info.nak) || info.nakName) + " नक्षत्र (अनुपयुक्त)" });
     else if (!smp.some(tithiOK)) b.push({ en: "unsuitable tithi", hi: "अनुपयुक्त तिथि" });
     else b.push({ en: "no clean nakshatra-tithi window", hi: "नक्षत्र-तिथि का शुद्ध योग नहीं" });
   }
@@ -448,7 +448,7 @@ function muhuratScanRange(place, ayanamsa, fromYmd, toYmd, category) {
 }
 
 export {
-  NAK_HI, NAK_GOOD, tithiScore, dayMuhurat, findMuhurat,
+  NAK_GOOD, tithiScore, dayMuhurat, findMuhurat,
   muhuratForDate, dayScore, vaishnavaEkadashi, vratDetail,
   vaishnavaEkadashiDay, MUHURTA_RULES, muhuratShuddhi, samskaraWindows, activityWindows, muhuratScanRange,
 };

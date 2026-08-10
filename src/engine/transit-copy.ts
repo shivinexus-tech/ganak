@@ -1,4 +1,4 @@
-import { panchangTerm } from "../i18n/panchang-terms";
+import { panchangTerm, SIGN_ORDER, SIGN_EN_WESTERN } from "../i18n/panchang-terms";
 /* Transit duration + event gloss helpers (SPLIT-UI-CHART-05). Wire deferred. */
 
 function fmtDur(ms) {
@@ -42,12 +42,25 @@ function eventDetail(ev, now) {
    Hindi readers still need Devanagari, so the transliteration happens here, in the
    interpretation layer, and never inside the astronomy. Unrecognised labels pass through
    unchanged rather than disappearing. */
+/* The lunation gloss is presentation, so the engine emits only the event name
+   ("Purnima") and BOTH languages are dressed here (E-1.0 B7). */
+const LUNATION_GLOSS = {
+  Purnima: { en: "Purnima — full moon", hi: "पूर्णिमा — पूर्ण चन्द्र" },
+  Amavasya: { en: "Amavasya — new moon", hi: "अमावस्या — नव चन्द्र" },
+};
+
 function transitLabel(lang, label) {
   const text = String(label || "");
-  if (lang !== "hi") return text;
+  const lunation = LUNATION_GLOSS[text];
+  if (lunation) return lang === "hi" ? lunation.hi : lunation.en;
+  // English mode names the rashi in English (E-1.0 B4). The engine emits the Sanskrit
+  // name, so swap it here — a label change only; the sign is the same sidereal sign.
+  // "Sankranti" is an event name and stays Sanskrit in both languages.
+  if (lang !== "hi") {
+    return SIGN_ORDER.reduce((out, sanskrit, i) =>
+      out.replace(new RegExp(`\\b${sanskrit}\\b`), SIGN_EN_WESTERN[i]), text);
+  }
   let out = text
-    .replace(/Purnima — full moon/, "पूर्णिमा — पूर्ण चन्द्र")
-    .replace(/Amavasya — new moon/, "अमावस्या — नव चन्द्र")
     .replace(/ turns retrograde ℞/, " वक्री ℞")
     .replace(/ turns direct/, " मार्गी")
     .replace(/ · Sankranti$/, " · संक्रांति")

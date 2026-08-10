@@ -7,6 +7,7 @@ import { tr, trN, obsLabel } from "../i18n";
 import { FEST_NAME } from "../data/festival-meta";
 import { festivalPathForKey } from "../data/festival-pages";
 import { zoneOffset } from "../engine/panchang";
+import { weekdayName, WEEKDAY_SHORT_EN } from "../i18n/panchang-terms";
 import { scanPanchangCalendar } from "../engine/festivals";
 import { searchUpcoming } from "../engine/search-upcoming";
 
@@ -16,7 +17,7 @@ function CalendarPage({ view, place, lang, onBack, C, card }) {
   const [q, setQ] = useState(view.type === "search" ? (view.q || "") : "");
   const MO = lang === "hi" ? ["जनवरी", "फ़रवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्तूबर", "नवंबर", "दिसंबर"] : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const MOs = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const WD = lang === "hi" ? ["रवि", "सोम", "मंगल", "बुध", "गुरु", "शुक्र", "शनि"] : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const WD = WEEKDAY_SHORT_EN.map((_, i) => weekdayName(lang, i, true));
   const fmtFull = (ms) => { const d = new Date(ms + tz * 3600000); return `${WD[d.getUTCDay()]}, ${d.getUTCDate()} ${MOs[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
 
   const yearData = useMemo(() => {

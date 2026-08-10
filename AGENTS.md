@@ -64,10 +64,23 @@ node validation/navadurga-pages.cjs                  # 18 day-pages, owned artwo
 node validation/sankranti-punya.cjs                  # Drik ingress + local Punya/Maha Punya windows
 node validation/panchaka-windows.cjs                 # no sub-minute/same-minute display windows or gaps
 node validation/hindi-devotional-language.cjs        # no vulgar/disrespectful Hindi in user-facing copy
+node validation/language-leak-scan.cjs                # ONE source of truth for rashi/nakshatra/graha names
+node validation/screen-snapshots.cjs                 # rendered TEXT of every screen, both languages (see caveat below)
 node validation/hindi-worship-glossary.cjs         # canonical संकल्प/पारण/नैवेद्य terms + UI labels
 node validation/devotional-voice-english.cjs     # no essay/therapy English in worship guides
 node validation/festival-deeplinks.cjs               # permanent festival routes + existing card default
 node validation/festival-page-coverage.cjs            # every in-scope openable label has a valid page
+```
+
+**`screen-snapshots.cjs` proves rendered TEXT, not layout.** A green run means no
+screen's copy or language changed unexpectedly. It does **not** mean anyone looked:
+overflow, contrast and touch targets at 375px still need a human or a browser pass.
+An intentional copy change is *expected* to fail it — re-baseline with
+`node validation/snapshot-generate.cjs --write` and commit the diff, which is the
+review artifact. It does not replace `TEST-STD-CALCULATORS` or the two-agent bug
+bash; it removes their mechanical half so human time goes to judgement.
+
+```text
 node validation/major-festival-pages.cjs              # reviewed major festivals stay substantive and bilingual
 node validation/durga-puja-pages.cjs                  # six Bengal Durga Puja pages stay substantive and bilingual
 node validation/vedic-season-clock.cjs                # Ritu boundaries, ghati rollover and equinox/solstice anchors

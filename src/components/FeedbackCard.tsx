@@ -22,7 +22,11 @@ export default function FeedbackCard({ lang, C, card, label, prompt, defaultOpen
     if (text.length < 5) return say("err", lang === "hi" ? "कृपया थोड़ा और लिखें।" : "Please add a little more detail.");
     if (!ENDPOINT) return say("err", lang === "hi" ? "प्रतिक्रिया सेवा अभी जुड़ी नहीं है।" : "The feedback service is not connected yet.");
     try {
-      const res = await fetch(ENDPOINT, { method: "POST", credentials: "omit", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "general", suggestion: text.slice(0, 2000), route: location.pathname, hp }) });
+      // `lang` is part of the endpoint's approved schema (functions/api/feedback.ts) but was
+      // never sent, so every stored review looked language-less. On a bilingual app that
+      // matters: a practitioner's correction reads very differently depending on whether
+      // they were looking at the Hindi or the English screen. Still no PII, no birth data.
+      const res = await fetch(ENDPOINT, { method: "POST", credentials: "omit", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "general", suggestion: text.slice(0, 2000), route: location.pathname, lang, hp }) });
       if (!res.ok) throw new Error("feedback failed");
       setMessage("");
       say("ok", lang === "hi" ? "धन्यवाद! आपकी प्रतिक्रिया भेज दी गई है।" : "Thank you! Your feedback has been sent.");
