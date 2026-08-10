@@ -3,7 +3,7 @@
 const { loadApp } = require('./_load-app.cjs');
 const { subtractWindows, adjudicate, dominantChoghadiya, nextCleanWindow } = loadApp('src/engine/hora-verdict.ts');
 const { computeTodayPanchang } = loadApp('src/engine/today-panchang.ts');
-const { dayHoras, horaWindowsForPlanet, nightHoras, HORA_ORDER, DAY_LORD, horaResultText } = loadApp('src/engine/hora.ts');
+const { dayHoras, horaWindowsForPlanet, nightHoras, HORA_ORDER, DAY_LORD, horaResultText, analyzeHora } = loadApp('src/engine/hora.ts');
 const { trikonaLords, personalHoraWindows } = loadApp('src/engine/personal-hora.ts');
 let failures = 0;
 const fail = (m) => { failures++; console.error('FAIL ' + m); };
@@ -404,6 +404,28 @@ if (horaPersonalAusp(8).join() !== trikonaLords(8).join()) fail('horaPersonalAus
     fail('horaResultText avoid-intent Hindi with 2+ planets should contain plural form "इन्हीं होरों से बचें", got: ' + resultMulti.text.hi);
   if (resultMulti.text.hi.includes('इसी होरा से बचें'))
     fail('horaResultText avoid-intent Hindi with 2+ planets should NOT contain singular form "इसी होरा से बचें", got: ' + resultMulti.text.hi);
+}
+
+// Task 8 (hora-usefulness): analyzeHora's "answer" result used to carry a
+// withTiming flag that gated whether MuhuratHub.tsx rendered the hora window
+// list with verdicts — set only when the question contained a timing word
+// ("today", "now", ...). That made the verdict feature invisible on the most
+// common path: four of the app's five hora example chips ("Best hora for
+// business", "Hora for travel", "Buying gold", "Marriage hora") contain no
+// timing word, so clicking them showed a bare planet name with no times.
+// MuhuratHub.tsx now always renders the window list for status==="answer"
+// (still gated on intent !== "avoid", which is handled separately), so
+// withTiming has no remaining reader anywhere in src/ or validation/ (grepped
+// before removal). Its computation was deleted from analyzeHora rather than
+// left dead. Pin its absence here so a future edit that re-adds it (and
+// re-couples the UI to it) is a deliberate, reviewed choice, not an accident.
+{
+  const timed = analyzeHora('hora for travel today');
+  const untimed = analyzeHora('hora for travel');
+  if (!timed || timed.status !== 'answer') fail('analyzeHora("hora for travel today") should still resolve to an answer');
+  if (!untimed || untimed.status !== 'answer') fail('analyzeHora("hora for travel") should still resolve to an answer');
+  if ('withTiming' in timed) fail('analyzeHora answer result should no longer carry withTiming (timed query) — removed as part of Task 8, see comment above');
+  if ('withTiming' in untimed) fail('analyzeHora answer result should no longer carry withTiming (untimed query) — removed as part of Task 8, see comment above');
 }
 
 if (failures) { console.error(`hora-adjudication: ${failures} failure(s)`); process.exit(1); }

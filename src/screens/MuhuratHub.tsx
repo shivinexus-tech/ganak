@@ -1247,7 +1247,7 @@ return (
                   ))}
                 </div>
               )}
-              {horaResult.withTiming && horaResult.intent !== "avoid" && todayP.rise != null && todayP.set != null && (() => {
+              {horaResult.status === "answer" && horaResult.intent !== "avoid" && todayP.rise != null && todayP.set != null && (() => {
                 const tp = hr.planets[0];
                 const wins = horaWindowsForPlanet(tp, todayP.dow, todayP.rise, todayP.set, nextRise);
                 if (!wins.length) return null;

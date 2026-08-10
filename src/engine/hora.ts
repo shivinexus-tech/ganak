@@ -172,8 +172,7 @@ export const analyzeHora = (question) => {
   const matches = HORA_ACTIVITY_MAP.filter((e) => e.kw.some((k) => horaHasTerm(q, k)));
   if (matches.length) {
     const planets = [...new Set(matches.flatMap((m) => m.planets))];
-    const withTiming = /\b(today|now|tonight|time|when|currently)\b/.test(q) || q.includes("आज") || q.includes("कब") || q.includes("समय") || q.includes("बजे");
-    return { status: "answer", intent, planets, act: matches[0].act, conf: matches.length === 1 ? "high" : "medium", withTiming };
+    return { status: "answer", intent, planets, act: matches[0].act, conf: matches.length === 1 ? "high" : "medium" };
   }
   // a planet is named -> default to TIMING (when is it today); explain only if explicitly asked
   const p = horaDetectPlanet(q);
