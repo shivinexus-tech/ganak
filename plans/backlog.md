@@ -1254,6 +1254,34 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
 
 ## E. Repo debt & small follow-ups
 
+- [ ] **#65 — Screen snapshot verification: prove what a reader SEES, not just the
+      maths (2026-08-10).** Ganak has 85 gates that prove calculation and structure and
+      **none** that prove rendered output. Every language defect this month escaped all
+      of them and was caught only by a person looking: the Devanagari leak on the English
+      gochar line; `SecHead` pinned to `lang="hi"` so three headings stayed Hindi in
+      English mode; and four raw `NAKSHATRAS[...]` sites that showed `Shatabhisha` in
+      Hindi — the last of which survived both a 16-table migration *and* its own
+      purpose-built gate, because those sites consulted no table for a table-scanning
+      gate to find. The owner cannot open ~40 screens in two languages after every
+      change, so most screens sit at *"the gates pass and nobody looked"* — the honest
+      current status of Dashakoota and the dosha pages.
+      **Approach (zero new dependencies):** render each screen's text with
+      `react-dom/server` (already a dependency) through `validation/_load-app.cjs`
+      (already the gates' TSX bundler), commit the text as a baseline per screen per
+      language, and fail a gate on any diff. Post-interaction surfaces get a second tier
+      that composes the real engine with the real display helpers at pinned inputs.
+      A frozen clock keeps it deterministic, honouring the standing rule against golden
+      files pinned to the real sky (`validation/prashna-practitioner.cjs`).
+      **Scope boundary, to be stated in the gate's own output:** this proves TEXT, never
+      layout — overflow and contrast at 375px still need a human.
+      **Prior art checked 2026-08-10: none.** `playwright` was only ever an accidental
+      unused package entry (removed 2026-07-28, `9150a58`); the surviving smoke suites
+      cover the API proxy, not the UI.
+      Spec `docs/superpowers/specs/2026-08-10-screen-snapshot-verification-design.md`;
+      plan `docs/superpowers/plans/2026-08-10-screen-snapshot-verification.md`.
+      Does **not** replace `TEST-STD-CALCULATORS` or the two-agent bug bash — it removes
+      their mechanical half so human time goes to judgement. _(VERIFY-SNAPSHOTS)_
+
 - **E-0.6 Chart deep-gloss Hindi translation** — advanced sub-section paragraphs
   (KP, Ashtakavarga, BNN, Bhrigu, Special Lagnas, Dasha levels) still English-only.
   Specialist-Hindi pass. Gates Phase 2's chart reveal.

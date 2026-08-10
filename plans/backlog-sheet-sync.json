@@ -112,7 +112,8 @@
     56,
     57,
     58,
-    59
+    59,
+    65
   ],
   "sourceConfidenceByItem": {
     "1": "Drik Panchang's parallel English/Hindi 108-pada tables; all positional pairs regression-tested",
@@ -133,6 +134,17 @@
     "47": "Mixed textual, institutional and regional sources across the launch corpus; future batches require their own classification"
   },
   "qualityOverrides": {
+    "65": {
+      "deliveryState": "Specified, not started",
+      "limitations": "Proves rendered TEXT only. renderToStaticMarkup produces no layout box, so overflow, contrast and touch targets at 375px still need a human or browser pass. Post-interaction surfaces (cast chart, calculator results) are covered by a separate result-snapshot tier rather than by rendering the screen.",
+      "shortTermImpact": "A shared change becomes reviewable as a text diff instead of by opening screens by hand. The three language defects that reached main in August 2026 - the Devanagari gochar leak, SecHead pinned to Hindi, and four raw NAKSHATRAS sites - would each have surfaced in the diff before merge.",
+      "longTermImpact": "Removes the mechanical half of verification permanently, so human bug-bash rounds and TEST-STD-CALCULATORS spend their time on judgement and interaction. Makes 'the gates pass and nobody looked' a visible state rather than the silent default.",
+      "bugBashStatus": "Not started. The plan requires the gate be proven red by reintroducing the real 2026-08-09 NAKSHATRAS regression before it is trusted.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-08-10 - Spec and plan written and committed; no implementation yet",
+      "sourceConfidence": "Not applicable \u2014 technical, operational or platform work",
+      "recommendedAction": "Implement Tasks 1-4 first (harness, render, baselines, gate proven red). That subset is independently useful; Tasks 5-7 extend it without rework."
+    },
     "46": {
       "deliveryState": "Comfort/accessibility and universal-primitives system deployed and production-verified across all six launch screens",
       "limitations": "Closure still needs owner live-URL sign-off, a human real-device screen-reader/audio/touch pass, and an owner decision on the Cloudflare Web Analytics beacon. Native dropdown option scaling remains browser-controlled.",
@@ -435,7 +447,8 @@
         46,
         47,
         48,
-        49
+        49,
+        65
       ]
     },
     {
@@ -837,6 +850,11 @@
     "64": {
       "section": "P0",
       "title": "Decide the Hindi URL structure (`/hi/...` vs `?lang=hi`)",
+      "technicalComplexity": "Medium"
+    },
+    "65": {
+      "section": "P1",
+      "title": "Screen snapshot verification (rendered text, both languages)",
       "technicalComplexity": "Medium"
     }
   }
