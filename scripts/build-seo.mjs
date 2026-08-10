@@ -114,4 +114,9 @@ function main() {
   console.log(`build-seo: ${htmlCount} route HTML files written.`);
 }
 
-main();
+export function emitAll() {
+  main();
+}
+
+/* Still runnable standalone: `node scripts/build-seo.mjs` */
+if (process.argv[1] && process.argv[1].endsWith("build-seo.mjs")) main();
