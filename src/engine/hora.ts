@@ -13,13 +13,23 @@ export function dayHoras(weekday, rise, set) {
   for (let i = 0; i < 12; i++) out.push({ ruler: HORA_ORDER[(startIdx + i) % 7], start: rise + i * dur, end: rise + (i + 1) * dur });
   return out;
 }
-/* all hora windows (day + night) ruled by a given planet today */
-export function horaWindowsForPlanet(planet, weekday, rise, set) {
+/* all hora windows (day + night) ruled by a given planet today.
+   nextRise is the FOLLOWING day's sunrise, from computeTodayPanchang. It is
+   defaulted so existing callers keep working, but the default is the very drift
+   this fix removes — pass the real value. */
+export function horaWindowsForPlanet(planet, weekday, rise, set, nextRise = rise + 86400000) {
   const startIdx = HORA_ORDER.indexOf(DAY_LORD[weekday % 7]);
-  const dayDur = (set - rise) / 12, nextRise = rise + 86400000, nightDur = (nextRise - set) / 12, out = [];
+  const dayDur = (set - rise) / 12, nightDur = (nextRise - set) / 12, out = [];
   for (let i = 0; i < 12; i++) if (HORA_ORDER[(startIdx + i) % 7] === planet) out.push({ start: rise + i * dayDur, end: rise + (i + 1) * dayDur, period: "day" });
   for (let i = 0; i < 12; i++) if (HORA_ORDER[(startIdx + 12 + i) % 7] === planet) out.push({ start: set + i * nightDur, end: set + (i + 1) * nightDur, period: "night" });
   out.sort((a, b) => a.start - b.start);
+  return out;
+}
+/* the twelve night horas, sunset -> next sunrise, in order */
+export function nightHoras(weekday, set, nextRise = set + 86400000) {
+  const startIdx = HORA_ORDER.indexOf(DAY_LORD[weekday % 7]);
+  const dur = (nextRise - set) / 12, out = [];
+  for (let i = 0; i < 12; i++) out.push({ ruler: HORA_ORDER[(startIdx + 12 + i) % 7], start: set + i * dur, end: set + (i + 1) * dur });
   return out;
 }
 export const HORA_GLYPH = { Sun: "\u2609", Moon: "\u263D", Mars: "\u2642", Mercury: "\u263F", Jupiter: "\u2643", Venus: "\u2640", Saturn: "\u2644" };

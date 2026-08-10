@@ -3,6 +3,7 @@
 const { loadApp } = require('./_load-app.cjs');
 const { subtractWindows, adjudicate, dominantChoghadiya, nextCleanWindow } = loadApp('src/engine/hora-verdict.ts');
 const { computeTodayPanchang } = loadApp('src/engine/today-panchang.ts');
+const { dayHoras, horaWindowsForPlanet, nightHoras } = loadApp('src/engine/hora.ts');
 let failures = 0;
 const fail = (m) => { failures++; console.error('FAIL ' + m); };
 const W = (s, e) => ({ start: s, end: e });
@@ -219,6 +220,48 @@ if (!(tp.nextRise > tp.set)) fail('nextRise must fall after sunset');
 // night choghadiya must end at the real sunrise, not the approximation
 const lastNight = tp.choghaNight[tp.choghaNight.length - 1];
 if (Math.abs(lastNight.end - tp.nextRise) > 1) fail('night choghadiya must end at the real next sunrise');
+
+// horaWindowsForPlanet: day + night horas must tile sunrise -> next sunrise
+// with no gap and no overlap, when the real nextRise is supplied.
+const RISE = Date.UTC(2026, 7, 9, 0, 30), SET = RISE + 13 * 3600000, NEXT = RISE + 24.4 * 3600000;
+const all = [];
+for (const p of ['Sun', 'Venus', 'Mercury', 'Moon', 'Saturn', 'Jupiter', 'Mars'])
+  all.push(...horaWindowsForPlanet(p, 0, RISE, SET, NEXT));
+all.sort((a, b) => a.start - b.start);
+if (all.length !== 24) fail('a full day should produce exactly 24 horas, got ' + all.length);
+if (Math.abs(all[0].start - RISE) > 1) fail('the first hora should start at sunrise');
+if (Math.abs(all[all.length - 1].end - NEXT) > 1) fail('the last hora should end at the NEXT sunrise, not rise+24h');
+for (let i = 1; i < all.length; i++)
+  if (Math.abs(all[i].start - all[i - 1].end) > 1) fail('hora ' + i + ' does not abut its predecessor');
+
+// horaWindowsForPlanet: the fifth (nextRise) parameter must be optional —
+// callers that omit it keep the old rise+24h approximation, not NaN/crash.
+// (Checked across all seven planets, combined: a single planet's own last
+// window need not land on the 12th night hora, since 12 nights / 7 planets
+// wraps unevenly — only the union of all planets' windows always reaches it.)
+const allDefaulted = [];
+for (const p of ['Sun', 'Venus', 'Mercury', 'Moon', 'Saturn', 'Jupiter', 'Mars'])
+  allDefaulted.push(...horaWindowsForPlanet(p, 0, RISE, SET));
+allDefaulted.sort((a, b) => a.start - b.start);
+if (allDefaulted.length !== 24) fail('horaWindowsForPlanet without nextRise should still return 24 windows total, got ' + allDefaulted.length);
+if (Math.abs(allDefaulted[allDefaulted.length - 1].end - (RISE + 86400000)) > 1)
+  fail('horaWindowsForPlanet without nextRise should fall back to rise+86400000');
+
+// nightHoras: twelve windows, sunset -> next sunrise, in Chaldean order, abutting.
+const nh = nightHoras(0, SET, NEXT);
+if (nh.length !== 12) fail('nightHoras should return exactly 12 windows, got ' + nh.length);
+if (Math.abs(nh[0].start - SET) > 1) fail('nightHoras: first window should start at sunset');
+if (Math.abs(nh[nh.length - 1].end - NEXT) > 1) fail('nightHoras: last window should end at the real next sunrise');
+for (let i = 1; i < nh.length; i++)
+  if (Math.abs(nh[i].start - nh[i - 1].end) > 1) fail('nightHoras: window ' + i + ' does not abut its predecessor');
+// sunday (weekday 0): day lord Sun -> hora order index 0, so night starts at
+// HORA_ORDER[0+12] = HORA_ORDER[5] = Jupiter (Chaldean order wraps every 7).
+if (nh[0].ruler !== 'Jupiter') fail('nightHoras: first night ruler for Sunday should be Jupiter, got ' + nh[0].ruler);
+
+// nightHoras: nextRise defaults to set + 86400000 when omitted.
+const nhDefault = nightHoras(0, SET);
+if (Math.abs(nhDefault[nhDefault.length - 1].end - (SET + 86400000)) > 1)
+  fail('nightHoras without nextRise should fall back to set+86400000');
 
 if (failures) { console.error(`hora-adjudication: ${failures} failure(s)`); process.exit(1); }
 console.log('hora-adjudication: PASS');
