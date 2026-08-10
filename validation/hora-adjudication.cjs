@@ -6,6 +6,7 @@ const { loadApp, ROOT } = require('./_load-app.cjs');
 const { subtractWindows, adjudicate, dominantChoghadiya, nextCleanWindow } = loadApp('src/engine/hora-verdict.ts');
 const { computeTodayPanchang } = loadApp('src/engine/today-panchang.ts');
 const { dayHoras, horaWindowsForPlanet, nightHoras, HORA_ORDER, DAY_LORD, horaResultText, analyzeHora } = loadApp('src/engine/hora.ts');
+const { muhuratForDate } = loadApp('src/engine/muhurat.ts');
 const { trikonaLords, personalHoraWindows } = loadApp('src/engine/personal-hora.ts');
 const { windowOverlapsDomain } = loadApp('src/components/TimingLanes.tsx');
 let failures = 0;
@@ -230,6 +231,26 @@ if (!(tp.nextRise > tp.set)) fail('nextRise must fall after sunset');
 // night choghadiya must end at the real sunrise, not the approximation
 const lastNight = tp.choghaNight[tp.choghaNight.length - 1];
 if (Math.abs(lastNight.end - tp.nextRise) > 1) fail('night choghadiya must end at the real next sunrise');
+
+// muhuratForDate had the identical rise+24h defect for its own choghaNight
+// (src/engine/muhurat.ts, fixed alongside today-panchang.ts's — same pattern:
+// sunEvents for day+1, fall back to rise+86400000 only on polar-night null).
+// This is currently dead in the running app (nothing reads muhuratForDate's
+// nextRise/choghaNight — MuhuratHub.tsx's todayP comes from
+// computeTodayPanchang, already covered above), but pin it anyway so a future
+// consumer inherits the correct value, not a silent revert to the old drift.
+{
+  const mfd = muhuratForDate(DELHI, 'lahiri', 2026, 12, 21); // arbitrary date, not chosen for max drift
+  if (!mfd) fail('muhuratForDate should resolve for Delhi on an arbitrary date');
+  else {
+    if (mfd.nextRise == null) fail('muhuratForDate should expose nextRise');
+    if (Math.abs(mfd.nextRise - (mfd.rise + 86400000)) < 1000)
+      fail('muhuratForDate nextRise looks like rise+24h — it must be the real following sunrise');
+    if (!(mfd.nextRise > mfd.set)) fail('muhuratForDate nextRise must fall after sunset');
+    const lastNightMfd = mfd.choghaNight[mfd.choghaNight.length - 1];
+    if (Math.abs(lastNightMfd.end - mfd.nextRise) > 1) fail('muhuratForDate night choghadiya must end at the real next sunrise');
+  }
+}
 
 // horaWindowsForPlanet: day + night horas must tile sunrise -> next sunrise
 // with no gap and no overlap, when the real nextRise is supplied.

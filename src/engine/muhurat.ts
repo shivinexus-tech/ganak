@@ -107,6 +107,11 @@ function muhuratForDate(place, ayanamsa, y, m, day) {
   const tz = zoneOffset(place.zone, y, m, day) ?? 5.5;
   const ev = sunEvents(y, m, day, tz, place.lat, place.lon);
   if (ev.rise === null || ev.set === null) return null;
+  /* The FOLLOWING day's sunrise, for anything spanning the night (night
+     choghadiya). rise+24h drifts by minutes and is worst near the solstices —
+     see today-panchang.ts, where this same defect was fixed first. */
+  const evNext = sunEvents(y, m, day + 1, tz, place.lat, place.lon);
+  const nextRise = evNext.rise !== null ? evNext.rise : ev.rise + 86400000;
   const dow = new Date(ev.rise + tz * 3600000).getUTCDay();
   const sun = sunSidMs(ev.rise), moon = moonSidMs(ev.rise), elong = rev(moon - sun);
   const tn = Math.floor(elong / 12), nak = Math.floor(moon / _NAKW), kn = Math.floor(elong / 6);
@@ -130,14 +135,14 @@ function muhuratForDate(place, ayanamsa, y, m, day) {
   }
   return {
     samples,
-    y, m, day, tz, rise: ev.rise, set: ev.set, dow,
+    y, m, day, tz, rise: ev.rise, set: ev.set, nextRise, dow,
     tn, tithiNum: tithiNum0, krishna: krishna0, nak, nakName: NAKSHATRAS[nak], karana: karanaAt(kn),
     lmonth: lm, lmonthName: lmi.amanta, adhik: lmi.adhik,
     sunSign, devshayana, venusAsta, guruAsta,
     pitruPaksha: pitruPakshaDay(ev.rise, ev.set),
     ayyappaMandala: ayyappaMandalaFor(ev.rise, tz),
     choghaDay: choghaSlots(dow, ev.rise, ev.set, true),
-    choghaNight: choghaSlots(dow, ev.set, ev.rise + 86400000, false),
+    choghaNight: choghaSlots(dow, ev.set, nextRise, false),
     abhijit: dow === 3 ? null : { start: ev.transit - dayLen / 30, end: ev.transit + dayLen / 30 },
     rahu: eighth(RAHU_SEGMENT[dow]), gulika: eighth(GULIKA_SEGMENT[dow]), yama: eighth(YAMA_SEGMENT[dow]),
   };
