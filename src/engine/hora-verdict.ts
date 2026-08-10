@@ -67,6 +67,23 @@ export function dominantChoghadiya(win: Window, ctx: TimingContext): { key: stri
   return best ? { key: best.key, nat: best.nat } : null;
 }
 
+/* R4/R6, summed across multiple spans: the choghadiya segment covering the
+   greatest combined share of `spans` (the usable remainders), not of any
+   single window. A segment touching two separate remainders accumulates both.
+   Ties resolve to the earlier segment (same strict-`>` rule as
+   dominantChoghadiya, applied to array order). Does not replace
+   dominantChoghadiya's single-Window signature — that function is unchanged
+   and still used directly by the gate and by the empty-usable fallback. */
+function dominantChoghadiyaOverSpans(spans: Window[], ctx: TimingContext): { key: string; nat: "good" | "neutral" | "bad" } | null {
+  let best: ChoghaSeg | null = null, bestOv = 0;
+  for (const seg of (ctx.chogha || [])) {
+    let ov = 0;
+    for (const span of spans) ov += overlapMs(span, seg);
+    if (ov > bestOv) { best = seg; bestOv = ov; }
+  }
+  return best ? { key: best.key, nat: best.nat } : null;
+}
+
 /* R1–R6. See docs/superpowers/specs/2026-08-09-hora-usefulness-design.md §4.2. */
 export function adjudicate(win: Window, ctx: TimingContext): Verdict {
   const blockedBy: BlockerKey[] = [];
@@ -98,7 +115,17 @@ export function adjudicate(win: Window, ctx: TimingContext): Verdict {
     status = "clean";
   }
 
-  const dom = dominantChoghadiya(win, ctx);
+  /* R4 (corrected): grade what the user can actually act in. When usable is
+     non-empty, sum overlap across the usable spans rather than grading the
+     raw window — otherwise a belt that carves a hole out of the window's
+     middle can leave the dominant segment sitting entirely inside the
+     blocked hole, describing time the user cannot use. When usable is empty
+     (fully blocked), fall back to grading the whole window: a blocked window
+     should still report what its quality would have been, and there is no
+     usable time left to measure against. */
+  const dom = usable.length > 0
+    ? dominantChoghadiyaOverSpans(usable, ctx)
+    : dominantChoghadiya(win, ctx);
   return {
     status,
     usable,

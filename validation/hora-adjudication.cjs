@@ -94,6 +94,32 @@ if (v.abhijitBoost !== true) fail('abhijit overlap should still set the boost fl
 const tie = dominantChoghadiya(W(25, 75), CTX());
 if (!tie || tie.key !== 'amrit') fail('an exact overlap tie should resolve to the earlier segment');
 
+// R4 (corrected): grade must come from the usable spans, not the whole window.
+// A belt cuts a hole in the middle of the window; the Choghadiya segment that
+// covers the greatest share of the WHOLE window ('shubh', the middle span) lies
+// entirely inside that blocked hole. Grading by usable spans instead: 'rog1'
+// covers all of the first remainder (0-300000, overlap 300000) and 'rog2' covers
+// all of the second (700000-1000000, overlap 300000) — a tie, which R6 resolves
+// to the earlier segment in chogha array order, i.e. 'rog1'.
+const HOLE_CTX = {
+  rahu: W(300000, 700000), gulika: null, yama: null, abhijit: null,
+  chogha: [
+    { key: 'rog1', nat: 'bad', start: 0, end: 300000 },
+    { key: 'shubh', nat: 'good', start: 300000, end: 700000 },
+    { key: 'rog2', nat: 'bad', start: 700000, end: 1000000 },
+  ],
+};
+v = adjudicate(W(0, 1000000), HOLE_CTX);
+if (v.usable.length !== 2 || v.usable[0].end !== 300000 || v.usable[1].start !== 700000) fail('the belt should leave two usable remainders around the blocked hole');
+if (v.grade !== 'bad') fail('grade must come from the usable spans, not the dominant segment of the whole window (expected bad, got ' + v.grade + ')');
+if (v.gradeKey !== 'rog1') fail('gradeKey must be the segment winning summed overlap across usable spans, tie resolved to the earlier one (expected rog1, got ' + v.gradeKey + ')');
+
+// R4 fallback: a fully blocked window (usable empty) still reports a grade,
+// computed over the whole window since there is no usable time to measure against.
+v = adjudicate(W(10, 20), CTX({ rahu: W(0, 100) }));
+if (v.usable.length !== 0) fail('sanity: this window should be fully blocked for the fallback check');
+if (v.grade !== 'good' || v.gradeKey !== 'amrit') fail('a fully blocked window should still grade over the whole window (expected good/amrit, got ' + v.grade + '/' + v.gradeKey + ')');
+
 // Use realistic window sizes (each 300s = 300000ms >> MIN_USABLE_MS = 180000ms)
 const WINS = [W(0, 300000), W(300000, 600000), W(600000, 900000)];
 
