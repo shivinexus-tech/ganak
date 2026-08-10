@@ -64,9 +64,32 @@ const LATIN_TERMS = [
   ...Object.keys(terms.SIGN_HI), ...Object.keys(terms.NAKSHATRA_HI), ...Object.keys(terms.PLANET_HI),
 ].filter((t) => !['Sun', 'Moon'].includes(t)); // also plain English words; covered by the sign/nakshatra checks
 
+/* E-1.0 (owner, 2026-07-28; "plain Virgo" confirmed 2026-08-05): English mode names the
+   12 rashi in English. The Devanagari check above cannot see this half — "Kanya (Virgo)"
+   and "(Karka)" are pure Latin script, so they sailed past every gate and shipped in the
+   Muhurat ascendant picker, the full-panchang Moon/Sun sign rows and the season clock.
+   Sanskrit survives in EXACTLY one place: a proper event name such as "Kanya Sankranti",
+   which festival-meta.ts owns — so those are subtracted from the text, not exempted by
+   pattern, and a bare "Kanya" anywhere else is a failure. */
+const fest = loadApp('src/data/festival-meta.ts');
+const EVENT_NAMES_EN = [...Object.values(fest.FEST_NAME || {}), ...Object.values(fest.OBS_NAME || {})]
+  .map((v) => (v && typeof v === 'object' ? v.en : v))
+  .filter((s) => typeof s === 'string' && s)
+  .sort((a, b) => b.length - a.length);
+
 for (const [key, text] of fresh) {
   if (key.endsWith('.en')) {
     const stripped = ALLOWED_IN_EN.reduce((s, w) => s.split(w).join(''), text);
+    const noEvents = EVENT_NAMES_EN.reduce((s, name) => s.split(name).join(''), text);
+    const sanskritSigns = terms.SIGN_ORDER.filter((s) => new RegExp(`\\b${s}\\b`).test(noEvents));
+    if (sanskritSigns.length) {
+      const bad = noEvents.split('\n')
+        .filter((l) => sanskritSigns.some((s) => new RegExp(`\\b${s}\\b`).test(l))).slice(0, 5);
+      console.error(`FAIL ${key}: Sanskrit rashi names in English output: ${sanskritSigns.join(', ')}`);
+      bad.forEach((l) => console.error(`    ${l}`));
+      console.error('    English mode shows the English sign name (E-1.0). Use signLabel(lang, …) / signName(lang, i).');
+      failures++;
+    }
     if (DEVANAGARI.test(stripped)) {
       const bad = stripped.split('\n').filter((l) => DEVANAGARI.test(l)).slice(0, 5);
       console.error(`FAIL ${key}: Devanagari in English output:`);

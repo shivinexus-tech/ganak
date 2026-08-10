@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { T } from "./ui-style-contract";
 import { computeVedicSeasonClock, TROPICAL_EVENTS } from "../engine/vedic-season-clock";
+import { signLabel } from "../i18n/panchang-terms";
 
 export default function SeasonClockCard({ place, lang, ayanamsa = "lahiri", atMs, isToday = true, C, card }) {
   const [tick, setTick] = useState(0);
@@ -40,7 +41,7 @@ export default function SeasonClockCard({ place, lang, ayanamsa = "lahiri", atMs
       <div style={{ fontFamily: T.serif, fontSize: 17, color: C.ivory, lineHeight: 1.35 }}>
         {lang === "hi"
           ? `अभी ${data.ritu.hi} (${data.ritu.signHi}) में हैं${g ? ` · घड़ी ${g.ghati} घटी ${g.pal} पल ${g.vipal} विपल` : ""}।`
-          : `You are in ${data.ritu.en} (${data.ritu.sign})${g ? ` · clock ${g.ghati} ghati ${g.pal} pal ${g.vipal} vipal` : ""}.`}
+          : `You are in ${data.ritu.en} (${signLabel("en", data.ritu.sign)})${g ? ` · clock ${g.ghati} ghati ${g.pal} pal ${g.vipal} vipal` : ""}.`}
       </div>
       <div style={{ fontSize: 12.5, color: C.muted, marginTop: 6, lineHeight: 1.55 }}>
         {lang === "hi"

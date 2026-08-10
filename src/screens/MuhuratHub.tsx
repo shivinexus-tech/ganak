@@ -645,8 +645,8 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         rows.push([tr(lang, "varaL"), P.vara]);
         rows.push([tr(lang, "amantaL"), P.months.amanta]);
         rows.push([tr(lang, "purnimantaL"), P.months.purnimanta]);
-        rows.push([tr(lang, "moonsignL"), P.moonSignEnd ? upto(P.moonSign, P.moonSignEnd) : P.moonSign]);
-        rows.push([tr(lang, "sunsignL"), P.sunSign]);
+        rows.push([tr(lang, "moonsignL"), P.moonSignEnd ? upto(signLabel(lang, P.moonSign), P.moonSignEnd) : signLabel(lang, P.moonSign)]);
+        rows.push([tr(lang, "sunsignL"), signLabel(lang, P.sunSign)]);
         rows.push([lang === "hi" ? "प्रविष्टे (सौर मास में बीते दिन)" : "Pravishte (days into the solar month)", String(P.pravishte)]);
         rows.push([lang === "hi" ? "शक संवत् (राष्ट्रीय पंचांग वर्ष)" : "Shaka Samvat (national calendar year)", P.samvat.shaka]);
         rows.push([lang === "hi" ? "विक्रम संवत् (उत्तर भारतीय पंचांग वर्ष)" : "Vikram Samvat (north Indian calendar year)", P.samvat.vikram]);
@@ -1549,7 +1549,7 @@ return (
             <span style={{ fontSize: T.fMicro, color: C.muted }}>{lang === "hi" ? "व्यक्तिगत सलाह — अपना लग्न:" : "Personalize — your ascendant:"}</span>
             <select value={horaAsc == null ? "" : horaAsc} onChange={(e) => setHoraAsc(e.target.value === "" ? null : parseInt(e.target.value))} style={{ minHeight: T.ctrlH, fontSize: T.fMicro, padding: `0 ${T.s2}`, borderRadius: T.rSm, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.ivory, fontFamily: T.body, maxWidth: "11.25rem" }}>
               <option value="">{lang === "hi" ? "— चुनें —" : "— none —"}</option>
-              {SIGNS.map((sg, i) => <option key={i} value={i}>{panchangTerm(lang, "sign", sg)}</option>)}
+              {SIGNS.map((sg, i) => <option key={i} value={i}>{signName(lang, i)}</option>)}
             </select>
           </div>
           <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: "0.3125rem", fontStyle: "italic" }}>{lang === "hi" ? "लग्न नहीं पता? 'कुंडली' टैब में कुंडली बनाएँ।" : "Don't know it? Cast your chart in the Chart tab."}</div>

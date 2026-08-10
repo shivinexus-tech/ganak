@@ -1374,6 +1374,20 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
   language-leak fixes (leaked Hindi planet names like `शुक्र` on the EN gochar line).
   **Owner directed: proceed.** Being executed as a focused pass; also build a permanent
   `validation/language-leak-scan` gate as the "zero leaks" oracle.
+  **DONE 2026-08-11.** Phase 1 (`33b4db5`) put all 12 rashi / 27 nakshatra / 9 graha names
+  in one module, `src/i18n/panchang-terms.ts`; Phase 2 (`9373e1a`) made English mode read
+  `Virgo`, with the sidereal disclosure on the chart header (`ChartScreen.tsx`). The last
+  three EN sites that still printed romanised Sanskrit were closed by
+  `CLAUDE-E1-SIGN-NAMES-FINISH-2026-08-11`: the Muhurat ascendant picker (`Mesha (Aries)`),
+  the full-panchang Moonsign/Sunsign rows (`Kanya` — *also* a Latin leak in Hindi mode) and
+  the season clock (`(Karka)`). Sanskrit is retained for event names (`Kanya Sankranti`).
+  **Standing gates:** `validation/language-leak-scan.cjs` holds the source side (one table,
+  no raw `SIGNS[…]`/`NAKSHATRAS[…]` in JSX, no English inside Hindi copy) and
+  `validation/screen-snapshots.cjs` holds the rendered side (no Devanagari in EN, no Latin
+  term names in HI, and — new — no Sanskrit rashi name in EN outside a `festival-meta.ts`
+  event name). **Still open, tracked as follow-ups, not blockers:** B8 — a human 375px
+  EN/HI pass over Dashakoota, the dosha pages and the Kundli tables; B10 — nakshatra pada
+  and sub-lord labels were never audited on this fault line.
 - **E-1.1 Western-calculator display — rethink (owner, 2026-07-28).** The app keeps a
   Western/Tropical calculator group (`western-natal`, `western-relationship`) deliberately
   separated from Vedic. Owner wants it **kept for now but presented better** (it's a
