@@ -119,13 +119,12 @@ export function nextCleanWindow(
     if (win.end <= afterMs) continue;
     const verdict = adjudicate(win, ctx);
     if (verdict.status === "blocked") continue;
-    /* Filter to segments that have at least MIN_USABLE_MS remaining after afterMs.
-       For each usable segment, calculate remaining time after afterMs and check
-       that it meets the minimum threshold. */
-    const stillAhead = verdict.usable.filter((w) => {
-      const start = Math.max(w.start, afterMs);
-      return start < w.end && (w.end - start) >= MIN_USABLE_MS;
-    });
+    /* Clip each segment to afterMs first — a segment that starts before afterMs
+       must not be handed back with its stale, already-elapsed start time — then
+       filter to segments that still have at least MIN_USABLE_MS remaining. */
+    const stillAhead = verdict.usable
+      .map((w) => ({ start: Math.max(w.start, afterMs), end: w.end }))
+      .filter((w) => w.start < w.end && (w.end - w.start) >= MIN_USABLE_MS);
     if (!stillAhead.length) continue;
     return { window: win, verdict: { ...verdict, usable: stillAhead } };
   }

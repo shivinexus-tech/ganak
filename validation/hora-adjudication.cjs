@@ -101,9 +101,17 @@ const WINS = [W(0, 300000), W(300000, 600000), W(600000, 900000)];
 let n = nextCleanWindow(WINS, CTX({ rahu: W(0, 300000) }), 0);
 if (!n || n.window.start !== 300000) fail('nextCleanWindow should skip a fully blocked window');
 
-// never returns a window that ended before afterMs
+// never returns a window that ended before afterMs; 350000 lands inside window 2
+// (300000-600000) with 250000ms remaining, comfortably over the 180000ms threshold
+n = nextCleanWindow(WINS, CTX(), 350000);
+if (!n || n.window.start !== 300000 || n.window.end !== 600000) fail('nextCleanWindow should return the window containing afterMs');
+if (!n.verdict.usable.length || n.verdict.usable[0].start !== 350000) fail('usable start should be clipped to afterMs');
+
+// 500000 also lands inside window 2, but only 100000ms remains in it — under the
+// 180000ms threshold — so that window is skipped in favour of window 3
 n = nextCleanWindow(WINS, CTX(), 500000);
-if (!n || n.window.start !== 600000) fail('nextCleanWindow should return the window containing afterMs');
+if (!n || n.window.start !== 600000) fail('nextCleanWindow should skip a window with insufficient remaining margin after afterMs, even though afterMs lands inside it');
+
 n = nextCleanWindow(WINS, CTX(), 1000000);
 if (n !== null) fail('nextCleanWindow should return null when nothing remains');
 
@@ -121,7 +129,7 @@ if (n !== null) fail('a window with less than 180000ms remaining after afterMs s
 // (at least MIN_USABLE_MS = 180000 remaining)
 n = nextCleanWindow([W(0, 300000)], CTX({ rahu: W(0, 40000) }), 80000);
 if (!n || n.window.start !== 0) fail('a window with at least 180000ms remaining after afterMs should be returned');
-if (!n.verdict.usable.length || n.verdict.usable[0].start !== 40000 || n.verdict.usable[0].end !== 300000) fail('usable should reflect the remainder after the cut');
+if (!n.verdict.usable.length || n.verdict.usable[0].start !== 80000 || n.verdict.usable[0].end !== 300000) fail('usable start must be clipped to afterMs (80000), not the unclipped cut boundary (40000)');
 
 if (failures) { console.error(`hora-adjudication: ${failures} failure(s)`); process.exit(1); }
 console.log('hora-adjudication: PASS');
