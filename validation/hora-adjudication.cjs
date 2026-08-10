@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 const { loadApp } = require('./_load-app.cjs');
-const { subtractWindows, adjudicate, dominantChoghadiya } = loadApp('src/engine/hora-verdict.ts');
+const { subtractWindows, adjudicate, dominantChoghadiya, nextCleanWindow } = loadApp('src/engine/hora-verdict.ts');
 let failures = 0;
 const fail = (m) => { failures++; console.error('FAIL ' + m); };
 const W = (s, e) => ({ start: s, end: e });
@@ -93,6 +93,35 @@ if (v.abhijitBoost !== true) fail('abhijit overlap should still set the boost fl
 // R6: ties resolve to the earlier segment
 const tie = dominantChoghadiya(W(25, 75), CTX());
 if (!tie || tie.key !== 'amrit') fail('an exact overlap tie should resolve to the earlier segment');
+
+// Use realistic window sizes (each 300s = 300000ms >> MIN_USABLE_MS = 180000ms)
+const WINS = [W(0, 300000), W(300000, 600000), W(600000, 900000)];
+
+// skips a blocked window and returns the next with usable time
+let n = nextCleanWindow(WINS, CTX({ rahu: W(0, 300000) }), 0);
+if (!n || n.window.start !== 300000) fail('nextCleanWindow should skip a fully blocked window');
+
+// never returns a window that ended before afterMs
+n = nextCleanWindow(WINS, CTX(), 500000);
+if (!n || n.window.start !== 600000) fail('nextCleanWindow should return the window containing afterMs');
+n = nextCleanWindow(WINS, CTX(), 1000000);
+if (n !== null) fail('nextCleanWindow should return null when nothing remains');
+
+// a partial window counts, and reports its usable remainder
+n = nextCleanWindow([W(0, 10 * 60000)], CTX({ rahu: W(5 * 60000, 60 * 60000) }), 0);
+if (!n || n.verdict.status !== 'partial') fail('a partial window should be offered');
+if (!n.verdict.usable.length || n.verdict.usable[0].end !== 5 * 60000) fail('partial remainder should be reported');
+
+// gate: a window whose usable time ends 60000 ms after afterMs must NOT be returned
+// (less than MIN_USABLE_MS = 180000 remaining)
+n = nextCleanWindow([W(0, 300000)], CTX({ rahu: W(0, 40000) }), 220000);
+if (n !== null) fail('a window with less than 180000ms remaining after afterMs should be skipped');
+
+// gate: a window whose usable time ends 240000 ms after afterMs must be returned
+// (at least MIN_USABLE_MS = 180000 remaining)
+n = nextCleanWindow([W(0, 300000)], CTX({ rahu: W(0, 40000) }), 80000);
+if (!n || n.window.start !== 0) fail('a window with at least 180000ms remaining after afterMs should be returned');
+if (!n.verdict.usable.length || n.verdict.usable[0].start !== 40000 || n.verdict.usable[0].end !== 300000) fail('usable should reflect the remainder after the cut');
 
 if (failures) { console.error(`hora-adjudication: ${failures} failure(s)`); process.exit(1); }
 console.log('hora-adjudication: PASS');

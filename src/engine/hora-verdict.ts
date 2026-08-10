@@ -108,3 +108,26 @@ export function adjudicate(win: Window, ctx: TimingContext): Verdict {
     abhijitBoost: !!(ctx.abhijit && overlapMs(win, ctx.abhijit) > 0),
   };
 }
+
+/* The first window at or after `afterMs` that still has usable time in it.
+   Returns null when the day has nothing left — the caller then offers tomorrow. */
+export function nextCleanWindow(
+  windows: Window[], ctx: TimingContext, afterMs: number
+): { window: Window; verdict: Verdict } | null {
+  const ordered = [...(windows || [])].sort((a, b) => a.start - b.start);
+  for (const win of ordered) {
+    if (win.end <= afterMs) continue;
+    const verdict = adjudicate(win, ctx);
+    if (verdict.status === "blocked") continue;
+    /* Filter to segments that have at least MIN_USABLE_MS remaining after afterMs.
+       For each usable segment, calculate remaining time after afterMs and check
+       that it meets the minimum threshold. */
+    const stillAhead = verdict.usable.filter((w) => {
+      const start = Math.max(w.start, afterMs);
+      return start < w.end && (w.end - start) >= MIN_USABLE_MS;
+    });
+    if (!stillAhead.length) continue;
+    return { window: win, verdict: { ...verdict, usable: stillAhead } };
+  }
+  return null;
+}
