@@ -57,6 +57,48 @@ export function emitRedirects() {
   return legacy.length;
 }
 
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function replaceOrAppendHead(html, pattern, replacement) {
+  return pattern.test(html)
+    ? html.replace(pattern, replacement)
+    : html.replace("</head>", `    ${replacement}\n  </head>`);
+}
+
+export function emitRouteHtml(routes) {
+  const template = fs.readFileSync(path.join(DIST, "index.html"), "utf8");
+  let written = 0;
+
+  for (const route of routes) {
+    const canonical = origin() + route.canonicalPath;
+    let html = template;
+
+    html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(route.title)}</title>`);
+    html = replaceOrAppendHead(html, /<meta name="description" content="[^"]*"\s*\/?>/,
+      `<meta name="description" content="${escapeHtml(route.description)}" />`);
+    html = replaceOrAppendHead(html, /<link rel="canonical" href="[^"]*"\s*\/?>/,
+      `<link rel="canonical" href="${escapeHtml(canonical)}" />`);
+    html = replaceOrAppendHead(html, /<meta property="og:title" content="[^"]*"\s*\/?>/,
+      `<meta property="og:title" content="${escapeHtml(route.title)}" />`);
+    html = replaceOrAppendHead(html, /<meta property="og:description" content="[^"]*"\s*\/?>/,
+      `<meta property="og:description" content="${escapeHtml(route.description)}" />`);
+    html = replaceOrAppendHead(html, /<meta property="og:url" content="[^"]*"\s*\/?>/,
+      `<meta property="og:url" content="${escapeHtml(canonical)}" />`);
+
+    const relative = route.path === "/" ? "index.html" : `${route.path.replace(/^\//, "")}/index.html`;
+    writeFile(relative, html);
+    written += 1;
+  }
+
+  return written;
+}
+
 function main() {
   if (!fs.existsSync(DIST)) {
     console.error("build-seo: dist/ not found — run `vite build` first.");
@@ -68,6 +110,8 @@ function main() {
   console.log(`build-seo: sitemap ${count} URLs, robots.txt written.`);
   const redirectCount = emitRedirects();
   console.log(`build-seo: ${redirectCount} legacy 301s written ahead of the base rules.`);
+  const htmlCount = emitRouteHtml(routes);
+  console.log(`build-seo: ${htmlCount} route HTML files written.`);
 }
 
 main();

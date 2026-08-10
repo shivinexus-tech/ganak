@@ -71,3 +71,28 @@ for (const { from, to } of legacyRedirects()) {
 }
 
 console.log(`prerender-seo gate: ${legacyRedirects().length} legacy 301s ordered ahead of the SPA catch-all.`);
+
+const seenTitles = new Map();
+for (const route of routes) {
+  const rel = route.path === "/" ? "index.html" : `${route.path.replace(/^\//, "")}/index.html`;
+  const html = fs.readFileSync(distPath(rel), "utf8");
+
+  const title = html.match(/<title>([\s\S]*?)<\/title>/)?.[1];
+  assert.equal(title, route.title, `wrong <title> for ${route.path}`);
+
+  const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
+  assert.equal(canonical, origin() + route.canonicalPath, `wrong canonical for ${route.path}`);
+
+  const ogUrl = html.match(/<meta property="og:url" content="([^"]+)"/)?.[1];
+  assert.equal(ogUrl, canonical, `og:url must match canonical for ${route.path}`);
+
+  assert.ok(html.includes('<div id="root"></div>'), `hydration root missing for ${route.path}`);
+  assert.ok(/<script type="module"[^>]+src="\/assets\//.test(html), `asset script missing for ${route.path}`);
+
+  if (route.canonicalPath === route.path) {
+    assert.ok(!seenTitles.has(title), `duplicate title: ${route.path} and ${seenTitles.get(title)}`);
+    seenTitles.set(title, route.path);
+  }
+}
+
+console.log(`prerender-seo gate: ${routes.length} route HTML files, each with a unique title and self-consistent canonical.`);
