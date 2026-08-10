@@ -40,7 +40,7 @@ import { observancesFor, scanPanchangCalendar, EKADASHI_NAMES, PRADOSH_NAMES_BY_
 import { urlPrefGet, urlPrefPush } from "../components/url-prefs";
 import MuhuratActions from "../components/MuhuratActions";
 import { privacyEvent } from "../telemetry/privacy-events";
-import { panchangTerm, panchangTermAt, signName } from "../i18n/panchang-terms";
+import { panchangTerm, panchangTermAt, signName, signLabel } from "../i18n/panchang-terms";
 import ReadAloudButton from "../accessibility/ReadAloudButton";
 import { useDepth } from "../accessibility/ComfortProvider";
 import { Badge, Card, DataRow, SectionHeader } from "../components/ui-primitives";
@@ -349,7 +349,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                   : "In plain words: begin anything auspicious during a ✓ time, and avoid starting something new during a ⚠ or ✗ time."}
               </p>}
               {isToday && curChogha && <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: "0.375rem" }}>{lang === "hi" ? "अभी चौघड़िया: " : "Now: "}<span style={{ color: natColor(curChogha.nat), fontWeight: 600 }}>{trN(lang, CHOG_NAME, curChogha.key)}</span></div>}
-              {isToday && curLagnaW && <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: "0.25rem" }}>{lang === "hi" ? "उदय लग्न: " : "Udaya Lagna: "}<span style={{ color: C.ivory }}>{panchangTerm(lang, "sign", SIGNS[curLagnaW.sign])}</span>{curPanchW && <> · {lang === "hi" ? "पञ्चक: " : "Panchaka: "}<span style={{ color: curPanchW.shubha ? "var(--good)" : C.sindoor, fontWeight: 600 }}>{trN(lang, PANCHAKA_NAME, curPanchW.type)}{curPanchW.shubha ? " ✓" : " ✗"}</span></>}</div>}
+              {isToday && curLagnaW && <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: "0.25rem" }}>{lang === "hi" ? "उदय लग्न: " : "Udaya Lagna: "}<span style={{ color: C.ivory }}>{signLabel(lang, SIGNS[curLagnaW.sign])}</span>{curPanchW && <> · {lang === "hi" ? "पञ्चक: " : "Panchaka: "}<span style={{ color: curPanchW.shubha ? "var(--good)" : C.sindoor, fontWeight: 600 }}>{trN(lang, PANCHAKA_NAME, curPanchW.type)}{curPanchW.shubha ? " ✓" : " ✗"}</span></>}</div>}
             </div>
             <div style={{ padding: `${T.s3} ${T.s5}`, borderTop: "0.0625rem solid " + C.line, display: "flex", flexWrap: "wrap", gap: `0.375rem ${T.s5}` }}>
               <div style={{ flex: "1 1 130px" }}>
@@ -470,7 +470,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
               const live = isToday && nowMs != null && nowMs >= w.start && nowMs < w.end;
               return (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.4375rem 0.125rem", borderBottom: "0.0625rem solid var(--line-soft)", flexWrap: "wrap", background: live ? "var(--surface-hover)" : undefined }}>
-                  <span style={{ flex: "1 1 auto", fontFamily: T.serif, fontSize: "var(--font-body)", color: C.ivory }}>{panchangTerm(lang, "sign", SIGNS[w.sign])}{live ? " ●" : ""}</span>
+                  <span style={{ flex: "1 1 auto", fontFamily: T.serif, fontSize: "var(--font-body)", color: C.ivory }}>{signLabel(lang, SIGNS[w.sign])}{live ? " ●" : ""}</span>
                   <span style={{ fontSize: T.fSmall, color: C.muted, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{fmtTime(w.start, lp.tz)} – {fmtTime(w.end, lp.tz)}</span>
                   <span style={{ flex: "0 0 auto", textAlign: "right", fontSize: T.fMicro, fontWeight: 600, color: w.shubha ? "var(--good)" : C.sindoor }}>{shubhaGlyph(w.shubha)} {trN(lang, PANCHAKA_SHORT, w.type)}</span>
                 </div>

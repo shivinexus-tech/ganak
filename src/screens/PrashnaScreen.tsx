@@ -1,4 +1,4 @@
-import { panchangTerm, panchangTermAt, SIGN_ORDER, NAKSHATRA_ORDER } from "../i18n/panchang-terms";
+import { panchangTerm, panchangTermAt, signName, SIGN_ORDER, NAKSHATRA_ORDER } from "../i18n/panchang-terms";
 import React, { useState, useEffect, useRef } from "react";
 import { T } from "../components/ui-style-contract";
 import { fmtDeg } from "../components/format";
@@ -284,7 +284,7 @@ function PR_judge(chart, q) {
    an import nor a TypeScript annotation. Everything the reader actually sees resolves
    through the one shared lookup. NAK_EN stays inlined above because the engine itself
    uses it; validation/language-leak-scan.cjs asserts that copy still matches. */
-const RASHI_EN = SIGN_ORDER;
+const RASHI_EN = SIGN_ORDER.map((_, i) => signName("en", i));
 const RASHI_HI = SIGN_ORDER.map((_, i) => panchangTermAt("hi", "sign", i));
 const GRAHA_HI: Record<string, string> = Object.fromEntries(
   Object.entries(GRAHA_EN).map(([abbr, full]) => [abbr, panchangTerm("hi", "planet", full)]));

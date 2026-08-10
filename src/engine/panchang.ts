@@ -187,9 +187,9 @@ function upcomingEvents(fromMs, days = 75) {
   const tS = solveCross(sunSidMs, fromMs, (nextSign * 30) % 360, 40);
   if (tS) ev.push({ t: tS, label: `Sun enters ${SIGNS[nextSign].split(" ")[0]} · Sankranti`, planet: "Sun", type: "sign" });
   const tP = solveCross(elongMs, fromMs, 180, 32);
-  if (tP) ev.push({ t: tP, label: "Purnima — full moon", planet: "Moon", type: "lunation" });
+  if (tP) ev.push({ t: tP, label: "Purnima", planet: "Moon", type: "lunation" });
   const tA = solveCross(elongMs, fromMs, 0, 32);
-  if (tA) ev.push({ t: tA, label: "Amavasya — new moon", planet: "Moon", type: "lunation" });
+  if (tA) ev.push({ t: tA, label: "Amavasya", planet: "Moon", type: "lunation" });
   for (const p of ["Mars", "Mercury", "Jupiter", "Venus", "Saturn"]) {
     const f = (ms) => planetSidMs(p, ms);
     let prevSign = Math.floor(f(fromMs) / 30);

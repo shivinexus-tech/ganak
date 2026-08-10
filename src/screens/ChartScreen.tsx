@@ -26,7 +26,7 @@ import { JyotishPanelNav } from "../components/JyotishPanelNav";
 import { BNNModule, BhriguModule } from "./JyotishBnnScreen";
 import { RectifyModule } from "./RectifyScreen";
 import { SIGNS, NAKSHATRAS, AYANAMSA, zoneOffset } from "../engine/panchang";
-import { panchangTerm } from "../i18n/panchang-terms";
+import { panchangTerm, signLabel } from "../i18n/panchang-terms";
 import LifeInterpretationCard from "../components/LifeInterpretationCard";
 import { buildLifeReading, SIGN_TRAITS } from "../data/life-interpretation";
 
@@ -443,13 +443,17 @@ export default function ChartScreen({ C, card, lang }) {
               {(hi ? "गणना आधार: " : "Calculation basis: ")}
               {(hi ? "अयनांश " : "ayanamsa ") + (AYANAMSA[ayanamsa]?.label || ayanamsa)}
               {hi ? " · मध्यम राहु/केतु · पूर्ण-राशि भाव · भाव-संधि श्रीपति" : " · mean Rahu/Ketu · whole-sign houses · Sripati bhava cusps"}
+              {/* E-1.0 B5: English mode now labels the rashi in English ("Virgo"), with no
+                  Sanskrit gloss. That makes this line load-bearing — it is the only thing
+                  telling a Western-trained reader these are SIDEREAL signs, not tropical. */}
+              {!hi && <> · sign names are <strong>sidereal</strong> (Lahiri), not tropical — “Virgo” here is the sidereal Kanya</>}
             </p>}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "0.75rem" }}>
               {[
-                [hi ? "लग्न" : "Lagna (Ascendant)", `${SIGNS[r.ascSign].split(" ")[0]} ${fmtDeg(r.ascDeg)}`],
-                [hi ? "राशि (चन्द्र राशि)" : "Rashi (Moon sign)", SIGNS[r.moon.sign].split(" ")[0]],
+                [hi ? "लग्न" : "Lagna (Ascendant)", `${signLabel(lang, SIGNS[r.ascSign])} ${fmtDeg(r.ascDeg)}`],
+                [hi ? "राशि (चन्द्र राशि)" : "Rashi (Moon sign)", signLabel(lang, SIGNS[r.moon.sign])],
                 [hi ? "जन्म नक्षत्र" : "Janma Nakshatra", `${NAKSHATRAS[r.moon.nak]} · ${hi ? "पाद" : "pada"} ${r.moon.pada}`],
-                [hi ? "सूर्य राशि" : "Surya (Sun sign)", SIGNS[r.sun.sign].split(" ")[0]],
+                [hi ? "सूर्य राशि" : "Surya (Sun sign)", signLabel(lang, SIGNS[r.sun.sign])],
               ].map(([k, v]) => (
                 <div key={k} style={{ ...card, padding: "0.875rem 1rem" }}>
                   <div style={{ ...T.label, color: C.muted, marginBottom: "0.375rem" }}>{k}</div>
@@ -582,7 +586,7 @@ export default function ChartScreen({ C, card, lang }) {
                       </span>
                     </div>
                     <div style={{ fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.4 }}>
-                      <div><span style={{ fontWeight: 600, color: C.ivory }}>{SIGNS[p.sign].split(" ")[0]}</span> {fmtDeg(p.deg)}</div>
+                      <div><span style={{ fontWeight: 600, color: C.ivory }}>{signLabel(lang, SIGNS[p.sign])}</span> {fmtDeg(p.deg)}</div>
                       <div style={{ fontSize: "var(--font-micro)", marginTop: "0.1875rem" }}>{NAKSHATRAS[p.nak].split(" ")[0]}</div>
                       <div style={{ fontSize: "var(--font-micro)", marginTop: "0.125rem", color: C.gold }}>H{p.house}</div>
                     </div>
@@ -778,7 +782,7 @@ export default function ChartScreen({ C, card, lang }) {
                   <div style={{ fontSize: "var(--font-body)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                     <span style={{ width: "0.5rem", height: "0.5rem", borderRadius: "0.25rem", background: PLANET_COLOR[kk.planet], boxShadow: `0 0 6px ${PLANET_COLOR[kk.planet]}55`, flexShrink: 0 }} />
                     {kk.planet}
-                    <span style={{ color: C.muted, fontSize: "var(--font-small)", fontVariantNumeric: "tabular-nums" }}>{fmtDeg(kk.deg)} {SIGNS[kk.sign].split(" ")[0]}</span>
+                    <span style={{ color: C.muted, fontSize: "var(--font-small)", fontVariantNumeric: "tabular-nums" }}>{fmtDeg(kk.deg)} {signLabel(lang, SIGNS[kk.sign])}</span>
                   </div>
                   <div style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.3125rem" }}>{hi ? "यह चर कारक जीवन के इस प्रमुख विषय और उससे जुड़ी सीख को दर्शाता है।" : kk.meaning}</div>
                 </div>
@@ -856,7 +860,7 @@ export default function ChartScreen({ C, card, lang }) {
                 <div style={{ ...card, padding: "0.75rem 0.875rem", borderLeft: `0.1875rem solid ${accent}` }}>
                   <div style={{ ...T.label, color: C.muted, marginBottom: "0.3125rem" }}>{item.k}</div>
                   <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: C.ivory, display: "flex", alignItems: "baseline", gap: "0.4375rem", flexWrap: "wrap" }}>
-                    {SIGNS[Math.floor(item.v / 30)].split(" ")[0]} <span style={{ fontSize: "var(--font-small)", color: C.muted, fontVariantNumeric: "tabular-nums" }}>{fmtDeg(item.v % 30)}</span>
+                    {signLabel(lang, SIGNS[Math.floor(item.v / 30)])} <span style={{ fontSize: "var(--font-small)", color: C.muted, fontVariantNumeric: "tabular-nums" }}>{fmtDeg(item.v % 30)}</span>
                     <span style={{ fontSize: "var(--font-label)", color: C.gold }}>H{hOf(item.v)}</span>
                     {item.pl && <span style={{ fontSize: "var(--font-label)", color: PLANET_COLOR[item.pl] }}>· {item.pl}</span>}
                   </div>
@@ -883,7 +887,7 @@ export default function ChartScreen({ C, card, lang }) {
                   <Group title={hi ? "संवेदनशील बिंदु" : "Sensitive Points"} items={SP.points} accent="color-mix(in srgb, #6E5C82, var(--ink) 26%)" />
                   <div style={{ ...card, padding: "0.75rem 0.875rem", marginTop: "0.625rem", borderLeft: `0.1875rem solid var(--good)`, display: "inline-block" }}>
                     <span style={{ ...T.label, color: C.muted, marginRight: "0.5rem" }}>{hi ? "इन्दु लग्न (धन)" : "Indu Lagna (wealth)"}</span>
-                    <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: "color-mix(in srgb, #2C7D4F, var(--ink) 26%)" }}>{SIGNS[SP.induSign].split(" ")[0]}</span>
+                    <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: "color-mix(in srgb, #2C7D4F, var(--ink) 26%)" }}>{signLabel(lang, SIGNS[SP.induSign])}</span>
                   </div>
                   <Group title={hi ? "उपग्रह · छाया बिंदु" : "Upagrahas · shadow sub-planets"} items={SP.upagrahas} accent="var(--bad)" />
                   <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "0.75rem 0 0", lineHeight: 1.5 }}>
@@ -1014,7 +1018,7 @@ export default function ChartScreen({ C, card, lang }) {
                     <div style={{ ...T.label, color: hot ? C.gold : C.muted, marginBottom: "0.3125rem" }}>
                       {a.h === 1 ? (hi ? "आरूढ़ लग्न" : "Arudha Lagna") : a.h === 12 ? (hi ? "उपपद" : "Upapada") : `A${a.h}`}{special && a.h !== 1 && a.h !== 12 ? "" : ""}
                     </div>
-                    <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-title)", color: hot ? C.gold : C.ivory }}>{SIGNS[a.sign].split(" ")[0]}</div>
+                    <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-title)", color: hot ? C.gold : C.ivory }}>{signLabel(lang, SIGNS[a.sign])}</div>
                     <div style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.25rem" }}>{ARUDHA_MEAN[i]}</div>
                   </div>
                 );

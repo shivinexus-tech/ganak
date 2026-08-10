@@ -15,7 +15,7 @@ import { scanPanchangCalendar } from "../engine/festivals";
 import { planetGochar, PLANET_PERIOD_DAYS } from "../engine/gochar";
 import PlanetCalendarCard from "../components/PlanetCalendarCard";
 import { fmtDur, eventDetail, transitLabel } from "../engine/transit-copy";
-import { panchangTerm, panchangTermAt, weekdayName, WEEKDAY_SHORT_EN } from "../i18n/panchang-terms";
+import { panchangTerm, panchangTermAt, weekdayName, WEEKDAY_SHORT_EN, signLabel } from "../i18n/panchang-terms";
 import { CALENDAR_CONVENTIONS, DEFAULT_REGIONAL_CALENDAR_FLAGS, calendarLabel, conventionIsEnabled, resolveConvention } from "../engine/calendar-conventions";
 import { loadRegionalCalendarFlags } from "../engine/regional-calendar-flags";
 import { runRegionalCalendarShadow } from "../monitoring/regional-calendar-shadow";
@@ -402,7 +402,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                                 <div style={{ paddingBottom: "0.125rem", flex: 1 }}>
                                   <div style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem", alignItems: "baseline", flexWrap: "wrap" }}>
                                     <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: isCur ? C.gold : C.ivory, fontWeight: isCur ? 700 : 500 }}>
-                                      {panchangTerm(lang, "sign", SIGNS[x.sign].split(" ")[0])}
+                                      {signLabel(lang, SIGNS[x.sign])}
                                     </span>
                                     {dur && <span style={{ fontSize: "var(--font-label)", color: C.muted }}>{dur}</span>}
                                   </div>
