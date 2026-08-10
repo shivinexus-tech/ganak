@@ -54,3 +54,20 @@ assert.ok(robots.startsWith("User-agent:"), "robots.txt must be robots syntax, n
 assert.ok(robots.includes(`Sitemap: ${origin()}/sitemap.xml`), "robots.txt must point at the sitemap");
 
 console.log(`prerender-seo gate: sitemap ${locCount} URLs, robots.txt present.`);
+
+const redirects = fs.readFileSync(distPath("_redirects"), "utf8");
+const catchAllAt = redirects.indexOf("/* /index.html 200");
+assert.ok(catchAllAt !== -1, "dist/_redirects lost the SPA catch-all");
+
+const faviconAt = redirects.indexOf("/favicon.ico /favicon.svg 301");
+assert.ok(faviconAt !== -1 && faviconAt < catchAllAt,
+  "favicon rule must still precede the catch-all (validation/favicon.cjs invariant)");
+
+for (const { from, to } of legacyRedirects()) {
+  const rule = `${from} ${to} 301`;
+  const at = redirects.indexOf(rule);
+  assert.ok(at !== -1, `missing legacy 301: ${rule}`);
+  assert.ok(at < catchAllAt, `legacy 301 must precede the catch-all: ${rule}`);
+}
+
+console.log(`prerender-seo gate: ${legacyRedirects().length} legacy 301s ordered ahead of the SPA catch-all.`);
