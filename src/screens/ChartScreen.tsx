@@ -25,7 +25,8 @@ import { ChartVault } from "../components/ChartVault";
 import { JyotishPanelNav } from "../components/JyotishPanelNav";
 import { BNNModule, BhriguModule } from "./JyotishBnnScreen";
 import { RectifyModule } from "./RectifyScreen";
-import { SIGNS, NAKSHATRAS, AYANAMSA, zoneOffset, PLANET_DEVA } from "../engine/panchang";
+import { SIGNS, NAKSHATRAS, AYANAMSA, zoneOffset } from "../engine/panchang";
+import { panchangTerm } from "../i18n/panchang-terms";
 import LifeInterpretationCard from "../components/LifeInterpretationCard";
 import { buildLifeReading, SIGN_TRAITS } from "../data/life-interpretation";
 
@@ -689,7 +690,7 @@ export default function ChartScreen({ C, card, lang }) {
                     <div className="rise" style={{ ...card, padding: "0.875rem 1rem", borderLeft: "0.25rem solid var(--accent)", marginBottom: "0.75rem", background: "var(--surface-raised)" }}>
                       <div style={{ ...T.label, color: C.gold, marginBottom: "0.375rem" }}>{hi ? "पहले पढ़ें · शासक ग्रह का सार" : "Read first · ruling-planet summary"}</div>
                       <p style={{ margin: 0, color: C.ivory, lineHeight: 1.6, fontSize: "var(--font-small)" }}>
-                        {hi ? <>इस जन्म-क्षण में सबसे समर्थ शासक ग्रह <strong style={{ color: PLANET_COLOR[topRp.planet] }}>{PLANET_DEVA[topRp.planet] || topRp.planet}</strong> है — यह {topRp.count} संकेतों में आया है। KP में बार-बार आने वाला ग्रह प्रश्न/घटना के फलित होने में अधिक ध्यान योग्य माना जाता है; इसे वादा नहीं, प्राथमिकता-सूचक मानें।</> : <>The strongest Ruling Planet at this birth moment is <strong style={{ color: PLANET_COLOR[topRp.planet] }}>{topRp.planet}</strong> — it appears through {topRp.count} source{topRp.count > 1 ? "s" : ""}. In KP, repeated ruling planets are read as higher-priority witnesses for timing and judgement; treat this as a priority signal, not a promise.</>}
+                        {hi ? <>इस जन्म-क्षण में सबसे समर्थ शासक ग्रह <strong style={{ color: PLANET_COLOR[topRp.planet] }}>{panchangTerm("hi", "planet", topRp.planet) || topRp.planet}</strong> है — यह {topRp.count} संकेतों में आया है। KP में बार-बार आने वाला ग्रह प्रश्न/घटना के फलित होने में अधिक ध्यान योग्य माना जाता है; इसे वादा नहीं, प्राथमिकता-सूचक मानें।</> : <>The strongest Ruling Planet at this birth moment is <strong style={{ color: PLANET_COLOR[topRp.planet] }}>{topRp.planet}</strong> — it appears through {topRp.count} source{topRp.count > 1 ? "s" : ""}. In KP, repeated ruling planets are read as higher-priority witnesses for timing and judgement; treat this as a priority signal, not a promise.</>}
                       </p>
                     </div>
                   )}
@@ -713,7 +714,7 @@ export default function ChartScreen({ C, card, lang }) {
                         {RP.ranked.map((rp, idx) => (
                           <div key={rp.planet} style={{ display: "grid", gridTemplateColumns: "1.75rem minmax(3.375rem, 4.375rem) 1fr", alignItems: "center", gap: "0.5rem" }}>
                             <span style={{ color: C.muted, fontSize: "var(--font-micro)" }}>#{idx + 1}</span>
-                            <span style={{ color: PLANET_COLOR[rp.planet], fontWeight: 700 }}>{hi ? (PLANET_DEVA[rp.planet] || rp.planet) : rp.planet}</span>
+                            <span style={{ color: PLANET_COLOR[rp.planet], fontWeight: 700 }}>{hi ? (panchangTerm("hi", "planet", rp.planet) || rp.planet) : rp.planet}</span>
                             <span style={{ color: C.muted, fontSize: "var(--font-micro)", lineHeight: 1.4 }}>
                               {rp.sources.map((s) => hi ? RP_SOURCE_LABELS[s].hi : RP_SOURCE_LABELS[s].en).join(" · ")}
                             </span>
@@ -790,7 +791,7 @@ export default function ChartScreen({ C, card, lang }) {
             <div style={{ ...card, padding: "0.75rem 1rem", marginBottom: "0.75rem", background: "var(--surface-raised)" }}>
               <p style={{ margin: 0, fontSize: "var(--font-small)", color: C.ivory, lineHeight: 1.55 }}>
                 {lang === "hi"
-                  ? <>षड्बल मापता है कि हर ग्रह अपने फल देने में कितना बलवान है। यहाँ सबसे बलवान <strong style={{ color: C.gold }}>{PLANET_DEVA[r.shadbala.ranked[0]]}</strong> है — इसके कारकत्व अपेक्षाकृत सहजता से फलित होते हैं; सबसे निर्बल <strong style={{ color: C.sindoor }}>{PLANET_DEVA[r.shadbala.ranked[6]]}</strong> है — इसके कारकत्व अधिक प्रयास माँग सकते हैं।</>
+                  ? <>षड्बल मापता है कि हर ग्रह अपने फल देने में कितना बलवान है। यहाँ सबसे बलवान <strong style={{ color: C.gold }}>{panchangTerm("hi", "planet", r.shadbala.ranked[0])}</strong> है — इसके कारकत्व अपेक्षाकृत सहजता से फलित होते हैं; सबसे निर्बल <strong style={{ color: C.sindoor }}>{panchangTerm("hi", "planet", r.shadbala.ranked[6])}</strong> है — इसके कारकत्व अधिक प्रयास माँग सकते हैं।</>
                   : <>Shadbala measures how much strength each planet has to deliver its results. Here <strong style={{ color: C.gold }}>{r.shadbala.ranked[0]}</strong> is strongest — its matters tend to come with more ease; <strong style={{ color: C.sindoor }}>{r.shadbala.ranked[6]}</strong> is weakest — its matters may take more effort.</>}
               </p>
             </div>
@@ -813,7 +814,7 @@ export default function ChartScreen({ C, card, lang }) {
                       <div key={p} className="rise" style={{ ...card, padding: "0.875rem 1rem" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.625rem" }}>
                           <span style={{ width: "0.5625rem", height: "0.5625rem", borderRadius: "0.3125rem", background: PLANET_COLOR[p], flexShrink: 0 }} />
-                          <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-title)", color: C.ivory }}>{PLANET_DEVA[p]} <span style={{ fontFamily: "var(--font-body-family)", fontSize: "var(--font-body)" }}>{p}</span></span>
+                          <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-title)", color: C.ivory }}>{panchangTerm("hi", "planet", p)} <span style={{ fontFamily: "var(--font-body-family)", fontSize: "var(--font-body)" }}>{p}</span></span>
                           <span style={{ marginLeft: "auto", fontSize: "var(--font-label)", color: C.muted }}>#{rank + 1}</span>
                           <span style={{ fontSize: "var(--font-micro)", fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase", padding: "0.1875rem 0.5rem", borderRadius: "0.625rem", color: strong ? "var(--good)" : C.sindoor, background: strong ? "rgba(63,126,46,.1)" : "var(--bad-surface)" }}>{strong ? (hi ? "प्रबल" : "strong") : (hi ? "निर्बल" : "weak")}</span>
                         </div>
@@ -842,7 +843,7 @@ export default function ChartScreen({ C, card, lang }) {
               );
             })()}
             <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "0.75rem 0 0", lineHeight: 1.5 }}>
-              {hi ? <>बल रूप में है (1 रूप = 60 विरूप)। अपेक्षित न्यूनतम से ऊपर का ग्रह अपने कारकत्व देने में अधिक समर्थ माना जाता है। सबसे प्रबल: <span style={{ color: C.gold }}>{PLANET_DEVA[r.shadbala.ranked[0]]}</span> · सबसे निर्बल: <span style={{ color: C.sindoor }}>{PLANET_DEVA[r.shadbala.ranked[6]]}</span>। चेष्टा और कुछ काल उप-बल अन्य सॉफ़्टवेयर से थोड़ा भिन्न हो सकते हैं।</> : <>Strength in Rupas (1 Rupa = 60 Virupas). A planet clearing its required minimum is well-placed to deliver its significations. Strongest: <span style={{ color: C.gold }}>{r.shadbala.ranked[0]}</span> · weakest: <span style={{ color: C.sindoor }}>{r.shadbala.ranked[6]}</span>. Cheshta and some Kala sub-balas are modelled and may differ slightly from other software.</>}
+              {hi ? <>बल रूप में है (1 रूप = 60 विरूप)। अपेक्षित न्यूनतम से ऊपर का ग्रह अपने कारकत्व देने में अधिक समर्थ माना जाता है। सबसे प्रबल: <span style={{ color: C.gold }}>{panchangTerm("hi", "planet", r.shadbala.ranked[0])}</span> · सबसे निर्बल: <span style={{ color: C.sindoor }}>{panchangTerm("hi", "planet", r.shadbala.ranked[6])}</span>। चेष्टा और कुछ काल उप-बल अन्य सॉफ़्टवेयर से थोड़ा भिन्न हो सकते हैं।</> : <>Strength in Rupas (1 Rupa = 60 Virupas). A planet clearing its required minimum is well-placed to deliver its significations. Strongest: <span style={{ color: C.gold }}>{r.shadbala.ranked[0]}</span> · weakest: <span style={{ color: C.sindoor }}>{r.shadbala.ranked[6]}</span>. Cheshta and some Kala sub-balas are modelled and may differ slightly from other software.</>}
             </p>
 
             {/* special lagnas & points */}
@@ -1158,7 +1159,7 @@ export default function ChartScreen({ C, card, lang }) {
                 <div className="rise" style={{ ...card, padding: "1rem 1.25rem" }}>
                   <p style={{ fontSize: "var(--font-small)", lineHeight: 1.6, color: C.ivory, margin: "0 0 0.75rem" }}>
                     {hi
-                      ? <>विवाह के कारक — शुक्र व गुरु, सप्तम भाव का स्वामी (<strong>{PLANET_DEVA[mw.seventhLord]}</strong>){mw.occ7.length ? <> तथा सप्तम में स्थित ग्रह</> : null} — जिन दशा-अवधियों में सक्रिय होते हैं, परम्परा उन्हें विवाह हेतु अनुकूल मानती है।</>
+                      ? <>विवाह के कारक — शुक्र व गुरु, सप्तम भाव का स्वामी (<strong>{panchangTerm("hi", "planet", mw.seventhLord)}</strong>){mw.occ7.length ? <> तथा सप्तम में स्थित ग्रह</> : null} — जिन दशा-अवधियों में सक्रिय होते हैं, परम्परा उन्हें विवाह हेतु अनुकूल मानती है।</>
                       : <>Periods run by the marriage significators — Venus &amp; Jupiter, the 7th lord (<strong>{mw.seventhLord}</strong>){mw.occ7.length ? <> and planets in the 7th</> : null} — are traditionally seen as supportive for marriage.</>}
                   </p>
                   {mw.windows.length === 0 ? (
@@ -1168,7 +1169,7 @@ export default function ChartScreen({ C, card, lang }) {
                       {mw.windows.map((w, i) => (
                         <div key={i} style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", padding: "0.5rem 0.125rem", borderBottom: "0.0625rem solid var(--line-soft)" }}>
                           <span style={{ color: C.gold, fontSize: "var(--font-small)", minWidth: "8rem", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{fmtY(w.start)} – {fmtY(w.end)}</span>
-                          <span style={{ fontSize: "var(--font-small)", color: C.ivory, flex: 1 }}>{hi ? `${PLANET_DEVA[w.maha]} / ${PLANET_DEVA[w.antar]} दशा` : `${w.maha} / ${w.antar} dasha`}</span>
+                          <span style={{ fontSize: "var(--font-small)", color: C.ivory, flex: 1 }}>{hi ? `${panchangTerm("hi", "planet", w.maha)} / ${panchangTerm("hi", "planet", w.antar)} दशा` : `${w.maha} / ${w.antar} dasha`}</span>
                         </div>
                       ))}
                     </div>

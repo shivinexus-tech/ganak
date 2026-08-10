@@ -73,6 +73,42 @@ The cost: five days of a visible defect, one agent blocked mid-task, and eight d
 finished P0 Jyotish work stranded on an unmerged branch while `main` moved 157 commits
 away from it.
 
+## The user and their journey
+
+The reader here is the **owner** steering by `plans/backlog.md` and
+`plans/task-log.md`, and the agents acting for them. The people ultimately harmed are
+**P4 · Serious Jyotish learner** and **P5 · Working astrologer**, who wait for Jyotish
+features that were built and then stranded.
+
+The journey, walked against the record as it stands today:
+
+1. Owner decides something mid-session ("English sign names — proceed"). **Works today.**
+2. An agent writes it into the backlog. **Works today** — evidence: `ed5e2a0`.
+3. The agent records a reservation row so the work is not lost. **BROKEN** — it must
+   choose between `RESERVED` (which locks files) and nothing. Evidence: `3d07d85`
+   filled the worktree column with a worktree belonging to a different task.
+4. The owner reads the log a week later to decide what is next. **BROKEN** — four rows
+   read `RESERVED` with `worktree TBD`, and one read `ACTIVE`, all describing work no
+   session was doing.
+5. Another agent tries to start real work and is blocked by those rows. **BROKEN** —
+   evidence: `CODEX-JYOTISH-CRITICAL-UX-2026-08-03` had to stop and audit them.
+6. Finished work waits to be merged. **BROKEN and the most costly** — `d6fc641` sat
+   unmerged for 8 days while `main` moved 157 commits away. Evidence: the files it
+   creates (`src/engine/sade-sati-report.ts`, `src/engine/mangal-dosha.ts`) were
+   missing from `main` entirely.
+
+## What already exists (reuse before building)
+
+- **`plans/task-log.md` already is the coordination record**, already has a status
+  vocabulary, and is already read by every agent at pre-flight. This spec adds a check,
+  not a system.
+- **`AGENTS.md:38` already requires** an exclusive branch and worktree per agent. The
+  rule exists; only enforcement is missing.
+- **`validation/route-reachability.cjs` is the precedent** — 214 lines that made an
+  equally invisible defect mechanical. This gate is the same shape.
+- **Tier A CI already runs on a daily cron** (added 2026-07-29), so there is already a
+  place to run a daily liveness check.
+
 ## Goals
 
 1. A row claiming live ownership is backed by a branch that exists — mechanically
@@ -244,6 +280,14 @@ already recorded in `plans/ganak-gate-decay-rootcause.md` and produced
 class of defect deserves its own standing review rather than another one-off gate.
 
 ## Success Metrics
+
+**In user steps** — measured on the six-step journey above:
+
+| Journey step | Today | Target |
+|---|---|---|
+| Steps that mislead the reader of the log | 4 of 6 | **0 of 6** |
+| Steps needed to learn whether a row is real | read the row, hunt the branch, ask the owner | **1 — run the gate** |
+| Delivered work invisible to the owner | 598 lines, 8 days | **surfaced within 1 day** |
 
 **Leading (at merge):**
 - Live rows with a non-existent branch: **4 → 0**.

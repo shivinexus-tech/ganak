@@ -1,7 +1,7 @@
+import { panchangTerm, panchangTermAt, SIGN_ORDER, NAKSHATRA_ORDER } from "../i18n/panchang-terms";
 import React, { useState, useEffect, useRef } from "react";
 import { T } from "../components/ui-style-contract";
 import { fmtDeg } from "../components/format";
-import { NAK_HI } from "../engine/muhurat";
 import { kpNumberToLagna, kpNumberInfo, KP_NUMBER_MIN, KP_NUMBER_MAX } from "../engine/kp-horary";
 import { useDepth } from "../accessibility/ComfortProvider";
 import { Card, DataRow } from "../components/ui-primitives";
@@ -139,12 +139,9 @@ function PR_placidus(ramc, eps, lat) {
 }
 const GRAHA = ['Ke','Ve','Su','Mo','Ma','Ra','Ju','Sa','Me'];
 const DASHA_YRS = { Ke:7, Ve:20, Su:6, Mo:10, Ma:7, Ra:18, Ju:16, Sa:19, Me:17 };
-const NAK_EN = ['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishtha','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
-const RASHI_EN = ['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrishchika','Dhanu','Makara','Kumbha','Meena'];
-const RASHI_HI = ['मेष','वृषभ','मिथुन','कर्क','सिंह','कन्या','तुला','वृश्चिक','धनु','मकर','कुम्भ','मीन'];
+const NAK_EN = ['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishta','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
 const PR_SIGN_LORD = ['Ma','Ve','Me','Mo','Su','Me','Ve','Ma','Ju','Sa','Sa','Ju'];
 const GRAHA_EN = { Su:'Sun', Mo:'Moon', Ma:'Mars', Me:'Mercury', Ju:'Jupiter', Ve:'Venus', Sa:'Saturn', Ra:'Rahu', Ke:'Ketu' };
-const GRAHA_HI = { Su:'सूर्य', Mo:'चन्द्र', Ma:'मंगल', Me:'बुध', Ju:'गुरु', Ve:'शुक्र', Sa:'शनि', Ra:'राहु', Ke:'केतु' };
 function PR_buildSubTable() {
   const rows = []; let cur = 0;
   for (let n = 0; n < 27; n++) {
@@ -281,6 +278,16 @@ function PR_judge(chart, q) {
   return { q, cuspSub, subPlanet, score, hits, moonLinked, retroDrag, verdict };
 }
 // ============================ END ENGINE ====================================
+
+/* Display-only name tables. These live BELOW the frozen marker on purpose: the parity
+   gate evaluates the region above as plain, self-contained JS, so it can carry neither
+   an import nor a TypeScript annotation. Everything the reader actually sees resolves
+   through the one shared lookup. NAK_EN stays inlined above because the engine itself
+   uses it; validation/language-leak-scan.cjs asserts that copy still matches. */
+const RASHI_EN = SIGN_ORDER;
+const RASHI_HI = SIGN_ORDER.map((_, i) => panchangTermAt("hi", "sign", i));
+const GRAHA_HI: Record<string, string> = Object.fromEntries(
+  Object.entries(GRAHA_EN).map(([abbr, full]) => [abbr, panchangTerm("hi", "planet", full)]));
 
 // ===================== KP HORARY NUMBER METHOD (1–249) ======================
 // Sits BELOW the parity-frozen engine on purpose: it reuses the exact same
@@ -477,7 +484,7 @@ function PR_shareCardCanvas(result, hi) {
      31/249 of them one arcminute low, so the card must format it exactly the way
      the in-app Lagna chip does or the two disagree on the same number. */
   const lagnaDeg = result.mode === 'number' ? PR_fmtNumberDeg(L.deg) : fmtDeg(L.deg);
-  g.fillText(`${hi ? 'लग्न' : 'Lagna'}: ${(hi ? RASHI_HI : RASHI_EN)[L.sign]} ${lagnaDeg}  ·  ${(hi ? NAK_HI[L.nak.idx] : L.nak.en)}-${L.nak.pada}`, PAD, y);
+  g.fillText(`${hi ? 'लग्न' : 'Lagna'}: ${(hi ? RASHI_HI : RASHI_EN)[L.sign]} ${lagnaDeg}  ·  ${(hi ? panchangTermAt("hi", "nakshatra", L.nak.idx) : L.nak.en)}-${L.nak.pada}`, PAD, y);
   y += 42; g.fillStyle = FLAG;
   const cuspOrd = hi ? `${result.verdict.q.cusp}वें भाव उप-स्वामी`
                      : `${englishOrdinal(result.verdict.q.cusp)} cusp sub-lord`;
@@ -553,7 +560,7 @@ const NUM_VERDICT = {
   unfavourable: { hi: 'अभी अनुकूल नहीं — थोड़ा ठहरें।',                 en: 'Not the right moment — better to hold than to force it.', badge: { hi: 'अभी नहीं', en: 'Not yet' },  color: TOKENS.sindoor, soft: TOKENS.sindoorSoft },
   mixed:        { hi: 'मिश्रित — कुछ पक्ष अनुकूल, कुछ नहीं; धैर्य रखें।', en: 'Mixed — some support, some resistance; give it time.',   badge: { hi: 'मिश्रित', en: 'Mixed' },     color: TOKENS.amber,   soft: TOKENS.amberSoft },
 };
-const GRAHA_FULL_HI = { Ketu: 'केतु', Venus: 'शुक्र', Sun: 'सूर्य', Moon: 'चन्द्र', Mars: 'मंगल', Rahu: 'राहु', Jupiter: 'गुरु', Saturn: 'शनि', Mercury: 'बुध' };
+
 
 const HOUSE_MEANING_HI = { 1:'आप स्वयं', 2:'धन और परिवार', 3:'साहस और प्रयास',
   4:'घर और सुख', 5:'संतान और सृजन', 6:'बाधा, रोग और ऋण',
@@ -1266,7 +1273,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               <div style={{ display: 'flex', gap: "0.5rem", marginBottom: "0.75rem", flexWrap: 'wrap' }}>
                 <PrashnaChip label={hi ? 'लग्न' : 'Lagna'} value={`${hi ? RASHI_HI[result.chart.lagna.sign] : RASHI_EN[result.chart.lagna.sign]} ${isNum ? PR_fmtNumberDeg(result.chart.lagna.deg) : fmtDeg(result.chart.lagna.deg)}`}
                   gloss={hi ? 'इस क्षण पूर्व में उदित राशि' : 'the sign rising in the east at this moment'} />
-                <PrashnaChip label={hi ? 'नक्षत्र' : 'Nakshatra'} value={`${hi ? NAK_HI[result.chart.lagna.nak.idx] : result.chart.lagna.nak.en}-${result.chart.lagna.nak.pada}`}
+                <PrashnaChip label={hi ? 'नक्षत्र' : 'Nakshatra'} value={`${hi ? panchangTermAt("hi", "nakshatra", result.chart.lagna.nak.idx) : result.chart.lagna.nak.en}-${result.chart.lagna.nak.pada}`}
                   gloss={hi ? 'उदित अंश जिस चन्द्र-नक्षत्र में पड़ता है' : 'the lunar mansion the rising degree falls in'} />
                 <PrashnaChip
                   label={hi ? `${v.q.cusp}वें भाव उप-स्वामी` : `${englishOrdinal(v.q.cusp)} cusp sub-lord`}
@@ -1296,7 +1303,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                           <span style={{ color: TOKENS.sindoor, fontSize: "var(--font-label)" }}> Rx</span>}
                       </td>
                       <td>{hi ? RASHI_HI[p.sign] : RASHI_EN[p.sign]} {fmtDeg(p.deg)}</td>
-                      <td>{hi ? NAK_HI[p.nak.idx] : p.nak.en}-{p.nak.pada}</td>
+                      <td>{hi ? panchangTermAt("hi", "nakshatra", p.nak.idx) : p.nak.en}-{p.nak.pada}</td>
                       <td>{p.star}/{p.sub}</td>
                       <td>{p.house}</td>
                     </tr>
@@ -1387,7 +1394,7 @@ function CuspalTable({ chart, hi, judgedCusp, mode }) {
                   background: on ? TOKENS.goldSoft : 'transparent' }}>
                   <td style={{ ...PR_TD, fontWeight: on ? 700 : 400 }}>{r.house}</td>
                   <td style={PR_TD}>{(hi ? RASHI_HI : RASHI_EN)[r.sign]} {degOf(r)}</td>
-                  <td style={PR_TD}>{(hi ? NAK_HI[r.nak.idx] : r.nak.en)}-{r.nak.pada}</td>
+                  <td style={PR_TD}>{(hi ? panchangTermAt("hi", "nakshatra", r.nak.idx) : r.nak.en)}-{r.nak.pada}</td>
                   <td style={PR_TD}>{(hi ? GRAHA_HI : GRAHA_EN)[r.star]}</td>
                   <td style={{ ...PR_TD, fontWeight: on ? 700 : 400 }}>
                     {(hi ? GRAHA_HI : GRAHA_EN)[r.sub]}
@@ -1476,9 +1483,9 @@ function NumRow({ label, value, gloss }) {
    jargon term carries a plain-language gloss (plans/prashna-249-ksk-verify.md). */
 function NumberSetBox({ info, favor, hi, cuspLabel, cuspIsAscendant }) {
   const signName = hi ? RASHI_HI[info.sign] : RASHI_EN[info.sign];
-  const nak = hi ? NAK_HI[info.nakshatra] : NAK_EN[info.nakshatra];
-  const star = hi ? GRAHA_FULL_HI[info.starLord] : info.starLord;
-  const sub = hi ? GRAHA_FULL_HI[info.subLord] : info.subLord;
+  const nak = hi ? panchangTermAt("hi", "nakshatra", info.nakshatra) : NAK_EN[info.nakshatra];
+  const star = hi ? panchangTerm("hi", "planet", info.starLord) : info.starLord;
+  const sub = hi ? panchangTerm("hi", "planet", info.subLord) : info.subLord;
   return (
     <div style={{ margin: '0 16px', padding: '10px 12px', background: TOKENS.bg,
       borderRadius: TOKENS.radius, border: `0.0625rem solid ${TOKENS.line}` }}>

@@ -44,6 +44,41 @@ sign names** (Kanya → Virgo) while the mathematics stays sidereal Lahiri. That
 vocabulary decision layered on top of the same migration, and is cheapest to do while
 every call site is already being touched.
 
+## The user and their journey
+
+**Primary persona: P4 · Serious Jyotish learner** reading in Hindi. Secondary:
+**P1 · Panchang householder / diaspora** reading in English, and **P5 · Working
+astrologer**, for whom an inconsistent term is a credibility problem.
+
+The journey, walked against the code as it stands today:
+
+1. Switches Ganak to हिन्दी. **Works today.**
+2. Opens the Muhurat finder and reads the nakshatra for a chosen day. Sees
+   `पूर्वाफाल्गुनी`. **Works today.**
+3. Opens a utility calculator and checks their birth nakshatra. Sees
+   `पूर्व फाल्गुनी` — a different spelling of the same star. **BROKEN.**
+   Evidence: `src/screens/UtilityCalculatorScreen.tsx:34` keeps its own `TERM_HI`.
+4. Casts a Kundli and reads the planet table. Sees `Saturn`, `Dhanishta`,
+   `Kumbha (Aquarius)` — English inside Hindi mode. **BROKEN.**
+   Evidence: the 2026-07-28 Codex bug bash, logged as `I18N-DEVANAGARI-TERMS`.
+5. Switches to English to compare. Sees Devanagari leaking the other way on the
+   gochar line. **BROKEN** — the same defect, mirrored.
+6. Concludes the two screens disagree about their own birth star. **The trust cost
+   is the real damage**, not the typography.
+
+## What already exists (reuse before building)
+
+- **`src/i18n/panchang-terms.ts` already is the shared lookup this backlog item asks
+  someone to "design later".** It exists, it documents the correct architecture, and
+  it covers tithi / paksha / month / sign / nakshatra.
+- **Adoption stalled rather than never started** — only 4 files import it.
+  `MuhuratHub.tsx` is the proof: it imports `panchangTerm` on line 43 **and** declares
+  a duplicate `SIGN_HI` on line 63.
+- **`panchangTerm(lang, kind, value)`** already handles the engine's display form
+  (`"Simha (Leo)"`) and already falls through unknown values unchanged.
+
+So Phase 1 is finishing a migration and deleting duplicates — not designing a system.
+
 ## Goals
 
 1. One lookup module owns every sign, nakshatra and planet name. Ad-hoc per-file
@@ -176,6 +211,14 @@ it; do not obstruct it.
 but were not audited here. Note for a later sweep rather than pretending coverage.
 
 ## Success Metrics
+
+**In user steps** — measured on the six-step journey above:
+
+| Journey step | Today | Target |
+|---|---|---|
+| Steps where the reader sees the wrong language | 3 of 6 | **0 of 6** |
+| Distinct spellings of the reader's own birth star across screens | 3 | **1** |
+| Taps needed to get consistent terms | impossible — no tap fixes it | **zero typing, zero extra taps** |
 
 **Leading (at merge):**
 - Duplicate name tables outside `src/i18n/`: currently **7** → target **0**.

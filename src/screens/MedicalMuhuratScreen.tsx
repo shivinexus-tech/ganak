@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { panchangTerm, weekdayName, WEEKDAY_SHORT_EN } from "../i18n/panchang-terms";
 import PlaceInput from "../components/PlaceInput";
 import { zoneOffset } from "../engine/panchang";
 import { medicalMuhuratScan, natalMoonSign } from "../engine/medical-muhurat";
@@ -28,18 +29,9 @@ function fmtTime(ms: number, tz: number, hi: boolean): string {
   const ap = h < 12 ? "AM" : "PM"; let h12 = h % 12; if (h12 === 0) h12 = 12;
   return `${h12}:${two(m)} ${ap}`;
 }
-const DOW_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const DOW_HI = ["रवि", "सोम", "मंगल", "बुध", "गुरु", "शुक्र", "शनि"];
+const DOW_EN = WEEKDAY_SHORT_EN;
 const MON_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MON_HI = ["जन॰", "फ़र॰", "मार्च", "अप्रैल", "मई", "जून", "जुल॰", "अग॰", "सित॰", "अक्तू॰", "नव॰", "दिस॰"];
-const NAK_HI: { [k: string]: string } = {
-  Ashwini: "अश्विनी", Bharani: "भरणी", Krittika: "कृत्तिका", Rohini: "रोहिणी", Mrigashira: "मृगशिरा",
-  Ardra: "आर्द्रा", Punarvasu: "पुनर्वसु", Pushya: "पुष्य", Ashlesha: "आश्लेषा", Magha: "मघा",
-  "Purva Phalguni": "पूर्वाफाल्गुनी", "Uttara Phalguni": "उत्तराफाल्गुनी", Hasta: "हस्त", Chitra: "चित्रा",
-  Swati: "स्वाति", Vishakha: "विशाखा", Anuradha: "अनुराधा", Jyeshtha: "ज्येष्ठा", Mula: "मूल",
-  "Purva Ashadha": "पूर्वाषाढ़ा", "Uttara Ashadha": "उत्तराषाढ़ा", Shravana: "श्रवण", Dhanishta: "धनिष्ठा",
-  Shatabhisha: "शतभिषा", "Purva Bhadrapada": "पूर्वाभाद्रपदा", "Uttara Bhadrapada": "उत्तराभाद्रपदा", Revati: "रेवती",
-};
 
 export default function MedicalMuhuratScreen({ lang, C, card, place, onPlace }: any) {
   const hi = lang === "hi";
@@ -191,8 +183,8 @@ export default function MedicalMuhuratScreen({ lang, C, card, place, onPlace }: 
               )}
               <div style={{ display: "grid", gap: "0.5rem" }}>
                 {result.map((r, i) => {
-                  const dstr = `${hi ? DOW_HI[r.dow] : DOW_EN[r.dow]} ${r.day} ${hi ? MON_HI[r.m - 1] : MON_EN[r.m - 1]}`;
-                  const nak = hi ? (NAK_HI[r.nakName] || r.nakName) : r.nakName;
+                  const dstr = `${hi ? weekdayName("hi", r.dow, true) : DOW_EN[r.dow]} ${r.day} ${hi ? MON_HI[r.m - 1] : MON_EN[r.m - 1]}`;
+                  const nak = hi ? (panchangTerm("hi", "nakshatra", r.nakName) || r.nakName) : r.nakName;
                   if (!r.clean || r.janmaRashi) {
                     const reasonText = !r.clean ? bi(MEDICAL_EXCLUSION[r.reason as "purnima" | "amavasya"]) : bi(MEDICAL_JANMA);
                     return (

@@ -6,7 +6,7 @@ import { T } from "../components/ui-style-contract";
 import { fmtTime } from "../components/format";
 import PlaceInput from "../components/PlaceInput";
 import {
-  SIGNS, NAKSHATRAS, zoneOffset, PLANET_DEVA,
+  SIGNS, NAKSHATRAS, zoneOffset,
 } from "../engine/panchang";
 import { computeTodayPanchang } from "../engine/today-panchang";
 import { CalendarPage } from "./CalendarPage";
@@ -15,7 +15,7 @@ import { scanPanchangCalendar } from "../engine/festivals";
 import { planetGochar, PLANET_PERIOD_DAYS } from "../engine/gochar";
 import PlanetCalendarCard from "../components/PlanetCalendarCard";
 import { fmtDur, eventDetail, transitLabel } from "../engine/transit-copy";
-import { panchangTerm } from "../i18n/panchang-terms";
+import { panchangTerm, panchangTermAt, weekdayName, WEEKDAY_SHORT_EN } from "../i18n/panchang-terms";
 import { CALENDAR_CONVENTIONS, DEFAULT_REGIONAL_CALENDAR_FLAGS, calendarLabel, conventionIsEnabled, resolveConvention } from "../engine/calendar-conventions";
 import { loadRegionalCalendarFlags } from "../engine/regional-calendar-flags";
 import { runRegionalCalendarShadow } from "../monitoring/regional-calendar-shadow";
@@ -25,14 +25,7 @@ import { holidayDatesForYear, resolveHolidayMode } from "../data/india-holidays"
 import ReadAloudButton from "../accessibility/ReadAloudButton";
 import { useDepth } from "../accessibility/ComfortProvider";
 import { Card, SectionHeader } from "../components/ui-primitives";
-import { NAK_HI } from "../engine/muhurat";
 
-const TITHI_HI = Object.freeze({
-  Pratipada: "प्रतिपदा", Dwitiya: "द्वितीया", Tritiya: "तृतीया", Chaturthi: "चतुर्थी",
-  Panchami: "पञ्चमी", Shashthi: "षष्ठी", Saptami: "सप्तमी", Ashtami: "अष्टमी",
-  Navami: "नवमी", Dashami: "दशमी", Ekadashi: "एकादशी", Dwadashi: "द्वादशी",
-  Trayodashi: "त्रयोदशी", Chaturdashi: "चतुर्दशी", Purnima: "पूर्णिमा", Amavasya: "अमावस्या",
-});
 
 export function isValidISODate(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) return false;
@@ -116,9 +109,9 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
   }, [place, ayanamsa, panchDate, isPanchToday]);
   const listenText = useMemo(() => {
     if (!todayP) return [];
-    const tithi = lang === "hi" ? (TITHI_HI[todayP.tithis[0].name] || todayP.tithis[0].name) : todayP.tithis[0].name;
+    const tithi = lang === "hi" ? (panchangTerm("hi", "tithi", todayP.tithis[0].name) || todayP.tithis[0].name) : todayP.tithis[0].name;
     const nakIndex = NAKSHATRAS.indexOf(todayP.naks[0].name);
-    const nakshatra = lang === "hi" ? (NAK_HI[nakIndex] || todayP.naks[0].name) : todayP.naks[0].name;
+    const nakshatra = lang === "hi" ? (panchangTermAt("hi", "nakshatra", nakIndex) || todayP.naks[0].name) : todayP.naks[0].name;
     if (lang === "hi") return [
       `${place?.label || "चुने हुए स्थान"} के लिए आज ${tithi} तिथि और ${todayP.krishna ? "कृष्ण पक्ष" : "शुक्ल पक्ष"} है।`,
       `नक्षत्र ${nakshatra} है।`,
@@ -172,7 +165,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
             {(() => {
               const [py, pm, pd] = panchDate.split("-").map(Number);
               const baseUTC = Date.UTC(py, pm - 1, pd);
-              const WD = lang === "hi" ? ["रवि", "सोम", "मंगल", "बुध", "गुरु", "शुक्र", "शनि"] : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+              const WD = WEEKDAY_SHORT_EN.map((_, i) => weekdayName(lang, i, true));
               const WD1 = lang === "hi" ? ["र", "सो", "मं", "बु", "गु", "शु", "श"] : ["S", "M", "T", "W", "T", "F", "S"];
               const MO = lang === "hi" ? ["जन", "फ़र", "मार्च", "अप्रैल", "मई", "जून", "जुल", "अग", "सित", "अक्तू", "नव", "दिस"] : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
               const MOL = lang === "hi" ? ["जनवरी", "फ़रवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्तूबर", "नवंबर", "दिसंबर"] : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -390,7 +383,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                       <div style={{ marginTop: "0.625rem", paddingTop: "0.75rem", borderTop: `0.0625rem solid var(--line-soft)`, fontSize: "var(--font-small)", color: C.ivory, lineHeight: 1.55 }}>
                         <div style={{ fontSize: "var(--font-small)", color: C.muted, fontStyle: "italic", marginBottom: "0.75rem" }}>{ed.desc}</div>
                         <div style={{ fontSize: "var(--font-micro)", textTransform: "uppercase", letterSpacing: ".1em", color: C.gold, marginBottom: "0.125rem", fontWeight: 600 }}>
-                          {PLANET_DEVA[pl]} {pl} {lang === "hi" ? "राशि गोचर" : "Rashi Gochar"}
+                          {panchangTerm(lang, "planet", pl)} {lang === "hi" ? "राशि गोचर" : "Rashi Gochar"}
                         </div>
                         <div style={{ fontSize: "var(--font-label)", color: C.muted, fontStyle: "italic", marginBottom: "0.625rem" }}>
                           {lang === "hi" ? "यह ग्रह अभी किस राशि से गुज़र रहा है" : "which zodiac sign this planet is currently moving through"}

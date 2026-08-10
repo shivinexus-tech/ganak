@@ -12,7 +12,7 @@ import {
 } from "../engine/panchang";
 import {
   dayMuhurat, findMuhurat, muhuratForDate, muhuratScanRange, muhuratShuddhi,
-  MUHURTA_RULES, vaishnavaEkadashi, NAK_HI, NAK_GOOD, dayScore,
+  MUHURTA_RULES, vaishnavaEkadashi, NAK_GOOD, dayScore,
 } from "../engine/muhurat";
 import { dayHoras, analyzeHora, horaResultText, HORA_GLYPH, HORA_COLOR, HORA_NAME, HORA_NATURE, HORA_PLANET_KEYS, horaDetectPlanet, horaIntent, HORA_CLARIFY, HORA_ACTIVITY_MAP, horaWindowsForPlanet } from "../engine/hora";
 import { computeLagnaPanchaka, panchakaRem, PANCHAKA_TYPE } from "../engine/panchaka";
@@ -40,7 +40,7 @@ import { observancesFor, scanPanchangCalendar, EKADASHI_NAMES, PRADOSH_NAMES_BY_
 import { urlPrefGet, urlPrefPush } from "../components/url-prefs";
 import MuhuratActions from "../components/MuhuratActions";
 import { privacyEvent } from "../telemetry/privacy-events";
-import { panchangTerm } from "../i18n/panchang-terms";
+import { panchangTerm, panchangTermAt, signName } from "../i18n/panchang-terms";
 import ReadAloudButton from "../accessibility/ReadAloudButton";
 import { useDepth } from "../accessibility/ComfortProvider";
 import { Badge, Card, DataRow, SectionHeader } from "../components/ui-primitives";
@@ -60,7 +60,6 @@ function muhuratSpeech(lang, { headline, good = [], avoid = [], note = "" }) {
   return lines.filter(Boolean);
 }
 
-const SIGN_HI = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
 
 function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, onCal = () => {}, onChangeCity = () => {}, C, card }) {
   const { showPlainHelp, showExpert } = useDepth();
@@ -652,7 +651,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
             const setProfile=(key,value)=>setSamskaraProfiles(prev=>({ ...prev, [mfCat]:{ ...(prev[mfCat]||{}), [key]:value } }));
             return <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))", gap: "0.5rem", margin: "0.625rem 0" }}>
               <label style={{ ...T.label,color:C.muted }}>{lang === "hi" ? "शिशु की जन्म-तिथि" : "Child's birth date"}<input type="date" value={profile.birthDate || ""} onChange={e=>setProfile("birthDate",e.target.value)} style={{ display:"block",width:"100%",height:T.ctrlH,boxSizing:"border-box",marginTop: "0.25rem",padding: "0 0.5625rem",borderRadius:T.rMd,border:`0.0625rem solid ${C.line}`,background:"var(--surface-sunken)",color:C.ivory,fontFamily:T.body }} /></label>
-              <label style={{ ...T.label,color:C.muted }}>{spec.secondaryLabel[lang === "hi" ? "hi" : "en"]}<select value={profile[spec.secondary] || ""} onChange={e=>setProfile(spec.secondary,e.target.value)} style={{ display:"block",width:"100%",height:T.ctrlH,boxSizing:"border-box",marginTop: "0.25rem",padding: "0 0.5625rem",borderRadius:T.rMd,border:`0.0625rem solid ${C.line}`,background:"var(--surface-sunken)",color:C.ivory,fontFamily:T.body }}><option value="">{lang === "hi" ? "चुनें" : "Choose"}</option>{(spec.options || NAKSHATRAS.map((en,i)=>({value:String(i),en,hi:NAK_HI[i]}))).map(o=><option key={o.value} value={o.value}>{lang === "hi" ? o.hi : o.en}</option>)}</select></label>
+              <label style={{ ...T.label,color:C.muted }}>{spec.secondaryLabel[lang === "hi" ? "hi" : "en"]}<select value={profile[spec.secondary] || ""} onChange={e=>setProfile(spec.secondary,e.target.value)} style={{ display:"block",width:"100%",height:T.ctrlH,boxSizing:"border-box",marginTop: "0.25rem",padding: "0 0.5625rem",borderRadius:T.rMd,border:`0.0625rem solid ${C.line}`,background:"var(--surface-sunken)",color:C.ivory,fontFamily:T.body }}><option value="">{lang === "hi" ? "चुनें" : "Choose"}</option>{(spec.options || NAKSHATRAS.map((en,i)=>({value:String(i),en,hi:panchangTermAt("hi","nakshatra",i)}))).map(o=><option key={o.value} value={o.value}>{lang === "hi" ? o.hi : o.en}</option>)}</select></label>
               <div style={{ gridColumn:"1 / -1",fontSize: "var(--font-label)",color:C.muted,lineHeight:1.45 }}>{lang === "hi" ? "ये विवरण संस्कार-सन्दर्भ स्पष्ट करते हैं; परिणाम सामान्य पंचांग और संस्कार-विशिष्ट लग्न-शुद्धि है, पूर्ण जन्म-कुण्डली मुहूर्त नहीं।" : "These details clarify the ceremony context; results use general Panchang plus ceremony-specific lagna screening, not a full personalized natal election."}</div>
             </div>;
           })()}
@@ -787,7 +786,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                                 ? `${catInfo.hi} के लिए सर्वोत्तम दिन ${dlFull(top)} है। निर्णय: ${qual(top.score).t}।`
                                 : `The best day for ${catInfo.en} is ${dlFull(top)}. Verdict: ${qual(top.score).t}.`,
                               good: [
-                                ...(top.samskaraWindows || []).slice(0, 3).map((w) => `${lang === "hi" ? SIGN_HI[w.sign] : SIGNS[w.sign]} ${lang === "hi" ? "लग्न" : "Lagna"} ${fmtTime(w.start, top.tz)} – ${fmtTime(w.end, top.tz)}`),
+                                ...(top.samskaraWindows || []).slice(0, 3).map((w) => `${signName(lang, w.sign)} ${lang === "hi" ? "लग्न" : "Lagna"} ${fmtTime(w.start, top.tz)} – ${fmtTime(w.end, top.tz)}`),
                                 ...(top.activityWindows || []).slice(0, 3).map((w) => `${w.kind === "panchaka-rahita" ? (lang === "hi" ? "पञ्चक रहित" : "Panchaka Rahita") : trN(lang, CHOG_NAME, w.key)} ${fmtTime(w.start, top.tz)} – ${fmtTime(w.end, top.tz)}`),
                               ],
                               avoid: (top.factors || []).filter((f) => !f.g).slice(0, 4).map((f) => (lang === "hi" ? f.hi : f.en)),
@@ -797,7 +796,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                         </div>
                         <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-heading)", color: C.ivory, lineHeight: 1.25 }}>{dlFull(top)}</div>
                         <div style={{ fontSize: "var(--font-label)", color: C.muted, margin: "0.1875rem 0 0.5rem" }}>
-                          {(lang === "hi" ? (NAK_HI[top.nak] || top.nakName) : top.nakName)} · {(lang === "hi" ? "तिथि " : "tithi ") + top.tithiNum}
+                          {(lang === "hi" ? (panchangTermAt("hi", "nakshatra", top.nak) || top.nakName) : top.nakName)} · {(lang === "hi" ? "तिथि " : "tithi ") + top.tithiNum}
                           <span style={{ marginLeft: "0.5rem", fontSize: "var(--font-label)", padding: "0.0625rem 0.5625rem", borderRadius: "0.625rem", background: `color-mix(in srgb, ${qual(top.score).c}, var(--surface-active) 88%)`, color: qual(top.score).c }}>{qual(top.score).t}</span>
                         </div>
                         <div style={{ fontSize: "var(--font-small)", color: C.ivory, marginBottom: "0.625rem", lineHeight: 1.5 }}>{(lang === "hi" ? "क्यों यह दिन: " : "Why this day: ") + (top.factors.filter((f) => f.g).map((f) => lang === "hi" ? f.hi : f.en).join(lang === "hi" ? ", " : ", ") || "—")}</div>
@@ -813,7 +812,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
                           <>
                             <div style={{ ...T.label, color:"var(--good)", marginBottom: "0.3125rem" }}>{lang === "hi" ? "संस्कार के अनुकूल लग्न-काल" : "Ceremony-specific lagna windows"}</div>
                             <div style={{ display:"flex", flexDirection:"column", gap: "0.25rem", marginBottom: "0.5rem" }}>
-                              {top.samskaraWindows.slice(0,6).map((w,i)=><div key={i} style={{ display:"flex", justifyContent:"space-between", gap: "0.625rem", fontSize: "var(--font-small)" }}><span style={{ color:"var(--good)" }}>✓ {lang === "hi" ? SIGN_HI[w.sign] : SIGNS[w.sign]} {lang === "hi" ? "लग्न" : "Lagna"}</span><span style={{ color:C.ivory, fontVariantNumeric:"tabular-nums" }}>{fmtTime(w.start,top.tz)} – {fmtTime(w.end,top.tz)}</span></div>)}
+                              {top.samskaraWindows.slice(0,6).map((w,i)=><div key={i} style={{ display:"flex", justifyContent:"space-between", gap: "0.625rem", fontSize: "var(--font-small)" }}><span style={{ color:"var(--good)" }}>✓ {signName(lang, w.sign)} {lang === "hi" ? "लग्न" : "Lagna"}</span><span style={{ color:C.ivory, fontVariantNumeric:"tabular-nums" }}>{fmtTime(w.start,top.tz)} – {fmtTime(w.end,top.tz)}</span></div>)}
                             </div>
                             <div style={{ fontSize: "var(--font-label)", color:C.muted, lineHeight:1.45 }}>{lang === "hi" ? "तिथि, नक्षत्र, वार और इस संस्कार के लग्न/कुण्डली नियम लागू हैं। पञ्चक दोष नीचे द्वितीयक सावधानी है।" : "Tithi, nakshatra, weekday and this Samskara's lagna/chart rules are applied. Panchaka dosha remains a secondary caution."}</div>
                           </>
