@@ -241,6 +241,14 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   const curHoraDialIdx = horaNowInDomain ? Math.min(11, Math.max(0, Math.floor((nowMs - horaDomainStart) / horaDialDur))) : null;
   const showHoraDialIdx = horaSel != null ? horaSel : curHoraDialIdx;
 
+  // Fix (Task 9): Clear horaSel whenever the active hora period changes, whether
+  // from manual toggle or automatic flip (clock crossing sunrise/sunset). The
+  // resolved activeHoraPeriod (not raw horaPeriod) is the dependency so both
+  // paths trigger the reset. Unconditional hook at top level.
+  useEffect(() => {
+    setHoraSel(null);
+  }, [activeHoraPeriod]);
+
   // Step 5: verdict telemetry, once per selection/period/language change. No
   // question text, place or birth data — only the fixed dictionary's
   // outcome/language fields (see src/telemetry/privacy-events.ts).
@@ -1156,7 +1164,7 @@ return (
                   <div role="tablist" aria-label={lang === "hi" ? "दिन या रात" : "Day or night"} style={{ display: "flex", gap: "0.375rem", margin: "0.375rem 0 0.5rem" }}>
                     {tabs.map((t) => (
                       <button key={t.key} type="button" role="tab" aria-selected={activePeriod === t.key}
-                        onClick={() => { setHoraPeriod(t.key); setHoraSel(null); }}
+                        onClick={() => setHoraPeriod(t.key)}
                         style={{ minHeight: T.ctrlH, padding: `0 ${T.s3}`, borderRadius: T.rPill, cursor: "pointer",
                           border: `0.0625rem solid ${activePeriod === t.key ? C.gold : C.line}`,
                           background: activePeriod === t.key ? "var(--accent-soft)" : "transparent",
