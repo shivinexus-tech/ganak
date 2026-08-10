@@ -34,7 +34,11 @@ function loadApp(entry = 'src/kundli-app.tsx') {
 
   // Temp bundle must live INSIDE the project: it `require`s react at runtime, and
   // Node resolves node_modules relative to the file's own location.
-  const tmp = path.join(__dirname, `.bundle-${process.pid}-${Date.now()}.tmp.cjs`);
+  // A monotonic counter, NOT Date.now(): two loads in the same millisecond would
+  // collide on the filename, and Node's require cache would then hand back the
+  // FIRST module's exports for every later entry. (Found 2026-08-10 by the
+  // snapshot harness, which freezes the clock and so collided every time.)
+  const tmp = path.join(__dirname, `.bundle-${process.pid}-${loadApp.seq = (loadApp.seq || 0) + 1}.tmp.cjs`);
   try {
     esbuild.buildSync({
       entryPoints: [entryAbs],
