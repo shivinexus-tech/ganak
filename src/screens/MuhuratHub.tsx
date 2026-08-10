@@ -16,7 +16,6 @@ import {
 } from "../engine/muhurat";
 import { dayHoras, nightHoras, analyzeHora, horaResultText, HORA_GLYPH, HORA_COLOR, HORA_NAME, HORA_NATURE, HORA_PLANET_KEYS, horaDetectPlanet, horaIntent, HORA_CLARIFY, HORA_ACTIVITY_MAP, horaWindowsForPlanet } from "../engine/hora";
 import { adjudicate, nextCleanWindow } from "../engine/hora-verdict";
-import { approvedStorage } from "../storage/approved-storage";
 import { computeLagnaPanchaka, panchakaRem, PANCHAKA_TYPE } from "../engine/panchaka";
 import { obsKind } from "../engine/festivals";
 import { festivalPathForKey } from "../data/festival-pages";
@@ -46,7 +45,7 @@ import MuhuratActions from "../components/MuhuratActions";
 import { privacyEvent } from "../telemetry/privacy-events";
 import { panchangTerm } from "../i18n/panchang-terms";
 import ReadAloudButton from "../accessibility/ReadAloudButton";
-import { useDepth } from "../accessibility/ComfortProvider";
+import { useDepth, useComfort } from "../accessibility/ComfortProvider";
 import { Badge, Card, DataRow, SectionHeader } from "../components/ui-primitives";
 
 /**
@@ -66,13 +65,9 @@ function muhuratSpeech(lang, { headline, good = [], avoid = [], note = "" }) {
 
 const SIGN_HI = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
 
-// Storage key for the practitioner "show blocked horas" toggle (Finding 2 — see
-// its useState initializer below for why this rides in approvedStorage's shared
-// "preferences" bucket and what that trades off).
-const HORA_SHOW_BLOCKED_KEY = "horaShowBlocked";
-
 function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, onCal = () => {}, onChangeCity = () => {}, C, card }) {
   const { showPlainHelp, showExpert } = useDepth();
+  const { preferences, updatePreferences } = useComfort();
   const tz = todayP.tz;
   const nowMs = isToday ? Date.now() : null;
   const lp = useMemo(() => { try { return computeLagnaPanchaka(place, ayanamsa, todayP.anchor); } catch (e) { return { lagnaSchedule: [], panchakaWindows: [], tz }; } }, [place, ayanamsa, todayP.anchor, tz]);
@@ -106,32 +101,13 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   // hard block: a favourable hora that falls inside Rahu Kaal/Gulika/Yamaganda
   // is never offered as a clean recommendation.
   //
-  // Persisted via approvedStorage.preferences (the project's single approved
-  // on-device store — see src/storage/approved-storage.ts) so a practitioner
-  // working chart after chart does not re-tick it every visit. That store's
-  // "preferences" bucket is a generic Record<string, unknown>, but in practice
-  // it is read/written end-to-end by ComfortProvider (src/accessibility/
-  // ComfortProvider.tsx) as one closed-shape GanakPreferences object:
-  // ComfortProvider's own write REPLACES the whole bucket with only its 13
-  // known fields every time any comfort/accessibility setting changes, so a
-  // foreign key added here (horaShowBlocked) survives a plain reload but can
-  // be silently dropped back to the default the next time the user touches
-  // an unrelated comfort setting. That is a known, reported limitation, not
-  // silently swallowed: it never corrupts ComfortProvider's own data (this
-  // code always merges before writing), it only ever degrades to today's
-  // pre-fix behaviour (defaults back to off), and closing it properly means
-  // adding a real GanakPreferences field in ComfortProvider.tsx, which is
-  // outside this task's file allowlist.
-  const [showBlockedHoras, setShowBlockedHorasState] = useState(() => {
-    const stored = approvedStorage.preferences.read({});
-    return stored.ok && stored.value && stored.value[HORA_SHOW_BLOCKED_KEY] === true;
-  });
-  const setShowBlockedHoras = (value) => {
-    setShowBlockedHorasState(value);
-    const current = approvedStorage.preferences.read({});
-    const base = current.ok && current.value && typeof current.value === "object" ? current.value : {};
-    approvedStorage.preferences.write({ ...base, [HORA_SHOW_BLOCKED_KEY]: value });
-  };
+  // A first-class field on ComfortProvider's GanakPreferences shape
+  // (src/accessibility/ComfortProvider.tsx), so it is read/written through
+  // the same updatePreferences() every other screen uses for its preferences
+  // and survives any write from any owner of that bucket — no more foreign
+  // key riding along in the raw storage record.
+  const showBlockedHoras = preferences.horaShowBlocked;
+  const setShowBlockedHoras = (value) => updatePreferences({ horaShowBlocked: value });
   const [showPanch, setShowPanch] = useState(false);
   const [dragMs, setDragMs] = useState(null);  // dragged time on arc
   const isoAtOffset = (days) => new Date(Date.now() + tz * 3600000 + days * 86400000).toISOString().slice(0, 10);

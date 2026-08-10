@@ -26,6 +26,7 @@ export type GanakPreferences = {
   following: string[];
   speechRate: number;
   firstRunComplete: boolean;
+  horaShowBlocked: boolean;
   privacy: {
     analytics: boolean;
     research: boolean;
@@ -63,6 +64,11 @@ export const DEFAULT_PREFERENCES: GanakPreferences = Object.freeze({
   following: [],
   speechRate: 0.92,
   firstRunComplete: false,
+  // Muhurat Hub's "show blocked horas too (practitioner view)" toggle
+  // (src/screens/MuhuratHub.tsx). Default OFF matches shipped behaviour: a
+  // favourable hora that falls inside Rahu Kaal/Gulika/Yamaganda stays hidden
+  // unless a practitioner explicitly opts in.
+  horaShowBlocked: false,
   privacy: { analytics: false, research: false, sensitiveSync: false },
 });
 
@@ -104,6 +110,7 @@ export function sanitizePreferences(value: unknown): GanakPreferences {
     following,
     speechRate: finiteInRange(v.speechRate, 0.75, 1.2, DEFAULT_PREFERENCES.speechRate),
     firstRunComplete: Boolean(v.firstRunComplete),
+    horaShowBlocked: Boolean(v.horaShowBlocked),
     privacy: {
       analytics: Boolean(privacy.analytics),
       research: Boolean(privacy.research),

@@ -698,9 +698,11 @@ if (nightNoteCallSites < 2)
   const savedWindow = global.window;
   global.window = { localStorage: fakeLocalStorage };
 
-  // Merge-safe write: the exact read-then-spread-then-write pattern
-  // MuhuratHub.tsx uses to add horaShowBlocked to the shared "preferences"
-  // bucket must not clobber a pre-existing unrelated key already there.
+  // Merge-safe write: the read-then-spread-then-write pattern that
+  // ComfortProvider.tsx's updatePreferences() uses internally (spread current
+  // preferences, apply the patch, sanitize, write the whole object back) must
+  // not clobber a pre-existing unrelated key already in the shared
+  // "preferences" bucket.
   storageMod.approvedStorage.preferences.write({ existingKey: 'keepme' });
   let cur = storageMod.approvedStorage.preferences.read({});
   storageMod.approvedStorage.preferences.write(Object.assign({}, cur.value, { horaShowBlocked: true }));
@@ -714,23 +716,33 @@ if (nightNoteCallSites < 2)
   cur = storageMod.approvedStorage.preferences.read({});
   if (cur.value.horaShowBlocked !== true) fail('approvedStorage.preferences: horaShowBlocked did not survive a read after write (Finding 2 — the toggle forgetting itself on reload)');
 
-  // DOCUMENTED, NOT FIXED (reported in the fix report and in the comment
-  // above showBlockedHoras's useState in MuhuratHub.tsx): approvedStorage's
-  // "preferences" bucket is a single whole-object store end-to-end owned by
-  // ComfortProvider.tsx, which REPLACES it wholesale — not merges — every
-  // time any comfort/accessibility setting changes. This pins that today's
-  // module genuinely behaves that way (a write shaped like ComfortProvider's
-  // own, with no spread of the existing value, drops horaShowBlocked back to
-  // undefined) so the risk is demonstrated, not asserted from memory. This is
-  // a deliberate "pin the known limitation" check, same idiom as the
-  // nightHoras-without-nextRise NaN assertion above: if this ever stops
-  // reproducing, approved-storage.ts's write() semantics changed for the
-  // better, and both this assertion and the MuhuratHub.tsx comment describing
-  // the old clobber risk need updating together, not left to silently drift.
-  storageMod.approvedStorage.preferences.write({ scalePercent: 106.25, colorMode: 'auto' }); // shaped like ComfortProvider's own unconditional whole-object write
+  // FIXED (previously "documented, not fixed" — a ComfortProvider-shaped
+  // whole-object write used to silently drop horaShowBlocked because it
+  // wasn't part of ComfortProvider's declared GanakPreferences shape).
+  // horaShowBlocked is now a first-class field on that shape
+  // (src/accessibility/ComfortProvider.tsx: the GanakPreferences type,
+  // DEFAULT_PREFERENCES, and sanitizePreferences all declare it), so
+  // ComfortProvider's own write — which always round-trips through
+  // sanitizePreferences before hitting storage — carries the key along with
+  // every other preference instead of dropping it. This pins the stronger
+  // claim: a write built the way ComfortProvider actually builds one (via
+  // the real sanitizePreferences(), not a hand-rolled partial object) must
+  // preserve horaShowBlocked. If this ever regresses, ComfortProvider's
+  // shape lost the field again and both this assertion and the persistence
+  // comment in MuhuratHub.tsx need updating together, not left to silently
+  // drift.
+  const comfortMod = loadApp('src/accessibility/ComfortProvider.tsx');
+  if (comfortMod.DEFAULT_PREFERENCES.horaShowBlocked !== false)
+    fail('ComfortProvider.tsx: DEFAULT_PREFERENCES.horaShowBlocked must default to false (blocked horas hidden, matching shipped behaviour)');
+  // Shaped like ComfortProvider's own unconditional whole-object write: take
+  // whatever is in storage, run it through the real sanitizePreferences(),
+  // and write the result back — exactly what the effect in
+  // ComfortProvider.tsx does on every preference change.
+  const sanitized = comfortMod.sanitizePreferences(Object.assign({}, cur.value, { scalePercent: 106.25, colorMode: 'auto' }));
+  storageMod.approvedStorage.preferences.write(sanitized);
   cur = storageMod.approvedStorage.preferences.read({});
-  if (cur.value.horaShowBlocked !== undefined)
-    fail('DOCUMENTATION CHECK (Finding 2): approvedStorage.preferences.write no longer replaces the bucket wholesale — horaShowBlocked survived a ComfortProvider-shaped write. If this is a deliberate improvement, update this assertion and the persistence-risk comment in MuhuratHub.tsx together, rather than leaving them describing a risk that no longer exists.');
+  if (cur.value.horaShowBlocked !== true)
+    fail('ComfortProvider.tsx: horaShowBlocked must survive a ComfortProvider-shaped whole-object write (Finding 2 follow-up) — it must be declared on GanakPreferences, defaulted in DEFAULT_PREFERENCES, and preserved by sanitizePreferences');
 
   if (hadWindow) global.window = savedWindow; else delete global.window;
 }
