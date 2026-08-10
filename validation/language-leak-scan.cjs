@@ -99,6 +99,30 @@ assert.strictEqual(duplicates.length, 0,
   `A second source of truth for rashi/nakshatra/graha names:\n  ${duplicates.join('\n  ')}\n` +
   'Delete the table and call panchangTerm / panchangTermAt / signName / signLabel instead.');
 
+/* ------------------------- 1b. engine name arrays must never reach JSX unlocalised */
+/* The defect this catches: a screen interpolating the engine's canonical English
+   array straight into the markup — `{NAKSHATRAS[i]}` — so Hindi mode prints
+   "Shatabhisha". Four such sites survived the whole 16-table migration on
+   2026-08-09 precisely because they consulted NO table, leaving check 1 nothing to
+   find. A rendered-text snapshot cannot see it either when the surface only appears
+   after a cast. So it is caught here, at the source, by shape. */
+const RAW_IN_JSX = /[{$]\{?\s*(NAKSHATRAS|SIGNS)\s*\[/;
+const rawRenders = [];
+for (const file of files) {
+  const rel = path.relative(root, file).split(path.sep).join('/');
+  if (!/^src\/(screens|components)\//.test(rel)) continue;
+  fs.readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
+    if (line.trim().startsWith('//') || line.trim().startsWith('*')) return;
+    if (!RAW_IN_JSX.test(line)) return;
+    // Localised forms wrap the array access, e.g. panchangTerm(lang,"nakshatra",NAKSHATRAS[i])
+    if (/(panchangTerm|panchangTermAt|signLabel|signName|signShort)\s*\(/.test(line)) return;
+    rawRenders.push(`${rel}:${i + 1} → ${line.trim().slice(0, 110)}`);
+  });
+}
+assert.strictEqual(rawRenders.length, 0,
+  `An engine name array is rendered without localisation:\n  ${rawRenders.join('\n  ')}\n` +
+  'Wrap it: panchangTerm(lang, "nakshatra", NAKSHATRAS[i]) or signLabel(lang, SIGNS[i]).');
+
 /* ------------------------------- 2. the one unavoidable copy is pinned, not trusted */
 /* PrashnaScreen's engine is validated by prashna-parity, which evaluates the region
    between its ENGINE markers as plain, self-contained JS — it can carry neither an
