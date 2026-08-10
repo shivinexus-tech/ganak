@@ -274,7 +274,60 @@ website implementation, not a reference-backed visual image.
 | Follow / Listen controls on the Today card | **Deferred — omit** | Existing Follow and Hindi read-aloud remain on contextual Festival Guide content until a separate Today behaviour is explicitly specified. | Consent/local-first follow preference; selected language. | No duplicate or fake Today control. |
 | Reminder / Save / Share | **Deferred — omit** | Backlog #37; it can appear only after a recipient, calendar/export behaviour and consent/data rules are implemented. | Explicit user choice; no sensitive data leakage. | #37 acceptance criteria and live user action pass. |
 
-### 10.3 Working procedure for every later screen
+### 10.3 Festivals — discovery, calendar and search, desktop website
+
+**Visual source:** the approved Ganak desktop system from §10.2 (wordmark, navigation,
+ivory canvas, pale-blue floral context ribbon, navy/gold hierarchy and floral footer).
+This screen is a working discovery surface, not a decorative festival gallery. Rows and
+search results use Ganak's live festival registry and permanent guide routes.
+
+| Screen element | Decision | Real target / behaviour | State that must survive | Acceptance proof |
+|---|---|---|---|---|
+| Shared Ganak header and primary navigation | **Move** | Same destinations as §10.2, with Festivals visibly current. | `lang`, place, coordinates, zone, selected date and applicable route state. | Open every destination and return; Festivals remains the selected destination when appropriate. |
+| Language selector | **Preserve** | Existing EN/HI application toggle. | Festival/calendar view, search query, place and date context. | Switch EN↔HI in the list, year view, search and an opened guide. |
+| Personalize access | **Move** | Existing comfort, language, privacy and data controls; not an account/profile promise. | Approved local-first preferences and current Festival context. | Change/review a preference and return without losing the current list/search state. |
+| Place field | **Move** | Existing shared place selector; dates and timings update for that place. | `city`, `lat`, `lon`, `zone`, `lang` and current Festival context. | Change city, open a guide, return/reload and confirm the same place. |
+| Date / Today context | **Move** | Existing selected-date context and explicit Today action; not an independent festival-date database. | `date`, place, `lang`, `cal`, `hol` and browser history. | Pick a date, open Festivals, open a guide and return without reset. |
+| Sunrise / sunset values in the shared ribbon | **Decorative / data-only** | Existing calculated local values; hide if unavailable. | Place, zone and date. | Compare with the current Daily result for the same inputs. |
+| Page title and plain-language introduction | **Improve** | Explain that users can browse upcoming festivals and fasts, search an observance or open the full-year calendar. | Language and selected context. | EN/HI copy clearly distinguishes discovery from the full guide. |
+| Festivals / Fasting tabs | **Preserve** | Existing upcoming Festival and fasting-observance lists. | Selected tab, place, date and `lang`; Vaishnava date note remains truthful where applicable. | Switch tabs; verify labels/dates and the Vaishnava note against the current list. |
+| Upcoming festival and fast rows | **Improve** | Whole row opens the existing canonical `/festival/<slug>` guide; no inline expansion. | Festival slug, place, coordinates, zone, `lang` and Back destination. | Every visible row opens the correct guide and browser Back returns to the same context. |
+| Festival artwork / thumbnail | **Decorative / data-only** | Owned Ganak art may identify a row or featured observance; it does not create a second action. | Same destination as its parent row. | Image has meaningful alt text; clicking its row opens the canonical guide. |
+| Date and relative-day label | **Decorative / data-only** | Existing calculated local occurrence and relative-day value. | Place, zone, selected date and language. | Compare displayed dates with the current Festival/Fasting list for the same place. |
+| Search field and Search action | **Preserve** | Existing festival/tithi search powered by `searchUpcoming`; Festival/Fast results open canonical guides and tithi-only results remain plainly informational. | Search query, place, zone, language and Back destination. | Search a festival, a fast and a tithi; reload/Back retain the originating context without a false link. |
+| Full-year calendar / View calendar | **Move** | Existing year view grouped by month; permanent festival/fast rows open canonical guides. | Year/view type, place, zone, `lang` and Back destination. | Open year view, open a guide, then Back; month grouping and place remain intact. |
+| Category, deity, region or tradition filter controls | **Deferred — omit** | Personalised discovery is product scope for a later approved slice; no such working filter currently exists on this route. | N/A. | No filter chip or dropdown implies unsupported filtering. |
+| Inline expand chevron or in-list festival preview | **Remove** | Rows navigate directly to the full canonical guide; the earlier inline preview was deliberately retired. | N/A. | One row has one clear destination and no competing expand action. |
+| Reminder / Save / Share | **Deferred — omit** | Backlog #37; discovery must not promise an unbuilt calendar/export/recipient flow. | N/A. | Absent until #37 is implemented and accepted. |
+
+### 10.4 Festival Detail — canonical guide, desktop website
+
+**Reference content:** `/festival/devshayani-ekadashi` is the first editable sample because
+it matches the approved visual master's Vishnu artwork and has distinct route content:
+Vishnu's symbolic rest, Chaturmas beginning, an Ekadashi fast and local parana. The
+template remains content-adaptive; it does not make every festival look like Devshayani.
+
+| Screen element | Decision | Real target / behaviour | State that must survive | Acceptance proof |
+|---|---|---|---|---|
+| Shared Ganak header and primary navigation | **Move** | Same destinations as §10.2, with Festivals visibly current. | `lang`, place, coordinates, zone, festival slug and Back destination. | Open each destination and return; direct festival URL remains permanent. |
+| Language selector | **Preserve** | Existing EN/HI toggle changes guide navigation, answer, timing and supported devotional content. | Festival slug, place and current guide position where practical. | Switch EN↔HI on the direct route without returning to Today. |
+| Personalize access | **Move** | Existing Personalize hub; not a new login/account menu. | Approved preferences, festival slug, place and language. | Open and return without losing the guide. |
+| Place field | **Move** | Existing shared place selector recalculates the guide's local date and timing. | `city`, `lat`, `lon`, `zone`, festival slug and `lang`. | Change city and confirm local date/timing refreshes without changing guide. |
+| Back to Festivals | **Move** | Returns to the Festival discovery context when entered there; normal browser Back remains valid. | Originating tab/view/search, place and language. | Open from list/search/year and return to the same context. |
+| Festival hero artwork | **Improve** | Existing owned, festival-appropriate Ganak art; Devshayani uses reclining Vishnu, while other guides use their own mapped art or omit the hero. | Festival identity and language-specific alt text. | Test Devshayani and at least one unrelated festival; no generic or mismatched deity art. |
+| Festival title, bilingual identity and answer-first summary | **Improve** | Existing canonical guide title and reviewed route-specific verdict/meaning, never placeholder prose. | Festival slug and `lang`. | Compare English/Hindi text with the existing guide data; named observances do not collapse into a generic base fast. |
+| Local date and timing card | **Improve** | Existing place-aware festival occurrence, deciding period and applicable parana/puja window; calculation rules remain untouched. | Festival slug, place, zone and language. | Compare with `findLocalFestivalOccurrence` for two cities and the relevant validation anchors. |
+| Follow | **Preserve** | Existing star toggle through approved preferences storage; local-first, with religious preference excluded from sync/analytics without explicit granular consent. | Followed state, festival slug and language. | Toggle, reload, review/clear preference and confirm no direct browser storage call. |
+| Listen | **Preserve** | Existing Web Speech read-aloud for the guide's title, verdict, meaning and supported content. | Language, current festival and play/stop UI state. | Start/stop in EN and Hindi; unsupported voice/error is visibly explained. |
+| Meaning / significance and story | **Preserve** | Existing reviewed route-specific content and shared guide material where explicitly labelled. | Festival slug and language. | Named variant keeps its own meaning; source-boundary wording remains visible. |
+| Vrat / Puja Vidhi | **Preserve** | Existing `VratVidhiCard` steps, who-it-is-for guidance, fasting boundaries and supported regional notes. | Festival slug, language and comfort depth. | Open the section in EN/HI; step order and caveats match current data. |
+| Aarti / mantra / devotional readings | **Preserve** | Existing guide content only where supplied and reviewed; absent rather than invented when unavailable. | Festival slug, language and comfort depth. | A guide with content shows it; a guide without content has no empty or fake section. |
+| Technical method / source boundary | **Preserve** | Existing expert-depth Lahiri/mean-node/local-sunrise note and route-specific sourcing boundary. | Guided/Expert preference and language. | Guided view stays plain; Expert view reveals the method without changing the result. |
+| Related observances / season links | **Move** | Existing canonical routes only (for example Navadurga season links where supported). | Destination slug, place and language. | Every visible related link resolves; no invented recommendation card. |
+| Reminder / Save / Share | **Deferred — omit** | Backlog #37; no calendar/export/recipient behaviour is implied before the feature is implemented. | N/A. | Absent from the working Figma screen and implementation. |
+| Donation, booking, premium or commerce CTA | **Deferred — omit** | No such Festival-guide capability or owner-approved commercial journey exists in this migration slice. | N/A. | No decorative or dead commercial action appears. |
+
+### 10.5 Working procedure for every later screen
 
 1. Start from the current-route inventory in §4 and capability map in §5, not from a
    mockup or component library.
