@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { T } from "../components/ui-style-contract";
 import { fmtDateT } from "../components/format";
-import { signShort } from "../i18n/panchang-terms";
+import { signShort, panchangTerm } from "../i18n/panchang-terms";
 import { SIGNS, NAKSHATRAS, zoneOffset, SIGN_LORD } from "../engine/panchang";
 import { rectSweep, mahaTimelineAt, runDashaAt, VIM_LORDS, rectAtMin } from "../engine/dasha";
 
@@ -72,7 +72,7 @@ function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
           <span style={{ fontSize: "var(--font-label)", color: C.muted }}>{hi ? "संभावित जन्म समय" : "candidate birth time"} {Math.abs(selC - centerMin) < 0.1 ? (hi ? "(दर्ज समय)" : "(as entered)") : (selC > centerMin ? "+" : "−") + fmtMin(Math.abs(selC - centerMin)).slice(3) + (hi ? " मिनट" : " min")}</span>
         </div>
         <input type="range" min={lo} max={hiMin} step={0.25} value={selC} onChange={(e) => setSel(+e.target.value)} style={{ width: "100%", accentColor: C.gold, marginBottom: "0.875rem" }} />
-        <Marker label={hi ? "लग्न" : "Lagna"} color={C.ivory}>{signShort(lang, mk.sign)} {dms(mk.deg)} · {NAKSHATRAS[mk.nak]} {hi ? "पाद" : "pada"} {mk.pada}</Marker>
+        <Marker label={hi ? "लग्न" : "Lagna"} color={C.ivory}>{signShort(lang, mk.sign)} {dms(mk.deg)} · {panchangTerm(lang, "nakshatra", NAKSHATRAS[mk.nak])} {hi ? "पाद" : "pada"} {mk.pada}</Marker>
         <Marker label={hi ? "नवांश D-9 लग्न" : "Navamsa D-9 lagna"} color={C.gold}>{signShort(lang, mk.d9)}</Marker>
         <Marker label={hi ? "षष्ट्यांश D-60 लग्न" : "Shashtiamsa D-60 lagna"} color={C.gold}>{signShort(lang, mk.d60)}</Marker>
         <Marker label={hi ? "केपी लग्न उप-स्वामी" : "KP ascendant sub-lord"} color={lordColor[mk.subLord]}>{mk.subLord}</Marker>

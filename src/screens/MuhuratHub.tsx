@@ -946,7 +946,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         const obs = observancesFor(todayP.krishna, todayP.tithiDay, todayP.months?.amanta || null, todayP.dow);
         const note = obs.length
           ? (isToday ? (lang === "hi" ? "आज " : "Today is ") : (lang === "hi" ? "इस तारीख़ को " : "This date is ")) + obsLabel(lang, obs[0]) + (obs[0].fasting ? (lang === "hi" ? " — व्रत का दिन" : " — a fasting day") : "")
-          : todayP.naks[0].name + (lang === "hi" ? " नक्षत्र · " : " nakshatra · ") + todayP.tithis[0].name;
+          : panchangTerm(lang, "nakshatra", todayP.naks[0].name) + (lang === "hi" ? " नक्षत्र · " : " nakshatra · ") + panchangTerm(lang, "tithi", todayP.tithis[0].name);
         const E = todayP.elong != null ? todayP.elong : (todayP.tithiNum || 0) * 12;
         const k = (1 - Math.cos(E * Math.PI / 180)) / 2, waxing = E < 180, mR = 22, rx = (mR * Math.abs(2 * k - 1)).toFixed(1);
         const moonLit = waxing

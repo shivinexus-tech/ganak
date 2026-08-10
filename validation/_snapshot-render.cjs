@@ -40,13 +40,15 @@ const path = require('path');
 const { ROOT } = require('./_load-app.cjs');
 
 let seq = 0;
-function loadScreenWithProvider(entry) {
+function loadScreenWithProvider(entry, exportName) {
   const rel = entry.replace(/^src\//, '').replace(/\.tsx?$/, '');
   const tmpRel = `src/.snapshot-entry-${process.pid}-${++seq}.tsx`;
   const tmpAbs = path.join(ROOT, tmpRel);
   fs.writeFileSync(tmpAbs,
     `export { ComfortProvider } from "./accessibility/ComfortProvider";\n` +
-    `export { default as Screen } from "./${rel}";\n`, 'utf8');
+    (exportName
+      ? `export { ${exportName} as Screen } from "./${rel}";\n`
+      : `export { default as Screen } from "./${rel}";\n`), 'utf8');
   try {
     return loadApp(tmpRel);
   } finally {
@@ -54,9 +56,11 @@ function loadScreenWithProvider(entry) {
   }
 }
 
-function renderScreenText(entry, props) {
-  const { ComfortProvider, Screen } = loadScreenWithProvider(entry);
-  if (typeof Screen !== 'function') throw new Error(`no default export from ${entry}`);
+function renderScreenText(entry, props, exportName) {
+  const { ComfortProvider, Screen } = loadScreenWithProvider(entry, exportName);
+  if (typeof Screen !== 'function') {
+    throw new Error(`no ${exportName ? `export "${exportName}"` : 'default export'} from ${entry}`);
+  }
   const tree = React.createElement(ComfortProvider, null, React.createElement(Screen, props));
   return toText(renderToStaticMarkup(tree));
 }

@@ -1,0 +1,15 @@
+Lagna: Cancer
+Moon sign: Aquarius
+Sun sign: Gemini
+Janma Nakshatra: Shatabhisha pada 3
+Ashtakavarga columns: Ar Ta Ge Cn Le Vi Li Sc Sg Cp Aq Pi
+--- planets ---
+Sun — Gemini · Mrigashira
+Moon — Aquarius · Shatabhisha
+Mars — Pisces · Revati
+Mercury — Taurus · Rohini
+Jupiter — Gemini · Punarvasu
+Venus — Aries · Bharani
+Saturn — Capricorn · Uttara Ashadha
+Rahu — Capricorn · Shravana
+Ketu — Cancer · Pushya

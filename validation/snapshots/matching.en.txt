@@ -1,0 +1,11 @@
+Groom
+Name
+Date of birth
+Time
+Place of birth
+Bride
+Name
+Date of birth
+Time
+Place of birth
+Match the kundalis
