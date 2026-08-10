@@ -126,7 +126,24 @@ export function nextCleanWindow(
       .map((w) => ({ start: Math.max(w.start, afterMs), end: w.end }))
       .filter((w) => w.start < w.end && (w.end - w.start) >= MIN_USABLE_MS);
     if (!stillAhead.length) continue;
-    return { window: win, verdict: { ...verdict, usable: stillAhead } };
+    /* The grade/gradeKey adjudicate computed describe the FULL window, which
+       can diverge from the range actually being offered once usable is
+       clipped to afterMs — e.g. an earlier "good" stretch can dominate the
+       whole window while everything still ahead of afterMs is "bad". Recompute
+       the dominant Choghadiya over just the offered range (from the clipped
+       start of the first surviving segment to the window's end) so grade
+       always describes the same span usable does. */
+    const offeredRange: Window = { start: stillAhead[0].start, end: win.end };
+    const dom = dominantChoghadiya(offeredRange, ctx);
+    return {
+      window: win,
+      verdict: {
+        ...verdict,
+        usable: stillAhead,
+        grade: dom ? dom.nat : "neutral",
+        gradeKey: dom ? dom.key : null,
+      },
+    };
   }
   return null;
 }

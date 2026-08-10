@@ -131,5 +131,20 @@ n = nextCleanWindow([W(0, 300000)], CTX({ rahu: W(0, 40000) }), 80000);
 if (!n || n.window.start !== 0) fail('a window with at least 180000ms remaining after afterMs should be returned');
 if (!n.verdict.usable.length || n.verdict.usable[0].start !== 80000 || n.verdict.usable[0].end !== 300000) fail('usable start must be clipped to afterMs (80000), not the unclipped cut boundary (40000)');
 
+// gate: grade/gradeKey must describe the OFFERED range, not the raw window.
+// Window 0-900000 is dominated by an earlier 'good'/'amrit' span (0-500000)
+// that adjudicate would grade the whole window by, but afterMs=550000 clips
+// usable to a 'bad'/'rog' remainder (550000-900000) with no overlap into the
+// 'good' span at all. The returned verdict must grade what's actually offered.
+const GRADE_CTX = CTX({
+  chogha: [
+    { key: 'amrit', nat: 'good', start: 0, end: 500000 },
+    { key: 'rog', nat: 'bad', start: 500000, end: 900000 },
+  ],
+});
+n = nextCleanWindow([W(0, 900000)], GRADE_CTX, 550000);
+if (!n || !n.verdict.usable.length || n.verdict.usable[0].start !== 550000) fail('grade gate: usable[0].start should be clipped to afterMs (550000)');
+if (!n || n.verdict.grade !== 'bad' || n.verdict.gradeKey !== 'rog') fail('grade/gradeKey must reflect the offered range, not the full window (expected bad/rog, got ' + (n && n.verdict.grade) + '/' + (n && n.verdict.gradeKey) + ')');
+
 if (failures) { console.error(`hora-adjudication: ${failures} failure(s)`); process.exit(1); }
 console.log('hora-adjudication: PASS');
