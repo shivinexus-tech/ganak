@@ -213,7 +213,9 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   const pill = (txt, nat) => <Badge tone={nat === "good" ? "good" : nat === "bad" ? "bad" : "accent"} density="compact">{txt}</Badge>;
   const SecHead = ({ deva, en, right }) => (
     <div style={{ margin: `${T.s6} 0 ${T.s3}`, borderBottom: `0.0625rem solid ${C.line}`, paddingBottom: T.s2 }}>
-      <SectionHeader hi={deva} en={en} lang="hi" density="compact" actions={right} />
+      {/* lang was pinned to "hi" here, so "व्रत एवं पर्व", "मुहूर्त खोज" and "होरा"
+          stayed Devanagari even in English mode. Follow the reader's choice. */}
+      <SectionHeader hi={deva} en={en} lang={lang === "hi" ? "hi" : "en"} density="compact" actions={right} />
     </div>
   );
 

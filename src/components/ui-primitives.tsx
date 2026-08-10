@@ -122,16 +122,11 @@ export function SectionHeader({
         }}
       >
         {icon && <span aria-hidden="true" style={{ color: "var(--accent)" }}>{icon}</span>}
+        {/* One language per screen (owner, 2026-08-09). This header used to print the
+            OTHER language as a muted subtitle, which put Devanagari on every English
+            heading and English on every Hindi one. The `hi` prop stays — it supplies
+            the heading itself when lang === "hi". */}
         <span>{lang === "hi" ? hi : en}</span>
-        <span
-          style={{
-            fontFamily: "var(--font-body-family)", fontSize: "var(--font-label)",
-            letterSpacing: "var(--label-letter-spacing)", textTransform: "var(--label-transform)" as any,
-            color: "var(--muted)", fontWeight: 400,
-          }}
-        >
-          {lang === "hi" ? en : hi}
-        </span>
       </h3>
       {actions && <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", flexWrap: "wrap" }}>{actions}</div>}
     </div>
