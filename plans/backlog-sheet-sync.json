@@ -340,9 +340,9 @@
       "longTermImpact": "With no raw colour or px value left in the screens, the later brand palette becomes a values-only swap with zero rework, and any future comfort dimension is a root-level change. A permanent gate now fails the build if a raw hex, a px type size or an undefined guidance-depth step comes back.",
       "bugBashStatus": "Required high-impact bug bash completed 2026-08-01 for the base system. A separate independent first-run-city bug bash on 2026-08-10 found and cleared four defects. The link-city follow-up then received its own independent PASS: prompt conditions, both non-mutating choices, normal city changes, Back/URL behavior, dialog sequencing, EN/HI and modal accessibility all passed; only harmless exact-place comparison sensitivity remains.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-08-10 · link-city follow-up local 375×812: remembered Mumbai + London link displayed the required two-choice dialog in EN/HI; London applied only to the linked view, normal reload returned to Mumbai, saved-city choice rewrote the current view to Mumbai, and both paths had zero overflow. Focused gates 9/9 + 13/13, independent bug bash, every canonical gate and production build pass. Deployment/live verification pending.",
+      "lastVerified": "2026-08-10 · production commit 95d9da0: live ganakapp.com displayed the required London-versus-remembered-Mumbai question before timings loaded. Local 375×812 EN/HI verification proved both choices, Mumbai restoration on a normal visit and zero overflow. Focused gates 9/9 + 13/13, independent bug bash, every canonical gate, production build and Tier A workflow 31370820045 pass.",
       "sourceConfidence": "Not applicable — technical accessibility, UX and design-system work",
-      "recommendedAction": "Deploy and live-verify the link-city question, then retain the standing owner live-URL sign-off and human real-device screen-reader/audio/touch pass for row 46 closure."
+      "recommendedAction": "No link-city code action remains. Retain the standing owner live-URL sign-off and human real-device screen-reader/audio/touch pass for row 46 closure."
     },
     "65": {
       "deliveryState": "Specified, not started",
