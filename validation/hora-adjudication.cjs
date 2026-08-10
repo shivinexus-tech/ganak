@@ -120,6 +120,30 @@ v = adjudicate(W(10, 20), CTX({ rahu: W(0, 100) }));
 if (v.usable.length !== 0) fail('sanity: this window should be fully blocked for the fallback check');
 if (v.grade !== 'good' || v.gradeKey !== 'amrit') fail('a fully blocked window should still grade over the whole window (expected good/amrit, got ' + v.grade + '/' + v.gradeKey + ')');
 
+// R5 (corrected): abhijitBoost must come from the usable spans, not the whole
+// window. Reuses HOLE_CTX's belt (rahu 300000-700000 cutting a hole out of a
+// 0-1000000 window), with abhijit (400000-600000) placed entirely inside that
+// blocked hole — the same hole R4's HOLE_CTX case exercises for grade.
+const ABHIJIT_HOLE_CTX = Object.assign({}, HOLE_CTX, { abhijit: W(400000, 600000) });
+v = adjudicate(W(0, 1000000), ABHIJIT_HOLE_CTX);
+if (v.usable.length !== 2 || v.usable[0].start !== 0 || v.usable[0].end !== 300000 || v.usable[1].start !== 700000 || v.usable[1].end !== 1000000) {
+  fail('abhijit-in-hole case: usable should still be [{0,300000},{700000,1000000}] (expected unchanged by abhijit)');
+}
+if (v.abhijitBoost !== false) fail('abhijit lying entirely inside the blocked hole must not set abhijitBoost (it overlaps no usable span)');
+
+// R5 (corrected): abhijit overlapping a surviving usable span DOES set the boost.
+const ABHIJIT_USABLE_CTX = Object.assign({}, HOLE_CTX, { abhijit: W(100000, 200000) });
+v = adjudicate(W(0, 1000000), ABHIJIT_USABLE_CTX);
+if (v.abhijitBoost !== true) fail('abhijit overlapping a surviving usable span should set abhijitBoost');
+
+// R5 fallback: a fully blocked window (usable empty) whose abhijit overlaps
+// the raw window still reports abhijitBoost true, and status stays blocked —
+// re-pinning that abhijit never clears a block, even under the corrected rule.
+v = adjudicate(W(10, 20), CTX({ rahu: W(0, 100), abhijit: W(0, 100) }));
+if (v.usable.length !== 0) fail('sanity: this window should be fully blocked for the R5 fallback check');
+if (v.abhijitBoost !== true) fail('a fully blocked window should still report abhijitBoost via the whole-window fallback');
+if (v.status !== 'blocked') fail('abhijitBoost must not clear a block, even under the fallback (R5)');
+
 // Use realistic window sizes (each 300s = 300000ms >> MIN_USABLE_MS = 180000ms)
 const WINS = [W(0, 300000), W(300000, 600000), W(600000, 900000)];
 

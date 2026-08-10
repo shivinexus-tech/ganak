@@ -84,6 +84,18 @@ function dominantChoghadiyaOverSpans(spans: Window[], ctx: TimingContext): { key
   return best ? { key: best.key, nat: best.nat } : null;
 }
 
+/* R5, mirroring R4/R6's dominantChoghadiyaOverSpans: true when `win` overlaps
+   at least one of `spans` (the usable remainders), not any single span alone.
+   Summing overlap across spans and checking for a positive total is
+   equivalent to "overlaps at least one," since overlapMs never returns a
+   negative value. */
+function overlapsAnySpan(win: Window | null, spans: Window[]): boolean {
+  if (!win) return false;
+  let total = 0;
+  for (const span of spans) total += overlapMs(span, win);
+  return total > 0;
+}
+
 /* R1–R6. See docs/superpowers/specs/2026-08-09-hora-usefulness-design.md §4.2. */
 export function adjudicate(win: Window, ctx: TimingContext): Verdict {
   const blockedBy: BlockerKey[] = [];
@@ -126,13 +138,25 @@ export function adjudicate(win: Window, ctx: TimingContext): Verdict {
   const dom = usable.length > 0
     ? dominantChoghadiyaOverSpans(usable, ctx)
     : dominantChoghadiya(win, ctx);
+
+  /* R5 (corrected): boost only what the user can actually act in. When
+     usable is non-empty, check ctx.abhijit against the usable spans rather
+     than the raw window — otherwise Abhijit can sit entirely inside a belt's
+     blocked hole and still claim to boost a recommendation the user cannot
+     use. When usable is empty (fully blocked), fall back to whole-window
+     overlap: a blocked window should still report whether it would have been
+     boosted, and there is no usable time left to measure against. */
+  const abhijitBoost = usable.length > 0
+    ? overlapsAnySpan(ctx.abhijit, usable)
+    : !!(ctx.abhijit && overlapMs(win, ctx.abhijit) > 0);
+
   return {
     status,
     usable,
     blockedBy,
     grade: dom ? dom.nat : "neutral",
     gradeKey: dom ? dom.key : null,
-    abhijitBoost: !!(ctx.abhijit && overlapMs(win, ctx.abhijit) > 0),
+    abhijitBoost,
   };
 }
 
