@@ -110,40 +110,26 @@ export function adjudicate(win: Window, ctx: TimingContext): Verdict {
 }
 
 /* The first window at or after `afterMs` that still has usable time in it.
-   Returns null when the day has nothing left — the caller then offers tomorrow. */
+   Returns null when the day has nothing left — the caller then offers tomorrow.
+
+   Adjudication runs on the OFFERED range (the window clipped to afterMs), not
+   the raw window, and every field of the returned verdict — status, usable,
+   blockedBy, grade, abhijitBoost — derives from that single adjudicate() call.
+   That makes it structurally impossible for a field to describe a belt or
+   Choghadiya span that falls entirely in the already-elapsed part of the
+   window: nothing outside the offered range ever reaches adjudicate(). */
 export function nextCleanWindow(
   windows: Window[], ctx: TimingContext, afterMs: number
 ): { window: Window; verdict: Verdict } | null {
   const ordered = [...(windows || [])].sort((a, b) => a.start - b.start);
   for (const win of ordered) {
-    if (win.end <= afterMs) continue;
-    const verdict = adjudicate(win, ctx);
+    const offeredRange: Window = { start: Math.max(win.start, afterMs), end: win.end };
+    if (offeredRange.end <= offeredRange.start) continue;
+    const verdict = adjudicate(offeredRange, ctx);
     if (verdict.status === "blocked") continue;
-    /* Clip each segment to afterMs first — a segment that starts before afterMs
-       must not be handed back with its stale, already-elapsed start time — then
-       filter to segments that still have at least MIN_USABLE_MS remaining. */
-    const stillAhead = verdict.usable
-      .map((w) => ({ start: Math.max(w.start, afterMs), end: w.end }))
-      .filter((w) => w.start < w.end && (w.end - w.start) >= MIN_USABLE_MS);
-    if (!stillAhead.length) continue;
-    /* The grade/gradeKey adjudicate computed describe the FULL window, which
-       can diverge from the range actually being offered once usable is
-       clipped to afterMs — e.g. an earlier "good" stretch can dominate the
-       whole window while everything still ahead of afterMs is "bad". Recompute
-       the dominant Choghadiya over just the offered range (from the clipped
-       start of the first surviving segment to the window's end) so grade
-       always describes the same span usable does. */
-    const offeredRange: Window = { start: stillAhead[0].start, end: win.end };
-    const dom = dominantChoghadiya(offeredRange, ctx);
-    return {
-      window: win,
-      verdict: {
-        ...verdict,
-        usable: stillAhead,
-        grade: dom ? dom.nat : "neutral",
-        gradeKey: dom ? dom.key : null,
-      },
-    };
+    const usableTotal = verdict.usable.reduce((s, w) => s + (w.end - w.start), 0);
+    if (usableTotal < MIN_USABLE_MS) continue;
+    return { window: win, verdict };
   }
   return null;
 }

@@ -146,5 +146,16 @@ n = nextCleanWindow([W(0, 900000)], GRADE_CTX, 550000);
 if (!n || !n.verdict.usable.length || n.verdict.usable[0].start !== 550000) fail('grade gate: usable[0].start should be clipped to afterMs (550000)');
 if (!n || n.verdict.grade !== 'bad' || n.verdict.gradeKey !== 'rog') fail('grade/gradeKey must reflect the offered range, not the full window (expected bad/rog, got ' + (n && n.verdict.grade) + '/' + (n && n.verdict.gradeKey) + ')');
 
+// gate: status/blockedBy/abhijitBoost must also describe the OFFERED range, not
+// the raw window. Both rahu (0-300000) and abhijit (0-200000) sit entirely in
+// the already-elapsed part (before afterMs=400000); the offered range
+// (400000-900000) touches neither. Every field must reflect that.
+const OFFERED_CTX = CTX({ rahu: W(0, 300000), abhijit: W(0, 200000) });
+n = nextCleanWindow([W(0, 900000)], OFFERED_CTX, 400000);
+if (!n || n.verdict.status !== 'clean') fail('offered-range gate: status should be clean when the offered range is untouched by rahu (got ' + (n && n.verdict.status) + ')');
+if (!n || n.verdict.blockedBy.length !== 0) fail('offered-range gate: blockedBy should be empty when rahu does not touch the offered range');
+if (!n || n.verdict.abhijitBoost !== false) fail('offered-range gate: abhijitBoost should be false when abhijit does not touch the offered range');
+if (!n || n.verdict.usable.length !== 1 || n.verdict.usable[0].start !== 400000 || n.verdict.usable[0].end !== 900000) fail('offered-range gate: usable should be exactly [400000,900000]');
+
 if (failures) { console.error(`hora-adjudication: ${failures} failure(s)`); process.exit(1); }
 console.log('hora-adjudication: PASS');
