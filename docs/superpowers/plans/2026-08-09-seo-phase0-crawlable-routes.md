@@ -589,30 +589,85 @@ needs no default-place decision."
 ### Task 5: Wire into the build and verify in production
 
 **Files:**
-- Modify: `package.json`
+- Modify: `vite.config.ts`
 - Modify: `plans/task-log.md` (own row)
+
+**Why a Vite plugin and not a `package.json` script:** the Cloudflare Pages build
+command lives in the dashboard, not in this repo. If it is set to `vite build` rather
+than `npm run build`, a `package.json`-only hook would silently never run — the site
+would deploy exactly as it does today while every local gate stayed green. Hooking
+`closeBundle` makes the step fire for *any* invocation of Vite's build, so the
+dashboard setting cannot void the work. This removes what would otherwise be an
+unverifiable owner gate.
 
 - [ ] **Step 1: Wire the build**
 
-In `package.json`, change:
+Replace `vite.config.ts` with:
 
-```json
-    "build": "vite build",
+```ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+/* Emit sitemap.xml, robots.txt, the canonical 301s and one HTML file per route
+   after the bundle is written. This runs inside Vite's own build rather than as
+   an `npm run build` step so it cannot be bypassed by the Cloudflare Pages build
+   command, which is configured in the dashboard and not in this repo. */
+function seoEmitter() {
+  return {
+    name: "ganak-seo-emitter",
+    apply: "build" as const,
+    closeBundle: async () => {
+      const { emitAll } = await import("./scripts/build-seo.mjs");
+      emitAll();
+    },
+  };
+}
+
+export default defineConfig({
+  plugins: [react(), seoEmitter()],
+  server: {
+    port: 5173,
+  },
+});
+```
+
+- [ ] **Step 2: Make the emitter importable**
+
+`scripts/build-seo.mjs` currently calls `main()` at module load, which would fire on
+import. Change the bottom of the file from:
+
+```js
+main();
 ```
 
 to:
 
-```json
-    "build": "vite build && node scripts/build-seo.mjs",
+```js
+export function emitAll() {
+  main();
+}
+
+/* Still runnable standalone: `node scripts/build-seo.mjs` */
+if (process.argv[1] && process.argv[1].endsWith("build-seo.mjs")) main();
 ```
 
-- [ ] **Step 2: Verify a clean build produces everything in one command**
+- [ ] **Step 3: Verify a clean build produces everything in ONE command**
+
+```bash
+export PATH="/opt/homebrew/bin:$PATH"; rm -rf dist && npx vite build && node validation/prerender-seo.mjs
+```
+
+Expected: `build-seo:` lines appear during the Vite build itself — note this uses bare
+`vite build`, proving the hook does not depend on `npm run build`. Gate passes.
+
+Then confirm the npm path works too:
 
 ```bash
 export PATH="/opt/homebrew/bin:$PATH"; rm -rf dist && npm run build && node validation/prerender-seo.mjs
 ```
 
-Expected: build succeeds, `build-seo:` lines appear, gate passes. `dist/` must be regenerated from scratch — Vite empties it, so `build-seo` must run after, which this ordering guarantees.
+Expected: identical output. `dist/` is regenerated from scratch each time — Vite
+empties it, and `closeBundle` runs after that, so ordering is guaranteed.
 
 - [ ] **Step 3: Run the full canonical gate suite**
 
@@ -628,17 +683,16 @@ export PATH="/opt/homebrew/bin:$PATH"; node validation/route-metadata.cjs && nod
 
 Expected: all PASS.
 
-- [ ] **Step 4: Confirm the Pages build command — OWNER GATE**
-
-The Cloudflare Pages project's build command lives in the dashboard, not in this repo. If it is set to `vite build` rather than `npm run build`, **none of this ships** — the site would deploy without the SEO step and look identical to today.
-
-Ask the owner to confirm the Pages build command is `npm run build`. Do not merge Task 5 until confirmed. This cannot be verified from inside the repo.
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
-git add package.json
-git commit -m "build(seo): run the SEO emitter after every vite build"
+git add vite.config.ts scripts/build-seo.mjs
+git commit -m "build(seo): emit SEO artifacts from inside the Vite build
+
+Hooked as a closeBundle plugin rather than an npm script so the step
+cannot be bypassed by the Cloudflare Pages build command, which lives
+in the dashboard and is not verifiable from this repo. Verified under
+bare \`vite build\` as well as \`npm run build\`."
 ```
 
 - [ ] **Step 6: Post-deploy production verification**
