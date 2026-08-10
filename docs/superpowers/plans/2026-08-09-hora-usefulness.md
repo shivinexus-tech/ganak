@@ -21,7 +21,8 @@
 - All new user-facing copy ships in English **and** Hindi in the same commit.
 - Telemetry properties are restricted to `action`, `language`, `outcome`. Do not widen the allow-list. Never send question text, place, or birth data.
 - All engine time values are epoch milliseconds. No `Date` objects across module boundaries.
-- **BLOCKED LANE:** `src/screens/MuhuratHub.tsx` is claimed by unmerged REVIEW branch `codex/jyotish-ux-remaining` (task `CODEX-JYOTISH-UX-REMAINING-2026-08-03`). Tasks 8 and 9 must not begin until that branch merges or the owner clears the lane. Tasks 1–7 and 10 are outside its file list.
+- **Lane status (verified 2026-08-09):** `codex/jyotish-ux-remaining` and `codex/jyotish-critical-ux` are both ancestors of `origin/main` — `git merge-base --is-ancestor` confirms both. `src/screens/MuhuratHub.tsx` is therefore **free**. `plans/task-log.md` still shows both rows as `REVIEW — READY TO INTEGRATE`; correcting those rows is part of Task 10.
+- Work from a worktree based on `origin/main`, not on `claude/brand-color-swap`. The untracked docs in the primary working tree collide with tracked files on main, so a worktree is the only clean base.
 - Reserve a row in `plans/task-log.md` before the first code edit.
 
 ---
@@ -472,6 +473,89 @@ git commit -m "feat(hora): offer the next clean window instead of a dead end"
 
 ---
 
+### Task 5A: Expose the real next sunrise
+
+> Found while planning: `src/engine/today-panchang.ts:96` already computes
+> `choghaNight` as `choghaSlots(dow, ev.set, ev.rise + 86400000, false)`. The
+> **shipped night Choghadiya has been drifting against a fake sunrise all along** —
+> several minutes most of the year, worst near the solstices. This is wider than
+> Hora, and one fix at the source serves both.
+
+**Files:**
+- Modify: `src/engine/today-panchang.ts` (the `sunEvents` call, the `choghaNight` line at `:96`, and the returned object at `:91`)
+- Modify: `validation/hora-adjudication.cjs`
+
+**Interfaces:**
+- Consumes: `sunEvents` from `src/engine/panchang.ts`
+- Produces: `nextRise` on the object returned by `computeTodayPanchang` — consumed by Tasks 5, 8, 9
+
+- [ ] **Step 1: Write the failing gate additions**
+
+Append to `validation/hora-adjudication.cjs` (add `loadApp('src/engine/today-panchang.ts')` for `computeTodayPanchang` at the top):
+
+```js
+const DELHI = { lat: 28.6139, lon: 77.2090, zone: 'Asia/Kolkata', label: 'Delhi' };
+const tp = computeTodayPanchang(DELHI, 'lahiri', Date.UTC(2026, 11, 21, 6, 30)); // solstice: worst drift
+if (tp.nextRise == null) fail('computeTodayPanchang should expose nextRise');
+if (Math.abs(tp.nextRise - (tp.rise + 86400000)) < 1000)
+  fail('nextRise looks like rise+24h — it must be the real following sunrise');
+if (!(tp.nextRise > tp.set)) fail('nextRise must fall after sunset');
+// night choghadiya must end at the real sunrise, not the approximation
+const lastNight = tp.choghaNight[tp.choghaNight.length - 1];
+if (Math.abs(lastNight.end - tp.nextRise) > 1) fail('night choghadiya must end at the real next sunrise');
+```
+
+- [ ] **Step 2: Run the gate to verify it fails**
+
+```bash
+export PATH="/opt/homebrew/bin:$PATH"
+node validation/hora-adjudication.cjs
+```
+
+Expected: FAIL on "should expose nextRise".
+
+- [ ] **Step 3: Compute and expose it**
+
+In `src/engine/today-panchang.ts`, beside the existing `ev` derivation, add:
+
+```js
+  /* The FOLLOWING day's sunrise. Everything that spans the night — night horas,
+     night choghadiya — must measure against this, not rise+24h, which drifts by
+     minutes and is worst near the solstices. */
+  const evNext = sunEvents(anchor + 86400000, place.lat, place.lon);
+  const nextRise = evNext.rise !== null ? evNext.rise : (ev.rise !== null ? ev.rise + 86400000 : null);
+```
+
+Change the `choghaNight` line at `:96` to consume it:
+
+```js
+    choghaNight: ev.rise !== null ? choghaSlots(dow, ev.set, nextRise, false) : null,
+```
+
+And add `nextRise` to the returned object beside `rise` and `set` at `:91`:
+
+```js
+    rise: ev.rise, set: ev.set, nextRise, moonrise: moonEv.rise, moonset: moonEv.set, rahu, abhijit, gulika, yama,
+```
+
+- [ ] **Step 4: Run the gate and the neighbouring gates to verify nothing regressed**
+
+```bash
+export PATH="/opt/homebrew/bin:$PATH"
+node validation/hora-adjudication.cjs && node validation/daily-windows.cjs && node validation/deep-muhurats.cjs && node validation/parse-check.cjs
+```
+
+Expected: all PASS. `daily-windows` and `deep-muhurats` both consume panchang output — if either fails, the night Choghadiya boundaries they assert were pinned to the old approximation and the pin is what must change, not the fix. Record which assertion moved and by how many minutes.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add src/engine/today-panchang.ts validation/hora-adjudication.cjs
+git commit -m "fix(panchang): measure the night against the real next sunrise"
+```
+
+---
+
 ### Task 5: Correct night hora boundaries
 
 **Files:**
@@ -479,8 +563,8 @@ git commit -m "feat(hora): offer the next clean window instead of a dead end"
 - Modify: `validation/hora-adjudication.cjs`
 
 **Interfaces:**
-- Consumes: nothing new
-- Produces: `horaWindowsForPlanet(planet, weekday, rise, set, nextRise)` — a fifth required parameter. Tasks 8 and 9 must pass it.
+- Consumes: `nextRise` from Task 5A
+- Produces: `horaWindowsForPlanet(planet, weekday, rise, set, nextRise?)` and `nightHoras(weekday, set, nextRise?)`. The fifth parameter is **optional and defaulted**, so this task ships independently of Tasks 8–9 without leaving `NaN` windows behind. Callers that pass the real `nextRise` get correct night boundaries; callers that do not get the old approximation until they are updated.
 
 - [ ] **Step 1: Write the failing gate additions**
 
@@ -516,9 +600,10 @@ In `src/engine/hora.ts`, replace `horaWindowsForPlanet`:
 
 ```ts
 /* all hora windows (day + night) ruled by a given planet today.
-   nextRise is the FOLLOWING day's sunrise — passing rise+24h drifts by several
-   minutes and worst near the solstices, so callers must supply the real value. */
-export function horaWindowsForPlanet(planet, weekday, rise, set, nextRise) {
+   nextRise is the FOLLOWING day's sunrise, from computeTodayPanchang. It is
+   defaulted so existing callers keep working, but the default is the very drift
+   this fix removes — pass the real value. */
+export function horaWindowsForPlanet(planet, weekday, rise, set, nextRise = rise + 86400000) {
   const startIdx = HORA_ORDER.indexOf(DAY_LORD[weekday % 7]);
   const dayDur = (set - rise) / 12, nightDur = (nextRise - set) / 12, out = [];
   for (let i = 0; i < 12; i++) if (HORA_ORDER[(startIdx + i) % 7] === planet) out.push({ start: rise + i * dayDur, end: rise + (i + 1) * dayDur, period: "day" });
@@ -528,7 +613,7 @@ export function horaWindowsForPlanet(planet, weekday, rise, set, nextRise) {
 }
 
 /* the twelve night horas, sunset -> next sunrise, in order */
-export function nightHoras(weekday, set, nextRise) {
+export function nightHoras(weekday, set, nextRise = set + 86400000) {
   const startIdx = HORA_ORDER.indexOf(DAY_LORD[weekday % 7]);
   const dur = (nextRise - set) / 12, out = [];
   for (let i = 0; i < 12; i++) out.push({ ruler: HORA_ORDER[(startIdx + 12 + i) % 7], start: set + i * dur, end: set + (i + 1) * dur });
@@ -552,7 +637,7 @@ export PATH="/opt/homebrew/bin:$PATH"
 grep -rn "horaWindowsForPlanet" src/
 ```
 
-Expected: only `src/engine/hora.ts` and `src/screens/MuhuratHub.tsx`. The MuhuratHub call sites are updated in Task 8 — until then the fifth argument is `undefined`, which yields `NaN` night windows. **Do not ship Task 5 without Task 8.** If Task 8 is still lane-blocked, hold this commit on the branch and say so in the handoff.
+Expected: only `src/engine/hora.ts`, `src/engine/personal-hora.ts` and `src/screens/MuhuratHub.tsx`. Because the fifth parameter is defaulted, every existing call keeps working unchanged — this task is independently shippable. Task 8 upgrades the MuhuratHub call sites to pass the real `nextRise`.
 
 - [ ] **Step 6: Commit**
 
@@ -785,9 +870,9 @@ git commit -m "feat(hora): add the shared-axis timing lane strip"
 
 ---
 
-### Task 8: Verdicts in the Ask box — LANE-BLOCKED
+### Task 8: Verdicts in the Ask box
 
-> **Do not start** until `codex/jyotish-ux-remaining` merges or the owner clears `src/screens/MuhuratHub.tsx`. Confirm status in `plans/task-log.md` first.
+> Lane verified free on 2026-08-09: both claiming codex branches are ancestors of `origin/main`. Re-confirm with `git merge-base --is-ancestor origin/codex/jyotish-ux-remaining origin/main` before starting, in case a new reservation has been filed.
 
 **Files:**
 - Modify: `src/screens/MuhuratHub.tsx:1106-1190` (the `horaResult` render block) and `:17` (imports)
@@ -808,15 +893,10 @@ const horaCtx = {
   abhijit: todayP.abhijit || null,
   chogha: [...(todayP.choghaDay || []), ...(todayP.choghaNight || [])],
 };
-const nextRise = todayP.nextRise != null ? todayP.nextRise : (todayP.rise != null ? todayP.rise + 86400000 : null);
+const nextRise = todayP.nextRise;
 ```
 
-If `todayP.nextRise` does not exist, add it in the panchang derivation rather than leaving the fallback — the fallback is exactly the drift Task 5 removed. Check first:
-
-```bash
-export PATH="/opt/homebrew/bin:$PATH"
-grep -n "nextRise\|rise:" src/engine/panchang.ts | head
-```
+`todayP.nextRise` is guaranteed by Task 5A. Do **not** reintroduce a `rise + 86400000` fallback here — that is the exact drift Tasks 5A and 5 removed. If it reads `undefined`, Task 5A has not landed; stop and complete it first.
 
 - [ ] **Step 2: Replace every `horaWindowsForPlanet` call with the five-argument form**
 
@@ -936,9 +1016,9 @@ git commit -m "feat(hora): adjudicate every hora answer against the forbidden be
 
 ---
 
-### Task 9: Day/night toggle, lanes and grading on the dial — LANE-BLOCKED
+### Task 9: Day/night toggle, lanes and grading on the dial
 
-> Same gate as Task 8.
+> Depends on Task 8 having landed the `horaCtx` and `nextRise` derivations in the same file.
 
 **Files:**
 - Modify: `src/screens/MuhuratHub.tsx:940-1077` (the hora dial block)
@@ -1108,8 +1188,12 @@ git commit -m "docs(hora): record the hora adjudication closeout"
 
 ## Self-review
 
-**Spec coverage:** G1 → Tasks 3, 8. G2 → Tasks 5, 9. G3 → Tasks 3, 9. G4 → Tasks 7, 9. G5 → Tasks 4, 8. G6 → Task 8 step 5. G7 → Task 1. G8 → Tasks 6, 9. Rule set R1–R7 → Task 3. Telemetry §6 → Task 1. Validation §7 → Tasks 2–6. Design system §5 → Tasks 7, 9. Every spec section maps to a task.
+**Spec coverage:** G1 → Tasks 3, 8. G2 → Tasks 5A, 5, 9. G3 → Tasks 3, 9. G4 → Tasks 7, 9. G5 → Tasks 4, 8. G6 → Task 8 step 5. G7 → Task 1. G8 → Tasks 6, 9. Rule set R1–R7 → Task 3. Telemetry §6 → Task 1. Validation §7 → Tasks 2–6. Design system §5 → Tasks 7, 9. Decision D6 → Task 5A. Every spec section maps to a task.
 
-**Type consistency:** `Window`, `TimingContext`, `Verdict`, `BlockerKey` are defined once in Task 2/3 and referenced by exact name in Tasks 4, 7, 8, 9. `horaWindowsForPlanet` gains its fifth parameter in Task 5 and every later call site passes it. `trikonaLords` is the canonical name; `horaPersonalAusp` survives only as a one-release alias.
+**Type consistency:** `Window`, `TimingContext`, `Verdict`, `BlockerKey` are defined once in Task 2/3 and referenced by exact name in Tasks 4, 7, 8, 9. `horaWindowsForPlanet` gains an optional fifth parameter in Task 5; `nextRise` originates in Task 5A and flows to Tasks 5, 8, 9 under that one name. `trikonaLords` is the canonical name; `horaPersonalAusp` survives only as a one-release alias.
 
-**Known ordering hazard:** Task 5 changes a shared signature that Task 8 consumes. Shipping Task 5 without Task 8 leaves `NaN` night windows in the screen. Task 5 step 5 states this; if the lane is still blocked, hold the branch rather than merging halfway.
+**Ordering:** Task 5A must precede Tasks 5, 8 and 9 — it creates `nextRise`. Tasks 1, 2 and 7 are independent of everything and can run in parallel. Tasks 3 → 4 → 6 are a chain on the verdict engine. Tasks 8 → 9 are a chain on one screen file and must be sequential.
+
+**Resolved hazard:** the fifth parameter is defaulted, so Task 5 no longer strands Task 8. Each task is independently shippable and independently revertible.
+
+**Scope note:** Task 5A fixes a defect outside the original spec — shipped night Choghadiya measured against `rise + 86400000`. It is included because Tasks 5, 8 and 9 all depend on the correct value, and leaving two sunrise definitions in the codebase would guarantee the contradiction this whole plan exists to remove.
