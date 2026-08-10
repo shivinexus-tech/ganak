@@ -47,7 +47,12 @@ const NAKSHATRA_HI: Record<string, string> = {
   "Uttara Bhadrapada": "उत्तरा भाद्रपदा", Revati: "रेवती", Abhijit: "अभिजित",
 };
 
-const TABLES = { tithi: TITHI_HI, paksha: PAKSHA_HI, month: MONTH_HI, sign: SIGN_HI, nakshatra: NAKSHATRA_HI };
+const PLANET_HI: Record<string, string> = {
+  Sun: "सूर्य", Moon: "चन्द्र", Mars: "मंगल", Mercury: "बुध", Jupiter: "गुरु",
+  Venus: "शुक्र", Saturn: "शनि", Rahu: "राहु", Ketu: "केतु",
+};
+
+const TABLES = { tithi: TITHI_HI, paksha: PAKSHA_HI, month: MONTH_HI, sign: SIGN_HI, nakshatra: NAKSHATRA_HI, planet: PLANET_HI };
 
 export type PanchangTermKind = keyof typeof TABLES;
 
@@ -71,4 +76,4 @@ export function panchangTerm(lang: string, kind: PanchangTermKind, value: unknow
   return out;
 }
 
-export { TITHI_HI, PAKSHA_HI, MONTH_HI, SIGN_HI, NAKSHATRA_HI };
+export { TITHI_HI, PAKSHA_HI, MONTH_HI, SIGN_HI, NAKSHATRA_HI, PLANET_HI };

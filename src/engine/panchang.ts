@@ -186,7 +186,7 @@ function upcomingEvents(fromMs, days = 75) {
   const ss = sunSidMs(fromMs);
   const nextSign = (Math.floor(ss / 30) + 1) % 12;
   const tS = solveCross(sunSidMs, fromMs, (nextSign * 30) % 360, 40);
-  if (tS) ev.push({ t: tS, label: `Surya enters ${SIGNS[nextSign].split(" ")[0]} · Sankranti`, planet: "Sun", type: "sign" });
+  if (tS) ev.push({ t: tS, label: `Sun enters ${SIGNS[nextSign].split(" ")[0]} · Sankranti`, planet: "Sun", type: "sign" });
   const tP = solveCross(elongMs, fromMs, 180, 32);
   if (tP) ev.push({ t: tP, label: "Purnima — full moon", planet: "Moon", type: "lunation" });
   const tA = solveCross(elongMs, fromMs, 0, 32);
@@ -202,14 +202,14 @@ function upcomingEvents(fromMs, days = 75) {
       if (sg !== prevSign) {
         let lo = t - 86400000, hi = t;
         for (let k = 0; k < 18; k++) { const mid = (lo + hi) / 2; if (Math.floor(f(mid) / 30) === prevSign) lo = mid; else hi = mid; }
-        ev.push({ t: hi, label: `${PLANET_DEVA[p]} ${p} enters ${SIGNS[sg].split(" ")[0]}`, planet: p, type: "sign" });
+        ev.push({ t: hi, label: `${p} enters ${SIGNS[sg].split(" ")[0]}`, planet: p, type: "sign" });
         prevSign = sg;
       }
       const v = speed(t);
       if (v * pv < 0) {
         let lo = t - 86400000, hi = t;
         for (let k = 0; k < 18; k++) { const mid = (lo + hi) / 2; if (speed(mid) * pv > 0) lo = mid; else hi = mid; }
-        ev.push({ t: hi, label: `${PLANET_DEVA[p]} ${p} turns ${v < 0 ? "retrograde ℞" : "direct"}`, planet: p, type: "station" });
+        ev.push({ t: hi, label: `${p} turns ${v < 0 ? "retrograde ℞" : "direct"}`, planet: p, type: "station" });
       }
       pv = v;
     }

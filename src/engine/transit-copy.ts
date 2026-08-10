@@ -17,7 +17,8 @@ function fmtDur(ms) {
 
 /* event detail enrichment */
 const EVENT_DESC = {
-  "Surya enters": "Sankranti marks the Sun's entry into a new sign, shifting seasonal energies and the rhythm of nature.",
+  // "Sankranti" is matched before the generic "enters" so the solar-ingress gloss wins.
+  "Sankranti": "Sankranti marks the Sun's entry into a new sign, shifting seasonal energies and the rhythm of nature.",
   "Purnima": "Full moon — a peak of lunar power, heightened intuition and emotional intensity.",
   "Amavasya": "New moon — a reset point, ideal for new beginnings and introspection.",
   "enters": "A planet changing signs shifts its character and influence across domains of life.",
@@ -45,13 +46,15 @@ function transitLabel(lang, label) {
   const text = String(label || "");
   if (lang !== "hi") return text;
   let out = text
-    .replace(/^Surya enters /, "सूर्य प्रवेश ")
     .replace(/Purnima — full moon/, "पूर्णिमा — पूर्ण चन्द्र")
     .replace(/Amavasya — new moon/, "अमावस्या — नव चन्द्र")
     .replace(/ turns retrograde ℞/, " वक्री ℞")
     .replace(/ turns direct/, " मार्गी")
     .replace(/ · Sankranti$/, " · संक्रांति")
     .replace(/ enters /, " प्रवेश ");
+  // Phrases first, then the two term tables: "full moon" must already be gone before
+  // the planet table could touch a stray "Moon".
+  out = panchangTerm("hi", "planet", out);
   out = panchangTerm("hi", "sign", out);
   return out;
 }
