@@ -16,16 +16,35 @@ finder and becomes the one place every timing system is reconciled.
 (a gate that landed after this design was written — see `plans/ganak-personas.md`). Written
 from what this branch actually built, not restated from the goals above.*
 
-**Primary persona: P1 · Panchang householder / diaspora.** Hora's core use is exactly P1's
-shape — "should I do X now", checked quickly, no birth chart required for the base answer.
-D1's default (hard-block, one verdict shown, jargon hidden unless asked) is deliberately P1's
-elder-friendly constraint.
+*Persona assignment corrected by the owner on 2026-08-10. It first read P1-primary; that was
+the analyst's call, not the owner's, and it was wrong. Recorded here rather than quietly
+overwritten, because D1's justification rested on it — see the note below the journeys.*
 
-**Secondary: P5 · Working astrologer**, served by the practitioner toggle (D1), which is
-off by default and exists specifically because P5 wants the raw, unblocked view — the
-opposite of P1's one-answer default.
+**Primary persona: P5 · Working astrologer.** Hora is a timing instrument whose output has to
+survive being shown to a client. P5 values *speed and correctness, not hand-holding*, and this
+branch's entire premise — that a section which recommends a time the same screen forbids is
+disqualifying — is a P5 standard, not a householder one. A householder tolerates a vague
+answer; a practitioner cannot defend one. Per AGENTS.md, P5 is also the bankable payer.
 
-### Journey 1 — P1 asks "hora for travel"
+**Also primary: P2 · Astrology enthusiast**, the growth persona. P2 knows the *names* —
+"hora", "Rahu Kaal", "Choghadiya" — and recognition is their trigger. They will read a dense,
+honest result and do not need elder-friendly simplification. The verdict badges, the belt
+names and the four-lane strip are all built for someone who recognises the vocabulary.
+
+**Secondary: P1 · Panchang householder / diaspora.** Served by the *default* being a single
+adjudicated answer with the jargon available but not forced. P1 is the reach surface, not the
+design target — the section is not scoped down to P1's needs.
+
+**Consequence of this correction, flagged not buried.** D1 (hard block by default, practitioner
+toggle off) was originally justified *by* P1 primacy. That justification no longer holds and is
+replaced by this one: the adjudicated answer is the correct default even for P5, because it is
+the answer a practitioner would stand behind — the toggle exists to inspect the raw data, not
+because the default is a simplification. What this correction does newly imply, and what is
+**not** built: for a P5 who works chart after chart, the toggle should persist across sessions
+rather than resetting to off every time. That is a real gap, recorded here and in
+`plans/backlog.md`, not silently absorbed.
+
+### Journey 1 — P2 asks "hora for travel"
 
 1. Opens the Muhurat/Hora screen (`src/screens/MuhuratHub.tsx`); sunrise/sunset are already
    loaded from `computeTodayPanchang`.
