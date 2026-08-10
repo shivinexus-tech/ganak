@@ -67,6 +67,16 @@ const NAT_LABEL: Record<string, { en: string; hi: string }> = {
   neutral: { en: "neutral", hi: "सामान्य" },
 };
 
+// M1: true only when `w` actually overlaps `domain`. Exported (not just an
+// inline closure) so validation/hora-adjudication.cjs can run it against real
+// computeTodayPanchang output across many days and cities and prove the belts
+// and Abhijit never render outside the active domain — see that gate's
+// "M1 real-panchang loop" for why this needs to be the SAME function the
+// component uses, not a re-implementation that could silently drift from it.
+export function windowOverlapsDomain(domain: Window, w: Window): boolean {
+  return w.end > domain.start && w.start < domain.end;
+}
+
 export default function TimingLanes({
   domain, period, horas, chogha, blockers, abhijit, personal, nowMs, lang, onSelect,
 }: TimingLanesProps) {
@@ -82,6 +92,22 @@ export default function TimingLanes({
   const pct = (ms: number) => Math.min(100, Math.max(0, ((ms - domain.start) / span) * 100));
   const leftRem = (ms: number) => (pct(ms) / 100) * trackRem;
   const widthRem = (w: Window, minRem = 0) => Math.max(minRem, leftRem(w.end) - leftRem(w.start));
+
+  // M1: the belts (Rahu/Gulika/Yamaganda are day-only; Abhijit is a midday
+  // window) do not necessarily fall inside the domain that is actually on
+  // screen — the night dial shares this component with the day dial, and a
+  // day-only window handed to the night render has no legitimate position on
+  // that axis. `pct`/`leftRem` clamp to [0,100] and widthRem enforces a
+  // minimum, so an out-of-domain window used to collapse to a forced-visible
+  // sliver at left:0 instead of disappearing — a screen reader would announce
+  // a block on time nothing forbids. The component owns its axis, so it must
+  // refuse to place anything outside it rather than relying on callers to
+  // pre-filter. (Hora, Choghadiya and the personal lane are bounded to
+  // `domain` by construction upstream — dayHoras/nightHoras partition exactly
+  // [domain.start, domain.end], choghaDay/choghaNight partition rise→set and
+  // set→nextRise respectively, and the personal lane is a filter over
+  // `horas` — so they need no such guard here.)
+  const inDomain = (w: Window) => windowOverlapsDomain(domain, w);
 
   const laneRow = (label: string, height: string, children: React.ReactNode) => (
     <div style={{ marginBottom: "var(--space-2)" }}>
@@ -206,7 +232,7 @@ export default function TimingLanes({
             tr("Blocked", "बाधित"),
             LANE_H,
             <>
-              {blockers.map((b, i) => {
+              {blockers.filter((b) => inDomain(b.window)).map((b, i) => {
                 const left = leftRem(b.window.start);
                 const width = widthRem(b.window, 0.0625);
                 const name = BLOCKER_LABEL[b.key]?.[lang] ?? b.key;
@@ -228,7 +254,7 @@ export default function TimingLanes({
                   />
                 );
               })}
-              {abhijit && (
+              {abhijit && inDomain(abhijit) && (
                 <div
                   role="img"
                   aria-label={tr("Abhijit muhurta", "अभिजित मुहूर्त")}
