@@ -1,7 +1,7 @@
 import { analyticsConsentGranted } from "../storage/approved-storage";
 
 const ENDPOINT = String(import.meta.env?.VITE_ANALYTICS_ENDPOINT || "").trim();
-const ALLOWED = new Set(["page_view", "muhurat_search", "muhurat_share", "muhurat_export", "feedback_sent"]);
+const ALLOWED = new Set(["page_view", "muhurat_search", "muhurat_share", "muhurat_export", "feedback_sent", "hora_ask", "hora_ask_outcome", "hora_verdict_shown"]);
 
 export function privacyEvent(name, props = {}) {
   if (!ENDPOINT || !analyticsConsentGranted() || !ALLOWED.has(name) || typeof fetch !== "function") return;
@@ -27,4 +27,7 @@ export const ANALYTICS_EVENT_DICTIONARY = Object.freeze({
   muhurat_share: ["action", "language"],
   muhurat_export: ["action", "language"],
   feedback_sent: ["area", "language", "outcome"],
+  hora_ask: ["action", "language"],
+  hora_ask_outcome: ["outcome", "language"],
+  hora_verdict_shown: ["outcome", "language"],
 });
