@@ -208,7 +208,7 @@ export default function PersonalizeScreen({ lang, C, place, onPlace, onLanguage,
         <div style={{ display: "grid", gap: T.s3, padding: `0 ${T.s4} ${T.s4}` }}>
           <label style={{ display: "grid", gap: "0.35rem" }}><strong>{hi ? "घर का स्थान" : "Home place"}</strong><PlaceInput inputId="personalize-place" value={place} onPick={onPlace} C={C} lang={lang} /></label>
           <div style={{ display: "grid", gap: "0.35rem" }}><strong>{hi ? "भाषा" : "Language"}</strong><Segmented value={lang} onChange={onLanguage} label={hi ? "भाषा चुनें" : "Choose language"} options={[{ value: "hi", label: "हिन्दी" }, { value: "en", label: "English" }]} /></div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: T.fSmall }}>{hi ? "कैलेंडर पद्धति “आज · Today” स्क्रीन पर तारीख़ के पास रहती है। साझा लिंक का स्थान और भाषा केवल उस लिंक के लिए पहले माने जाते हैं।" : "Calendar convention stays beside the date on Today. An explicit place or language in a shared link wins for that link only."}</p>
+          <p style={{ margin: 0, color: "var(--muted)", fontSize: T.fSmall }}>{hi ? "कैलेंडर पद्धति “आज” स्क्रीन पर तारीख़ के पास रहती है। साझा लिंक का स्थान और भाषा केवल उस लिंक के लिए पहले माने जाते हैं।" : "Calendar convention stays beside the date on Today. An explicit place or language in a shared link wins for that link only."}</p>
         </div>
       </details>
 

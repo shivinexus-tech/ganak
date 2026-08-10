@@ -1492,13 +1492,13 @@ function NumberSetBox({ info, favor, hi, cuspLabel, cuspIsAscendant }) {
       <div style={{ fontSize: "var(--font-label)", letterSpacing: '0.1em', textTransform: 'uppercase', color: TOKENS.muted, marginBottom: "0.25rem" }}>
         {hi ? 'आपके अंक ने क्या तय किया' : 'What your number set'}
       </div>
-      <NumRow label={hi ? 'राशि · Sign' : 'Sign'} value={signName} />
-      <NumRow label={hi ? 'नक्षत्र · Star' : 'Star'} value={`${nak} · ${star}`}
+      <NumRow label={hi ? 'राशि' : 'Sign'} value={signName} />
+      <NumRow label={hi ? 'नक्षत्र' : 'Star'} value={`${nak} · ${star}`}
         gloss={hi ? 'जिस नक्षत्र में अंक गिरा' : 'the star your number fell into'} />
       {/* On the "Other question" topic the judged cusp IS cusp 1, so pointing the
           reader at "the 1st cusp sub-lord" sends them to this very planet and reads
           as a contradiction against the chip beside it. Say they are the same. */}
-      <NumRow label={hi ? 'लग्न उप-स्वामी · Ascendant sub lord' : 'Ascendant sub-lord'} value={sub}
+      <NumRow label={hi ? 'लग्न उप-स्वामी' : 'Ascendant sub-lord'} value={sub}
         gloss={cuspIsAscendant
           ? (hi
             ? 'आपका प्रश्न लग्न पर ही विचारा गया है, इसलिए हाँ/नहीं का निर्णय भी यही ग्रह देता है'
@@ -1506,10 +1506,10 @@ function NumberSetBox({ info, favor, hi, cuspLabel, cuspIsAscendant }) {
           : (hi
             ? `प्रश्न सच्चा है या नहीं, यह इससे देखा जाता है। हाँ/नहीं का निर्णय ${cuspLabel} भाव के उप-स्वामी से होता है।`
             : `shows whether the question is genuine and ripens at all — the yes/no itself is read from the ${cuspLabel} cusp sub-lord`)} />
-      <NumRow label={hi ? 'लग्न · Ascendant' : 'Ascendant'} value={`${signName} ${PR_fmtNumberDeg(info.signDeg)}`}
+      <NumRow label={hi ? 'लग्न' : 'Ascendant'} value={`${signName} ${PR_fmtNumberDeg(info.signDeg)}`}
         gloss={hi ? 'जहाँ अंक ने कुण्डली स्थिर की' : 'where the number fixed your chart'} />
       <div style={{ borderTop: `0.0625rem solid ${TOKENS.line}`, marginTop: "0.25rem", paddingTop: "0.1875rem" }}>
-        <NumRow label={hi ? 'विचारित भाव · Houses judged' : 'Houses judged'} value={favor.join(' · ')} />
+        <NumRow label={hi ? 'विचारित भाव' : 'Houses judged'} value={favor.join(' · ')} />
       </div>
     </div>
   );

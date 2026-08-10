@@ -123,6 +123,37 @@ assert.strictEqual(rawRenders.length, 0,
   `An engine name array is rendered without localisation:\n  ${rawRenders.join('\n  ')}\n` +
   'Wrap it: panchangTerm(lang, "nakshatra", NAKSHATRAS[i]) or signLabel(lang, SIGNS[i]).');
 
+/* ----------------------- 1c. a Hindi string must not carry an English word inside it */
+/* Owner, 2026-08-10: "i dont want a single hindi word on english and vice versa."
+   The screen-snapshot gate catches the RENDERED form, but only for screens it can
+   render — it does not cover the shell chrome, which is where the Personalize
+   control lived: Hindi mode read "Personalize · अपना बनाएँ", English first, on every
+   single screen. This catches the shape at source, wherever it is written.
+
+   Allowed: proper nouns, initialisms and format tokens that have no Hindi form. */
+const ENGLISH_OK = new Set(['Ganak', 'KP', 'PDF', 'SAV', 'ISKCON', 'Smarta', 'AM', 'PM',
+  'UTC', 'IST', 'YYYY', 'MM', 'DD', 'BNN', 'Rahu', 'Ketu', 'Om']);
+const HI_BRANCH = /(?:lang\s*===\s*["']hi["']|(?<![A-Za-z_$])hi)\s*\?\s*["']([^"']{2,160})["']/g;
+const englishInHindi = [];
+for (const file of files) {
+  const rel = path.relative(root, file).split(path.sep).join('/');
+  fs.readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
+    if (line.trim().startsWith('//') || line.trim().startsWith('*')) return;
+    for (const m of line.matchAll(HI_BRANCH)) {
+      const text = m[1];
+      if (!/[ऀ-ॿ]/.test(text)) continue; // not actually the Hindi branch
+      const words = (text.match(/[A-Za-z]{3,}/g) || []).filter((w) => !ENGLISH_OK.has(w));
+      if (words.length) {
+        englishInHindi.push(`${rel}:${i + 1} — English inside Hindi copy: ${words.join(', ')}\n      ${text.slice(0, 90)}`);
+      }
+    }
+  });
+}
+assert.strictEqual(englishInHindi.length, 0,
+  `Hindi copy containing English words:\n  ${englishInHindi.join('\n  ')}\n` +
+  'Write the Hindi string in Hindi. If the word is a proper noun or a format token with no\n' +
+  'Hindi form, add it to ENGLISH_OK in this gate with that reason.');
+
 /* ------------------------------- 2. the one unavoidable copy is pinned, not trusted */
 /* PrashnaScreen's engine is validated by prashna-parity, which evaluates the region
    between its ENGINE markers as plain, self-contained JS — it can carry neither an

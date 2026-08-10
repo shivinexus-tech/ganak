@@ -208,7 +208,9 @@ export default function AccessibilityRoot({ children }: { children: React.ReactN
       {!needsFirstPlace && !needsLinkCityChoice && <div style={{ display: personalizeRoute ? "none" : "block" }}>
         <div style={{ maxWidth: "47.5rem", margin: "0 auto", padding: `${T.s2} ${T.s5} 0`, textAlign: "right", background: "var(--bg-active)" }}>
           <button type="button" onClick={openPersonalize} className="comfort-control comfort-focus" style={{ display: "inline-flex", alignItems: "center", gap: T.s2, border: "0.0625rem solid var(--line)", borderRadius: T.rPill, padding: `0 ${T.s3}`, background: "var(--surface-active)", color: "var(--accent)", fontSize: T.fSmall, fontWeight: 700, cursor: "pointer" }}>
-            <span aria-hidden="true">⚙</span>{lang === "hi" ? "Personalize · अपना बनाएँ" : "Personalize"}
+            {/* Was "Personalize · अपना बनाएँ" in Hindi — the English word led, so the one
+                control on every screen leaked English into Hindi mode (owner, 2026-08-10). */}
+            <span aria-hidden="true">⚙</span>{lang === "hi" ? "अपना बनाएँ" : "Personalize"}
           </button>
         </div>
         {placeStorageWarning && <div role="alert" style={{ maxWidth: "47.5rem", margin: `${T.s3} auto 0`, padding: `${T.s3} ${T.s4}`, border: "0.0625rem solid var(--bad)", borderRadius: T.rMd, background: "var(--surface-active)", color: "var(--bad)" }}>{placeStorageWarning}</div>}
