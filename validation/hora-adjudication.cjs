@@ -678,6 +678,36 @@ if (nightNoteCallSites < 2)
   fail(`MuhuratHub.tsx: nightApplicabilityNote must be called by both hora window list sites, found ${nightNoteCallSites} call site(s) (Finding 3)`);
 
 // ============================================================================
+// fix-final-gaps (2026-08-10) — two mutations a reviewer found that survive
+// every gate above plus the build. Both are UI-side, so both are closed with
+// source-level assertions on the exact structural relationship the mutation
+// breaks, not a string that would still be sitting in the file afterward.
+
+// Hole A: `const isNight = w.period === "night";` mutated to
+// `const isNight = false;` compiles fine and leaves the existing Finding-3
+// check above (`trN(lang, CHOG_NAME, v.gradeKey)`) green, because that call
+// sits inside the `isNight ? ... : ...` branch's true-arm, which the mutation
+// never takes — every window, day or night, would silently fall through to
+// the day badge, which for a night window (no belt can ever touch it) can
+// only ever read "Clear". Pin the actual comparison driving the branch.
+if (!/const isNight = w\.period === "night";/.test(muhuratSrc))
+  fail('MuhuratHub.tsx: horaVerdictRow\'s isNight must be driven by `w.period === "night"` — hardcoding isNight would silently revert night rows to the day badge that can only ever read "Clear" (Hole A)');
+
+// Hole B: the approvedStorage/ComfortProvider block below proves
+// horaShowBlocked persists through storage in isolation, but nothing above
+// proves MuhuratHub.tsx actually consumes it — reverting the toggle to a
+// bare `useState(false)` (literally re-introducing the "toggle forgets
+// itself" bug) would still pass every one of those checks. Pin the two
+// source lines that wire the toggle to preferences/updatePreferences, and
+// make sure the old local-state shape hasn't crept back in alongside them.
+if (!/const showBlockedHoras = preferences\.horaShowBlocked;/.test(muhuratSrc))
+  fail('MuhuratHub.tsx: showBlockedHoras must be read from preferences.horaShowBlocked, not local component state (Hole B — the toggle would forget itself every session again)');
+if (!/const setShowBlockedHoras = \(value\) => updatePreferences\(\{ horaShowBlocked: value \}\);/.test(muhuratSrc))
+  fail('MuhuratHub.tsx: setShowBlockedHoras must write through updatePreferences({ horaShowBlocked: value }) so the toggle persists (Hole B)');
+if (/const \[showBlockedHoras,\s*setShowBlockedHoras\] = useState\(false\)/.test(muhuratSrc))
+  fail('MuhuratHub.tsx: the practitioner toggle must not be reverted to a bare useState(false) — that silently re-introduces the "toggle forgets itself" bug (Hole B)');
+
+// ============================================================================
 // fix-three-gaps (2026-08-10) — Finding 2, engine-level assertions on
 // src/storage/approved-storage.ts, the project's single approved on-device
 // store. Node has no window/localStorage, so a fake one is installed only for

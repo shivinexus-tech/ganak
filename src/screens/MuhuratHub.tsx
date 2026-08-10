@@ -1394,9 +1394,16 @@ return (
                 // Jupiter hora are favourable for marriage") but used to time only
                 // hr.planets[0] — Jupiter would be named and never timed. Every named
                 // planet now gets its own compact heading + window list below, reusing
-                // horaVerdictRow (not a second renderer) for each. A planet whose windows
-                // are all blocked still gets its heading and the "all blocked" line —
-                // it must not silently vanish from the list.
+                // horaVerdictRow (not a second renderer) for each. The "all blocked" line
+                // further down is a fallback for a planet whose windows are all blocked,
+                // but it cannot actually fire today: Rahu Kaal/Gulika/Yamaganda are
+                // computed only as eighths of daylight (todayP.rise..todayP.set), so a
+                // night window can never adjudicate "blocked", and horaWindowsForPlanet
+                // always returns at least one night window per planet — so anyVisible
+                // below can never be false. A planet never silently vanishes from the
+                // list because a night row is always offered, not because of this
+                // fallback; it stays in as cheap insurance should night belts ever be
+                // added.
                 const groups = hr.planets
                   .map((tp) => ({ tp, wins: horaWindowsForPlanet(tp, todayP.dow, todayP.rise, todayP.set, nextRise) }))
                   .filter((g) => g.wins.length > 0);

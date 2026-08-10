@@ -1091,9 +1091,11 @@ Feature exists and renders; not a claim of polish/parity.
   **Owner correction 2026-08-10:** Hora's primary personas are **P5 (working
   astrologer)** and **P2 (astrology enthusiast)**; P1 (householder) is the reach
   surface, not the design target. The spec first recorded P1-primary — that was
-  the analyst's call and it was wrong. Consequence, not yet built: the
-  practitioner toggle resets to off every session, which is friction for a P5
-  working chart after chart. It should persist. Small, self-contained follow-up.
+  the analyst's call and it was wrong. Consequence, now built: the practitioner
+  toggle used to reset to off every session, which was friction for a P5
+  working chart after chart. It now persists via `horaShowBlocked`, a
+  first-class field on `ComfortProvider`'s `GanakPreferences` shape (defaulting
+  to off), so it survives across sessions like every other comfort preference.
 - **Gochar / transit display** — upcoming sign changes, retro/direct (display only).
 - **Full birth chart (17 sub-sections)** — Kundli, Yogas, Grahas, KP sub-lords,
   KP significators, Kundali Matching / Guna Milan, Karakas, Shadbala, Special

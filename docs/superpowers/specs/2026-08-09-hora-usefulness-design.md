@@ -39,10 +39,12 @@ design target — the section is not scoped down to P1's needs.
 toggle off) was originally justified *by* P1 primacy. That justification no longer holds and is
 replaced by this one: the adjudicated answer is the correct default even for P5, because it is
 the answer a practitioner would stand behind — the toggle exists to inspect the raw data, not
-because the default is a simplification. What this correction does newly imply, and what is
-**not** built: for a P5 who works chart after chart, the toggle should persist across sessions
-rather than resetting to off every time. That is a real gap, recorded here and in
-`plans/backlog.md`, not silently absorbed.
+because the default is a simplification. What this correction newly implied — that for a P5
+who works chart after chart, the toggle should persist across sessions rather than resetting to
+off every time — **is now built**: `horaShowBlocked` is a first-class field on
+`ComfortProvider`'s `GanakPreferences` shape (declared on the type, defaulted to `false` in
+`DEFAULT_PREFERENCES`, and preserved by `sanitizePreferences`), so the practitioner toggle
+persists across sessions like every other comfort preference.
 
 ### Journey 1 — P2 asks "hora for travel"
 
