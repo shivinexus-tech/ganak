@@ -87,7 +87,8 @@
     56,
     58,
     59,
-    62
+    62,
+    66
   ],
   "sourceNotApplicableItemIds": [
     5,
@@ -134,39 +135,6 @@
     "47": "Mixed textual, institutional and regional sources across the launch corpus; future batches require their own classification"
   },
   "qualityOverrides": {
-    "65": {
-      "deliveryState": "Specified, not started",
-      "limitations": "Proves rendered TEXT only. renderToStaticMarkup produces no layout box, so overflow, contrast and touch targets at 375px still need a human or browser pass. Post-interaction surfaces (cast chart, calculator results) are covered by a separate result-snapshot tier rather than by rendering the screen.",
-      "shortTermImpact": "A shared change becomes reviewable as a text diff instead of by opening screens by hand. The three language defects that reached main in August 2026 - the Devanagari gochar leak, SecHead pinned to Hindi, and four raw NAKSHATRAS sites - would each have surfaced in the diff before merge.",
-      "longTermImpact": "Removes the mechanical half of verification permanently, so human bug-bash rounds and TEST-STD-CALCULATORS spend their time on judgement and interaction. Makes 'the gates pass and nobody looked' a visible state rather than the silent default.",
-      "bugBashStatus": "Not started. The plan requires the gate be proven red by reintroducing the real 2026-08-09 NAKSHATRAS regression before it is trusted.",
-      "qualityRisk": "Amber",
-      "lastVerified": "2026-08-10 - Spec and plan written and committed; no implementation yet",
-      "sourceConfidence": "Not applicable \u2014 technical, operational or platform work",
-      "recommendedAction": "Implement Tasks 1-4 first (harness, render, baselines, gate proven red). That subset is independently useful; Tasks 5-7 extend it without rework."
-    },
-    "46": {
-      "deliveryState": "Comfort/accessibility and universal-primitives system deployed and production-verified across all six launch screens",
-      "limitations": "Closure still needs owner live-URL sign-off, a human real-device screen-reader/audio/touch pass, and an owner decision on the Cloudflare Web Analytics beacon. Native dropdown option scaling remains browser-controlled.",
-      "shortTermImpact": "Production users can now choose larger/roomier presentation, use bilingual read-aloud, select light/dark behavior and review or clear remembered preferences without login.",
-      "longTermImpact": "All launch screens now share the same primitive and semantic-token contracts, reducing one-off visual drift and making later comfort or brand-value changes consistent.",
-      "bugBashStatus": "Required high-impact slice bug bash completed 2026-08-01. Independent review found and fixed fail-open telemetry, dark Place input, incomplete clear, deep-route state loss, competing TTS controls, exact-follow review, false AA fixtures, focus and touch-target defects. Production QA then passed at 390×844 in EN/HI with preset persistence, dark mode, read-aloud start/stop, no horizontal overflow and a clean console. A final full-route matrix remains mandatory before 100% closure.",
-      "qualityRisk": "Amber",
-      "lastVerified": "2026-08-01 · production main 3333928 live on ganakapp.com; Festival, Ask, Jyotish and Personalize at 390px each show primitive-backed content with zero overflow and zero console warnings/errors; design-system-primitives 199, accessibility-comfort 278, Prashna parity EXACT 198/6 and calc 24/24, every canonical gate, build 144 modules, Sheet and diff checks pass",
-      "sourceConfidence": "Not applicable — technical accessibility, UX and design-system work",
-      "recommendedAction": "Obtain the owner live-URL decision, resolve the Cloudflare beacon policy, and complete the human real-device screen-reader/audio/touch pass; keep src/styles/design-tokens.css as the only token source."
-    },
-    "19": {
-      "deliveryState": "Delivered and production-verified",
-      "limitations": "None in the owner-approved conservative medical Muhurat scope. R9 body-part rules and procedure-specific outcome logic remain intentionally excluded.",
-      "shortTermImpact": "Users have a safety-gated cultural timing tool for clinician-approved flexible care, with truthful handling of high-latitude daylight limits.",
-      "longTermImpact": "Dedicated engine boundaries, outcome-claim checks and DST/polar/range regressions prevent this safety-sensitive feature from drifting into generic Muhurat or medical advice.",
-      "bugBashStatus": "Completed 2026-07-28 — independent Codex pass found and fixed F4 P1 safety order, F5 P2 polar empty-state and F6 P2 future-birth bypass; production EN/HI phone verification passed.",
-      "qualityRisk": "Green",
-      "lastVerified": "2026-07-28 · Production bundle index-D8DzyB5u.js after PR #4 / 557664c; EN/HI 320px, safety/confirmation/F1–F3, zero overflow and zero console warnings/errors",
-      "sourceConfidence": "Primary/textual Muhurta sources and B.V. Raman rule review; Drik Panchang timing/date anchors; lineage-variable factors disclosed and not prescribed",
-      "recommendedAction": "No corrective action required; retain the dedicated engine, safety-first source-order guard, outcome-claim ban and independent medical-risk bug-bash requirement for future scope changes."
-    },
     "1": {
       "deliveryState": "Delivered and production-verified",
       "limitations": "None in the approved utility-calculator scope.",
@@ -375,6 +343,17 @@
       "lastVerified": "2026-08-02 · production main 3333928 (docs fa40c2e) live on ganakapp.com; primitive-backed Festival, Ask, Jyotish and Personalize verified at 390px with zero horizontal overflow and zero console messages; 390px EN and 320px HI Today clean; Simple & Large root font 18px; dark mode rgb(24,21,28) with zero low-contrast text nodes; design-system-primitives 199 checks, accessibility-comfort 278, privacy-events, parse-check, Prashna parity EXACT 198/6 and calc 24/24, every canonical gate and the production build pass. Owner decisions recorded 2026-08-02: Cloudflare Web Analytics to be switched off; native-dropdown scaling and the real-device human pass parked behind the prototype/theme track.",
       "sourceConfidence": "Not applicable — technical accessibility, UX and design-system work",
       "recommendedAction": "Owner to disable Web Analytics for ganakapp.com in the Cloudflare dashboard (decided 2026-08-02) and confirm no /cdn-cgi/rum request remains on a live load, then give the live-URL sign-off. Keep src/styles/design-tokens.css as the only token source and let the brand track change only the existing colour values. Book the human real-device screen-reader, audio and touch pass, and the custom-listbox replacement for the native selects, immediately after the new prototype and theme track."
+    },
+    "65": {
+      "deliveryState": "Specified, not started",
+      "limitations": "Proves rendered TEXT only. renderToStaticMarkup produces no layout box, so overflow, contrast and touch targets at 375px still need a human or browser pass. Post-interaction surfaces (cast chart, calculator results) are covered by a separate result-snapshot tier rather than by rendering the screen.",
+      "shortTermImpact": "A shared change becomes reviewable as a text diff instead of by opening screens by hand. The three language defects that reached main in August 2026 - the Devanagari gochar leak, SecHead pinned to Hindi, and four raw NAKSHATRAS sites - would each have surfaced in the diff before merge.",
+      "longTermImpact": "Removes the mechanical half of verification permanently, so human bug-bash rounds and TEST-STD-CALCULATORS spend their time on judgement and interaction. Makes 'the gates pass and nobody looked' a visible state rather than the silent default.",
+      "bugBashStatus": "Not started. The plan requires the gate be proven red by reintroducing the real 2026-08-09 NAKSHATRAS regression before it is trusted.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-08-10 - Spec and plan written and committed; no implementation yet",
+      "sourceConfidence": "Not applicable — technical, operational or platform work",
+      "recommendedAction": "Implement Tasks 1-4 first (harness, render, baselines, gate proven red). That subset is independently useful; Tasks 5-7 extend it without rework."
     }
   },
   "dashboard": {
@@ -437,7 +416,8 @@
         59,
         62,
         63,
-        64
+        64,
+        66
       ]
     },
     {
@@ -855,6 +835,11 @@
     "65": {
       "section": "P1",
       "title": "Screen snapshot verification (rendered text, both languages)",
+      "technicalComplexity": "Medium"
+    },
+    "66": {
+      "section": "P0",
+      "title": "Give Prashna and Jyotish their own crawlable URLs",
       "technicalComplexity": "Medium"
     }
   }
