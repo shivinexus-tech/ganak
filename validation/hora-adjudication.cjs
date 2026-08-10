@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 'use strict';
-const { loadApp } = require('./_load-app.cjs');
+const fs = require('fs');
+const path = require('path');
+const { loadApp, ROOT } = require('./_load-app.cjs');
 const { subtractWindows, adjudicate, dominantChoghadiya, nextCleanWindow } = loadApp('src/engine/hora-verdict.ts');
 const { computeTodayPanchang } = loadApp('src/engine/today-panchang.ts');
 const { dayHoras, horaWindowsForPlanet, nightHoras, HORA_ORDER, DAY_LORD, horaResultText, analyzeHora } = loadApp('src/engine/hora.ts');
 const { trikonaLords, personalHoraWindows } = loadApp('src/engine/personal-hora.ts');
+const { windowOverlapsDomain } = loadApp('src/components/TimingLanes.tsx');
 let failures = 0;
 const fail = (m) => { failures++; console.error('FAIL ' + m); };
 const W = (s, e) => ({ start: s, end: e });
@@ -427,6 +430,162 @@ if (horaPersonalAusp(8).join() !== trikonaLords(8).join()) fail('horaPersonalAus
   if ('withTiming' in timed) fail('analyzeHora answer result should no longer carry withTiming (timed query) — removed as part of Task 8, see comment above');
   if ('withTiming' in untimed) fail('analyzeHora answer result should no longer carry withTiming (untimed query) — removed as part of Task 8, see comment above');
 }
+
+// ============================================================================
+// M1 real-panchang loop (final whole-branch review, 2026-08-10).
+//
+// The lane strip (src/components/TimingLanes.tsx) used to hand Rahu Kaal,
+// Gulika, Yamaganda and Abhijit to whichever domain (day or night) happened
+// to be on screen without checking they actually belonged there. Rahu/
+// Gulika/Yama are computed as eighths of sunrise..sunset (day-only) and
+// Abhijit is a midday window; none of them has any legitimate position in
+// the night domain. The component's percent-clamp then rendered an
+// out-of-domain window as a forced-visible sliver at the domain's edge
+// (left:0, forced-minimum width) instead of nothing — a screen reader would
+// announce a block on time nothing forbids.
+//
+// This loop exercises the ACTUAL exported predicate the component uses
+// (windowOverlapsDomain — imported above, not a re-implementation that
+// could silently drift from the real one) against 370 consecutive real
+// days for two Indian cities, for both the day and the night domain. It
+// also satisfies spec §7 item 1 (subtraction over 370 days, Delhi and
+// Chennai) and item 9 (all 24 horas adjudicated on real data without
+// throwing), which were never implemented before this branch.
+const M1_DAY_MS = 86400000;
+const M1_CITIES = [
+  { lat: 28.6139, lon: 77.2090, zone: 'Asia/Kolkata', label: 'Delhi' },
+  { lat: 13.0827, lon: 80.2707, zone: 'Asia/Kolkata', label: 'Chennai' },
+];
+const m1Intersects = (a, b) => a && b && a.end > b.start && a.start < b.end;
+let m1Adjudications = 0;
+for (const city of M1_CITIES) {
+  for (let i = 0; i < 370; i++) {
+    const ts = Date.UTC(2026, 0, 1, 6, 30) + i * M1_DAY_MS;
+    let tp;
+    try { tp = computeTodayPanchang(city, 'lahiri', ts); }
+    catch (e) { fail(`M1 ${city.label} day ${i}: computeTodayPanchang threw: ${e.message}`); continue; }
+    if (tp.rise == null || tp.set == null || tp.nextRise == null) continue; // defensive; not exercised at these latitudes
+
+    const domainDay = { start: tp.rise, end: tp.set };
+    const domainNight = { start: tp.set, end: tp.nextRise };
+    const belts = [tp.rahu, tp.gulika, tp.yama].filter(Boolean);
+
+    // Every window that would actually be handed to the lane strip for a
+    // domain (i.e. survives the component's own overlap predicate) must
+    // genuinely overlap that domain.
+    for (const domain of [domainDay, domainNight]) {
+      const label = domain === domainNight ? 'night' : 'day';
+      for (const w of belts.filter((b) => windowOverlapsDomain(domain, b)))
+        if (!(w.end > domain.start && w.start < domain.end))
+          fail(`M1 ${city.label} day ${i}: a belt survived windowOverlapsDomain without overlapping the ${label} domain`);
+      if (tp.abhijit && windowOverlapsDomain(domain, tp.abhijit) && !(tp.abhijit.end > domain.start && tp.abhijit.start < domain.end))
+        fail(`M1 ${city.label} day ${i}: Abhijit survived windowOverlapsDomain without overlapping the ${label} domain`);
+    }
+
+    // Rahu Kaal, Gulika and Yamaganda are day-only in this app and must
+    // NEVER survive the night domain's filter — this is the exact defect
+    // class M1 reported, pinned against real data so a weakened or removed
+    // guard fails here even if the synthetic unit tests above are untouched.
+    const nightBeltLeak = belts.filter((w) => windowOverlapsDomain(domainNight, w));
+    if (nightBeltLeak.length) fail(`M1 ${city.label} day ${i}: ${nightBeltLeak.length} day-only belt window(s) would render in the night domain`);
+    if (tp.abhijit && windowOverlapsDomain(domainNight, tp.abhijit)) fail(`M1 ${city.label} day ${i}: Abhijit would render in the night domain`);
+
+    // spec §7 item 9: adjudicate all 24 real horas (day + night) without
+    // throwing, and confirm no usable span from any of them intersects a
+    // belt — the core promise the whole branch exists to keep, now checked
+    // against real computed data across a full year rather than synthetic
+    // fixtures only.
+    const dayHs = dayHoras(tp.dow, tp.rise, tp.set).map((h) => ({ h, chogha: tp.choghaDay || [] }));
+    const nightHs = nightHoras(tp.dow, tp.set, tp.nextRise).map((h) => ({ h, chogha: tp.choghaNight || [] }));
+    const allHs = [...dayHs, ...nightHs];
+    if (allHs.length !== 24) fail(`M1 ${city.label} day ${i}: expected 24 real horas, got ${allHs.length}`);
+    const ctx = { rahu: tp.rahu, gulika: tp.gulika, yama: tp.yama, abhijit: tp.abhijit };
+    for (const { h, chogha } of allHs) {
+      let v;
+      try { v = adjudicate({ start: h.start, end: h.end }, Object.assign({}, ctx, { chogha })); }
+      catch (e) { fail(`M1 ${city.label} day ${i}: adjudicate threw on a real hora: ${e.message}`); continue; }
+      m1Adjudications++;
+      for (const u of v.usable) {
+        if (m1Intersects(u, tp.rahu)) fail(`M1 ${city.label} day ${i}: a usable span intersects Rahu Kaal`);
+        if (m1Intersects(u, tp.gulika)) fail(`M1 ${city.label} day ${i}: a usable span intersects Gulika`);
+        if (m1Intersects(u, tp.yama)) fail(`M1 ${city.label} day ${i}: a usable span intersects Yamaganda`);
+      }
+    }
+  }
+}
+if (m1Adjudications < 10000) fail(`M1 real-panchang loop ran suspiciously few adjudications (${m1Adjudications}) — coverage may have silently shrunk`);
+
+// TimingLanes.tsx must actually apply windowOverlapsDomain at both places M1
+// found a leak (the blockers lane and the Abhijit notch), and `inDomain`
+// must be wired to the exported predicate rather than a local
+// reimplementation (or a stub) invisible to the loop above.
+const timingLanesSrc = fs.readFileSync(path.join(ROOT, 'src/components/TimingLanes.tsx'), 'utf8');
+if (!/const inDomain = \(w: Window\) => windowOverlapsDomain\(domain, w\);/.test(timingLanesSrc))
+  fail('TimingLanes.tsx: inDomain must delegate to the exported windowOverlapsDomain, not a reimplementation the M1 loop above cannot see');
+if (!/blockers\.filter\(\(b\) => inDomain\(b\.window\)\)/.test(timingLanesSrc))
+  fail('TimingLanes.tsx: the blockers lane must filter through inDomain — M1 (belts rendering in the wrong domain) regressed');
+if (!/abhijit && inDomain\(abhijit\)/.test(timingLanesSrc))
+  fail('TimingLanes.tsx: the Abhijit notch must be gated by inDomain — M1 (Abhijit rendering in the wrong domain) regressed');
+
+// ============================================================================
+// M5 — mutation-survivor closures (final whole-branch review, 2026-08-10).
+// Five mutations survived every existing gate; three are closed here with
+// source-level assertions on src/screens/MuhuratHub.tsx, following the same
+// read-source-text idiom validation/design-system-primitives.cjs uses.
+const muhuratSrc = fs.readFileSync(path.join(ROOT, 'src/screens/MuhuratHub.tsx'), 'utf8');
+
+// Mutation 1: removing the fifth (nextRise) argument from a live
+// horaWindowsForPlanet(...) call silently reverts that call to the
+// rise+86400000 approximation a whole task was spent removing (hora.ts
+// defaults nextRise to rise+86400000 when omitted). The review found two
+// "live" call sites; grepping MuhuratHub.tsx finds three real call sites
+// (inside nextCleanBlock's fallback branch, the "timing" status branch, and
+// the "answer" status branch) — all three are reachable at runtime, so all
+// three are pinned here, which is a strict superset of "both".
+const hwCalls = [...muhuratSrc.matchAll(/horaWindowsForPlanet\(([^()]*)\)/g)];
+if (hwCalls.length < 2)
+  fail(`MuhuratHub.tsx: expected at least 2 live horaWindowsForPlanet call sites, found ${hwCalls.length} (mutation 1)`);
+for (const m of hwCalls) {
+  const args = m[1].split(',').map((a) => a.trim());
+  if (args.length !== 5 || args[4] !== 'nextRise')
+    fail(`MuhuratHub.tsx: horaWindowsForPlanet call "${m[0]}" must pass the real nextRise as its fifth argument — omitting it silently reverts to the rise+86400000 approximation (mutation 1)`);
+}
+
+// Mutation 2: `{false && <TimingLanes ... />}` deletes the branch's headline
+// component while leaving its JSX text in the file, so a naive "does the
+// string <TimingLanes appear" check would stay green.
+if (!/<TimingLanes\b/.test(muhuratSrc))
+  fail('MuhuratHub.tsx: TimingLanes must be mounted — the shared timing lane strip is missing (mutation 2)');
+if (/\{\s*false\s*&&\s*<TimingLanes\b/.test(muhuratSrc))
+  fail('MuhuratHub.tsx: TimingLanes must not be gated behind a hardcoded false (mutation 2)');
+
+// Mutation 3: re-introducing the timing-gate defect under a new name
+// (e.g. showTimes) so most of the hora example chips show no times again.
+// The existing gate above pins the ENGINE symbol withTiming's absence, but
+// that does not stop a NEW UI-local flag computed straight from question
+// content and spliced into this boolean chain. Pin the exact gate on the
+// answer-branch timing block: status, intent and rise/set only — any added
+// clause (a fresh flag name included) changes this string and fails.
+// NOTE: the condition must be pinned as the FIRST thing inside the JSX
+// expression brace (`{horaResult...`, no leading `&&`) — an earlier version
+// of this check used a bare .includes() on the tail substring, which still
+// matched when a mutation prepended `someFlag(...) &&` in front of it,
+// because the original text survives unchanged later in the same line.
+// Reproduced and confirmed against that exact mutation before landing this
+// anchored version (see the M5 mutation-3 transcript in the fix report).
+if (!muhuratSrc.includes('{horaResult.status === "answer" && horaResult.intent !== "avoid" && todayP.rise != null && todayP.set != null && (() => {'))
+  fail('MuhuratHub.tsx: the answer-branch timing block must be gated on status/intent/rise/set only, as the first condition in its JSX expression — no question-content flag (mutation 3)');
+
+// Mutations 4 (LANE_H = "20px" in TimingLanes.tsx — the primitives gate's px
+// regex only matches padding|margin|gap|borderRadius|minHeight, not a bare
+// constant assignment) and 5 (a different avoid-intent falsehood dodging the
+// four banned substrings) are gate-weakness findings reported but NOT closed
+// here — closing 4 correctly belongs to validation/design-system-primitives.cjs
+// (the px/colour-literal gate for src/), and widening its regex to catch a
+// bare `const X = "20px"` risks new false positives across every other
+// screen it already scans; closing 5 needs a positive assertion of what the
+// avoid-intent sentence must say, not more banned substrings to dodge, which
+// is a wording decision for whoever owns that copy, not a mechanical fix.
 
 if (failures) { console.error(`hora-adjudication: ${failures} failure(s)`); process.exit(1); }
 console.log('hora-adjudication: PASS');
