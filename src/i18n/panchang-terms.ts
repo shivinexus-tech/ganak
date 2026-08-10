@@ -90,6 +90,21 @@ export function weekdayName(lang: string, index: unknown, short = false): string
   return short ? WEEKDAY_SHORT_EN[i] : WEEKDAY_EN[i];
 }
 
+/* Compact rashi labels for dense grids (Ashtakavarga). Devanagari is deliberately
+   THREE aksharas, not two: at two, वृषभ and वृश्चिक both collapse to वृ and the reader
+   cannot tell which column they are in. वृष / वृश्चि keeps them distinct. */
+const SIGN_SHORT_HI = ["मेष", "वृष", "मिथ", "कर्क", "सिंह", "कन्या",
+  "तुला", "वृश्चि", "धनु", "मकर", "कुंभ", "मीन"] as const;
+const SIGN_SHORT_EN = ["Ar", "Ta", "Ge", "Cn", "Le", "Vi",
+  "Li", "Sc", "Sg", "Cp", "Aq", "Pi"] as const;
+
+/** Compact rashi label for a dense table column. */
+export function signShort(lang: string, index: unknown): string {
+  const i = Number(index);
+  if (!Number.isInteger(i) || i < 0 || i > 11) return "";
+  return lang === "hi" ? SIGN_SHORT_HI[i] : SIGN_SHORT_EN[i];
+}
+
 const ORDERS = { sign: SIGN_ORDER, nakshatra: NAKSHATRA_ORDER } as const;
 
 const TABLES = { tithi: TITHI_HI, paksha: PAKSHA_HI, month: MONTH_HI, sign: SIGN_HI, nakshatra: NAKSHATRA_HI, planet: PLANET_HI };
@@ -158,4 +173,5 @@ export function signLabel(lang: string, value: unknown): string {
 
 export { TITHI_HI, PAKSHA_HI, MONTH_HI, SIGN_HI, NAKSHATRA_HI, PLANET_HI,
   SIGN_ORDER, NAKSHATRA_ORDER, SIGN_EN_WESTERN,
-  WEEKDAY_EN, WEEKDAY_SHORT_EN, WEEKDAY_HI, WEEKDAY_SHORT_HI };
+  WEEKDAY_EN, WEEKDAY_SHORT_EN, WEEKDAY_HI, WEEKDAY_SHORT_HI,
+  SIGN_SHORT_HI, SIGN_SHORT_EN };

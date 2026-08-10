@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { T } from "../components/ui-style-contract";
 import { fmtDateT } from "../components/format";
-import { SIGN_SHORT } from "../data/chart-divisions";
+import { signShort } from "../i18n/panchang-terms";
 import { SIGNS, NAKSHATRAS, zoneOffset, SIGN_LORD } from "../engine/panchang";
 import { rectSweep, mahaTimelineAt, runDashaAt, VIM_LORDS, rectAtMin } from "../engine/dasha";
 
@@ -72,9 +72,9 @@ function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
           <span style={{ fontSize: "var(--font-label)", color: C.muted }}>{hi ? "संभावित जन्म समय" : "candidate birth time"} {Math.abs(selC - centerMin) < 0.1 ? (hi ? "(दर्ज समय)" : "(as entered)") : (selC > centerMin ? "+" : "−") + fmtMin(Math.abs(selC - centerMin)).slice(3) + (hi ? " मिनट" : " min")}</span>
         </div>
         <input type="range" min={lo} max={hiMin} step={0.25} value={selC} onChange={(e) => setSel(+e.target.value)} style={{ width: "100%", accentColor: C.gold, marginBottom: "0.875rem" }} />
-        <Marker label={hi ? "लग्न" : "Lagna"} color={C.ivory}>{SIGN_SHORT[mk.sign]} {dms(mk.deg)} · {NAKSHATRAS[mk.nak]} {hi ? "पाद" : "pada"} {mk.pada}</Marker>
-        <Marker label={hi ? "नवांश D-9 लग्न" : "Navamsa D-9 lagna"} color={C.gold}>{SIGN_SHORT[mk.d9]}</Marker>
-        <Marker label={hi ? "षष्ट्यांश D-60 लग्न" : "Shashtiamsa D-60 lagna"} color={C.gold}>{SIGN_SHORT[mk.d60]}</Marker>
+        <Marker label={hi ? "लग्न" : "Lagna"} color={C.ivory}>{signShort(lang, mk.sign)} {dms(mk.deg)} · {NAKSHATRAS[mk.nak]} {hi ? "पाद" : "pada"} {mk.pada}</Marker>
+        <Marker label={hi ? "नवांश D-9 लग्न" : "Navamsa D-9 lagna"} color={C.gold}>{signShort(lang, mk.d9)}</Marker>
+        <Marker label={hi ? "षष्ट्यांश D-60 लग्न" : "Shashtiamsa D-60 lagna"} color={C.gold}>{signShort(lang, mk.d60)}</Marker>
         <Marker label={hi ? "केपी लग्न उप-स्वामी" : "KP ascendant sub-lord"} color={lordColor[mk.subLord]}>{mk.subLord}</Marker>
         <Marker label={hi ? "आरंभिक महादशा" : "Starting mahadasha"} color={lordColor[startMaha.lord]}>{startMaha.lord} · {startBal.toFixed(2)} {hi ? "वर्ष शेष" : "yrs balance"}</Marker>
       </div>
@@ -91,8 +91,8 @@ function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
           return (
             <div key={i} onClick={() => setSel(r.totalMin)} style={{ display: "grid", gridTemplateColumns: "62px 1fr 46px 46px 64px", gap: "0.375rem", padding: "0.375rem 0.75rem", borderTop: i ? "0.0625rem solid var(--line-soft)" : "none", fontSize: "var(--font-small)", cursor: "pointer", background: isSel ? "var(--accent-soft)" : r.chSign ? "var(--bad-surface)" : "transparent", alignItems: "baseline", fontVariantNumeric: "tabular-nums" }}>
               <span style={{ color: isSel ? C.gold : C.ivory }}>{fmtMin(r.totalMin).slice(0, 5)}</span>
-              <span style={{ color: r.chSign ? C.sindoor : C.ivory, fontWeight: r.chSign ? 600 : 400 }}>{SIGN_SHORT[r.sign]} {dms(r.deg)}{r.chSign ? " ⟵ sign" : ""}</span>
-              {ch(r.chD9, SIGN_SHORT[r.d9])}{ch(r.chD60, SIGN_SHORT[r.d60])}{ch(r.chSub, r.subLord.slice(0, 3))}
+              <span style={{ color: r.chSign ? C.sindoor : C.ivory, fontWeight: r.chSign ? 600 : 400 }}>{signShort(lang, r.sign)} {dms(r.deg)}{r.chSign ? " ⟵ sign" : ""}</span>
+              {ch(r.chD9, signShort(lang, r.d9))}{ch(r.chD60, signShort(lang, r.d60))}{ch(r.chSub, r.subLord.slice(0, 3))}
             </div>
           );
         })}

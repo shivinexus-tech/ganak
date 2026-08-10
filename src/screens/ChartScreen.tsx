@@ -12,7 +12,7 @@ import SouthChart from "../components/SouthChart";
 import EastChart from "../components/EastChart";
 import { urlPrefGet, urlPrefSet } from "../components/url-prefs";
 import { useDepth } from "../accessibility/ComfortProvider";
-import { VARGAS, SPECIAL_CHARTS, SIGN_SHORT, PLANET_GLYPH } from "../data/chart-divisions";
+import { VARGAS, SPECIAL_CHARTS, PLANET_GLYPH } from "../data/chart-divisions";
 import { vargaSign } from "../engine/varga";
 import { SEVEN } from "../engine/classical";
 import { BALA_PARTS } from "../engine/shadbala";
@@ -26,7 +26,7 @@ import { JyotishPanelNav } from "../components/JyotishPanelNav";
 import { BNNModule, BhriguModule } from "./JyotishBnnScreen";
 import { RectifyModule } from "./RectifyScreen";
 import { SIGNS, NAKSHATRAS, AYANAMSA, zoneOffset } from "../engine/panchang";
-import { panchangTerm, signLabel } from "../i18n/panchang-terms";
+import { panchangTerm, signLabel, signShort, SIGN_SHORT_EN } from "../i18n/panchang-terms";
 import LifeInterpretationCard from "../components/LifeInterpretationCard";
 import { buildLifeReading, SIGN_TRAITS } from "../data/life-interpretation";
 
@@ -84,6 +84,19 @@ const RP_SOURCE_LABELS = {
   moonStarLord: { en: "Moon star lord", hi: "चन्द्र नक्षत्र स्वामी" },
   moonSubLord: { en: "Moon sub-lord", hi: "चन्द्र उप-स्वामी" },
   dayLord: { en: "Day lord", hi: "वार स्वामी" },
+};
+
+/* The Ashtakavarga grid is 12 rashi columns wide and has always scrolled sideways on a
+   phone. Scrolling used to carry the planet label off-screen, so the reader lost track
+   of which row they were reading — worse than the width itself. Pinning the label
+   column fixes that, which is what makes the 3-akshara Devanagari headers affordable.
+   The opaque background is required: without it the scrolling cells show through. */
+const STICKY_COL = {
+  position: "sticky" as const,
+  left: 0,
+  zIndex: 1,
+  background: "var(--surface-raised)",
+  textAlign: "left" as const,
 };
 
 export default function ChartScreen({ C, card, lang }) {
@@ -974,14 +987,14 @@ export default function ChartScreen({ C, card, lang }) {
               </p>
             </div>
             <div className="rise2" style={{ ...card, padding: "0.5rem 1.125rem 0.75rem", overflowX: "auto", marginTop: "0.75rem" }}>
-              <table style={{ minWidth: "35rem" }}>
+              <table style={{ minWidth: "38rem", borderCollapse: "separate", borderSpacing: 0 }}>
                 <thead>
-                  <tr><th>Graha</th>{SIGN_SHORT.map((sn) => <th key={sn} style={{ textAlign: "center" }}>{sn}</th>)}<th style={{ textAlign: "center" }}>Σ</th></tr>
+                  <tr><th style={STICKY_COL}>{hi ? "ग्रह" : "Graha"}</th>{SIGN_SHORT_EN.map((_, i) => <th key={i} style={{ textAlign: "center", whiteSpace: "nowrap" }}>{signShort(lang, i)}</th>)}<th style={{ textAlign: "center" }}>Σ</th></tr>
                 </thead>
                 <tbody>
                   {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"].map((p) => (
                     <tr key={p}>
-                      <td style={{ whiteSpace: "nowrap" }}>
+                      <td style={{ ...STICKY_COL, whiteSpace: "nowrap" }}>
                         <span style={{ display: "inline-block", width: "0.4375rem", height: "0.4375rem", borderRadius: "0.25rem", background: PLANET_COLOR[p], marginRight: "0.5rem" }} />{PLANET_GLYPH[p]}
                       </td>
                       {r.av.bav[p].map((v, i) => (
@@ -991,7 +1004,7 @@ export default function ChartScreen({ C, card, lang }) {
                     </tr>
                   ))}
                   <tr>
-                    <td style={{ color: C.gold, fontWeight: 600 }}>SAV</td>
+                    <td style={{ ...STICKY_COL, color: C.gold, fontWeight: 600 }}>{hi ? "सर्वाष्टक" : "SAV"}</td>
                     {r.av.sav.map((v, i) => <td key={i} style={{ textAlign: "center", color: C.gold, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{v}</td>)}
                     <td style={{ textAlign: "center", color: C.gold, fontWeight: 600 }}>337</td>
                   </tr>

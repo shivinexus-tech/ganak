@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { T } from "../components/ui-style-contract";
 import { fmtDateT } from "../components/format";
-import { SIGN_SHORT } from "../data/chart-divisions";
+import { signShort } from "../i18n/panchang-terms";
 import {
   BNN_PLANETS, BNN_KARAKA, bnnRelations, bnnReading, bnnTiming,
   bcpTimeline, bspRules, jupiterProgression,
@@ -76,7 +76,7 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
               d.planets.map((p) => (
                 <div key={p.name} style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem", fontSize: "var(--font-small)", padding: "0.125rem 0" }}>
                   <span style={{ fontFamily: "var(--font-display-family)", color: C.ivory }}>{p.name}{p.retro ? <span style={{ color: C.sindoor, fontSize: "var(--font-label)" }}> ℞</span> : ""}</span>
-                  <span style={{ color: C.muted, fontSize: "var(--font-label)", fontVariantNumeric: "tabular-nums" }}>{SIGN_SHORT[p.sign]} {fmtD(p.deg)}</span>
+                  <span style={{ color: C.muted, fontSize: "var(--font-label)", fontVariantNumeric: "tabular-nums" }}>{signShort(lang, p.sign)} {fmtD(p.deg)}</span>
                 </div>
               ))}
           </div>
@@ -129,14 +129,14 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
         <div style={{ ...card, padding: "0.8125rem 0.9375rem", marginTop: "1rem", fontSize: "var(--font-small)", color: C.muted, lineHeight: 1.6 }}>
           {bnn.parivartana.length > 0 && <div><span style={{ color: C.gold, fontFamily: "var(--font-display-family)" }}>{hi ? "परिवर्तन योग" : "Parivartana"}</span> {hi ? "(राशि-विनिमय — दोनों को अपनी राशि जैसा पढ़ें)" : "(exchange — read each as in its own sign)"}: {bnn.parivartana.map((p) => p.join(" ⇄ ")).join("; ")}</div>}
           {bnn.rahuKetu && <div style={{ marginTop: bnn.parivartana.length ? 6 : 0 }}><span style={{ color: C.gold, fontFamily: "var(--font-display-family)" }}>{hi ? "राहु–केतु विभाजन" : "Rahu–Ketu split"}</span> {hi ? "(अलग पक्ष के ग्रह पृथक कार्य करते हैं)" : "(separated planets act apart)"}: {hi ? "राहु पक्ष" : "Rahu side"} — {bnn.rahuKetu.rahuSide.join(", ") || "—"} · {hi ? "केतु पक्ष" : "Ketu side"} — {bnn.rahuKetu.ketuSide.join(", ") || "—"}</div>}
-          {bnn.retroShadow.length > 0 && <div style={{ marginTop: "0.375rem" }}><span style={{ color: C.gold, fontFamily: "var(--font-display-family)" }}>{hi ? "वक्री छाया" : "Retrograde shadow"}</span> {hi ? "(द्वादश राशि से भी पढ़ें)" : "(also reads from the 12th sign)"}: {bnn.retroShadow.map((r) => `${r.name} → ${SIGN_SHORT[r.shadowSign]}`).join(", ")}</div>}
+          {bnn.retroShadow.length > 0 && <div style={{ marginTop: "0.375rem" }}><span style={{ color: C.gold, fontFamily: "var(--font-display-family)" }}>{hi ? "वक्री छाया" : "Retrograde shadow"}</span> {hi ? "(द्वादश राशि से भी पढ़ें)" : "(also reads from the 12th sign)"}: {bnn.retroShadow.map((r) => `${r.name} → ${signShort(lang, r.shadowSign)}`).join(", ")}</div>}
         </div>
       )}
 
       {/* Jupiter transit timing */}
       <div style={{ ...T.label, color: C.muted, margin: `${T.s5} 0 ${T.s2}` }}>{hi ? "गुरु गोचर · समय" : "Jupiter transit · timing"}</div>
       <div style={{ fontSize: "var(--font-label)", color: C.muted, marginBottom: "0.5rem", lineHeight: 1.5 }}>
-        {hi ? "वास्तविक गुरु गोचर — नई राशि में प्रवेश करते समय वह जन्मकुंडली के युति, त्रिकोण या विरोध वाले ग्रहों को सक्रिय करता है।" : "Real Jupiter transit — as it enters each sign it activates the natal planets it conjuncts, trines or opposes, bringing that combination into season."}{satNow != null && <> {hi ? "कर्म-घड़ी शनि अभी" : "Saturn, the fate-clock, currently transits"} <span style={{ color: C.gold }}>{SIGN_SHORT[satNow]}</span>{hi ? " में है।" : "."}</>}
+        {hi ? "वास्तविक गुरु गोचर — नई राशि में प्रवेश करते समय वह जन्मकुंडली के युति, त्रिकोण या विरोध वाले ग्रहों को सक्रिय करता है।" : "Real Jupiter transit — as it enters each sign it activates the natal planets it conjuncts, trines or opposes, bringing that combination into season."}{satNow != null && <> {hi ? "कर्म-घड़ी शनि अभी" : "Saturn, the fate-clock, currently transits"} <span style={{ color: C.gold }}>{signShort(lang, satNow)}</span>{hi ? " में है।" : "."}</>}
       </div>
       <div style={{ ...card, padding: "0.25rem 0.25rem", maxHeight: "26.875rem", overflowY: "auto" }}>
         {timing.map((p, i) => {
@@ -145,7 +145,7 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
           return (
             <div key={i} style={{ display: "grid", gridTemplateColumns: "94px 1fr", gap: "0.625rem", padding: "0.5rem 0.75rem", borderTop: i ? "0.0625rem solid var(--line-soft)" : "none", background: isNow ? "var(--surface-hover)" : "transparent", alignItems: "start" }}>
               <div>
-                <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: isNow ? C.gold : C.ivory }}>{SIGN_SHORT[p.sign]}{isNow && <span style={{ fontSize: "var(--font-micro)", letterSpacing: ".12em" }}> {hi ? "अभी" : "NOW"}</span>}</div>
+                <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: isNow ? C.gold : C.ivory }}>{signShort(lang, p.sign)}{isNow && <span style={{ fontSize: "var(--font-micro)", letterSpacing: ".12em" }}> {hi ? "अभी" : "NOW"}</span>}</div>
                 <div style={{ fontSize: "var(--font-micro)", color: C.muted, fontVariantNumeric: "tabular-nums" }}>{p.enter ? fmtDateT(p.enter, tz, false) : "…"}</div>
               </div>
               <div style={{ paddingTop: "0.0625rem" }}>
@@ -229,7 +229,7 @@ function BhriguModule({ rows, ascSign, birthMs, tz, C, card, lang = "en" }) {
                 <div style={{ fontSize: "var(--font-micro)", color: C.muted }}>~{birthYear + b.age}</div>
               </div>
               <div>
-                <div style={{ fontSize: "var(--font-small)", color: C.ivory }}>{ord(b.houseNum)} · {SIGN_SHORT[b.sign]}</div>
+                <div style={{ fontSize: "var(--font-small)", color: C.ivory }}>{ord(b.houseNum)} · {signShort(lang, b.sign)}</div>
                 <div style={{ fontSize: "var(--font-micro)", letterSpacing: ".06em", color: lordColor[b.cycleLord] || C.muted }}>{b.cycleLord} {hi ? "चक्र" : "cycle"}</div>
               </div>
               <div style={{ fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.4 }}>
@@ -252,7 +252,7 @@ function BhriguModule({ rows, ascSign, birthMs, tz, C, card, lang = "en" }) {
               <div style={{ fontSize: "var(--font-micro)", color: C.muted }}>{r.age ? `${hi ? "आयु" : "age"} ${r.age}` : (hi ? "जीवनभर" : "lifelong")} · {hi ? `अपने से ${ord(r.from)}` : `${ord(r.from)} from self`}</div>
             </div>
             <div style={{ fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.45 }}>
-              {hi ? "पड़ता है" : "lands on"} <span style={{ color: C.ivory }}>{SIGN_SHORT[r.targetSign]}</span> ({hi ? `लग्न से ${ord(r.houseFromLagna)} भाव` : `${ord(r.houseFromLagna)} house`}) — {hi ? "इस भाव के विषय सक्रिय माने जाते हैं" : r.theme}
+              {hi ? "पड़ता है" : "lands on"} <span style={{ color: C.ivory }}>{signShort(lang, r.targetSign)}</span> ({hi ? `लग्न से ${ord(r.houseFromLagna)} भाव` : `${ord(r.houseFromLagna)} house`}) — {hi ? "इस भाव के विषय सक्रिय माने जाते हैं" : r.theme}
               {r.occupants.length > 0 && <span style={{ color: C.gold }}> · {hi ? "साथ" : "with"} {r.occupants.join(", ")}</span>}
             </div>
           </div>
@@ -269,7 +269,7 @@ function BhriguModule({ rows, ascSign, birthMs, tz, C, card, lang = "en" }) {
           return (
             <div key={p.age} style={{ display: "grid", gridTemplateColumns: "90px 60px 1fr", gap: "0.5rem", padding: "0.4375rem 0.75rem", borderTop: i ? "0.0625rem solid var(--line-soft)" : "none", background: isNow ? "var(--surface-hover)" : "transparent", alignItems: "baseline" }}>
               <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-small)", color: isNow ? C.gold : C.ivory }}>{hi ? "आयु" : "age"} {p.age}{isNow && <span style={{ fontSize: "var(--font-micro)" }}> {hi ? "अभी" : "NOW"}</span>}</div>
-              <div style={{ fontSize: "var(--font-small)", color: C.ivory }}>{SIGN_SHORT[p.progSign]}</div>
+              <div style={{ fontSize: "var(--font-small)", color: C.ivory }}>{signShort(lang, p.progSign)}</div>
               <div style={{ paddingTop: "0.0625rem" }}>
                 {quiet ? <span style={{ fontSize: "var(--font-label)", color: C.line }}>{hi ? "— शांत" : "— quiet"}</span> :
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "0.1875rem 0.375rem" }}>
