@@ -15,7 +15,7 @@ const config = JSON.parse(await readFile(new URL("../plans/backlog-sheet-sync.js
 const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md", import.meta.url), "utf8");
 const base = parseRegister(markdown, config, "test base");
 
-assert.equal(base.rows.size, 61);
+assert.equal(base.rows.size, 64);
 assert.equal(sheetRow(base.rows.get("1")).length, 19);
 assert.equal(base.rows.get("58").section, "P0");
 assert.equal(base.rows.get("58").metadata.title, "Direct date entry and better Panchang date picker");
@@ -234,8 +234,8 @@ assert.throws(
 );
 assert.equal(
   parseRegister(preAutomationMarkdown, config, "bootstrap historical fixture", { allowMetadataTitleMismatch: true }).rows.size,
-  61,
+  64,
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 
-console.log("Backlog Sheet sync gate: PASS — 61 rows; 19-column quality/action contract, legacy-header migration, dashboard formula guard, high-impact bug-bash/RAG policy, API limitation/impact disclosure, verification/source confidence, changed-cell targeting, stale-Sheet self-heal, row-grid expansion, idempotence, strict conflict detector, metadata guard and explicit bootstrap planning verified.");
+console.log("Backlog Sheet sync gate: PASS — 64 rows; 19-column quality/action contract, legacy-header migration, dashboard formula guard, high-impact bug-bash/RAG policy, API limitation/impact disclosure, verification/source confidence, changed-cell targeting, stale-Sheet self-heal, row-grid expansion, idempotence, strict conflict detector, metadata guard and explicit bootstrap planning verified.");

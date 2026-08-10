@@ -86,7 +86,8 @@
     55,
     56,
     58,
-    59
+    59,
+    62
   ],
   "sourceNotApplicableItemIds": [
     5,
@@ -421,7 +422,10 @@
         44,
         45,
         58,
-        59
+        59,
+        62,
+        63,
+        64
       ]
     },
     {
@@ -597,7 +601,7 @@
     },
     "26": {
       "section": "P0",
-      "title": "Clean routes, metadata, sitemap and SEO pages",
+      "title": "Crawlable routes: sitemap, robots, canonical redirects and share cards",
       "technicalComplexity": "High"
     },
     "27": {
@@ -819,6 +823,21 @@
       "section": "P2",
       "title": "Owner native review of regional aartis (aarti final 5%)",
       "technicalComplexity": "Low"
+    },
+    "62": {
+      "section": "P0",
+      "title": "Build-time per-route HTML head (SEO/share unblock)",
+      "technicalComplexity": "High"
+    },
+    "63": {
+      "section": "P0",
+      "title": "Google Search Console registration and sitemap submission",
+      "technicalComplexity": "Low"
+    },
+    "64": {
+      "section": "P0",
+      "title": "Decide the Hindi URL structure (`/hi/...` vs `?lang=hi`)",
+      "technicalComplexity": "Medium"
     }
   }
 }
