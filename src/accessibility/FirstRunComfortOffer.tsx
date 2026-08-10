@@ -5,8 +5,9 @@ import { useModalFocus } from "./useModalFocus";
 
 export default function FirstRunComfortOffer({ lang, onParentSetup }: { lang: "hi" | "en"; onParentSetup: () => void }) {
   const { preferences, ready, applyPreset, dismissFirstRun } = useComfort();
-  const dialogRef = useModalFocus(ready && !preferences.firstRunComplete, dismissFirstRun);
-  if (!ready || preferences.firstRunComplete) return null;
+  const dialogRef = useModalFocus(ready && !!preferences.homePlace && !preferences.firstRunComplete, dismissFirstRun);
+  // Place comes first: do not stack two first-run dialogs or let Delhi flash behind them.
+  if (!ready || !preferences.homePlace || preferences.firstRunComplete) return null;
   const hi = lang === "hi";
 
   const choose = (preset: "simple-large" | "balanced") => {

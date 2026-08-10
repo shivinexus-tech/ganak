@@ -3,6 +3,8 @@ import { R as T } from "../components/ui-style-contract";
 import PersonalizeScreen from "../screens/PersonalizeScreen";
 import FirstRunComfortOffer from "./FirstRunComfortOffer";
 import { useComfort } from "./ComfortProvider";
+import FirstRunPlaceDialog from "../components/FirstRunPlaceDialog";
+import { approvedStorage } from "../storage/approved-storage";
 
 const DEFAULT_PLACE = { label: "New Delhi, India", lat: 28.61, lon: 77.21, zone: "Asia/Kolkata" };
 
@@ -12,9 +14,12 @@ function urlValue(key: string) {
 }
 
 function placeFromUrl() {
-  const label = urlValue("city"), zone = urlValue("zone");
-  const lat = Number(urlValue("lat")), lon = Number(urlValue("lon"));
-  return label && zone && Number.isFinite(lat) && Math.abs(lat) <= 90 && Number.isFinite(lon) && Math.abs(lon) <= 180
+  const label = urlValue("city"), zone = urlValue("zone"), rawLat = urlValue("lat"), rawLon = urlValue("lon");
+  const lat = rawLat == null || rawLat.trim() === "" ? NaN : Number(rawLat);
+  const lon = rawLon == null || rawLon.trim() === "" ? NaN : Number(rawLon);
+  let validZone = false;
+  try { if (zone) { new Intl.DateTimeFormat("en", { timeZone: zone }).format(); validZone = true; } } catch { /* invalid shared timezone */ }
+  return label && zone && validZone && Number.isFinite(lat) && Math.abs(lat) <= 90 && Number.isFinite(lon) && Math.abs(lon) <= 180
     ? { label, zone, lat, lon }
     : null;
 }
@@ -36,6 +41,7 @@ export default function AccessibilityRoot({ children }: { children: React.ReactN
   const { preferences, ready, updatePreferences, clearPreferences } = useComfort();
   const [routeTick, setRouteTick] = useState(0);
   const [bootstrapKey, setBootstrapKey] = useState(0);
+  const [placeStorageWarning, setPlaceStorageWarning] = useState("");
   const returnScrollRef = useRef(0);
   const explicitLanguage = urlValue("lang");
   const initialLanguage = explicitLanguage === "hi" || explicitLanguage === "en"
@@ -94,6 +100,7 @@ export default function AccessibilityRoot({ children }: { children: React.ReactN
 
   const screen = useMemo(() => urlValue("screen"), [routeTick]);
   const personalizeRoute = screen === "personalize";
+  const needsFirstPlace = ready && !placeFromUrl() && !preferences.homePlace;
 
   // The shell only titles the screens it owns, so Personalize kept whatever title the
   // previous route had left behind — including when it was deep-linked directly.
@@ -140,6 +147,10 @@ export default function AccessibilityRoot({ children }: { children: React.ReactN
   };
 
   const choosePlace = (next: typeof DEFAULT_PLACE) => {
+    const stored = approvedStorage.preferences.write({ ...preferences, homePlace: next } as unknown as Record<string, unknown>);
+    setPlaceStorageWarning(stored.ok ? "" : (lang === "hi"
+      ? "यह ब्राउज़र शहर को याद नहीं रख सका। इस बार गणना सही शहर के लिए होगी, लेकिन अगली बार आपको फिर चुनना पड़ सकता है।"
+      : "This browser could not remember the city. Calculations will use it now, but you may need to choose again next time."));
     setPlace(next);
     updatePreferences({ homePlace: next });
     replaceQuery({ city: next.label, lat: next.lat, lon: next.lon, zone: next.zone });
@@ -159,15 +170,17 @@ export default function AccessibilityRoot({ children }: { children: React.ReactN
 
   return (
     <>
+      {needsFirstPlace && <FirstRunPlaceDialog lang={lang} onPick={choosePlace} />}
       {!personalizeRoute && <FirstRunComfortOffer lang={lang} onParentSetup={openPersonalize} />}
-      <div style={{ display: personalizeRoute ? "none" : "block" }}>
+      {!needsFirstPlace && <div style={{ display: personalizeRoute ? "none" : "block" }}>
         <div style={{ maxWidth: "47.5rem", margin: "0 auto", padding: `${T.s2} ${T.s5} 0`, textAlign: "right", background: "var(--bg-active)" }}>
           <button type="button" onClick={openPersonalize} className="comfort-control comfort-focus" style={{ display: "inline-flex", alignItems: "center", gap: T.s2, border: "0.0625rem solid var(--line)", borderRadius: T.rPill, padding: `0 ${T.s3}`, background: "var(--surface-active)", color: "var(--accent)", fontSize: T.fSmall, fontWeight: 700, cursor: "pointer" }}>
             <span aria-hidden="true">⚙</span>{lang === "hi" ? "Personalize · अपना बनाएँ" : "Personalize"}
           </button>
         </div>
+        {placeStorageWarning && <div role="alert" style={{ maxWidth: "47.5rem", margin: `${T.s3} auto 0`, padding: `${T.s3} ${T.s4}`, border: "0.0625rem solid var(--bad)", borderRadius: T.rMd, background: "var(--surface-active)", color: "var(--bad)" }}>{placeStorageWarning}</div>}
         <React.Fragment key={bootstrapKey}>{children}</React.Fragment>
-      </div>
+      </div>}
       {personalizeRoute && <div style={{ minHeight: "100vh", background: "var(--bg-active)", color: "var(--ink)", padding: `${T.s5} ${T.s4} 5rem` }}>
         <div style={{ maxWidth: "47.5rem", margin: "0 auto" }}>
           <PersonalizeScreen lang={lang} C={C} place={place} onPlace={choosePlace} onLanguage={chooseLanguage} onClearPreferences={clearAllPreferences} onBack={closePersonalize} />
