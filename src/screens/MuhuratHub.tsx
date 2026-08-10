@@ -15,6 +15,7 @@ import {
   MUHURTA_RULES, vaishnavaEkadashi, NAK_HI, NAK_GOOD, dayScore,
 } from "../engine/muhurat";
 import { dayHoras, analyzeHora, horaResultText, HORA_GLYPH, HORA_COLOR, HORA_NAME, HORA_NATURE, HORA_PLANET_KEYS, horaDetectPlanet, horaIntent, HORA_CLARIFY, HORA_ACTIVITY_MAP, horaWindowsForPlanet } from "../engine/hora";
+import { adjudicate, nextCleanWindow } from "../engine/hora-verdict";
 import { computeLagnaPanchaka, panchakaRem, PANCHAKA_TYPE } from "../engine/panchaka";
 import { obsKind } from "../engine/festivals";
 import { festivalPathForKey } from "../data/festival-pages";
@@ -89,6 +90,11 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   const [horaResult, setHoraResult] = useState(null);
   const [horaAsc, setHoraAsc] = useState(null);
   const [horaSel, setHoraSel] = useState(null);
+  // Practitioner view: reveals hora windows the belts block (greyed, belt named)
+  // instead of silently hiding them. Default OFF — the default behaviour is a
+  // hard block: a favourable hora that falls inside Rahu Kaal/Gulika/Yamaganda
+  // is never offered as a clean recommendation.
+  const [showBlockedHoras, setShowBlockedHoras] = useState(false);
   const [showPanch, setShowPanch] = useState(false);
   const [dragMs, setDragMs] = useState(null);  // dragged time on arc
   const isoAtOffset = (days) => new Date(Date.now() + tz * 3600000 + days * 86400000).toISOString().slice(0, 10);
@@ -203,6 +209,59 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   const inAvoid = inWin(todayP.rahu) || inWin(todayP.yama) || inWin(todayP.gulika);
   const inAbhijit = inWin(todayP.abhijit);
   const nowState = inAbhijit ? "good" : inAvoid ? "bad" : curChogha ? curChogha.nat : "neutral";
+
+  // Hora adjudication context: every hora window offered below is reconciled against
+  // the forbidden belts before it is shown as a recommendation (Task 8). nextRise is
+  // the real following sunrise from computeTodayPanchang — never rise + 86400000.
+  const horaCtx = { rahu: todayP.rahu || null, gulika: todayP.gulika || null, yama: todayP.yama || null, abhijit: todayP.abhijit || null, chogha: allChogha };
+  const nextRise = todayP.nextRise;
+
+  const askHora = (q, action) => {
+    privacyEvent("hora_ask", { action, language: lang });
+    const r = analyzeHora(q);
+    privacyEvent("hora_ask_outcome", { outcome: r.status, language: lang });
+    setHoraResult(r);
+  };
+
+  // One window + its verdict, shared by the "timing" and "answer" hora branches.
+  // A blocked window is hidden by default (hard block); the practitioner toggle
+  // reveals it greyed out with the blocking belt named — never colour alone.
+  const horaVerdictRow = (w, i, p) => {
+    const v = adjudicate({ start: w.start, end: w.end }, horaCtx);
+    if (v.status === "blocked" && !showBlockedHoras) return null;
+    const isNow = isToday && Date.now() >= w.start && Date.now() < w.end;
+    return (
+      <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", fontVariantNumeric: "tabular-nums", opacity: v.status === "blocked" ? 0.55 : 1 }}>
+        <span style={{ fontSize: T.fSmall, color: C.ivory, fontWeight: isNow ? 700 : 400 }}>{fmtT(w.start)} – {fmtT(w.end)}</span>
+        <span style={{ fontSize: T.fMicro, color: C.muted }}>{w.period === "day" ? (lang === "hi" ? "दिन" : "day") : (lang === "hi" ? "रात" : "night")}</span>
+        <Badge tone={v.status === "clean" ? "good" : v.status === "partial" ? "warn" : "bad"} density="compact">
+          {v.status === "clean" ? (lang === "hi" ? "स्पष्ट" : "Clear") : v.status === "partial" ? (lang === "hi" ? "आंशिक" : "Partial") : (lang === "hi" ? "बाधित" : "Blocked")}
+        </Badge>
+        {v.status === "partial" && v.usable[0] && (
+          <span style={{ fontSize: T.fMicro, color: C.gold }}>{lang === "hi" ? "प्रयोग करें " : "use "}{fmtT(v.usable[0].start)}–{fmtT(v.usable[0].end)}</span>
+        )}
+        {v.blockedBy.length > 0 && (
+          <span style={{ fontSize: T.fMicro, color: C.sindoor }}>{v.blockedBy.map((k) => tr(lang, k + "L")).join(", ")}</span>
+        )}
+        {isNow && <span style={{ fontSize: T.fMicro, color: HORA_COLOR[p], fontWeight: 700 }}>● {lang === "hi" ? "अभी" : "now"}</span>}
+      </div>
+    );
+  };
+
+  // Never dead-end: when every window for a planet is blocked (or the answer's
+  // intent was "avoid"), point at the next window that actually has usable time.
+  const nextCleanBlock = (planet) => {
+    if (todayP.rise == null || todayP.set == null) return null;
+    const planetWins = horaWindowsForPlanet(planet, todayP.dow, todayP.rise, todayP.set, nextRise).map((w) => ({ start: w.start, end: w.end }));
+    const alt = nextCleanWindow(planetWins, horaCtx, isToday ? Date.now() : todayP.rise);
+    return (
+      <div style={{ fontSize: T.fMicro, color: C.gold, marginTop: "0.5rem" }}>
+        {alt
+          ? (lang === "hi" ? `अगला स्पष्ट समय: ${fmtT(alt.verdict.usable[0].start)}–${fmtT(alt.verdict.usable[0].end)}` : `Next clear window: ${fmtT(alt.verdict.usable[0].start)}–${fmtT(alt.verdict.usable[0].end)}`)
+          : (lang === "hi" ? "आज और कोई स्पष्ट समय नहीं — कल देखें।" : "No clear window left today — check tomorrow.")}
+      </div>
+    );
+  };
 
   const ev = EVENTS.find((e) => e.key === evKey);
   const goodSlots = allChogha.filter((c) => ev.good.includes(c.key) && c.end > nowMs).slice(0, 6);
@@ -1086,11 +1145,11 @@ return (
           <input
             value={horaQuestion}
             onChange={(e) => setHoraQuestion(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") setHoraResult(analyzeHora(horaQuestion)); }}
+            onKeyDown={(e) => { if (e.key === "Enter") askHora(horaQuestion, "typed"); }}
             placeholder={lang === "hi" ? "जैसे: व्यापार के लिए कौन सी होरा?" : "e.g. best hora for business?"}
             style={{ flex: "1 1 180px", minWidth: "9.375rem", height: T.ctrlH, boxSizing: "border-box", padding: "0 0.75rem", borderRadius: T.rMd, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.ivory, fontFamily: T.body, fontSize: "var(--font-small)" }}
           />
-          <button type="button" onClick={() => setHoraResult(analyzeHora(horaQuestion))} style={{ height: T.ctrlH, boxSizing: "border-box", padding: "0 1.125rem", borderRadius: T.rMd, border: "none", background: "linear-gradient(180deg, var(--accent), var(--accent-strong))", color: "var(--on-accent)", cursor: "pointer", fontFamily: T.serif, fontSize: "var(--font-small)", fontWeight: 600 }}>
+          <button type="button" onClick={() => askHora(horaQuestion, "button")} style={{ height: T.ctrlH, boxSizing: "border-box", padding: "0 1.125rem", borderRadius: T.rMd, border: "none", background: "linear-gradient(180deg, var(--accent), var(--accent-strong))", color: "var(--on-accent)", cursor: "pointer", fontFamily: T.serif, fontSize: "var(--font-small)", fontWeight: 600 }}>
             {lang === "hi" ? "पूछें" : "Ask"}
           </button>
         </div>
@@ -1098,7 +1157,7 @@ return (
         {!horaResult && (
           <div style={{ display: "flex", gap: "0.375rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
             {[{ en: "Best hora for business", hi: "व्यापार के लिए होरा" }, { en: "Hora for travel", hi: "यात्रा के लिए होरा" }, { en: "Good time to study", hi: "अध्ययन का समय" }, { en: "Buying gold", hi: "सोना खरीदना" }, { en: "Marriage hora", hi: "विवाह होरा" }].map((ex, i) => (
-              <button key={i} type="button" onClick={() => { setHoraQuestion(ex.en); setHoraResult(analyzeHora(ex.en)); }} style={{ minHeight: T.ctrlH, fontSize: T.fMicro, padding: `0 ${T.s3}`, borderRadius: T.rPill, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.muted, cursor: "pointer" }}>
+              <button key={i} type="button" onClick={() => { setHoraQuestion(ex.en); askHora(ex.en, "example"); }} style={{ minHeight: T.ctrlH, fontSize: T.fMicro, padding: `0 ${T.s3}`, borderRadius: T.rPill, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.muted, cursor: "pointer" }}>
                 {ex[lang === "hi" ? "hi" : "en"]}
               </button>
             ))}
@@ -1109,25 +1168,21 @@ return (
           const LL = lang === "hi" ? "hi" : "en";
           if (horaResult.status === "timing") {
             const p = horaResult.planet;
-            const wins = (todayP.rise != null && todayP.set != null) ? horaWindowsForPlanet(p, todayP.dow, todayP.rise, todayP.set) : [];
+            const wins = (todayP.rise != null && todayP.set != null) ? horaWindowsForPlanet(p, todayP.dow, todayP.rise, todayP.set, nextRise) : [];
+            const rows = wins.map((w, i) => horaVerdictRow(w, i, p));
+            const anyVisible = rows.some((r) => r !== null);
             return (
               <div style={{ marginTop: "0.625rem", padding: "0.625rem 0.75rem", background: "var(--surface-hover)", borderRadius: T.rMd, borderLeft: `0.1875rem solid ${HORA_COLOR[p]}` }}>
                 <div style={{ fontSize: T.fBody, color: HORA_COLOR[p], fontWeight: 600, marginBottom: "0.4375rem" }}>{HORA_GLYPH[p]} {HORA_NAME[p][LL]} {lang === "hi" ? "होरा — आज" : "hora — today"}</div>
                 {wins.length === 0 ? (
                   <div style={{ fontSize: T.fSmall, color: C.muted }}>{lang === "hi" ? "आज का समय उपलब्ध नहीं।" : "Times unavailable for today."}</div>
+                ) : !anyVisible ? (
+                  <>
+                    <div style={{ fontSize: T.fSmall, color: C.muted }}>{lang === "hi" ? "आज की सभी अवधि राहु काल, गुलिक या यमगण्ड से बाधित हैं।" : "Every window today falls in Rahu Kaal, Gulika or Yamaganda."}</div>
+                    {nextCleanBlock(p)}
+                  </>
                 ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.3125rem" }}>
-                    {wins.map((w, i) => {
-                      const isNow = isToday && Date.now() >= w.start && Date.now() < w.end;
-                      return (
-                        <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontVariantNumeric: "tabular-nums" }}>
-                          <span style={{ fontSize: T.fSmall, color: C.ivory, fontWeight: isNow ? 700 : 400 }}>{fmtT(w.start)} – {fmtT(w.end)}</span>
-                          <span style={{ fontSize: T.fMicro, color: C.muted }}>{w.period === "day" ? (lang === "hi" ? "दिन" : "day") : (lang === "hi" ? "रात" : "night")}</span>
-                          {isNow && <span style={{ fontSize: T.fMicro, color: HORA_COLOR[p], fontWeight: 700 }}>● {lang === "hi" ? "अभी" : "now"}</span>}
-                        </div>
-                      );
-                    })}
-                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.3125rem" }}>{rows}</div>
                 )}
                 <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: "0.4375rem" }}>{lang === "hi" ? "उपयुक्त: " : "Good for: "}{HORA_NATURE[p][LL]}</div>
               </div>
@@ -1154,7 +1209,7 @@ return (
                 <div style={{ fontSize: T.fSmall, color: C.muted, marginBottom: "0.5rem" }}>{lang === "hi" ? "इनमें से आज़माएँ:" : "Try one of these:"}</div>
                 <div style={{ display: "flex", gap: "0.375rem", flexWrap: "wrap" }}>
                   {[{ en: "business", hi: "व्यापार" }, { en: "travel", hi: "यात्रा" }, { en: "marriage", hi: "विवाह" }, { en: "study", hi: "अध्ययन" }, { en: "property", hi: "संपत्ति" }, { en: "health", hi: "स्वास्थ्य" }, { en: "worship", hi: "पूजा" }].map((ex, i) => (
-                    <button key={i} type="button" onClick={() => { setHoraQuestion(ex.en); setHoraResult(analyzeHora(ex.en)); }} style={{ minHeight: T.ctrlH, fontSize: T.fMicro, padding: `0 ${T.s3}`, borderRadius: T.rPill, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.muted, cursor: "pointer" }}>{ex[LL]}</button>
+                    <button key={i} type="button" onClick={() => { setHoraQuestion(ex.en); askHora(ex.en, "retry"); }} style={{ minHeight: T.ctrlH, fontSize: T.fMicro, padding: `0 ${T.s3}`, borderRadius: T.rPill, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.muted, cursor: "pointer" }}>{ex[LL]}</button>
                   ))}
                 </div>
               </div>
@@ -1164,7 +1219,12 @@ return (
           if (!hr) return null;
           return (
             <div style={{ marginTop: "0.625rem", padding: "0.625rem 0.75rem", background: "var(--surface-hover)", borderRadius: T.rMd, borderLeft: `0.1875rem solid ${C.gold}` }}>
-              <div style={{ fontSize: T.fBody, color: C.ivory, marginBottom: hr.planets.length ? 8 : 0 }}>{hr.text[LL]}</div>
+              <div style={{ fontSize: T.fBody, color: C.ivory, marginBottom: hr.planets.length ? "0.5rem" : 0 }}>{hr.text[LL]}</div>
+              {horaResult.conf === "medium" && (
+                <div style={{ fontSize: T.fMicro, color: C.muted, marginTop: "0.25rem", marginBottom: "0.25rem", fontStyle: "italic" }}>
+                  {lang === "hi" ? "सर्वोत्तम अनुमान — आपके प्रश्न से एक से अधिक कार्य मेल खाए।" : "Best guess — your question matched more than one activity."}
+                </div>
+              )}
               {hr.planets.length > 0 && (
                 <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                   {hr.planets.map((p) => (
@@ -1174,22 +1234,32 @@ return (
               )}
               {horaResult.withTiming && horaResult.intent !== "avoid" && todayP.rise != null && todayP.set != null && (() => {
                 const tp = hr.planets[0];
-                const wins = horaWindowsForPlanet(tp, todayP.dow, todayP.rise, todayP.set);
+                const wins = horaWindowsForPlanet(tp, todayP.dow, todayP.rise, todayP.set, nextRise);
                 if (!wins.length) return null;
+                const rows = wins.map((w, i) => horaVerdictRow(w, i, tp));
+                const anyVisible = rows.some((r) => r !== null);
                 return (
-                  <div style={{ marginTop: "0.5rem", fontSize: T.fMicro, color: C.muted, lineHeight: 1.6 }}>
-                    <span style={{ color: HORA_COLOR[tp], fontWeight: 600 }}>{HORA_GLYPH[tp]} {HORA_NAME[tp][LL]} {lang === "hi" ? "होरा आज" : "hora today"}: </span>
-                    {wins.map((w, i) => {
-                      const isNow = isToday && Date.now() >= w.start && Date.now() < w.end;
-                      return <span key={i} style={{ fontVariantNumeric: "tabular-nums", fontWeight: isNow ? 700 : 400, color: isNow ? HORA_COLOR[tp] : C.ivory }}>{fmtT(w.start)}–{fmtT(w.end)}{isNow ? " ●" : ""}{i < wins.length - 1 ? " · " : ""}</span>;
-                    })}
+                  <div style={{ marginTop: "0.5rem" }}>
+                    <div style={{ fontSize: T.fMicro, color: HORA_COLOR[tp], fontWeight: 600, marginBottom: "0.3125rem" }}>{HORA_GLYPH[tp]} {HORA_NAME[tp][LL]} {lang === "hi" ? "होरा आज" : "hora today"}</div>
+                    {anyVisible ? (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>{rows}</div>
+                    ) : (
+                      <div style={{ fontSize: T.fMicro, color: C.muted }}>{lang === "hi" ? "आज की सभी अवधि बाधित हैं।" : "Every window today is blocked."}</div>
+                    )}
+                    {!anyVisible && nextCleanBlock(tp)}
                   </div>
                 );
               })()}
+              {horaResult.intent === "avoid" && hr.planets.length > 0 && todayP.rise != null && todayP.set != null && nextCleanBlock(hr.planets[0])}
               {hr.note && <div style={{ fontSize: T.fMicro, color: C.gold, marginTop: "0.5rem", lineHeight: 1.5 }}>★ {hr.note[LL]}</div>}
             </div>
           );
         })()}
+
+        <label className="comfort-choice" style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: T.fMicro, color: C.muted }}>
+          <input type="checkbox" checked={showBlockedHoras} onChange={(e) => setShowBlockedHoras(e.target.checked)} />
+          {lang === "hi" ? "बाधित होरा भी दिखाएँ (ज्योतिषी दृश्य)" : "Show blocked horas too (practitioner view)"}
+        </label>
 
         <div style={{ marginTop: "0.625rem", paddingTop: "0.625rem", borderTop: `0.0625rem solid ${C.line}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
