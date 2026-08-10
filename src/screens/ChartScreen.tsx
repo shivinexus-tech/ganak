@@ -452,7 +452,7 @@ export default function ChartScreen({ C, card, lang }) {
               {[
                 [hi ? "लग्न" : "Lagna (Ascendant)", `${signLabel(lang, SIGNS[r.ascSign])} ${fmtDeg(r.ascDeg)}`],
                 [hi ? "राशि (चन्द्र राशि)" : "Rashi (Moon sign)", signLabel(lang, SIGNS[r.moon.sign])],
-                [hi ? "जन्म नक्षत्र" : "Janma Nakshatra", `${NAKSHATRAS[r.moon.nak]} · ${hi ? "पाद" : "pada"} ${r.moon.pada}`],
+                [hi ? "जन्म नक्षत्र" : "Janma Nakshatra", `${panchangTerm(lang, "nakshatra", NAKSHATRAS[r.moon.nak])} · ${hi ? "पाद" : "pada"} ${r.moon.pada}`],
                 [hi ? "सूर्य राशि" : "Surya (Sun sign)", signLabel(lang, SIGNS[r.sun.sign])],
               ].map(([k, v]) => (
                 <div key={k} style={{ ...card, padding: "0.875rem 1rem" }}>
@@ -587,7 +587,7 @@ export default function ChartScreen({ C, card, lang }) {
                     </div>
                     <div style={{ fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.4 }}>
                       <div><span style={{ fontWeight: 600, color: C.ivory }}>{signLabel(lang, SIGNS[p.sign])}</span> {fmtDeg(p.deg)}</div>
-                      <div style={{ fontSize: "var(--font-micro)", marginTop: "0.1875rem" }}>{NAKSHATRAS[p.nak].split(" ")[0]}</div>
+                      <div style={{ fontSize: "var(--font-micro)", marginTop: "0.1875rem" }}>{panchangTerm(lang, "nakshatra", NAKSHATRAS[p.nak]).split(" ")[0]}</div>
                       <div style={{ fontSize: "var(--font-micro)", marginTop: "0.125rem", color: C.gold }}>H{p.house}</div>
                     </div>
                   </div>
@@ -619,7 +619,7 @@ export default function ChartScreen({ C, card, lang }) {
                         <span style={{ color: PLANET_COLOR[p.name], fontWeight: 600 }}>{PLANET_GLYPH[p.name]}</span> {p.name}{p.retro ? <span style={{ color: C.sindoor }}> ℞</span> : ""}
                       </td>
                       <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, whiteSpace: "nowrap" }}>{SIGN_SHORT[p.sign]} {fmtDeg(p.deg)}</td>
-                      <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, fontSize: "var(--font-label)" }}>{NAKSHATRAS[p.nak]}</td>
+                      <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, fontSize: "var(--font-label)" }}>{panchangTerm(lang, "nakshatra", NAKSHATRAS[p.nak])}</td>
                       <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.starLord] }}>{p.kp.starLord}</td>
                       <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.subLord], fontWeight: 700 }}>{p.kp.subLord}</td>
                       <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.subSub] }}>{p.kp.subSub}</td>
@@ -657,7 +657,7 @@ export default function ChartScreen({ C, card, lang }) {
                       <tr key={h} style={{ borderTop: "0.0625rem solid var(--line-soft)", background: angular ? "var(--surface-hover)" : "transparent" }}>
                         <td style={{ padding: "0.4375rem 0.625rem", fontFamily: "var(--font-display-family)", color: angular ? C.gold : C.ivory, whiteSpace: "nowrap" }}>{h}{h === 1 ? " (Asc)" : h === 10 ? " (MC)" : ""}</td>
                         <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, whiteSpace: "nowrap" }}>{SIGN_SHORT[Math.floor(L / 30)]} {fmtDeg(L % 30)}</td>
-                        <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, fontSize: "var(--font-label)" }}>{NAKSHATRAS[nakIdx]}</td>
+                        <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, fontSize: "var(--font-label)" }}>{panchangTerm(lang, "nakshatra", NAKSHATRAS[nakIdx])}</td>
                         <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.starLord] }}>{sl.starLord}</td>
                         <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.subLord], fontWeight: 700 }}>{sl.subLord}</td>
                         <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.subSub] }}>{sl.subSub}</td>
