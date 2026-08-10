@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Give every Ganak page a language-explicit, product-explicit address — `/prashna`, `/jyotish`, `/hi/festival/diwali` — so that all 396 page-language combinations are separately indexable, and the Hindi content that already exists in the code stops being invisible to search.
+**Goal:** Give every Ganak page a language-explicit, product-explicit address — `/prashna`, `/kundli`, `/hi/festival/diwali` — so that all 396 page-language combinations are separately indexable, and the Hindi content that already exists in the code stops being invisible to search.
 
 **Architecture:** Language moves from a query parameter into a `/hi` path prefix, and screens move from `?screen=` into real paths. One new pure function splits `/hi/<rest>` into `{lang, rest}` before the three existing path matchers run, so those matchers are untouched. Because `applyRouteMetadata()` already builds the canonical from `window.location.pathname`, **moving the language into the path fixes the canonical-collapse bug for free** — no change to the Codex-owned `route-metadata.ts`. `hreflang` is emitted at build time only, in the prerendered head, which is where Google reads it.
 
@@ -26,19 +26,19 @@
 |---|---|---|
 | `/` | `/hi/` | Panchang (daily) |
 | `/prashna` | `/hi/prashna` | Prashna |
-| `/jyotish` | `/hi/jyotish` | Jyotish (chart) |
+| `/kundli` | `/hi/kundli` | Jyotish (chart) — label stays "Jyotish", address is `/kundli` |
 | `/festival/<slug>` × 181 | `/hi/festival/<slug>` | Festival guide |
 | `/calculator/<slug>` × 14 | `/hi/calculator/<slug>` | Calculator |
 | `/calculators` | `/hi/calculators` | Catalogue |
 | `/muhurat/medical` | `/hi/muhurat/medical` | Medical Muhurat |
 
-**200 English + 200 Hindi = 400 sitemap URLs** (198 today + `/prashna` + `/jyotish`, doubled).
+**200 English + 200 Hindi = 400 sitemap URLs** (198 today + `/prashna` + `/kundli`, doubled).
 
-**Unresolved sub-decision — `/jyotish` vs `/kundli`.** `kundli` is the higher-volume Indian
-search term and is what Prokerala and AstroSage name the route. Settle it with real query
-data from register row 63, but **before** row 63 submits — renaming an indexed URL forfeits
-its position. Until settled, this plan builds `/jyotish` and Task 5 makes the rename a
-one-line change.
+**Sub-decision RESOLVED (owner, 2026-08-10): the path is `/kundli`.** It is the term Indians
+actually search, and what Prokerala (`/astrology/kundli/`) and AstroSage (`/kundli/`) both
+name the same route. Settled before row 63 submits, which was the constraint.
+**The visible nav label stays "Jyotish"** — frozen under the 2026-08-09 brand decision. The
+URL is optimised for search, the label for the reader; they are allowed to differ.
 
 ---
 
@@ -189,7 +189,7 @@ const { screenFromPath } = loadApp('src/kundli-app.tsx');
 
 assert.equal(screenFromPath("/"), "daily");
 assert.equal(screenFromPath("/prashna"), "prashna");
-assert.equal(screenFromPath("/jyotish"), "chart");
+assert.equal(screenFromPath("/kundli"), "chart");
 assert.equal(screenFromPath("/festival/diwali"), null, "festival paths are not screen paths");
 assert.equal(screenFromPath("/calculator/rashi"), null);
 assert.equal(screenFromPath("/nope"), null);
@@ -203,7 +203,7 @@ assert.ok(src.includes('urlPrefGet("screen")'),
 assert.ok(src.includes('urlPrefGet("lang")'),
   'the legacy ?lang= form must still be read so old shared links keep working');
 
-console.log('screen-routes gate: PASS — /prashna and /jyotish resolve, legacy query forms still honoured.');
+console.log('screen-routes gate: PASS — /prashna and /kundli resolve, legacy query forms still honoured.');
 ```
 
 - [ ] **Step 2: Run it, confirm it fails**
@@ -221,7 +221,7 @@ export function screenFromPath(rest) {
   const clean = String(rest || "/").replace(/\/{2,}/g, "/").replace(/(.)\/+$/, "$1");
   if (clean === "/") return "daily";
   if (clean === "/prashna") return "prashna";
-  if (clean === "/jyotish") return "chart";
+  if (clean === "/kundli") return "chart";
   return null;
 }
 ```
@@ -263,7 +263,7 @@ Update the unknown-festival check on line 107 to use `routePath` instead of `win
 The mode buttons at `kundli-app.tsx:225` are `<button onClick={() => chooseMode(mk)}>`. Replace with anchors so crawlers can follow them — this is also why the codebase has only 16 `<a href>` tags against 198 routes:
 
 ```jsx
-<a key={mk} href={withLang(mk === "daily" ? "/" : mk === "prashna" ? "/prashna" : "/jyotish", lang)}
+<a key={mk} href={withLang(mk === "daily" ? "/" : mk === "prashna" ? "/prashna" : "/kundli", lang)}
    className="comfort-focus" aria-current={mode === mk ? "page" : undefined}
    style={{ display: "inline-flex", alignItems: "center", minHeight: T.ctrlH, padding: `0 ${T.s5}`, borderRadius: T.rSm, fontFamily: T.serif, fontSize: T.fBody, textDecoration: "none", border: "none", background: mode === mk ? C.panel : "transparent", color: mode === mk ? C.gold : C.ivory, fontWeight: mode === mk ? 700 : 400, boxShadow: mode === mk ? T.e1 : "none", transition: "all .15s" }}>{label}</a>
 ```
@@ -293,7 +293,7 @@ Change `if (clean === "/prashna") return "prashna";` to return `null`, run, conf
 
 ```bash
 git add src/kundli-app.tsx validation/screen-routes.cjs
-git commit -m "feat(routing): /prashna and /jyotish paths, /hi language prefix
+git commit -m "feat(routing): /prashna and /kundli paths, /hi language prefix
 
 Two of three product areas had no address at all. The nav becomes real
 anchors rather than onClick handlers, which also fixes the crawlable
@@ -322,7 +322,7 @@ Append to `validation/prerender-seo.mjs`:
 assert.equal(routes.length, 400, `expected 400 routes across both languages, got ${routes.length}`);
 assert.equal(routes.filter((r) => r.lang === "hi").length, 200, "expected 200 Hindi routes");
 assert.ok(routes.some((r) => r.path === "/prashna"), "/prashna missing");
-assert.ok(routes.some((r) => r.path === "/hi/jyotish"), "/hi/jyotish missing");
+assert.ok(routes.some((r) => r.path === "/hi/kundli"), "/hi/kundli missing");
 
 for (const route of routes) {
   const rel = route.path === "/" ? "index.html" : `${route.path.replace(/^\//, "").replace(/\/$/, "")}/index.html`;
@@ -359,7 +359,7 @@ In `scripts/seo-routes.mjs`, add the two screen routes to `FIXED` and emit both 
 const FIXED = [
   { path: "/",                args: { mode: "daily" } },
   { path: "/prashna",         args: { mode: "prashna" } },
-  { path: "/jyotish",         args: { mode: "chart" } },
+  { path: "/kundli",         args: { mode: "chart" } },
   { path: "/calculators",     args: { mode: "daily", utility: { kind: "catalogue" } } },
   { path: "/muhurat/medical", args: { mode: "daily", medical: { kind: "medical" } } },
 ];
@@ -456,7 +456,7 @@ Cloudflare `_redirects` matches query strings with a `?` suffix on the rule and 
 ```js
 for (const rule of [
   "/?screen=prashna /prashna 301",
-  "/?screen=chart /jyotish 301",
+  "/?screen=chart /kundli 301",
   "/?lang=hi /hi/ 301",
 ]) {
   const at = redirects.indexOf(rule);
@@ -477,7 +477,7 @@ In `emitRedirects()`, before the festival legacy rules:
 ```js
   const queryForms = [
     "/?screen=prashna /prashna 301",
-    "/?screen=chart /jyotish 301",
+    "/?screen=chart /kundli 301",
     "/?screen=daily / 301",
     "/?lang=hi /hi/ 301",
   ];
@@ -523,9 +523,9 @@ export PATH="/opt/homebrew/bin:$PATH"; node validation/prerender-seo.mjs && node
 
 - [ ] **Step 2: Browser smoke, EN and HI, at 390px**
 
-Use the Browser pane with launch config `kundli-dev`. Visit `/prashna`, `/jyotish`, `/hi/`, `/hi/festival/diwali`. Confirm: correct screen renders, language matches the path, the language link swaps to the mirrored path, zero console errors, no horizontal overflow.
+Use the Browser pane with launch config `kundli-dev`. Visit `/prashna`, `/kundli`, `/hi/`, `/hi/festival/diwali`. Confirm: correct screen renders, language matches the path, the language link swaps to the mirrored path, zero console errors, no horizontal overflow.
 
-- [ ] **Step 3: The `/jyotish` vs `/kundli` decision**
+- [ ] **Step 3: The `/kundli` vs `/kundli` decision**
 
 If the owner has settled it, change the two literals in `screenFromPath` and `FIXED`, plus the `/?screen=chart` redirect target, and rebuild. If not settled, record in `plans/task-log.md` that it is **still open and blocks register row 63**.
 

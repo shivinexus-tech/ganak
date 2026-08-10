@@ -1342,9 +1342,10 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
   **Also decided:** Latin slugs, not Devanagari (percent-encoding wrecks shared links); and
   **no auto-redirect by browser language** — Google advises against it, and it would leave
   Googlebot, which crawls from the US, never seeing the Hindi pages at all.
-  **Left open on purpose:** `/jyotish` vs `/kundli`, to be settled with real Search Console
-  query data from row 63 — but before row 63 submits, since renaming an indexed URL
-  forfeits its position.
+  **Resolved 2026-08-10:** the path is **`/kundli`**, not `/jyotish` — it is the term Indians
+  actually search, and what Prokerala and AstroSage both name the same route. Settled before
+  row 63 submits, which was the whole constraint. The visible nav label stays "Jyotish" under
+  the frozen 2026-08-09 brand decision; URL and label are allowed to differ.
 - ✅ **SEO/share infrastructure ships BEFORE the UI redesign (owner, 2026-08-09).**
   Resolves `plans/ganak-architecture-audit.md` Decision 2, which had been open since the
   audit. Order: register row **62** (build-time per-route HTML head — the audit's #1
