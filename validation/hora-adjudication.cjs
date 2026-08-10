@@ -3,7 +3,7 @@
 const { loadApp } = require('./_load-app.cjs');
 const { subtractWindows, adjudicate, dominantChoghadiya, nextCleanWindow } = loadApp('src/engine/hora-verdict.ts');
 const { computeTodayPanchang } = loadApp('src/engine/today-panchang.ts');
-const { dayHoras, horaWindowsForPlanet, nightHoras } = loadApp('src/engine/hora.ts');
+const { dayHoras, horaWindowsForPlanet, nightHoras, HORA_ORDER, DAY_LORD } = loadApp('src/engine/hora.ts');
 let failures = 0;
 const fail = (m) => { failures++; console.error('FAIL ' + m); };
 const W = (s, e) => ({ start: s, end: e });
@@ -258,10 +258,47 @@ for (let i = 1; i < nh.length; i++)
 // HORA_ORDER[0+12] = HORA_ORDER[5] = Jupiter (Chaldean order wraps every 7).
 if (nh[0].ruler !== 'Jupiter') fail('nightHoras: first night ruler for Sunday should be Jupiter, got ' + nh[0].ruler);
 
-// nightHoras: nextRise defaults to set + 86400000 when omitted.
-const nhDefault = nightHoras(0, SET);
-if (Math.abs(nhDefault[nhDefault.length - 1].end - (SET + 86400000)) > 1)
-  fail('nightHoras without nextRise should fall back to set+86400000');
+// nightHoras: nextRise has NO default (unlike horaWindowsForPlanet's
+// rise+86400000 — see the comment on nightHoras for why). Calling it without
+// nextRise must NOT silently produce a usable 24h-after-sunset approximation;
+// it must produce garbage that is visibly unusable, proving the argument is
+// genuinely required rather than quietly defaulted back in.
+const nhMissing = nightHoras(0, SET);
+if (!Number.isNaN(nhMissing[nhMissing.length - 1].end))
+  fail('nightHoras without nextRise should produce a NaN end (undefined arithmetic), not a usable window — got ' + nhMissing[nhMissing.length - 1].end);
+
+// horaWindowsForPlanet: night-hora RULER sequence must be pinned, not just
+// timestamps. The existing tiling gates above (line ~224) check only
+// start/end, which are invariant under any relabelling of which planet owns
+// which slot — a mutation swapping the night loop's (startIdx + 12 + i) for
+// (startIdx + i) mislabels every night ruler while leaving every timestamp
+// untouched, and those gates would stay green. Derivation: startIdx =
+// HORA_ORDER.indexOf(DAY_LORD[weekday]); the ruler of hora i (i = 0..11 day,
+// 12..23 night, in time order) is HORA_ORDER[(startIdx + i) % 7] — the night
+// sequence continues the day sequence, it does not restart at night's start.
+// Covers three different weekdays, not Sunday alone (the existing nightHoras
+// ruler check above tests only Sunday).
+function rulerSeqFor(weekday) {
+  const tagged = [];
+  for (const p of HORA_ORDER)
+    for (const w of horaWindowsForPlanet(p, weekday, RISE, SET, NEXT))
+      tagged.push(Object.assign({ ruler: p }, w));
+  tagged.sort((a, b) => a.start - b.start);
+  return tagged;
+}
+for (const weekday of [0, 1, 3, 5]) { // Sunday, Monday, Wednesday, Friday
+  const startIdx = HORA_ORDER.indexOf(DAY_LORD[weekday % 7]);
+  const seq = rulerSeqFor(weekday);
+  if (seq.length !== 24) fail('weekday ' + weekday + ': ruler sequence should have 24 windows, got ' + seq.length);
+  for (let i = 0; i < seq.length; i++) {
+    const expected = HORA_ORDER[(startIdx + i) % 7];
+    if (seq[i].ruler !== expected)
+      fail('weekday ' + weekday + ': hora ' + i + ' ruler should be ' + expected + ' (rotation continues without break), got ' + seq[i].ruler);
+  }
+  const firstNightRuler = HORA_ORDER[(startIdx + 12) % 7];
+  if (seq[12].ruler !== firstNightRuler)
+    fail('weekday ' + weekday + ': first night hora ruler should be ' + firstNightRuler + ' (the planet following day hora 12 in the rotation), got ' + seq[12].ruler);
+}
 
 if (failures) { console.error(`hora-adjudication: ${failures} failure(s)`); process.exit(1); }
 console.log('hora-adjudication: PASS');

@@ -25,8 +25,14 @@ export function horaWindowsForPlanet(planet, weekday, rise, set, nextRise = rise
   out.sort((a, b) => a.start - b.start);
   return out;
 }
-/* the twelve night horas, sunset -> next sunrise, in order */
-export function nightHoras(weekday, set, nextRise = set + 86400000) {
+/* the twelve night horas, sunset -> next sunrise, in order.
+   nextRise has NO default, unlike horaWindowsForPlanet's rise + 86400000.
+   A default here would have to be set + 86400000 (24h after SUNSET), which
+   claims the night itself is 24 hours long — it disagrees with the day-
+   anchored approximation used elsewhere by the length of the day (e.g. 13h
+   apart for a 13-hour day). A wrong default is worse than no default, and
+   this function has no call sites yet, so require the real next sunrise. */
+export function nightHoras(weekday, set, nextRise) {
   const startIdx = HORA_ORDER.indexOf(DAY_LORD[weekday % 7]);
   const dur = (nextRise - set) / 12, out = [];
   for (let i = 0; i < 12; i++) out.push({ ruler: HORA_ORDER[(startIdx + 12 + i) % 7], start: set + i * dur, end: set + (i + 1) * dur });
