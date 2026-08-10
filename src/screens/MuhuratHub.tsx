@@ -1180,7 +1180,7 @@ return (
                   : (lang === "hi" ? "आज रात का होरा चक्र — सूर्यास्त से अगले सूर्योदय तक प्रत्येक ग्रह की होरा; विवरण नीचे सूची में है।" : "Tonight's planetary-hour dial — each hora from sunset to the next sunrise; the same information is listed below.")}
                 viewBox={"0 0 " + AW + " " + AH} style={{ width: "100%", maxWidth: 380, display: "block", margin: "2px auto 0", cursor: "crosshair" }} onMouseMove={handleArcDrag} onMouseLeave={handleArcLeave} onTouchMove={handleArcDrag} onTouchEnd={handleArcLeave}>
                 <line x1="8" y1={cy} x2={AW - 8} y2={cy} stroke="var(--line)" strokeWidth="1" />
-                {horas.map((h, i) => { const cur = curHoraIdx === i, sel = horaSel === i; const v = adjudicate({ start: h.start, end: h.end }, horaCtx); const tone = v.status === "blocked" ? "var(--bad)" : v.grade === "good" ? "var(--good)" : v.grade === "bad" ? "var(--bad)" : "var(--muted)"; return (
+                {horas.map((h, i) => { const cur = curHoraIdx === i, sel = horaSel === i; const v = adjudicate({ start: h.start, end: h.end }, horaCtx); const tone = v.status === "blocked" ? "var(--bad)" : v.status === "partial" ? "var(--accent)" : v.grade === "good" ? "var(--good)" : v.grade === "bad" ? "var(--bad)" : "var(--muted)"; return (
                   <g key={i}>
                     <polyline points={arcPoly(i / 12, (i + 1) / 12, 8)} fill="none" stroke={HORA_COLOR[h.ruler]} strokeWidth={cur || sel ? 5.5 : 3} strokeOpacity={cur ? 1 : sel ? 0.85 : 0.36} strokeLinecap="butt" />
                     <polyline points={arcPoly(i / 12, (i + 1) / 12, 8)} fill="none" stroke={tone} strokeWidth="1.5" strokeOpacity="0.8" transform="translate(0,7)" />
@@ -1232,6 +1232,12 @@ return (
                       <>
                         {v.gradeKey && <span style={{ fontSize: T.fMicro, color: C.muted }}> · {trN(lang, CHOG_NAME, v.gradeKey)}</span>}
                         {v.status === "blocked" && <span style={{ fontSize: T.fMicro, color: C.sindoor }}> · ⚠ {lang === "hi" ? "बाधित" : "blocked"}</span>}
+                        {v.status === "partial" && (
+                          <span style={{ fontSize: T.fMicro, color: C.gold }}>
+                            {" "}· ! {lang === "hi" ? "आंशिक रूप से बाधित" : "Partly blocked"}
+                            {v.usable[0] && <> · {lang === "hi" ? "प्रयोग करें " : "use "}{fmtT(v.usable[0].start)}–{fmtT(v.usable[0].end)}</>}
+                          </span>
+                        )}
                       </>
                     );
                   })()}
