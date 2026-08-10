@@ -382,5 +382,29 @@ if (horaPersonalAusp(8).join() !== trikonaLords(8).join()) fail('horaPersonalAus
   }
 }
 
+// Parity gate: Hindi/English branching on planet count must be synchronized.
+// Single planet case: closing clause must use singular form.
+{
+  const avoidSingle = { status: 'answer', intent: 'avoid', planets: ['Mercury'], act: { en: 'business', hi: 'व्यापार' } };
+  const resultSingle = horaResultText(avoidSingle, null);
+  if (!resultSingle || !resultSingle.text.hi) fail('horaResultText should return text for single-planet avoid intent');
+  if (!resultSingle.text.hi.includes('इसी होरा से बचें'))
+    fail('horaResultText avoid-intent Hindi with 1 planet should contain singular form "इसी होरा से बचें", got: ' + resultSingle.text.hi);
+  if (resultSingle.text.hi.includes('इन्हीं होरों से बचें'))
+    fail('horaResultText avoid-intent Hindi with 1 planet should NOT contain plural form "इन्हीं होरों से बचें", got: ' + resultSingle.text.hi);
+}
+
+// Parity gate: Hindi/English branching on planet count must be synchronized.
+// Multiple planets case: closing clause must use plural form.
+{
+  const avoidMulti = { status: 'answer', intent: 'avoid', planets: ['Mercury', 'Jupiter'], act: { en: 'business', hi: 'व्यापार' } };
+  const resultMulti = horaResultText(avoidMulti, null);
+  if (!resultMulti || !resultMulti.text.hi) fail('horaResultText should return text for multi-planet avoid intent');
+  if (!resultMulti.text.hi.includes('इन्हीं होरों से बचें'))
+    fail('horaResultText avoid-intent Hindi with 2+ planets should contain plural form "इन्हीं होरों से बचें", got: ' + resultMulti.text.hi);
+  if (resultMulti.text.hi.includes('इसी होरा से बचें'))
+    fail('horaResultText avoid-intent Hindi with 2+ planets should NOT contain singular form "इसी होरा से बचें", got: ' + resultMulti.text.hi);
+}
+
 if (failures) { console.error(`hora-adjudication: ${failures} failure(s)`); process.exit(1); }
 console.log('hora-adjudication: PASS');
