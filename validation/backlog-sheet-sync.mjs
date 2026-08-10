@@ -28,7 +28,7 @@ assert.equal(base.rows.get("46").quality.deliveryState, "Base design-system pass
 assert.equal(base.rows.get("46").quality.qualityRisk, "Amber");
 assert.match(base.rows.get("46").quality.limitations, /Cloudflare Web Analytics beacon/);
 assert.match(base.rows.get("46").quality.bugBashStatus, /first-run-city bug bash/);
-assert.match(base.rows.get("46").quality.recommendedAction, /No city-flow code action remains/);
+assert.match(base.rows.get("46").quality.recommendedAction, /Deploy and live-verify the link-city question/);
 assert.equal(base.rows.get("1").quality.deliveryState, "Delivered and production-verified");
 assert.equal(base.rows.get("1").quality.qualityRisk, "Green");
 assert.match(base.rows.get("1").quality.bugBashStatus, /F7 was then fixed/);

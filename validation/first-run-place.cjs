@@ -8,10 +8,10 @@ const places = fs.readFileSync("src/data/places.ts", "utf8");
 const shell = fs.readFileSync("src/kundli-app.tsx", "utf8");
 
 const checks = [
-  [root.includes("!placeFromUrl() && !preferences.homePlace"), "first-run gate requires neither URL nor remembered place"],
+  [root.includes("!linkedPlace && !preferences.homePlace"), "first-run gate requires neither URL nor remembered place"],
   [root.includes('rawLat == null || rawLat.trim() === "" ? NaN') && root.includes("new Intl.DateTimeFormat"), "incomplete or invalid shared places cannot bypass the gate"],
   [root.includes("needsFirstPlace && <FirstRunPlaceDialog"), "place chooser renders before child app"],
-  [root.includes("{!needsFirstPlace && <div"), "city-dependent app does not mount until selection"],
+  [root.includes("{!needsFirstPlace && !needsLinkCityChoice && <div"), "city-dependent app does not mount until selection"],
   [root.includes("updatePreferences({ homePlace: next })"), "selection uses approved preferences path"],
   [root.includes("approvedStorage.preferences.write") && root.includes("placeStorageWarning"), "storage failure is immediately visible"],
   [root.includes("replaceQuery({ city: next.label, lat: next.lat, lon: next.lon, zone: next.zone })"), "selection updates shareable URL state"],

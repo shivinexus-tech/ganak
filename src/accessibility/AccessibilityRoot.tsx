@@ -4,6 +4,7 @@ import PersonalizeScreen from "../screens/PersonalizeScreen";
 import FirstRunComfortOffer from "./FirstRunComfortOffer";
 import { useComfort } from "./ComfortProvider";
 import FirstRunPlaceDialog from "../components/FirstRunPlaceDialog";
+import LinkCityChoiceDialog from "../components/LinkCityChoiceDialog";
 import { approvedStorage } from "../storage/approved-storage";
 
 const DEFAULT_PLACE = { label: "New Delhi, India", lat: 28.61, lon: 77.21, zone: "Asia/Kolkata" };
@@ -30,6 +31,14 @@ function replaceQuery(values: Record<string, string | number | null>) {
   window.history.replaceState(window.history.state, "", `${window.location.pathname}?${query.toString()}${window.location.hash}`);
 }
 
+function placeSignature(place: { label: string; lat: number; lon: number; zone: string } | null) {
+  return place ? `${place.label}|${place.lat}|${place.lon}|${place.zone}` : "";
+}
+
+function samePlace(a: { label: string; lat: number; lon: number; zone: string } | null, b: { label: string; lat: number; lon: number; zone: string } | null) {
+  return !!a && !!b && a.label === b.label && a.lat === b.lat && a.lon === b.lon && a.zone === b.zone;
+}
+
 function detectLanguage(): "hi" | "en" {
   try {
     const languages = navigator.languages?.length ? navigator.languages : [navigator.language || "en"];
@@ -42,6 +51,7 @@ export default function AccessibilityRoot({ children }: { children: React.ReactN
   const [routeTick, setRouteTick] = useState(0);
   const [bootstrapKey, setBootstrapKey] = useState(0);
   const [placeStorageWarning, setPlaceStorageWarning] = useState("");
+  const [acceptedLinkSignature, setAcceptedLinkSignature] = useState("");
   const returnScrollRef = useRef(0);
   const explicitLanguage = urlValue("lang");
   const initialLanguage = explicitLanguage === "hi" || explicitLanguage === "en"
@@ -100,7 +110,11 @@ export default function AccessibilityRoot({ children }: { children: React.ReactN
 
   const screen = useMemo(() => urlValue("screen"), [routeTick]);
   const personalizeRoute = screen === "personalize";
-  const needsFirstPlace = ready && !placeFromUrl() && !preferences.homePlace;
+  const linkedPlace = placeFromUrl();
+  const linkedSignature = placeSignature(linkedPlace);
+  const needsFirstPlace = ready && !linkedPlace && !preferences.homePlace;
+  const needsLinkCityChoice = ready && !!linkedPlace && !!preferences.homePlace
+    && !samePlace(linkedPlace, preferences.homePlace) && acceptedLinkSignature !== linkedSignature;
 
   // The shell only titles the screens it owns, so Personalize kept whatever title the
   // previous route had left behind — including when it was deep-linked directly.
@@ -152,8 +166,26 @@ export default function AccessibilityRoot({ children }: { children: React.ReactN
       ? "यह ब्राउज़र शहर को याद नहीं रख सका। इस बार गणना सही शहर के लिए होगी, लेकिन अगली बार आपको फिर चुनना पड़ सकता है।"
       : "This browser could not remember the city. Calculations will use it now, but you may need to choose again next time."));
     setPlace(next);
+    setAcceptedLinkSignature(placeSignature(next));
     updatePreferences({ homePlace: next });
     replaceQuery({ city: next.label, lat: next.lat, lon: next.lon, zone: next.zone });
+    setBootstrapKey((value) => value + 1);
+    setRouteTick((value) => value + 1);
+  };
+
+  const useLinkedPlace = () => {
+    if (!linkedPlace) return;
+    setPlace(linkedPlace);
+    setAcceptedLinkSignature(linkedSignature);
+    setBootstrapKey((value) => value + 1);
+  };
+
+  const useRememberedPlace = () => {
+    const saved = preferences.homePlace;
+    if (!saved) return;
+    setPlace(saved);
+    setAcceptedLinkSignature(placeSignature(saved));
+    replaceQuery({ city: saved.label, lat: saved.lat, lon: saved.lon, zone: saved.zone });
     setBootstrapKey((value) => value + 1);
     setRouteTick((value) => value + 1);
   };
@@ -171,8 +203,9 @@ export default function AccessibilityRoot({ children }: { children: React.ReactN
   return (
     <>
       {needsFirstPlace && <FirstRunPlaceDialog lang={lang} onPick={choosePlace} />}
-      {!personalizeRoute && <FirstRunComfortOffer lang={lang} onParentSetup={openPersonalize} />}
-      {!needsFirstPlace && <div style={{ display: personalizeRoute ? "none" : "block" }}>
+      {needsLinkCityChoice && linkedPlace && preferences.homePlace && <LinkCityChoiceDialog lang={lang} linkedPlace={linkedPlace} savedPlace={preferences.homePlace} onUseLinked={useLinkedPlace} onUseSaved={useRememberedPlace} />}
+      {!personalizeRoute && !needsLinkCityChoice && <FirstRunComfortOffer lang={lang} onParentSetup={openPersonalize} />}
+      {!needsFirstPlace && !needsLinkCityChoice && <div style={{ display: personalizeRoute ? "none" : "block" }}>
         <div style={{ maxWidth: "47.5rem", margin: "0 auto", padding: `${T.s2} ${T.s5} 0`, textAlign: "right", background: "var(--bg-active)" }}>
           <button type="button" onClick={openPersonalize} className="comfort-control comfort-focus" style={{ display: "inline-flex", alignItems: "center", gap: T.s2, border: "0.0625rem solid var(--line)", borderRadius: T.rPill, padding: `0 ${T.s3}`, background: "var(--surface-active)", color: "var(--accent)", fontSize: T.fSmall, fontWeight: 700, cursor: "pointer" }}>
             <span aria-hidden="true">⚙</span>{lang === "hi" ? "Personalize · अपना बनाएँ" : "Personalize"}
