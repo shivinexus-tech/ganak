@@ -56,6 +56,16 @@ export const MIN_USABLE_MS = 3 * 60000;
 const BELTS: BlockerKey[] = ["rahu", "gulika", "yama"];
 const overlapMs = (a: Window, b: Window) => Math.max(0, Math.min(a.end, b.end) - Math.max(a.start, b.start));
 
+/* Sum total overlap between a window and a list of spans. Returns milliseconds
+   of cumulative overlap; a span can overlap win at multiple points, and each
+   overlap accumulates. Used by dominantChoghadiyaOverSpans (sum per Choghadiya
+   segment) and overlapsAnySpan (sum across all usable spans). */
+function sumOverlap(win: Window, spans: Window[]): number {
+  let total = 0;
+  for (const span of spans) total += overlapMs(span, win);
+  return total;
+}
+
 /* R4/R6: the choghadiya segment covering the greatest share of the window.
    Ties resolve to the earlier segment, which makes the output deterministic. */
 export function dominantChoghadiya(win: Window, ctx: TimingContext): { key: string; nat: "good" | "neutral" | "bad" } | null {
@@ -77,8 +87,7 @@ export function dominantChoghadiya(win: Window, ctx: TimingContext): { key: stri
 function dominantChoghadiyaOverSpans(spans: Window[], ctx: TimingContext): { key: string; nat: "good" | "neutral" | "bad" } | null {
   let best: ChoghaSeg | null = null, bestOv = 0;
   for (const seg of (ctx.chogha || [])) {
-    let ov = 0;
-    for (const span of spans) ov += overlapMs(span, seg);
+    const ov = sumOverlap(seg, spans);
     if (ov > bestOv) { best = seg; bestOv = ov; }
   }
   return best ? { key: best.key, nat: best.nat } : null;
@@ -91,9 +100,7 @@ function dominantChoghadiyaOverSpans(spans: Window[], ctx: TimingContext): { key
    negative value. */
 function overlapsAnySpan(win: Window | null, spans: Window[]): boolean {
   if (!win) return false;
-  let total = 0;
-  for (const span of spans) total += overlapMs(span, win);
-  return total > 0;
+  return sumOverlap(win, spans) > 0;
 }
 
 /* R1–R6. See docs/superpowers/specs/2026-08-09-hora-usefulness-design.md §4.2. */
@@ -168,7 +175,9 @@ export function adjudicate(win: Window, ctx: TimingContext): Verdict {
    blockedBy, grade, abhijitBoost — derives from that single adjudicate() call.
    That makes it structurally impossible for a field to describe a belt or
    Choghadiya span that falls entirely in the already-elapsed part of the
-   window: nothing outside the offered range ever reaches adjudicate(). */
+   window: nothing outside the offered range ever reaches adjudicate(). Additionally,
+   adjudicate scopes both grade/gradeKey and abhijitBoost to the usable spans,
+   not the raw window, ensuring recommendations describe time the user can act in. */
 export function nextCleanWindow(
   windows: Window[], ctx: TimingContext, afterMs: number
 ): { window: Window; verdict: Verdict } | null {
