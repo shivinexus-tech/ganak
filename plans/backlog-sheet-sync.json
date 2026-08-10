@@ -829,7 +829,7 @@
     },
     "64": {
       "section": "P0",
-      "title": "Decide the Hindi URL structure (`/hi/...` vs `?lang=hi`)",
+      "title": "Hindi URL structure — DECIDED 2026-08-10: `/hi/...` subdirectory",
       "technicalComplexity": "Medium"
     },
     "65": {
@@ -839,7 +839,7 @@
     },
     "66": {
       "section": "P0",
-      "title": "Give Prashna and Jyotish their own crawlable URLs",
+      "title": "Prashna and Jyotish crawlable URLs — DECIDED 2026-08-10: real paths",
       "technicalComplexity": "Medium"
     }
   }

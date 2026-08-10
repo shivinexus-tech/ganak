@@ -1323,6 +1323,28 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
 
 ## Decisions — resolved (owner, 2026-07-18)
 
+- ✅ **URL structure decided (owner, 2026-08-10): real paths per product area, `/hi/` for Hindi.**
+  Settles register rows 64 and 66 together, because they are one decision. Shape:
+  `/prashna`, `/jyotish`, `/hi/prashna`, `/hi/festival/diwali` … — 396 sitemap URLs,
+  reciprocal `hreflang` per pair, old `?screen=` and `?lang=hi` kept working as redirects.
+  **Decided against on evidence, not by default:** subdomain (`hi.ganakapp.com`) splits the
+  authority of a three-week-old domain; keeping query parameters is what Google marks
+  "not recommended" and makes a shared WhatsApp link unreadable as Hindi.
+  **Honest confidence split:** the product-path half is near-certain — AstroSage, Drik
+  Panchang and Prokerala are unanimous on descriptive paths per product area, and Ganak
+  is the outlier with none. The language half is a judgement call — the market is split,
+  and AstroSage ranks #1 for a Hindi Diwali query on a `?language=hi` URL. `/hi/` is
+  chosen because a new domain should follow the recommended shape rather than rely on
+  authority it does not have.
+  **Root-cause correction:** Hindi is not invisible because it is a query parameter — it is
+  invisible because `applyRouteMetadata()` canonicalises to `pathname`, so `?lang=hi`
+  declares itself a duplicate of English. That bug is fixed either way.
+  **Also decided:** Latin slugs, not Devanagari (percent-encoding wrecks shared links); and
+  **no auto-redirect by browser language** — Google advises against it, and it would leave
+  Googlebot, which crawls from the US, never seeing the Hindi pages at all.
+  **Left open on purpose:** `/jyotish` vs `/kundli`, to be settled with real Search Console
+  query data from row 63 — but before row 63 submits, since renaming an indexed URL
+  forfeits its position.
 - ✅ **SEO/share infrastructure ships BEFORE the UI redesign (owner, 2026-08-09).**
   Resolves `plans/ganak-architecture-audit.md` Decision 2, which had been open since the
   audit. Order: register row **62** (build-time per-route HTML head — the audit's #1
