@@ -77,27 +77,25 @@ export function adjudicate(win: Window, ctx: TimingContext): Verdict {
   }
 
   const remainders = subtractWindows(win, cuts);
-  const usable = remainders;
-  const significantRemainders = remainders.filter((w) => w.end - w.start >= MIN_USABLE_MS);
-  const significantTotal = significantRemainders.reduce((s, w) => s + (w.end - w.start), 0);
+  /* R2: the MIN_USABLE_MS filter applies only to remainders produced by a cut.
+     A window no belt touches (cuts.length === 0) passes through whole, however
+     short — R2 suppresses slivers left behind by subtraction, not short windows
+     in general. subtractWindows(win, []) always returns exactly [win], so the
+     "whole window" case falls out of the same expression. */
+  const usable = cuts.length === 0
+    ? remainders
+    : remainders.filter((w) => w.end - w.start >= MIN_USABLE_MS);
 
-  const anyBeltsInContext = ctx.rahu || ctx.gulika || ctx.yama;
-
+  /* R3: status derives from usable vs. the window alone. */
+  const usableTotal = usable.reduce((s, w) => s + (w.end - w.start), 0);
+  const windowTotal = win.end - win.start;
   let status: VerdictStatus;
-  if (blockedBy.length === 0) {
-    if (anyBeltsInContext) {
-      status = win.end - win.start >= MIN_USABLE_MS ? "clean" : "blocked";
-    } else {
-      status = "clean";
-    }
-  } else if (remainders.length === 0) {
+  if (usable.length === 0) {
     status = "blocked";
-  } else if (significantTotal <= 0) {
+  } else if (usableTotal < windowTotal) {
     status = "partial";
-  } else if (significantTotal >= win.end - win.start) {
-    status = "clean";
   } else {
-    status = "partial";
+    status = "clean";
   }
 
   const dom = dominantChoghadiya(win, ctx);

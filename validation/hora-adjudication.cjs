@@ -54,17 +54,32 @@ if (v.status !== 'blocked') fail('window inside rahu should be blocked');
 if (v.usable.length !== 0) fail('blocked window should have no usable time');
 if (v.blockedBy.join() !== 'rahu') fail('blockedBy should name rahu');
 
-// partial: straddles the start of rahu
-v = adjudicate(W(0, 100), CTX({ rahu: W(60, 200) }));
-if (v.status !== 'partial') fail('straddling window should be partial');
-if (v.usable.length !== 1 || v.usable[0].end !== 60) fail('partial remainder should end at the rahu start');
+// R2: these three replace an earlier gate whose windows ended exactly where
+// rahu began (zero overlap), so the subtraction path was never exercised —
+// a reviewer could (and did) delete the MIN_USABLE_MS filter with the gate
+// still green. All three below genuinely overlap a belt or deliberately don't.
 
-// R2: remainders under 3 minutes are discarded
-const MIN = 3 * 60000;
-v = adjudicate(W(0, MIN - 60000), CTX({ rahu: W(MIN - 60000, 10 * MIN) }));
-if (v.status !== 'blocked') fail('a sub-3-minute remainder should be discarded');
-v = adjudicate(W(0, MIN + 60000), CTX({ rahu: W(MIN + 60000, 10 * MIN) }));
-if (v.status !== 'clean') fail('a 4-minute window should survive');
+// discarded sliver: the cut leaves a 90s remainder, under the 3-minute floor
+v = adjudicate(W(0, 600000), CTX({ rahu: W(90000, 600000) }));
+if (v.status !== 'blocked') fail('a 90-second cut remainder should be discarded');
+if (v.usable.length !== 0) fail('a discarded remainder should leave usable empty');
+if (v.blockedBy.join() !== 'rahu') fail('blockedBy should name rahu even though the remainder was discarded');
+
+// surviving remainder: the cut leaves a 240s remainder, over the 3-minute floor
+// (this also supersedes the old "straddles the start of rahu" partial case,
+// rescaled to real ms so it no longer accidentally trips MIN_USABLE_MS)
+v = adjudicate(W(0, 600000), CTX({ rahu: W(240000, 600000) }));
+if (v.status !== 'partial') fail('a 240-second cut remainder should survive as partial');
+if (v.usable.length !== 1 || v.usable[0].start !== 0 || v.usable[0].end !== 240000) fail('surviving remainder should run from the window start to the cut');
+if (v.blockedBy.join() !== 'rahu') fail('blockedBy should name rahu');
+
+// no overlap, belt present elsewhere: a short window untouched by any belt
+// passes through whole — R2 discards slivers left by cutting, not short
+// windows in general (spec ambiguity, resolved).
+v = adjudicate(W(0, 120000), CTX({ rahu: W(3000000, 3600000) }));
+if (v.status !== 'clean') fail('an unblocked window should never be discarded for its own length');
+if (v.usable.length !== 1 || v.usable[0].start !== 0 || v.usable[0].end !== 120000) fail('unblocked window should be usable whole');
+if (v.blockedBy.length !== 0) fail('blockedBy should be empty when nothing overlaps');
 
 // multiple belts are all named
 v = adjudicate(W(0, 100), CTX({ rahu: W(0, 30), gulika: W(30, 60), yama: W(60, 100) }));
