@@ -31,6 +31,8 @@ import { VIM_LORDS } from "../engine/dasha";
 import { MUH_CATS, EVENTS, MUHURAT_GUIDANCE, SAMSKARA_INPUTS, PURCHASE_ACTIONS, PANCHAKA_NAME, PANCHAKA_SHORT, PANCHAKA_GLOSS } from "../data/muhurat-ui";
 import DailyWindowsCard from "../components/DailyWindowsCard";
 import SeasonClockCard from "../components/SeasonClockCard";
+import TimingLanes from "../components/TimingLanes";
+import { trikonaLords } from "../engine/personal-hora";
 import { ascendantAt } from "../engine/ephemeris";
 import { ayanAt } from "../engine/panchang";
 import { computeTodayPanchang } from "../engine/today-panchang";
@@ -90,6 +92,9 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   const [horaResult, setHoraResult] = useState(null);
   const [horaAsc, setHoraAsc] = useState(null);
   const [horaSel, setHoraSel] = useState(null);
+  // Day/night toggle for the hora dial (Task 9). null = auto (follows the clock
+  // when isToday, otherwise defaults to day).
+  const [horaPeriod, setHoraPeriod] = useState(null);
   // Practitioner view: reveals hora windows the belts block (greyed, belt named)
   // instead of silently hiding them. Default OFF — the default behaviour is a
   // hard block: a favourable hora that falls inside Rahu Kaal/Gulika/Yamaganda
@@ -215,6 +220,36 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
   // the real following sunrise from computeTodayPanchang — never rise + 86400000.
   const horaCtx = { rahu: todayP.rahu || null, gulika: todayP.gulika || null, yama: todayP.yama || null, abhijit: todayP.abhijit || null, chogha: allChogha };
   const nextRise = todayP.nextRise;
+
+  // Task 9: day/night dial state, lifted to the top of the component (not
+  // computed inside the dial's render IIFE below) so the verdict-telemetry
+  // effect can be a plain Hook that runs unconditionally on every render. The
+  // dial IIFE has an early return when rise/set are unavailable; a useEffect
+  // placed after that early return would be skipped on some renders and not
+  // others, which breaks React's rule that hooks run in the same order every
+  // time. These are used both by the dial/lane markup below and by the effect.
+  const horaHasRiseSet = todayP.rise != null && todayP.set != null;
+  const horaAutoPeriod = isToday && nowMs != null && horaHasRiseSet && (nowMs < todayP.rise || nowMs > todayP.set) ? "night" : "day";
+  const activeHoraPeriod = horaPeriod || horaAutoPeriod;
+  const horaDomainStart = activeHoraPeriod === "day" ? todayP.rise : todayP.set;
+  const horaDomainEnd = activeHoraPeriod === "day" ? todayP.set : nextRise;
+  const activeHoras = horaHasRiseSet
+    ? (activeHoraPeriod === "day" ? dayHoras(todayP.dow, todayP.rise, todayP.set) : nightHoras(todayP.dow, todayP.set, nextRise))
+    : [];
+  const horaNowInDomain = isToday && nowMs != null && horaHasRiseSet && nowMs >= horaDomainStart && nowMs <= horaDomainEnd;
+  const horaDialDur = horaHasRiseSet ? (horaDomainEnd - horaDomainStart) / 12 : 0;
+  const curHoraDialIdx = horaNowInDomain ? Math.min(11, Math.max(0, Math.floor((nowMs - horaDomainStart) / horaDialDur))) : null;
+  const showHoraDialIdx = horaSel != null ? horaSel : curHoraDialIdx;
+
+  // Step 5: verdict telemetry, once per selection/period/language change. No
+  // question text, place or birth data — only the fixed dictionary's
+  // outcome/language fields (see src/telemetry/privacy-events.ts).
+  useEffect(() => {
+    if (showHoraDialIdx == null || !activeHoras[showHoraDialIdx]) return;
+    const v = adjudicate({ start: activeHoras[showHoraDialIdx].start, end: activeHoras[showHoraDialIdx].end }, horaCtx);
+    privacyEvent("hora_verdict_shown", { outcome: v.status, language: lang });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showHoraDialIdx, activeHoraPeriod, lang]);
 
   const askHora = (q, action) => {
     privacyEvent("hora_ask", { action, language: lang });
@@ -1057,21 +1092,27 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           return (<div className="rise" style={{ ...card, borderRadius: T.rLg, padding: 0, overflow: "hidden", borderTop: `0.1875rem solid ${natColor(nowState)}` }}>
             <div style={{ background: "linear-gradient(135deg, var(--surface-raised), var(--surface-sunken))", padding: "1rem 1.25rem" }}>{head}</div>{moonRow}</div>);
         }
-        const dayFrac = (ms) => set > rise ? Math.max(0, Math.min(1, (ms - rise) / (set - rise))) : 0;
+        // Task 9: which period (day/night) is on screen, and the shared time
+        // axis for it. Aliased from the top-level consts (see above the
+        // askHora definition) so the render below and the telemetry effect
+        // never compute two different answers for "what's the active hora".
+        const activePeriod = activeHoraPeriod;
+        const domainStart = horaDomainStart;
+        const domainEnd = horaDomainEnd;
+        const horas = activeHoras;
+        const dayFrac = (ms) => domainEnd > domainStart ? Math.max(0, Math.min(1, (ms - domainStart) / (domainEnd - domainStart))) : 0;
         const AW = 320, AH = 240, cx = AW / 2, cy = AH - 60, R = 132;
         const arcPt = (f) => { const a = Math.PI - f * Math.PI; return [cx + R * Math.cos(a), cy - R * Math.sin(a)]; };
         const arcPoly = (f0, f1, n) => { const p = []; for (let i = 0; i <= n; i++) { const xy = arcPt(f0 + (f1 - f0) * i / n); p.push(xy[0].toFixed(1) + "," + xy[1].toFixed(1)); } return p.join(" "); };
-        const seg = (w) => (w && w.end > rise && w.start < set) ? [dayFrac(w.start), dayFrac(w.end)] : null;
+        const seg = (w) => (w && w.end > domainStart && w.start < domainEnd) ? [dayFrac(w.start), dayFrac(w.end)] : null;
         const segPoly = (sv, color, w) => sv ? <polyline points={arcPoly(sv[0], sv[1], 16)} fill="none" stroke={color} strokeWidth={w} strokeLinecap="round" /> : null;
         const showNow = isToday && nowMs != null;
-        const isDay = showNow && nowMs >= rise && nowMs <= set;
-        const sunXY = isDay ? arcPt(dayFrac(nowMs)) : [0, 0];
+        const nowInDomain = horaNowInDomain;
+        const sunXY = nowInDomain ? arcPt(dayFrac(nowMs)) : [0, 0];
         const radPt = (f, r) => { const a = Math.PI - f * Math.PI; return [cx + r * Math.cos(a), cy - r * Math.sin(a)]; };
-        const horas = dayHoras(todayP.dow, rise, set);
-        const horaDur = (set - rise) / 12;
-        const curHoraIdx = isDay ? Math.min(11, Math.max(0, Math.floor((nowMs - rise) / horaDur))) : null;
-        const showHora = horaSel != null ? horaSel : curHoraIdx;
-        
+        const curHoraIdx = curHoraDialIdx;
+        const showHora = showHoraDialIdx;
+
         // Arc dragging: convert SVG mouse position to time
         const handleArcDrag = (evt) => {
           const svg = evt.currentTarget;
@@ -1082,19 +1123,22 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           // Compute angle: atan2(cy - y, x - cx), then map to [0, 1] fraction
           const dx = svgX - cx, dy = cy - svgY;
           const angle = Math.atan2(dy, dx) / Math.PI; // [-1, 1]
-          const frac = Math.max(0, Math.min(1, 1 - angle)); // map to [0,1] = sunrise → sunset
-          const ms = rise + frac * (set - rise);
+          const frac = Math.max(0, Math.min(1, 1 - angle)); // map to [0,1] = domain start → domain end
+          const ms = domainStart + frac * (domainEnd - domainStart);
           setDragMs(ms);
         };
         const handleArcLeave = () => setDragMs(null);
-        
-        // Compute auspiciousness and details at dragged time
-        const dragInfo = dragMs && dragMs >= rise && dragMs <= set ? (() => {
-          const chog = todayP.choghaDay ? todayP.choghaDay.find(c => dragMs >= c.start && dragMs < c.end) : null;
+
+        // Compute auspiciousness and details at dragged time. Choghadiya is
+        // period-aware — dragging the night dial must read choghaNight, not
+        // the day segments, or the readout would silently show stale/no data.
+        const activeChogha = activePeriod === "day" ? (todayP.choghaDay || []) : (todayP.choghaNight || []);
+        const dragInfo = dragMs != null && dragMs >= domainStart && dragMs <= domainEnd ? (() => {
+          const chog = activeChogha.find(c => dragMs >= c.start && dragMs < c.end) || null;
           const inRahu = todayP.rahu && dragMs >= todayP.rahu.start && dragMs < todayP.rahu.end;
           const inAbhijit = todayP.abhijit && dragMs >= todayP.abhijit.start && dragMs < todayP.abhijit.end;
-          const isDangerous = inRahu || (chog && chog.nat === "rik");
-          const isGood = inAbhijit || (chog && chog.nat === "shubh");
+          const isDangerous = inRahu || (chog && chog.nat === "bad");
+          const isGood = inAbhijit || (chog && chog.nat === "good");
           return { time: dragMs, chog, inRahu, inAbhijit, isDangerous, isGood };
         })() : null;
         
@@ -1103,35 +1147,66 @@ return (
           <div className="rise" style={{ ...card, borderRadius: T.rLg, padding: 0, overflow: "hidden", borderTop: `0.1875rem solid ${natColor(nowState)}` }}>
             <div style={{ background: "linear-gradient(135deg, var(--surface-raised), var(--surface-sunken))", padding: "1rem 1.25rem 0.25rem" }}>
               {head}
-              <svg role="img" aria-label={lang === "hi" ? "आज का होरा चक्र — सूर्योदय से सूर्यास्त तक प्रत्येक ग्रह की होरा; विवरण नीचे सूची में है।" : "Today\u2019s planetary-hour dial — each hora from sunrise to sunset; the same information is listed below."} viewBox={"0 0 " + AW + " " + AH} style={{ width: "100%", maxWidth: 380, display: "block", margin: "2px auto 0", cursor: "crosshair" }} onMouseMove={handleArcDrag} onMouseLeave={handleArcLeave} onTouchMove={handleArcDrag} onTouchEnd={handleArcLeave}>
+              {(() => {
+                const tabs = [
+                  { key: "day", en: "Day", hi: "दिन" },
+                  { key: "night", en: "Night", hi: "रात" },
+                ];
+                return (
+                  <div role="tablist" aria-label={lang === "hi" ? "दिन या रात" : "Day or night"} style={{ display: "flex", gap: "0.375rem", margin: "0.375rem 0 0.5rem" }}>
+                    {tabs.map((t) => (
+                      <button key={t.key} type="button" role="tab" aria-selected={activePeriod === t.key}
+                        onClick={() => { setHoraPeriod(t.key); setHoraSel(null); }}
+                        style={{ minHeight: T.ctrlH, padding: `0 ${T.s3}`, borderRadius: T.rPill, cursor: "pointer",
+                          border: `0.0625rem solid ${activePeriod === t.key ? C.gold : C.line}`,
+                          background: activePeriod === t.key ? "var(--accent-soft)" : "transparent",
+                          color: activePeriod === t.key ? C.gold : C.muted, fontSize: T.fMicro }}>
+                        {lang === "hi" ? t.hi : t.en}
+                      </button>
+                    ))}
+                  </div>
+                );
+              })()}
+              <svg role="img" aria-label={activePeriod === "day"
+                  ? (lang === "hi" ? "आज दिन का होरा चक्र — सूर्योदय से सूर्यास्त तक प्रत्येक ग्रह की होरा; विवरण नीचे सूची में है।" : "Today's daytime planetary-hour dial — each hora from sunrise to sunset; the same information is listed below.")
+                  : (lang === "hi" ? "आज रात का होरा चक्र — सूर्यास्त से अगले सूर्योदय तक प्रत्येक ग्रह की होरा; विवरण नीचे सूची में है।" : "Tonight's planetary-hour dial — each hora from sunset to the next sunrise; the same information is listed below.")}
+                viewBox={"0 0 " + AW + " " + AH} style={{ width: "100%", maxWidth: 380, display: "block", margin: "2px auto 0", cursor: "crosshair" }} onMouseMove={handleArcDrag} onMouseLeave={handleArcLeave} onTouchMove={handleArcDrag} onTouchEnd={handleArcLeave}>
                 <line x1="8" y1={cy} x2={AW - 8} y2={cy} stroke="var(--line)" strokeWidth="1" />
-                {horas.map((h, i) => { const cur = curHoraIdx === i, sel = horaSel === i; return (
+                {horas.map((h, i) => { const cur = curHoraIdx === i, sel = horaSel === i; const v = adjudicate({ start: h.start, end: h.end }, horaCtx); const tone = v.status === "blocked" ? "var(--bad)" : v.grade === "good" ? "var(--good)" : v.grade === "bad" ? "var(--bad)" : "var(--muted)"; return (
                   <g key={i}>
                     <polyline points={arcPoly(i / 12, (i + 1) / 12, 8)} fill="none" stroke={HORA_COLOR[h.ruler]} strokeWidth={cur || sel ? 5.5 : 3} strokeOpacity={cur ? 1 : sel ? 0.85 : 0.36} strokeLinecap="butt" />
+                    <polyline points={arcPoly(i / 12, (i + 1) / 12, 8)} fill="none" stroke={tone} strokeWidth="1.5" strokeOpacity="0.8" transform="translate(0,7)" />
                     <polyline points={arcPoly(i / 12, (i + 1) / 12, 8)} fill="none" stroke="transparent" strokeWidth="18" style={{ cursor: "pointer" }} onClick={() => setHoraSel(i)} />
                   </g>); })}
                 {Array.from({ length: 13 }, (_, i) => { 
                   const a = radPt(i / 12, R - 5), b = radPt(i / 12, R + 4); 
-                  const timeLabel = (() => { const tm = rise + i * (set - rise) / 12; const h = Math.floor(tm / 3600000) % 24, m = Math.floor((tm % 3600000) / 60000); return (h < 10 ? "0" : "") + h + (m > 0 ? ":" + (m < 10 ? "0" : "") + m : ""); })();
+                  const timeLabel = (() => { const tm = domainStart + i * (domainEnd - domainStart) / 12; const h = Math.floor(tm / 3600000) % 24, m = Math.floor((tm % 3600000) / 60000); return (h < 10 ? "0" : "") + h + (m > 0 ? ":" + (m < 10 ? "0" : "") + m : ""); })();
                   const labelPt = radPt(i / 12, R + 16);
                   return <g key={i}><line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke="var(--line)" strokeWidth="1" /><text x={labelPt[0]} y={labelPt[1]} textAnchor="middle" style={{ fontSize: 9.5, fill: C.muted, fontVariantNumeric: "tabular-nums" }}>{timeLabel}</text></g>; 
                 })}
-                {showHora != null && (() => { const g = radPt((showHora + 0.5) / 12, R - 16); return <text x={g[0]} y={g[1] + 4} textAnchor="middle" style={{ fontSize: 13, fontWeight: 700, fill: HORA_COLOR[horas[showHora].ruler] }}>{HORA_GLYPH[horas[showHora].ruler]}</text>; })()}
-                {dragMs ? (() => { 
-                  const dxy = arcPt(dayFrac(dragMs)); 
-                  const chog = todayP.choghaDay ? todayP.choghaDay.find(c => dragMs >= c.start && dragMs < c.end) : null;
-                  const inRahu = todayP.rahu && dragMs >= todayP.rahu.start && dragMs < todayP.rahu.end;
-                  const inAbhijit = todayP.abhijit && dragMs >= todayP.abhijit.start && dragMs < todayP.abhijit.end;
-                  const isDangerous = inRahu || (chog && chog.nat === "rik");
-                  const isGood = inAbhijit || (chog && chog.nat === "shubh");
-                  return <circle cx={dxy[0]} cy={dxy[1]} r="7" fill="none" stroke={isGood ? C.gold : isDangerous ? C.sindoor : C.muted} strokeWidth="2.5" opacity="0.7" />; 
+                {showHora != null && horas[showHora] && (() => { const g = radPt((showHora + 0.5) / 12, R - 16); return <text x={g[0]} y={g[1] + 4} textAnchor="middle" style={{ fontSize: 13, fontWeight: 700, fill: HORA_COLOR[horas[showHora].ruler] }}>{HORA_GLYPH[horas[showHora].ruler]}</text>; })()}
+                {dragInfo ? (() => {
+                  const dxy = arcPt(dayFrac(dragMs));
+                  return <circle cx={dxy[0]} cy={dxy[1]} r="7" fill="none" stroke={dragInfo.isGood ? C.gold : dragInfo.isDangerous ? C.sindoor : C.muted} strokeWidth="2.5" opacity="0.7" />;
                 })() : null}
-                {isDay
+                {nowInDomain
                   ? <g><circle cx={sunXY[0]} cy={sunXY[1]} r="11" fill={C.gold} opacity="0.22" style={{ animation: "softpulse 3s ease-in-out infinite" }} /><circle cx={sunXY[0]} cy={sunXY[1]} r="5" fill="var(--accent)" stroke="var(--on-accent)" strokeWidth="1.5" /></g>
-                  : (showNow ? <text x={cx} y={cy - 10} textAnchor="middle" style={{ fontSize: 12, fill: C.muted }}>{lang === "hi" ? "रात्रि" : "night"}</text> : null)}
-                <text x="10" y={cy - 6} style={{ fontSize: 10.5, fill: C.muted }}>↑ {fmtT(rise)}</text>
-                <text x={AW - 10} y={cy - 6} textAnchor="end" style={{ fontSize: 10.5, fill: C.muted }}>{fmtT(set)} ↓</text>
+                  : (showNow ? <text x={cx} y={cy - 10} textAnchor="middle" style={{ fontSize: 12, fill: C.muted }}>{activePeriod === "day" ? (lang === "hi" ? "रात्रि" : "night") : (lang === "hi" ? "दिन" : "day")}</text> : null)}
+                <text x="10" y={cy - 6} style={{ fontSize: 10.5, fill: C.muted }}>{activePeriod === "day" ? "\u2191" : "\u2193"} {fmtT(domainStart)}</text>
+                <text x={AW - 10} y={cy - 6} textAnchor="end" style={{ fontSize: 10.5, fill: C.muted }}>{fmtT(domainEnd)} {activePeriod === "day" ? "\u2193" : "\u2191"}</text>
               </svg>
+              <TimingLanes
+                domain={{ start: domainStart, end: domainEnd }}
+                period={activePeriod}
+                horas={horas}
+                chogha={activeChogha}
+                blockers={[["rahu", todayP.rahu], ["gulika", todayP.gulika], ["yama", todayP.yama]].filter(([, w]) => w).map(([key, w]) => ({ key, window: w }))}
+                abhijit={todayP.abhijit || null}
+                personal={horaAsc != null ? trikonaLords(horaAsc) : null}
+                nowMs={isToday ? nowMs : null}
+                lang={lang}
+                onSelect={(w) => setHoraSel(horas.findIndex((h) => h.start === w.start))}
+              />
               {dragInfo ? (
                 <div style={{ display: "flex", alignItems: "center", gap: "0.4375rem", padding: "0.375rem 0.125rem 0.125rem", flexWrap: "wrap", justifyContent: "center", fontVariantNumeric: "tabular-nums" }}>
                   <span style={{ fontFamily: T.serif, fontSize: T.fSmall, color: dragInfo.isGood ? C.gold : dragInfo.isDangerous ? C.sindoor : C.muted }}>{dragInfo.isGood ? "✓ Auspicious" : dragInfo.isDangerous ? "✗ Inauspicious" : "○ Neutral"}</span>
@@ -1143,6 +1218,15 @@ return (
                 <div style={{ display: "flex", alignItems: "center", gap: "0.4375rem", padding: "0.375rem 0.125rem 0.125rem", flexWrap: "wrap", justifyContent: "center", fontVariantNumeric: "tabular-nums" }}>
                   <span style={{ fontFamily: T.serif, fontSize: T.fSmall, color: HORA_COLOR[horas[showHora].ruler] }}>{HORA_GLYPH[horas[showHora].ruler]} {trN(lang, HORA_NAME, horas[showHora].ruler)} {lang === "hi" ? "होरा" : "hora"}</span>
                   <span style={{ fontSize: T.fMicro, color: C.muted }}>{fmtT(horas[showHora].start)}–{fmtT(horas[showHora].end)} · {trN(lang, HORA_NATURE, horas[showHora].ruler)}</span>
+                  {(() => {
+                    const v = adjudicate({ start: horas[showHora].start, end: horas[showHora].end }, horaCtx);
+                    return (
+                      <>
+                        {v.gradeKey && <span style={{ fontSize: T.fMicro, color: C.muted }}> · {trN(lang, CHOG_NAME, v.gradeKey)}</span>}
+                        {v.status === "blocked" && <span style={{ fontSize: T.fMicro, color: C.sindoor }}> · ⚠ {lang === "hi" ? "बाधित" : "blocked"}</span>}
+                      </>
+                    );
+                  })()}
                   {horaSel != null && <button onClick={() => setHoraSel(null)} style={{ border: "none", background: "transparent", color: C.gold, cursor: "pointer", fontSize: T.fMicro, padding: "0 0.125rem" }} aria-label="reset">✕</button>}
                 </div>
               )}
