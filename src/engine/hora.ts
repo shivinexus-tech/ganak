@@ -2,7 +2,11 @@
 // Pure move: Chaldean order, day/night hora windows, and the client-side hora
 // advisor. No formula, keyword or scoring change. Owned by the Hora/Gochar lane.
 
-import { SIGN_LORD } from "./panchang";
+// trikonaLords is imported (not just re-exported) because horaResultText below
+// calls it directly under its old name horaPersonalAusp — a bare `export { x
+// as y } from "mod"` re-export does not create a local binding, so that call
+// site would throw "horaPersonalAusp is not defined" without this import.
+import { trikonaLords } from "./personal-hora";
 
 /* ---- planetary hours (hora): day divided sunrise->sunset, Chaldean order from the weekday lord ---- */
 export const HORA_ORDER = ["Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars"];
@@ -182,8 +186,9 @@ export const analyzeHora = (question) => {
   return { status: "unknown" };
 };
 
-/* personally-auspicious planets = lords of trikona houses (1,5,9) from ascendant */
-export const horaPersonalAusp = (ascIdx) => [...new Set([0, 4, 8].map((o) => SIGN_LORD[(ascIdx + o) % 12]))];
+/* personally-auspicious planets = lords of trikona houses (1,5,9) from ascendant.
+   Moved to personal-hora.ts; this alias is kept for one release. */
+export { trikonaLords as horaPersonalAusp };
 
 /* build the displayable answer text (bilingual) */
 export const horaResultText = (res, ascIdx) => {
@@ -208,7 +213,7 @@ export const horaResultText = (res, ascIdx) => {
     }
     let note = null;
     if (ascIdx != null && ascIdx >= 0) {
-      const mine = horaPersonalAusp(ascIdx), overlap = planets.filter((p) => mine.includes(p));
+      const mine = trikonaLords(ascIdx), overlap = planets.filter((p) => mine.includes(p));
       if (overlap.length) note = { en: `${overlap.join(" & ")} also rule${overlap.length === 1 ? "s" : ""} auspicious (trikona) houses in your chart — extra favourable for you.`, hi: `${overlap.map((p) => HORA_NAME[p].hi).join(" व ")} आपकी कुंडली के त्रिकोण भावों के स्वामी भी हैं — आपके लिए विशेष शुभ।` };
       else note = { en: `Your personally-auspicious horas (trikona lords): ${mine.join(", ")}.`, hi: `आपके शुभ होरा (त्रिकोण स्वामी): ${mine.map((p) => HORA_NAME[p].hi).join(", ")}।` };
     }

@@ -4,6 +4,7 @@ const { loadApp } = require('./_load-app.cjs');
 const { subtractWindows, adjudicate, dominantChoghadiya, nextCleanWindow } = loadApp('src/engine/hora-verdict.ts');
 const { computeTodayPanchang } = loadApp('src/engine/today-panchang.ts');
 const { dayHoras, horaWindowsForPlanet, nightHoras, HORA_ORDER, DAY_LORD } = loadApp('src/engine/hora.ts');
+const { trikonaLords, personalHoraWindows } = loadApp('src/engine/personal-hora.ts');
 let failures = 0;
 const fail = (m) => { failures++; console.error('FAIL ' + m); };
 const W = (s, e) => ({ start: s, end: e });
@@ -299,6 +300,68 @@ for (const weekday of [0, 1, 3, 5]) { // Sunday, Monday, Wednesday, Friday
   if (seq[12].ruler !== firstNightRuler)
     fail('weekday ' + weekday + ': first night hora ruler should be ' + firstNightRuler + ' (the planet following day hora 12 in the rotation), got ' + seq[12].ruler);
 }
+
+// trikonaLords: lords of houses 1, 5, 9 from the ascendant (trikona houses).
+// Derived from SIGN_LORD in panchang.ts:
+//   SIGN_LORD = [Mars,Venus,Mercury,Moon,Sun,Mercury,Venus,Mars,Jupiter,Saturn,Saturn,Jupiter]
+// Aries ascendant (idx 0): offsets 0,4,8 -> signs 0,4,8 = Mars, Sun, Jupiter
+const aries = trikonaLords(0);
+if (aries.join() !== 'Mars,Sun,Jupiter') fail('Aries trikona lords wrong: ' + aries.join());
+
+// Sagittarius ascendant (idx 8): offsets 0,4,8 -> signs 8,0,4 = Jupiter, Mars, Sun
+if (trikonaLords(8).slice().sort().join() !== 'Jupiter,Mars,Sun') fail('Sagittarius trikona lords wrong: ' + trikonaLords(8).join());
+
+// duplicates are collapsed (some ascendants have one lord ruling two of the three houses)
+for (let i = 0; i < 12; i++) {
+  const l = trikonaLords(i);
+  if (new Set(l).size !== l.length) fail('trikona lords should be unique for asc ' + i);
+  if (!l.length || l.length > 3) fail('trikona lords should number 1-3 for asc ' + i);
+}
+
+// personal windows are a subset of that planet's windows and carry the planet name
+const pw = personalHoraWindows(0, 0, RISE, SET, NEXT);
+if (!pw.length) fail('personal hora windows should not be empty');
+for (const w of pw) {
+  if (!aries.includes(w.planet)) fail('personal window names a non-trikona planet: ' + w.planet);
+  if (w.end <= w.start) fail('personal window has non-positive length');
+  if (w.period !== 'day' && w.period !== 'night') fail('personal window missing period');
+}
+
+// personalHoraWindows must forward the real nextRise, not silently default to
+// rise+86400000 — NEXT (RISE + 24.4h) differs from RISE + 24h by 0.4h = 1440000ms,
+// well over any float-noise threshold, so a dropped nextRise is detectable.
+const pwReal = personalHoraWindows(0, 0, RISE, SET, NEXT);
+const lastReal = pwReal[pwReal.length - 1];
+const pwDefaultish = (() => {
+  // compute what the windows would look like if nextRise were silently
+  // defaulted to RISE + 86400000 instead of the real NEXT we passed
+  const wrongNext = RISE + 86400000;
+  const out = [];
+  for (const planet of aries)
+    for (const w of horaWindowsForPlanet(planet, 0, RISE, SET, wrongNext))
+      out.push({ planet, start: w.start, end: w.end, period: w.period });
+  out.sort((a, b) => a.start - b.start);
+  return out;
+})();
+const lastWrong = pwDefaultish[pwDefaultish.length - 1];
+if (Math.abs(lastReal.end - lastWrong.end) < 1000)
+  fail('personalHoraWindows last window end does not reflect the real nextRise — looks like it silently defaulted to rise+86400000');
+
+// personal windows carry correct planet identity, not just correct timestamps:
+// cross-check every window's ruler against horaWindowsForPlanet for that same
+// planet at the same timestamps (guards a mislabel mutation slipping through
+// on timestamp-only checks).
+for (const w of pwReal) {
+  const own = horaWindowsForPlanet(w.planet, 0, RISE, SET, NEXT);
+  const match = own.some((o) => Math.abs(o.start - w.start) < 1 && Math.abs(o.end - w.end) < 1 && o.period === w.period);
+  if (!match) fail('personal window planet/time/period does not match horaWindowsForPlanet for ' + w.planet);
+}
+
+// horaPersonalAusp (kept as a re-export alias in hora.ts) must still behave
+// identically to trikonaLords.
+const { horaPersonalAusp } = loadApp('src/engine/hora.ts');
+if (horaPersonalAusp(0).join() !== trikonaLords(0).join()) fail('horaPersonalAusp alias should match trikonaLords(0)');
+if (horaPersonalAusp(8).join() !== trikonaLords(8).join()) fail('horaPersonalAusp alias should match trikonaLords(8)');
 
 if (failures) { console.error(`hora-adjudication: ${failures} failure(s)`); process.exit(1); }
 console.log('hora-adjudication: PASS');
