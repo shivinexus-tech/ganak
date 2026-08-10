@@ -202,8 +202,13 @@ export const horaResultText = (res, ascIdx) => {
     const enN = planets.join(" & "), hiN = planets.map((p) => HORA_NAME[p].hi).join(" व ");
     let en, hi;
     if (intent === "avoid") {
-      en = `For ${act.en}, ${enN} hora ${planets.length > 1 ? "are" : "is"} not ideal — choose another hora.`;
-      hi = `${act.hi} के लिए ${hiN} होरा उपयुक्त नहीं — कोई अन्य होरा चुनें।`;
+      // res.planets are the planets FAVOURABLE for act — analyzeHora resolves
+      // an activity to what suits it, independent of avoid/best/good intent.
+      // So the truthful avoid-intent sentence is: these horas suit the
+      // activity, so if you want to avoid the activity, avoid these horas.
+      // (Do not say "not ideal" — that inverts what the planets mean.)
+      en = `${enN} hora ${planets.length > 1 ? "suit" : "suits"} ${act.en} — since you want to avoid it, avoid ${planets.length > 1 ? "these horas" : "this hora"}.`;
+      hi = `${hiN} होरा ${act.hi} के लिए उपयुक्त ${planets.length > 1 ? "हैं" : "है"} — इसे टालना है तो इसी होरा से बचें।`;
     } else if (intent === "best") {
       en = `Best hora for ${act.en}: ${planets[0]} — ${HORA_NATURE[planets[0]].en}.`;
       hi = `${act.hi} के लिए सर्वोत्तम होरा: ${HORA_NAME[planets[0]].hi} — ${HORA_NATURE[planets[0]].hi}।`;

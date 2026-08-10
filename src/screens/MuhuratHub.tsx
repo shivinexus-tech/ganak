@@ -14,7 +14,7 @@ import {
   dayMuhurat, findMuhurat, muhuratForDate, muhuratScanRange, muhuratShuddhi,
   MUHURTA_RULES, vaishnavaEkadashi, NAK_HI, NAK_GOOD, dayScore,
 } from "../engine/muhurat";
-import { dayHoras, analyzeHora, horaResultText, HORA_GLYPH, HORA_COLOR, HORA_NAME, HORA_NATURE, HORA_PLANET_KEYS, horaDetectPlanet, horaIntent, HORA_CLARIFY, HORA_ACTIVITY_MAP, horaWindowsForPlanet } from "../engine/hora";
+import { dayHoras, nightHoras, analyzeHora, horaResultText, HORA_GLYPH, HORA_COLOR, HORA_NAME, HORA_NATURE, HORA_PLANET_KEYS, horaDetectPlanet, horaIntent, HORA_CLARIFY, HORA_ACTIVITY_MAP, horaWindowsForPlanet } from "../engine/hora";
 import { adjudicate, nextCleanWindow } from "../engine/hora-verdict";
 import { computeLagnaPanchaka, panchakaRem, PANCHAKA_TYPE } from "../engine/panchaka";
 import { obsKind } from "../engine/festivals";
@@ -235,7 +235,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
         <span style={{ fontSize: T.fSmall, color: C.ivory, fontWeight: isNow ? 700 : 400 }}>{fmtT(w.start)} – {fmtT(w.end)}</span>
         <span style={{ fontSize: T.fMicro, color: C.muted }}>{w.period === "day" ? (lang === "hi" ? "दिन" : "day") : (lang === "hi" ? "रात" : "night")}</span>
         <Badge tone={v.status === "clean" ? "good" : v.status === "partial" ? "warn" : "bad"} density="compact">
-          {v.status === "clean" ? (lang === "hi" ? "स्पष्ट" : "Clear") : v.status === "partial" ? (lang === "hi" ? "आंशिक" : "Partial") : (lang === "hi" ? "बाधित" : "Blocked")}
+          {v.status === "clean" ? (lang === "hi" ? "स्पष्ट" : "Clear") : v.status === "partial" ? (lang === "hi" ? "आंशिक रूप से बाधित" : "Partly blocked") : (lang === "hi" ? "बाधित" : "Blocked")}
         </Badge>
         {v.status === "partial" && v.usable[0] && (
           <span style={{ fontSize: T.fMicro, color: C.gold }}>{lang === "hi" ? "प्रयोग करें " : "use "}{fmtT(v.usable[0].start)}–{fmtT(v.usable[0].end)}</span>
@@ -250,14 +250,29 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
 
   // Never dead-end: when every window for a planet is blocked (or the answer's
   // intent was "avoid"), point at the next window that actually has usable time.
-  const nextCleanBlock = (planet) => {
+  //
+  // excludePlanets is set only for the "avoid" answer: hr.planets there are the
+  // planets FAVOURABLE for the activity (see horaResultText in hora.ts) — the
+  // very hours the user was just told to stay away from. Offering "next clean
+  // window" scoped to one of those planets would hand back exactly what the
+  // user asked to avoid, so the alternative is built instead from every hora
+  // (day + night) NOT ruled by any flagged planet, then adjudicated as usual.
+  const nextCleanBlock = (planet, excludePlanets) => {
     if (todayP.rise == null || todayP.set == null) return null;
-    const planetWins = horaWindowsForPlanet(planet, todayP.dow, todayP.rise, todayP.set, nextRise).map((w) => ({ start: w.start, end: w.end }));
+    const exclude = excludePlanets && excludePlanets.length ? excludePlanets : null;
+    const planetWins = exclude
+      ? [...dayHoras(todayP.dow, todayP.rise, todayP.set), ...nightHoras(todayP.dow, todayP.set, nextRise)]
+          .filter((w) => !exclude.includes(w.ruler))
+          .map((w) => ({ start: w.start, end: w.end }))
+      : horaWindowsForPlanet(planet, todayP.dow, todayP.rise, todayP.set, nextRise).map((w) => ({ start: w.start, end: w.end }));
     const alt = nextCleanWindow(planetWins, horaCtx, isToday ? Date.now() : todayP.rise);
+    const freeLabel = exclude ? exclude.map((p) => HORA_NAME[p][lang === "hi" ? "hi" : "en"]).join(lang === "hi" ? ", " : ", ") : null;
     return (
       <div style={{ fontSize: T.fMicro, color: C.gold, marginTop: "0.5rem" }}>
         {alt
-          ? (lang === "hi" ? `अगला स्पष्ट समय: ${fmtT(alt.verdict.usable[0].start)}–${fmtT(alt.verdict.usable[0].end)}` : `Next clear window: ${fmtT(alt.verdict.usable[0].start)}–${fmtT(alt.verdict.usable[0].end)}`)
+          ? (lang === "hi"
+              ? (exclude ? `${freeLabel} से मुक्त अगला समय: ${fmtT(alt.verdict.usable[0].start)}–${fmtT(alt.verdict.usable[0].end)}` : `अगला स्पष्ट समय: ${fmtT(alt.verdict.usable[0].start)}–${fmtT(alt.verdict.usable[0].end)}`)
+              : (exclude ? `Next window free of ${freeLabel}: ${fmtT(alt.verdict.usable[0].start)}–${fmtT(alt.verdict.usable[0].end)}` : `Next clear window: ${fmtT(alt.verdict.usable[0].start)}–${fmtT(alt.verdict.usable[0].end)}`))
           : (lang === "hi" ? "आज और कोई स्पष्ट समय नहीं — कल देखें।" : "No clear window left today — check tomorrow.")}
       </div>
     );
@@ -1250,7 +1265,7 @@ return (
                   </div>
                 );
               })()}
-              {horaResult.intent === "avoid" && hr.planets.length > 0 && todayP.rise != null && todayP.set != null && nextCleanBlock(hr.planets[0])}
+              {horaResult.intent === "avoid" && hr.planets.length > 0 && todayP.rise != null && todayP.set != null && nextCleanBlock(hr.planets[0], hr.planets)}
               {hr.note && <div style={{ fontSize: T.fMicro, color: C.gold, marginTop: "0.5rem", lineHeight: 1.5 }}>★ {hr.note[LL]}</div>}
             </div>
           );

@@ -3,7 +3,7 @@
 const { loadApp } = require('./_load-app.cjs');
 const { subtractWindows, adjudicate, dominantChoghadiya, nextCleanWindow } = loadApp('src/engine/hora-verdict.ts');
 const { computeTodayPanchang } = loadApp('src/engine/today-panchang.ts');
-const { dayHoras, horaWindowsForPlanet, nightHoras, HORA_ORDER, DAY_LORD } = loadApp('src/engine/hora.ts');
+const { dayHoras, horaWindowsForPlanet, nightHoras, HORA_ORDER, DAY_LORD, horaResultText } = loadApp('src/engine/hora.ts');
 const { trikonaLords, personalHoraWindows } = loadApp('src/engine/personal-hora.ts');
 let failures = 0;
 const fail = (m) => { failures++; console.error('FAIL ' + m); };
@@ -362,6 +362,25 @@ for (const w of pwReal) {
 const { horaPersonalAusp } = loadApp('src/engine/hora.ts');
 if (horaPersonalAusp(0).join() !== trikonaLords(0).join()) fail('horaPersonalAusp alias should match trikonaLords(0)');
 if (horaPersonalAusp(8).join() !== trikonaLords(8).join()) fail('horaPersonalAusp alias should match trikonaLords(8)');
+
+// Task 8 review fix: horaResultText's "avoid" sentence used to say the
+// favourable-for-the-activity planets were "not ideal", which inverts what
+// res.planets means (they FAVOUR the activity — see analyzeHora). Pin the
+// corrected wording: the English sentence must not claim the planets are
+// unsuitable/not-ideal/bad for the activity, and both languages must produce
+// non-empty text.
+{
+  const avoidRes = { status: 'answer', intent: 'avoid', planets: ['Moon'], act: { en: 'travel', hi: 'यात्रा' } };
+  const avoidHr = horaResultText(avoidRes, null);
+  if (!avoidHr || !avoidHr.text) fail('horaResultText should return text for an avoid-intent answer');
+  else {
+    const enLower = (avoidHr.text.en || '').toLowerCase();
+    if (!enLower) fail('horaResultText avoid-intent English sentence should be non-empty');
+    if (!avoidHr.text.hi) fail('horaResultText avoid-intent Hindi sentence should be non-empty');
+    if (enLower.includes('not ideal') || enLower.includes('unsuitable') || enLower.includes('not suitable') || enLower.includes(' bad'))
+      fail('horaResultText avoid-intent English sentence still claims the planets are unsuitable — this inverts what res.planets means: ' + avoidHr.text.en);
+  }
+}
 
 if (failures) { console.error(`hora-adjudication: ${failures} failure(s)`); process.exit(1); }
 console.log('hora-adjudication: PASS');
