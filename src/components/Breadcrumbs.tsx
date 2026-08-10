@@ -44,7 +44,7 @@ function Breadcrumbs({ ctx, lang, C }) {
   if (trail.length < 2) return null;
   const sep = { margin: "0 0.375rem", color: C.muted };
   return (
-    <nav aria-label="Breadcrumb" style={{ marginBottom: "0.5rem" }}>
+    <nav aria-label={lang === "hi" ? "मार्ग-सूची" : "Breadcrumb"} style={{ marginBottom: "0.5rem" }}>
       <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", alignItems: "center", flexWrap: "nowrap", fontSize: "var(--font-small)", fontFamily: "inherit", overflow: "hidden" }}>
         {trail.map((item, i) => {
           const last = i === trail.length - 1;

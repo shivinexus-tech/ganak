@@ -154,6 +154,57 @@ assert.strictEqual(englishInHindi.length, 0,
   'Write the Hindi string in Hindi. If the word is a proper noun or a format token with no\n' +
   'Hindi form, add it to ENGLISH_OK in this gate with that reason.');
 
+/* --------- 1d. no hand-rolled bilingual pair, and no unbranched English JSX text */
+/* Two more mechanisms, both found 2026-08-10 after the owner asked for every
+   remaining one:
+     - a Devanagari heading with its English translation in the next span, printed
+       together with no language branch. This is SectionHeader's old behaviour
+       rebuilt by hand, so the header gate could never see it. MuhuratHub had four.
+     - a bare English word in JSX text with no branch at all, so Hindi readers get
+       English ("upto", "Graha"). */
+const jsxLeaks = [];
+for (const file of files) {
+  const rel = path.relative(root, file).split(path.sep).join('/');
+  const lines = fs.readFileSync(file, 'utf8').split('\n');
+  lines.forEach((line, i) => {
+    const st = line.trim();
+    if (st.startsWith('//') || st.startsWith('*')) return;
+    const branched = /\bhi\s*\?|lang\s*===|!hi\s*&&|hi\s*&&/.test(line);
+
+    // adjacent Devanagari span + English span, neither behind a branch
+    const next = lines[i + 1] || '';
+    if (!branched && !/\bhi\s*\?|lang\s*===/.test(next)
+        && /<span[^>]*>[^<]*[ऀ-ॿ][^<]*<\/span>/.test(line)
+        && /<span[^>]*>\s*[A-Za-z][A-Za-z ,'’\-/&]{2,}\s*<\/span>/.test(next)) {
+      jsxLeaks.push(`${rel}:${i + 1} — Devanagari heading with an English twin on the next line (show one language)`);
+    }
+
+    /* English in a user-facing PROP never reaches JSX text, so the check above
+       cannot see it — a Hindi screen-reader user was hearing "reset". */
+    if (!branched) {
+      for (const m of line.matchAll(/\b(aria-label|title|placeholder|alt)=["']([^"']{3,60})["']/g)) {
+        const val = m[2].trim();
+        if (!/[A-Za-z]{3}/.test(val) || ENGLISH_OK.has(val)) continue;
+        if (/^(https?|\/|#)/.test(val)) continue;
+        jsxLeaks.push(`${rel}:${i + 1} — English in ${m[1]} with no language branch: "${val.slice(0, 40)}"`);
+      }
+    }
+
+    // unbranched English JSX text
+    if (!branched) {
+      for (const m of line.matchAll(/>([A-Za-z][A-Za-z ,'’\-/&]{2,60})</g)) {
+        const t = m[1].trim();
+        if (t.length < 3 || /^(https?|www)/.test(t)) continue;
+        if (ENGLISH_OK.has(t)) continue;
+        jsxLeaks.push(`${rel}:${i + 1} — English JSX text with no language branch: "${t.slice(0, 40)}"`);
+      }
+    }
+  });
+}
+assert.strictEqual(jsxLeaks.length, 0,
+  `Text that ignores the language toggle:\n  ${jsxLeaks.join('\n  ')}\n` +
+  'Branch on lang, or add a genuinely language-neutral token to ENGLISH_OK.');
+
 /* ------------------------------- 2. the one unavoidable copy is pinned, not trusted */
 /* PrashnaScreen's engine is validated by prashna-parity, which evaluates the region
    between its ENGINE markers as plain, self-contained JS — it can carry neither an

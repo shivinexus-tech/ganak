@@ -379,7 +379,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
 
       {showPanch && todayP && (() => {
         const P = todayP, ptz = P.tz, A = P.anchor;
-        const upto = (name, end) => <>{name} <span style={{ color: C.muted }}>upto</span> <span style={{ color: C.gold }}>{fmtTimeD(end, ptz, A)}</span></>;
+        const upto = (name, end) => <>{name} <span style={{ color: C.muted }}>{lang === "hi" ? "तक" : "upto"}</span> <span style={{ color: C.gold }}>{fmtTimeD(end, ptz, A)}</span></>;
         const multi = (entries) => (
           <span style={{ display: "inline-flex", flexDirection: "column", gap: "0.1875rem", alignItems: "flex-end" }}>
             {(Array.isArray(entries) ? entries : []).map((e3, k) => <span key={k}>{upto(e3.name, e3.end)}</span>)}
@@ -413,8 +413,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           <>
           <div className="rise" style={{ ...card, padding: "1.125rem 1.25rem", marginBottom: T.s4 }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: T.s3, marginBottom: "0.625rem", borderBottom: `0.0625rem solid ${C.line}`, paddingBottom: T.s3 }}>
-              <span style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fHeading }}>विस्तृत पञ्चाङ्ग</span>
-              <span style={{ ...T.label, color: C.muted }}>Full panchang</span>
+              <span style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fHeading }}>{lang === "hi" ? "विस्तृत पञ्चाङ्ग" : "Full panchang"}</span>
             </div>
             <div style={{ marginBottom: "0.875rem" }}>
               <span style={{ fontFamily: T.serif, fontSize: "var(--font-title)", color: C.gold }}>{P.dateLabel}</span>
@@ -433,8 +432,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
 
           <div className="rise" style={{ ...card, padding: "1rem 1.25rem", marginBottom: T.s4 }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: T.s3, marginBottom: "0.5rem", borderBottom: `0.0625rem solid ${C.line}`, paddingBottom: T.s3 }}>
-              <span style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fHeading }}>चौघड़िया</span>
-              <span style={{ ...T.label, color: C.muted }}>Choghadiya</span>
+              <span style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fHeading }}>{lang === "hi" ? "चौघड़िया" : "Choghadiya"}</span>
             </div>
             <div style={{ fontSize: T.fMicro, color: C.muted, marginBottom: "0.5rem" }}>{lang === "hi" ? "घंटे-दर-घंटे शुभ/अशुभ समय" : "Hour-by-hour good & avoid times"}</div>
             {[["dayChogha", todayP.choghaDay], ["nightChogha", todayP.choghaNight]].map(([lbl, slots]) => slots && (
@@ -462,8 +460,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
           </div>
           <div className="rise technical-only" style={{ ...card, padding: "1rem 1.25rem", marginBottom: T.s4 }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: T.s3, marginBottom: "0.375rem", borderBottom: `0.0625rem solid ${C.line}`, paddingBottom: T.s3 }}>
-              <span style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fHeading }}>उदय लग्न</span>
-              <span style={{ ...T.label, color: C.muted }}>Udaya Lagna</span>
+              <span style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fHeading }}>{lang === "hi" ? "उदय लग्न" : "Udaya Lagna"}</span>
             </div>
             <div style={{ fontSize: T.fMicro, color: C.muted, marginBottom: "0.5rem" }}>{lang === "hi" ? "सूर्योदय से अगले सूर्योदय तक प्रत्येक राशि का उदयकाल" : "Each rising sign, sunrise to next sunrise"}</div>
             {(lp.lagnaSchedule || []).map((w, i) => {
@@ -480,8 +477,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
 
           <div className="rise technical-only" style={{ ...card, padding: "1rem 1.25rem", marginBottom: T.s4 }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: T.s3, marginBottom: "0.375rem", borderBottom: `0.0625rem solid ${C.line}`, paddingBottom: T.s3 }}>
-              <span style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fHeading }}>पञ्चक रहित मुहूर्त</span>
-              <span style={{ ...T.label, color: C.muted }}>Panchaka Rahita</span>
+              <span style={{ fontFamily: T.serif, color: C.gold, fontSize: T.fHeading }}>{lang === "hi" ? "पञ्चक रहित मुहूर्त" : "Panchaka Rahita"}</span>
             </div>
             <div style={{ fontSize: T.fMicro, color: C.muted, marginBottom: "0.5rem" }}>{lang === "hi" ? "शुभ (दोषरहित) व पञ्चक-दोष काल" : "Auspicious (blemish-free) vs Panchaka-dosha windows"}</div>
             {(lp.panchakaWindows || []).map((w, i) => {
@@ -1068,7 +1064,7 @@ return (
                 <div style={{ display: "flex", alignItems: "center", gap: "0.4375rem", padding: "0.375rem 0.125rem 0.125rem", flexWrap: "wrap", justifyContent: "center", fontVariantNumeric: "tabular-nums" }}>
                   <span style={{ fontFamily: T.serif, fontSize: T.fSmall, color: HORA_COLOR[horas[showHora].ruler] }}>{HORA_GLYPH[horas[showHora].ruler]} {trN(lang, HORA_NAME, horas[showHora].ruler)} {lang === "hi" ? "होरा" : "hora"}</span>
                   <span style={{ fontSize: T.fMicro, color: C.muted }}>{fmtT(horas[showHora].start)}–{fmtT(horas[showHora].end)} · {trN(lang, HORA_NATURE, horas[showHora].ruler)}</span>
-                  {horaSel != null && <button onClick={() => setHoraSel(null)} style={{ border: "none", background: "transparent", color: C.gold, cursor: "pointer", fontSize: T.fMicro, padding: "0 0.125rem" }} aria-label="reset">✕</button>}
+                  {horaSel != null && <button onClick={() => setHoraSel(null)} style={{ border: "none", background: "transparent", color: C.gold, cursor: "pointer", fontSize: T.fMicro, padding: "0 0.125rem" }} aria-label={lang === "hi" ? "हटाएँ" : "reset"}>✕</button>}
                 </div>
               )}
             </div>
