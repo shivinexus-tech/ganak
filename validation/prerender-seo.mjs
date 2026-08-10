@@ -25,3 +25,32 @@ const titles = routes.map((r) => r.title);
 assert.equal(new Set(titles).size, titles.length, "two routes share a title — canonical collapse risk");
 
 console.log(`prerender-seo gate: PASS — ${routes.length} routes, ${legacyRedirects().length} legacy redirects, all titles unique.`);
+
+import fs from "node:fs";
+
+const DIST = new URL("../dist/", import.meta.url);
+const distPath = (rel) => new URL(rel, DIST);
+
+const sitemap = fs.readFileSync(distPath("sitemap.xml"), "utf8");
+assert.ok(sitemap.startsWith("<?xml"), "sitemap must be XML, not the SPA shell");
+assert.ok(sitemap.includes("<urlset"), "sitemap missing <urlset>");
+
+for (const route of routes) {
+  const loc = `<loc>${origin()}${route.canonicalPath}</loc>`;
+  assert.ok(sitemap.includes(loc), `sitemap missing ${route.canonicalPath}`);
+}
+
+const locCount = (sitemap.match(/<loc>/g) || []).length;
+assert.equal(locCount, new Set(routes.map((r) => r.canonicalPath)).size,
+  "sitemap <loc> count must equal the unique canonical path count — no duplicates, no extras");
+
+for (const { from } of legacyRedirects()) {
+  assert.ok(!sitemap.includes(`<loc>${origin()}${from}</loc>`),
+    `legacy path must never appear in the sitemap: ${from}`);
+}
+
+const robots = fs.readFileSync(distPath("robots.txt"), "utf8");
+assert.ok(robots.startsWith("User-agent:"), "robots.txt must be robots syntax, not the SPA shell");
+assert.ok(robots.includes(`Sitemap: ${origin()}/sitemap.xml`), "robots.txt must point at the sitemap");
+
+console.log(`prerender-seo gate: sitemap ${locCount} URLs, robots.txt present.`);
