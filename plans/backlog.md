@@ -1077,7 +1077,17 @@ Feature exists and renders; not a claim of polish/parity.
   coverage alone — see Content Track §C1.
 - **Muhurat date-range finder** — 7 activities, Drik-validated. ✅ 2026-07-17.
 - **Prashna (horary)** — verdict-first, birth-data-free. ✅ 2026-07-16.
-- **Hora / planetary hours** — with advice input.
+- **Hora / planetary hours** — with advice input. Overhaul **complete but not yet
+  merged or deployed**, on `claude/hora-code` (`CLAUDE-HORA-USEFULNESS-2026-08-09`
+  in `plans/task-log.md`): every hora answer is now adjudicated against Rahu
+  Kaal/Gulika/Yamaganda before it is recommended, all 24 horas are visible
+  (day + night, not just 12), horas are graded by Choghadiya, and Hora/Choghadiya/
+  the forbidden belts/the user's personal trikona hours share one time axis.
+  5 of 6 spec success criteria fully met, 1 partly (a multi-planet answer still
+  times only one of the two planets it names) — see the task-log row for gate
+  evidence, browser-verification limits (no screenshot was captured) and every
+  deferred finding, including a second live instance of the fake-sunrise bug at
+  `src/engine/muhurat.ts:140`.
 - **Gochar / transit display** — upcoming sign changes, retro/direct (display only).
 - **Full birth chart (17 sub-sections)** — Kundli, Yogas, Grahas, KP sub-lords,
   KP significators, Kundali Matching / Guna Milan, Karakas, Shadbala, Special
