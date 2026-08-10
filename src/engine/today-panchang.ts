@@ -21,6 +21,11 @@ function computeTodayPanchang(place, ayanamsa = "lahiri", atMs) {
 
   const ev = sunEvents(y, m, day, tz, place.lat, place.lon);
   const moonEv = moonEvents(y, m, day, tz, place.lat, place.lon);
+  /* The FOLLOWING day's sunrise. Everything that spans the night — night horas,
+     night choghadiya — must measure against this, not rise+24h, which drifts by
+     minutes and is worst near the solstices. */
+  const evNext = sunEvents(y, m, day + 1, tz, place.lat, place.lon);
+  const nextRise = evNext.rise !== null ? evNext.rise : (ev.rise !== null ? ev.rise + 86400000 : null);
   const anchor = ev.rise !== null ? ev.rise : Date.UTC(y, m - 1, day, 6) - tz * 3600000; // panchang day begins at sunrise
   const dayEnd = anchor + 24.2 * 3600000;
 
@@ -88,12 +93,12 @@ function computeTodayPanchang(place, ayanamsa = "lahiri", atMs) {
     months, samvat, pravishte,
     moonSign: SIGNS[msIdx].split(" ")[0], moonSignEnd: msEnd < dayEnd ? msEnd : null,
     sunSign: SIGNS[Math.floor(sun / 30)].split(" ")[0],
-    rise: ev.rise, set: ev.set, moonrise: moonEv.rise, moonset: moonEv.set, rahu, abhijit, gulika, yama,
+    rise: ev.rise, set: ev.set, nextRise, moonrise: moonEv.rise, moonset: moonEv.set, rahu, abhijit, gulika, yama,
     dow,
     pitruPaksha: (ev.rise !== null && ev.set !== null) ? pitruPakshaDay(ev.rise, ev.set) : null,
     ayyappaMandala: ayyappaMandalaFor(anchor, tz),
     choghaDay: ev.rise !== null ? choghaSlots(dow, ev.rise, ev.set, true) : null,
-    choghaNight: ev.rise !== null ? choghaSlots(dow, ev.set, ev.rise + 86400000, false) : null,
+    choghaNight: ev.rise !== null ? choghaSlots(dow, ev.set, nextRise, false) : null,
     events: upcomingEvents(now),
     dailyWindows,
   };

@@ -2,6 +2,7 @@
 'use strict';
 const { loadApp } = require('./_load-app.cjs');
 const { subtractWindows, adjudicate, dominantChoghadiya, nextCleanWindow } = loadApp('src/engine/hora-verdict.ts');
+const { computeTodayPanchang } = loadApp('src/engine/today-panchang.ts');
 let failures = 0;
 const fail = (m) => { failures++; console.error('FAIL ' + m); };
 const W = (s, e) => ({ start: s, end: e });
@@ -206,6 +207,18 @@ if (!n || n.verdict.status !== 'clean') fail('offered-range gate: status should 
 if (!n || n.verdict.blockedBy.length !== 0) fail('offered-range gate: blockedBy should be empty when rahu does not touch the offered range');
 if (!n || n.verdict.abhijitBoost !== false) fail('offered-range gate: abhijitBoost should be false when abhijit does not touch the offered range');
 if (!n || n.verdict.usable.length !== 1 || n.verdict.usable[0].start !== 400000 || n.verdict.usable[0].end !== 900000) fail('offered-range gate: usable should be exactly [400000,900000]');
+
+// nextRise: night choghadiya must be measured against the real following
+// sunrise, not rise+24h (which drifts by minutes, worst near the solstices).
+const DELHI = { lat: 28.6139, lon: 77.2090, zone: 'Asia/Kolkata', label: 'Delhi' };
+const tp = computeTodayPanchang(DELHI, 'lahiri', Date.UTC(2026, 11, 21, 6, 30)); // solstice: worst drift
+if (tp.nextRise == null) fail('computeTodayPanchang should expose nextRise');
+if (Math.abs(tp.nextRise - (tp.rise + 86400000)) < 1000)
+  fail('nextRise looks like rise+24h — it must be the real following sunrise');
+if (!(tp.nextRise > tp.set)) fail('nextRise must fall after sunset');
+// night choghadiya must end at the real sunrise, not the approximation
+const lastNight = tp.choghaNight[tp.choghaNight.length - 1];
+if (Math.abs(lastNight.end - tp.nextRise) > 1) fail('night choghadiya must end at the real next sunrise');
 
 if (failures) { console.error(`hora-adjudication: ${failures} failure(s)`); process.exit(1); }
 console.log('hora-adjudication: PASS');
