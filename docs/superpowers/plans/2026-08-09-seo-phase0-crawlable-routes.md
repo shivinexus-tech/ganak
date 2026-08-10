@@ -39,7 +39,7 @@
 | `scripts/seo-routes.mjs` (create) | Single source of route truth: returns every public route with its resolved title, description and canonical path. Imported by both the emitter and the gate so they can never disagree. |
 | `scripts/build-seo.mjs` (create) | Post-build emitter: writes `dist/sitemap.xml`, `dist/robots.txt`, `dist/_redirects` and one `dist/<path>/index.html` per route. |
 | `validation/prerender-seo.mjs` (create) | Permanent gate over the emitted `dist/`. |
-| `package.json` (modify) | `build` script gains the post-build step. |
+| `vite.config.ts` (modify) | Registers the emitter as a `closeBundle` plugin, so it fires for any Vite build. `package.json` is deliberately **not** modified — see Task 5. |
 | `public/robots.txt` | **Not used** — `robots.txt` is emitted by the script so its `Sitemap:` line stays consistent with the emitted origin. |
 
 ---
@@ -54,7 +54,7 @@
 - Consumes: `validation/_load-app.cjs` → `loadApp(entry)`; `src/data/festival-pages.ts` → `FESTIVAL_PAGE_ROUTES`, `FESTIVAL_LEGACY_PATH_REDIRECTS`; `src/data/utility-calculators.ts` → `UTILITY_CALCULATORS`; `src/metadata/route-metadata.ts` → `routeMetadata`, `canonicalOrigin`.
 - Produces: `publicRoutes()` → `Array<{ path: string, title: string, description: string, canonicalPath: string }>`; `legacyRedirects()` → `Array<{ from: string, to: string }>`; `origin()` → `string`. Later tasks import exactly these three names.
 
-- [ ] **Step 1: Write the failing gate**
+- [x] **Step 1: Write the failing gate**
 
 Create `validation/prerender-seo.mjs`:
 
@@ -88,7 +88,7 @@ assert.equal(new Set(titles).size, titles.length, "two routes share a title — 
 console.log(`prerender-seo gate: PASS — ${routes.length} routes, ${legacyRedirects().length} legacy redirects, all titles unique.`);
 ```
 
-- [ ] **Step 2: Run it to confirm it fails**
+- [x] **Step 2: Run it to confirm it fails**
 
 ```bash
 export PATH="/opt/homebrew/bin:$PATH"; node validation/prerender-seo.mjs
@@ -96,7 +96,7 @@ export PATH="/opt/homebrew/bin:$PATH"; node validation/prerender-seo.mjs
 
 Expected: `ERR_MODULE_NOT_FOUND` for `../scripts/seo-routes.mjs`.
 
-- [ ] **Step 3: Write the module**
+- [x] **Step 3: Write the module**
 
 Create `scripts/seo-routes.mjs`:
 
@@ -160,7 +160,7 @@ export function legacyRedirects() {
 }
 ```
 
-- [ ] **Step 4: Run the gate to confirm it passes**
+- [x] **Step 4: Run the gate to confirm it passes**
 
 ```bash
 export PATH="/opt/homebrew/bin:$PATH"; node validation/prerender-seo.mjs
@@ -170,11 +170,11 @@ Expected: `prerender-seo gate: PASS — 198 routes, 10 legacy redirects, all tit
 
 If the title-uniqueness assertion fails, **do not relax it** — it means two registry entries resolve to the same label, which is exactly the duplicate-content defect this work exists to remove. Record the colliding paths and stop; that is a content fix for the festival registry owner.
 
-- [ ] **Step 5: Prove the gate is non-vacuous**
+- [x] **Step 5: Prove the gate is non-vacuous**
 
 Temporarily change `assert.equal(routes.length, 198, …)` to `199`, run, confirm it fails with `expected 198 public routes, got 198`, then restore and confirm PASS. Paste both outputs.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/seo-routes.mjs validation/prerender-seo.mjs
@@ -203,7 +203,7 @@ Gate proven non-vacuous by expecting 199 routes."
 - Consumes: `publicRoutes()`, `origin()` from Task 1.
 - Produces: `dist/sitemap.xml`, `dist/robots.txt`. Task 3 extends the same `build-seo.mjs` entry point; Task 4 adds HTML emission to it.
 
-- [ ] **Step 1: Add the failing assertions**
+- [x] **Step 1: Add the failing assertions**
 
 Append to `validation/prerender-seo.mjs`:
 
@@ -238,7 +238,7 @@ assert.ok(robots.includes(`Sitemap: ${origin()}/sitemap.xml`), "robots.txt must 
 console.log(`prerender-seo gate: sitemap ${locCount} URLs, robots.txt present.`);
 ```
 
-- [ ] **Step 2: Run to confirm it fails**
+- [x] **Step 2: Run to confirm it fails**
 
 ```bash
 export PATH="/opt/homebrew/bin:$PATH"; node validation/prerender-seo.mjs
@@ -246,7 +246,7 @@ export PATH="/opt/homebrew/bin:$PATH"; node validation/prerender-seo.mjs
 
 Expected: `ENOENT … dist/sitemap.xml`.
 
-- [ ] **Step 3: Write the emitter**
+- [x] **Step 3: Write the emitter**
 
 Create `scripts/build-seo.mjs`:
 
@@ -309,7 +309,7 @@ function main() {
 main();
 ```
 
-- [ ] **Step 4: Build and run the gate**
+- [x] **Step 4: Build and run the gate**
 
 ```bash
 export PATH="/opt/homebrew/bin:$PATH"; npm run build && node scripts/build-seo.mjs && node validation/prerender-seo.mjs
@@ -317,11 +317,11 @@ export PATH="/opt/homebrew/bin:$PATH"; npm run build && node scripts/build-seo.m
 
 Expected: `build-seo: sitemap 198 URLs, robots.txt written.` then both gate PASS lines.
 
-- [ ] **Step 5: Prove non-vacuous**
+- [x] **Step 5: Prove non-vacuous**
 
 Delete one `<url>` line from `dist/sitemap.xml` by hand, rerun the gate, confirm it fails naming that exact path, then re-run `node scripts/build-seo.mjs` and confirm PASS. Paste both outputs.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/build-seo.mjs validation/prerender-seo.mjs
@@ -347,7 +347,7 @@ task rather than sitemap entries."
 
 Ordering is load-bearing. `_redirects` is first-match-wins, so every specific rule must precede `/* /index.html 200`. `validation/favicon.cjs` already pins that invariant for the favicon rule and must keep passing.
 
-- [ ] **Step 1: Add the failing assertions**
+- [x] **Step 1: Add the failing assertions**
 
 Append to `validation/prerender-seo.mjs`:
 
@@ -370,7 +370,7 @@ for (const { from, to } of legacyRedirects()) {
 console.log(`prerender-seo gate: ${legacyRedirects().length} legacy 301s ordered ahead of the SPA catch-all.`);
 ```
 
-- [ ] **Step 2: Run to confirm it fails**
+- [x] **Step 2: Run to confirm it fails**
 
 ```bash
 export PATH="/opt/homebrew/bin:$PATH"; node validation/prerender-seo.mjs
@@ -378,7 +378,7 @@ export PATH="/opt/homebrew/bin:$PATH"; node validation/prerender-seo.mjs
 
 Expected: `missing legacy 301: /festival/nrisimha-jayanti /festival/narasimha-jayanti 301`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Add to `scripts/build-seo.mjs`, above `main()`:
 
@@ -406,7 +406,7 @@ and call it inside `main()`, after `emitRobots()`:
   console.log(`build-seo: ${redirectCount} legacy 301s written ahead of the base rules.`);
 ```
 
-- [ ] **Step 4: Rebuild and verify**
+- [x] **Step 4: Rebuild and verify**
 
 ```bash
 export PATH="/opt/homebrew/bin:$PATH"; npm run build && node scripts/build-seo.mjs && node validation/prerender-seo.mjs && node validation/favicon.cjs
@@ -414,11 +414,11 @@ export PATH="/opt/homebrew/bin:$PATH"; npm run build && node scripts/build-seo.m
 
 Expected: all PASS, including the pre-existing favicon gate.
 
-- [ ] **Step 5: Prove non-vacuous**
+- [x] **Step 5: Prove non-vacuous**
 
 Reorder `emitRedirects` so the legacy rules are appended *after* `base` instead of before, rebuild, confirm the gate fails with `legacy 301 must precede the catch-all`, restore, confirm PASS. Paste both outputs.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/build-seo.mjs validation/prerender-seo.mjs
@@ -445,7 +445,7 @@ catch-all; the favicon ordering invariant still passes."
 
 The template is the **built** `dist/index.html`, not the source `index.html`, because the built one carries the hashed asset tags. We rewrite its head tags rather than regenerating the document, so any future head change by the `CODEX-P0-ROWS-38-39` lane flows through automatically.
 
-- [ ] **Step 1: Add the failing assertions**
+- [x] **Step 1: Add the failing assertions**
 
 Append to `validation/prerender-seo.mjs`:
 
@@ -476,7 +476,7 @@ for (const route of routes) {
 console.log(`prerender-seo gate: ${routes.length} route HTML files, each with a unique title and self-consistent canonical.`);
 ```
 
-- [ ] **Step 2: Run to confirm it fails**
+- [x] **Step 2: Run to confirm it fails**
 
 ```bash
 export PATH="/opt/homebrew/bin:$PATH"; node validation/prerender-seo.mjs
@@ -484,7 +484,7 @@ export PATH="/opt/homebrew/bin:$PATH"; node validation/prerender-seo.mjs
 
 Expected: `ENOENT … dist/calculators/index.html`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Add to `scripts/build-seo.mjs`:
 
@@ -543,7 +543,7 @@ Call it in `main()` after `emitRedirects()`:
   console.log(`build-seo: ${htmlCount} route HTML files written.`);
 ```
 
-- [ ] **Step 4: Rebuild and verify**
+- [x] **Step 4: Rebuild and verify**
 
 ```bash
 export PATH="/opt/homebrew/bin:$PATH"; npm run build && node scripts/build-seo.mjs && node validation/prerender-seo.mjs
@@ -551,7 +551,7 @@ export PATH="/opt/homebrew/bin:$PATH"; npm run build && node scripts/build-seo.m
 
 Expected: `build-seo: 198 route HTML files written.` and every gate line PASS.
 
-- [ ] **Step 5: Verify the actual served bytes, not just the gate**
+- [x] **Step 5: Verify the actual served bytes, not just the gate**
 
 ```bash
 grep -o '<title>[^<]*</title>' dist/festival/diwali/index.html
@@ -565,11 +565,13 @@ grep -o 'rel="canonical" href="[^"]*"' dist/calculator/rashi/index.html
 
 Expected: `rel="canonical" href="https://ganakapp.com/calculator/rashi"`
 
-- [ ] **Step 6: Prove non-vacuous**
+- [x] **Step 6: Prove non-vacuous**
 
-Change one route's title emission to a constant string, rebuild, confirm the gate fails with `duplicate title:`, restore, confirm PASS. Paste both outputs.
+Change one route's title emission to a constant string, rebuild, confirm the gate fails with `wrong <title> for …`, restore, confirm PASS. Paste both outputs.
 
-- [ ] **Step 7: Commit**
+**Corrected during execution:** this step originally predicted a `duplicate title:` failure. That message is unreachable — the per-route equality assertion fires before the duplicate check, and Task 1's inventory-level uniqueness assertion blocks the only path that could reach it. The `duplicate title:` line in the gate is therefore dead code. It is harmless and stays as defence-in-depth, but the real guard against title collapse is the Task 1 assertion at `validation/prerender-seo.mjs:25`.
+
+- [x] **Step 7: Commit**
 
 ```bash
 git add scripts/build-seo.mjs validation/prerender-seo.mjs
@@ -600,7 +602,7 @@ would deploy exactly as it does today while every local gate stayed green. Hooki
 dashboard setting cannot void the work. This removes what would otherwise be an
 unverifiable owner gate.
 
-- [ ] **Step 1: Wire the build**
+- [x] **Step 1: Wire the build**
 
 Replace `vite.config.ts` with:
 
@@ -631,7 +633,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 2: Make the emitter importable**
+- [x] **Step 2: Make the emitter importable**
 
 `scripts/build-seo.mjs` currently calls `main()` at module load, which would fire on
 import. Change the bottom of the file from:
@@ -651,7 +653,7 @@ export function emitAll() {
 if (process.argv[1] && process.argv[1].endsWith("build-seo.mjs")) main();
 ```
 
-- [ ] **Step 3: Verify a clean build produces everything in ONE command**
+- [x] **Step 3: Verify a clean build produces everything in ONE command**
 
 ```bash
 export PATH="/opt/homebrew/bin:$PATH"; rm -rf dist && npx vite build && node validation/prerender-seo.mjs
@@ -669,7 +671,7 @@ export PATH="/opt/homebrew/bin:$PATH"; rm -rf dist && npm run build && node vali
 Expected: identical output. `dist/` is regenerated from scratch each time — Vite
 empties it, and `closeBundle` runs after that, so ordering is guaranteed.
 
-- [ ] **Step 3: Run the full canonical gate suite**
+- [x] **Step 4: Run the full canonical gate suite**
 
 ```bash
 export PATH="/opt/homebrew/bin:$PATH"; for f in validation/*.cjs; do node "$f" >/dev/null 2>&1 || echo "FAIL: $f"; done; echo "cjs sweep done"
@@ -683,7 +685,7 @@ export PATH="/opt/homebrew/bin:$PATH"; node validation/route-metadata.cjs && nod
 
 Expected: all PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add vite.config.ts scripts/build-seo.mjs
