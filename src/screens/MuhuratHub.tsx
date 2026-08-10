@@ -1222,11 +1222,16 @@ return (
                     <polyline points={arcPoly(i / 12, (i + 1) / 12, 8)} fill="none" stroke={tone} strokeWidth="1.5" strokeOpacity="0.8" transform="translate(0,7)" />
                     <polyline points={arcPoly(i / 12, (i + 1) / 12, 8)} fill="none" stroke="transparent" strokeWidth="18" style={{ cursor: "pointer" }} onClick={() => setHoraSel(i)} />
                   </g>); })}
-                {Array.from({ length: 13 }, (_, i) => { 
-                  const a = radPt(i / 12, R - 5), b = radPt(i / 12, R + 4); 
-                  const timeLabel = (() => { const tm = domainStart + i * (domainEnd - domainStart) / 12; return fmtT(tm).replace(" AM", "a").replace(" PM", "p"); })();
+                {Array.from({ length: 13 }, (_, i) => {
+                  const a = radPt(i / 12, R - 5), b = radPt(i / 12, R + 4);
+                  // The first (i=0) and last (i=12) rim ticks mark the same two instants as
+                  // the arrow-end labels drawn below (↑ start / end ↓) and were printing on
+                  // top of them. Keep the tick mark for geometry but drop its text label —
+                  // the 11 interior ticks are unaffected and the two end instants stay
+                  // readable from the arrow labels.
+                  const showTickLabel = i !== 0 && i !== 12;
                   const labelPt = radPt(i / 12, R + 16);
-                  return <g key={i}><line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke="var(--line)" strokeWidth="1" /><text x={labelPt[0]} y={labelPt[1]} textAnchor="middle" style={{ fontSize: 9.5, fill: C.muted, fontVariantNumeric: "tabular-nums" }}>{timeLabel}</text></g>; 
+                  return <g key={i}><line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke="var(--line)" strokeWidth="1" />{showTickLabel && (() => { const tm = domainStart + i * (domainEnd - domainStart) / 12; const timeLabel = fmtT(tm).replace(" AM", "a").replace(" PM", "p"); return <text x={labelPt[0]} y={labelPt[1]} textAnchor="middle" style={{ fontSize: 9.5, fill: C.muted, fontVariantNumeric: "tabular-nums" }}>{timeLabel}</text>; })()}</g>;
                 })}
                 {showHora != null && horas[showHora] && (() => { const g = radPt((showHora + 0.5) / 12, R - 16); return <text x={g[0]} y={g[1] + 4} textAnchor="middle" style={{ fontSize: 13, fontWeight: 700, fill: HORA_COLOR[horas[showHora].ruler] }}>{HORA_GLYPH[horas[showHora].ruler]}</text>; })()}
                 {dragInfo ? (() => {
@@ -1235,7 +1240,7 @@ return (
                 })() : null}
                 {nowInDomain
                   ? <g><circle cx={sunXY[0]} cy={sunXY[1]} r="11" fill={C.gold} opacity="0.22" style={{ animation: "softpulse 3s ease-in-out infinite" }} /><circle cx={sunXY[0]} cy={sunXY[1]} r="5" fill="var(--accent)" stroke="var(--on-accent)" strokeWidth="1.5" /></g>
-                  : (showNow ? <text x={cx} y={cy - 10} textAnchor="middle" style={{ fontSize: 12, fill: C.muted }}>{activePeriod === "day" ? (lang === "hi" ? "रात्रि" : "night") : (lang === "hi" ? "दिन" : "day")}</text> : null)}
+                  : (showNow ? <text x={cx} y={cy - 10} textAnchor="middle" style={{ fontSize: 12, fill: C.muted }}>{horaAutoPeriod === "day" ? (lang === "hi" ? "दिन" : "day") : (lang === "hi" ? "रात्रि" : "night")}</text> : null)}
                 <text x="10" y={cy - 6} style={{ fontSize: 10.5, fill: C.muted }}>{activePeriod === "day" ? "\u2191" : "\u2193"} {fmtT(domainStart)}</text>
                 <text x={AW - 10} y={cy - 6} textAnchor="end" style={{ fontSize: 10.5, fill: C.muted }}>{fmtT(domainEnd)} {activePeriod === "day" ? "\u2193" : "\u2191"}</text>
               </svg>
