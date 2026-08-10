@@ -214,9 +214,15 @@ if (!n || n.verdict.abhijitBoost !== false) fail('offered-range gate: abhijitBoo
 if (!n || n.verdict.usable.length !== 1 || n.verdict.usable[0].start !== 400000 || n.verdict.usable[0].end !== 900000) fail('offered-range gate: usable should be exactly [400000,900000]');
 
 // nextRise: night choghadiya must be measured against the real following
-// sunrise, not rise+24h (which drifts by minutes, worst near the solstices).
+// sunrise, not rise+24h. Measured at final review (2026-08-10): the rise+24h
+// approximation drifts ~1.2 minutes maximum at Delhi, peaking near the equinox
+// — not "several minutes, worst near the solstices" as this comment used to
+// claim. (Multi-minute drift only shows up at high latitude: ~23 min at
+// Tromsø, ~3 min at Reykjavík.) The sample date below is arbitrary — this
+// assertion checks that nextRise is real, not rise+24h, which does not depend
+// on which day of year is sampled.
 const DELHI = { lat: 28.6139, lon: 77.2090, zone: 'Asia/Kolkata', label: 'Delhi' };
-const tp = computeTodayPanchang(DELHI, 'lahiri', Date.UTC(2026, 11, 21, 6, 30)); // solstice: worst drift
+const tp = computeTodayPanchang(DELHI, 'lahiri', Date.UTC(2026, 11, 21, 6, 30)); // arbitrary sample date, not chosen for max drift
 if (tp.nextRise == null) fail('computeTodayPanchang should expose nextRise');
 if (Math.abs(tp.nextRise - (tp.rise + 86400000)) < 1000)
   fail('nextRise looks like rise+24h — it must be the real following sunrise');
