@@ -24,11 +24,11 @@ assert.equal(base.rows.get("59").metadata.title, "Global site search and guided 
 assert.equal(base.rows.get("46").section, "P1");
 assert.equal(base.rows.get("46").metadata.title, "Design-system pass");
 assert.equal(sheetRow(base.rows.get("46"))[4], "95%");
-assert.equal(base.rows.get("46").quality.deliveryState, "Design-system pass deployed and production-verified across every launch screen; the remaining work is owner-side only — one Cloudflare dashboard switch, the live-URL sign-off and a human real-device pass");
+assert.equal(base.rows.get("46").quality.deliveryState, "Base design-system pass is deployed and production-verified across every launch screen. The first-run city chooser is built and independently bug-bashed locally on 2026-08-10; branch integration, deployment and live verification remain before that slice is publicly delivered.");
 assert.equal(base.rows.get("46").quality.qualityRisk, "Amber");
 assert.match(base.rows.get("46").quality.limitations, /Cloudflare Web Analytics beacon/);
-assert.match(base.rows.get("46").quality.bugBashStatus, /38 continuous minutes/);
-assert.match(base.rows.get("46").quality.recommendedAction, /only token source/);
+assert.match(base.rows.get("46").quality.bugBashStatus, /first-run-city bug bash/);
+assert.match(base.rows.get("46").quality.recommendedAction, /Integrate and deploy the first-run city branch/);
 assert.equal(base.rows.get("1").quality.deliveryState, "Delivered and production-verified");
 assert.equal(base.rows.get("1").quality.qualityRisk, "Green");
 assert.match(base.rows.get("1").quality.bugBashStatus, /F7 was then fixed/);
