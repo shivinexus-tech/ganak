@@ -1188,7 +1188,7 @@ return (
                   </g>); })}
                 {Array.from({ length: 13 }, (_, i) => { 
                   const a = radPt(i / 12, R - 5), b = radPt(i / 12, R + 4); 
-                  const timeLabel = (() => { const tm = domainStart + i * (domainEnd - domainStart) / 12; const h = Math.floor(tm / 3600000) % 24, m = Math.floor((tm % 3600000) / 60000); return (h < 10 ? "0" : "") + h + (m > 0 ? ":" + (m < 10 ? "0" : "") + m : ""); })();
+                  const timeLabel = (() => { const tm = domainStart + i * (domainEnd - domainStart) / 12; return fmtT(tm).replace(" AM", "a").replace(" PM", "p"); })();
                   const labelPt = radPt(i / 12, R + 16);
                   return <g key={i}><line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke="var(--line)" strokeWidth="1" /><text x={labelPt[0]} y={labelPt[1]} textAnchor="middle" style={{ fontSize: 9.5, fill: C.muted, fontVariantNumeric: "tabular-nums" }}>{timeLabel}</text></g>; 
                 })}
