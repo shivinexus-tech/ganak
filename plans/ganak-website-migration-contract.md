@@ -215,3 +215,78 @@ visual approval does not waive the compatibility gates above.
   data storage rules or owner-gated interpretation release.
 - It is not a promise that every current first-screen panel stays on Today. It is a
   promise that every **working job** remains reachable and state-safe.
+
+## 10. Screen-level decision register — required before a Figma screen can become build scope
+
+Sections 2–8 protect journeys and route/state behaviour. This register is the practical
+last check: it records the product decision for **every visible control, row or apparent
+control** on a particular visual screen. It prevents an illustrative label in a reference
+from silently becoming a Ganak feature.
+
+### 10.1 Allowed decision states
+
+| State | Meaning | May appear as a working Figma / website control? |
+|---|---|---|
+| **Preserve** | Existing Ganak capability; same job and a named current route/action. | Yes, once the target and state proof are recorded. |
+| **Move** | Existing capability is relocated; its replacement remains reachable. | Yes, once the old and new entry are both mapped. |
+| **Improve** | Existing capability gets clearer copy/presentation but retains the same calculation, data and user job. | Yes, once its behaviour and acceptance proof are recorded. |
+| **New — owner-approved** | A genuinely new feature explicitly approved by the owner. | Only after its backlog/implementation owner and privacy implications are recorded. |
+| **Deferred — omit** | Useful but not yet approved or not yet implemented. | No. It must be absent, not disabled-looking or decorative-clickable. |
+| **Remove** | Invented, duplicate, misleading or deliberately retired. | No. It must not appear in a buildable screen. |
+| **Decorative / data-only** | Visual treatment or calculated display with no independent action. | Yes, but it must not look like a button or input. |
+
+**Hard gate:** a buildable screen may contain only `Preserve`, `Move`, `Improve`,
+`New — owner-approved`, or clearly non-interactive `Decorative / data-only` rows. A
+`Deferred — omit` or `Remove` row is absent from the working screen. A control with a blank
+destination, state-preservation rule or acceptance proof fails this contract.
+
+### 10.2 Today — Festival Day, desktop website
+
+**Visual source:** approved desktop Today composition, used only as visual direction. It
+does not grant functionality. This register governs the editable Figma reconstruction and
+website implementation, not a reference-backed visual image.
+
+| Screen element | Decision | Real target / behaviour | State that must survive | Acceptance proof |
+|---|---|---|---|---|
+| Ganak wordmark | **Move** | Root Today entry; not a separate account/profile action. | `lang`, place, date, calendar preferences. | Click from each primary screen; Back behaves normally. |
+| Today / Festivals / Muhurat / Prashna / Jyotish navigation | **Move** | Existing mapped destinations in §4. | Shared `lang`, place, coordinates, zone; specialist route state where applicable. | Each destination opens; reload and Back preserve the required state. |
+| Language selector | **Preserve** | Existing EN/HI application toggle. | Current route, selected date, place and meaningful route metadata. | Switch EN↔HI on Today, festival, Muhurat, Prashna and Jyotish. |
+| Personalize access | **Move** | Existing Personalize / comfort, language, privacy and data controls—not a fake account menu. | Approved local-first preferences and current route context. | Open, change/review/clear a preference; return without a reset. |
+| Place field | **Move** | The single existing shared place input and selector. | `city`, `lat`, `lon`, `zone`, `lang`, selected date. | Change city → visit every primary destination → return/reload. |
+| Current-location/crosshair icon | **Deferred — omit** | No visual geolocation control until a truthful permissioned capability is explicitly approved and built. | N/A. | Absent from the editable screen and code until approved. |
+| Date field and Today action | **Move** | Existing validated date picker, stepping and explicit Today reset. | `date`, place, `lang`, `cal`, `hol`; browser history. | Typed/picked date, Today, reload, Back/Forward and EN/HI parity. |
+| Sunrise / sunset ribbon values | **Decorative / data-only** | Calculated local values for the chosen place/date; hide if unavailable. | Place, zone and date. | Compare with current Daily result for the same inputs. |
+| Festival headline, description and “Read significance” | **Improve** | Canonical festival guide for the displayed observance; content stays in the guide, not an invented Today detail page. | Festival slug, place and `lang`. | Open current guide; test local timing and Hindi switch. |
+| Festival guide links such as Vidhi / Aarti | **Move** | Existing canonical guide sections where that observance supplies them. | Festival slug, place and `lang`. | Open relevant guide section; Follow/Listen remain truthful there. |
+| Good / Avoid timing panel | **Improve** | Existing local Panchang/Muhurat results; labels and icon+text remain colour-blind-safe. | Place, zone, date and `lang`. | Compare values and warning wording against current Daily/Muhurat for the same inputs. |
+| “View all” in the timing panel | **Deferred — omit** | No new timing-details destination is implied until its exact existing destination and URL behaviour are decided. | N/A. | Absent until mapped. |
+| Upcoming festival rows | **Move** | Existing canonical festival-guide routes. | Festival slug, place and `lang`. | Every visible row opens its guide, including Hindi/deep-link behaviour. |
+| “View calendar” beside upcoming festivals | **Move** | Existing calendar / festival-search view. | Place, date, language, calendar and holiday choices; Back destination. | Year/search/back flows pass. |
+| Panchang table | **Improve** | Existing Panchang data in a dense, readable table; values are not copied from a mockup. | Place, zone, date, calendar system and `lang`. | Compare all displayed fields with current Daily result and relevant engine gates. |
+| “Panchang PDF” | **Remove** | It is not a current Ganak capability and has no approved owner decision. | N/A. | Not present in any editable Figma screen or website build. |
+| “Sunrise & Sunset” quick-access tile | **Remove** | Duplicates the calculated ribbon already on the same screen; it adds no distinct user job. | N/A. | Not present as an apparent action. |
+| Panchang Calendar quick access | **Move** | Existing calendar/year/search view. | Place, date, `lang`, `cal`, `hol`, and Back destination. | Open calendar, search/year view and return without state loss. |
+| Today’s Muhurat quick access | **Move** | Existing local daily-timings/Muhurat context. | Place, zone, date and `lang`. | Same timing values as the panel; no duplicate calculation. |
+| Muhurat Finder quick access | **Move** | Existing finder, including purpose/action/range. | `muhurat`, `maction`, `mfrom`, `mto`, place and `lang`. | Direct and clicked paths hydrate the same finder context. |
+| Prashna quick access | **Move** | Existing Prashna route. | Place, coordinates and `lang`. | Selected place is visible; both methods still work. |
+| Jyotish quick access | **Move** | Existing Jyotish route and tool catalogue. | `cstyle`, saved-chart behaviour and `lang`. | Cast, saved charts, matching, calculators and print/PDF remain reachable. |
+| Festival Calendar quick access | **Move** | Existing calendar / festival-search view, with a festival-oriented entry treatment only. | Place, date, language, calendar and holiday choices. | Festival discovery and Back flow pass. |
+| Follow / Listen controls on the Today card | **Deferred — omit** | Existing Follow and Hindi read-aloud remain on contextual Festival Guide content until a separate Today behaviour is explicitly specified. | Consent/local-first follow preference; selected language. | No duplicate or fake Today control. |
+| Reminder / Save / Share | **Deferred — omit** | Backlog #37; it can appear only after a recipient, calendar/export behaviour and consent/data rules are implemented. | Explicit user choice; no sensitive data leakage. | #37 acceptance criteria and live user action pass. |
+
+### 10.3 Working procedure for every later screen
+
+1. Start from the current-route inventory in §4 and capability map in §5, not from a
+   mockup or component library.
+2. List every item that looks actionable, including icons, labels, cards, rows and
+   editable-looking fields.
+3. Give each item one state from §10.1; record its real target, state to preserve and
+   acceptance proof. A missing answer means `Deferred — omit`.
+4. Build only the allowed rows into the editable Figma screen. Put new features in a
+   clearly labelled future-flow board, never in the working screen.
+5. Before code, compare the approved Figma screen to this register. Before deployment,
+   exercise the stated acceptance proofs against the current and redesigned journeys.
+
+This is deliberately a **single appendix to the preservation contract**, not a second
+parallel migration plan. It turns the contract's “no fake interaction” rule into a
+screen-by-screen stop check.
