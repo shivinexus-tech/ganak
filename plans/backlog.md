@@ -1,5 +1,12 @@
 # Ganak — Product Backlog
 
+> **Permanent city-preference migration contract:** every UI/UX, routing, storage,
+> authentication or framework migration must preserve the first-run city gate,
+> opt-in device location, approved local persistence, always-available city change,
+> and the mandatory remembered-city-versus-linked-city question. Signed-in account
+> sync remains required and must ask before resolving a local/account conflict.
+> Acceptance details and regression matrix: `plans/city-preference-migration-contract.md`.
+
 Rebuilt 2026-07-18 into a phased launch plan reflecting the owner's strategy.
 Status verified against `src/kundli-app.tsx`, not assumed.
 
@@ -889,7 +896,44 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       a platform limitation, closable only by replacing the native selects with a custom
       listbox; (b) real-device human verification — screen-reader voicing, audible speech
       quality and physical touch targets, which no agent can check without ears and a thumb.
-      _(Backlog #46; 95% as of 2026-08-02.)_
+      **Reopened 2026-08-10 by a second independent city bug bash**
+      (`plans/audits/city-selection-persistence-bugbash-2026-08-10.md` — FAIL: 1 P1, 3 P2,
+      3 P3). The P1 corrected an earlier closeout that had dismissed the same root cause as
+      "harmless exact-place comparison sensitivity": because "use my device location" saves
+      the city's *name* with the visitor's *own* GPS coordinates, while Ganak's own share
+      links carry rounded gazetteer coordinates, opening a Ganak link for your **own** city
+      blocked the page with two buttons that both read "Mumbai, India". **Fixed:** same-city
+      comparison is now timezone + 5km, device-location matching is capped at 300km, and a
+      deliberate Hindi choice is remembered. Each is pinned by a gate that runs the shipped
+      function and was mutation-tested. **Still open:** both blocking dialogs are 19px wider
+      than every phone viewport and clip at the corners (they render before the shell that
+      injects the `box-sizing` reset); the city combobox ignores arrow keys; Hindi shows
+      English city names; the title stays English behind a Hindi first-run dialog. The fixes
+      are deployed and production-verified (main `3efbb9f`, asset `index-C4lR-t1p.js`).
+      _(Backlog #46; 95% -> **93%** as of 2026-08-10 — the row had claimed only human
+      verification remained, which was not true.)_
+
+- [ ] **City preference — signed-in cross-device sync (contract rule 4, NOT BUILT).**
+      `plans/city-preference-migration-contract.md` requires the home city to follow the
+      user to another browser/device once accounts exist, with an explicit non-destructive
+      conflict question on sign-in when the account city and a deliberate local city differ.
+      Only the local/device and shared-link halves are live. Recorded here so it is visible
+      rather than buried in an audit report; it must not be marked delivered until
+      authenticated cross-device tests pass. **Copy debt that ships with it:** the footer
+      line "computed on your device · no account" (`src/kundli-app.tsx`) is accurate today
+      and becomes **false** the day Jyotish accounts launch — update it in the same slice.
+      _(Depends on the Jyotish accounts track; see `ganak-accounts-jyotish-only`.)_
+
+- [ ] **Owner chore / human gate (2026-08-10) — two city checks no agent can run.**
+      (a) **Real keyboard + screen-reader pass on both blocking city dialogs.** The agent
+      harness delivers no key events to the page (proven with a capture listener), so the
+      focus trap was verified by dispatching at the live handler and by measuring focus
+      order — Tab/Shift+Tab wrap correctly and Escape is deliberately swallowed — but nobody
+      has physically tabbed through it or heard VoiceOver/NVDA/TalkBack announce it.
+      (b) **A real "allow" on device location.** The test browser had location permission
+      denied at profile level, which is what made the denial path testable; the 300km
+      distance cap is proven by a gate that executes the shipped `nearestCity`, not by a
+      live GPS grant. Worth one pass on a real phone, indoors and outdoors.
 
 **Still not required by the 2026-07-21 scope change:** accounts, cross-device data
 persistence, paid AI, Android/iOS store packaging, SDUI and paywalls. The backend

@@ -28,7 +28,14 @@ export default function FirstRunPlaceDialog({ lang, onPick }: { lang: "hi" | "en
         const place = nearestCity(coords.latitude, coords.longitude);
         setBusy(false);
         if (!place) {
-          setError(hi ? "स्थान पढ़ा नहीं जा सका। कृपया शहर खोजें।" : "Your location could not be read. Please search for your city.");
+          // `nearestCity` now returns null when the closest known city is too far away to
+          // be the visitor's, so this branch no longer means "the location could not be
+          // read" — it usually means it was read fine and Ganak simply has no city near it.
+          // Saying so keeps the guidance honest and points at the search, which covers the
+          // whole world through the online geocoder.
+          setError(hi
+            ? "गणक आपके स्थान के पास का कोई शहर नहीं पहचान सका। कृपया नीचे अपना शहर खोजें।"
+            : "Ganak could not find a known city near your location. Please search for your city below.");
           return;
         }
         onPick(place);

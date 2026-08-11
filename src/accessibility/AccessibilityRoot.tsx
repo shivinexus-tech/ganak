@@ -6,6 +6,7 @@ import { useComfort } from "./ComfortProvider";
 import FirstRunPlaceDialog from "../components/FirstRunPlaceDialog";
 import LinkCityChoiceDialog from "../components/LinkCityChoiceDialog";
 import { approvedStorage } from "../storage/approved-storage";
+import { distanceKm } from "../data/places";
 
 const DEFAULT_PLACE = { label: "New Delhi, India", lat: 28.61, lon: 77.21, zone: "Asia/Kolkata" };
 
@@ -35,8 +36,30 @@ function placeSignature(place: { label: string; lat: number; lon: number; zone: 
   return place ? `${place.label}|${place.lat}|${place.lon}|${place.zone}` : "";
 }
 
-function samePlace(a: { label: string; lat: number; lon: number; zone: string } | null, b: { label: string; lat: number; lon: number; zone: string } | null) {
-  return !!a && !!b && a.label === b.label && a.lat === b.lat && a.lon === b.lon && a.zone === b.zone;
+/* How close two places must be before the conflict question is pointless.
+ *
+ * Within one timezone, 5 km moves sunrise by well under the minute Ganak prints, so every
+ * displayed timing is identical and there is genuinely nothing to ask about. Real cities
+ * that deserve the question stay far outside it — Mumbai to Thane is 18 km, Mumbai to Pune
+ * 120 km — so a legitimate conflict is never swallowed. */
+const SAME_PLACE_KM = 5;
+
+/* Exact label+lat+lon+zone equality was too strict to be usable, and the failure was not
+ * an edge case. `nearestCity` stores the matched city's LABEL with the visitor's OWN GPS
+ * coordinates, so anyone who tapped "use my device location" held
+ * "Mumbai, India / 19.0760 / 72.8777" while Ganak's own share links carry the rounded
+ * gazetteer "Mumbai, India / 19.08 / 72.88". The two never compared equal, so opening a
+ * Ganak link for your own city blocked the page and asked which city you wanted — with
+ * both buttons reading "Mumbai, India" (bug bash 2026-08-10, P1-1). The offline and online
+ * geocoders disagreeing on a label ("Mumbai, India" vs "Mumbai, Maharashtra, India") did
+ * the same thing.
+ *
+ * Comparing by timezone and proximity instead of by exact text answers the question the
+ * dialog actually exists to ask: would the visitor see different timings? */
+export function samePlace(a: { label: string; lat: number; lon: number; zone: string } | null, b: { label: string; lat: number; lon: number; zone: string } | null) {
+  if (!a || !b) return false;
+  if (a.label === b.label && a.lat === b.lat && a.lon === b.lon && a.zone === b.zone) return true;
+  return a.zone === b.zone && distanceKm(a.lat, a.lon, b.lat, b.lon) <= SAME_PLACE_KM;
 }
 
 function detectLanguage(): "hi" | "en" {

@@ -92,10 +92,15 @@ export default function KundliApp() {
   };
 
   const detectLang = () => { try { const ls = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "en"]).map((x) => String(x || "").toLowerCase()); return ls.some((l) => l.startsWith("hi")) ? "hi" : "en"; } catch (e) { return "en"; } };
-  // Language and screen survive a reload via the URL (?lang=hi&screen=prashna) —
-  // browser storage is banned in this project, but the address bar is not storage.
+  // Language and screen survive a reload via the URL (?lang=hi&screen=prashna).
   const [lang, setLang] = useState(() => { const v = urlPrefGet("lang"); return v === "hi" || v === "en" ? v : detectLang(); });
-  const chooseLang = (v) => { setLang(v); urlPrefSet("lang", v); };
+  // The URL alone was not enough: arriving at a bare ganakapp.com dropped a deliberate
+  // Hindi choice back to English on every visit, so a Hindi-first reader re-picked Hindi
+  // every time (bug bash 2026-08-10, P2-3). The old comment here said browser storage was
+  // banned — true when this line was written, but `approved-storage.ts` has since become
+  // the sanctioned path and the city control two lines below already persists through it.
+  // Language is non-sensitive comfort data, explicitly allowed in the `preferences` store.
+  const chooseLang = (v) => { setLang(v); urlPrefSet("lang", v); updatePreferences({ language: v }); };
   const [mode, setMode] = useState(() => { const v = urlPrefGet("screen"); return v === "prashna" || v === "daily" || v === "chart" ? v : "daily"; });
   const chooseMode = (v) => { setMode(v); urlPrefSet("screen", v); };
   const directFestivalGuide = festivalGuideFromPath(typeof window !== "undefined" ? window.location.pathname : "/");
@@ -274,19 +279,13 @@ export default function KundliApp() {
         <FeedbackCard lang={lang} C={C} card={card} />
 
         {/* Footer stays accurate with or without optional telemetry endpoints.
-            The calculator catalogue and the medical Muhurat finder are linked here so both
-            are reachable from every screen — each shipped as an orphan route with zero
-            inbound links, and validation/route-reachability.cjs now guards against that
-            returning. Medical Muhurat is named for what it is (optional timing around
+            The calculator catalogue now lives under Jyotish; the footer retains only the
+            medical Muhurat finder, which originally shipped with zero inbound links.
+            Medical Muhurat is named for what it is (optional timing around
             already-approved, non-urgent care) so the link itself cannot read as medical
             advice; the route's own safety wall still gates everything behind it. */}
         <footer style={{ textAlign: "center", color: C.muted, fontSize: T.fLabel, marginTop: T.s8, letterSpacing: ".06em" }}>
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: `${T.s2} ${T.s4}`, marginBottom: T.s3 }}>
-            <a href={`/calculators?lang=${lang}`} className="comfort-focus" style={{ color: C.gold, textDecoration: "none", borderBottom: `0.0625rem solid ${C.line}`, paddingBottom: "0.125rem" }}>
-              {lang === "hi"
-                ? "ज्योतिष कैलकुलेटर — राशि, लग्न, नक्षत्र, मांगलिक और अन्य"
-                : "Astrology calculators — Rashi, Lagna, Nakshatra, Mangal Dosha and more"}
-            </a>
             <a href={`/muhurat/medical?lang=${lang}`} className="comfort-focus" style={{ color: C.gold, textDecoration: "none", borderBottom: `0.0625rem solid ${C.line}`, paddingBottom: "0.125rem" }}>
               {lang === "hi"
                 ? "चिकित्सा मुहूर्त — पहले से तय, अत्यावश्यक-रहित उपचार के लिए वैकल्पिक समय"

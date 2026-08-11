@@ -43,6 +43,7 @@ const JYOTISH_GROUPS = [
     en: "Tools",
     hi: "उपकरण",
     items: [
+      ["/calculators", "Quick calculators", "त्वरित कैलकुलेटर"],
       ["#kp", "KP sub-lords", "केपी उप-स्वामी"],
       ["#ksig", "KP significators", "केपी कारक"],
       ["#shadbala", "Shadbala", "षड्बल"],
@@ -128,7 +129,7 @@ function JyotishPanelNav({ lang, C, showTechnical = true, activeGroup = "kundli"
               {group.items.filter(([href]) => (showReading || href !== "#reading") && (showTechnical || !TECHNICAL_ANCHORS.has(href))).map(([href, en, itemHi]) => (
                 <a
                   key={href}
-                  href={href}
+                  href={href.startsWith("/") ? `${href}?lang=${lang}` : href}
                   style={{
                     minHeight: T.ctrlH,
                     display: "flex",

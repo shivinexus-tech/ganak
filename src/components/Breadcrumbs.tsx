@@ -12,6 +12,7 @@ const LBL = {
   ganak: { en: "Ganak", hi: "गणक" },
   muhurat: { en: "Muhurat", hi: "मुहूर्त" },
   medical: { en: "Medical timing", hi: "चिकित्सा समय" },
+  jyotish: { en: "Jyotish", hi: "ज्योतिष" },
   calculators: { en: "Calculators", hi: "कैलकुलेटर" },
 };
 const pick = (o, lang) => (o && (lang === "hi" ? o.hi : o.en)) || "";
@@ -26,6 +27,7 @@ function breadcrumbTrail(ctx, lang) {
     trail.push({ label: pick(LBL.medical, l), href: null });
   } else if (ctx && ctx.utility) {
     const u = ctx.utility;
+    trail.push({ label: pick(LBL.jyotish, l), href: `/?lang=${l}&screen=chart` });
     if (u.kind === "calculator" && u.calculator) {
       trail.push({ label: pick(LBL.calculators, l), href: `/calculators?lang=${l}` });
       trail.push({ label: pick(u.calculator, l), href: null });
