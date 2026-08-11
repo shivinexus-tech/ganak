@@ -17,7 +17,16 @@ const LBL = {
 };
 const pick = (o, lang) => (o && (lang === "hi" ? o.hi : o.en)) || "";
 
-function breadcrumbTrail(ctx, lang) {
+function calculatorContextQuery(search, lang) {
+  const source = new URLSearchParams(search || "");
+  const out = new URLSearchParams({ lang: lang === "hi" ? "hi" : "en" });
+  if (["city", "lat", "lon", "zone"].every((key) => source.get(key))) {
+    for (const key of ["city", "lat", "lon", "zone"]) out.set(key, source.get(key));
+  }
+  return out.toString();
+}
+
+function breadcrumbTrail(ctx, lang, search = "") {
   const l = lang === "hi" ? "hi" : "en";
   const trail = [{ label: pick(LBL.ganak, l), href: `/?lang=${l}` }];
   if (ctx && ctx.medical) {
@@ -27,9 +36,12 @@ function breadcrumbTrail(ctx, lang) {
     trail.push({ label: pick(LBL.medical, l), href: null });
   } else if (ctx && ctx.utility) {
     const u = ctx.utility;
-    trail.push({ label: pick(LBL.jyotish, l), href: `/?lang=${l}&screen=chart` });
+    const utilityQuery = calculatorContextQuery(search, l);
+    const chartQuery = new URLSearchParams(utilityQuery);
+    chartQuery.set("screen", "chart");
+    trail.push({ label: pick(LBL.jyotish, l), href: `/?${chartQuery.toString()}` });
     if (u.kind === "calculator" && u.calculator) {
-      trail.push({ label: pick(LBL.calculators, l), href: `/calculators?lang=${l}` });
+      trail.push({ label: pick(LBL.calculators, l), href: `/calculators/?${utilityQuery}` });
       trail.push({ label: pick(u.calculator, l), href: null });
     } else {
       trail.push({ label: pick(LBL.calculators, l), href: null });
@@ -42,7 +54,7 @@ function breadcrumbTrail(ctx, lang) {
 }
 
 function Breadcrumbs({ ctx, lang, C }) {
-  const trail = breadcrumbTrail(ctx, lang);
+  const trail = breadcrumbTrail(ctx, lang, typeof location === "undefined" ? "" : location.search);
   if (trail.length < 2) return null;
   const sep = { margin: "0 0.375rem", color: C.muted };
   return (
@@ -64,5 +76,5 @@ function Breadcrumbs({ ctx, lang, C }) {
   );
 }
 
-export { breadcrumbTrail };
+export { breadcrumbTrail, calculatorContextQuery };
 export default Breadcrumbs;

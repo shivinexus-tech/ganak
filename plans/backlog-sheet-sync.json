@@ -136,15 +136,15 @@
   },
   "qualityOverrides": {
     "1": {
-      "deliveryState": "Legacy calculator pages live; final Jyotish UI migration incomplete",
-      "limitations": "The catalogue and calculator detail/result routes remain standalone legacy-page experiences. Current links and breadcrumbs improve reachability but do not complete the redesigned Jyotish migration.",
-      "shortTermImpact": "Users can reach and use the calculators today, but the transition from Jyotish into the standalone pages still feels orphaned and visually disconnected.",
+      "deliveryState": "Immediate Jyotish continuity bridge live locally; final redesigned-UI migration incomplete",
+      "limitations": "Catalogue and calculator detail/result routes now have Jyotish workspace navigation and preserve linked city/language context, but still use the standalone legacy-page shell. This bridge does not complete the redesigned Jyotish migration.",
+      "shortTermImpact": "Users retain city, timezone and language while moving among Kundli, calculator catalogue and detail pages, with a visible Jyotish parent on both reported orphan journeys.",
       "longTermImpact": "After the redesigned Jyotish UI is ready, migrate the catalogue and every calculator journey into that system while preserving permanent URLs, bilingual state and calculation gates.",
       "bugBashStatus": "Completed 2026-07-24 — fresh independent 60-focused-minute all-12 pass found no P0/P1; F7 was then fixed, regression-tested and production-verified.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-08-11 · Owner review: current /calculators and /calculator/* pages remain orphan-feeling standalone legacy UI; migration is explicitly open",
+      "lastVerified": "2026-08-11 · Local 375px EN/HI click-through: /calculators/ and /calculator/rashi/ show Jyotish workspace context; all parent/detail links preserve San Francisco city state; zero overflow or console errors; final migration remains open",
       "sourceConfidence": "Drik Panchang's parallel English/Hindi 108-pada tables; all positional pairs regression-tested",
-      "recommendedAction": "Keep row open at 90%. After the redesigned Jyotish UI lands, migrate catalogue and detail/result pages into it, preserve URLs and EN/HI state, then rerun calculator bug bash and live visual QA."
+      "recommendedAction": "Keep row open at 90%. Deploy and verify the immediate continuity bridge; after the redesigned Jyotish UI lands, migrate catalogue and detail/result pages into it, preserve URLs and EN/HI state, then rerun calculator bug bash and live visual QA."
     },
     "3": {
       "deliveryState": "Delivered and production-verified",

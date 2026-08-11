@@ -28,6 +28,14 @@ check(/screen=chart/.test(cat[1].href), 'calculator catalogue: Jyotish parent li
 const detail = breadcrumbTrail({ utility: { kind: 'calculator', calculator: { en: 'Mangal Dosha', hi: 'मंगल दोष', slug: 'mangal-dosha' } } }, 'en');
 check(JSON.stringify(labels(detail)) === JSON.stringify(['Ganak', 'Jyotish', 'Calculators', 'Mangal Dosha']), 'calculator detail trail = Ganak > Jyotish > Calculators > <name>');
 check(/\/calculators/.test(detail[2].href), 'calculator detail: Calculators links to /calculators');
+const linkedDetail = breadcrumbTrail(
+  { utility: { kind: 'calculator', calculator: { en: 'Moon sign', hi: 'राशि', slug: 'rashi' } } },
+  'en',
+  '?lang=en&city=San+Francisco%2C+USA&lat=37.77&lon=-122.42&zone=America%2FLos_Angeles',
+);
+for (const href of [linkedDetail[1].href, linkedDetail[2].href]) {
+  check(/city=San\+Francisco%2C\+USA/.test(href) && /lat=37.77/.test(href) && /lon=-122.42/.test(href) && /zone=America%2FLos_Angeles/.test(href), 'calculator ancestor preserves the complete linked-city context');
+}
 
 const catHi = breadcrumbTrail({ utility: { kind: 'catalogue' } }, 'hi');
 check(JSON.stringify(labels(catHi)) === JSON.stringify(['गणक', 'ज्योतिष', 'कैलकुलेटर']), 'calculator catalogue HI trail localised');
