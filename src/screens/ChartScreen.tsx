@@ -421,6 +421,27 @@ export default function ChartScreen({ C, card, lang }) {
           </p>
         </section>
 
+        <Card density="compact" tone="sunken" elevated={false} style={{ marginTop: T.s4 }}>
+          <SectionHeader hi="त्वरित कैलकुलेटर" en="QUICK CALCULATORS" lang={lang === "hi" ? "hi" : "en"} density="compact" />
+          <p style={{ color: C.ivory, fontSize: T.fBody, lineHeight: 1.55, margin: `0 0 ${T.s2}` }}>
+            {hi
+              ? "पूरी कुंडली बनाए बिना राशि, लग्न, नक्षत्र, साढ़ेसाती या दोष का एक स्पष्ट उत्तर पाएँ।"
+              : "Get a focused answer for Rashi, Lagna, Nakshatra, Sade Sati or a dosha without opening the full chart workspace."}
+          </p>
+          <p style={{ color: C.muted, fontSize: T.fSmall, lineHeight: 1.5, margin: `0 0 ${T.s3}` }}>
+            {hi
+              ? "वैदिक लाहिरी और पाश्चात्य ट्रॉपिकल विधियाँ अलग रखी गई हैं।"
+              : "Vedic Lahiri and Western Tropical methods stay clearly separated."}
+          </p>
+          <a
+            href={`/calculators?lang=${lang}`}
+            className="comfort-focus"
+            style={{ minHeight: T.ctrlH, display: "inline-flex", alignItems: "center", padding: `0 ${T.s4}`, border: `0.0625rem solid ${C.gold}`, borderRadius: T.rMd, color: C.gold, textDecoration: "none", fontWeight: 700 }}
+          >
+            {hi ? "सभी ज्योतिष कैलकुलेटर देखें →" : "Browse all astrology calculators →"}
+          </a>
+        </Card>
+
         {activePanel === "vault" && <div id="vault" style={{ scrollMarginTop: 72 }}>
           <ChartVault snapshot={{ form, place, tzOverride, ayanamsa }} result={result} onLoad={loadChart} C={C} card={card} lang={lang} />
         </div>}
@@ -631,7 +652,7 @@ export default function ChartScreen({ C, card, lang }) {
                       <td style={{ padding: "0.4375rem 0.625rem", whiteSpace: "nowrap" }}>
                         <span style={{ color: PLANET_COLOR[p.name], fontWeight: 600 }}>{PLANET_GLYPH[p.name]}</span> {p.name}{p.retro ? <span style={{ color: C.sindoor }}> ℞</span> : ""}
                       </td>
-                      <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, whiteSpace: "nowrap" }}>{SIGN_SHORT[p.sign]} {fmtDeg(p.deg)}</td>
+                      <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, whiteSpace: "nowrap" }}>{signShort(lang, p.sign)} {fmtDeg(p.deg)}</td>
                       <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, fontSize: "var(--font-label)" }}>{panchangTerm(lang, "nakshatra", NAKSHATRAS[p.nak])}</td>
                       <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.starLord] }}>{p.kp.starLord}</td>
                       <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.subLord], fontWeight: 700 }}>{p.kp.subLord}</td>
@@ -669,7 +690,7 @@ export default function ChartScreen({ C, card, lang }) {
                     return (
                       <tr key={h} style={{ borderTop: "0.0625rem solid var(--line-soft)", background: angular ? "var(--surface-hover)" : "transparent" }}>
                         <td style={{ padding: "0.4375rem 0.625rem", fontFamily: "var(--font-display-family)", color: angular ? C.gold : C.ivory, whiteSpace: "nowrap" }}>{h}{h === 1 ? " (Asc)" : h === 10 ? " (MC)" : ""}</td>
-                        <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, whiteSpace: "nowrap" }}>{SIGN_SHORT[Math.floor(L / 30)]} {fmtDeg(L % 30)}</td>
+                        <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, whiteSpace: "nowrap" }}>{signShort(lang, Math.floor(L / 30))} {fmtDeg(L % 30)}</td>
                         <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, fontSize: "var(--font-label)" }}>{panchangTerm(lang, "nakshatra", NAKSHATRAS[nakIdx])}</td>
                         <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.starLord] }}>{sl.starLord}</td>
                         <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.subLord], fontWeight: 700 }}>{sl.subLord}</td>
@@ -954,7 +975,7 @@ export default function ChartScreen({ C, card, lang }) {
                     return (
                       <div key={b.house} style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
                         <span style={{ width: "1.875rem", fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: strong ? C.gold : weak ? C.sindoor : C.ivory, flexShrink: 0 }}>H{b.house}</span>
-                        <span style={{ width: "3.375rem", fontSize: "var(--font-label)", color: C.muted, flexShrink: 0 }}>{SIGN_SHORT[b.sign]} · <span style={{ color: PLANET_COLOR[b.lord] }}>{PLANET_GLYPH[b.lord]}</span></span>
+                        <span style={{ width: "3.375rem", fontSize: "var(--font-label)", color: C.muted, flexShrink: 0 }}>{signShort(lang, b.sign)} · <span style={{ color: PLANET_COLOR[b.lord] }}>{PLANET_GLYPH[b.lord]}</span></span>
                         <div style={{ flex: 1, height: "0.875rem", background: "var(--surface-sunken)", borderRadius: "0.4375rem", overflow: "hidden" }}>
                           <div style={{ width: `${Math.max(4, b.total / maxB * 100)}%`, height: "100%", background: strong ? `linear-gradient(90deg, var(--gold), var(--accent))` : weak ? "var(--bad)" : "var(--line)", borderRadius: "0.4375rem" }} />
                         </div>

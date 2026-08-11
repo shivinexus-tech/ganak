@@ -24,6 +24,9 @@ assert(shell.includes('v === "prashna" || v === "daily" || v === "chart"'), "dir
 assert(shell.includes('["chart", lang === "hi" ? "ज्योतिष" : "Jyotish"]'), "Jyotish must be visible in the primary navigation in both languages");
 assert(shell.includes('mode === "chart"'), "the shell must render ChartScreen");
 assert(screen.includes("<JyotishPanelNav lang={lang} C={C}"), "ChartScreen must use the grouped Jyotish navigation");
+assert(nav.includes('["/calculators", "Quick calculators", "त्वरित कैलकुलेटर"]'), "Tools navigation must expose the calculator catalogue in both languages");
+assert(screen.includes('href={`/calculators?lang=${lang}`}'), "Jyotish home must link directly to the calculator catalogue and preserve language");
+assert(screen.includes('hi="त्वरित कैलकुलेटर" en="QUICK CALCULATORS"'), "Jyotish home must introduce calculators as a secondary Jyotish section");
 // Guided depth hides the two practitioner-only panels, so the nav must hide exactly those
 // entries too — an anchor that scrolls to nothing is the dead-end pattern this repo bans.
 assert(screen.includes("showTechnical={showTechnical}"), "the Jyotish nav must be told the current guidance depth");

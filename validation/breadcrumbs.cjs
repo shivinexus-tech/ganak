@@ -21,12 +21,16 @@ const medHi = breadcrumbTrail({ medical: true }, 'hi');
 check(JSON.stringify(labels(medHi)) === JSON.stringify(['गणक', 'मुहूर्त', 'चिकित्सा समय']), 'medical HI trail localised');
 
 const cat = breadcrumbTrail({ utility: { kind: 'catalogue' } }, 'en');
-check(JSON.stringify(labels(cat)) === JSON.stringify(['Ganak', 'Calculators']), 'calculator catalogue trail = Ganak > Calculators');
+check(JSON.stringify(labels(cat)) === JSON.stringify(['Ganak', 'Jyotish', 'Calculators']), 'calculator catalogue trail = Ganak > Jyotish > Calculators');
 check(lastNoLink(cat), 'catalogue: current has no href');
+check(/screen=chart/.test(cat[1].href), 'calculator catalogue: Jyotish parent links to the chart workspace');
 
 const detail = breadcrumbTrail({ utility: { kind: 'calculator', calculator: { en: 'Mangal Dosha', hi: 'मंगल दोष', slug: 'mangal-dosha' } } }, 'en');
-check(JSON.stringify(labels(detail)) === JSON.stringify(['Ganak', 'Calculators', 'Mangal Dosha']), 'calculator detail trail = Ganak > Calculators > <name>');
-check(/\/calculators/.test(detail[1].href), 'calculator detail: Calculators links to /calculators');
+check(JSON.stringify(labels(detail)) === JSON.stringify(['Ganak', 'Jyotish', 'Calculators', 'Mangal Dosha']), 'calculator detail trail = Ganak > Jyotish > Calculators > <name>');
+check(/\/calculators/.test(detail[2].href), 'calculator detail: Calculators links to /calculators');
+
+const catHi = breadcrumbTrail({ utility: { kind: 'catalogue' } }, 'hi');
+check(JSON.stringify(labels(catHi)) === JSON.stringify(['गणक', 'ज्योतिष', 'कैलकुलेटर']), 'calculator catalogue HI trail localised');
 
 const fest = breadcrumbTrail({ festival: { key: 'diwali' } }, 'en');
 check(fest.length === 2 && fest[0].label === 'Ganak' && fest[1].href === null && fest[1].label.length > 0, 'festival trail = Ganak > <name>, current no link');
