@@ -32,7 +32,7 @@ assert.equal(sheetRow(base.rows.get("46"))[4], "93%");
 // Pinning stale text would have forced the register to keep claiming the journey was clear.
 // No assertion was dropped — each is re-pointed at what is now true, and the row's open
 // limitations and unbuilt account sync are pinned so they cannot be quietly deleted.
-assert.equal(base.rows.get("46").quality.deliveryState, "Base design-system pass, the first-run city chooser and the linked-city question are deployed; a second independent city bug bash on 2026-08-10 found one P1 and three P2s, three of which are now fixed with permanent behavioural gates. One P2 (blocking-dialog width on phones) and three P3s remain open, alongside the standing owner live sign-off and the human real-device accessibility pass.");
+assert.equal(base.rows.get("46").quality.deliveryState, "Base design-system pass, the first-run city chooser and the linked-city question are deployed; a second independent city bug bash on 2026-08-10 found one P1 and three P2s, three of which are now fixed with permanent behavioural gates, deployed and production-verified. One P2 (blocking-dialog width on phones) and three P3s remain open, alongside the standing owner live sign-off and the human real-device accessibility pass.");
 assert.equal(base.rows.get("46").quality.qualityRisk, "Amber");
 assert.match(base.rows.get("46").quality.limitations, /Cloudflare Web Analytics beacon/);
 assert.match(base.rows.get("46").quality.limitations, /signed-in cross-device account sync/i);

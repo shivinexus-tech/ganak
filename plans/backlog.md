@@ -909,7 +909,7 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       than every phone viewport and clip at the corners (they render before the shell that
       injects the `box-sizing` reset); the city combobox ignores arrow keys; Hindi shows
       English city names; the title stays English behind a Hindi first-run dialog. The fixes
-      are **not yet deployed**.
+      are deployed and production-verified (main `3efbb9f`, asset `index-C4lR-t1p.js`).
       _(Backlog #46; 95% -> **93%** as of 2026-08-10 — the row had claimed only human
       verification remained, which was not true.)_
 

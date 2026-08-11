@@ -15,7 +15,8 @@
 > **Update 2026-08-10 — owner directed fixes in the same session.** P1-1, P2-2 and P2-3 are
 > **fixed, gated and re-verified**; see [Fix dispositions](#fix-dispositions) at the end of
 > this report. **P2-1 (phone-width clipping) and all three P3s remain open**, so the journey
-> still must not be marked PASS. The fixes are **not yet deployed**.
+> still must not be marked PASS. The fixes are **deployed and production-verified** on
+> ganakapp.com (main `3efbb9f`, asset `index-C4lR-t1p.js`), with zero console errors.
 
 One **P1** remains open. Per the closeout rule, this journey must not be marked PASS while a P0/P1 is open.
 
