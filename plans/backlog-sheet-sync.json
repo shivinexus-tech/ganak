@@ -138,13 +138,13 @@
     "1": {
       "deliveryState": "Delivered and production-verified",
       "limitations": "None in the approved utility-calculator scope.",
-      "shortTermImpact": "All 12 approved calculator journeys are available with aligned bilingual naming sounds and visible input validation.",
-      "longTermImpact": "The exact 108-pair fixture prevents future English/Hindi alias drift while preserving the documented family-language spelling caveat.",
+      "shortTermImpact": "All approved calculator journeys are available from a bilingual Quick calculators section and Tools entry inside Jyotish, with aligned naming sounds and visible input validation.",
+      "longTermImpact": "The Jyotish-parent breadcrumb and permanent catalogue route create a durable calculator home; the exact 108-pair fixture prevents future English/Hindi alias drift.",
       "bugBashStatus": "Completed 2026-07-24 — fresh independent 60-focused-minute all-12 pass found no P0/P1; F7 was then fixed, regression-tested and production-verified.",
       "qualityRisk": "Green",
-      "lastVerified": "2026-07-24 · Production bundle index-C1i23ZgZ.js; corrected rows plus live EN/HI result, metadata and layout",
+      "lastVerified": "2026-08-11 · Main 2af2da8 / live index-DAxjKszd.js; EN/HI Jyotish discovery, breadcrumb hierarchy, footer cleanup and Tier A 31516243417",
       "sourceConfidence": "Drik Panchang's parallel English/Hindi 108-pada tables; all positional pairs regression-tested",
-      "recommendedAction": "No corrective action required; retain the 108-pair parity gate for future naming-table changes."
+      "recommendedAction": "No corrective action required; retain the Jyotish discovery/breadcrumb gates and the 108-pair parity gate."
     },
     "3": {
       "deliveryState": "Delivered and production-verified",
