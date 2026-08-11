@@ -101,5 +101,10 @@ assert(screenSource.includes('place={placeB} onPlace={setPlaceB} onConfirmed={se
 assert(screenSource.includes('if(!confirmedA||!place)')&&screenSource.includes('if(item.slug==="western-relationship"&&(!confirmedB||!placeB))'), 'calculation must reject unconfirmed A/B places');
 assert(placeSource.includes('onConfirmed(confirmed)')&&placeSource.includes('if (onConfirmed) return'), 'strict PlaceInput mode must report divergence and avoid stale snap-back');
 assert(screenSource.includes('hi?q.syllableHi:q.syllable'), 'Hindi baby-name answer must use the sourced Devanagari sound');
+assert(screenSource.includes('JYOTISH WORKSPACE')&&screenSource.includes('ज्योतिष कार्यक्षेत्र'), 'catalogue and details must visibly remain inside the bilingual Jyotish workspace');
+assert(screenSource.includes('utilityHref("/",lang,place,{screen:"chart"})'), 'calculator pages must provide a Kundli parent link');
+assert(screenSource.includes('utilityHref(`/calculator/${x.slug}/`,lang,place)'), 'catalogue detail links must preserve language and place context');
+assert(screenSource.match(/utilityHref\("\/calculators\/",lang,place\)/g)?.length>=3, 'detail, catalogue and not-found journeys must preserve context when returning to calculators');
+assert(screenSource.includes('params.set("city",String(place.label))')&&screenSource.includes('params.set("zone",String(place.zone))'), 'calculator journey URLs must carry the selected city and timezone');
 
-console.log(`UTILITY CALCULATORS PASSED (${expected.length} bilingual permanent journeys; 108 Drik-aligned English/Hindi pairs; F1-F7 regressions)`);
+console.log(`UTILITY CALCULATORS PASSED (${expected.length} bilingual permanent journeys; Jyotish context bridge; 108 Drik-aligned English/Hindi pairs; F1-F7 regressions)`);
