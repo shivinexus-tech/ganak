@@ -266,6 +266,99 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showHoraDialIdx, activeHoraPeriod, lang]);
 
+  // Answer line (owner request, 2026-08-11): one plain-language sentence for
+  // the hora running right now, rendered FIRST in the hora section, before
+  // the dial — the section used to lead with the arc/lane-strip data and
+  // never stated an answer. Built only from data the dial/lanes already
+  // consume: activeHoras (dayHoras/nightHoras), adjudicate() for the
+  // verdict, HORA_NATURE for what the hora suits, CHOG_NAME for the
+  // Choghadiya grade at night. No new astrology, no new engine calls.
+  const horaAnswerLine = (() => {
+    if (!horaHasRiseSet) {
+      // Polar-type dates: no sunrise/sunset, so no hora windows exist to
+      // report on at all. Degrade to a truthful sentence, never a blank.
+      return {
+        tone: null,
+        en: "No sunrise or sunset time is available for this date and place, so hora hours can't be shown.",
+        hi: "इस तिथि और स्थान के लिए सूर्योदय या सूर्यास्त का समय उपलब्ध नहीं है, इसलिए होरा समय नहीं दिखाया जा सकता।",
+      };
+    }
+    const periodEn = activeHoraPeriod === "day" ? "day" : "night";
+    const periodHi = activeHoraPeriod === "day" ? "दिन" : "रात";
+    if (!(isToday && horaNowInDomain) || curHoraDialIdx == null || !activeHoras[curHoraDialIdx]) {
+      // No "now" to report — either a date other than today, or (today) the
+      // clock is outside the period currently shown (e.g. the night dial is
+      // open while it is still daytime). State what the section shows
+      // instead of pretending a current hora exists.
+      const dateNote = isToday ? "" : (lang === "hi" ? " — आज नहीं" : " — not today");
+      return {
+        tone: null,
+        en: `Showing ${periodEn} horas, ${fmtT(horaDomainStart)}–${fmtT(horaDomainEnd)}${dateNote}. Tap an hour below for its status.`,
+        hi: `${periodHi} की होरा दिखाई जा रही है, ${fmtT(horaDomainStart)}–${fmtT(horaDomainEnd)}${dateNote}। नीचे किसी घंटे पर टैप कर उसका विवरण देखें।`,
+      };
+    }
+
+    const cur = activeHoras[curHoraDialIdx];
+    const planetEn = HORA_NAME[cur.ruler].en, planetHi = HORA_NAME[cur.ruler].hi;
+    const natureEn = HORA_NATURE[cur.ruler].en, natureHi = HORA_NATURE[cur.ruler].hi;
+    const v = adjudicate({ start: cur.start, end: cur.end }, horaCtx);
+
+    if (activeHoraPeriod === "night") {
+      // Finding 3 (task 8): Rahu Kaal, Gulika and Yamaganda are built from
+      // daylight only and never overlap a night window, so v.status here is
+      // always "clean" — reporting that as "clear of the forbidden periods"
+      // would claim a check ran that could never find anything wrong. The
+      // Choghadiya grade (v.grade/v.gradeKey, already computed from
+      // choghaNight via horaCtx.chogha) is real information after dark.
+      const grade = v.grade;
+      const gradeWordEn = grade === "good" ? "favourable" : grade === "bad" ? "best avoided" : "neutral";
+      const gradeWordHi = grade === "good" ? "अनुकूल" : grade === "bad" ? "टालने योग्य" : "सामान्य";
+      const badgeEn = grade === "good" ? "Favourable" : grade === "bad" ? "Avoid" : "Neutral";
+      const badgeHi = grade === "good" ? "अनुकूल" : grade === "bad" ? "टालें" : "सामान्य";
+      const gradeNameEn = v.gradeKey ? CHOG_NAME[v.gradeKey]?.en : null;
+      const gradeNameHi = v.gradeKey ? CHOG_NAME[v.gradeKey]?.hi : null;
+      return {
+        tone: grade === "good" ? "good" : grade === "bad" ? "bad" : "default",
+        badgeEn, badgeHi,
+        en: `It's ${planetEn}'s hora until ${fmtT(cur.end)} — favours ${natureEn}, currently ${gradeWordEn}${gradeNameEn ? ` (${gradeNameEn})` : ""} by Choghadiya.`,
+        hi: `${fmtT(cur.end)} तक ${planetHi} होरा है — ${natureHi} के लिए उपयुक्त, अभी चौघड़िया अनुसार ${gradeWordHi}${gradeNameHi ? ` (${gradeNameHi})` : ""}।`,
+      };
+    }
+
+    // Day
+    if (v.status === "clean") {
+      return {
+        tone: "good", badgeEn: "Clear", badgeHi: "स्पष्ट",
+        en: `It's ${planetEn}'s hora until ${fmtT(cur.end)} — favours ${natureEn}, and is clear of the forbidden periods.`,
+        hi: `${fmtT(cur.end)} तक ${planetHi} होरा है — ${natureHi} के लिए उपयुक्त, और निषिद्ध अवधियों से मुक्त।`,
+      };
+    }
+    const beltNamesEn = v.blockedBy.map((k) => tr("en", k + "L")).join(", ");
+    const beltNamesHi = v.blockedBy.map((k) => tr("hi", k + "L")).join(", ");
+    if (v.status === "partial") {
+      const u = v.usable[0];
+      return {
+        tone: "warn", badgeEn: "Partly blocked", badgeHi: "आंशिक रूप से बाधित",
+        en: `It's ${planetEn}'s hora until ${fmtT(cur.end)} — favours ${natureEn}, but ${beltNamesEn} cuts in; use ${fmtT(u.start)}–${fmtT(u.end)}.`,
+        hi: `${fmtT(cur.end)} तक ${planetHi} होरा है — ${natureHi} के लिए उपयुक्त, पर ${beltNamesHi} इसमें कटौती करता है; ${fmtT(u.start)}–${fmtT(u.end)} का प्रयोग करें।`,
+      };
+    }
+    // status === "blocked": fully cut, so point at the next window that
+    // actually has usable time — scanned across BOTH day and night horas
+    // (mirrors nextCleanBlock's excludePlanets branch below) so "no window
+    // left today" is never claimed while the other period still has one.
+    const allWinsToday = [...dayHoras(todayP.dow, todayP.rise, todayP.set), ...nightHoras(todayP.dow, todayP.set, nextRise)]
+      .map((w) => ({ start: w.start, end: w.end }));
+    const alt = nextCleanWindow(allWinsToday, horaCtx, nowMs);
+    const altEn = alt ? `Next clear window: ${fmtT(alt.verdict.usable[0].start)}–${fmtT(alt.verdict.usable[0].end)}.` : "No clear window left today — check tomorrow.";
+    const altHi = alt ? `अगला स्पष्ट समय: ${fmtT(alt.verdict.usable[0].start)}–${fmtT(alt.verdict.usable[0].end)}।` : "आज और कोई स्पष्ट समय नहीं — कल देखें।";
+    return {
+      tone: "bad", badgeEn: "Blocked", badgeHi: "बाधित",
+      en: `It's ${planetEn}'s hora until ${fmtT(cur.end)}, but it's fully inside ${beltNamesEn} — not usable now. ${altEn}`,
+      hi: `${fmtT(cur.end)} तक ${planetHi} होरा है, पर यह पूरी तरह ${beltNamesHi} में है — अभी उपयोग योग्य नहीं। ${altHi}`,
+    };
+  })();
+
   const askHora = (q, action) => {
     privacyEvent("hora_ask", { action, language: lang });
     const r = analyzeHora(q);
@@ -1089,6 +1182,22 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
 
       {/* hora timeline (secondary) */}
       <SecHead deva="होरा" en="Planetary hours" />
+      {/* Change 1 — the answer line: one plain-language sentence for the hora
+          running right now, FIRST in the section, before the dial. See
+          horaAnswerLine above for how each state (clear/partial/blocked/
+          night/not-today/no-data) is built. */}
+      <div style={{ ...card, padding: "0.75rem 0.875rem", marginBottom: "0.75rem" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem", flexWrap: "wrap" }}>
+          {horaAnswerLine.tone && (
+            <Badge tone={horaAnswerLine.tone} density="compact">
+              {lang === "hi" ? horaAnswerLine.badgeHi : horaAnswerLine.badgeEn}
+            </Badge>
+          )}
+          <p style={{ margin: 0, flex: "1 1 12rem", fontSize: T.fBody, color: C.ivory, lineHeight: 1.4 }}>
+            {lang === "hi" ? horaAnswerLine.hi : horaAnswerLine.en}
+          </p>
+        </div>
+      </div>
       {/* today — hero */}
       {(() => {
         const rise = todayP.rise, set = todayP.set;

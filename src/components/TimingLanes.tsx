@@ -156,30 +156,51 @@ export default function TimingLanes({
               const left = leftRem(h.start);
               const width = widthRem(h);
               const isNow = nowMs != null && nowMs >= h.start && nowMs < h.end;
+              const horaName = HORA_NAME[h.ruler]?.[lang] ?? h.ruler;
               return (
                 <button
                   key={i}
                   type="button"
                   onClick={() => onSelect({ start: h.start, end: h.end })}
-                  aria-label={`${HORA_NAME[h.ruler]?.[lang] ?? h.ruler} ${tr("hora", "होरा")}`}
+                  aria-label={`${horaName} ${tr("hora", "होरा")}`}
+                  title={horaName}
                   style={{
                     position: "absolute",
                     left: `${left}rem`,
                     width: `${width}rem`,
                     top: 0,
                     bottom: 0,
+                    boxSizing: "border-box",
                     border: isNow ? "0.0625rem solid var(--accent)" : "none",
-                    padding: 0,
+                    padding: "0 0.0625rem",
                     cursor: "pointer",
                     background: HORA_COLOR[h.ruler],
                     opacity: 0.55,
                     display: "flex",
+                    flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
+                    overflow: "hidden",
                   }}
                 >
-                  <span aria-hidden="true" style={{ fontSize: "var(--font-label)", color: "var(--on-accent)" }}>
+                  <span aria-hidden="true" style={{ fontSize: "var(--font-label)", color: "var(--on-accent)", lineHeight: 1 }}>
                     {HORA_GLYPH[h.ruler]}
+                  </span>
+                  {/* Planet name beside the glyph (owner request 2026-08-11) — the strip
+                      used to be glyph-only, forcing a first-time user to decode seven
+                      symbols before reading anything. Segments are always ~2.75rem (the
+                      touch floor) regardless of viewport, because the track is a
+                      fixed-rem width that scrolls rather than shrinking below the floor,
+                      so most names don't fit whole. text-overflow: ellipsis degrades to
+                      as much of the name as fits rather than hiding it; the full name
+                      stays reachable either way via aria-label (screen reader) and title
+                      (pointer hover) on the button. */}
+                  <span aria-hidden="true" style={{
+                    display: "block", width: "100%", textAlign: "center",
+                    fontSize: "var(--font-micro)", color: "var(--on-accent)", lineHeight: 1.1,
+                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                  }}>
+                    {horaName}
                   </span>
                 </button>
               );
