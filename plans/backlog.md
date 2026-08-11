@@ -1,5 +1,12 @@
 # Ganak — Product Backlog
 
+> **Permanent city-preference migration contract:** every UI/UX, routing, storage,
+> authentication or framework migration must preserve the first-run city gate,
+> opt-in device location, approved local persistence, always-available city change,
+> and the mandatory remembered-city-versus-linked-city question. Signed-in account
+> sync remains required and must ask before resolving a local/account conflict.
+> Acceptance details and regression matrix: `plans/city-preference-migration-contract.md`.
+
 Rebuilt 2026-07-18 into a phased launch plan reflecting the owner's strategy.
 Status verified against `src/kundli-app.tsx`, not assumed.
 
