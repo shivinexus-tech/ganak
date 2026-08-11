@@ -440,7 +440,9 @@
         52,
         53,
         60,
-        61
+        61,
+        67,
+        68
       ]
     },
     {
@@ -841,6 +843,16 @@
       "section": "P0",
       "title": "Prashna and Jyotish crawlable URLs — DECIDED 2026-08-10: real paths",
       "technicalComplexity": "Medium"
+    },
+    "67": {
+      "section": "P2",
+      "title": "Panchang day boundary — sunrise-to-sunrise, not midnight",
+      "technicalComplexity": "High"
+    },
+    "68": {
+      "section": "P2",
+      "title": "Empty \"Blocked\" lane reads as a glitch at night",
+      "technicalComplexity": "Low"
     }
   }
 }

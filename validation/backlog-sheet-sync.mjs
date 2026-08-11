@@ -15,7 +15,14 @@ const config = JSON.parse(await readFile(new URL("../plans/backlog-sheet-sync.js
 const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md", import.meta.url), "utf8");
 const base = parseRegister(markdown, config, "test base");
 
-assert.equal(base.rows.size, 66);
+assert.equal(base.rows.size, 68);
+// 67 and 68 added 2026-08-11: the sunrise-vs-midnight panchang day boundary, and
+// the empty night Blocked lane. Both found on production while verifying the Hora
+// overhaul; both deliberately left unfixed there and tracked instead.
+assert.equal(base.rows.get("67").section, "P2");
+assert.equal(base.rows.get("67").metadata.title, "Panchang day boundary — sunrise-to-sunrise, not midnight");
+assert.equal(base.rows.get("68").section, "P2");
+assert.equal(base.rows.get("68").metadata.title, 'Empty "Blocked" lane reads as a glitch at night');
 assert.equal(sheetRow(base.rows.get("1")).length, 19);
 assert.equal(base.rows.get("58").section, "P0");
 assert.equal(base.rows.get("58").metadata.title, "Direct date entry and better Panchang date picker");
@@ -234,8 +241,8 @@ assert.throws(
 );
 assert.equal(
   parseRegister(preAutomationMarkdown, config, "bootstrap historical fixture", { allowMetadataTitleMismatch: true }).rows.size,
-  66,
+  68,
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 
-console.log("Backlog Sheet sync gate: PASS — 66 rows; 19-column quality/action contract, legacy-header migration, dashboard formula guard, high-impact bug-bash/RAG policy, API limitation/impact disclosure, verification/source confidence, changed-cell targeting, stale-Sheet self-heal, row-grid expansion, idempotence, strict conflict detector, metadata guard and explicit bootstrap planning verified.");
+console.log(`Backlog Sheet sync gate: PASS — ${base.rows.size} rows; 19-column quality/action contract, legacy-header migration, dashboard formula guard, high-impact bug-bash/RAG policy, API limitation/impact disclosure, verification/source confidence, changed-cell targeting, stale-Sheet self-heal, row-grid expansion, idempotence, strict conflict detector, metadata guard and explicit bootstrap planning verified.`);

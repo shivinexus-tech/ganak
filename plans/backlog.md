@@ -1088,6 +1088,14 @@ Feature exists and renders; not a claim of polish/parity.
   evidence, browser-verification limits (no screenshot was captured) and every
   deferred finding, including a second live instance of the fake-sunrise bug at
   `src/engine/muhurat.ts:140`.
+  **Found on production 2026-08-11, logged as rows 67 and 68, not fixed here:**
+  (67) Ganak decides which day you are looking at by local midnight, but a
+  panchang day runs sunrise to sunrise — so between midnight and sunrise the
+  night dial shows the night starting at *tonight's* sunset, not the one the
+  user is in. Same `todayISO`/`isPanchToday` rule drives "Back to today",
+  holiday overlays and festival dates, so it needs its own sourced pass.
+  (68) At night the Blocked lane is correctly empty — no belts apply after
+  sunset — but an empty lane reads as a rendering fault; it should say so.
   **Owner correction 2026-08-10:** Hora's primary personas are **P5 (working
   astrologer)** and **P2 (astrology enthusiast)**; P1 (householder) is the reach
   surface, not the design target. The spec first recorded P1-primary — that was
