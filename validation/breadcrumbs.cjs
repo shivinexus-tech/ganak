@@ -6,6 +6,7 @@
 
 const { loadApp } = require('./_load-app.cjs');
 const { breadcrumbTrail } = loadApp('src/components/Breadcrumbs.tsx');
+const breadcrumbSource = require('node:fs').readFileSync('src/components/Breadcrumbs.tsx', 'utf8');
 
 let failures = 0;
 const check = (c, m) => { if (c) console.log('PASS  ' + m); else { failures++; console.error('FAIL  ' + m); } };
@@ -28,6 +29,7 @@ check(/screen=chart/.test(cat[1].href), 'calculator catalogue: Jyotish parent li
 const detail = breadcrumbTrail({ utility: { kind: 'calculator', calculator: { en: 'Mangal Dosha', hi: 'मंगल दोष', slug: 'mangal-dosha' } } }, 'en');
 check(JSON.stringify(labels(detail)) === JSON.stringify(['Ganak', 'Jyotish', 'Calculators', 'Mangal Dosha']), 'calculator detail trail = Ganak > Jyotish > Calculators > <name>');
 check(/\/calculators/.test(detail[2].href), 'calculator detail: Calculators links to /calculators');
+check(breadcrumbSource.includes('onClick={followUtilityLink}') && breadcrumbSource.includes('new PopStateEvent("popstate")'), 'calculator breadcrumbs navigate inside Ganak without repeating the linked-city question');
 const linkedDetail = breadcrumbTrail(
   { utility: { kind: 'calculator', calculator: { en: 'Moon sign', hi: 'राशि', slug: 'rashi' } } },
   'en',

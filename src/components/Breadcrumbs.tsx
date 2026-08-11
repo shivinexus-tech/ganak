@@ -55,6 +55,15 @@ function breadcrumbTrail(ctx, lang, search = "") {
 
 function Breadcrumbs({ ctx, lang, C }) {
   const trail = breadcrumbTrail(ctx, lang, typeof location === "undefined" ? "" : location.search);
+  const followUtilityLink = (event) => {
+    if (!ctx?.utility || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    const href = event.currentTarget.getAttribute("href");
+    if (!href) return;
+    window.history.pushState(window.history.state, "", href);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+    window.scrollTo({ top: 0, behavior: "auto" });
+  };
   if (trail.length < 2) return null;
   const sep = { margin: "0 0.375rem", color: C.muted };
   return (
@@ -67,7 +76,7 @@ function Breadcrumbs({ ctx, lang, C }) {
               {i > 0 && <span aria-hidden="true" style={sep}>›</span>}
               {last || item.href === null
                 ? <span aria-current="page" title={item.label} style={{ color: C.ivory, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>{item.label}</span>
-                : <a href={item.href} className="comfort-focus" style={{ color: C.gold, textDecoration: "none", whiteSpace: "nowrap", minHeight: 44, padding: "0.375rem 0", display: "inline-flex", alignItems: "center" }}>{item.label}</a>}
+                : <a href={item.href} onClick={followUtilityLink} className="comfort-focus" style={{ color: C.gold, textDecoration: "none", whiteSpace: "nowrap", minHeight: 44, padding: "0.375rem 0", display: "inline-flex", alignItems: "center" }}>{item.label}</a>}
             </li>
           );
         })}

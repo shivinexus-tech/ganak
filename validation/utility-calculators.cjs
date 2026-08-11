@@ -106,5 +106,6 @@ assert(screenSource.includes('utilityHref("/",lang,place,{screen:"chart"})'), 'c
 assert(screenSource.includes('utilityHref(`/calculator/${x.slug}/`,lang,place)'), 'catalogue detail links must preserve language and place context');
 assert(screenSource.match(/utilityHref\("\/calculators\/",lang,place\)/g)?.length>=3, 'detail, catalogue and not-found journeys must preserve context when returning to calculators');
 assert(screenSource.includes('params.set("city",String(place.label))')&&screenSource.includes('params.set("zone",String(place.zone))'), 'calculator journey URLs must carry the selected city and timezone');
+assert((screenSource.match(/onClick=\{followUtilityLink\}/g)||[]).length>=5&&screenSource.includes('window.dispatchEvent(new PopStateEvent("popstate"))'), 'calculator-internal links must navigate without reloading and re-asking an accepted linked-city choice');
 
 console.log(`UTILITY CALCULATORS PASSED (${expected.length} bilingual permanent journeys; Jyotish context bridge; 108 Drik-aligned English/Hindi pairs; F1-F7 regressions)`);
