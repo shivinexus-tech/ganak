@@ -114,7 +114,8 @@
     57,
     58,
     59,
-    65
+    65,
+    69
   ],
   "sourceConfidenceByItem": {
     "1": "Drik Panchang's parallel English/Hindi 108-pada tables; all positional pairs regression-tested",
@@ -354,6 +355,17 @@
       "lastVerified": "2026-08-10 - Spec and plan written and committed; no implementation yet",
       "sourceConfidence": "Not applicable — technical, operational or platform work",
       "recommendedAction": "Implement Tasks 1-4 first (harness, render, baselines, gate proven red). That subset is independently useful; Tasks 5-7 extend it without rework."
+    },
+    "69": {
+      "deliveryState": "Delivered and deployed 2026-08-11 (main 0a9a832); two human follow-ups open",
+      "limitations": "Two follow-ups remain and neither can be closed by a gate. B8 - Dashakoota, the dosha pages and the Kundli tables, the three surfaces the 2026-07-28 bug bash named, still need a human 375px pass in both languages; no snapshot covers them. B10 - nakshatra pada and sub-lord labels sit on the same architectural fault line and were never audited. Three screens (calendar, rectify, bnn) are inner modules the snapshot gate cannot render, so they are outside its rendered-text coverage.",
+      "shortTermImpact": "An English reader is no longer asked to learn Sanskrit vocabulary to read their own chart, and a Hindi reader no longer sees two spellings of their own birth star on two screens. Sixteen drifted private name tables became one.",
+      "longTermImpact": "The next agent has one obvious place to add a name and two gates that fail the build if they hardcode one instead, so the duplication cannot silently return. Adding a third language becomes a table, not a migration.",
+      "bugBashStatus": "Bug-bash driven throughout. The 2026-07-28 Codex Jyotish bash raised the leak as I18N-DEVANAGARI-TERMS; 22f5892 closed four chart displays a later bash found; the final three English screens were found on 2026-08-11 by reading every sign call site rather than trusting the green gates, then closed and gated.",
+      "qualityRisk": "Amber",
+      "lastVerified": "2026-08-11 - main 0a9a832 pushed after a full gate sweep (every validation/*.cjs, 0 failures), prashna-parity EXACT 198/6, production build; browser-verified at 375x812 in EN and HI on a worktree dev server, live URL not yet owner-signed-off",
+      "sourceConfidence": "Not applicable - technical, operational or platform work",
+      "recommendedAction": "Run B8 as one human 375px pass over Dashakoota, the dosha pages and the Kundli tables in both languages, then audit B10 nakshatra pada and sub-lord labels against the shared module. Do not re-open the rename itself."
     }
   },
   "dashboard": {
@@ -428,7 +440,8 @@
         47,
         48,
         49,
-        65
+        65,
+        69
       ]
     },
     {
@@ -853,6 +866,11 @@
       "section": "P2",
       "title": "Empty \"Blocked\" lane reads as a glitch at night",
       "technicalComplexity": "Low"
+    },
+    "69": {
+      "section": "P1",
+      "title": "E-1.0 English sign names and one shared name table",
+      "technicalComplexity": "Medium"
     }
   }
 }

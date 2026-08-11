@@ -15,7 +15,11 @@ const config = JSON.parse(await readFile(new URL("../plans/backlog-sheet-sync.js
 const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md", import.meta.url), "utf8");
 const base = parseRegister(markdown, config, "test base");
 
-assert.equal(base.rows.size, 68);
+assert.equal(base.rows.size, 69);
+// 69 added 2026-08-11: E-1.0, registered at the owner's instruction after the code
+// had already shipped, so the two human follow-ups (B8, B10) have a home.
+assert.equal(base.rows.get("69").section, "P1");
+assert.equal(base.rows.get("69").metadata.title, "E-1.0 English sign names and one shared name table");
 // 67 and 68 added 2026-08-11: the sunrise-vs-midnight panchang day boundary, and
 // the empty night Blocked lane. Both found on production while verifying the Hora
 // overhaul; both deliberately left unfixed there and tracked instead.
@@ -255,7 +259,7 @@ assert.throws(
 );
 assert.equal(
   parseRegister(preAutomationMarkdown, config, "bootstrap historical fixture", { allowMetadataTitleMismatch: true }).rows.size,
-  68,
+  69,
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 
