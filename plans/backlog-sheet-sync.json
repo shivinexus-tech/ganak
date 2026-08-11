@@ -142,7 +142,7 @@
       "longTermImpact": "After the redesigned Jyotish UI is ready, migrate the catalogue and every calculator journey into that system while preserving permanent URLs, bilingual state and calculation gates.",
       "bugBashStatus": "Completed 2026-07-24 — fresh independent 60-focused-minute all-12 pass found no P0/P1; F7 was then fixed, regression-tested and production-verified.",
       "qualityRisk": "Amber",
-      "lastVerified": "2026-08-11 · Local 375px EN/HI click-through: /calculators/ and /calculator/rashi/ show Jyotish workspace context; all parent/detail links preserve San Francisco state; calculator-internal navigation does not reload or repeat the accepted linked-city question; zero overflow or console errors; final migration remains open",
+      "lastVerified": "2026-08-11 · Production main 8ac21b5 / asset index-BfZnVnNX.js: exact San Francisco Rashi → catalogue journey stays in Jyotish, preserves full city/language state and does not repeat the accepted linked-city question; zero console errors; final redesigned-UI migration remains open",
       "sourceConfidence": "Drik Panchang's parallel English/Hindi 108-pada tables; all positional pairs regression-tested",
       "recommendedAction": "Keep row open at 90%. Deploy and verify the immediate continuity bridge; after the redesigned Jyotish UI lands, migrate catalogue and detail/result pages into it, preserve URLs and EN/HI state, then rerun calculator bug bash and live visual QA."
     },
