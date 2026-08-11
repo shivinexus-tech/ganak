@@ -92,10 +92,15 @@ export default function KundliApp() {
   };
 
   const detectLang = () => { try { const ls = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "en"]).map((x) => String(x || "").toLowerCase()); return ls.some((l) => l.startsWith("hi")) ? "hi" : "en"; } catch (e) { return "en"; } };
-  // Language and screen survive a reload via the URL (?lang=hi&screen=prashna) —
-  // browser storage is banned in this project, but the address bar is not storage.
+  // Language and screen survive a reload via the URL (?lang=hi&screen=prashna).
   const [lang, setLang] = useState(() => { const v = urlPrefGet("lang"); return v === "hi" || v === "en" ? v : detectLang(); });
-  const chooseLang = (v) => { setLang(v); urlPrefSet("lang", v); };
+  // The URL alone was not enough: arriving at a bare ganakapp.com dropped a deliberate
+  // Hindi choice back to English on every visit, so a Hindi-first reader re-picked Hindi
+  // every time (bug bash 2026-08-10, P2-3). The old comment here said browser storage was
+  // banned — true when this line was written, but `approved-storage.ts` has since become
+  // the sanctioned path and the city control two lines below already persists through it.
+  // Language is non-sensitive comfort data, explicitly allowed in the `preferences` store.
+  const chooseLang = (v) => { setLang(v); urlPrefSet("lang", v); updatePreferences({ language: v }); };
   const [mode, setMode] = useState(() => { const v = urlPrefGet("screen"); return v === "prashna" || v === "daily" || v === "chart" ? v : "daily"; });
   const chooseMode = (v) => { setMode(v); urlPrefSet("screen", v); };
   const directFestivalGuide = festivalGuideFromPath(typeof window !== "undefined" ? window.location.pathname : "/");

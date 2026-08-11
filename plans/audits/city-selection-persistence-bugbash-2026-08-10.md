@@ -10,7 +10,12 @@
 
 ---
 
-## Verdict: **FAIL**
+## Verdict at time of the bash: **FAIL**
+
+> **Update 2026-08-10 — owner directed fixes in the same session.** P1-1, P2-2 and P2-3 are
+> **fixed, gated and re-verified**; see [Fix dispositions](#fix-dispositions) at the end of
+> this report. **P2-1 (phone-width clipping) and all three P3s remain open**, so the journey
+> still must not be marked PASS. The fixes are **not yet deployed**.
 
 One **P1** remains open. Per the closeout rule, this journey must not be marked PASS while a P0/P1 is open.
 
@@ -403,3 +408,105 @@ near-identical places (coordinate tolerance and label casing), or the defect can
   accept and disclose the approximation.
 - **P2-3** is a two-word fix (`updatePreferences({language: v})` in `chooseLang`) but touches
   the integration-owned shell, so it needs a reservation.
+
+---
+
+## Fix dispositions
+
+Owner directed fixes for P1-1, P2-2 and P2-3 in the same session (2026-08-10). No product
+code was touched during the bash itself; everything below came after.
+
+| ID | Disposition |
+|---|---|
+| **P1-1** same-city false conflict | **FIXED** |
+| **P2-1** dialogs overflow phone widths | **OPEN** — not in the directed scope |
+| **P2-2** device location names a distant city/zone | **FIXED** |
+| **P2-3** Hindi choice not remembered | **FIXED** |
+| **P3-1/2/3** combobox arrows, English city names, English title | **OPEN** |
+
+### P1-1 — compare places by timezone and distance, not exact text
+
+`samePlace` (`src/accessibility/AccessibilityRoot.tsx`) keeps exact equality as a fast path
+and otherwise treats two places as the same city when they **share a timezone and sit within
+5 km**. 5 km moves sunrise well under the minute Ganak prints, so every displayed timing is
+identical and there is nothing to ask; Mumbai→Thane (18.8 km) and Mumbai→Pune (120 km) stay
+outside it, so genuine conflicts still ask. `distanceKm` was extracted to `src/data/places.ts`
+and shared, so distance is computed one way everywhere.
+
+**Agent decision, open to overrule:** the 5 km radius. Recorded in the backlog and the Sheet.
+
+### P2-2 — cap the device-location match at 300 km
+
+`nearestCity` returns `null` beyond `NEAREST_CITY_MAX_KM = 300`, so the dialog shows bilingual
+guidance instead of naming a distant city. The threshold is measured, not guessed: across the
+shipped gazetteer every wrong-timezone match sits at **614 km or further** (Male 614, Tashkent
+749, Almaty 1034, Reykjavik 1339, Anchorage 2129, Novosibirsk 2413, Honolulu 3854) while
+dense-population cases land far below (Mumbai GPS 1, Bhiwandi 12, rural Bihar 42, Milton
+Keynes 29, Fresno 198, Kelowna 225) — roughly a 2× margin under the closest known failure.
+Anyone beyond the cap still reaches their city through the search, which covers the world via
+the online geocoder.
+
+The null-result copy was also corrected: it used to say "Your location could not be read",
+which is now usually untrue — the location reads fine, Ganak simply has no city near it. It
+now reads *"Ganak could not find a known city near your location. Please search for your city
+below."* / *"गणक आपके स्थान के पास का कोई शहर नहीं पहचान सका। कृपया नीचे अपना शहर खोजें।"*
+
+**Agent decision, open to overrule:** the 300 km cap, and refusing rather than warning.
+
+### P2-3 — persist the language choice
+
+`chooseLang` (`src/kundli-app.tsx`) now calls `updatePreferences({ language: v })` alongside
+the URL write. The stale comment above it claimed browser storage was banned — true when the
+line was written, superseded by `src/storage/approved-storage.ts`; language is non-sensitive
+comfort data explicitly allowed in the `preferences` store. Corrected in place.
+
+### Gates — all three mutation-tested
+
+Assertions were added that **execute the shipped functions** rather than grep for their text,
+because the original gates passed the P1 untouched: they asserted `!samePlace(...)` was *used*,
+never how it decided.
+
+```
+first-run-place:   PASS (21 checks)   was 13
+link-city-choice:  PASS (17 checks)   was 9
+```
+
+Reverting each fix turns the relevant gate red, proving none of them is theatre:
+
+```
+MUTATION 1  samePlace -> exact equality
+  FAIL: device-location coordinates and a Ganak share link for the same city do not prompt
+  FAIL: offline and online geocoder labels for the same city do not prompt
+MUTATION 2  remove the device-location distance cap
+  FAIL: a location with no city within the cap returns null instead of a distant wrong city
+MUTATION 3  chooseLang -> URL-only
+  FAIL: the header language control persists the choice through approved preferences
+```
+
+The Sheet gate's row-46 pins were realigned to current truth (the old pins asserted "only the
+standing owner live sign-off … remain" and "No link-city code action remains", both falsified
+by this bash) and a new pin now fails if the unbuilt account-sync limitation is deleted from
+the register — mutation-verified.
+
+### Re-verification
+
+Full sweep: **79 validation gates, zero failures**; `parse-check` clean; production build
+clean; `sync-backlog-sheet --check` 66 rows / 6 tabs.
+
+Browser-verified EN and HI on a dev server **rooted on the fix worktree** (the default dev
+server serves the main worktree and was silently testing unfixed code — worth knowing):
+
+- Device-location Mumbai (19.076/72.8777) + Ganak share link (19.08/72.88) → **no dialog**,
+  page loads straight through (4966 chars, previously blocked at 374), saved preference untouched.
+- Genuine London link with Mumbai remembered → **still blocks**, `#root` holds only the dialog,
+  buttons distinct: "View London, UK for this link" / "Use my remembered city: Mumbai, India".
+- Choosing London → dialog closes, view is London, **saved preference still Mumbai**.
+- Choosing हिन्दी → `preferences.language` becomes `"hi"`; a later **bare-URL** visit stays
+  Hindi (title `गणक पंचांग — आज की तिथि, पर्व और मुहूर्त`, `aria-pressed="true"` on हिन्दी)
+  while the city correctly returns to Mumbai — so the linked city still never became the default.
+- Console: the only 404 is `/favicon.ico`, **identical on the unfixed baseline** — pre-existing
+  dev-server artefact, not introduced here.
+
+P2-2's cap is proven by a gate that executes the real `nearestCity`; it could not be exercised
+through a live GPS grant because the test browser had location permission denied. That, and a
+real keyboard/screen-reader pass, are now recorded as owner/human gates in `plans/backlog.md`.

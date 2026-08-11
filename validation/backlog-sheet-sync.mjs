@@ -23,12 +23,23 @@ assert.equal(base.rows.get("59").section, "P0");
 assert.equal(base.rows.get("59").metadata.title, "Global site search and guided “find what I need” input");
 assert.equal(base.rows.get("46").section, "P1");
 assert.equal(base.rows.get("46").metadata.title, "Design-system pass");
-assert.equal(sheetRow(base.rows.get("46"))[4], "95%");
-assert.equal(base.rows.get("46").quality.deliveryState, "Base design-system pass and the first-run city chooser are deployed and production-verified across every launch screen; only the standing owner live sign-off and human real-device accessibility pass remain.");
+// 95% -> 93%: the row claimed only human verification remained, which the 2026-08-10 city
+// bash disproved. Percentages move down when a bash reopens real work, not silently back up.
+assert.equal(sheetRow(base.rows.get("46"))[4], "93%");
+// Realigned 2026-08-10 after the second independent city bug bash. The old pins asserted
+// "only the standing owner live sign-off ... remain" and "No link-city code action remains";
+// both became false when that bash found a P1 (the same-city false conflict) plus three P2s.
+// Pinning stale text would have forced the register to keep claiming the journey was clear.
+// No assertion was dropped — each is re-pointed at what is now true, and the row's open
+// limitations and unbuilt account sync are pinned so they cannot be quietly deleted.
+assert.equal(base.rows.get("46").quality.deliveryState, "Base design-system pass, the first-run city chooser and the linked-city question are deployed; a second independent city bug bash on 2026-08-10 found one P1 and three P2s, three of which are now fixed with permanent behavioural gates. One P2 (blocking-dialog width on phones) and three P3s remain open, alongside the standing owner live sign-off and the human real-device accessibility pass.");
 assert.equal(base.rows.get("46").quality.qualityRisk, "Amber");
 assert.match(base.rows.get("46").quality.limitations, /Cloudflare Web Analytics beacon/);
-assert.match(base.rows.get("46").quality.bugBashStatus, /first-run-city bug bash/);
-assert.match(base.rows.get("46").quality.recommendedAction, /No link-city code action remains/);
+assert.match(base.rows.get("46").quality.limitations, /signed-in cross-device account sync/i);
+assert.match(base.rows.get("46").quality.bugBashStatus, /first-run-city/);
+assert.match(base.rows.get("46").quality.bugBashStatus, /not harmless/);
+assert.match(base.rows.get("46").quality.recommendedAction, /within 5km/);
+assert.match(base.rows.get("46").quality.recommendedAction, /300km/);
 assert.equal(base.rows.get("1").quality.deliveryState, "Delivered and production-verified");
 assert.equal(base.rows.get("1").quality.qualityRisk, "Green");
 assert.match(base.rows.get("1").quality.bugBashStatus, /F7 was then fixed/);
@@ -165,7 +176,7 @@ assert.ok(
     change.kind === "cell"
     && change.liveRow.id === "46"
     && change.sheetIndex === 4
-    && change.value === "95%"
+    && change.value === "93%"   // realigned with row 46 after the 2026-08-10 city bug bash
   )),
   "incremental sync must repair stale live cells even when the Git base already contains the new value",
 );

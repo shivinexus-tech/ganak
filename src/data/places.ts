@@ -41,22 +41,49 @@ async function searchOnline(q) {
   }));
 }
 
+/* Great-circle distance in kilometres. Shared so that "how far apart are two places?"
+   is answered the same way everywhere — the device-location cap below and the
+   same-city test in src/accessibility/AccessibilityRoot.tsx. */
+function distanceKm(aLat, aLon, bLat, bLon) {
+  const R = 6371;
+  const p = Math.PI / 180;
+  const dLat = (bLat - aLat) * p, dLon = (bLon - aLon) * p;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(aLat * p) * Math.cos(bLat * p) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+}
+
+/* How far the nearest gazetteer city may be before "use my device location" gives up.
+ *
+ * This used to be unbounded: the closest CITY_DB entry was returned no matter how far
+ * away, carrying ITS timezone, so a visitor in Honolulu was labelled "San Francisco, USA"
+ * on America/Los_Angeles and every sunrise, tithi and muhurat was three hours out with no
+ * warning (bug bash 2026-08-10). Panchang is timezone-derived, so a confidently wrong zone
+ * is worse than no answer.
+ *
+ * 300 km is measured, not guessed. Across the shipped gazetteer every WRONG timezone match
+ * sits at 614 km or further (Male 614, Tashkent 749, Almaty 1034, Reykjavik 1339, Anchorage
+ * 2129, Novosibirsk 2413, Honolulu 3854) while dense-population cases land far below it
+ * (Mumbai GPS 1, Bhiwandi 12, rural Bihar 42, Milton Keynes 29, Fresno 198, Kelowna 225).
+ * That leaves roughly a 2x margin under the closest known failure. Beyond the cap the
+ * caller shows bilingual guidance and the visitor searches manually — the online geocoder
+ * covers the whole world, so nobody is stranded.
+ */
+const NEAREST_CITY_MAX_KM = 300;
+
 function nearestCity(lat, lon) {
   if (!Number.isFinite(lat) || Math.abs(lat) > 90 || !Number.isFinite(lon) || Math.abs(lon) > 180) return null;
   let best = null, bestDistance = Infinity;
   for (const [label, cityLat, cityLon, zoneIndex] of CITY_DB) {
-    const dLat = (cityLat - lat) * Math.PI / 180;
-    const dLon = (cityLon - lon) * Math.PI / 180;
-    const a = Math.sin(dLat / 2) ** 2
-      + Math.cos(lat * Math.PI / 180) * Math.cos(cityLat * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
-    const distance = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = distanceKm(lat, lon, cityLat, cityLon);
     if (distance < bestDistance) {
       bestDistance = distance;
       best = { label, lat, lon, zone: ZONES[zoneIndex] };
     }
   }
-  return best;
+  // Keep the visitor's own coordinates, but never claim a city — or a timezone — that is
+  // too far away to be theirs.
+  return bestDistance <= NEAREST_CITY_MAX_KM ? best : null;
 }
 
 
-export { ZONES, CITY_DB, searchOffline, searchOnline, nearestCity };
+export { ZONES, CITY_DB, searchOffline, searchOnline, nearestCity, distanceKm, NEAREST_CITY_MAX_KM };
