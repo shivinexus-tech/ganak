@@ -322,12 +322,12 @@ function observancesFor(krishna, tithiNum, month = null, dow = null, ms = null) 
   if (tithiNum === 14 && krishna) out.push({ key: "masikShivaratri", fasting: true });
   if (tithiNum === 15 && !krishna) out.push({ key: "purnima", fasting: true });
   if (tithiNum === 15 && krishna) {
-    // Name the new moon for its Tamil solar month (Aadi Amavasai, Thai Amavasai …)
-    // when the date is known; every solar-month Amavasya is a tarpanam day.
-    const mi = ms != null ? tamilSolarMonthIdx(ms) : -1;
-    out.push(mi >= 0
-      ? { key: `amavasya_${TAMIL_MONTH_SLUGS[mi]}`, fasting: true, isVariant: true, baseKey: "amavasya" }
-      : { key: "amavasya", fasting: true });
+    // Neutral "Amavasya" for everyone until the regional-name lens ships. The same
+    // new moon is Hariyali Amavasya (North), Aadi Amavasai (Tamil), Karkataka
+    // Amavasya (Kerala) … — naming it for ONE region is wrong for the others, so it
+    // stays neutral until region drives the label. (tamilSolarMonthIdx + the
+    // amavasya_<month> keys/routes remain as ready infrastructure for that lens.)
+    out.push({ key: "amavasya", fasting: true });
   }
   return out;
 }
