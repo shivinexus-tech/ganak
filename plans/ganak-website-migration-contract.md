@@ -240,6 +240,39 @@ from silently becoming a Ganak feature.
 `Deferred — omit` or `Remove` row is absent from the working screen. A control with a blank
 destination, state-preservation rule or acceptance proof fails this contract.
 
+#### 10.1.1 Canonical screen-fixture integrity gate
+
+A visual screen that mixes independently typed dates, festival names, Panchang values or
+timings is **data-invalid even when its visual composition is approved**. Every buildable
+Figma screen and every screenshot used for approval must bind to one named immutable
+fixture containing, at minimum:
+
+`fixtureId`, selected civil date, place label, latitude, longitude, IANA zone, calendar
+convention, language and—when applicable—canonical festival slug. That same fixture must
+produce the weekday/day lord, sunrise and sunset, Tithi/Paksha/month, Nakshatra, Yoga,
+Karana, good/avoid timings, festival hero, local observance date/parana and chronological
+upcoming list. Individual values must not be manually substituted from another day, city
+or year.
+
+**Required checks before a frame is shown as approved:**
+
+1. civil date, weekday and day lord agree;
+2. festival identity agrees with its deciding Tithi/Paksha/month and local occurrence;
+3. all astronomical and Muhurat values use the same place, coordinates, zone and date;
+4. every “coming up” item is later than the selected date and uses the intended year;
+5. the displayed calendar convention is explicit; and
+6. the fixture is compared against Ganak's current route/engine for the same URL inputs.
+
+The first canonical Festival-Day sample is
+`today-delhi-2026-07-25-devshayani-v1`: New Delhi, India
+(`28.6139`, `77.209`, `Asia/Kolkata`), Saturday 25 July 2026, Amanta calendar,
+`/festival/devshayani-ekadashi`. Verified Ganak values are Ekadashi until 11:35 AM,
+Shukla Paksha, Ashadha, Jyeshtha until 7:34 AM on 26 July, Brahma Yoga until 9:07 PM,
+Vishti Karana until 11:35 AM, sunrise 5:38 AM, sunset 7:16 PM, Abhijit Muhurat
+12:00–12:55 PM and Rahu Kalam 9:03–10:45 AM. The previous Figma frame mixed
+25 July, 4 August and 2025 data and therefore had no valid approval status until this
+fixture replaced every conflicting value.
+
 ### 10.2 Today — Festival Day, desktop website
 
 **Visual source:** approved desktop Today composition, used only as visual direction. It
@@ -309,6 +342,36 @@ List resolve to D; clearing all applicable follows/preferences returns it to A; 
 list and Calendar remain reachable in every state; religious preferences produce no
 telemetry or sync without granular consent.
 
+#### 10.3.2 Owner-approved multi-tag observance taxonomy (2026-08-11)
+
+The current binary Festival/Fasting split is insufficient for migration. One observance
+may belong to several useful families, so Ganak must keep one canonical observance record
+with one presentation-driving `primaryType` and multiple searchable facets:
+
+| Field | Rule | Examples |
+|---|---|---|
+| `primaryType` | Exactly one of `vrat`, `festival`, or `astronomical-event`; selects the answer-first treatment, not a separate data source. | Ekadashi → `vrat`; Raksha Bandhan → `festival`; Surya Grahan → `astronomical-event`. |
+| `observanceFamily` | One or more recurring/religious families where relevant. | `ekadashi`, `pradosha`, `sankashti`, `eclipse`. |
+| `cadence` | Optional recurrence facet. | `monthly`, `annual`, `adhika-masa`. |
+| `deityTradition` | Zero or more reviewed content facets; this metadata does not imply a user's personal belief. | Ekadashi → `vishnu`; Pradosh → `shiva`. |
+| `region` | Zero or more regional applicability facets, with `all-india` only when reviewed as true. | `tamil-nadu`, `bengal`, `north-india`. |
+| `canonicalSlug` | One permanent guide identity shared by List, Calendar, search, Today and detail. | `/festival/devshayani-ekadashi`. |
+
+The default Festivals destination remains chronological and complete. Its first-level
+views may offer **All observances**, **Vrats & fasts**, **Festivals**, and
+**Astronomical events / eclipses**; deity, tradition and region remain supporting facets
+for search and explicit personalisation rather than a wall of default filter controls.
+An observance must remain discoverable through every applicable facet without being
+duplicated or disappearing from the complete list. Religious preference choices stay
+local-first and are never inferred from passive browsing or sent to analytics without
+explicit granular consent.
+
+**Minimum migration examples:** Ekadashi = `vrat` + `ekadashi` + `vishnu` + recurring;
+Pradosh = `vrat` + `pradosha` + `shiva` + monthly; Surya Grahan =
+`astronomical-event` + `eclipse` + `solar`. The migrated registry fails acceptance if
+any of these cannot be found from both the complete chronological list and each relevant
+first-level view/search facet.
+
 | Screen element | Decision | Real target / behaviour | State that must survive | Acceptance proof |
 |---|---|---|---|---|
 | Shared Ganak header and primary navigation | **Move** | Same destinations as §10.2, with Festivals visibly current. | `lang`, place, coordinates, zone, selected date and applicable route state. | Open every destination and return; Festivals remains the selected destination when appropriate. |
@@ -318,14 +381,14 @@ telemetry or sync without granular consent.
 | Date / Today context | **Move** | Existing selected-date context and explicit Today action; not an independent festival-date database. | `date`, place, `lang`, `cal`, `hol` and browser history. | Pick a date, open Festivals, open a guide and return without reset. |
 | Sunrise / sunset values in the shared ribbon | **Decorative / data-only** | Existing calculated local values; hide if unavailable. | Place, zone and date. | Compare with the current Daily result for the same inputs. |
 | Page title and plain-language introduction | **Improve** | In A/D, explain that users can browse **Upcoming this month**, search an observance or open Calendar; D additionally explains its explicit-preference basis. | Language, selected context and applicable explicit preferences. | EN/HI copy clearly distinguishes discovery, personal priority and the full guide. |
-| Festivals / Fasting tabs | **Preserve** | Existing upcoming Festival and fasting-observance lists. | Selected tab, place, date and `lang`; Vaishnava date note remains truthful where applicable. | Switch tabs; verify labels/dates and the Vaishnava note against the current list. |
+| Observance views (replacing binary Festival / Fasting tabs) | **Improve** | One canonical chronological registry with first-level All, Vrats & fasts, Festivals and Astronomical events/eclipses views; no duplicated observance records. | Selected view, place, date and `lang`; Vaishnava date note remains truthful where applicable. | Find Ekadashi, Pradosh and Surya Grahan from All and their relevant view/search facet; verify canonical guide routes and dates. |
 | Upcoming festival and fast rows | **Improve** | Whole row opens the existing canonical `/festival/<slug>` guide; no inline expansion. | Festival slug, place, coordinates, zone, `lang` and Back destination. | Every visible row opens the correct guide and browser Back returns to the same context. |
 | Festival artwork / thumbnail | **Decorative / data-only** | Owned Ganak art may identify a row or featured observance; it does not create a second action. | Same destination as its parent row. | Image has meaningful alt text; clicking its row opens the canonical guide. |
 | Date and relative-day label | **Decorative / data-only** | Existing calculated local occurrence and relative-day value. | Place, zone, selected date and language. | Compare displayed dates with the current Festival/Fasting list for the same place. |
 | Search field and Search action | **Preserve** | Existing festival/tithi search powered by `searchUpcoming`; Festival/Fast results open canonical guides and tithi-only results remain plainly informational. | Search query, place, zone, language and Back destination. | Search a festival, a fast and a tithi; reload/Back retain the originating context without a false link. |
 | Calendar view (B) / full-year access | **New — owner-approved** | B is the optional month-grid presentation over the same registry; existing full-year grouping remains reachable. It must not fork routes, calculations or content. | Dedicated Festival view state, visible month/year, place, zone, `lang` and Back destination. | Switch A/D↔B, move month/year, open a guide, reload and Back; place and view remain intact. |
 | Returning-user personalised list (D) | **New — owner-approved** | After an explicit applicable follow/preference, prioritise relevant observances with a plain reason while keeping the complete chronological list and Calendar available. | Approved local-first preferences, List view, place, date and `lang`. | Add a follow/preference, return to Festivals and see D; clear all applicable choices and see A; no consent-free sync/analytics. |
-| Category, deity, region or tradition filter controls | **Deferred — omit** | Personalised discovery is product scope for a later approved slice; no such working filter currently exists on this route. | N/A. | No filter chip or dropdown implies unsupported filtering. |
+| Deity, tradition and region facets | **New — owner-approved, progressive** | Store reviewed multi-tag metadata now; expose it through search and explicit Personalize choices. Do not crowd the default page with every facet as a filter chip. | Search query, explicit local-first preferences, place and `lang`; no passive religious-profile inference. | Relevant observances can be found; clearing a preference restores A; no religious facet enters sync or analytics without granular consent. |
 | Standalone current/next landing (C) | **Remove** | Today already owns current and next observance context; C would duplicate that job. | N/A. | C is absent as a route, template and navigation destination. |
 | Inline expand chevron or in-list festival preview | **Remove** | Rows navigate directly to the full canonical guide; the earlier inline preview was deliberately retired. | N/A. | One row has one clear destination and no competing expand action. |
 | Reminder / Save / Share | **Deferred — omit** | Backlog #37; discovery must not promise an unbuilt calendar/export/recipient flow. | N/A. | Absent until #37 is implemented and accepted. |
