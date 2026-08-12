@@ -105,6 +105,7 @@ const slugFromEnglish = (name) => String(name)
 
 function observanceBaseKey(key) {
   if (String(key).startsWith("pradosh_")) return "pradosh";
+  if (String(key).startsWith("amavasya_")) return "amavasya";
   if (String(key).endsWith("_11")) return "ekadashi";
   return key;
 }
@@ -145,6 +146,20 @@ function makeObservanceEntries() {
     return out;
   }, {});
   return raw.map((item) => {
+    // Tamil-month Amavasai variants all share the single canonical Amavasya guide
+    // rather than spawning 12 thin metadata-only pages.
+    if (String(item.key).startsWith("amavasya_")) {
+      return Object.freeze({
+        sourceKind: item.sourceKind,
+        key: item.key,
+        metaKey: item.metaKey,
+        title: item.title,
+        slug: "amavasya",
+        path: "/festival/amavasya",
+        status: "shared",
+        vidhiKey: item.vidhiKey,
+      });
+    }
     const slug = counts[item.baseSlug] > 1
       ? `${item.baseSlug}-${slugFromKey(item.key.replace(/_11$/, ""))}`
       : item.baseSlug;

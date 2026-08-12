@@ -14,6 +14,21 @@ export const OBS_NAME = {
   masikShivaratri: { en: "Masik Shivaratri", hi: "मासिक शिवरात्रि" },
   purnima: { en: "Purnima", hi: "पूर्णिमा" },
   amavasya: { en: "Amavasya", hi: "अमावस्या" },
+  // Tamil solar-month new moons (Amavasai) — each month's Amavasya is a tarpanam
+  // day named for the Tamil month the sun is in. Emitted by observancesFor when the
+  // date is known; all share the /festival/amavasya guide.
+  amavasya_chithirai: { en: "Chithirai Amavasai", hi: "चित्तिरै अमावस्या" },
+  amavasya_vaikasi: { en: "Vaikasi Amavasai", hi: "वैकासी अमावस्या" },
+  amavasya_aani: { en: "Aani Amavasai", hi: "आनि अमावस्या" },
+  amavasya_aadi: { en: "Aadi Amavasai", hi: "आडि अमावस्या" },
+  amavasya_avani: { en: "Avani Amavasai", hi: "आवणि अमावस्या" },
+  amavasya_purattasi: { en: "Purattasi Amavasai", hi: "पुरट्टासि अमावस्या" },
+  amavasya_aippasi: { en: "Aippasi Amavasai", hi: "ऐप्पसि अमावस्या" },
+  amavasya_karthigai: { en: "Karthigai Amavasai", hi: "कार्त्तिकै अमावस्या" },
+  amavasya_margazhi: { en: "Margazhi Amavasai", hi: "मार्गळि अमावस्या" },
+  amavasya_thai: { en: "Thai Amavasai", hi: "तै अमावस्या" },
+  amavasya_maasi: { en: "Maasi Amavasai", hi: "मासि अमावस्या" },
+  amavasya_panguni: { en: "Panguni Amavasai", hi: "पङ्गुनि अमावस्या" },
   pradosh_Sunday: { en: "Ravi Pradosh", hi: "रवि प्रदोष" },
   pradosh_Monday: { en: "Som Pradosh", hi: "सोम प्रदोष" },
   pradosh_Tuesday: { en: "Bhaum Pradosh", hi: "भौम प्रदोष" },

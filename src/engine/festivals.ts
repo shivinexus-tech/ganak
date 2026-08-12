@@ -296,7 +296,12 @@ const PRADOSH_NAMES_BY_DAY = {
   6: { en: "Shani Pradosh", hi: "शनि प्रदोष" }
 };
 
-function observancesFor(krishna, tithiNum, month = null, dow = null) {
+// Tamil solar months, indexed by the sun's sidereal sign (0 = Mesha/Chithirai …
+// 3 = Karka/Aadi …). Matches the Tamil-calendar month the app already displays.
+const TAMIL_MONTH_SLUGS = ["chithirai", "vaikasi", "aani", "aadi", "avani", "purattasi", "aippasi", "karthigai", "margazhi", "thai", "maasi", "panguni"];
+const tamilSolarMonthIdx = (ms) => ((Math.floor(sunSidMs(ms) / 30) % 12) + 12) % 12;
+
+function observancesFor(krishna, tithiNum, month = null, dow = null, ms = null) {
   const out = [];
   if (tithiNum === 11) {
     const pk = krishna ? "Krishna" : "Shukla";
@@ -316,7 +321,14 @@ function observancesFor(krishna, tithiNum, month = null, dow = null) {
   if (tithiNum === 8 && krishna) out.push({ key: "kalashtami", fasting: false });
   if (tithiNum === 14 && krishna) out.push({ key: "masikShivaratri", fasting: true });
   if (tithiNum === 15 && !krishna) out.push({ key: "purnima", fasting: true });
-  if (tithiNum === 15 && krishna) out.push({ key: "amavasya", fasting: true });
+  if (tithiNum === 15 && krishna) {
+    // Name the new moon for its Tamil solar month (Aadi Amavasai, Thai Amavasai …)
+    // when the date is known; every solar-month Amavasya is a tarpanam day.
+    const mi = ms != null ? tamilSolarMonthIdx(ms) : -1;
+    out.push(mi >= 0
+      ? { key: `amavasya_${TAMIL_MONTH_SLUGS[mi]}`, fasting: true, isVariant: true, baseKey: "amavasya" }
+      : { key: "amavasya", fasting: true });
+  }
   return out;
 }
 // major festivals by amanta month index (into MONTHS_HINDU) + paksha + tithi
@@ -542,7 +554,7 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
         for (const krishna of rule.krishna == null ? [false, true] : [rule.krishna]) {
           const target = targetTithiIndex(krishna, rule.tithi);
           if (!tithiKalaOverlap(parts, rule.kala, target)) continue;
-          const obs = observancesFor(krishna, rule.tithi, month, dow).filter((o) => obsKind(o.key) === rule.baseKey);
+          const obs = observancesFor(krishna, rule.tithi, month, dow, parts.noon).filter((o) => obsKind(o.key) === rule.baseKey);
           for (const o of obs) {
             if (!o.fasting) continue;
             const prev = [...fasts].reverse().find((x) => x.key === o.key);
@@ -704,7 +716,7 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
 
 
 /* classify an observance key to its base kind */
-const obsKind = (key) => (key === "ekadashi" || /_11$/.test(key)) ? "ekadashi" : (key || "").startsWith("pradosh") ? "pradosh" : key;
+const obsKind = (key) => (key === "ekadashi" || /_11$/.test(key)) ? "ekadashi" : (key || "").startsWith("pradosh") ? "pradosh" : (key || "").startsWith("amavasya_") ? "amavasya" : key;
 
 export {
   SOLAR_NAK_FESTIVALS, ayyappaMandalaFor, EKADASHI_NAMES,

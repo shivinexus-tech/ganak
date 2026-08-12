@@ -40,10 +40,10 @@ function coverageProblems(entries, routes) {
 
 const liveCount = Object.keys(meta.FEST_NAME).length + Object.keys(meta.OBS_NAME).length;
 assert.strictEqual(FESTIVAL_PAGE_ENTRIES.length, liveCount, 'registry must contain every live openable label');
-assert.strictEqual(liveCount, 166, 'update the reviewed inventory when the live label count changes');
+assert.strictEqual(liveCount, 178, 'update the reviewed inventory when the live label count changes');
 assert.strictEqual(EXCLUDED_PAGE_KEYS.length, 4, 'only the four Chhath shared labels may be excluded from standalone routes');
 assert.strictEqual(REQUIRED_PAGE_ENTRIES.length, 162, '162 non-deferred labels must have dedicated routes');
-assert.strictEqual(SHARED_PAGE_ENTRIES.length, 4, 'the four Chhath labels must share the existing Chhath page');
+assert.strictEqual(SHARED_PAGE_ENTRIES.length, 16, 'four Chhath labels + twelve Tamil-month Amavasai labels share an existing page');
 assert.strictEqual(DEFERRED_PAGE_ENTRIES.length, 0, 'no openable label may remain explicitly deferred');
 
 const existingStandalone = new Set(['hartalikaTeej', 'chaitraNavratri', 'sharadNavratri']);
@@ -66,10 +66,12 @@ for (const entry of REQUIRED_PAGE_ENTRIES) {
   if (entry.vidhiKey) assert(vidhis.VRAT_VIDHI[entry.vidhiKey], `${entry.key} points at missing vidhi ${entry.vidhiKey}`);
 }
 
+const SHARED_PAGE_TARGET = (key) => key.startsWith('amavasya_') ? '/festival/amavasya' : '/festival/chhath';
 for (const entry of SHARED_PAGE_ENTRIES) {
-  assert.strictEqual(entry.path, '/festival/chhath', `${entry.key} must remain attached to the shared Chhath page`);
+  assert.strictEqual(entry.path, SHARED_PAGE_TARGET(entry.key), `${entry.key} must remain attached to its shared page`);
 }
 assert(screen.festivalGuideFromPath('/festival/chhath'), 'the shared Chhath page must remain live');
+assert(screen.festivalGuideFromPath('/festival/amavasya'), 'the shared Amavasya page must remain live');
 
 for (const entry of DEFERRED_PAGE_ENTRIES) {
   assert.strictEqual(entry.path, null, `${entry.key} must stay explicitly deferred until its page structure is researched`);
