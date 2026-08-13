@@ -127,9 +127,9 @@ check(hubFestHref && festHrefPreservesState(hubFestHref[0]), 'MuhuratHub: festHr
 check(/comingRow\("fast",/.test(HUB) && /comingRow\("festival",/.test(HUB), 'MuhuratHub: "Coming up" nextFast/nextFest not wired through comingRow');
 const comingRowFn = HUB.match(/const comingRow = \([\s\S]*?<\/a>[\s\S]*?\n {8}\};/);
 check(comingRowFn && /festivalPathForKey\(kind, item\.key\)/.test(comingRowFn[0]) && /href=\{festHref\(p\)\}/.test(comingRowFn[0]), 'MuhuratHub: "Coming up" rows do not open the canonical festival page');
-// the answer-first observance chip must open the canonical page when a route exists
+// every answer-first day event (fast, festival or eclipse) must open its canonical page
 // (its own scoped assertion — a regression to a static <div> must not ship green)
-check(/const obsPath = festivalPathForKey\("fast", fastObs\.key\)/.test(HUB) && /href=\{festHref\(obsPath\)\}/.test(HUB), 'MuhuratHub: answer-first observance chip does not open the canonical festival page');
+check(/const eventPath = festivalPathForKey\(event\.kind, event\.key\)/.test(HUB) && /href=\{festHref\(eventPath\)\}/.test(HUB), 'MuhuratHub: answer-first day-event chips do not open their canonical festival pages');
 
 /* ---- 3. Live registry coverage — every displayed key reaches a route ---- */
 

@@ -742,8 +742,31 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
 /* classify an observance key to its base kind */
 const obsKind = (key) => (key === "ekadashi" || /_11$/.test(key)) ? "ekadashi" : (key || "").startsWith("pradosh") ? "pradosh" : (key || "").startsWith("amavasya_") ? "amavasya" : key;
 
+/* One display boundary for a selected civil day. Recurring fasts and annually
+   scanned festivals used to reach the UI through separate lists, which let a
+   correctly calculated eclipse disappear from the Today card. Keep both kinds
+   and remove only exact within-kind duplicates; distinct same-day observances
+   (for example Amavasya and Surya Grahan) must remain visible together. */
+function eventsForDay(observances, festivals, selectedMs, tz) {
+  const dayKey = (ms) => new Date(ms + tz * 3600000).toISOString().slice(0, 10);
+  const selectedKey = dayKey(selectedMs);
+  const combined = [
+    ...(observances || []).map((event) => ({ ...event, kind: "fast" })),
+    ...(festivals || [])
+      .filter((event) => dayKey(event.ms) === selectedKey)
+      .map((event) => ({ ...event, kind: "festival" })),
+  ];
+  const seen = new Set();
+  return combined.filter((event) => {
+    const identity = `${event.kind}:${event.key}`;
+    if (seen.has(identity)) return false;
+    seen.add(identity);
+    return true;
+  });
+}
+
 export {
   SOLAR_NAK_FESTIVALS, ayyappaMandalaFor, EKADASHI_NAMES, ekadashiIdentityMonth,
   PRADOSH_NAMES_BY_DAY, observancesFor, FESTIVALS, FAST_KALA_RULES,
-  scanPanchangCalendar, sankrantiPunyaKala, obsKind,
+  scanPanchangCalendar, sankrantiPunyaKala, obsKind, eventsForDay,
 };

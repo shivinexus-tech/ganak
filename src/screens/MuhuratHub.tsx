@@ -39,7 +39,7 @@ import { computeTodayPanchang } from "../engine/today-panchang";
 import { searchUpcoming } from "../engine/search-upcoming";
 import { planetGochar } from "../engine/gochar";
 import { fmtDur, eventDetail } from "../engine/transit-copy";
-import { observancesFor, scanPanchangCalendar, EKADASHI_NAMES, PRADOSH_NAMES_BY_DAY, ekadashiIdentityMonth } from "../engine/festivals";
+import { observancesFor, scanPanchangCalendar, EKADASHI_NAMES, PRADOSH_NAMES_BY_DAY, ekadashiIdentityMonth, eventsForDay } from "../engine/festivals";
 import { urlPrefGet, urlPrefPush } from "../components/url-prefs";
 import MuhuratActions from "../components/MuhuratActions";
 import { privacyEvent } from "../telemetry/privacy-events";
@@ -473,10 +473,11 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", calendarMode = "
         const L2 = lang === "hi" ? "hi" : "en";
         const obs = observancesFor(p.krishna, p.tithiDay, ekadashiIdentityMonth(p.months, p.krishna), p.dow, p.anchor, calendarMode);
         const OBS_GLOSS = { ekadashi: { en: "Fasting day for Vishnu", hi: "विष्णु का व्रत" }, purnima: { en: "Full moon", hi: "पूर्ण चंद्र" }, amavasya: { en: "New moon", hi: "नवचंद्र" }, pradosh: { en: "Evening fast for Shiva", hi: "शिव संध्या व्रत" }, sankashti: { en: "Fast for Ganesha", hi: "गणेश व्रत" }, masikShivaratri: { en: "Monthly Shivaratri", hi: "मासिक शिवरात्रि" }, kalashtami: { en: "Kala Bhairava day", hi: "काल भैरव दिवस" } };
-        const fastObs = obs.find((o) => o.fasting) || obs[0];
+        const dayEvents = eventsForDay(obs, cal.festivals, dayStart, tz);
         const nkIdx = NAKSHATRAS.indexOf(p.naks[0].name), nkLord = nkIdx >= 0 ? VIM_LORDS[nkIdx % 9] : null;
-        const nextFast = (effFasts || []).find((f) => f.ms >= dayStart);
-        const nextFest = (cal.festivals || []).find((f) => f.ms >= dayStart);
+        const isSelectedDay = (ms) => eventsForDay([], [{ key: "candidate", ms }], dayStart, tz).length > 0;
+        const nextFast = (effFasts || []).find((f) => f.ms >= dayStart && !isSelectedDay(f.ms));
+        const nextFest = (cal.festivals || []).find((f) => f.ms >= dayStart && !isSelectedDay(f.ms));
         const away = (ms) => { const d = Math.round((ms - dayStart) / DAY); return d <= 0 ? (lang === "hi" ? "आज" : "today") : d === 1 ? (lang === "hi" ? "कल" : "tomorrow") : (lang === "hi" ? d + " दिन में" : "in " + d + " days"); };
         // "Coming up" summary rows follow the same interaction contract as the
         // Fasts & Festivals list: the whole row opens the canonical festival page
@@ -519,16 +520,23 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", calendarMode = "
                 <span style={{ fontSize: T.fMicro, color: C.muted, fontVariantNumeric: "tabular-nums" }}>{p.tithis[0].end ? (lang === "hi" ? "तक " : "till ") + fmtT(p.tithis[0].end) : ""}</span>
               </div>
               <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: "0.125rem" }}>{panchangTerm(L2, "paksha", p.paksha)} · {lang === "hi" ? (p.krishna ? "कृष्ण (क्षीयमान)" : "शुक्ल (वर्धमान)") : (p.krishna ? "waning moon" : "waxing moon")} · {lang === "hi" ? "चंद्र दिवस " + p.tithiDay : "lunar day " + p.tithiDay}</div>
-              {obs.length > 0 && (() => {
-                const obsPath = festivalPathForKey("fast", fastObs.key);
-                const chipStyle = { marginTop: "0.5rem", display: "inline-flex", alignItems: "center", gap: "0.4375rem", padding: "0.3125rem 0.6875rem", borderRadius: T.rMd, background: fastObs.fasting ? "var(--bad-surface)" : "var(--surface-hover)", border: `0.0625rem solid color-mix(in srgb, ${fastObs.fasting ? C.sindoor : C.gold}, var(--surface-active) 70%)` };
+              {dayEvents.length > 0 && <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "0.375rem", marginTop: "0.5rem" }}>
+                {dayEvents.map((event) => {
+                const isFast = event.kind === "fast";
+                const eventPath = festivalPathForKey(event.kind, event.key);
+                const eventLabel = isFast ? obsLabel(lang, event) : trN(lang, FEST_NAME, event.key);
+                const baseKey = event.baseKey || event.key;
+                const isEclipse = event.key === "suryaGrahan" || event.key === "chandraGrahan";
+                const gloss = isFast ? OBS_GLOSS[baseKey]?.[L2] : isEclipse ? (lang === "hi" ? "स्थान के अनुसार दृश्यता और सूतक देखें" : "Check local visibility and Sutak") : (lang === "hi" ? "आज का पर्व" : "Festival today");
+                const caution = Boolean(event.fasting || isEclipse);
+                const chipStyle = { display: "inline-flex", alignItems: "center", gap: "0.4375rem", padding: "0.3125rem 0.6875rem", borderRadius: T.rMd, background: caution ? "var(--bad-surface)" : "var(--surface-hover)", border: `0.0625rem solid color-mix(in srgb, ${caution ? C.sindoor : C.gold}, var(--surface-active) 70%)` };
                 const inner = (<>
-                  <span style={{ fontSize: T.fSmall, fontWeight: 600, color: fastObs.fasting ? C.sindoor : C.gold }}>{obsLabel(lang, fastObs)}</span>
-                  {OBS_GLOSS[fastObs.baseKey || fastObs.key] && <span style={{ fontSize: T.fMicro, color: C.muted }}>· {OBS_GLOSS[fastObs.baseKey || fastObs.key][L2]}</span>}
+                  <span style={{ fontSize: T.fSmall, fontWeight: 600, color: caution ? C.sindoor : C.gold }}>{eventLabel}</span>
+                  {gloss && <span style={{ fontSize: T.fMicro, color: C.muted }}>· {gloss}</span>}
                 </>);
-                if (!obsPath) return <div style={chipStyle}>{inner}</div>;
-                return <a href={festHref(obsPath)} className="ff-row" aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + obsLabel(lang, fastObs)} style={{ ...chipStyle, textDecoration: "none", color: "inherit", cursor: "pointer" }}>{inner}<span aria-hidden="true" style={{ color: C.muted, fontSize: T.fMicro, flexShrink: 0 }}>›</span></a>;
-              })()}
+                if (!eventPath) return <div key={`${event.kind}:${event.key}`} style={chipStyle}>{inner}</div>;
+                return <a key={`${event.kind}:${event.key}`} href={festHref(eventPath)} className="ff-row" aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + eventLabel} style={{ ...chipStyle, textDecoration: "none", color: "inherit", cursor: "pointer" }}>{inner}<span aria-hidden="true" style={{ color: C.muted, fontSize: T.fMicro, flexShrink: 0 }}>›</span></a>;
+              })}</div>}
               {p.pitruPaksha && (() => {
                 const pp = p.pitruPaksha;
                 const SP = { mahalaya: { en: "Sarva Pitru Amavasya (Mahalaya)", hi: "सर्वपितृ अमावस्या (महालय)" }, purnimaShraddha: { en: "Purnima Shraddha — Pitru Paksha begins", hi: "पूर्णिमा श्राद्ध — पितृ पक्ष आरंभ" }, avidhavaNavami: { en: "Avidhava Navami", hi: "अविधवा नवमी" }, ghataChaturdashi: { en: "Ghata Chaturdashi", hi: "घट चतुर्दशी" } };
