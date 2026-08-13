@@ -281,6 +281,27 @@ const EKADASHI_NAMES = {
   "Magh_Krishna_11": { en: "Shattila Ekadashi", hi: "षट्तिला एकादशी" },
   "Phalgun_Krishna_11": { en: "Vijaya Ekadashi", hi: "विजया एकादशी" }
 };
+/* Named Ekadashi identities use the Purnimanta month during Krishna Paksha.
+   Thus Amanta Ashadha / Purnimanta Shravana is Kamika, not Yogini. This is an
+   observance identity rule, independent of the user's preferred date label. */
+function ekadashiIdentityMonth(months, krishna) {
+  if (!months) return null;
+  const raw = typeof months === "string"
+    ? months
+    : ((krishna ? months.purnimanta : months.amanta) || months.purnimanta || months.amanta || null);
+  // Adhik-masa Ekadashis have separate identities (Padmini/Parama). Until those
+  // sourced routes exist, fall back visibly to generic Ekadashi rather than
+  // misnaming them as the ordinary month's vrata.
+  if (/\(Adhik\)/.test(String(raw || ""))) return null;
+  const keyByPanchangMonth = {
+    Chaitra: "Chaitra", Vaishakha: "Vaisakha", Vaisakha: "Vaisakha", Jyeshtha: "Jyeshtha",
+    Ashadha: "Ashadha", Shravana: "Shravan", Shravan: "Shravan", Bhadrapada: "Bhadrapad",
+    Bhadrapad: "Bhadrapad", Ashwina: "Ashwin", Ashwin: "Ashwin", Kartika: "Kartik",
+    Kartik: "Kartik", Margashirsha: "Margshirsh", Margshirsh: "Margshirsh", Pausha: "Paush",
+    Paush: "Paush", Magha: "Magh", Magh: "Magh", Phalguna: "Phalgun", Phalgun: "Phalgun",
+  };
+  return keyByPanchangMonth[String(raw || "")] || raw;
+}
 const PRADOSH_KEY_BY_DAY = Object.freeze([
   "pradosh_Sunday", "pradosh_Monday", "pradosh_Tuesday",
   "pradosh_Wednesday", "pradosh_Thursday", "pradosh_Friday",
@@ -719,7 +740,7 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
 const obsKind = (key) => (key === "ekadashi" || /_11$/.test(key)) ? "ekadashi" : (key || "").startsWith("pradosh") ? "pradosh" : (key || "").startsWith("amavasya_") ? "amavasya" : key;
 
 export {
-  SOLAR_NAK_FESTIVALS, ayyappaMandalaFor, EKADASHI_NAMES,
+  SOLAR_NAK_FESTIVALS, ayyappaMandalaFor, EKADASHI_NAMES, ekadashiIdentityMonth,
   PRADOSH_NAMES_BY_DAY, observancesFor, FESTIVALS, FAST_KALA_RULES,
   scanPanchangCalendar, sankrantiPunyaKala, obsKind,
 };

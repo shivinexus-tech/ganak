@@ -327,7 +327,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
           </p>}
           {place && <div style={{ margin: "-0.75rem 0 1rem", display:"flex", alignItems:"flex-end", gap: "0.625rem", flexWrap:"wrap" }}>
             <label style={{ display: "grid", gap: T.s1, ...T.label, color: C.muted }}>
-              <span>{lang === "hi" ? "कैलेंडर पद्धति" : "CALENDAR SYSTEM"}</span>
+              <span>{lang === "hi" ? "आपके परिवार का कैलेंडर" : "YOUR FAMILY CALENDAR"}</span>
               <select value={calendarMode} onChange={(e) => chooseCalendarMode(e.target.value)} aria-label={lang === "hi" ? "कैलेंडर पद्धति" : "Calendar system"} style={{ height:T.ctrlH, borderRadius:T.rMd, border:`0.0625rem solid ${C.line}`, background:"var(--surface-sunken)", color:C.ivory, padding: "0 0.625rem", fontFamily:T.body }}>
               {CALENDAR_CONVENTIONS.filter(x => conventionIsEnabled(x.id,regionalFlags)).map(x => <option key={x.id} value={x.id}>{lang === "hi" ? x.hi : x.en}</option>)}
               </select>
@@ -335,7 +335,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
             <HolidayOverlaySelect mode={holidayMode} onMode={chooseHolidayMode} lang={lang} />
             <div style={{ fontSize:T.fMicro, color:C.muted, lineHeight:1.45, flex:"1 1 220px" }}>
               <div>{calendarLabel(calendarMode, todayP, todayP.rise, lang === "hi" ? "hi" : "en", place)}</div>
-              <div style={{ fontStyle:"italic" }}>{lang === "hi" ? `समय ${place.label} के अनुसार · दूसरा कैलेंडर चुनने से केवल तारीख़ का नाम बदलता है, समय वही रहता है` : `Times shown for ${place.label} · choosing a different calendar only changes how the date is named, the timings stay the same`}</div>
+              <div style={{ fontStyle:"italic" }}>{lang === "hi" ? `पता न हो तो मानक विकल्प रहने दें। इससे केवल तारीख़ और महीने का नाम बदलता है; ${place.label} के समय और पर्व वही रहते हैं।` : `Not sure? Keep the default. This only changes the date and month names; timings and observances for ${place.label} stay the same.`}</div>
               {(calendarMode==="tamil-solar"||calendarMode==="bengali-solar")&&<div className="technical-only" style={{marginTop: "0.1875rem",fontStyle:"normal"}}>{calendarMode==="tamil-solar"?(lang==="hi"?"तिरुकणित · सूर्य का निरयण राशि-प्रवेश और तमिल सूर्यास्त नियम":"Thirukanitha · sidereal solar ingress with the Tamil sunset rule"):(lang==="hi"?"विशुद्ध सिद्धान्त · सूर्य का निरयण राशि-प्रवेश और बंगाल सूर्योदय नियम":"Vishuddha Siddhanta · sidereal solar ingress with the Bengal sunrise rule")}</div>}
               {calendarState.recoveredFrom && <div role="status" style={{ marginTop: "0.1875rem",color:C.sindoor,fontStyle:"normal" }}>{calendarState.reason === "disabled" ? (lang === "hi" ? "यह क्षेत्रीय पद्धति अस्थायी रूप से बन्द है; आपकी तिथि, स्थान और भाषा रखते हुए गणक मानक दिखाया गया है।" : "That regional mode is temporarily disabled; Ganak default is shown without losing your date, place or language.") : (lang === "hi" ? "यह कैलेंडर पद्धति समर्थित नहीं है; गणक मानक दिखाया गया है।" : "That calendar mode is unsupported; Ganak default is shown.")}</div>}
             </div>

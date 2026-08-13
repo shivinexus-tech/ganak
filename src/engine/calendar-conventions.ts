@@ -29,11 +29,11 @@ export const CALENDAR_CONVENTIONS: CalendarConvention[] = [
   /* "Ganak default" alone told users nothing — it named the app, not the reckoning.
      The default IS the amanta lunar month, so the label now says so and keeps the
      "(Ganak default)" tag to mark which option is selected out of the box. */
-  { id:"canonical", en:"Amanta lunar (Ganak default)", hi:"अमान्त चान्द्र (गणक मानक)", region:"Pan-Indian", enabled:true },
-  { id:"gregorian", en:"Gregorian", hi:"ग्रेगोरियन", region:"Civil calendar", enabled:true },
-  { id:"north-purnimanta", en:"Purnimanta lunar", hi:"पूर्णिमान्त चान्द्र", region:"Northern India", enabled:true },
-  { id:"tamil-solar", en:"Tamil solar · Thirukanitha", hi:"तमिल सौर · तिरुकणित", native:"தமிழ் சூரிய · திருக்கணிதம்", region:"Tamil Nadu", enabled:true, flag:"tamilSolar", policy:"Lahiri sidereal ingress; Tamil sunset rule" },
-  { id:"bengali-solar", en:"Bengali solar · Vishuddha Siddhanta", hi:"बंगाली सौर · विशुद्ध सिद्धान्त", native:"বাংলা সৌর · বিশুদ্ধ সিদ্ধান্ত", region:"West Bengal", enabled:true, flag:"bengaliSolar", policy:"Lahiri sidereal ingress; Bengal next-sunrise rule" },
+  { id:"canonical", en:"South & West Indian lunar (default)", hi:"दक्षिण व पश्चिम भारतीय चंद्र (मानक)", region:"Pan-Indian", enabled:true },
+  { id:"gregorian", en:"Regular January–December", hi:"सामान्य जनवरी–दिसंबर", region:"Civil calendar", enabled:true },
+  { id:"north-purnimanta", en:"North Indian lunar (Sawan etc.)", hi:"उत्तर भारतीय चंद्र (सावन आदि)", region:"Northern India", enabled:true },
+  { id:"tamil-solar", en:"Tamil calendar", hi:"तमिल कैलेंडर", native:"தமிழ் நாட்காட்டி", region:"Tamil Nadu", enabled:true, flag:"tamilSolar", policy:"Lahiri sidereal ingress; Tamil sunset rule" },
+  { id:"bengali-solar", en:"Bengali calendar", hi:"बंगाली कैलेंडर", native:"বাংলা পঞ্জিকা", region:"West Bengal", enabled:true, flag:"bengaliSolar", policy:"Lahiri sidereal ingress; Bengal next-sunrise rule" },
 ];
 
 const TAMIL_EN = ["Chithirai","Vaikasi","Aani","Aadi","Avani","Purattasi","Aippasi","Karthigai","Margazhi","Thai","Maasi","Panguni"];
@@ -123,7 +123,7 @@ export function conventionIsEnabled(id:CalendarConventionId,flags:RegionalCalend
 export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: number, lang: "hi" | "en", place?:Place) {
   if (id === "gregorian") return new Date(atMs+(panchang.tz||0)*3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-IN", { day:"numeric", month:"long", year:"numeric", timeZone:"UTC" });
   const term=(kind:any,value:any)=>panchangTerm(lang,kind,value);
-  const lunarDay=`${term("paksha",panchang.paksha)} ${panchang.tithiNum}`;
+  const lunarDay=`${term("paksha",panchang.paksha)} · ${lang === "hi" ? "चंद्र दिवस" : "lunar day"} ${panchang.tithiDay}`;
   if (id === "north-purnimanta") return lang === "hi" ? `पूर्णिमान्त · ${term("month",panchang.months.purnimanta)} · ${lunarDay}` : `Purnimanta · ${term("month",panchang.months.purnimanta)} · ${lunarDay}`;
   if((id==="tamil-solar"||id==="bengali-solar")&&place){
     const d=regionalCalendarDate(id,panchang,atMs,place);

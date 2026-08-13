@@ -29,6 +29,13 @@ const enabled=CALENDAR_CONVENTIONS.filter(x=>x.enabled).map(x=>x.id);
    produced a byte-identical label, so offering both was a duplicate choice. */
 for(const required of ['canonical','gregorian','north-purnimanta','tamil-solar','bengali-solar']) if(!enabled.includes(required)) { console.error(`FAIL ${required}: supported switch missing`); failures++; }
 if(enabled.includes('amanta')) { console.error('FAIL amanta: merged into the default, must not reappear as a separate switch'); failures++; }
+const plainNames=Object.fromEntries(CALENDAR_CONVENTIONS.map(x=>[x.id,x.en]));
+for(const [id,name] of Object.entries({canonical:'South & West Indian lunar (default)',gregorian:'Regular January–December','north-purnimanta':'North Indian lunar (Sawan etc.)','tamil-solar':'Tamil calendar','bengali-solar':'Bengali calendar'})){
+  if(plainNames[id]!==name) { console.error(`FAIL ${id}: plain-language dropdown name drifted`); failures++; }
+}
+const kamikaPanchang=computeTodayPanchang(CITIES[0],'lahiri',Date.UTC(2026,7,9,6,30));
+const kamikaCalendarLabel=calendarLabel('canonical',kamikaPanchang,kamikaPanchang.rise,'en',CITIES[0]);
+if(!kamikaCalendarLabel.includes('lunar day 11')||kamikaCalendarLabel.includes(' 25')) { console.error(`FAIL selected-day lunar ordinal: ${kamikaCalendarLabel}`); failures++; }
 /* Retired ids must still resolve SILENTLY so shared/bookmarked links keep working
    and never show an "unsupported mode" warning for output we still produce. */
 for(const [retired,expect] of [['amanta','canonical']]){

@@ -78,6 +78,42 @@ for (const key of PRADOSH_KEYS) {
 }
 console.log('PASS  800-day live scan produces every named Ekadashi and weekday Pradosh route key');
 
+const today = loadApp('src/engine/today-panchang.ts');
+for (const fixture of [
+  { label: 'Delhi', tz: 5.5, date: [2026, 8, 9], place: { label: 'Delhi', lat: 28.6139, lon: 77.2090, zone: 'Asia/Kolkata' } },
+  { label: 'Los Angeles', tz: -7, date: [2026, 8, 8], place: { label: 'Los Angeles', lat: 34.0522, lon: -118.2437, zone: 'America/Los_Angeles' } },
+]) {
+  const [y, m, d] = fixture.date;
+  const atMs = Date.UTC(y, m - 1, d, 12) - fixture.tz * 3600000;
+  const panchang = today.computeTodayPanchang(fixture.place, 'lahiri', atMs);
+  assert.strictEqual(panchang.tithiDay, 11, `${fixture.label} anchor must be Ekadashi`);
+  assert.strictEqual(panchang.krishna, true, `${fixture.label} anchor must be Krishna Paksha`);
+  assert.strictEqual(panchang.months.amanta, 'Ashadha', `${fixture.label} Amanta fixture`);
+  assert.strictEqual(panchang.months.purnimanta, 'Shravana', `${fixture.label} Purnimanta fixture`);
+  const identityMonth = engine.ekadashiIdentityMonth(panchang.months, panchang.krishna);
+  const occurrence = engine.observancesFor(panchang.krishna, panchang.tithiDay, identityMonth, panchang.dow, panchang.anchor)[0];
+  assert.strictEqual(occurrence.key, 'Shravan_Krishna_11', `${fixture.label} selected-day identity must be Kamika`);
+  const scanFrom = Date.UTC(y, m - 1, d, 0) - fixture.tz * 3600000;
+  const scanned = engine.scanPanchangCalendar(scanFrom, fixture.tz, 2, 2, fixture.place).fasts;
+  assert(scanned.some((item) => item.key === 'Shravan_Krishna_11'), `${fixture.label} scanner must agree on Kamika`);
+}
+console.log('PASS  Delhi and Los Angeles selected-day surfaces agree with scanner on Kamika Ekadashi');
+
+for (const fixture of [
+  { date: [2026, 5, 27], paksha: 'Shukla' },
+  { date: [2026, 6, 11], paksha: 'Krishna' },
+]) {
+  const [y, m, d] = fixture.date;
+  const atMs = Date.UTC(y, m - 1, d, 6, 30);
+  const panchang = today.computeTodayPanchang({ label: 'Delhi', lat: 28.6139, lon: 77.2090, zone: 'Asia/Kolkata' }, 'lahiri', atMs);
+  assert(/\(Adhik\)/.test(panchang.months.amanta), `${fixture.paksha} fixture must remain Adhik`);
+  const identityMonth = engine.ekadashiIdentityMonth(panchang.months, panchang.krishna);
+  assert.strictEqual(identityMonth, null, `${fixture.paksha} Adhik identity must stay generic until Padmini/Parama is sourced`);
+  const occurrence = engine.observancesFor(panchang.krishna, 11, identityMonth, panchang.dow, panchang.anchor)[0];
+  assert.strictEqual(occurrence.key, 'ekadashi', `${fixture.paksha} Adhik must not inherit an ordinary-month name`);
+}
+console.log('PASS  Adhik Shukla/Krishna Ekadashis stay generic instead of being misnamed');
+
 for (const [oldPath, canonicalPath] of Object.entries(pages.FESTIVAL_LEGACY_PATH_REDIRECTS)) {
   assert(!pages.FESTIVAL_PAGE_ROUTES[oldPath], `${oldPath} must not remain a second live identity`);
   assert(pages.FESTIVAL_PAGE_ROUTES[canonicalPath], `${oldPath} redirect target must resolve`);
