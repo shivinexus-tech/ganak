@@ -3,7 +3,7 @@
 const { loadApp }=require('./_load-app.cjs');
 const fs=require('fs');
 const { computeTodayPanchang }=loadApp('src/engine/today-panchang.ts');
-const { CALENDAR_CONVENTIONS, calendarLabel, safeConvention, resolveConvention }=loadApp('src/engine/calendar-conventions.ts');
+const { CALENDAR_CONVENTIONS, calendarLabel, calendarMonthLabel, safeConvention, resolveConvention }=loadApp('src/engine/calendar-conventions.ts');
 const DAY=86400000;
 const CITIES=[
   {label:'Delhi',lat:28.6139,lon:77.2090,zone:'Asia/Kolkata'},
@@ -36,6 +36,10 @@ for(const [id,name] of Object.entries({canonical:'South & West Indian lunar (def
 const kamikaPanchang=computeTodayPanchang(CITIES[0],'lahiri',Date.UTC(2026,7,9,6,30));
 const kamikaCalendarLabel=calendarLabel('canonical',kamikaPanchang,kamikaPanchang.rise,'en',CITIES[0]);
 if(!kamikaCalendarLabel.includes('lunar day 11')||kamikaCalendarLabel.includes(' 25')) { console.error(`FAIL selected-day lunar ordinal: ${kamikaCalendarLabel}`); failures++; }
+for(const [mode,expected] of [['canonical','Ashadha'],['north-purnimanta','Shravana'],['gregorian',''],['tamil-solar','Aadi'],['bengali-solar','Shrabon']]){
+  const got=calendarMonthLabel(mode,kamikaPanchang,kamikaPanchang.rise,'en',CITIES[0]);
+  if(got!==expected){console.error(`FAIL Today-card month ${mode}: got ${got}, expected ${expected}`);failures++;}
+}
 /* Retired ids must still resolve SILENTLY so shared/bookmarked links keep working
    and never show an "unsupported mode" warning for output we still produce. */
 for(const [retired,expect] of [['amanta','canonical']]){

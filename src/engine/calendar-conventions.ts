@@ -152,6 +152,20 @@ export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: num
     : `Amanta · ${amantaMonth} · ${lunarDay}`;
 }
 
+/* Compact month text for prominent date cards. Unlike calendarLabel(), this
+   deliberately returns only the selected convention's month; the civil date is
+   already rendered beside it. Gregorian therefore needs no duplicate suffix. */
+export function calendarMonthLabel(id: CalendarConventionId, panchang: any, atMs: number, lang: "hi" | "en", place?:Place) {
+  const term=(kind:any,value:any)=>panchangTerm(lang,kind,value);
+  if(id==="gregorian") return "";
+  if(id==="north-purnimanta") return term("month",panchang.months.purnimanta);
+  if((id==="tamil-solar"||id==="bengali-solar")&&place){
+    const d=regionalCalendarDate(id,panchang,atMs,place);
+    return lang==="hi"?d.monthHi:d.monthEn;
+  }
+  return term("month",panchang.months.amanta);
+}
+
 export function safeConvention(value: string | null,flags:RegionalCalendarFlags=DEFAULT_REGIONAL_CALENDAR_FLAGS): CalendarConventionId { return resolveConvention(value,flags).id; }
 
 export function resolveConvention(value: string | null,flags:RegionalCalendarFlags=DEFAULT_REGIONAL_CALENDAR_FLAGS): { id:CalendarConventionId; recoveredFrom:string | null; reason:"unknown" | "disabled" | null } {

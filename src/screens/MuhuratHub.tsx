@@ -47,6 +47,7 @@ import { panchangTerm, panchangTermAt, signName, signLabel } from "../i18n/panch
 import ReadAloudButton from "../accessibility/ReadAloudButton";
 import { useDepth, useComfort } from "../accessibility/ComfortProvider";
 import { Badge, Card, DataRow, SectionHeader } from "../components/ui-primitives";
+import { calendarMonthLabel } from "../engine/calendar-conventions";
 
 /**
  * What Muhurat reads aloud: the verdict first, then the recommended time, then the windows
@@ -507,7 +508,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", calendarMode = "
                 <div>
                   <div style={{ ...T.label, color: C.muted }}>{isToday ? (lang === "hi" ? "आज" : "Today") : (lang === "hi" ? "चुनी हुई तारीख़" : "Selected date")}</div>
                   <div style={{ fontFamily: T.serif, fontSize: T.fDisplay, color: C.ivory, lineHeight: 1.1 }}>{dObj.toLocaleDateString(L2 === "hi" ? "hi-IN" : "en-IN", { weekday: "long", timeZone: "UTC" })}</div>
-                  <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: "0.125rem" }}>{dObj.toLocaleDateString(L2 === "hi" ? "hi-IN" : "en-IN", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}{p.months ? " · " + panchangTerm(L2, "month", p.months.amanta) : ""}</div>
+                  <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: "0.125rem" }}>{dObj.toLocaleDateString(L2 === "hi" ? "hi-IN" : "en-IN", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}{p.months ? (()=>{const month=calendarMonthLabel(calendarMode,p,p.rise,L2,place);return month?" · "+month:"";})() : ""}</div>
                 </div>
                 {isToday && <span style={{ fontSize: T.fSmall, padding: "0.3125rem 0.75rem", borderRadius: T.rPill, background: `color-mix(in srgb, ${natColor(nowState)}, var(--surface-active) 88%)`, color: natColor(nowState), fontFamily: T.serif, fontWeight: 600, whiteSpace: "nowrap" }}>{nowState === "good" ? tr(lang, "auspiciousNow") : nowState === "bad" ? tr(lang, "cautionNow") : tr(lang, "neutralNow")}</span>}
               </div>
