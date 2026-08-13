@@ -474,6 +474,9 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", calendarMode = "
         const obs = observancesFor(p.krishna, p.tithiDay, ekadashiIdentityMonth(p.months, p.krishna), p.dow, p.anchor, calendarMode);
         const OBS_GLOSS = { ekadashi: { en: "Fasting day for Vishnu", hi: "विष्णु का व्रत" }, purnima: { en: "Full moon", hi: "पूर्ण चंद्र" }, amavasya: { en: "New moon", hi: "नवचंद्र" }, pradosh: { en: "Evening fast for Shiva", hi: "शिव संध्या व्रत" }, sankashti: { en: "Fast for Ganesha", hi: "गणेश व्रत" }, masikShivaratri: { en: "Monthly Shivaratri", hi: "मासिक शिवरात्रि" }, kalashtami: { en: "Kala Bhairava day", hi: "काल भैरव दिवस" } };
         const dayEvents = eventsForDay(obs, cal.festivals, dayStart, tz);
+        const primaryDayEvent = dayEvents[0] || null;
+        const primaryDayLabel = primaryDayEvent ? (primaryDayEvent.kind === "fast" ? obsLabel(lang, primaryDayEvent) : trN(lang, FEST_NAME, primaryDayEvent.key)) : null;
+        const primaryDayPath = primaryDayEvent ? festivalPathForKey(primaryDayEvent.kind, primaryDayEvent.key) : null;
         const nkIdx = NAKSHATRAS.indexOf(p.naks[0].name), nkLord = nkIdx >= 0 ? VIM_LORDS[nkIdx % 9] : null;
         const isSelectedDay = (ms) => eventsForDay([], [{ key: "candidate", ms }], dayStart, tz).length > 0;
         const nextFast = (effFasts || []).find((f) => f.ms >= dayStart && !isSelectedDay(f.ms));
@@ -516,12 +519,16 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", calendarMode = "
             </div>
             <div style={{ padding: `${T.s3} ${T.s5}`, borderTop: "0.0625rem solid " + C.line }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.625rem" }}>
-                <span style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.gold }}>{panchangTerm(L2, "tithi", p.tithis[0].name)}</span>
-                <span style={{ fontSize: T.fMicro, color: C.muted, fontVariantNumeric: "tabular-nums" }}>{p.tithis[0].end ? (lang === "hi" ? "तक " : "till ") + fmtT(p.tithis[0].end) : ""}</span>
+                {primaryDayLabel
+                  ? (primaryDayPath
+                      ? <a href={festHref(primaryDayPath)} className="ff-row" style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.gold, textDecoration: "none" }} aria-label={(lang === "hi" ? "पूरी मार्गदर्शिका खोलें: " : "Open full guide: ") + primaryDayLabel}>{primaryDayLabel} <span aria-hidden="true" style={{ fontSize: T.fSmall }}>›</span></a>
+                      : <span style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.gold }}>{primaryDayLabel}</span>)
+                  : <span style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.gold }}>{panchangTerm(L2, "tithi", p.tithis[0].name)}</span>}
+                {!primaryDayLabel && <span style={{ fontSize: T.fMicro, color: C.muted, fontVariantNumeric: "tabular-nums" }}>{p.tithis[0].end ? (lang === "hi" ? "तक " : "till ") + fmtT(p.tithis[0].end) : ""}</span>}
               </div>
-              <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: "0.125rem" }}>{panchangTerm(L2, "paksha", p.paksha)} · {lang === "hi" ? (p.krishna ? "कृष्ण (क्षीयमान)" : "शुक्ल (वर्धमान)") : (p.krishna ? "waning moon" : "waxing moon")} · {lang === "hi" ? "चंद्र दिवस " + p.tithiDay : "lunar day " + p.tithiDay}</div>
-              {dayEvents.length > 0 && <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "0.375rem", marginTop: "0.5rem" }}>
-                {dayEvents.map((event) => {
+              <div style={{ fontSize: T.fSmall, color: C.muted, marginTop: "0.125rem" }}>{primaryDayLabel && <>{panchangTerm(L2, "tithi", p.tithis[0].name)}{p.tithis[0].end ? (lang === "hi" ? ` · ${fmtT(p.tithis[0].end)} तक` : ` · till ${fmtT(p.tithis[0].end)}`) : ""} · </>}{panchangTerm(L2, "paksha", p.paksha)} · {lang === "hi" ? (p.krishna ? "कृष्ण (क्षीयमान)" : "शुक्ल (वर्धमान)") : (p.krishna ? "waning moon" : "waxing moon")} · {lang === "hi" ? "चंद्र दिवस " + p.tithiDay : "lunar day " + p.tithiDay}</div>
+              {dayEvents.length > 1 && <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "0.375rem", marginTop: "0.5rem" }}>
+                {dayEvents.slice(primaryDayEvent ? 1 : 0).map((event) => {
                 const isFast = event.kind === "fast";
                 const eventPath = festivalPathForKey(event.kind, event.key);
                 const eventLabel = isFast ? obsLabel(lang, event) : trN(lang, FEST_NAME, event.key);

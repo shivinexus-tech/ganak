@@ -34,7 +34,12 @@ assert(!nextDay.some((event) => event.key === 'suryaGrahan'), 'an event must not
 const ui = fs.readFileSync('src/screens/MuhuratHub.tsx', 'utf8');
 assert(ui.includes('eventsForDay(obs, cal.festivals, dayStart, tz)'), 'Today card must consume the combined day result');
 assert(!ui.includes('const fastObs = obs.find'), 'Today card must not collapse the day to one observance');
-assert(ui.includes('dayEvents.map((event)'), 'Today card must render every combined day event');
+assert(ui.includes('dayEvents.slice(primaryDayEvent ? 1 : 0).map((event)'), 'Today card must render every non-headline day event');
 assert(ui.includes('Check local visibility and Sutak'), 'eclipse chip must explain the location-specific next step');
+assert(ui.includes('const primaryDayEvent = dayEvents[0] || null'), 'Today card must promote the first observance to its answer-first headline');
+assert(ui.includes('primaryDayLabel && <>{panchangTerm'), 'technical tithi must move underneath an observance headline');
+assert(ui.includes('!primaryDayLabel && <span'), 'tithi end time must not appear beside a festival headline');
+assert(ui.includes('` · till ${fmtT(p.tithis[0].end)}`'), 'festival-day tithi end must be explicitly tied to the technical tithi line');
+assert(ui.includes('dayEvents.slice(primaryDayEvent ? 1 : 0).map((event)'), 'primary event must not be repeated as a secondary chip');
 
 console.log('DAY EVENT COMPLETENESS PASSED (Hariyali Amavasya + Surya Grahan together, deduped, civil-day bounded)');
