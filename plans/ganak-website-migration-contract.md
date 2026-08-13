@@ -15,6 +15,13 @@ This contract is the implementation gate: a feature can move, be simplified or b
 better entry point only when its replacement is named here and passes the same journey.
 Nothing is deleted merely because it is absent from a first-screen mockup.
 
+**Site-wide companion gate:**
+[`plans/ganak-site-capability-placement-register.md`](ganak-site-capability-placement-register.md)
+is authoritative for shared controls, inherited state and backlog rows 1–61. Every screen
+register in §10 must first satisfy that site's G1/G2 inheritance matrix. A screen-level
+mockup cannot omit a global/contextual capability merely because its own visible-control
+table does not mention it.
+
 ### Approved visual composition, expressed as component rules
 
 - The desktop reference is a visual master, **not a screenshot to ship**. Build original
@@ -137,7 +144,7 @@ green before this redesign can claim complete feature preservation.
 | Fasts/festivals and upcoming rows | Festival rail + Festivals destination | Rows route to canonical guide; guides retain place/language and direct URLs. | Open row, shared URL, Hindi switch, legacy slug. |
 | Festival guide meaning, vidhi, aarti, local timing, Follow, Listen | Festival detail — not the Today card | Follow stays consent/local-first; Listen uses existing TTS; content is never reduced to a teaser. | Guide route EN/HI, follow toggle, TTS state, local timing. |
 | Calendar, year view and festival search | Panchang/Calendar quick access | Existing views remain reachable even while a future dedicated route is planned. | Open year + search; back; no state loss. |
-| Calendar systems and holiday overlays | Personalize/settings or collapsed Daily preference block | No calendar convention/holiday capability is deleted; changing naming never changes timing. | Switch each supported convention + holiday mode, inspect date and time invariant. |
+| Calendar systems and holiday overlays | Shared Date & Calendar Context beside Date on applicable routes; defaults also reviewable in Personalize | No calendar convention/holiday capability is deleted; changing naming never changes timing. Personalize is not the only discoverability path. | Switch each supported convention + holiday mode, inspect date and time invariant. |
 | Muhurat finder + ceremony/purchase context | Dedicated Muhurat destination | URL category/action/range hydrate the finder and actions (save/share/calendar) continue. | Direct shared links; results; actions; changed city/date. |
 | Hora, season clock, daily windows, planetary events | Muhurat / Panchang detail, not silently discarded | Every current result gains a mapped detail entry before removal from Daily. | Link inventory and existing route-reachability regression. |
 | Prashna methods, topics, result/chart | Prashna destination | No birth data needed; inherited place is visible; answer/chart tier behaviour preserved. | Both methods, new question clears stale result, EN/HI, shared place. |
@@ -307,6 +314,15 @@ website implementation, not a reference-backed visual image.
 | Follow / Listen controls on the Today card | **Deferred — omit** | Existing Follow and Hindi read-aloud remain on contextual Festival Guide content until a separate Today behaviour is explicitly specified. | Consent/local-first follow preference; selected language. | No duplicate or fake Today control. |
 | Reminder / Save / Share | **Deferred — omit** | Backlog #37; it can appear only after a recipient, calendar/export behaviour and consent/data rules are implemented. | Explicit user choice; no sensitive data leakage. | #37 acceptance criteria and live user action pass. |
 
+**Inherited site-wide controls:** the Today frame must instantiate the shared G1 header and
+G2 Date & Calendar Context component defined in the site capability register. This places
+Calendar System and Holiday Overlay beside the existing Date control without changing the
+locked Today answer hierarchy.
+
+**Editable Figma implementation (2026-08-13):** component `206:135` on component page
+`204:2` now supplies this ribbon. Today special `104:49` and ordinary `116:49` use
+instances `208:49` and `209:135`; their page content and ribbon geometry are unchanged.
+
 ### 10.3 Festivals — discovery, calendar and search, desktop website
 
 **Visual source:** the approved Ganak desktop system from §10.2 (wordmark, navigation,
@@ -393,6 +409,14 @@ first-level view/search facet.
 | Inline expand chevron or in-list festival preview | **Remove** | Rows navigate directly to the full canonical guide; the earlier inline preview was deliberately retired. | N/A. | One row has one clear destination and no competing expand action. |
 | Reminder / Save / Share | **Deferred — omit** | Backlog #37; discovery must not promise an unbuilt calendar/export/recipient flow. | N/A. | Absent until #37 is implemented and accepted. |
 
+**Inherited site-wide controls:** A, B and D use the same G1 header and G2 Date & Calendar
+Context component. Calendar convention and holiday overlay apply to the List and Calendar
+over the same registry; switching A/D↔B must not reset them.
+
+**Editable Figma implementation (2026-08-13):** A `135:50`, B `135:254` and D
+`135:662` use shared instances `209:222`, `209:309` and `209:396`. They no longer carry
+independent copy-pasted context ribbons.
+
 ### 10.4 Festival Detail — canonical guide, desktop website
 
 **Reference content:** `/festival/devshayani-ekadashi` is the first editable sample because
@@ -443,6 +467,15 @@ existing engine/data contract, not Figma sample values.
 | Related observances / season links | **Move** | Existing canonical routes only (for example Navadurga season links where supported). | Destination slug, place and language. | Every visible related link resolves; no invented recommendation card. |
 | Reminder / Save / Share | **Deferred — omit** | Backlog #37; no calendar/export/recipient behaviour is implied before the feature is implemented. | N/A. | Absent from the working Figma screen and implementation. |
 | Donation, booking, premium or commerce CTA | **Deferred — omit** | No such Festival-guide capability or owner-approved commercial journey exists in this migration slice. | N/A. | No decorative or dead commercial action appears. |
+
+**Inherited site-wide controls:** Festival Detail uses the G1 header and inherits G2 place,
+selected date, calendar convention and holiday-overlay state from its origin. The shared
+context ribbon keeps that state visible and changeable without adding a second guide-specific
+holiday card; browser Back returns to the exact originating context.
+
+**Editable Figma implementation (2026-08-13):** Detail frames `135:866`, `135:1089`
+and `135:1312` use shared instances `209:483`, `209:570` and `209:657`. The three intent
+templates remain otherwise visually unchanged.
 
 ### 10.5 Working procedure for every later screen
 
