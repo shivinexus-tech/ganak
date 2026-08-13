@@ -88,7 +88,9 @@
     58,
     59,
     62,
-    66
+    66,
+    70,
+    71
   ],
   "sourceNotApplicableItemIds": [
     5,
@@ -441,7 +443,9 @@
         48,
         49,
         65,
-        69
+        69,
+        70,
+        71
       ]
     },
     {
@@ -871,6 +875,16 @@
       "section": "P1",
       "title": "E-1.0 English sign names and one shared name table",
       "technicalComplexity": "Medium"
+    },
+    "70": {
+      "section": "P1",
+      "title": "Calendar types and regional Panchang-name display",
+      "technicalComplexity": "High"
+    },
+    "71": {
+      "section": "P1",
+      "title": "Panchang utilities hub",
+      "technicalComplexity": "High"
     }
   }
 }

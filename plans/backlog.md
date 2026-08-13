@@ -1352,6 +1352,23 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
       Does **not** replace `TEST-STD-CALCULATORS` or the two-agent bug bash — it removes
       their mechanical half so human time goes to judgement. _(VERIFY-SNAPSHOTS)_
 
+- [ ] **#70 — Calendar types and regional Panchang-name display (brainstorm/spec).**
+      Owner request 2026-08-13: Ganak should display calendar types and region-specific
+      Panchang names like Drik Panchang, but in Ganak's own answer-before-data style.
+      This is not a code task yet. First write a spec covering supported calendar
+      types, amanta/purnimanta/regional bases, native/regional Panchang names, default
+      selection, UX placement, URL/state persistence, EN/HI/native-name behaviour and
+      source confidence. No regional name should be invented or loosely translated.
+
+- [ ] **#71 — Panchang utilities hub (brainstorm/spec).**
+      Owner request 2026-08-13: Ganak must have explicit Panchang utilities. First
+      inventory which utilities belong before go-live versus later, which are links to
+      existing journeys, and which require new engines. Candidate families include
+      direct date lookup, tithi/nakshatra and day-part tools, choghadiya/hora/Rahu-style
+      timing tools, festival/vrat lookup and other owner-approved Panchang helpers.
+      Requirement: preserve selected city/date/language and avoid cluttering the Daily
+      answer card.
+
 - **E-0.6 Chart deep-gloss Hindi translation** — advanced sub-section paragraphs
   (KP, Ashtakavarga, BNN, Bhrigu, Special Lagnas, Dasha levels) still English-only.
   Specialist-Hindi pass. Gates Phase 2's chart reveal.

@@ -15,7 +15,14 @@ const config = JSON.parse(await readFile(new URL("../plans/backlog-sheet-sync.js
 const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md", import.meta.url), "utf8");
 const base = parseRegister(markdown, config, "test base");
 
-assert.equal(base.rows.size, 69);
+assert.equal(base.rows.size, 71);
+// 70 and 71 added 2026-08-13 at owner instruction: Drik-style calendar/regional
+// Panchang-name display, and a Panchang utilities hub. Both are deliberately
+// registered as brainstorming/spec rows, not as implementation claims.
+assert.equal(base.rows.get("70").section, "P1");
+assert.equal(base.rows.get("70").metadata.title, "Calendar types and regional Panchang-name display");
+assert.equal(base.rows.get("71").section, "P1");
+assert.equal(base.rows.get("71").metadata.title, "Panchang utilities hub");
 // 69 added 2026-08-11: E-1.0, registered at the owner's instruction after the code
 // had already shipped, so the two human follow-ups (B8, B10) have a home.
 assert.equal(base.rows.get("69").section, "P1");
@@ -259,7 +266,7 @@ assert.throws(
 );
 assert.equal(
   parseRegister(preAutomationMarkdown, config, "bootstrap historical fixture", { allowMetadataTitleMismatch: true }).rows.size,
-  69,
+  71,
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 
