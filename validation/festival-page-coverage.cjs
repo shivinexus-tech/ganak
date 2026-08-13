@@ -40,10 +40,10 @@ function coverageProblems(entries, routes) {
 
 const liveCount = Object.keys(meta.FEST_NAME).length + Object.keys(meta.OBS_NAME).length;
 assert.strictEqual(FESTIVAL_PAGE_ENTRIES.length, liveCount, 'registry must contain every live openable label');
-assert.strictEqual(liveCount, 178, 'update the reviewed inventory when the live label count changes');
+assert.strictEqual(liveCount, 179, 'update the reviewed inventory when the live label count changes');
 assert.strictEqual(EXCLUDED_PAGE_KEYS.length, 4, 'only the four Chhath shared labels may be excluded from standalone routes');
 assert.strictEqual(REQUIRED_PAGE_ENTRIES.length, 162, '162 non-deferred labels must have dedicated routes');
-assert.strictEqual(SHARED_PAGE_ENTRIES.length, 16, 'four Chhath labels + twelve Tamil-month Amavasai labels share an existing page');
+assert.strictEqual(SHARED_PAGE_ENTRIES.length, 17, 'four Chhath labels + twelve Tamil-month Amavasai labels + Hariyali Amavasya share existing pages');
 assert.strictEqual(DEFERRED_PAGE_ENTRIES.length, 0, 'no openable label may remain explicitly deferred');
 
 const existingStandalone = new Set(['hartalikaTeej', 'chaitraNavratri', 'sharadNavratri']);

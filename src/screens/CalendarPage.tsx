@@ -11,7 +11,7 @@ import { weekdayName, WEEKDAY_SHORT_EN } from "../i18n/panchang-terms";
 import { scanPanchangCalendar } from "../engine/festivals";
 import { searchUpcoming } from "../engine/search-upcoming";
 
-function CalendarPage({ view, place, lang, onBack, C, card }) {
+function CalendarPage({ view, place, lang, calendarMode = "canonical", onBack, C, card }) {
   const now = new Date();
   const tz = (zoneOffset(place.zone, now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate())) ?? 5.5;
   const [q, setQ] = useState(view.type === "search" ? (view.q || "") : "");
@@ -24,13 +24,13 @@ function CalendarPage({ view, place, lang, onBack, C, card }) {
     if (view.type !== "year") return null;
     const year = now.getUTCFullYear();
     const from = Date.UTC(year, 0, 1, 6) - tz * 3600000;
-    const r = scanPanchangCalendar(from, tz, 366, 366, place);
+    const r = scanPanchangCalendar(from, tz, 366, 366, place, calendarMode);
     const all = [...r.festivals.map((f) => ({ ms: f.ms, kind: "festival", key: f.key })), ...r.fasts.map((f) => ({ ms: f.ms, kind: "fast", key: f.key }))]
       .filter((x) => new Date(x.ms + tz * 3600000).getUTCFullYear() === year).sort((a, b) => a.ms - b.ms);
     const byMonth = Array.from({ length: 12 }, () => []);
     for (const it of all) byMonth[new Date(it.ms + tz * 3600000).getUTCMonth()].push(it);
     return { year, byMonth };
-  }, [view.type, tz, place]);
+  }, [view.type, tz, place, calendarMode]);
 
   const results = useMemo(() => view.type === "search" ? searchUpcoming(q, Date.now(), tz, 30, place) : null, [view.type, q, tz, place]);
 

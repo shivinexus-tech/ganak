@@ -142,7 +142,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
 
   return (
     <>
-      {calView && <CalendarPage view={calView} place={place} lang={lang} onBack={() => setCalView(null)} C={C} card={card} />}
+      {calView && <CalendarPage view={calView} place={place} lang={lang} calendarMode={calendarMode} onBack={() => setCalView(null)} C={C} card={card} />}
 
       {!todayP && (
         <div className="rise" style={{ marginBottom: "1.25rem" }}>
@@ -341,7 +341,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
             </div>
           </div>}
           <HolidayOverlayCard isoDate={panchDate} mode={holidayMode} onMode={chooseHolidayMode} lang={lang} C={C} card={card} />
-          <MuhuratHub todayP={todayP} place={place} lang={lang} ayanamsa={ayanamsa} isToday={isPanchToday} onCal={setCalView} onChangeCity={focusPlaceInput} C={C} card={card} />
+          <MuhuratHub todayP={todayP} place={place} lang={lang} ayanamsa={ayanamsa} calendarMode={calendarMode} isToday={isPanchToday} onCal={setCalView} onChangeCity={focusPlaceInput} C={C} card={card} />
 
           <Card className="rise2" style={{ marginTop: "0.75rem" }}>
             <SectionHeader

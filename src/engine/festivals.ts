@@ -322,7 +322,7 @@ const PRADOSH_NAMES_BY_DAY = {
 const TAMIL_MONTH_SLUGS = ["chithirai", "vaikasi", "aani", "aadi", "avani", "purattasi", "aippasi", "karthigai", "margazhi", "thai", "maasi", "panguni"];
 const tamilSolarMonthIdx = (ms) => ((Math.floor(sunSidMs(ms) / 30) % 12) + 12) % 12;
 
-function observancesFor(krishna, tithiNum, month = null, dow = null, ms = null) {
+function observancesFor(krishna, tithiNum, month = null, dow = null, ms = null, calendarConvention = "canonical") {
   const out = [];
   if (tithiNum === 11) {
     const pk = krishna ? "Krishna" : "Shukla";
@@ -343,12 +343,15 @@ function observancesFor(krishna, tithiNum, month = null, dow = null, ms = null) 
   if (tithiNum === 14 && krishna) out.push({ key: "masikShivaratri", fasting: true });
   if (tithiNum === 15 && !krishna) out.push({ key: "purnima", fasting: true });
   if (tithiNum === 15 && krishna) {
-    // Neutral "Amavasya" for everyone until the regional-name lens ships. The same
-    // new moon is Hariyali Amavasya (North), Aadi Amavasai (Tamil), Karkataka
-    // Amavasya (Kerala) … — naming it for ONE region is wrong for the others, so it
-    // stays neutral until region drives the label. (tamilSolarMonthIdx + the
-    // amavasya_<month> keys/routes remain as ready infrastructure for that lens.)
-    out.push({ key: "amavasya", fasting: true });
+    const normalizedMonth = String(month || "").replace(/a$/, "");
+    if (calendarConvention === "tamil-solar" && ms != null) {
+      const mi = tamilSolarMonthIdx(ms);
+      out.push({ key: `amavasya_${TAMIL_MONTH_SLUGS[mi]}`, fasting: true, isVariant: true, baseKey: "amavasya" });
+    } else if ((calendarConvention === "canonical" || calendarConvention === "north-purnimanta") && normalizedMonth === "Shravan") {
+      out.push({ key: "amavasya_hariyali", fasting: true, isVariant: true, baseKey: "amavasya" });
+    } else {
+      out.push({ key: "amavasya", fasting: true });
+    }
   }
   return out;
 }
@@ -560,7 +563,7 @@ function festivalMatch(f, parts) {
   const kala = f.kala || "udaya", overlap = tithiKalaOverlap(parts, kala, target);
   return overlap ? { rank: 0, reason: kala, overlap } : null;
 }
-function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = null) {
+function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = null, calendarConvention = "canonical") {
   const DAY = 86400000, fasts = [], festivals = [], candidates = new Map();
   const start = new Date(fromMs + tz * 3600000);
   const sy = start.getUTCFullYear(), sm = start.getUTCMonth(), sd = start.getUTCDate();
@@ -575,7 +578,7 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
         for (const krishna of rule.krishna == null ? [false, true] : [rule.krishna]) {
           const target = targetTithiIndex(krishna, rule.tithi);
           if (!tithiKalaOverlap(parts, rule.kala, target)) continue;
-          const obs = observancesFor(krishna, rule.tithi, month, dow, parts.noon).filter((o) => obsKind(o.key) === rule.baseKey);
+          const obs = observancesFor(krishna, rule.tithi, month, dow, parts.noon, calendarConvention).filter((o) => obsKind(o.key) === rule.baseKey);
           for (const o of obs) {
             if (!o.fasting) continue;
             const prev = [...fasts].reverse().find((x) => x.key === o.key);

@@ -64,7 +64,7 @@ function muhuratSpeech(lang, { headline, good = [], avoid = [], note = "" }) {
 }
 
 
-function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, onCal = () => {}, onChangeCity = () => {}, C, card }) {
+function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", calendarMode = "canonical", isToday = true, onCal = () => {}, onChangeCity = () => {}, C, card }) {
   const { showPlainHelp, showExpert } = useDepth();
   const { preferences, updatePreferences } = useComfort();
   const tz = todayP.tz;
@@ -183,7 +183,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
     setCalBusy(true);
     const id = setTimeout(() => {
       try {
-        const r = scanPanchangCalendar(todayP.anchor, tz, SCAN_DAYS, SCAN_CAP, place);
+        const r = scanPanchangCalendar(todayP.anchor, tz, SCAN_DAYS, SCAN_CAP, place, calendarMode);
         if (alive) setCal(r);
       } catch (e) {
         if (alive) setCal({ fasts: [], festivals: [] });
@@ -192,7 +192,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       }
     }, 0);
     return () => { alive = false; clearTimeout(id); };
-  }, [todayP.anchor, tz, place]);
+  }, [todayP.anchor, tz, place, calendarMode]);
   const [trad, setTrad] = useState("smarta");
   useEffect(() => { let alive = true; (async () => { try { const st = (typeof window !== "undefined" && window.storage) ? window.storage : null; if (st) { const r = await st.get("janma_trad"); if (alive && r && r.value) setTrad(r.value); } } catch (e) {} })(); return () => { alive = false; }; }, []);
   const chooseTrad = (v) => { setTrad(v); try { const st = (typeof window !== "undefined" && window.storage) ? window.storage : null; if (st) st.set("janma_trad", v); } catch (e) {} };
@@ -470,7 +470,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       {(() => {
         const p = todayP, DAY = 86400000, dayStart = p.anchor;
         const L2 = lang === "hi" ? "hi" : "en";
-        const obs = observancesFor(p.krishna, p.tithiDay, ekadashiIdentityMonth(p.months, p.krishna), p.dow, p.anchor);
+        const obs = observancesFor(p.krishna, p.tithiDay, ekadashiIdentityMonth(p.months, p.krishna), p.dow, p.anchor, calendarMode);
         const OBS_GLOSS = { ekadashi: { en: "Fasting day for Vishnu", hi: "विष्णु का व्रत" }, purnima: { en: "Full moon", hi: "पूर्ण चंद्र" }, amavasya: { en: "New moon", hi: "नवचंद्र" }, pradosh: { en: "Evening fast for Shiva", hi: "शिव संध्या व्रत" }, sankashti: { en: "Fast for Ganesha", hi: "गणेश व्रत" }, masikShivaratri: { en: "Monthly Shivaratri", hi: "मासिक शिवरात्रि" }, kalashtami: { en: "Kala Bhairava day", hi: "काल भैरव दिवस" } };
         const fastObs = obs.find((o) => o.fasting) || obs[0];
         const nkIdx = NAKSHATRAS.indexOf(p.naks[0].name), nkLord = nkIdx >= 0 ? VIM_LORDS[nkIdx % 9] : null;
@@ -1201,7 +1201,7 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", isToday = true, 
       {/* today — hero */}
       {(() => {
         const rise = todayP.rise, set = todayP.set;
-        const obs = observancesFor(todayP.krishna, todayP.tithiDay, ekadashiIdentityMonth(todayP.months, todayP.krishna), todayP.dow, todayP.anchor);
+        const obs = observancesFor(todayP.krishna, todayP.tithiDay, ekadashiIdentityMonth(todayP.months, todayP.krishna), todayP.dow, todayP.anchor, calendarMode);
         const note = obs.length
           ? (isToday ? (lang === "hi" ? "आज " : "Today is ") : (lang === "hi" ? "इस तारीख़ को " : "This date is ")) + obsLabel(lang, obs[0]) + (obs[0].fasting ? (lang === "hi" ? " — व्रत का दिन" : " — a fasting day") : "")
           : panchangTerm(lang, "nakshatra", todayP.naks[0].name) + (lang === "hi" ? " नक्षत्र · " : " nakshatra · ") + panchangTerm(lang, "tithi", todayP.tithis[0].name);

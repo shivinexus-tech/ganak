@@ -14,6 +14,7 @@ export const OBS_NAME = {
   masikShivaratri: { en: "Masik Shivaratri", hi: "मासिक शिवरात्रि" },
   purnima: { en: "Purnima", hi: "पूर्णिमा" },
   amavasya: { en: "Amavasya", hi: "अमावस्या" },
+  amavasya_hariyali: { en: "Hariyali Amavasya (Shravana Amavasya)", hi: "हरियाली अमावस्या (श्रावण अमावस्या)" },
   // Tamil solar-month new moons (Amavasai) — each month's Amavasya is a tarpanam
   // day named for the Tamil month the sun is in. Emitted by observancesFor when the
   // date is known; all share the /festival/amavasya guide.
