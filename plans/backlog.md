@@ -403,18 +403,57 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
         (Shani, Santoshi, Khatu Shyam) are **deity** aartis not tied to one festival — they need
         the standalone pages from the finder item below, not just a festival embed.
         _(P2-FESTIVAL-AARTI-BREADTH; owner scope 2026-08-01)_
-  - [ ] **Aarti finder + dedicated per-aarti pages.** Today aartis are **inline-only**
-        inside festival pages — they have no URL of their own, so they are unlinkable
-        and near-invisible to search. Give every aarti a home. **Scope:** (a) a `/aarti`
-        index route grouping all aartis by deity/festival; (b) a per-aarti route
-        `/aarti/<slug>` (e.g. `/aarti/om-jai-shiv-omkara`), each a stable canonical URL;
-        (c) input/search navigation ("shiv" → the Shiv aarti), reusing the existing
-        place-search pattern; (d) deep links + cross-links (festival page ↔ its aartis'
-        pages). Additive — existing festival routes and the inline render stay.
-        **Acceptance:** every distinct aarti has a working standalone URL; `/aarti`
-        lists all and links to each; a deity/festival search term resolves to the right
-        aarti; the festival guide links out to each aarti's dedicated page; EN/HI, 0
-        console errors. Unblocks SEO below. _(P2-FESTIVAL-AARTI-FINDER; owner scope 2026-08-01)_
+  - [ ] **P2-BHAKTI-ADDRESS-CONTRACT — name the devotional vocabulary, fix the URL shape
+        forever, and give the 14 existing aartis permanent pages.** *(Owner decision
+        2026-08-14 — "Option A". **Starts only after the redesign track lands.**)*
+        Ganak has 14 aartis and they are **inline-only** inside festival pages: none has
+        an address, so none can be linked, bookmarked, shared or ranked, and the same
+        aarti is duplicated across several festival pages. The owner also proposed a full
+        Bhakti section (search + browse by form/deity/occasion + curated guides); that
+        remains the destination, but Ganak has **one** of the seven devotional forms and
+        only 14 items of it, so four browse axes are premature. What is **not** premature
+        is the part that becomes expensive to change: the vocabulary and the URL shape.
+        **Scope:** (a) freeze the section as **Bhakti · भक्ति** and the seven forms —
+        Bhajan, Aarti, Chalisa, Stotra, Mantra, Naamavali, **Paath** (the owner's "longer
+        path"; `paath` is the tradition's own word and what users search); (b) freeze the
+        address contract — `/bhakti`, `/bhakti/<form>`, `/bhakti/<form>/<slug>` for the
+        one canonical composition page, `/bhakti/deity/<deity>` and `/bhakti/guides/<slug>`
+        **reserved, not built**; explicitly **no** `/bhakti/festivals/...` tree, because
+        the 181 existing festival pages already own that and a parallel tree would split
+        their search value; (c) slug rules — lowercase Latin transliteration, hyphens, the
+        searched name not the ceremonial title, honorifics dropped, opening line where a
+        text is known by it, **published slugs never change**; (d) one canonical page per
+        composition, every other surface a pointer not a copy; (e) build the 14 aarti
+        pages at `/bhakti/aarti/<slug>` with the existing refrain/cue layout, plus a
+        minimal `/bhakti` home and `/bhakti/aarti` list so nothing is an orphan; (f)
+        festival pages link out to each aarti's page, inline text stays; (g) per-page
+        title/description/canonical so the pages are correct the moment prerender lands;
+        (h) a **non-vacuous** gate asserting every devotional URL matches the contract,
+        every form word is one of the seven, and no composition has two pages.
+        **Out of scope (deferred, not rejected):** search, deity hubs, occasion guides,
+        any new text, the other six forms, prerender, audio, regional languages.
+        **Task metric:** "reach one specific devotional text directly" — **0 of 14 today,
+        14 of 14 on completion**, each verified by opening its URL directly in EN and HI.
+        Indexed-page and organic-entrance gains are **not claimable from this row** —
+        they need INFRA-SPA-PRERENDER. **Acceptance:** contract written and gated; 14
+        working standalone URLs; `/bhakti` + `/bhakti/aarti` reachable and linking to
+        each; festival guides link out; EN/HI, 0 console errors, no 375px overflow; owner
+        slug review **before** publication (slugs are permanent). Spec:
+        `docs/superpowers/specs/2026-08-14-bhakti-address-contract-design.md`.
+        Blocks AARTI-FINDER search, AARTI-SEO and AARTI-MULTILANG.
+  - [ ] **Aarti finder — search over the devotional pages.** *(**Amended 2026-08-14:**
+        the URL half of this row is superseded by `P2-BHAKTI-ADDRESS-CONTRACT`, which
+        builds the per-aarti pages at `/bhakti/aarti/<slug>` — **not** the flat
+        `/aarti/<slug>` originally written here. Do not ship the flat shape; it cannot
+        express the seven forms and undoing it is a site-wide rename. What remains in
+        this row is search.)* **Remaining scope:** input/search navigation over
+        devotional content ("shiv" → the Shiv aarti; a deity or festival term resolves to
+        the right text), reusing the existing place-search pattern; grouping the
+        `/bhakti/aarti` list by deity/festival once there is enough content to justify it.
+        **Acceptance:** a deity/festival/opening-line term resolves to the right
+        composition page; results are labelled with the composition's form; EN/HI, 0
+        console errors. Depends on `P2-BHAKTI-ADDRESS-CONTRACT` (URLs must exist first).
+        _(P2-FESTIVAL-AARTI-FINDER; owner scope 2026-08-01, amended 2026-08-14)_
   - [ ] **Aarti SEO** (depends on FINDER + the SPA-prerender unlock). Make the dedicated
         aarti URLs actually rank. **Scope:** per-aarti `<title>` + meta description via
         `src/metadata/route-metadata.ts` (e.g. "Om Jai Shiv Omkara — Shiv Aarti Lyrics

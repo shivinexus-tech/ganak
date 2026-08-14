@@ -459,7 +459,8 @@
         60,
         61,
         67,
-        68
+        68,
+        72
       ]
     },
     {
@@ -885,6 +886,11 @@
       "section": "P1",
       "title": "Panchang utilities hub",
       "technicalComplexity": "High"
+    },
+    "72": {
+      "section": "P2",
+      "title": "Bhakti naming + URL contract, and permanent pages for the 14 existing aartis",
+      "technicalComplexity": "Medium"
     }
   }
 }
