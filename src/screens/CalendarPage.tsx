@@ -10,8 +10,10 @@ import { zoneOffset } from "../engine/panchang";
 import { weekdayName, WEEKDAY_SHORT_EN } from "../i18n/panchang-terms";
 import { scanPanchangCalendar } from "../engine/festivals";
 import { searchUpcoming } from "../engine/search-upcoming";
+import { INDIA_HOLIDAY_DATASET } from "../data/india-holidays";
+import { sharedContextHref } from "../components/url-prefs";
 
-function CalendarPage({ view, place, lang, calendarMode = "canonical", onBack, C, card }) {
+function CalendarPage({ view, place, lang, selectedDate = null, calendarMode = "canonical", holidayMode = "national", onBack, C, card }) {
   const now = new Date();
   const tz = (zoneOffset(place.zone, now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate())) ?? 5.5;
   const [q, setQ] = useState(view.type === "search" ? (view.q || "") : "");
@@ -25,34 +27,36 @@ function CalendarPage({ view, place, lang, calendarMode = "canonical", onBack, C
     const year = now.getUTCFullYear();
     const from = Date.UTC(year, 0, 1, 6) - tz * 3600000;
     const r = scanPanchangCalendar(from, tz, 366, 366, place, calendarMode);
-    const all = [...r.festivals.map((f) => ({ ms: f.ms, kind: "festival", key: f.key })), ...r.fasts.map((f) => ({ ms: f.ms, kind: "fast", key: f.key }))]
+    const holidayItems = year === INDIA_HOLIDAY_DATASET.year && holidayMode !== "off"
+      ? INDIA_HOLIDAY_DATASET.holidays
+          .filter((holiday) => holidayMode === "gazetted" || holiday.kind === "national")
+          .map((holiday) => {
+            const [hy, hm, hd] = holiday.date.split("-").map(Number);
+            return { ms: Date.UTC(hy, hm - 1, hd, 12) - tz * 3600000, kind: "holiday", key: holiday.date, holiday };
+          })
+      : [];
+    const all = [...r.festivals.map((f) => ({ ms: f.ms, kind: "festival", key: f.key })), ...r.fasts.map((f) => ({ ms: f.ms, kind: "fast", key: f.key })), ...holidayItems]
       .filter((x) => new Date(x.ms + tz * 3600000).getUTCFullYear() === year).sort((a, b) => a.ms - b.ms);
     const byMonth = Array.from({ length: 12 }, () => []);
     for (const it of all) byMonth[new Date(it.ms + tz * 3600000).getUTCMonth()].push(it);
     return { year, byMonth };
-  }, [view.type, tz, place, calendarMode]);
+  }, [view.type, tz, place, calendarMode, holidayMode]);
 
   const results = useMemo(() => view.type === "search" ? searchUpcoming(q, Date.now(), tz, 30, place) : null, [view.type, q, tz, place]);
 
   const labelOf = (it) => it.kind === "tithi"
     ? ((it.paksha ? (lang === "hi" ? (it.paksha === "Krishna" ? "कृष्ण " : "शुक्ल ") : it.paksha + " ") : "") + it.label)
-    : (it.kind === "fast" ? obsLabel(lang, {key: it.key}) : trN(lang, FEST_NAME, it.key));
+    : it.kind === "holiday"
+      ? it.holiday.name[lang === "hi" ? "hi" : "en"]
+      : (it.kind === "fast" ? obsLabel(lang, {key: it.key}) : trN(lang, FEST_NAME, it.key));
 
   // Preserve language + selected city on the dedicated festival page and on the
   // browser Back trip (no localStorage/sessionStorage; URL query only).
-  const festHref = (path) => {
-    const p = new URLSearchParams();
-    p.set("lang", lang);
-    if (place && place.label) {
-      p.set("city", place.label);
-      p.set("lat", String(place.lat));
-      p.set("lon", String(place.lon));
-      if (place.zone) p.set("zone", place.zone);
-    }
-    return `${path}?${p.toString()}`;
-  };
+  const festHref = (path) => sharedContextHref(path, {
+    lang, place, date: selectedDate, calendarMode, holidayMode,
+  });
 
-  const dot = (it) => <span style={{ width: "0.4375rem", height: "0.4375rem", borderRadius: "50%", background: it.kind === "festival" ? C.gold : C.sindoor, flexShrink: 0 }} />;
+  const dot = (it) => <span style={{ width: "0.4375rem", height: "0.4375rem", borderRadius: "50%", background: it.kind === "festival" ? C.gold : it.kind === "holiday" ? C.muted : C.sindoor, flexShrink: 0 }} />;
   const dateSpan = (it) => <span style={{ fontSize: T.fSmall, color: C.gold, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{fmtFull(it.ms)}</span>;
 
   const Row = ({ it, first }) => {
@@ -60,11 +64,14 @@ function CalendarPage({ view, place, lang, calendarMode = "canonical", onBack, C
     // Tithi-only rows are informational, never a dedicated page — keep them plainly
     // non-interactive so they don't look like a broken button (and never route a
     // bare tithi to an unrelated festival).
-    if (it.kind === "tithi") {
+    if (it.kind === "tithi" || it.kind === "holiday") {
       return (
         <div style={{ display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.625rem 0.25rem", borderTop: border }}>
           {dot(it)}
-          <span style={{ flex: 1, fontFamily: T.serif, fontSize: T.fBody, color: C.ivory }}>{labelOf(it)}</span>
+          <span style={{ flex: 1, fontFamily: T.serif, fontSize: T.fBody, color: C.ivory }}>
+            {labelOf(it)}
+            {it.kind === "holiday" && <span style={{ display: "block", fontFamily: T.body, fontSize: T.fMicro, color: C.muted }}>{lang === "hi" ? "सरकारी अवकाश · पंचांग गणना से अलग" : "Government holiday · separate from Panchang calculation"}</span>}
+          </span>
           {dateSpan(it)}
         </div>
       );
@@ -99,10 +106,10 @@ function CalendarPage({ view, place, lang, calendarMode = "canonical", onBack, C
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 60, background: C.bg, overflowY: "auto" }}>
+    <section aria-label={view.type === "year" ? (lang === "hi" ? "पूरा पंचांग कैलेंडर" : "Full Panchang calendar") : (lang === "hi" ? "पर्व खोज" : "Festival search")}>
       <style>{`.fest-row{border-radius:8px;transition:background .12s ease;} .fest-row:hover{background:var(--surface-hover);} .fest-row:hover span[aria-hidden]{color:${C.gold};} .fest-row:focus-visible{outline:0.125rem solid var(--accent);outline-offset:-2px;background:var(--accent-soft);}`}</style>
-      <div style={{ maxWidth: "42.5rem", margin: "0 auto", padding: "0 1.125rem 3.75rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", position: "sticky", top: 0, background: C.bg, padding: "0.875rem 0 0.75rem", zIndex: 2, borderBottom: `0.0625rem solid ${C.line}`, marginBottom: "1.125rem" }}>
+      <div style={{ maxWidth: "48rem", margin: "0 auto", paddingBottom: "3.75rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", background: C.bg, padding: "0.25rem 0 0.75rem", borderBottom: `0.0625rem solid ${C.line}`, marginBottom: "1.125rem" }}>
           <button onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: "0.3125rem", padding: "0.5625rem 0.9375rem", borderRadius: T.rMd, border: `0.0625rem solid ${C.line}`, background: C.panel, color: C.ivory, cursor: "pointer", fontFamily: T.serif, fontSize: T.fSmall }}>‹ {tr(lang, "backLabel")}</button>
           <span style={{ fontFamily: T.serif, fontSize: T.fHeading, color: C.gold }}>{view.type === "year" ? `${tr(lang, "calTitle")}${yearData ? " · " + yearData.year : ""}` : tr(lang, "searchTitle")}</span>
         </div>
@@ -127,7 +134,7 @@ function CalendarPage({ view, place, lang, calendarMode = "canonical", onBack, C
           : <div style={{ ...card, padding: "0.25rem 0.875rem" }}>{results.map((it, i) => <Row key={i} it={it} first={i === 0} />)}</div>
         )}
       </div>
-    </div>
+    </section>
   );
 }
 

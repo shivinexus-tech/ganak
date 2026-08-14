@@ -40,7 +40,7 @@ import { searchUpcoming } from "../engine/search-upcoming";
 import { planetGochar } from "../engine/gochar";
 import { fmtDur, eventDetail } from "../engine/transit-copy";
 import { observancesFor, scanPanchangCalendar, EKADASHI_NAMES, PRADOSH_NAMES_BY_DAY, ekadashiIdentityMonth, eventsForDay } from "../engine/festivals";
-import { urlPrefGet, urlPrefPush } from "../components/url-prefs";
+import { sharedContextHref, urlPrefGet, urlPrefPush } from "../components/url-prefs";
 import MuhuratActions from "../components/MuhuratActions";
 import { privacyEvent } from "../telemetry/privacy-events";
 import { panchangTerm, panchangTermAt, signName, signLabel } from "../i18n/panchang-terms";
@@ -65,7 +65,7 @@ function muhuratSpeech(lang, { headline, good = [], avoid = [], note = "" }) {
 }
 
 
-function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", calendarMode = "canonical", isToday = true, onCal = () => {}, onChangeCity = () => {}, C, card }) {
+function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", calendarMode = "canonical", holidayMode = "national", selectedDate = null, isToday = true, onCal = () => {}, onChangeCity = () => {}, C, card }) {
   const { showPlainHelp, showExpert } = useDepth();
   const { preferences, updatePreferences } = useComfort();
   const tz = todayP.tz;
@@ -78,17 +78,9 @@ function MuhuratHub({ todayP, place, lang, ayanamsa = "lahiri", calendarMode = "
   const [fq, setFq] = useState("");
   // Preserve language + selected city on the canonical festival page and Back trip
   // (URL query only — no localStorage/sessionStorage).
-  const festHref = (path) => {
-    const p = new URLSearchParams();
-    p.set("lang", lang);
-    if (place && place.label) {
-      p.set("city", place.label);
-      p.set("lat", String(place.lat));
-      p.set("lon", String(place.lon));
-      if (place.zone) p.set("zone", place.zone);
-    }
-    return `${path}?${p.toString()}`;
-  };
+  const festHref = (path) => sharedContextHref(path, {
+    lang, place, date: selectedDate, calendarMode, holidayMode,
+  });
   const [horaQuestion, setHoraQuestion] = useState("");
   const [horaResult, setHoraResult] = useState(null);
   const [horaAsc, setHoraAsc] = useState(null);

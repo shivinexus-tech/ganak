@@ -34,6 +34,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const pages = loadApp('src/data/festival-pages.ts');
 const meta = loadApp('src/data/festival-meta.ts');
 const engine = loadApp('src/engine/festivals.ts');
+const { sharedContextHref } = loadApp('src/components/url-prefs.ts');
 const { festivalPathForKey, FESTIVAL_PAGE_ROUTES } = pages;
 const { FEST_NAME, OBS_NAME } = meta;
 const { scanPanchangCalendar } = engine;
@@ -81,8 +82,25 @@ function anchorBlockOk(block) {
   return /^<a\b/.test(block) && /href=\{festHref\(/.test(block) && /aria-label=/.test(block);
 }
 function festHrefPreservesState(fnSrc) {
-  return /p\.set\("lang"/.test(fnSrc) && /p\.set\("city"/.test(fnSrc);
+  const legacyInlineBuilder = /p\.set\("lang"/.test(fnSrc) && /p\.set\("city"/.test(fnSrc);
+  const sharedBuilder = /sharedContextHref/.test(fnSrc) && /\blang\b/.test(fnSrc) && /\bplace\b/.test(fnSrc);
+  return legacyInlineBuilder || sharedBuilder;
 }
+
+const sharedFixtureHref = sharedContextHref('/festival/example', {
+  lang: 'hi',
+  place: { label: 'New Delhi, India', lat: 28.6139, lon: 77.209, zone: 'Asia/Kolkata' },
+  date: '2026-07-25', calendarMode: 'north-purnimanta', holidayMode: 'gazetted',
+});
+const sharedFixtureQuery = new URL(sharedFixtureHref, 'https://ganakapp.com').searchParams;
+check(
+  sharedFixtureQuery.get('lang') === 'hi'
+    && sharedFixtureQuery.get('city') === 'New Delhi, India'
+    && sharedFixtureQuery.get('date') === '2026-07-25'
+    && sharedFixtureQuery.get('cal') === 'north-purnimanta'
+    && sharedFixtureQuery.get('hol') === 'gazetted',
+  'sharedContextHref drops language/place/date/calendar/holiday state',
+);
 
 /* ---- 1. CalendarPage (full-year + search rows) -------------------------- */
 

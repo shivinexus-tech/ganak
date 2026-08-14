@@ -24,6 +24,7 @@ import { vratDetail } from "../engine/muhurat";
 import { navratriTimings, navadurgaDatesFor } from "../engine/navratri";
 import { zoneOffset } from "../engine/panchang";
 import { eclipseDetail } from "../engine/eclipse";
+import { sharedContextHref, urlPrefGet } from "../components/url-prefs";
 
 const FESTIVAL_GUIDE_ROUTES = FESTIVAL_PAGE_ROUTES;
 const SKANDA_SEQUENCE_KEYS = new Set(["skandaSashtiBegins", "skandaSashtiSoorasamharam", "skandaSashtiThirukalyanam"]);
@@ -235,7 +236,14 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
   const title = guide ? guide.title[L] : "";
   const followKey = guide ? `festival:${guide.key}` : "";
   const isFollowed = Boolean(followKey && preferences.following.includes(followKey));
-  const homeHref = `/?lang=${L}&screen=daily`;
+  const homeHref = sharedContextHref("/", {
+    lang: L,
+    place,
+    date: urlPrefGet("date"),
+    calendarMode: urlPrefGet("cal") || "canonical",
+    holidayMode: urlPrefGet("hol") || "national",
+    extra: { screen: "daily" },
+  });
   const [localTiming, setLocalTiming] = useState({ status: "idle", hit: null, detail: null, punyaKala: null, tz: null, error: null });
   const [retryTick, setRetryTick] = useState(0);
 
