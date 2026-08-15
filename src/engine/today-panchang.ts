@@ -10,21 +10,43 @@ import { rev } from "./ephemeris";
 import { ayyappaMandalaFor } from "./festivals";
 import { computeDailyWindows } from "./daily-windows";
 
+function panchangDayParts(place, atMs = Date.now()) {
+  const probe = new Date(atMs);
+  const probeTz = zoneOffset(place.zone, probe.getUTCFullYear(), probe.getUTCMonth() + 1, probe.getUTCDate()) ?? 5.5;
+  const local = new Date(atMs + probeTz * 3600000);
+  let y = local.getUTCFullYear(), m = local.getUTCMonth() + 1, day = local.getUTCDate();
+  const dayTz = zoneOffset(place.zone, y, m, day) ?? probeTz;
+  const rise = sunEvents(y, m, day, dayTz, place.lat, place.lon).rise;
+  if (rise !== null && atMs < rise) {
+    const previous = new Date(Date.UTC(y, m - 1, day - 1));
+    y = previous.getUTCFullYear(); m = previous.getUTCMonth() + 1; day = previous.getUTCDate();
+  }
+  return { y, m, day };
+}
+
+function panchangDayISO(place, atMs = Date.now()) {
+  const { y, m, day } = panchangDayParts(place, atMs);
+  return `${y}-${String(m).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
 function computeTodayPanchang(place, ayanamsa = "lahiri", atMs) {
   setAyanMode(ayanamsa);
   const now = atMs != null ? atMs : Date.now();
-  const probe = new Date(now);
-  const tz = zoneOffset(place.zone, probe.getUTCFullYear(), probe.getUTCMonth() + 1, probe.getUTCDate()) ?? 5.5;
-  const local = new Date(now + tz * 3600000);
-  const y = local.getUTCFullYear(), m = local.getUTCMonth() + 1, day = local.getUTCDate();
-  const dow = local.getUTCDay();
+  const selected = panchangDayParts(place, now);
+  const y = selected.y, m = selected.m, day = selected.day;
+  const tz = zoneOffset(place.zone, y, m, day) ?? 5.5;
+  const local = new Date(Date.UTC(y, m - 1, day, 12));
+  const dow = new Date(Date.UTC(y, m - 1, day)).getUTCDay();
 
   const ev = sunEvents(y, m, day, tz, place.lat, place.lon);
   const moonEv = moonEvents(y, m, day, tz, place.lat, place.lon);
   /* The FOLLOWING day's sunrise. Everything that spans the night — night horas,
      night choghadiya — must measure against this, not rise+24h, which drifts by
      minutes and is worst near the solstices. */
-  const evNext = sunEvents(y, m, day + 1, tz, place.lat, place.lon);
+  const nextCivil = new Date(Date.UTC(y, m - 1, day + 1));
+  const nextY = nextCivil.getUTCFullYear(), nextM = nextCivil.getUTCMonth() + 1, nextDay = nextCivil.getUTCDate();
+  const nextTz = zoneOffset(place.zone, nextY, nextM, nextDay) ?? tz;
+  const evNext = sunEvents(nextY, nextM, nextDay, nextTz, place.lat, place.lon);
   const nextRise = evNext.rise !== null ? evNext.rise : (ev.rise !== null ? ev.rise + 86400000 : null);
   const anchor = ev.rise !== null ? ev.rise : Date.UTC(y, m - 1, day, 6) - tz * 3600000; // panchang day begins at sunrise
   const dayEnd = anchor + 24.2 * 3600000;
@@ -104,4 +126,4 @@ function computeTodayPanchang(place, ayanamsa = "lahiri", atMs) {
   };
 }
 
-export { computeTodayPanchang };
+export { computeTodayPanchang, panchangDayISO };

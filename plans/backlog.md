@@ -1177,6 +1177,11 @@ Feature exists and renders; not a claim of polish/parity.
   night dial shows the night starting at *tonight's* sunset, not the one the
   user is in. Same `todayISO`/`isPanchToday` rule drives "Back to today",
   holiday overlays and festival dates, so it needs its own sourced pass.
+  **Resolved 2026-08-15:** automatic Today now selects the sunrise-day through
+  one engine helper; before dawn it retains the preceding civil date, while an
+  explicit URL/calendar date remains exact. Delhi and New York DST boundaries,
+  polar no-sunrise fallback, mutation resistance, all sourced festival gates and
+  unchanged EN/HI screen snapshots are permanent closure evidence.
   (68) At night the Blocked lane is correctly empty — no belts apply after
   sunset — but an empty lane reads as a rendering fault; it should say so.
   **Owner correction 2026-08-10:** Hora's primary personas are **P5 (working

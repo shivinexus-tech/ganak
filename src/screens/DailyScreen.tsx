@@ -8,7 +8,7 @@ import PlaceInput from "../components/PlaceInput";
 import {
   SIGNS, NAKSHATRAS, zoneOffset,
 } from "../engine/panchang";
-import { computeTodayPanchang } from "../engine/today-panchang";
+import { computeTodayPanchang, panchangDayISO } from "../engine/today-panchang";
 import { CalendarPage } from "./CalendarPage";
 import { MuhuratHub } from "./MuhuratHub";
 import { scanPanchangCalendar } from "../engine/festivals";
@@ -55,6 +55,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
   const chooseCalendarMode = (value) => { const next = resolveConvention(value,regionalFlags); setCalendarState(next); urlPrefPush("cal", next.id); };
   const chooseHolidayMode = (value) => { const next = resolveHolidayMode(value); setHolidayMode(next); urlPrefPush("hol", next); };
   const todayISO = (() => {
+    if (place) return panchangDayISO(place, Date.now());
     const nowU = new Date();
     let off = null;
     try { off = place ? zoneOffset(place.zone, nowU.getUTCFullYear(), nowU.getUTCMonth() + 1, nowU.getUTCDate()) : null; } catch (e) { off = null; }
