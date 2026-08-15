@@ -7,6 +7,54 @@
 
 ---
 
+**Primary persona: P1 · Panchang householder / diaspora.** They know the aarti or
+festival by name and want to reach the familiar devotional text quickly; they should
+not need to understand Ganak's content structure or astrology vocabulary.
+
+## Journey
+
+1. The visitor opens Ganak for a festival or searches for a familiar aarti by name.
+2. They recognise the aarti they want on the festival guide or Bhakti aarti list.
+3. They open that one aarti at its permanent address, without hunting inside an
+   unrelated festival page.
+4. They read it in the selected English or Hindi interface and can bookmark or share
+   that same address.
+5. When they return through the bookmark or shared link, the same composition opens
+   directly rather than requiring them to repeat the navigation.
+
+## Walking it against the code
+
+- **Step 1 works today for festivals:** `src/kundli-app.tsx` resolves permanent
+  festival routes through `festivalGuideFromPath`, and
+  `src/screens/FestivalGuideScreen.tsx` renders the selected guide.
+- **Step 2 partly works today:** `src/components/VratVidhiCard.tsx` renders each
+  guide's `data.aartis`, backed by the shared compositions in
+  `src/data/aarti-texts.ts`, but only inside the festival guide.
+- **Steps 3–5 are missing today:** there is no `/bhakti` route, aarti-list route or
+  composition route in `src/kundli-app.tsx`; `VratVidhiCard.tsx` renders the text but
+  no permanent composition link. A visitor therefore cannot directly open, bookmark
+  or share one aarti.
+
+## What already exists
+
+- The fourteen shared compositions already exist in `src/data/aarti-texts.ts`; this
+  work reuses them rather than copying devotional text into new pages.
+- The refrain/cue presentation already exists in `src/components/VratVidhiCard.tsx`
+  and remains the visual/content baseline for a standalone page.
+- Permanent festival-route parsing and route-specific rendering already exist in
+  `src/kundli-app.tsx` and `src/screens/FestivalGuideScreen.tsx`; the later build can
+  extend that infrastructure instead of inventing a second navigation model.
+
+## Success
+
+Reaching one specific aarti changes from an impossible direct journey today (the user
+must open a festival page and manually scroll) to **one tap from its link or bookmark**.
+All 14 compositions move from zero direct addresses today to one stable address each;
+returning through a saved or shared address requires zero search forms and zero
+festival-page scrolling.
+
+---
+
 ## 1. Problem
 
 Ganak has fourteen aartis. Every one of them lives **inside** a festival page, as a
