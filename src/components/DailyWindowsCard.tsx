@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { T } from "./ui-style-contract";
 import { scanSpecialYogaCalendar } from "../engine/daily-windows";
-import { dayRange } from "./format";
+import { dayRange, panchangTime } from "./format";
 
 const NAK_TARA = ["Janma","Sampat","Vipat","Kshema","Pratyari","Sadhaka","Naidhana","Mitra","Parama Mitra"];
 const YOGA_FILTERS = [
@@ -33,9 +33,7 @@ export default function DailyWindowsCard({ data, place, lang, C, card }) {
   // Bhadra, Dur, Varjyam, Brahma, Nishita and the night Gowri halves all run past
   // midnight, so every clock here is bound to the sunrise anchor of the day it
   // belongs to and carries its date when it crosses (C3-CROSSMIDNIGHT-DATE).
-  const clockOf = (ms, tz) => place?.zone
-    ? new Date(ms).toLocaleTimeString(lang === "hi" ? "hi-IN" : "en-IN", { hour:"numeric", minute:"2-digit", hour12:true, timeZone:place.zone })
-    : new Date(ms + tz * 3600000).toLocaleTimeString(lang === "hi" ? "hi-IN" : "en-IN", { hour:"numeric", minute:"2-digit", hour12:true, timeZone:"UTC" });
+  const clockOf = (ms, tz) => panchangTime(ms, tz, lang, place?.zone, "locale");
   const span = dayRange(data.tz, data.anchor, lang, (ms) => clockOf(ms, data.tz), place?.zone);
   const row = (label, windows, tone = C.ivory) => (
     <div style={{ display:"flex", justifyContent:"space-between", gap: "0.75rem", padding: "0.375rem 0", borderBottom:`0.0625rem solid ${C.line}`, fontSize: "var(--font-small)" }}>

@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from "react";
 import { T, R as RT } from "../components/ui-style-contract";
 import PlaceInput from "../components/PlaceInput";
-import { dayClock, dayRange } from "../components/format";
+import { dayClock, dayRange, panchangTime } from "../components/format";
 import VratVidhiCard from "../components/VratVidhiCard";
 import NavadurgaDayGuide, { NavadurgaSeasonLinks } from "../components/NavadurgaDayGuide";
 import FestivalRasterHero from "../components/FestivalRasterHero";
@@ -144,18 +144,6 @@ function formatLocalDate(ms, tz, lang) {
   return d.toLocaleDateString(lang === "hi" ? "hi-IN" : "en-IN", {
     weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "UTC",
   });
-}
-
-function formatLocalClock(ms, tz, refMs, lang, zone) {
-  const locale = lang === "hi" ? "hi-IN" : "en-IN";
-  const render = (value) => zone
-    ? new Date(value).toLocaleTimeString(locale, {
-      hour: "2-digit", minute: "2-digit", hour12: lang !== "hi", hourCycle: lang === "hi" ? "h23" : undefined, timeZone: zone,
-    })
-    : new Date(value + tz * 3600000).toLocaleTimeString(locale, {
-      hour: "2-digit", minute: "2-digit", hour12: lang !== "hi", hourCycle: lang === "hi" ? "h23" : undefined, timeZone: "UTC",
-    });
-  return dayClock(tz, refMs, lang, render, zone)(ms);
 }
 
 function dayKalaWindow(detail, timing) {
@@ -337,12 +325,9 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
   const refMs = hit ? hit.ms : null;
   const clock = dayClock(tz, refMs, L, undefined, place?.zone);
   const clockRange = dayRange(tz, refMs, L, undefined, place?.zone);
-  const festivalClock = (ms, eventTz = tz) => formatLocalClock(ms, eventTz, refMs, L, place?.zone);
+  const festivalClock = (ms, eventTz = tz) => dayClock(eventTz, refMs, L, (value) => panchangTime(value, eventTz, L, place?.zone, "two-digit"), place?.zone)(ms);
   const festivalRange = (a, b, eventTz = tz) => {
-    const locale = L === "hi" ? "hi-IN" : "en-IN";
-    const render = (value) => place?.zone
-      ? new Date(value).toLocaleTimeString(locale, { hour:"2-digit", minute:"2-digit", hour12:L !== "hi", hourCycle:L === "hi" ? "h23" : undefined, timeZone:place.zone })
-      : new Date(value + eventTz * 3600000).toLocaleTimeString(locale, { hour:"2-digit", minute:"2-digit", hour12:L !== "hi", hourCycle:L === "hi" ? "h23" : undefined, timeZone:"UTC" });
+    const render = (value) => panchangTime(value, eventTz, L, place?.zone, "two-digit");
     return dayRange(eventTz, refMs, L, render, place?.zone)(a, b);
   };
   const paranaBasis = navratri && ({

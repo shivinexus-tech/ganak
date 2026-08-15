@@ -167,7 +167,7 @@ else ok();
 {
   const fs = require('fs');
   const festival = fs.readFileSync('src/screens/FestivalGuideScreen.tsx','utf8');
-  if (!/return dayClock\(tz, refMs, lang, render, zone\)\(ms\)/.test(festival)) fail('FestivalGuideScreen does not delegate its localized clock to dayClock');
+  if (!/dayClock\(eventTz, refMs, L, \(value\) => panchangTime/.test(festival)) fail('FestivalGuideScreen does not delegate its localized clock to dayClock');
   else ok();
   if (/sameDay\s*=|getUTCFullYear\(\)\s*===\s*ref/.test(festival)) fail('FestivalGuideScreen still duplicates the civil-date comparison');
   else ok();

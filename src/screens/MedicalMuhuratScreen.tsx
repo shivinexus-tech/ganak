@@ -3,6 +3,7 @@ import { panchangTerm, weekdayName, WEEKDAY_SHORT_EN } from "../i18n/panchang-te
 import PlaceInput from "../components/PlaceInput";
 import { zoneOffset } from "../engine/panchang";
 import { medicalMuhuratScan, natalMoonSign } from "../engine/medical-muhurat";
+import { panchangTime } from "../components/format";
 import {
   MEDICAL_SAFETY, MEDICAL_INTRO, MEDICAL_CONFIRM, MEDICAL_TRADITION_NOTE,
   MEDICAL_EXCLUSION, MEDICAL_LABELS, MEDICAL_RESULT_NOTE, MEDICAL_NO_WINDOW, MEDICAL_NO_SOLAR_DATA,
@@ -21,13 +22,8 @@ export function medicalMuhuratFromPath(pathname: string) {
   return pathname === "/muhurat/medical" || pathname === "/muhurat/medical/" ? { kind: "medical" } : null;
 }
 
-const two = (n: number) => String(n).padStart(2, "0");
 function fmtTime(ms: number, tz: number, hi: boolean): string {
-  const d = new Date(ms + tz * 3600000);
-  const h = d.getUTCHours(), m = d.getUTCMinutes();
-  if (hi) return `${two(h)}:${two(m)}`;
-  const ap = h < 12 ? "AM" : "PM"; let h12 = h % 12; if (h12 === 0) h12 = 12;
-  return `${h12}:${two(m)} ${ap}`;
+  return panchangTime(ms, tz, hi ? "hi" : "en");
 }
 const DOW_EN = WEEKDAY_SHORT_EN;
 const MON_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

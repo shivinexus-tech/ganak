@@ -22,9 +22,8 @@ const fmtDeg = (x) => {
 
    Reference behaviour: Drik Panchang prints "02:21 AM, Jul 26".
 
-   `lang` selects the locale of the appended DATE only. The clock format is the
-   caller's business: the Hindi 24-hour convention belongs to the festival
-   pages' `formatLocalClock` and is deliberately not changed here.
+   `lang` selects the locale of the appended date. Panchang clocks use the
+   shared 12-hour convention below in both languages.
 --------------------------------------------------------------------------- */
 const localParts = (ms, tz, zone) => {
   if (zone) {
@@ -80,6 +79,18 @@ const fmtTimeZone = (ms, tz, zone) => {
   const ap = p.h >= 12 ? "PM" : "AM", h = p.h % 12 || 12;
   return `${h}:${String(p.mi).padStart(2, "0")} ${ap}`;
 };
+const panchangTime = (ms, tz, lang, zone, englishStyle = "canonical") => {
+  if (ms === null || ms === undefined) return "—";
+  // Owner-approved convention: Hindi Panchang clocks use the same unambiguous
+  // 12-hour AM/PM notation as Today/Muhurat. English legacy typography stays
+  // byte-identical on cards that used locale formatting before this migration.
+  if (lang === "hi" || englishStyle === "canonical") return fmtTimeZone(ms, tz, zone);
+  const value = zone ? new Date(ms) : new Date(ms + tz * 3600000);
+  return value.toLocaleTimeString("en-IN", {
+    hour: englishStyle === "two-digit" ? "2-digit" : "numeric",
+    minute: "2-digit", hour12: true, timeZone: zone || "UTC",
+  });
+};
 
 const fmtDateT = (ms, tz = 0, withTime = false) => {
   const d = new Date(ms + tz * 3600000);
@@ -94,7 +105,7 @@ const fmtDateT = (ms, tz = 0, withTime = false) => {
    across Today/Muhurat; surfaces with their own locale-aware clock pass theirs
    so only the date suffix comes from here. */
 const dayClock = (tz, refMs, lang, render, zone) => {
-  const clock = render || ((ms) => fmtTimeZone(ms, tz, zone));
+  const clock = render || ((ms) => panchangTime(ms, tz, lang, zone));
   return (ms) => (ms === null || ms === undefined ? "—" : withDayDate(clock(ms), ms, tz, refMs, lang, zone));
 };
 
@@ -103,7 +114,7 @@ const dayClock = (tz, refMs, lang, render, zone) => {
    dates only the end, "11:19 PM–12:43 AM, Aug 15". Both are Drik's own layout,
    and a window inside the panchang day is untouched. */
 const dayRange = (tz, refMs, lang, render, zone) => {
-  const clock = render || ((ms) => fmtTimeZone(ms, tz, zone));
+  const clock = render || ((ms) => panchangTime(ms, tz, lang, zone));
   return (a, b, sep = "–") => {
     if (a === null || a === undefined || b === null || b === undefined) return "—";
     // A range carries one date, at the end. This stays true even for an unusual
@@ -112,4 +123,4 @@ const dayRange = (tz, refMs, lang, render, zone) => {
   };
 };
 
-export { fmtDeg, fmtTimeD, fmtTime, fmtTimeZone, fmtDateT, fmtDateZone, crossesDay, dayDate, withDayDate, dayClock, dayRange };
+export { fmtDeg, fmtTimeD, fmtTime, fmtTimeZone, panchangTime, fmtDateT, fmtDateZone, crossesDay, dayDate, withDayDate, dayClock, dayRange };
