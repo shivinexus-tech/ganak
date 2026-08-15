@@ -431,7 +431,8 @@
         62,
         63,
         64,
-        66
+        66,
+        73
       ]
     },
     {
@@ -445,7 +446,9 @@
         65,
         69,
         70,
-        71
+        71,
+        74,
+        75
       ]
     },
     {
@@ -891,6 +894,21 @@
       "section": "P2",
       "title": "Bhakti naming + URL contract, and permanent pages for the 14 existing aartis",
       "technicalComplexity": "Medium"
+    },
+    "73": {
+      "section": "P0",
+      "title": "Cross-midnight times must carry their date (`C3-CROSSMIDNIGHT-DATE`)",
+      "technicalComplexity": "Medium"
+    },
+    "74": {
+      "section": "P1",
+      "title": "Moonset divergence vs Drik ~43 min (`C3-MOONSET-DRIK`)",
+      "technicalComplexity": "Medium"
+    },
+    "75": {
+      "section": "P1",
+      "title": "Godhuli convention divergence ~14 min (`C3-GODHULI-DRIK`)",
+      "technicalComplexity": "Low"
     }
   }
 }

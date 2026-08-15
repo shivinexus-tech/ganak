@@ -1359,6 +1359,59 @@ Consequences that follow from the "all Hindu traditions + beyond Drik" scope:
    user feedback** (aligns with the "gather user input" strategy — users surface
    their own missing local observances).
 
+### C3 — Reference-source divergences (Drik cross-check, 2026-08-12) — ALL CLOSED 2026-08-14
+
+Ganak's engine was compared field-by-field against Drik Panchang for one shared
+anchor: **New Delhi (28.6139, 77.209, Asia/Kolkata), Saturday 25 July 2026,
+Lahiri, Amanta** — the `today-delhi-2026-07-25-devshayani-v1` fixture.
+
+**Matched exactly:** sunrise 05:38 · Abhijit 12:00–12:55 · Rahu Kalam 09:03–10:45 ·
+Brahma Muhurta 04:16–04:57 · Dinamana 13h 38m · Vikram 2083 Siddharthi · Shaka
+1948 Parabhava · Gujarati 2082 Pingala · Pravishte 10 · Disha Shool East · Moonsign
+Vrishchika · Sunsign Karka. Tithi, karana, yoga, Gulika, Yamaganda and Nishita all
+agree within one minute. **The engine is in good shape**; only the rows below diverged,
+and all three are now fixed, gated and mutation-tested. Backlog rows 73, 74 and 75.
+
+- [x] **C3-GODHULI-DRIK — Godhuli Muhurta was ~14 minutes early.** Ganak 19:03–19:27;
+      Drik 19:17–19:37. Both agreed sunset was 19:16–19:17, so the divergence was in
+      the rule, not the solar position. **Declared convention (2026-08-14): Godhuli
+      begins AT sunset and runs for half a night muhurta** — the night from sunset to
+      the next sunrise divided into fifteen muhurtas. Chosen on four published Drik
+      anchors across three cities and two seasons, over which the window's own length
+      varies 20→27 minutes; that variation rules out a fixed duration and identifies
+      the rule uniquely. Reproduces all four to the minute. Named in
+      `plans/panchang-muhurat-source-matrix.md` and stated to the reader in EN and HI.
+      _(found by Drik cross-check 2026-08-12; closed 2026-08-14)_
+
+- [x] **C3-MOONSET-DRIK — moonset differed by ~43 minutes.** Ganak 01:33 AM;
+      Drik 02:16 AM (26 Jul). The suspicion recorded here — horizon/parallax treatment
+      or a clipped next-day search window — **was wrong, and the evidence refuted it**:
+      the set following that day's 16:15 moonrise already computed to 02:20, four
+      minutes from Drik. The cause was **pairing**. Moonset was taken as the first set
+      inside the local *calendar* day, which belongs to the PREVIOUS day's rise, so it
+      ran a full lunar retardation early — every day of the month. Drik pairs moonset
+      with the rise it closes, normally after midnight. Fixed, with ±6 min declared as
+      Ganak's lunar tolerance (measured 3–5 min, and symmetric with moonrise, so it is
+      the truncated lunar series and not the rule).
+      _(found by Drik cross-check 2026-08-12; closed 2026-08-14)_
+
+- [x] **C3-CROSSMIDNIGHT-DATE — values that cross midnight now carry their date.**
+      Nakshatra Jyeshtha ends 07:34 **on 26 July**, but a bare "till 07:34" read as the
+      same day. This was a **data-contract defect, not a display preference**: any
+      surface rendering tithi, nakshatra, yoga, karana, Nishita, moonset or paran can
+      express a time past midnight. The engine was never wrong — the ms values always
+      carried the date; two vacuous call sites threw it away, one passing each value as
+      its own same-day reference. One shared contract in `src/components/format.ts` now
+      decides it for every surface, anchored to the panchang day's sunrise, with a
+      window printing its date once at the end as Drik does. Same-day values are
+      untouched, so the change is a strict superset of the old output.
+      _(found while writing the Today data pack 2026-08-12; closed 2026-08-14)_
+
+**Related but distinct — still open:** row 67 (panchang day boundary) is about *which*
+day the app shows before sunrise. C3-CROSSMIDNIGHT-DATE is about whether a rendered
+time carries its date. Both come from the sunrise-to-sunrise day model; neither closes
+the other.
+
 ---
 
 ## E. Repo debt & small follow-ups
