@@ -1384,7 +1384,7 @@ and all three are now fixed, gated and mutation-tested. Backlog rows 73, 74 and 
       _(found by Drik cross-check 2026-08-12; closed 2026-08-14)_
 
 - [x] **C3-MOONSET-DRIK — moonset differed by ~43 minutes.** Ganak 01:33 AM;
-      Drik 02:16 AM (26 Jul). The suspicion recorded here — horizon/parallax treatment
+      Drik's current exact New Delhi monthly row is 02:21 AM (26 Jul). The suspicion recorded here — horizon/parallax treatment
       or a clipped next-day search window — **was wrong, and the evidence refuted it**:
       the set following that day's 16:15 moonrise already computed to 02:20, four
       minutes from Drik. The cause was **pairing**. Moonset was taken as the first set

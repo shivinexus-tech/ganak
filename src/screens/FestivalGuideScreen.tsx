@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from "react";
 import { T, R as RT } from "../components/ui-style-contract";
 import PlaceInput from "../components/PlaceInput";
-import { fmtTimeD } from "../components/format";
+import { dayClock, dayRange } from "../components/format";
 import VratVidhiCard from "../components/VratVidhiCard";
 import NavadurgaDayGuide, { NavadurgaSeasonLinks } from "../components/NavadurgaDayGuide";
 import FestivalRasterHero from "../components/FestivalRasterHero";
@@ -146,19 +146,16 @@ function formatLocalDate(ms, tz, lang) {
   });
 }
 
-function formatLocalClock(ms, tz, refMs, lang) {
+function formatLocalClock(ms, tz, refMs, lang, zone) {
   const locale = lang === "hi" ? "hi-IN" : "en-IN";
-  const d = new Date(ms + tz * 3600000);
-  const ref = new Date(refMs + tz * 3600000);
-  const clock = d.toLocaleTimeString(locale, {
-    hour: "2-digit", minute: "2-digit", hour12: lang !== "hi", hourCycle: lang === "hi" ? "h23" : undefined, timeZone: "UTC",
-  });
-  const sameDay = d.getUTCFullYear() === ref.getUTCFullYear()
-    && d.getUTCMonth() === ref.getUTCMonth()
-    && d.getUTCDate() === ref.getUTCDate();
-  if (sameDay) return clock;
-  const date = d.toLocaleDateString(locale, { month: "short", day: "numeric", timeZone: "UTC" });
-  return `${clock}, ${date}`;
+  const render = (value) => zone
+    ? new Date(value).toLocaleTimeString(locale, {
+      hour: "2-digit", minute: "2-digit", hour12: lang !== "hi", hourCycle: lang === "hi" ? "h23" : undefined, timeZone: zone,
+    })
+    : new Date(value + tz * 3600000).toLocaleTimeString(locale, {
+      hour: "2-digit", minute: "2-digit", hour12: lang !== "hi", hourCycle: lang === "hi" ? "h23" : undefined, timeZone: "UTC",
+    });
+  return dayClock(tz, refMs, lang, render, zone)(ms);
 }
 
 function dayKalaWindow(detail, timing) {
@@ -337,7 +334,17 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
   // own reference made the same-day test always true, so Nishita puja, Ghatasthapana
   // and Chhath windows that run past midnight printed a bare time with no date
   // (C3-CROSSMIDNIGHT-DATE).
-  const clock = (ms) => fmtTimeD(ms, tz, hit ? hit.ms : ms, L);
+  const refMs = hit ? hit.ms : null;
+  const clock = dayClock(tz, refMs, L, undefined, place?.zone);
+  const clockRange = dayRange(tz, refMs, L, undefined, place?.zone);
+  const festivalClock = (ms, eventTz = tz) => formatLocalClock(ms, eventTz, refMs, L, place?.zone);
+  const festivalRange = (a, b, eventTz = tz) => {
+    const locale = L === "hi" ? "hi-IN" : "en-IN";
+    const render = (value) => place?.zone
+      ? new Date(value).toLocaleTimeString(locale, { hour:"2-digit", minute:"2-digit", hour12:L !== "hi", hourCycle:L === "hi" ? "h23" : undefined, timeZone:place.zone })
+      : new Date(value + eventTz * 3600000).toLocaleTimeString(locale, { hour:"2-digit", minute:"2-digit", hour12:L !== "hi", hourCycle:L === "hi" ? "h23" : undefined, timeZone:"UTC" });
+    return dayRange(eventTz, refMs, L, render, place?.zone)(a, b);
+  };
   const paranaBasis = navratri && ({
     "navami-end": {
       en: "Navami ends at this time; complete the full nine-day fast afterwards.",
@@ -590,14 +597,12 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                   </div>
                   <div>
                     {L === "hi" ? "अधिकतम ग्रहण: " : "Maximum eclipse: "}
-                    {formatLocalClock(grahan.eclipseMs, tz, hit.ms, L)}
+                    {festivalClock(grahan.eclipseMs)}
                   </div>
                   {grahan.visible && grahan.contacts && (
                     <div style={{ color: C.ivory, fontWeight: 500 }}>
                       {L === "hi" ? "ग्रहण स्पर्श: " : "Eclipse contacts: "}
-                      {formatLocalClock(grahan.contacts.start, tz, hit.ms, L)}
-                      {" – "}
-                      {formatLocalClock(grahan.contacts.end, tz, hit.ms, L)}
+                      {festivalRange(grahan.contacts.start, grahan.contacts.end, tz)}
                     </div>
                   )}
                   {grahan.visible && (
@@ -605,18 +610,16 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                       {grahan.visibility && (
                         <div style={{ color: C.ivory, fontWeight: 500 }}>
                           {L === "hi" ? "स्थानीय दृश्य अवधि: " : "Visible locally: "}
-                          {formatLocalClock(grahan.visibility.start, tz, hit.ms, L)}
-                          {" – "}
-                          {formatLocalClock(grahan.visibility.end, tz, hit.ms, L)}
+                          {festivalRange(grahan.visibility.start, grahan.visibility.end, tz)}
                         </div>
                       )}
                       <div>
                         {L === "hi" ? `सूतक (${grahan.sutakHours} घंटे पहले): ` : `Sutak (${grahan.sutakHours}h before): `}
-                        {formatLocalClock(grahan.sutakStart, tz, hit.ms, L)}
+                        {festivalClock(grahan.sutakStart)}
                       </div>
                       <div>
                         {L === "hi" ? "मोक्ष (ग्रहण समाप्ति): " : "Moksha (eclipse ends): "}
-                        {formatLocalClock(grahan.moksha, tz, hit.ms, L)}
+                        {festivalClock(grahan.moksha)}
                       </div>
                     </>
                   )}
@@ -641,7 +644,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                   {lakshmiPuja.primary ? (
                     <div>
                       {L === "hi" ? "लक्ष्मी पूजा का शुभ मुहूर्त: " : "Lakshmi Puja muhurat: "}
-                      {clock(lakshmiPuja.primary.start)}–{clock(lakshmiPuja.primary.end)}
+                      {clockRange(lakshmiPuja.primary.start, lakshmiPuja.primary.end)}
                     </div>
                   ) : (
                     <div style={{ color: C.sindoor }}>
@@ -651,24 +654,22 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                   {lakshmiPuja.pradosh && (
                     <div style={{ color: C.ivory, fontWeight: 500 }}>
                       {L === "hi" ? "प्रदोष काल: " : "Pradosh Kaal: "}
-                      {clock(lakshmiPuja.pradosh.start)}–{clock(lakshmiPuja.pradosh.end)}
+                      {clockRange(lakshmiPuja.pradosh.start, lakshmiPuja.pradosh.end)}
                     </div>
                   )}
                   {lakshmiPuja.amavasya && (
                     <div style={{ color: C.muted, fontWeight: 400, fontSize: T.fMicro }}>
                       {L === "hi" ? "अमावस्या तिथि: " : "Amavasya tithi: "}
-                      {formatLocalClock(lakshmiPuja.amavasya.start, tz, hit.ms, L)}
-                      {" – "}
-                      {formatLocalClock(lakshmiPuja.amavasya.end, tz, hit.ms, L)}
+                      {festivalRange(lakshmiPuja.amavasya.start, lakshmiPuja.amavasya.end, tz)}
                     </div>
                   )}
                 </div>
               )}
               {punyaKala && (
                 <div style={{ display: "grid", gap: "0.3125rem", padding: "0.5625rem 0.625rem", borderRadius: T.rSm, background: "var(--good-surface)", border: "0.0625rem solid var(--good-surface)", fontSize: T.fSmall, color: "var(--good)", fontVariantNumeric: "tabular-nums", lineHeight: 1.45 }}>
-                  <div><strong>{L === "hi" ? "संक्रांति क्षण: " : "Sankranti moment: "}</strong>{formatLocalClock(punyaKala.ingress, tz, hit.ms, L)}</div>
-                  <div><strong>{L === "hi" ? "पुण्य काल: " : "Punya Kala: "}</strong>{formatLocalClock(punyaKala.punya.start, punyaKala.tz, hit.ms, L)}–{formatLocalClock(punyaKala.punya.end, punyaKala.tz, hit.ms, L)}</div>
-                  <div><strong>{L === "hi" ? "महा पुण्य काल: " : "Maha Punya Kala: "}</strong>{formatLocalClock(punyaKala.mahaPunya.start, punyaKala.tz, hit.ms, L)}–{formatLocalClock(punyaKala.mahaPunya.end, punyaKala.tz, hit.ms, L)}</div>
+                  <div><strong>{L === "hi" ? "संक्रांति क्षण: " : "Sankranti moment: "}</strong>{festivalClock(punyaKala.ingress)}</div>
+                  <div><strong>{L === "hi" ? "पुण्य काल: " : "Punya Kala: "}</strong>{festivalRange(punyaKala.punya.start, punyaKala.punya.end, punyaKala.tz)}</div>
+                  <div><strong>{L === "hi" ? "महा पुण्य काल: " : "Maha Punya Kala: "}</strong>{festivalRange(punyaKala.mahaPunya.start, punyaKala.mahaPunya.end, punyaKala.tz)}</div>
                   {punyaKala.carriedToDaylight && <div style={{ color: C.muted, fontWeight: 400 }}>{L === "hi" ? "सूर्यास्त के बाद की संक्रांति होने से पूजा का समय अगले स्थानीय सूर्योदय से है।" : "Because ingress is outside daylight, the worship window begins at the applicable local sunrise."}</div>}
                 </div>
               )}
@@ -679,7 +680,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                   borderRadius: T.rSm, padding: "0.4375rem 0.625rem", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
                 }}>
                   {d.parana
-                    ? <>{L === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, hit.ms, L)}{L === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {L === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, hit.ms, L)}</span>}</>
+                    ? <>{L === "hi" ? "पारण: " : "Parana: "}{festivalClock(d.parana.start, d.tz)}{L === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {L === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{festivalClock(d.parana.dwadashiEnd, d.tz)}</span>}</>
                     : dayKala
                       ? <>{meta.timing === "madhyahna"
                         ? (L === "hi" ? "मध्याह्न काल: " : "Madhyahna period: ")
@@ -688,16 +689,16 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                           : (L === "hi" ? "अपराह्न काल: " : "Aparahna period: ")}
                         {clock(dayKala.start)}–{clock(dayKala.end)}</>
                     : d.moonrise != null
-                      ? <>{L === "hi" ? "चंद्रोदय पर व्रत खोलें: " : "Break fast after moonrise: "}{fmtTimeD(d.moonrise, d.tz, hit.ms, L)}</>
+                      ? <>{L === "hi" ? "चंद्रोदय पर व्रत खोलें: " : "Break fast after moonrise: "}{festivalClock(d.moonrise, d.tz)}</>
                       : d.nishita
                         ? <>{L === "hi" ? "निषीथ काल (मुख्य पूजा): " : "Nishita period (main puja): "}{clock(d.nishita.start)}–{clock(d.nishita.end)}</>
                         : d.morning
                           ? <>{L === "hi" ? "प्रातः पूजा: " : "Morning puja: "}{clock(d.morning.start)}–{clock(d.morning.end)}</>
                           : d.sunrise != null
-                            ? <>{L === "hi" ? "प्रातः / सूर्योदय: " : "Morning — from sunrise: "}{fmtTimeD(d.sunrise, d.tz, hit.ms, L)}</>
+                            ? <>{L === "hi" ? "प्रातः / सूर्योदय: " : "Morning — from sunrise: "}{festivalClock(d.sunrise, d.tz)}</>
                             : d.stars
                               ? <>{L === "hi" ? "तारे दिखाई देने के बाद व्रत खोलें" : "Break the fast after the stars are visible"}</>
-                              : <>{L === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, hit.ms, L)}</>}
+                              : <>{L === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{festivalClock(d.sunset, d.tz)}</>}
                 </div>
               )}
               {decidingLabel && !(d && (navratri || lakshmiPuja || chhathSeq || skandaSeq || ayyappaSeq || dayKala || d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars)) && (

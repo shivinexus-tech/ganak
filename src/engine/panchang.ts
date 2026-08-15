@@ -69,8 +69,8 @@ function moonRefine(a, b, lat, lon, h0) {
    month falls after midnight on the NEXT civil date. Taking the first set
    inside the calendar day instead pairs the day with the PREVIOUS day's rise
    and so reports a whole lunar retardation (~45 min) early — that was the
-   ~43-minute divergence from Drik on 2026-07-25 at New Delhi (01:33 reported,
-   02:16 published). The ephemeris was never at fault: the set following that
+   ~48-minute divergence from Drik on 2026-07-25 at New Delhi (01:33 reported,
+   02:21 published). The ephemeris was never at fault: the set following that
    day's 16:15 rise already computed to 02:20.
 
    When the Moon does not rise at all on the day (roughly once a lunation) there
@@ -80,8 +80,11 @@ function moonEvents(y, m, day, tz, lat, lon, step = 300000) {
   const h0 = 0.125, DAY = 86400000;
   const start = Date.UTC(y, m - 1, day, 0, 0) - tz * 3600000, dayEnd = start + DAY;
   let rise = null, set = null, setInDay = null, prev = moonAltitude(start, lat, lon) - h0;
-  // Scans into the next day because the closing set usually lives there.
-  for (let t = step; t <= 2 * DAY; t += step) {
+  // Ordinary closing sets live on the next day. At high latitude the Moon can
+  // remain continuously above the horizon for many days, so keep following a
+  // rise for up to half a lunation. Never fall back to a set that precedes it.
+  const MAX_PAIR_SPAN = 16 * DAY;
+  for (let t = step; t <= MAX_PAIR_SPAN; t += step) {
     const ms = start + t, cur = moonAltitude(ms, lat, lon) - h0;
     if (prev < 0 && cur >= 0) {
       if (rise === null && ms - step < dayEnd) rise = moonRefine(ms - step, ms, lat, lon, h0);
@@ -91,9 +94,9 @@ function moonEvents(y, m, day, tz, lat, lon, step = 300000) {
       if (setInDay === null && cross < dayEnd) setInDay = cross;
     }
     prev = cur;
-    if (ms >= dayEnd && rise === null) break; // no moonrise today — nothing to pair with
+    if (ms >= dayEnd && rise === null) break; // no moonrise today — use only an in-day set
   }
-  return { rise, set: set !== null ? set : setInDay };
+  return { rise, set: rise !== null ? set : setInDay };
 }
 
 const RAHU_SEGMENT = { 0: 8, 1: 2, 2: 7, 3: 5, 4: 6, 5: 4, 6: 3 };

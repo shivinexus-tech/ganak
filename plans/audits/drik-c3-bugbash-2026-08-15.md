@@ -154,3 +154,40 @@ Independent negative mutations in disposable copies:
 - No physical-device or live-URL visual test was appropriate: this is an unmerged
   branch audit. Rendering was checked through the branch's static-render gate.
 - No product fixes were made, per the assignment.
+
+## Owner-assigned resolution follow-up (2026-08-15)
+
+The owner subsequently authorised fixes for F1–F5 on this same Task B branch.
+
+- **F1 fixed:** `moonEvents` follows a found rise for up to half a lunation and
+  never uses an earlier in-day set as fallback. The original 976-place-day probe
+  now reports `mismatch: 0`; exact Tromsø, Reykjavík and Longyearbyen fixtures
+  close 4–9 days after their rises and are permanent gate anchors.
+- **F2 fixed:** the shared contract accepts the place's IANA zone and resolves
+  wall-clock/date parts at each instant. New York next sunrise now renders
+  `7:18 AM, Mar 8` across spring-forward and `6:26 AM, Nov 1` across fall-back.
+- **F3 fixed:** `dayRange` always prints one date at the end. The pathological
+  case now renders `11:00 PM–1:00 AM, Jan 3`; all Muhurat/festival range call
+  sites use the shared range helper.
+- **F4 fixed:** the exact New Delhi reference is corrected to Drik's current
+  16:16 / 26:21+ monthly row. Ganak computes 16:15 / 02:20.
+- **F5 fixed:** festival clocks retain their caller-owned clock style but delegate
+  date crossing to `dayClock`; a static negative assertion rejects a duplicated
+  civil-date comparison.
+
+Strengthened clean gates: `drik-reference-anchors` 384 checks;
+`cross-midnight-date` 8,411 checks. Independent mutations prove each new guard:
+old two-day/fallback pairing fails all three high-latitude anchors; disabling IANA
+offsets fails both DST anchors; dating both range endpoints fails Nishita and the
+multi-day fixture; bypassing the festival delegation fails the static contract.
+The 14 screen snapshot baselines remain byte-identical, proving ordinary existing
+EN/HI rendered text did not drift.
+
+An independent post-fix regression pass then found one additional fixed-offset
+path in Today's distant transit list. It is now repaired: event, sign-entry and
+station dates use the selected place's IANA zone, so a New York page no longer
+reuses winter UTC−5 for a summer event that is actually UTC−4. Permanent checks
+pin winter `7:00 AM`, summer `8:00 AM`, the zoned date, and the Daily-screen
+delegation. The final `cross-midnight-date` count is 8,417 checks. The same pass
+swept 488 high/polar samples: 131 rise days, zero missing closing sets, zero
+backward pairings, longest valid pair 12.864 days, and slowest call 14 ms.

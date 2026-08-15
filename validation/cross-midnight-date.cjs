@@ -115,6 +115,64 @@ else ok();
   else ok();
 }
 
+// A pathological multi-day window still follows the one-date contract: its
+// date appears once, at the end, never once per endpoint.
+{
+  const ref = Date.UTC(2026,0,1,6), a = Date.UTC(2026,0,2,23), b = Date.UTC(2026,0,3,1);
+  const text = fmt.dayRange(0, ref, 'en')(a,b);
+  const dates = (text.match(/Jan /g) || []).length;
+  if (text !== '11:00 PM–1:00 AM, Jan 3') fail(`multi-day range broke the one-date contract: "${text}"`);
+  else if (dates !== 1) fail(`multi-day range names ${dates} dates, expected one at the end: "${text}"`);
+  else ok();
+}
+
+// A numeric offset cannot represent a DST change inside one panchang day. The
+// shared renderer accepts the IANA zone so the clock and date are instant-aware.
+{
+  const NY = { lat:40.7128, lon:-74.0060, zone:'America/New_York' };
+  for (const [label, at, want] of [
+    ['spring forward', Date.parse('2026-03-07T17:00:00Z'), '7:18 AM, Mar 8'],
+    ['fall back', Date.parse('2026-10-31T16:00:00Z'), '6:26 AM, Nov 1'],
+  ]) {
+    const P = computeTodayPanchang(NY, 'lahiri', at);
+    const got = fmt.dayClock(P.tz, P.anchor, 'en', undefined, NY.zone)(P.nextRise);
+    if (got !== want) fail(`${label}: next sunrise renders "${got}", expected "${want}" with the IANA-zone offset transition`);
+    else ok();
+  }
+}
+
+// Future transit events can be months away from today's numeric offset. Their
+// clocks and dates must use the place's IANA zone so seasonal DST is respected.
+{
+  const zone = 'America/New_York', winter = Date.parse('2026-01-15T12:00:00Z'), summer = Date.parse('2026-07-15T12:00:00Z');
+  if (fmt.fmtTimeZone(winter, -5, zone) !== '7:00 AM') fail('future-event winter clock is not IANA-zone aware');
+  else ok();
+  if (fmt.fmtTimeZone(summer, -5, zone) !== '8:00 AM') fail('future-event summer clock reused the winter numeric offset');
+  else ok();
+  if (fmt.fmtDateZone(summer, -5, 'en', zone, true) !== 'Jul 15, 2026') fail('future-event date is not rendered in the selected IANA zone');
+  else ok();
+
+  const fs = require('fs');
+  const daily = fs.readFileSync('src/screens/DailyScreen.tsx','utf8');
+  if (!/fmtTimeZone\(e2\.t, todayP\.tz, place\?\.zone\)/.test(daily)) fail('DailyScreen future event clock bypasses the IANA-zone formatter');
+  else ok();
+  if (!/fmtDateZone\(x\.enter, todayP\.tz, lang, place\?\.zone, true\)/.test(daily)) fail('DailyScreen transit timeline date bypasses the IANA-zone formatter');
+  else ok();
+  if (/new Date\((?:e2\.t|x\.enter|st\.t) \+ todayP\.tz \* 3600000\)/.test(daily)) fail('DailyScreen still shifts a future event by today\'s fixed offset');
+  else ok();
+}
+
+// Festival clocks may choose their own 12/24-hour style, but date crossing must
+// be delegated to the shared contract rather than reimplemented.
+{
+  const fs = require('fs');
+  const festival = fs.readFileSync('src/screens/FestivalGuideScreen.tsx','utf8');
+  if (!/return dayClock\(tz, refMs, lang, render, zone\)\(ms\)/.test(festival)) fail('FestivalGuideScreen does not delegate its localized clock to dayClock');
+  else ok();
+  if (/sameDay\s*=|getUTCFullYear\(\)\s*===\s*ref/.test(festival)) fail('FestivalGuideScreen still duplicates the civil-date comparison');
+  else ok();
+}
+
 /* --------------------------------------------- layer 2: as a reader sees it */
 // Screens whose rendered text is reachable without user interaction. Panels that
 // open on a tap (the decision-window detail list, the 60-day yoga calendar, the

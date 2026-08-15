@@ -30,6 +30,7 @@ const LUNAR_TOL = 6;   // minutes — moonrise, moonset
 // ============================================================================
 const { loadApp } = require('./_load-app.cjs');
 const { computeTodayPanchang } = loadApp('src/engine/today-panchang.ts');
+const { moonEvents } = loadApp('src/engine/panchang.ts');
 
 let failures = 0, checks = 0;
 const fail = (m) => { failures++; console.error('FAIL ' + m); };
@@ -64,7 +65,8 @@ const at = (h, mi) => h * 60 + mi;
 const ANCHORS = [
   { label: 'New Delhi 2026-07-25', place: DELHI, y: 2026, m: 7, d: 25,
     sunset: at(19, 17), godhuli: [at(19, 17), at(19, 37)],
-    moonrise: at(16, 20), moonset: at(2, 16), moonsetDate: '2026-07-26' },
+    // Current Drik monthly table for geoname-id=1261481: 16:16 / 26:21+.
+    moonrise: at(16, 16), moonset: at(2, 21), moonsetDate: '2026-07-26' },
   { label: 'New Delhi 2026-11-15', place: DELHI, y: 2026, m: 11, d: 15,
     sunset: at(17, 27), godhuli: [at(17, 27), at(17, 54)],
     moonrise: at(11, 45), moonset: at(22, 14), moonsetDate: '2026-11-15' },
@@ -128,6 +130,23 @@ for (const [name, place] of [['Delhi', DELHI], ['Mumbai', MUMBAI], ['Chennai', C
 // above would be trivially satisfiable by the very bug it exists to catch.
 if (crossings < sweptDays / 4) fail(`only ${crossings} of ${sweptDays} swept days put moonset after midnight — the sweep is not exercising the cross-midnight case`);
 else ok();
+
+// High-latitude pairing. The closing set can be many days after the rise; it
+// must never fall back to the earlier set inside the civil day. These exact
+// fixtures reproduced set<=rise with the former two-day scan.
+const HIGH_LAT = [
+  ['Tromso 2026-07-09', 2026,7,9,1,69.6492,18.9553],
+  ['Reykjavik 2026-02-24', 2026,2,24,0,64.1466,-21.9426],
+  ['Longyearbyen 2026-01-25', 2026,1,25,1,78.2232,15.6469],
+];
+for (const [label,y,m,d,tz,lat,lon] of HIGH_LAT) {
+  const ev = moonEvents(y,m,d,tz,lat,lon);
+  if (ev.rise == null) fail(`${label}: fixture no longer contains the required moonrise`);
+  else if (ev.set == null) fail(`${label}: closing moonset was not found within the declared half-lunation scan`);
+  else if (ev.set <= ev.rise) fail(`${label}: closing set ${new Date(ev.set).toISOString()} precedes rise ${new Date(ev.rise).toISOString()}`);
+  else if (ev.set - ev.rise <= 2 * DAY) fail(`${label}: fixture no longer exercises a closing set beyond the old two-day scan`);
+  else ok();
+}
 
 console.log(failures
   ? `drik-reference-anchors: ${failures} FAILURES (${checks} checks passed, ${sweptDays} days swept, ${crossings} cross-midnight moonsets)`

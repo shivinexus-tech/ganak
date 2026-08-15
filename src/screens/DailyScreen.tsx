@@ -3,7 +3,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { T } from "../components/ui-style-contract";
-import { fmtTime } from "../components/format";
+import { fmtTime, fmtTimeZone, fmtDateZone } from "../components/format";
 import PlaceInput from "../components/PlaceInput";
 import {
   SIGNS, NAKSHATRAS, zoneOffset,
@@ -366,7 +366,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                   >
                     <span style={{ fontSize: "var(--font-small)", display: "flex", gap: "0.875rem", alignItems: "baseline", flex: 1 }}>
                       <span style={{ color: C.gold, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap", minWidth: "5.75rem", fontSize: "var(--font-small)" }}>
-                        {new Date(e2.t + todayP.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { month: "short", day: "numeric", timeZone: "UTC" })} · {fmtTime(e2.t, todayP.tz)}
+                        {fmtDateZone(e2.t, todayP.tz, lang, place?.zone)} · {fmtTimeZone(e2.t, todayP.tz, place?.zone)}
                       </span>
                       <span style={{ color: e2.label.includes("℞") ? C.sindoor : C.ivory, flex: 1, overflowWrap: "break-word" }}>{transitLabel(lang, e2.label)}</span>
                     </span>
@@ -407,12 +407,12 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                                     {dur && <span style={{ fontSize: "var(--font-label)", color: C.muted }}>{dur}</span>}
                                   </div>
                                   <div style={{ fontSize: "var(--font-label)", color: C.muted, marginTop: "0.125rem", fontVariantNumeric: "tabular-nums" }}>
-                                    {x.enter ? new Date(x.enter + todayP.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }) + " · " + fmtTime(x.enter, todayP.tz) : (lang === "hi" ? "पहले से गोचर में" : "transiting since before")}
+                                    {x.enter ? fmtDateZone(x.enter, todayP.tz, lang, place?.zone, true) + " · " + fmtTimeZone(x.enter, todayP.tz, place?.zone) : (lang === "hi" ? "पहले से गोचर में" : "transiting since before")}
                                     {isCur && <span style={{ color: C.gold, fontWeight: 600 }}>{lang === "hi" ? " · अभी यहाँ" : " · now here"}</span>}
                                   </div>
                                   {stationsInSign.map((st, si) => (
                                     <div key={si} style={{ fontSize: "var(--font-label)", color: C.sindoor, marginTop: "0.1875rem" }}>
-                                      ↺ {lang === "hi" ? (st.retro ? "वक्री होता है" : "मार्गी होता है") : ("turns " + (st.retro ? "retrograde" : "direct"))} — {new Date(st.t + todayP.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}
+                                      ↺ {lang === "hi" ? (st.retro ? "वक्री होता है" : "मार्गी होता है") : ("turns " + (st.retro ? "retrograde" : "direct"))} — {fmtDateZone(st.t, todayP.tz, lang, place?.zone, true)}
                                     </div>
                                   ))}
                                 </div>

@@ -31,12 +31,14 @@ export default function SeasonClockCard({ place, lang, ayanamsa = "lahiri", atMs
     );
   }
   const fmtDate = (ms) => new Date(ms + data.tz * 3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
-  const clockOf = (ms) => new Date(ms + data.tz * 3600000).toLocaleTimeString(lang === "hi" ? "hi-IN" : "en-IN", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "UTC" });
+  const clockOf = (ms) => place?.zone
+    ? new Date(ms).toLocaleTimeString(lang === "hi" ? "hi-IN" : "en-IN", { hour:"numeric", minute:"2-digit", hour12:true, timeZone:place.zone })
+    : new Date(ms + data.tz * 3600000).toLocaleTimeString(lang === "hi" ? "hi-IN" : "en-IN", { hour:"numeric", minute:"2-digit", hour12:true, timeZone:"UTC" });
   const placeLabel = place?.label || (lang === "hi" ? "चुने हुए स्थान" : "the selected place");
   const g = data.ghati;
   // The ghati clock spans sunrise to the NEXT sunrise, so its closing time is
   // always the following morning and must say so (C3-CROSSMIDNIGHT-DATE).
-  const fmtTime = dayClock(data.tz, g ? g.sunrise : null, lang, clockOf);
+  const fmtTime = dayClock(data.tz, g ? g.sunrise : null, lang, clockOf, place?.zone);
   const tropical = data.tropicalNext;
   const tropicalMeta = tropical ? TROPICAL_EVENTS.find((e) => e.key === tropical.key) : null;
   return (

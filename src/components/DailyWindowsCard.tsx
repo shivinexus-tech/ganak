@@ -33,8 +33,10 @@ export default function DailyWindowsCard({ data, place, lang, C, card }) {
   // Bhadra, Dur, Varjyam, Brahma, Nishita and the night Gowri halves all run past
   // midnight, so every clock here is bound to the sunrise anchor of the day it
   // belongs to and carries its date when it crosses (C3-CROSSMIDNIGHT-DATE).
-  const clockOf = (ms, tz) => new Date(ms + tz * 3600000).toLocaleTimeString(lang === "hi" ? "hi-IN" : "en-IN", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "UTC" });
-  const span = dayRange(data.tz, data.anchor, lang, (ms) => clockOf(ms, data.tz));
+  const clockOf = (ms, tz) => place?.zone
+    ? new Date(ms).toLocaleTimeString(lang === "hi" ? "hi-IN" : "en-IN", { hour:"numeric", minute:"2-digit", hour12:true, timeZone:place.zone })
+    : new Date(ms + tz * 3600000).toLocaleTimeString(lang === "hi" ? "hi-IN" : "en-IN", { hour:"numeric", minute:"2-digit", hour12:true, timeZone:"UTC" });
+  const span = dayRange(data.tz, data.anchor, lang, (ms) => clockOf(ms, data.tz), place?.zone);
   const row = (label, windows, tone = C.ivory) => (
     <div style={{ display:"flex", justifyContent:"space-between", gap: "0.75rem", padding: "0.375rem 0", borderBottom:`0.0625rem solid ${C.line}`, fontSize: "var(--font-small)" }}>
       <span style={{ color:tone }}>{label}</span>
@@ -58,7 +60,7 @@ export default function DailyWindowsCard({ data, place, lang, C, card }) {
     </button>
     <button onClick={() => setCalendarOpen(v => !v)} style={{ marginTop: "0.5rem", width:"100%", height:T.ctrlH, borderRadius:T.rMd, border:`0.0625rem solid ${C.line}`, background:"transparent", color:C.gold, cursor:"pointer", fontFamily:T.body }}>{calendarOpen ? (lang === "hi" ? "योग कैलेंडर छिपाएँ" : "Hide yoga calendar") : (lang === "hi" ? "अगले 60 दिन का विशेष-योग कैलेंडर" : "Next 60 days: special-yoga calendar")}</button>
     {calendarOpen && <><div style={{ display:"flex",flexWrap:"wrap",gap: "0.3125rem",marginTop: "0.5rem" }}>{YOGA_FILTERS.map(y=><button key={y[0]} onClick={()=>setYogaFilter(y[0])} style={{padding: "0.25rem 0.5rem",borderRadius:T.rPill,border:`0.0625rem solid ${yogaFilter===y[0]?C.gold:C.line}`,background:yogaFilter===y[0]?"var(--accent-soft)":"transparent",color:yogaFilter===y[0]?C.gold:C.muted,fontSize: "var(--font-micro)",cursor:"pointer"}}>{lang === "hi" ? y[2] : y[1]}</button>)}</div><div style={{fontSize: "var(--font-label)",color:C.muted,lineHeight:1.45,marginTop: "0.375rem"}}>{YOGA_WHY[yogaFilter][lang === "hi" ? 1 : 0]}</div><div style={{ marginTop: "0.375rem", maxHeight: "20rem", overflowY:"auto" }}>{calendar.filter(d=>d.yogas.some(y=>y.key===yogaFilter)).map((d,i) => {
-      const tfSpan=dayRange(d.tz, d.ms, lang, (ms)=>clockOf(ms, d.tz));
+      const tfSpan=dayRange(d.tz, d.ms, lang, (ms)=>clockOf(ms, d.tz), place?.zone);
       return <div key={i} style={{ display:"grid", gridTemplateColumns:"minmax(78px,.55fr) minmax(0,1.45fr)", gap: "0.625rem", padding: "0.5rem 0.125rem", borderBottom:`0.0625rem solid ${C.line}`, fontSize: "var(--font-label)" }}><span style={{ color:C.ivory }}>{new Date(d.ms+d.tz*3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-IN", { day:"numeric", month:"short", weekday:"short", timeZone:"UTC" })}</span><span style={{ color:C.muted, textAlign:"right" }}>{d.windows.filter(w=>w.key===yogaFilter).map((w,j)=><span key={j} style={{ display:"block" }}>{lang === "hi" ? w.hi : w.en} · {tfSpan(w.start, w.end)}</span>)}</span></div>;
     })}{calendar.filter(d=>d.yogas.some(y=>y.key===yogaFilter)).length===0 && <div style={{padding: "0.75rem 0.125rem",fontSize: "var(--font-label)",color:C.muted,fontStyle:"italic"}}>{lang === "hi" ? "अगले 60 दिनों में यह योग नहीं है।" : "This yoga does not occur in the next 60 days."}</div>}</div></>}
     {details && <div style={{ marginTop: "0.5rem" }}>
