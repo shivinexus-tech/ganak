@@ -15,7 +15,19 @@ const config = JSON.parse(await readFile(new URL("../plans/backlog-sheet-sync.js
 const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md", import.meta.url), "utf8");
 const base = parseRegister(markdown, config, "test base");
 
-assert.equal(base.rows.size, 72);
+assert.equal(base.rows.size, 75);
+// 73, 74 and 75 added 2026-08-14: the three reference-source divergences the
+// 2026-08-12 Drik cross-check left open (C3). All three shipped with the row, so
+// they are registered as closed work with gate evidence, not as intentions.
+// NOTE ON NUMBERING: these were first drafted as 62/63/64 against a stale branch;
+// those IDs already belong to the SEO rows on main, and the Sheet sync treats a
+// duplicate ID as a hard failure. Renumbered to the next free IDs.
+assert.equal(base.rows.get("73").section, "P0");
+assert.equal(base.rows.get("73").metadata.title, "Cross-midnight times must carry their date (`C3-CROSSMIDNIGHT-DATE`)");
+assert.equal(base.rows.get("74").section, "P1");
+assert.equal(base.rows.get("74").metadata.title, "Moonset divergence vs Drik ~43 min (`C3-MOONSET-DRIK`)");
+assert.equal(base.rows.get("75").section, "P1");
+assert.equal(base.rows.get("75").metadata.title, "Godhuli convention divergence ~14 min (`C3-GODHULI-DRIK`)");
 // 70 and 71 added 2026-08-13 at owner instruction: Drik-style calendar/regional
 // Panchang-name display, and a Panchang utilities hub. Both are deliberately
 // registered as brainstorming/spec rows, not as implementation claims.
@@ -266,7 +278,7 @@ assert.throws(
 );
 assert.equal(
   parseRegister(preAutomationMarkdown, config, "bootstrap historical fixture", { allowMetadataTitleMismatch: true }).rows.size,
-  72,
+  75,
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 

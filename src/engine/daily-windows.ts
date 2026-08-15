@@ -215,7 +215,17 @@ function computeDailyWindows(place: any, atMs: number) {
     amrit:nkWindows.filter(x=>x.kind==="amrit"),
     brahma:{start:next.rise-2*nightUnit,end:next.rise-nightUnit},
     nishita:{start:nishitaMid-nightUnit/2,end:nishitaMid+nightUnit/2},
-    godhuli:{start:ev.set-dayUnit/4,end:ev.set+nightUnit/4},
+    // Godhuli Muhurta (C3-GODHULI-DRIK) — the declared convention is: it BEGINS
+    // at sunset and runs for half a night muhurta, the night from sunset to the
+    // next sunrise being divided into fifteen muhurtas. It is a dusk window that
+    // opens at sunset, not a window centred on it.
+    // Verified to the minute against Drik Panchang on four anchors:
+    //   New Delhi 2026-07-25  19:16→19:37  (Drik 19:17–19:37)
+    //   New Delhi 2026-11-15  17:27→17:54  (Drik 17:27–17:54)
+    //   Mumbai    2026-07-25  19:17→19:39  (Drik 19:17–19:39)
+    //   Chennai   2026-07-25  18:38→19:01  (Drik 18:38–19:01)
+    // The old rule centred a half-muhurta on sunset and so opened ~14 min early.
+    godhuli:{start:ev.set,end:ev.set+nightUnit/2},
     // Three-muhurta twilight centred on sunset, matching the festival
     // deciding-kala convention already used by Ganak.
     pradosha:{start:ev.set-(ev.set-ev.rise)/10,end:ev.set+(next.rise-ev.set)/10},

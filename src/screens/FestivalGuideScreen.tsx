@@ -333,7 +333,11 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
   const grahan = d && d.grahan;
   const punyaKala = localTiming.punyaKala;
   const decidingLabel = hit ? decidingKalaLabel(hit.decidingKala, L) : null;
-  const clock = (ms) => fmtTimeD(ms, tz, ms);
+  // Referenced to the FESTIVAL day, not to the value itself. Passing `ms` as its
+  // own reference made the same-day test always true, so Nishita puja, Ghatasthapana
+  // and Chhath windows that run past midnight printed a bare time with no date
+  // (C3-CROSSMIDNIGHT-DATE).
+  const clock = (ms) => fmtTimeD(ms, tz, hit ? hit.ms : ms, L);
   const paranaBasis = navratri && ({
     "navami-end": {
       en: "Navami ends at this time; complete the full nine-day fast afterwards.",
@@ -675,7 +679,7 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                   borderRadius: T.rSm, padding: "0.4375rem 0.625rem", fontVariantNumeric: "tabular-nums", lineHeight: 1.45,
                 }}>
                   {d.parana
-                    ? <>{L === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, hit.ms)}{L === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {L === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, hit.ms)}</span>}</>
+                    ? <>{L === "hi" ? "पारण: " : "Parana: "}{fmtTimeD(d.parana.start, d.tz, hit.ms, L)}{L === "hi" ? " से" : " onwards"}{d.parana.dwadashiEnd > d.parana.start && <span style={{ color: C.muted, fontWeight: 400 }}> · {L === "hi" ? "द्वादशी समाप्त " : "Dwadashi ends "}{fmtTimeD(d.parana.dwadashiEnd, d.tz, hit.ms, L)}</span>}</>
                     : dayKala
                       ? <>{meta.timing === "madhyahna"
                         ? (L === "hi" ? "मध्याह्न काल: " : "Madhyahna period: ")
@@ -684,16 +688,16 @@ function FestivalGuideScreen({ guide, lang, C, card, place, onPlace }) {
                           : (L === "hi" ? "अपराह्न काल: " : "Aparahna period: ")}
                         {clock(dayKala.start)}–{clock(dayKala.end)}</>
                     : d.moonrise != null
-                      ? <>{L === "hi" ? "चंद्रोदय पर व्रत खोलें: " : "Break fast after moonrise: "}{fmtTimeD(d.moonrise, d.tz, hit.ms)}</>
+                      ? <>{L === "hi" ? "चंद्रोदय पर व्रत खोलें: " : "Break fast after moonrise: "}{fmtTimeD(d.moonrise, d.tz, hit.ms, L)}</>
                       : d.nishita
                         ? <>{L === "hi" ? "निषीथ काल (मुख्य पूजा): " : "Nishita period (main puja): "}{clock(d.nishita.start)}–{clock(d.nishita.end)}</>
                         : d.morning
                           ? <>{L === "hi" ? "प्रातः पूजा: " : "Morning puja: "}{clock(d.morning.start)}–{clock(d.morning.end)}</>
                           : d.sunrise != null
-                            ? <>{L === "hi" ? "प्रातः / सूर्योदय: " : "Morning — from sunrise: "}{fmtTimeD(d.sunrise, d.tz, hit.ms)}</>
+                            ? <>{L === "hi" ? "प्रातः / सूर्योदय: " : "Morning — from sunrise: "}{fmtTimeD(d.sunrise, d.tz, hit.ms, L)}</>
                             : d.stars
                               ? <>{L === "hi" ? "तारे दिखाई देने के बाद व्रत खोलें" : "Break the fast after the stars are visible"}</>
-                              : <>{L === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, hit.ms)}</>}
+                              : <>{L === "hi" ? "संध्या पूजा सूर्यास्त से: " : "Evening puja from sunset: "}{fmtTimeD(d.sunset, d.tz, hit.ms, L)}</>}
                 </div>
               )}
               {decidingLabel && !(d && (navratri || lakshmiPuja || chhathSeq || skandaSeq || ayyappaSeq || dayKala || d.parana || d.moonrise != null || d.sunset != null || d.sunrise != null || d.nishita || d.morning || d.stars)) && (

@@ -3,18 +3,18 @@ Fri, 14 Aug 2026
 ▾
 ›
 🔊 Listen to today's Panchang
-CALENDAR SYSTEM
-Amanta lunar (Ganak default)
-Gregorian
-Purnimanta lunar
-Tamil solar · Thirukanitha
-Bengali solar · Vishuddha Siddhanta
+YOUR FAMILY CALENDAR
+South & West Indian lunar (default)
+Regular January–December
+North Indian lunar (Sawan etc.)
+Tamil calendar
+Bengali calendar
 Government holidays
 Hide holidays
 National holidays
 Central gazetted holidays
-Amanta · Shravana · Shukla Paksha 1
-Times shown for Mumbai, India · choosing a different calendar only changes how the date is named, the timings stay the same
+Amanta · Shravana · Shukla Paksha · lunar day 2
+Not sure? Keep the default. This only changes the date and month names; timings and observances for Mumbai, India stay the same.
 Today
 Friday
 14 August 2026 · Shravana
@@ -48,7 +48,7 @@ Udaya Lagna: Virgo
 ☾ Moon
 7:41 AM → 8:19 PM
 ✦ Nakshatra
-Purva Phalguni · ruler Venus · till 3:42 AM
+Purva Phalguni · ruler Venus · till 3:42 AM, Aug 15
 View full panchang ▾
 Fasts & festivals
 Smarta
@@ -103,11 +103,11 @@ Amrit
 Shubh
 12:43 PM–2:19 PM
 Labh
-11:19 PM–12:43 AM
+11:19 PM–12:43 AM, Aug 15
 Amrit
-12:43 AM–2:07 AM
+12:43 AM–2:07 AM, Aug 15
 Shubh
-3:31 AM–4:55 AM
+3:31 AM–4:55 AM, Aug 15
 Abhijit Muhurat
 12:17 PM–1:08 PM
 Best avoided today
@@ -120,7 +120,7 @@ Yamaganda
 Season and Vedic clock
 You are in Grishma (Summer) (Cancer) · clock 7 ghati 56 pal 36 vipal.
 Ritu is a global astronomical calculation from the sidereal Sun sign. Next season Varsha (Monsoon) begins 17 Aug 2026 — dated in Mumbai, India local time.
-Ghati clock for Mumbai, India: 60 ghatis from its local sunrise today (6:19 am) to its next sunrise (6:19 am).
+Ghati clock for Mumbai, India: 60 ghatis from its local sunrise today (6:19 am) to its next sunrise (6:19 am, Aug 15).
 Next global astronomical point
 Autumn equinox · 23 Sept 2026
 day and night are nearly equal as the Sun crosses southward
