@@ -66,6 +66,7 @@ journey.
 | Capability | Class | Canonical website home | Contextual copies | State/behaviour that must survive | Acceptance proof |
 |---|---|---|---|---|---|
 | Product identity + Today/Festivals/Muhurat/Prashna/Jyotish | G1 | Shared site header | Compact mobile navigation | `lang`, place and applicable route state | Every destination + reload + Back/Forward. |
+| Shared website footer | G1/J/G3 | Shared site shell after page-specific content | None; screens use one linked instance rather than local copies | `lang`; Back origin; only destination-applicable shared context; no sensitive route payload on legal/feedback links | Exactly one EN/HI component instance per public screen; real-route matrix; 320/390/768/1280px, keyboard and AA proof. |
 | Language | G1/G3 | Header and Personalize | Content-level bilingual controls only where required | Current route and all meaningful inputs/results | EN↔HI route matrix; no reset or mixed-language shell. |
 | Personalize | G1 | Header | First-run/parent setup and contextual Follow/Listen shortcuts | Approved `preferences` store | Review/change/clear; direct storage calls remain absent. |
 | Place | G2/G3 | Shared Date & Calendar Context on Today/Festivals/Muhurat; default in Personalize | Visible inherited-place line in Prashna/Festival guide | `city`, `lat`, `lon`, `zone` | Change place, traverse routes, reload and return. |
@@ -167,7 +168,9 @@ Before any Figma screen or code slice is called ready:
 
 The shared-component audit must fail if a date/calendar-dependent approved frame lacks
 the Date & Calendar Context component, or if a detached/copy-pasted context group silently
-diverges from the component source.
+diverges from the component source. It must also fail when a public approval frame lacks
+the shared Website footer, contains more than one footer, detaches/rebuilds the footer
+locally, or exposes a footer label without a real mapped destination.
 
 ## 7. Figma shared-context evidence — 2026-08-13
 
@@ -197,3 +200,20 @@ copy-pasted context ribbons remain; every instance stays at `x=0`, `y=97`,
 `1536×132`. Full-frame screenshot QA found no overlaps, clipping, shifted content or
 decorative-art mutation. The canonical special-day frame remains internally consistent:
 Devshayani Ekadashi, Shukla Ekadashi/Ashadha and Saturday 25 July 2026.
+
+## 8. Figma shared-footer evidence — 2026-08-16
+
+The approved footer is now a reusable bilingual site-shell component rather than a local
+Full Panchang drawing:
+
+| Artifact | Figma node | Evidence |
+|---|---:|---|
+| `Website footer` component set | `349:14` | One master with a `Language` variant axis. |
+| English / Hindi variants | `349:2` / `349:8` | Identical geometry, neutral shell surface and complete approved floral ending. |
+| Full Panchang EN / HI instances | `351:178` / `351:184` | Linked instances in frames `290:794` / `320:2`; old local footer and floral copies removed. |
+
+The component currently proves architecture on those two approval frames only. All other
+approved prototypes and the production website remain pending until they instantiate the
+same shared component and their visible links have real destinations. The full behavioural,
+responsive and no-fake-link rules live in the migration contract's **Shared website footer**
+section.

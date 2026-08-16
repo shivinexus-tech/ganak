@@ -34,6 +34,65 @@ table does not mention it.
   particular, global search, geolocation, profile/account and any reminder action must not
   be shown as working until their corresponding approved feature exists.
 
+### Shared website footer — global migration contract
+
+The footer is part of the **shared website shell**, not a Full Panchang card and not a
+screen-owned decorative block. Every migrated public website route must render exactly one
+instance after its page-specific content. There is one master component with English and
+Hindi variants; a screen must not detach, redraw, recolour or maintain its own footer copy.
+Editing the master is how a later site-wide footer improvement reaches every route.
+
+#### Approved visual structure
+
+1. Use the same approved neutral page background as the surrounding shell, separated by a
+   thin approved line. Do not introduce a sage, blue-status, pink-status or dark feature-card
+   surface merely to make the footer prominent.
+2. Use two compact, centred utility-link rows followed by the **complete approved blue floral
+   ending**. The floral artwork is decorative: it must not be cropped into a banner, recoloured
+   per screen, used as a status indicator or placed behind text.
+3. The current approved link order is:
+   - primary: **Festivals this month · Other cities · Hora · Muhurat Finder**;
+   - secondary: **English / हिन्दी · About Ganak · Sources & conventions · Privacy · Terms**.
+4. The link list is a design and IA contract, not permission to fake a route. A production
+   link renders only when its real mapped destination exists and passes the state/Back proof
+   below. An item without a live target is omitted until built; it is not disabled-looking or
+   decorative-clickable. In particular, `Other cities` needs the approved city-browsing home,
+   and About/Sources/Privacy/Terms need truthful public routes before launch.
+5. At phone widths the link rows may wrap into additional rows, but their order, grouping,
+   focus order and minimum touch target remain intact. The floral ending stays below the links
+   and must not overlap or hide them.
+
+#### Behaviour and state rules
+
+- Footer navigation preserves `lang` and the originating route for browser Back. Place, date,
+  `cal` and `hol` are carried only to destinations that consume that shared context; no footer
+  action silently rewrites stored defaults.
+- The footer language action is the same application language capability as the header and
+  Personalize, not a second preference or storage key.
+- Legal, About, Sources and feedback destinations must not inherit Prashna question text,
+  birth details, chart data or other sensitive route payloads.
+- Footer privacy/tracking wording must describe the actual deployed network behaviour. It is
+  updated in the same release as any analytics or feedback-provider change; visual migration
+  cannot preserve an obsolete claim.
+- The footer is a low-priority orientation and utility surface. It does not replace a missing
+  primary navigation entry for a core journey, and it cannot be the only route to a product's
+  principal job after navigation parity is complete.
+
+#### Current editable Figma evidence — 2026-08-16
+
+| Artifact | Figma node | Contract evidence |
+|---|---:|---|
+| Shared footer variant set | `349:14` | One `Website footer` component set governs both languages. |
+| English variant | `349:2` | Neutral surface, two approved link rows and the exact approved floral ending. |
+| Hindi variant | `349:8` | Same geometry and artwork; Hindi labels are a variant, not a separate design. |
+| Full Panchang English instance | `351:178` | Linked instance at the end of frame `290:794`; no local footer/art copy remains. |
+| Full Panchang Hindi instance | `351:184` | Linked instance at the end of frame `320:2`; no local footer/art copy remains. |
+
+This evidence proves the component architecture on the two Full Panchang approval frames.
+It does **not** claim that all other prototypes or the production website have migrated yet.
+Before another screen becomes implementation scope, its local footer must be replaced by an
+instance of this set and pass EN/HI, 320/390/768/1280px, keyboard, contrast and route tests.
+
 ## 2. Primary persona and the journey we protect
 
 ### Primary persona
