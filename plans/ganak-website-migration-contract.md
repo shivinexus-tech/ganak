@@ -280,6 +280,32 @@ Vishti Karana until 11:35 AM, sunrise 5:38 AM, sunset 7:16 PM, Abhijit Muhurat
 25 July, 4 August and 2025 data and therefore had no valid approval status until this
 fixture replaced every conflicting value.
 
+**Rule 7 — calculated values are generated, never typed (added 2026-08-16).** Every
+astronomical value on a frame must be produced by running Ganak's own engine for that
+frame's own stated place and date, and pasted without alteration. A value that was typed
+by hand, or copied from a sibling frame, fails this gate even when it looks plausible.
+The reviewable artefact for a frame pack is therefore the **generator output**, not the
+frame: a pack is approvable only when each frame's civil date, sunrise and sunset can be
+reproduced by re-running the engine for that frame's inputs.
+
+**Audit finding 2026-08-16 — the Vrat Guide fixture pack fails this rule.** All four
+frames (`Fixture A`, `B`, `C`, `D`) display `sunrise 5:52 AM / sunset 7:08 PM`. Running
+`sunEvents` from `src/engine/panchang.ts` for New Delhi (`28.6139`, `77.209`, UTC+5:30)
+returns:
+
+| Date | Engine sunrise | Engine sunset |
+|---|---|---|
+| Saturday 25 July 2026 | 5:38 AM | 7:16 PM |
+| Sunday 23 August 2026 | 5:54 AM | 6:53 PM |
+| Monday 24 August 2026 | 5:55 AM | 6:52 PM |
+
+The 25 July row reproduces the canonical values recorded above, confirming engine and
+contract agree. The displayed pair `5:52 AM / 7:08 PM` matches **no** date in the pack —
+it was neither calculated nor copied, but invented. `Fixture B` compounds this: its
+context ribbon reads *Saturday, 25 July 2026* while its entire content concerns fasting
+on 23–24 August. Until regenerated, no frame in that pack holds approval status,
+irrespective of the board's label.
+
 ### 10.2 Today — Festival Day, desktop website
 
 **Visual source:** approved desktop Today composition, used only as visual direction. It
@@ -493,3 +519,66 @@ templates remain otherwise visually unchanged.
 This is deliberately a **single appendix to the preservation contract**, not a second
 parallel migration plan. It turns the contract's “no fake interaction” rule into a
 screen-by-screen stop check.
+
+### 10.6 Vrat / Festival Guide — desktop website  `(added 2026-08-16)`
+
+**Visual source:** the `Vrat Guide Pack` fixture frames (`Fixture A` richest,
+`B` split tradition, `C` longest name, `D` sparse content). The stress-variant method is
+adopted: a guide template is reviewable only as a pack covering its richest, sparsest and
+longest-name cases, never as a single showpiece frame.
+
+**Structurally sound and retained without change:** the previous/next observance pair
+(the crawl spine for all 181 guides), the collapsing artwork slot, and the
+method/source and health notes.
+
+| Screen element | Decision | Real target / behaviour | State that must survive | Acceptance proof |
+|---|---|---|---|---|
+| Eyebrow line | **Improve** | The observance's own name in the page language. It never carries a fixture id, board label or internal identifier. | Festival slug, place, `lang`. | `Fixture B` renders its real observance name; no string matching `FIXTURE [A-Z]` survives in any frame or build. |
+| Page headline | **Improve** | Always the **meaning** of the day, one sentence, never a restatement of the name and never an instruction. The name lives in the eyebrow and the document title. | Festival slug, `lang`. | All four fixtures answer the same question in the same voice; `B` names its observance somewhere above the fold. |
+| Sub-heading below the headline | **Improve** | Optional single supporting line. Vertical space beneath it is fixed and independent of whether it wraps. | `lang`. | `Fixture B`'s two-line sub-heading leaves the same gap as `A`'s one-line sub-heading. |
+| Explanatory paragraph | **Improve** | Devotee-facing prose only. Text describing the design's own behaviour is a register entry, never page content. | `lang`. | No frame contains a sentence addressed to a reviewer (see the note-removal list below). |
+| Follow control | **Preserve** | The shipped follow capability — `festival:<key>` appended to the local `preferences.following` list, shared with the Personalize “What you follow” surface. Labelled with the observance name where known. | Local-first follow preference; festival key; `lang`. | Present and operable on **every** guide including the sparse fixture; toggling it appears in Personalize; a sparse day never removes it. |
+| Listen control | **Preserve** | Existing single-session read-aloud. | `lang`, current guide. | Reads the guide in the page language. |
+| “Read in Hindi” / “Read in English” | **Improve** | A language **switch to the twin address** under the merged `/hi/` scheme — not an in-page toggle. Carries place, date and observance across. | `city`, `lat`, `lon`, `zone`, `date`, festival slug. | Following it from any guide lands on the same observance, same place, same date, in the other language; reciprocal `hreflang` present on both. |
+| All section and field labels | **Improve** | **One language per address.** `Diet rules` on the English page, `आहार नियम` on the Hindi page. Paired in-place labels (`Diet rules / आहार नियम`) are retired. | `lang`. | No frame or built page renders both scripts for the same label. |
+| Sacred terms | **Preserve** | `Sankalpa`, `Vidhi`, `Paran`, `Udyapan`, `Aarti` and observance names remain untransliterated on the English address — they are names, not translations. | `lang`. | Present in Latin script on the English page and Devanagari on the Hindi page. |
+| Artwork slot | **Preserve** | Collapses cleanly when no mapped artwork exists; never a placeholder or generated image. | Festival slug. | `Fixture D` closes the slot with no gap and no broken frame. |
+| Previous / Next observance | **Preserve** | Permanent guide routes for the adjacent observances, with dates. | Place, `lang`, calendar convention. | Both open real guides; the pair is present on every guide, giving crawlers a complete chain. |
+| Method / source note | **Improve** | Calculation basis for the displayed values. **Required on every guide page**, not only fasting guides (owner, 2026-08-16). Citations open without changing selected state. | Place, date, calendar convention, `lang`. | Present on all four fixtures and on a non-fasting observance; opening a citation preserves route state. |
+| Health note | **Improve** | Medical-suitability wording. **Required on every guide page** (owner, 2026-08-16); on non-fasting observances it carries the same wording, since a guide may still describe optional restraint. | `lang`. | Present on all four fixtures and on a non-fasting observance, in the page language. |
+| Last-updated stamp and “how Ganak calculates” link | **Deferred — omit** | Recorded here because both are required for citation by answer engines; neither has an owner decision or destination yet. | N/A. | Absent until specified. |
+| Aarti language chooser (`हिन्दी \| मराठी \| बंगला \| गुजराती`) | **Deferred — omit** | Content-language choice for a single section is a distinct capability from the site language address, and has no mapped storage or destination. | N/A. | Absent from working screens until mapped. |
+
+#### 10.6.1 Reviewer notes to be removed from content positions
+
+The following strings sit in devotee-facing content slots while addressing the reviewer.
+Each is deleted from the frame; where it recorded a requirement, that requirement is
+already captured in the table above.
+
+| Frame | String |
+|---|---|
+| `Fixture C` hero | “The full observance name remains visible in both scripts, including on the action below.” |
+| `Fixture D` hero | “Only verified content appears. Unavailable story, regional tradition, and mapped artwork are absent.” |
+| Reading block | “Shravana Putrada Ekadashi story in English and Hindi, displayed without clipping.” |
+| Regional traditions | “Regional tattva to read or hear / पढ़ने या सुनने योग्य क्षेत्रीय जानकारी” |
+| Method note | “Source and calculation basis remain visible here; citations open without changing selected state.” |
+
+#### 10.6.2 Long-name proof must cover the four places names actually break
+
+`Fixture C` proves a long observance name fits the headline and the primary action. That
+is the controlled case. The pack is complete only when the same name is also shown in the
+document title, the previous/next observance pair, the primary action at the narrowest
+supported width, and the calendar/discovery row.
+
+#### 10.6.3 Variation is expressed as component options, never as edited or copied parts
+
+Recorded because it governs how every later screen is built (owner, 2026-08-16):
+
+- A page that needs to differ **selects a different option** on a shared part.
+- A shared part is **never edited to satisfy one page**; the need for that is the signal
+  that the part requires a new option.
+- A shared part is **never duplicated** to create a one-off. A genuine one-off is declared
+  as such in this register, together with the explicit statement that site-wide token and
+  component changes will not reach it.
+- Site-wide change therefore has exactly two levers: the design tokens, and the shared
+  part itself. Both remain able to move every screen at once.
