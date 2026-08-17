@@ -241,9 +241,11 @@ from silently becoming a Ganak feature.
 | **Deferred — omit** | Useful but not yet approved or not yet implemented. | No. It must be absent, not disabled-looking or decorative-clickable. |
 | **Remove** | Invented, duplicate, misleading or deliberately retired. | No. It must not appear in a buildable screen. |
 | **Decorative / data-only** | Visual treatment or calculated display with no independent action. | Yes, but it must not look like a button or input. |
+| **Provisional — revisit on dependency** *(added 2026-08-16)* | A real, working capability whose final form depends on work that has not landed yet. It ships in its current form and is **not** treated as approved. Requires a named **revisit trigger**: the backlog rows or destinations whose arrival re-opens it. | Yes. It must be truthful and complete for what exists today, and must degrade to fewer items rather than to a broken or placeholder state. |
 
 **Hard gate:** a buildable screen may contain only `Preserve`, `Move`, `Improve`,
-`New — owner-approved`, or clearly non-interactive `Decorative / data-only` rows. A
+`New — owner-approved`, `Provisional — revisit on dependency`, or clearly non-interactive
+`Decorative / data-only` rows. A
 `Deferred — omit` or `Remove` row is absent from the working screen. A control with a blank
 destination, state-preservation rule or acceptance proof fails this contract.
 
@@ -645,3 +647,51 @@ health note under a paired `Health note / स्वास्थ्य टिप�
 throughout the body. Under the merged `/hi/` address scheme this resolves to the §10.6
 rule — **one language per address**, sacred terms excepted — and that rule governs the
 footer, the previous/next pair, the method note and the health note equally.
+
+### 10.8 Where a change belongs — three levels and page settings  `(owner, 2026-08-16)`
+
+The owner requires two things that only look opposed: a single page must be changeable
+without disturbing others, **and** a change must be able to reach the whole site at once.
+Both hold as long as every change travels through one of three levels and never sideways.
+
+| Level | What lives there | Blast radius when changed |
+|---|---|---|
+| **Tokens** | Colour, spacing, type scale, radius, density | Every screen, everywhere. This is the site-wide lever. |
+| **Shared parts, with options** | Card, tile, data row, timing block, badge, section header, context ribbon, footer | Only the screens that select that option |
+| **Content** | This observance's name, this day's calculated values | Only that one page |
+
+**The routing rule — apply in this order:**
+
+1. Can the difference be expressed by **selecting a different option** on an existing
+   shared part? → it is a **page setting**. Record it in that screen's register row.
+2. Does no suitable option exist? → the shared part **gains a new option**. Never an edit
+   made to satisfy one page.
+3. Should the difference be true everywhere? → it is a **token** change.
+4. Anything else — editing a shared part for one screen, or duplicating it to create a
+   one-off — is prohibited by §10.6.3. A genuine one-off must be declared as such in the
+   register, together with the explicit statement that token and shared-part changes will
+   not reach it.
+
+**The screen registers in §10.2–§10.7 are the page-settings panel.** Each row states what
+a screen's element is, which shared capability it uses and what state it must preserve —
+the written equivalent of a per-page configuration screen. A register row that names a
+shared part must also name the **option** that screen selects, so that "the same part,
+configured differently" is visible on the page rather than inferred from the picture.
+
+#### 10.8.1 The site footer is generated, not composed
+
+Recorded because it is the clearest instance of `Provisional — revisit on dependency`.
+
+The footer is a **rendering of the site's destination list**, not a hand-placed set of
+links. It looks sparse today because most of what it should point to does not exist yet;
+it fills in on its own as those destinations ship, provided it is never built as fixed
+markup.
+
+- **State:** `Provisional — revisit on dependency`.
+- **Revisit trigger:** the arrival of city-aware Panchang addresses, the Hora / Rahu Kalam
+  / Choghadiya / Abhijit destinations, the Muhurat finder entry, and the
+  about / sources-and-methods pages.
+- **Degradation rule:** with fewer destinations it shows fewer links. It never shows a
+  disabled link, a placeholder, or a link to a page that does not exist.
+- **Consequence:** the footer is not approved or rejected on how it looks today, and a
+  visual objection to it is not a blocking finding until its trigger has fired.
