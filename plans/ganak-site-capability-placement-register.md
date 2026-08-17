@@ -226,3 +226,25 @@ approved prototypes and the production website remain pending until they instant
 same shared component and their visible links have real destinations. The full behavioural,
 responsive and no-fake-link rules live in the migration contract's **Shared website footer**
 section.
+
+## 9. Website family prototype index — 2026-08-16
+
+These are **owner-review prototypes**, not production-complete claims. Each frame uses the
+approved website header/footer family and either the shared Date & Calendar Context or an
+explicit job-specific context band. Exact per-control decisions are in migration-contract
+§§10.6–10.10.
+
+| Family | Frames | Protected jobs |
+|---|---|---|
+| Muhurat | `403:1003`, `403:1191`, `403:1537`, `403:1888`, `406:22`, `403:1364`, `403:1711` | Hub; Property; Vehicle; ranked result; copy/share; city-local calendar save/reminder. |
+| Calendar | `407:1654`, `407:1924`, `407:2215`, `407:2381` | Month; calendar convention; selected day; search/full year; holiday overlay. |
+| Prashna | `416:2024`, `416:2206`, `416:2388`, `416:2536`, `416:2699` | Moment method; KP 1–249; verdict first; expert evidence; deliberate New question lifecycle. |
+| Jyotish | `419:2489`, `419:2677`, `419:2865`, `419:3046`, `419:3222`, `419:3419` | Birth chart; Kundli; Dashas; Matching; Tools; explicit-save Vault. |
+| Personalize / legal | `421:3047`, `421:3224`, `421:3410`, `421:3586`, `421:3769`, `421:3931`, `421:4097`, `421:4268` | Comfort; follows/place/language/sound; privacy/data; Privacy; Terms; Sources; About. |
+
+**Fixture evidence:** Muhurat and Calendar values were inspected on current Ganak for
+New Delhi. Prashna moment and KP-number results were cast in current Ganak. Jyotish
+summary, dasha and Matching values were generated with the repository's current engines.
+Prototype-only sample people are labelled as such. No Figma frame changes engine or
+production behaviour, releases owner-gated interpretation copy, enables analytics/replay,
+or completes a backlog/Google-Sheet row.

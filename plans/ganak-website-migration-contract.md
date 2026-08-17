@@ -591,3 +591,87 @@ templates remain otherwise visually unchanged.
 This is deliberately a **single appendix to the preservation contract**, not a second
 parallel migration plan. It turns the contract's “no fake interaction” rule into a
 screen-by-screen stop check.
+
+### 10.6 Muhurat — hub, finder, result and accepted-result actions
+
+**Owner-review Figma frames (2026-08-16):** Hub `403:1003`; Property finder
+`403:1191`; Property result `403:1537`; calendar/reminder confirmation `403:1888`;
+copy-link confirmation `406:22`; Vehicle finder `403:1364`; Vehicle result
+`403:1711`.
+
+| Screen element | Decision | Protected behaviour / evidence |
+|---|---|---|
+| Activity hub and dedicated Property / Vehicle entries | **Improve** | Current Muhurat categories remain separate jobs; Property and Vehicle do not collapse into a generic form. |
+| Activity, action and date-range fields | **Preserve** | `muhurat`, `maction`, `mfrom`, `mto`, place and language hydrate the finder and survive direct links/reload. |
+| Ranked best day, reasons and clean windows | **Improve** | Uses inspected live New Delhi fixtures: Property Registration, 17 Sep 2026; Vehicle Delivery / first drive, 1 Nov 2026. |
+| Copy result link / share | **Preserve** | Copy produces a stable URL that reopens the same activity/action/range/place context. No recipient picker is invented. |
+| Add to calendar, save and reminder | **Preserve** | Calendar export is the current save/reminder path: first confirm the event city and local time, then create the calendar item with its reminder. No browser-storage “Save” is invented. |
+| Change city from confirmation | **Preserve** | Returns to the stable place field without clearing the accepted result. |
+| Medical Muhurat | **Move** | Remains a separate safety-first Muhurat entry and direct route; it is not mixed into the general finder. |
+
+This prototype provides visual coverage for backlog #31, #32 and #37 but does not
+change their production or Google-Sheet status. Native iPhone/Android calendar-import
+verification remains the existing #37 human closeout.
+
+### 10.7 Panchang Calendar — month, convention, selected day and search/year
+
+**Owner-review Figma frames (2026-08-16):** Month `407:1654`; calendar-system
+selector `407:1924`; selected day `407:2215`; search/year `407:2381`.
+
+| Screen element | Decision | Protected behaviour / evidence |
+|---|---|---|
+| Month calendar | **Improve** | Dedicated Calendar job, not a replacement for Today or a static illustration. Shared place/date state and Back destination survive. |
+| Calendar-system selector | **Preserve** | Exact approved labels: Amanta lunar — Ganak default; Standard International Calendar; Hindu Panchang; Tamil solar · Thirukanitha; Bengali Panjika. |
+| Holiday overlay | **Move** | Lives with Calendar controls rather than crowding every Today ribbon; changing it never changes astronomy or observance timing. |
+| Selected-day summary | **Improve** | Opens a real day context and links to the canonical festival/vrat guide and Full Panchang. |
+| Search and full year | **Preserve** | Search/year results use canonical routes; Pradosh examples were verified against current Ganak and unverified rows were removed. |
+
+### 10.8 Prashna — moment, KP number, verdict and expert evidence
+
+**Owner-review Figma frames (2026-08-16):** moment question `416:2024`; KP-number
+question `416:2206`; moment answer `416:2388`; KP-number answer `416:2536`; expanded
+expert evidence `416:2699`.
+
+| Screen element | Decision | Protected behaviour / evidence |
+|---|---|---|
+| Ask from this moment | **Improve** | Inherited New Delhi place is visible; no birth details are requested. The sample Travel answer was cast in current Ganak and copied as one immutable result. |
+| KP number method 1–249 | **Preserve** | Alternative method remains explicit; first sincere number locks after casting and only New question resets it. Sample number 108 and its result came from current Ganak. |
+| Topic choices | **Preserve** | All twelve current categories remain; changing topic clears stale output. |
+| Answer before chart | **Preserve** | Plain verdict and reasons render before Lagna, Nakshatra, sub-lord and technical tables. |
+| Full Prashna chart / Astrologer evidence | **Improve** | Expert material remains reachable and contained; it never replaces the public verdict. |
+| Question-text privacy | **Preserve** | Raw question text is not sent to ordinary analytics or replay. A separate deliberate research contribution remains required for server storage. |
+
+### 10.9 Jyotish — birth chart, Kundli, Dashas, Matching, Tools and Vault
+
+**Owner-review Figma frames (2026-08-16):** hub/birth details `419:2489`; Kundli
+workspace `419:2677`; Dashas `419:2865`; Matching `419:3046`; Tools `419:3222`;
+Vault `419:3419`.
+
+| Screen element | Decision | Protected behaviour / evidence |
+|---|---|---|
+| Birth inputs | **Improve** | Birth place/date/time remain explicit chart inputs. Today/home place may prefill only visibly and never silently replaces birth context. |
+| Ayanamsa and node convention | **Preserve** | Lahiri + mean Rahu/Ketu remains the visible default; Raman, KP and True Chitrapaksha stay explicit choices. |
+| Kundli overview and chart style | **Improve** | Exact sample values were calculated with Ganak's engine; North/South/East and `cstyle` remain available. |
+| Answer-first life interpretation | **Deferred — omit from public result** | The prototype names the owner-review gate; it does not present unapproved interpretation copy as released. |
+| Dashas | **Improve** | Vimshottari current period first; Antardasha through Prana and BNN/Bhrigu remain reachable for expert use. |
+| Matching | **Improve** | Ashtakoota and Dashakoota remain distinct; sample values are engine-derived and qualified, never a deterministic marriage verdict. |
+| Tools | **Move** | Focused calculators and specialist panels gain one coherent catalogue; unavailable reports do not appear as dead tiles. |
+| Vault / saved charts | **Preserve** | Save is explicit-only through `approvedStorage.savedCharts`; local device is the current data home. Optional login/sync remains future work and never gates Panchang. |
+| Print/PDF | **Preserve** | Result-level Save as PDF remains available for Kundli and Matching; there is still no global Panchang PDF. |
+
+### 10.10 Personalize and public legal pages
+
+**Owner-review Figma frames (2026-08-16):** Personalize hub `421:3047`; Appearance
+& Comfort `421:3224`; follow/place/language/sound `421:3410`; Privacy & Data
+`421:3586`; Privacy Policy `421:3769`; Terms `421:3931`; Sources & Conventions
+`421:4097`; About Ganak `421:4268`.
+
+| Screen element | Decision | Protected behaviour / evidence |
+|---|---|---|
+| Personalize hub | **Improve** | One job-specific home for five current sections; critical Follow, Listen and calendar controls still remain discoverable in context. |
+| Comfort presets and fine controls | **Preserve** | Simple & Large, Balanced, Detailed; scale/density, warmth, light/dark and Guided/Expert remain token-driven. |
+| Parent setup | **Preserve** | Picture/sample-led larger-text and language setup remains available without requiring technical menu literacy. |
+| Follow, home place, language and sound | **Preserve** | Uses approved preferences store; religious preference remains local-first and sensitive; read-aloud never autoplays. |
+| Privacy controls | **Improve** | One concise consent/settings home rather than repeated notices. Current analytics/replay state is shown as disabled; any launch activation requires explicit opt-in and masked/excluded sensitive flows. |
+| Review / clear data | **Preserve** | Preferences and saved charts are separately reviewable and clearable; one store never silently clears the other. |
+| Privacy, Terms, Sources and About | **Move** | Footer labels now have named public destinations with plain-language current behaviour, conventions and limitations. No prototype wording is automatically published. |
