@@ -578,7 +578,8 @@ Recorded because it governs how every later screen is built (owner, 2026-08-16):
 
 - A page that needs to differ **selects a different option** on a shared part.
 - A shared part is **never edited to satisfy one page**; the need for that is the signal
-  that the part requires a new option.
+  that the part requires a new option. Editing the part *for every screen that uses it*
+  is a different act, is permitted, and is governed by the sweep obligation in §10.8.
 - A shared part is **never duplicated** to create a one-off. A genuine one-off is declared
   as such in this register, together with the explicit statement that site-wide token and
   component changes will not reach it.
@@ -664,13 +665,28 @@ Both hold as long as every change travels through one of three levels and never 
 
 1. Can the difference be expressed by **selecting a different option** on an existing
    shared part? → it is a **page setting**. Record it in that screen's register row.
-2. Does no suitable option exist? → the shared part **gains a new option**. Never an edit
-   made to satisfy one page.
-3. Should the difference be true everywhere? → it is a **token** change.
-4. Anything else — editing a shared part for one screen, or duplicating it to create a
-   one-off — is prohibited by §10.6.3. A genuine one-off must be declared as such in the
-   register, together with the explicit statement that token and shared-part changes will
-   not reach it.
+2. Does no suitable option exist, and does only this screen (or a subset) need it? → the
+   shared part **gains a new option**.
+3. Is the shared part itself **wrong for every screen that uses it**? → **edit the shared
+   part.** This is permitted and expected; it is what a shared part is for. It carries one
+   obligation, below.
+4. Should the difference hold across all parts? → it is a **token** change.
+5. Can none of the above serve the screen? → declare a **one-off** in the register,
+   together with the explicit statement that token and shared-part changes will not reach
+   it.
+
+**The obligation on step 3 — the sweep.** Editing a shared part is a deliberate,
+site-wide act. Before it merges, every screen that instantiates that part is opened and
+checked, and the register rows naming it are re-read. The prohibited act in §10.6.3 is
+narrower than "editing a shared part": it is **editing a shared part in order to fix one
+screen**, where the other users of that part are changed without anyone looking. The edit
+is not the defect; the unexamined blast radius is.
+
+**Choosing between step 2 and step 3.** A new option costs nothing elsewhere but adds a
+choice that must be maintained and documented forever. An edit costs a sweep but keeps the
+part simple. Neither is free. Adding an option to avoid a sweep is how a part accumulates
+near-duplicate choices nobody can tell apart; editing to avoid documenting an option is
+how unrelated screens silently regress. The register records which was chosen and why.
 
 **The screen registers in §10.2–§10.7 are the page-settings panel.** Each row states what
 a screen's element is, which shared capability it uses and what state it must preserve —
