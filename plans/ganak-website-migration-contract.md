@@ -34,26 +34,56 @@ table does not mention it.
   particular, global search, geolocation, profile/account and any reminder action must not
   be shown as working until their corresponding approved feature exists.
 
+### Shared component architecture — site-wide defaults without page lock-in
+
+Ganak must support both kinds of change the owner described: a deliberate **site-wide**
+change and a deliberate **one-page/one-instance** change. Reuse must not mean that every
+screen is permanently identical; flexibility must not mean detached copies that drift.
+
+| Change scope | Correct design mechanism | Intended effect |
+|---|---|---|
+| Theme or rule for the entire site | Semantic token or shared master | Every applicable component updates. |
+| A recurring alternative | Named component variant | Only instances selecting that variant update together. |
+| One page or one use | Exposed instance property, optional slot or page wrapper | That instance changes without altering siblings. |
+| Truly unique page composition | Page-owned layout around still-linked shared primitives | The unique page can differ without forking the reusable base. |
+
+Every shared component must document its **locked structure**, **editable properties**,
+**optional parts/slots** and **named variants**. Text, destination, selected state, visibility
+and other approved instance data should be exposed as properties where they legitimately vary.
+A page-specific need must not be implemented by editing a global token or master. A site-wide
+need must not be implemented through many manual page edits.
+
+Figma instances remain linked to their master; production components expose equivalent React
+props/slots. If an instance needs a difference the current API cannot express, add a reviewed
+property, variant or wrapper. Do not detach/copy it merely to obtain editability. Every design
+handoff must label the intended blast radius as **site-wide**, **variant-wide** or
+**this page only**, and QA must prove that one-page changes do not mutate sibling screens while
+master/token changes still propagate as intended.
+
 ### Shared website footer — global migration contract
 
 The footer is part of the **shared website shell**, not a Full Panchang card and not a
 screen-owned decorative block. Every migrated public website route must render exactly one
-instance after its page-specific content. There is one master component with English and
-Hindi variants; a screen must not detach, redraw, recolour or maintain its own footer copy.
-Editing the master is how a later site-wide footer improvement reaches every route.
+linked instance after its page-specific content. One component family supplies the approved
+default and English/Hindi variants. A page may use exposed properties, optional slots, a named
+variant or a wrapper for a justified page-specific difference; it must not detach or maintain
+an ungoverned copy. Editing the master remains the mechanism for an intentional site-wide
+footer change.
 
 #### Approved visual structure
 
-1. Use the approved pale-white `color/surface` treatment, separated from the page by a thin
-   approved line. Do **not** bind the footer to the warm-ivory `color/bg` token, and do not
-   introduce a sage, blue-status, pink-status or dark feature-card surface merely to make the
-   footer prominent.
+1. By default the footer **inherits its page canvas**; it has no independent cream/ivory fill.
+   Do not bind it to warm-ivory `color/bg` or `color/surface`. If a future page genuinely needs
+   a distinct footer surface, use a reviewed `Surface` variant or page wrapper rather than
+   changing the master or theme token for every screen.
 2. Use two compact, centred utility-link rows followed by the **complete approved blue floral
    ending**. The floral artwork is decorative: it must not be cropped into a banner, recoloured
    per screen, used as a status indicator or placed behind text.
 3. The current approved link order is:
    - primary: **Festivals this month · Other cities · Hora · Muhurat Finder**;
    - secondary: **English / हिन्दी · About Ganak · Sources & conventions · Privacy · Terms**.
+   A justified page-specific omission/addition uses an exposed visibility property or slot;
+   it does not fork the whole footer.
 4. The link list is a design and IA contract, not permission to fake a route. A production
    link renders only when its real mapped destination exists and passes the state/Back proof
    below. An item without a live target is omitted until built; it is not disabled-looking or
@@ -84,7 +114,7 @@ Editing the master is how a later site-wide footer improvement reaches every rou
 | Artifact | Figma node | Contract evidence |
 |---|---:|---|
 | Shared footer variant set | `349:14` | One `Website footer` component set governs both languages. |
-| English variant | `349:2` | Pale-white `color/surface`, two approved link rows and the exact approved floral ending. |
+| English variant | `349:2` | Transparent/canvas-inheriting container, two approved link rows and the exact approved floral ending. |
 | Hindi variant | `349:8` | Same geometry and artwork; Hindi labels are a variant, not a separate design. |
 | Full Panchang English instance | `351:178` | Linked instance at the end of frame `290:794`; no local footer/art copy remains. |
 | Full Panchang Hindi instance | `351:184` | Linked instance at the end of frame `320:2`; no local footer/art copy remains. |
@@ -92,7 +122,15 @@ Editing the master is how a later site-wide footer improvement reaches every rou
 This evidence proves the component architecture on the two Full Panchang approval frames.
 It does **not** claim that all other prototypes or the production website have migrated yet.
 Before another screen becomes implementation scope, its local footer must be replaced by an
-instance of this set and pass EN/HI, 320/390/768/1280px, keyboard, contrast and route tests.
+instance of this set or a documented linked variant/wrapper and pass EN/HI,
+320/390/768/1280px, keyboard, contrast and route tests.
+
+#### Breadcrumb canvas correction — 2026-08-16
+
+Full Panchang breadcrumb frames `310:90` (English) and `320:331` (Hindi) now inherit the
+page canvas instead of binding to cream `color/surface` (`#FDFAF2`). Breadcrumb trail text is
+page-specific data; the visual pattern may become shared, but changing one trail must not edit
+the trail on another route.
 
 ## 2. Primary persona and the journey we protect
 

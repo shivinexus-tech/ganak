@@ -60,13 +60,18 @@ journey.
    next calculation, not an already-issued result without a new user action.
 6. Religious follow/tradition preferences remain local-first and never enter analytics or
    sync without explicit granular consent.
+7. A shared component supplies defaults, not a prohibition on page-specific design. Use a
+   semantic token/master for site-wide changes, a named variant for recurring differences,
+   and exposed instance properties, slots or a wrapper for one-page differences. Instances
+   remain linked; never edit a global token/master to solve one page or detach a component to
+   obtain local control.
 
 ## 4. Shared components and permanent homes
 
 | Capability | Class | Canonical website home | Contextual copies | State/behaviour that must survive | Acceptance proof |
 |---|---|---|---|---|---|
 | Product identity + Today/Festivals/Muhurat/Prashna/Jyotish | G1 | Shared site header | Compact mobile navigation | `lang`, place and applicable route state | Every destination + reload + Back/Forward. |
-| Shared website footer | G1/J/G3 | Shared site shell after page-specific content | None; screens use one linked instance rather than local copies | `lang`; Back origin; only destination-applicable shared context; no sensitive route payload on legal/feedback links | Exactly one EN/HI component instance per public screen; real-route matrix; 320/390/768/1280px, keyboard and AA proof. |
+| Shared website footer | G1/J/G3 | Shared site shell after page-specific content | One linked instance; justified page differences use exposed properties, slots, named variants or a wrapper—not detached copies | `lang`; Back origin; only destination-applicable shared context; no sensitive route payload on legal/feedback links | Exactly one linked footer family instance per public screen; page-only override isolation + site-wide propagation proof; real-route matrix; 320/390/768/1280px, keyboard and AA proof. |
 | Language | G1/G3 | Header and Personalize | Content-level bilingual controls only where required | Current route and all meaningful inputs/results | EN↔HI route matrix; no reset or mixed-language shell. |
 | Personalize | G1 | Header | First-run/parent setup and contextual Follow/Listen shortcuts | Approved `preferences` store | Review/change/clear; direct storage calls remain absent. |
 | Place | G2/G3 | Shared Date & Calendar Context on Today/Festivals/Muhurat; default in Personalize | Visible inherited-place line in Prashna/Festival guide | `city`, `lat`, `lon`, `zone` | Change place, traverse routes, reload and return. |
@@ -169,8 +174,11 @@ Before any Figma screen or code slice is called ready:
 The shared-component audit must fail if a date/calendar-dependent approved frame lacks
 the Date & Calendar Context component, or if a detached/copy-pasted context group silently
 diverges from the component source. It must also fail when a public approval frame lacks
-the shared Website footer, contains more than one footer, detaches/rebuilds the footer
-locally, or exposes a footer label without a real mapped destination.
+the shared Website footer family, contains more than one footer, detaches/rebuilds the footer
+locally instead of using a documented property/variant/wrapper, or exposes a footer label
+without a real mapped destination. The audit must additionally prove both directions: a
+page-only override leaves sibling instances unchanged, and an intentional master/token change
+reaches every applicable instance.
 
 ## 7. Figma shared-context evidence — 2026-08-13
 
@@ -209,8 +217,9 @@ Full Panchang drawing:
 | Artifact | Figma node | Evidence |
 |---|---:|---|
 | `Website footer` component set | `349:14` | One master with a `Language` variant axis. |
-| English / Hindi variants | `349:2` / `349:8` | Identical geometry, pale-white `color/surface` binding and complete approved floral ending; warm-ivory `color/bg` is forbidden for this component. |
+| English / Hindi variants | `349:2` / `349:8` | Identical base geometry, canvas-inheriting transparent containers and complete approved floral ending; cream `color/bg`/`color/surface` fills are absent. |
 | Full Panchang EN / HI instances | `351:178` / `351:184` | Linked instances in frames `290:794` / `320:2`; old local footer and floral copies removed. |
+| Full Panchang breadcrumb EN / HI | `310:90` / `320:331` | Page-specific trails now inherit the canvas; changing either trail does not require changing the other route. |
 
 The component currently proves architecture on those two approval frames only. All other
 approved prototypes and the production website remain pending until they instantiate the
