@@ -15,7 +15,7 @@ const config = JSON.parse(await readFile(new URL("../plans/backlog-sheet-sync.js
 const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md", import.meta.url), "utf8");
 const base = parseRegister(markdown, config, "test base");
 
-assert.equal(base.rows.size, 75);
+assert.equal(base.rows.size, 82);
 // 73, 74 and 75 added 2026-08-14: the three reference-source divergences the
 // 2026-08-12 Drik cross-check left open (C3). All three shipped with the row, so
 // they are registered as closed work with gate evidence, not as intentions.
@@ -278,7 +278,7 @@ assert.throws(
 );
 assert.equal(
   parseRegister(preAutomationMarkdown, config, "bootstrap historical fixture", { allowMetadataTitleMismatch: true }).rows.size,
-  75,
+  82,
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 

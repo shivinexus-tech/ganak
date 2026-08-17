@@ -124,7 +124,19 @@ export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: num
   if (id === "gregorian") return new Date(atMs+(panchang.tz||0)*3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-IN", { day:"numeric", month:"long", year:"numeric", timeZone:"UTC" });
   const term=(kind:any,value:any)=>panchangTerm(lang,kind,value);
   const lunarDay=`${term("paksha",panchang.paksha)} · ${lang === "hi" ? "चंद्र दिवस" : "lunar day"} ${panchang.tithiDay}`;
-  if (id === "north-purnimanta") return lang === "hi" ? `पूर्णिमान्त · ${term("month",panchang.months.purnimanta)} · ${lunarDay}` : `Purnimanta · ${term("month",panchang.months.purnimanta)} · ${lunarDay}`;
+  /* The line named the month and the lunar day but never the YEAR, so it was not a whole
+     Hindu date — an owner comparing it to Drik (which prints the samvat on its main page)
+     could not find Vikram Samvat at all; all three samvats sit in the Muhurat detail
+     table (owner, 2026-08-14). Only the two LUNAR modes get it: Gregorian is the civil
+     calendar and carries no samvat, and the Tamil/Bengali solar modes already print their
+     own era year further along their own line. Vikram alone, not Shaka and Gujarati too —
+     this is micro text that already carries two month names during the Krishna fortnight,
+     and the full set stays one tap away in the detail table. Year number only, without its
+     samvatsara name ("2083", not "2083 Siddharthi"), for the same reason — and also
+     because that name is currently wrong for Vikram; see C4-SAMVATSARA-OFFSET. */
+  const vikram=String(panchang.samvat?.vikram ?? "").trim().split(" ")[0];
+  const era=vikram ? (lang === "hi" ? `विक्रम संवत् ${vikram} · ` : `Vikram Samvat ${vikram} · `) : "";
+  if (id === "north-purnimanta") return lang === "hi" ? `${era}पूर्णिमान्त · ${term("month",panchang.months.purnimanta)} · ${lunarDay}` : `${era}Purnimanta · ${term("month",panchang.months.purnimanta)} · ${lunarDay}`;
   if((id==="tamil-solar"||id==="bengali-solar")&&place){
     const d=regionalCalendarDate(id,panchang,atMs,place);
     const month=lang==="hi"?d.monthHi:d.monthEn;
@@ -144,12 +156,12 @@ export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: num
   const monthsDiffer = purnMonth && purnMonth !== amantaMonth;
   if (lang === "hi") {
     return monthsDiffer
-      ? `${amantaMonth} (अमान्त) / ${purnMonth} (पूर्णिमान्त) · ${lunarDay}`
-      : `अमान्त · ${amantaMonth} · ${lunarDay}`;
+      ? `${era}${amantaMonth} (अमान्त) / ${purnMonth} (पूर्णिमान्त) · ${lunarDay}`
+      : `${era}अमान्त · ${amantaMonth} · ${lunarDay}`;
   }
   return monthsDiffer
-    ? `${amantaMonth} (Amanta) / ${purnMonth} (Purnimanta) · ${lunarDay}`
-    : `Amanta · ${amantaMonth} · ${lunarDay}`;
+    ? `${era}${amantaMonth} (Amanta) / ${purnMonth} (Purnimanta) · ${lunarDay}`
+    : `${era}Amanta · ${amantaMonth} · ${lunarDay}`;
 }
 
 /* Compact month text for prominent date cards. Unlike calendarLabel(), this

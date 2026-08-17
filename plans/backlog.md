@@ -992,6 +992,19 @@ Phase-1 infrastructure; broader account/monetization architecture remains deferr
 - [ ] **Broader multi-language interface** — languages beyond the current Hindi and
       English pair are explicitly post-launch. Translation must cover complete
       journeys and errors, not only labels. _(Owner priority 2026-07-21)_
+      **Re-priced 2026-08-15 by the Drik menu audit (#70): this row is worth more, and
+      costs less, than it reads.** Drik's Marathi, Gujarati, Kannada and Telugu Panchang
+      pages run on the **Amanta lunar reckoning that is already Ganak's default**, and its
+      Bengali and Tamil pages run on modes Ganak already ships. For those six, **Ganak's
+      dates are already correct today** — the only barrier is that the interface speaks
+      English and Hindi. So this row buys six audiences with **zero engine work**, a better
+      return than any single calculation feature, while a Bengali or Tamil reader currently
+      cannot use an answer Ganak already computes correctly. Sequence by reader count
+      against translation cost, not by the order the calendar modes were built.
+      **Malayalam, Nepali, Odia and Assamese are different** — they need #76–#79 first;
+      translating their interface before that ships a fluent page showing a wrong month
+      name. Applies equally to **Full regional-language calendar presentation** (#51)
+      immediately above.
 - [ ] Prioritize new features by what Phase 1 user feedback actually asks for.
 - [ ] Cheap feature candidates: **Prashnavali** (number-pick → verse, very low
       cost). Possibly **Gemstone/Remedy** if users ask.
@@ -1145,6 +1158,38 @@ Trigger conditions — build a piece only when one is actually true:
   Explicitly NOT before scale.
 Guardrails carried from the review: none of this uses `localStorage`/`sessionStorage`
 (project ban); nothing requires rewriting the validated ephemeris engine.
+
+- [ ] **#82 — The phased migration must carry the calendar/era display contract.**
+      _(Owner instruction 2026-08-15, from the Drik menu audit.)_ Ganak's calendar and era
+      display is a thin **interpretation-only** layer: it consumes the finished Panchang
+      result and never feeds a value back into astronomy, festival, muhurat or fasting
+      rules. That property is currently held by convention and a file-header comment, not
+      by any gate — **and every remaining migration phase is a chance to lose it silently.**
+      The migration must preserve it explicitly, phase by phase:
+      - **Route table / breaking the mega-scroll.** Regional calendar and month-grid pages
+        (see #70) must read era and month names from the same single source the app uses.
+        A route that recomputes a year to render its own heading forks the contract on
+        day one.
+      - **Extracting the engine package.** The calendar-label layer belongs on the
+        **presentation** side of that boundary, not inside the engine. `samvatInfo` and the
+        sidereal-ingress helpers move; the label/era formatting does not. Getting this
+        backwards would put language and regional naming inside the astronomy package.
+      - **Server-side Jyotish compute.** Once any calculation runs server-side, era values
+        must not be computed in **both** places. One producer, or the client and server
+        will drift and the drift will be invisible — exactly the failure mode already live
+        in `C4-SAMVATSARA-OFFSET` (#81), where two eras naming the same year disagree
+        because two code paths compute the name separately.
+      - **Every phase:** the regional-calendar gates must stay green across the phase, not
+        be re-pointed at new internals afterwards.
+      **Add the cross-era agreement gate before, not after, the migration touches this
+      area** — see §6 of
+      [`docs/superpowers/specs/2026-08-15-calendar-era-display-design.md`](../docs/superpowers/specs/2026-08-15-calendar-era-display-design.md).
+      **Reference caveat:** the phased-migration design this row guards
+      (`2026-08-11-full-stack-architecture-design.md`, 7 phases) currently exists **only on
+      the unmerged `claude/hora-usefulness` branch** — it is not on `main`, so this row
+      names a plan the repository cannot yet see. Its Phase 2 (prerender + sitemap) has
+      since been delivered independently. Reconcile that spec with `main` before treating
+      its phase numbering as current. _(MIGRATION-CALENDAR-CONTRACT)_
 
 ---
 
@@ -1457,6 +1502,54 @@ the other.
       selection, UX placement, URL/state persistence, EN/HI/native-name behaviour and
       source confidence. No regional name should be invented or loosely translated.
 
+      **INVENTORY DELIVERED 2026-08-15 — the spec's first required input is now done.**
+      The owner compared Drik's two nav menus, "Calendars" (15 entries) and "Panchang"
+      (17 entries), against Ganak after being unable to locate Vikram Samvat in the app at
+      all. All ~32 entries were audited against what Ganak actually computes on `main`.
+      **The headline: those 32 entries are not 32 calendars. They are four different kinds
+      of thing with wildly different costs, and the spec should be organised around that
+      split rather than around Drik's menu shape.**
+
+      1. **~15 are page surface over calculations Ganak already has and already gets
+         right.** Hindu / Indian / Tamil / Malayalam / Bengali / Gujarati / Marathi /
+         Telugu / Odia / ISKCON "Calendar", plus Diwali, Durga Puja, Shardiya Navratri,
+         Chaitra Navratri and Sankranti "Calendar", are **one month-grid template and one
+         festival-landing template rendered under fifteen names people search for**. Ganak
+         computes every day on every one of those pages today. What it lacks is an address
+         per regional name. This is route-registry work — it belongs with the SEO rows
+         (#62/#63/#66), not in this row's engine scope. **The prerender blocker is gone:**
+         `scripts/seo-routes.mjs` + the prerender/sitemap gate landed and cover 198 routes,
+         so new routes are no longer born invisible.
+      2. **~6 are language, not reckoning — and this is the single largest honest gap in
+         the comparison.** Marathi, Gujarati, Kannada and Telugu Panchang all run on the
+         **Amanta lunar reckoning that is already Ganak's default**; Bengali and Tamil run
+         on modes Ganak already ships. For all six, **Ganak's dates are already correct and
+         the only thing between it and those readers is that the interface speaks English
+         and Hindi**. Six audiences for zero engine work. Tracked in Phase 2 (#50, #51) —
+         this audit re-prices those rows, it does not add another.
+      3. **4 are genuine reckoning gaps** — Malayalam, Nepali, Odia and Assamese. These are
+         the *only* entries in the whole audit needing new calendar rules. Opened as their
+         own rows (#76–#79) so this row stays a spec, not a build.
+      4. **1 is partly covered** — ISKCON has the fasting/festival toggle but not the
+         Gaudiya calendar itself. Opened as #80.
+      5. **4 are not calendars at all** — Chandrabalam, Vinchudo, Nakshatra and Panchang
+         Utilities are tools. Handed to #71 below.
+
+      **Already fixed, do not re-raise:** the dropdown labels that triggered this audit
+      ("Amanta lunar (Ganak default)", "Gregorian", "Purnimanta lunar") have since been
+      rewritten in plain language on `main` — "South & West Indian lunar (default)",
+      "Regular January–December", "North Indian lunar (Sawan etc.)", "Tamil calendar",
+      "Bengali calendar". The spec should build on those, not restate the problem.
+
+      **Still open in the same area:** the main Panchang date line names the month and the
+      tithi but **not the year**, which is why an expert user could not find Vikram Samvat;
+      all three samvats sit in the Muhurat detail table. A fix is drafted (see the task-log
+      row) but not merged. The spec should decide whether the year belongs on the line
+      permanently and which era leads.
+
+      **Decide before designing:** see "Region-once vs calendar-picker" under
+      *Open decisions* — it changes what this spec is for.
+
 - [ ] **#71 — Panchang utilities hub (brainstorm/spec).**
       Owner request 2026-08-13: Ganak must have explicit Panchang utilities. First
       inventory which utilities belong before go-live versus later, which are links to
@@ -1465,6 +1558,76 @@ the other.
       timing tools, festival/vrat lookup and other owner-approved Panchang helpers.
       Requirement: preserve selected city/date/language and avoid cluttering the Daily
       answer card.
+
+      **Three named candidates added 2026-08-15 from the Drik menu audit.** Drik shelves
+      these under its *Panchang* menu, which is what makes them easy to mistake for
+      calendars; they are tools, and Ganak already has the right home for them in the
+      approved utility-calculator catalogue (#1, delivered) rather than needing a new
+      surface:
+      - **Chandrabalam** — Moon strength relative to the user's janma nakshatra/rashi.
+      - **Vinchudo** — the Marathi Vinchu ("scorpion tail") caution window.
+      - **Nakshatra finder** — standalone lookup, currently only reachable inside Daily.
+      **Each needs a stated source convention before it ships. Vinchudo especially:** it is
+      a regional rule with more than one version in circulation, so the work is choosing
+      and citing a convention, not computing a number. Follow the catalogue's existing
+      definition of done — answer-first bilingual route, dated anchor, named source.
+
+**#76–#80 — the reckoning gaps behind #70 (Drik menu audit, 2026-08-15).** Ganak ships
+five calendar modes on `main`. These are the only entries in the whole ~32-item audit that
+need new calendar rules rather than a page, a translation or a label. Each must reuse the
+sidereal-ingress machinery the Tamil and Bengali solar modes already share — **no mode may
+change the validated astronomy engine or add scattered mode-specific conditionals**, the
+same constraint those two modes shipped under.
+
+- [ ] **#76 — Malayalam Kollavarsham display calendar.** Solar, but neither Tamil nor
+      Bengali: its own era (Kollam Era, currently ~1201), its own months Chingam through
+      Karkidakam, and its own day-start rule. **Ganak already knows these months well
+      enough to date Onam and Vishu correctly inside the festival rules** — it simply
+      cannot display the calendar, so the month mapping is partly proven already. The era
+      year must be anchored against a source, not derived arithmetically from another era.
+      _(C4-MALAYALAM-KOLLAVARSHAM)_
+- [ ] **#77 — Nepali Patro (Bikram Sambat solar).** Baisakh through Chaitra.
+      **Correctness trap: this is not the Vikram Samvat lunar year.** They share a name,
+      both run ~57 years ahead of the Gregorian year, and the lunar form is the one users
+      see on the Panchang date line. Whatever ships must make the distinction visible in
+      EN and HI or it will actively mislead. Bikram Sambat month lengths do **not** follow
+      a clean sidereal rule alone, so unlike #76 this cannot be derived from the existing
+      solar modes — verify against a published Patro before implementing and pin anchors.
+      _(C4-NEPALI-BIKRAM-SOLAR)_
+- [ ] **#78 — Odia Panji (month names + anka era).** Sits in the Bengali-family solar
+      reckoning Ganak already has, so the astronomy is done — but **this is not just
+      renaming.** Odia counts *anka* (regnal) years, which skip certain numbers on their
+      own rule. Approximating that from the Bengali year yields a plausible wrong number,
+      which is worse than shipping nothing. Implement the skip rule from a cited source and
+      anchor a span that crosses a skip. Shares engine work with #79 — coordinate.
+      _(C4-ODIA-ANKA)_
+- [ ] **#79 — Assamese Panjika (month names + era).** Same Bengali-family solar base as
+      #78 and closer to a straight naming layer, with no anka complication. Cheapest of the
+      four. Shares engine work with #78 — do not let both lanes rebuild the same layer.
+      _(C4-ASSAMESE-NAMING)_
+- [ ] **#80 — Gaudiya (ISKCON) calendar proper.** The ISKCON toggle on the fasts-and-
+      festivals list already exists, so **the temptation is to call this done** — the
+      calendar itself is absent: Gaurabda era and Gaudiya month names (Madhusudana,
+      Trivikrama and the rest). Scope as completing the existing toggle, not a new surface.
+      **Audit before adding:** Gaudiya Ekadashi parana rules differ from the Smarta rules
+      already implemented; record which existing ISKCON observance rules are already
+      correct under this calendar and which are not, either fixing or documenting each.
+      _(C4-GAUDIYA-CALENDAR)_
+
+- [ ] **#81 — Defect: the same day gets two different Sanskrit year names.**
+      `samvatInfo` in `src/engine/panchang.ts` names the 60-year samvatsara with a
+      different offset per era: Shaka uses `+11`, Vikram `+9`, Gujarati `+8`. Vikram and
+      Shaka denote the **same** year, so they must resolve to the same samvatsara — they do
+      not. For 2026-08-14 at New Delhi the engine returns Shaka 1948 **Parabhava** but
+      Vikram 2083 **Siddharthi**, 17 places apart. The Shaka name agrees with the
+      independently-derived Tamil solar year name, so the Vikram offset is the likely
+      culprit (matching Shaka needs `+56`). **Do not fix by arithmetic alone** — verify the
+      intended name against a reliable panchang and cite the source. Visible today in the
+      Muhurat detail table. **Promoted to acceptance-register row #81 on owner instruction
+      2026-08-15** so it is scheduled rather than picked up opportunistically. The gate that
+      would have caught it — every era denoting the same year must resolve to the same
+      samvatsara — is specified in §6 of the era-display design and **must be watched
+      failing before the fix**. _(C4-SAMVATSARA-OFFSET)_
 
 - **E-0.6 Chart deep-gloss Hindi translation** — advanced sub-section paragraphs
   (KP, Ashtakavarga, BNN, Bhrigu, Special Lagnas, Dasha levels) still English-only.
@@ -1562,6 +1725,26 @@ the other.
   proxy/server fit inside this when they arrive.
 
 ## Open decisions — awaiting confirm (research/costs now provided)
+
+- **Region-once vs calendar-picker — the fork behind #70 and #76–#80.** Drik's fifteen-
+  entry Calendars menu is a **search-traffic layout, not a user's mental model**. Nobody
+  wants to choose between fifteen calendars; they want *their* calendar to be the one they
+  see. Ganak's dropdown asks the user to pick a **reckoning** — which is exactly why the
+  owner, who knows this domain, could not tell which option was "the Hindu Panchang" when
+  looking at it (2026-08-14). Plain-language labels have since landed and help, but they
+  do not change what the control asks of the reader.
+  **Option (a) — region-once.** The user sets their region once, or it is inferred from the
+  place they already enter, and that single choice drives the calendar reckoning, the month
+  names and eventually the interface language. The picker becomes a rarely-touched override
+  instead of a decision every reader must make. Regional landing pages still exist for
+  search, but they **set** the region rather than being fifteen equal menu choices.
+  **Option (b) — menu parity.** Ship the fifteen named entries as peers, matching Drik.
+  These are not exclusive at the page level — both need the same two templates — but they
+  are **opposite answers to what the app asks on arrival**, and that must be settled before
+  #70's spec is written, not after.
+  Recommendation: **(a)** — Ganak already collects the user's place, which implies the
+  region for most readers, and the current picker has now demonstrably confused an expert
+  user. Awaiting owner confirm. _(opened 2026-08-15 from the Drik menu audit)_
 
 - **Umbrella branding** — market research done (2026-07-18): EVERY successful app
   (Drik, AstroSage, AstroYogi, Astrotalk) uses ONE app + feature tabs; none split

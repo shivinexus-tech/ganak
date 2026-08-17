@@ -463,7 +463,14 @@
         61,
         67,
         68,
-        72
+        72,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82
       ]
     },
     {
@@ -909,6 +916,41 @@
       "section": "P1",
       "title": "Godhuli convention divergence ~14 min (`C3-GODHULI-DRIK`)",
       "technicalComplexity": "Low"
+    },
+    "76": {
+      "section": "P2",
+      "title": "Malayalam Kollavarsham display calendar (`C4-MALAYALAM-KOLLAVARSHAM`)",
+      "technicalComplexity": "Medium"
+    },
+    "77": {
+      "section": "P2",
+      "title": "Nepali Patro — Bikram Sambat solar (`C4-NEPALI-BIKRAM-SOLAR`)",
+      "technicalComplexity": "Medium"
+    },
+    "78": {
+      "section": "P2",
+      "title": "Odia Panji — month names and anka era (`C4-ODIA-ANKA`)",
+      "technicalComplexity": "Medium"
+    },
+    "79": {
+      "section": "P2",
+      "title": "Assamese Panjika — month names and era (`C4-ASSAMESE-NAMING`)",
+      "technicalComplexity": "Low"
+    },
+    "80": {
+      "section": "P2",
+      "title": "Gaudiya (ISKCON) calendar proper (`C4-GAUDIYA-CALENDAR`)",
+      "technicalComplexity": "Medium"
+    },
+    "81": {
+      "section": "P2",
+      "title": "Samvatsara name disagrees between eras for the same day (`C4-SAMVATSARA-OFFSET`)",
+      "technicalComplexity": "Low"
+    },
+    "82": {
+      "section": "P2",
+      "title": "Migration must carry the calendar/era display contract (`MIGRATION-CALENDAR-CONTRACT`)",
+      "technicalComplexity": "Medium"
     }
   }
 }
