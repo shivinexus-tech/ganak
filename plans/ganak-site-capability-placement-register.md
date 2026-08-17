@@ -209,7 +209,7 @@ Full Panchang drawing:
 | Artifact | Figma node | Evidence |
 |---|---:|---|
 | `Website footer` component set | `349:14` | One master with a `Language` variant axis. |
-| English / Hindi variants | `349:2` / `349:8` | Identical geometry, neutral shell surface and complete approved floral ending. |
+| English / Hindi variants | `349:2` / `349:8` | Identical geometry, pale-white `color/surface` binding and complete approved floral ending; warm-ivory `color/bg` is forbidden for this component. |
 | Full Panchang EN / HI instances | `351:178` / `351:184` | Linked instances in frames `290:794` / `320:2`; old local footer and floral copies removed. |
 
 The component currently proves architecture on those two approval frames only. All other

@@ -44,9 +44,10 @@ Editing the master is how a later site-wide footer improvement reaches every rou
 
 #### Approved visual structure
 
-1. Use the same approved neutral page background as the surrounding shell, separated by a
-   thin approved line. Do not introduce a sage, blue-status, pink-status or dark feature-card
-   surface merely to make the footer prominent.
+1. Use the approved pale-white `color/surface` treatment, separated from the page by a thin
+   approved line. Do **not** bind the footer to the warm-ivory `color/bg` token, and do not
+   introduce a sage, blue-status, pink-status or dark feature-card surface merely to make the
+   footer prominent.
 2. Use two compact, centred utility-link rows followed by the **complete approved blue floral
    ending**. The floral artwork is decorative: it must not be cropped into a banner, recoloured
    per screen, used as a status indicator or placed behind text.
@@ -83,7 +84,7 @@ Editing the master is how a later site-wide footer improvement reaches every rou
 | Artifact | Figma node | Contract evidence |
 |---|---:|---|
 | Shared footer variant set | `349:14` | One `Website footer` component set governs both languages. |
-| English variant | `349:2` | Neutral surface, two approved link rows and the exact approved floral ending. |
+| English variant | `349:2` | Pale-white `color/surface`, two approved link rows and the exact approved floral ending. |
 | Hindi variant | `349:8` | Same geometry and artwork; Hindi labels are a variant, not a separate design. |
 | Full Panchang English instance | `351:178` | Linked instance at the end of frame `290:794`; no local footer/art copy remains. |
 | Full Panchang Hindi instance | `351:184` | Linked instance at the end of frame `320:2`; no local footer/art copy remains. |
