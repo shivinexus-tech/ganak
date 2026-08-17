@@ -582,3 +582,66 @@ Recorded because it governs how every later screen is built (owner, 2026-08-16):
   component changes will not reach it.
 - Site-wide change therefore has exactly two levers: the design tokens, and the shared
   part itself. Both remain able to move every screen at once.
+
+### 10.7 Full Panchang — desktop website  `(added 2026-08-16)`
+
+**Visual source:** frame `Full Panchang · CANONICAL Delhi 2026-07-25 · APPROVAL`
+(1536 × 1820, English only). Audited 2026-08-16 against §4, §10.1 and §10.1.1.
+
+**Fixture status:** this frame's displayed values **do** reconcile with the canonical
+fixture `today-delhi-2026-07-25-devshayani-v1` — Ekadashi until 11:35 AM, Shukla Paksha,
+Ashadha, Jyeshtha until 7:34 AM on 26 July, Brahma Yoga until 9:07 PM, Vishti Karana
+until 11:35 AM, sunrise 5:38 AM, sunset 7:16 PM, Abhijit 12:00–12:55 PM, Rahu Kalam
+9:03–10:45 AM. It therefore passes §10.1.1 rules 1–6, unlike the Vrat Guide pack.
+
+**Retained without change:** the lean context ribbon (three controls, two read-outs, no
+gate machinery); the Decision Windows block; and the tradition-separation labelling —
+Gowri marked *kept separate from North-Indian daily windows*, Bala marked *favourable
+only · no personal details required*, both footnoted *not a personal chart*.
+
+**Colour-only status is already solved on this screen** and must not regress: every
+tinted tile and pill pairs a ✓ / ! glyph and a word with its colour, closing the gap the
+2026-08-01 accessibility review found in the shipped Muhurat surface.
+
+| Screen element | Decision | Real target / behaviour | State that must survive | Acceptance proof |
+|---|---|---|---|---|
+| Primary navigation active state | **Improve** | Full Panchang is a distinct destination; the navigation must not mark **Today** as current while this page is shown. Whether Full Panchang is a peer destination or a child of Today, the page states where it is. | Current route, `lang`, place, `date`, `cal`, `hol`. | Loading Full Panchang never renders Today as the active item. |
+| Breadcrumb / return path | **New — owner-approved** | A `Today › Full Panchang` trail in the context ribbon, the first element linking back. Currently the only surface marker is the small ochre `FULL PANCHANG` line above the headline. | Place, `date`, `cal`, `hol`, `lang` carried back to Today unchanged. | From Full Panchang, the trail returns to Today for the same place and date; Back behaves normally. |
+| Site footer | **Move** | The shared footer already drawn for the guide template — this month's observances, other cities, Hora, Muhurat finder, language twin, about, sources and methods, privacy, terms. Full Panchang currently ends on the decorative border with no footer at all. | `lang`, place, `date`. | The same footer component instance renders here and on a guide; every link resolves. |
+| Masthead decorative artwork | **Improve** | The botanical motif is retained as an edge and border treatment and removed from the band containing the wordmark and primary navigation. The wordmark must not be the lowest-contrast text in its own header. | N/A. | First-fixation and contrast check: the wordmark is legible and is not subordinate to adjacent artwork. |
+| Midnight-crossing date markers | **Improve** | **One** convention for a time that continues past midnight, applied identically in Sun/Moon, Choghadiya, Decision Windows and Gowri. Explained **once**, in the Day Reckoning block. The frame currently uses three visual treatments and three separate explanatory notes. | Place, zone, `date`, `cal`. | A single marker style across all four blocks; exactly one explanatory sentence on the page. |
+| Section-label typography | **Improve** | The label tier must be distinguishable by something other than Latin uppercase and letterspacing — weight, rule, size step or tint. Devanagari has neither uppercase nor an equivalent letterspacing convention, so the current scheme collapses the label tier into the footnote tier in Hindi. | `lang`. | The Hindi twin of this frame shows the same three visual tiers as the English one. |
+| Hindi twin of this frame | **Improve** | Required before approval. The frame is English-only, so approval would otherwise cover only the half of the design that works. | `lang`, place, `date`. | A Devanagari frame of the same fixture exists and passes this register. |
+| Choghadiya and Gowri grids | **Improve** | One tile component and one column count for both. Choghadiya currently runs four across, Gowri five, for the same content type on the same page. | Place, zone, `date`. | Both grids instantiate the same part with different options, per §10.6.3. |
+| Core Panchang / Sun-Moon / Calendar-Season card row | **Improve** | One column structure across the three cards. The `26 Jul` qualifier in the Moonset row currently lands in an unlabelled third column in an alert colour and reads as a warning rather than a date. | Place, zone, `date`, `cal`. | The three cards share a structure; the date qualifier uses the §-wide midnight convention, not an alert treatment. |
+| “Continue from this day” block | **Improve** | Retained, but the primary next step also needs an entry above the fold. It is the page's only dark, highest-contrast surface and sits roughly 70% down an 1820px page, so the strongest element is the one most visitors never reach. | `muhurat`, place, `date`, `cal`, `lang`. | The Muhurat next step is reachable without scrolling; the deep-link still hydrates the finder. |
+| Footnote and secondary-value type | **Improve** | Measured against a 12px floor and 4.5:1 contrast. The footnote tier is roughly half the size of the values it sits under, in grey on white. | Comfort/scale preference. | Measured pass at every comfort preset, per the existing accessibility gate. |
+| Personalize control in the header | **Preserve** | Existing Personalize entry, per §10.2. | Approved local-first preferences, current route. | Unchanged from §10.2. |
+
+#### 10.7.1 Guide-template evidence boards — what they already close
+
+Boards `357-2` (page-foot band close-up) and `380-22` (specimen strip) were reviewed on
+2026-08-16 and resolve part of §10.6.2 and the footer gap:
+
+- **Footer exists and is specified** — this month's observances, other cities, Hora,
+  Muhurat finder, language twin, about, sources and methods, privacy, terms. §10.7 above
+  adopts it for Full Panchang rather than inventing a second footer.
+- **Long-name proof at 320px exists** (`FOLLOW · 320PX ACTION`) and **in the calendar row**
+  (`CALENDAR LIST ROW`), which completes two of the four places named in §10.6.2. The
+  document title and the previous/next pair remain unproven.
+- **The 320px specimen is set as text, not as the control.** It proves the label wraps; it
+  does not prove the button's height, padding or tap target survive three wrapped lines.
+  The proof must be the rendered control.
+- **The interaction rules board is adopted into this contract as written:** every tappable
+  opens a defined destination; one deliberate next step, with previous/next placed after
+  the answer; reminder location is reserved only, never a fake or disabled control; and
+  religious preference never syncs or enters analytics without granular consent.
+
+#### 10.7.2 Language mixing is the one systemic defect across all reviewed boards
+
+A single guide page currently applies four different language rules at once: a
+Devanagari-only footer, English previous/next controls, an English method note, an English
+health note under a paired `Health note / स्वास्थ्य टिप्पणी` label, and paired labels
+throughout the body. Under the merged `/hi/` address scheme this resolves to the §10.6
+rule — **one language per address**, sacred terms excepted — and that rule governs the
+footer, the previous/next pair, the method note and the health note equally.
