@@ -51,12 +51,19 @@ const child = spawn(process.execPath, [path.join(here, "index.js")], {
   },
   stdio: ["ignore", "pipe", "pipe"],
 });
-child.stdout.on("data", () => {});
-child.stderr.on("data", () => {});
+// Keep the child's output instead of discarding it: when the server cannot start,
+// the reason (port in use, sandbox refusing the bind, a syntax error) is the only
+// thing that makes this suite diagnosable by whoever runs it.
+let childOutput = "";
+child.stdout.on("data", (chunk) => { childOutput += chunk; });
+child.stderr.on("data", (chunk) => { childOutput += chunk; });
+child.on("error", (error) => { childOutput += `spawn failed: ${error?.message || error}\n`; });
 
 try {
   if (!(await waitForServer())) {
-    console.error("server did not start");
+    console.error(`server did not start on ${BASE} after waiting`);
+    const why = childOutput.trim();
+    console.error(why ? `server output:\n${why}` : "server produced no output — check that PORT is free and node can bind it");
     process.exit(1);
   }
 
