@@ -258,15 +258,18 @@ direct paste of Vrat botanical sweep `485:51` was also rejected: `485:51` is the
 Festival/Vrat hero source, not the whole Ganak ornament vocabulary and not a universal
 replacement.
 
-The current correction is deliberately desktop-only and review-only. Frame
-`652:13737` keeps the approved ordinary/no-hero architecture intact; inside panel
-`652:13964`, the only visible additions are lattice rail `675:14247` from vocabulary
-source `62:2`, gold bookplate rails `675:14248`/`675:14249`, floral terminal
-`675:14250` from `62:13`, and upper finials `675:14251`/`675:14253` from
-`148:323`/`148:325`. Rejected sweep `666:14247` and the old fragments
-`652:13965`/`652:13967` remain hidden. No content module, position or other style was
-changed. Active source `601:9563` and 390px companion `652:13989` remain untouched
-until the owner accepts this desktop ornament; do not propagate it beforehand.
+The subsequent textile-bookplate correction was also rejected by the owner as an
+invented composition that did not match the already-created vocabulary. Its nodes
+`675:14247`–`675:14253` were removed from panel `652:13964`; rejected sweep
+`666:14247` and the old fragments `652:13965`/`652:13967` remain hidden. No active
+Today source or 390px companion was changed.
+
+The exact historical twelve-treatment vocabulary board was recovered from the
+recorded Figma mutation history at `682:22`, using the retained Figma image hashes
+and the original approved source lineage. It is explicitly an archive, not an
+approved screen or a new design direction. Do not apply any one treatment to Today
+without a job-specific decision; the recovery exists to prevent another invented or
+single-asset substitution.
 
 This is not production-readiness approval. The source candidates remain
 `CHANGES REQUESTED` for interaction implementation: several current Figma reactions

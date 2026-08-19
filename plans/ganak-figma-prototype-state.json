@@ -264,13 +264,15 @@
         "decision": "CHANGES REQUESTED — DESKTOP OWNER REVIEW: replace both disputed ornaments without rebuilding the approved ordinary-Today screen",
         "rejectedUniversalAssetAssumption": "485:51 is Festival/Vrat hero vocabulary only; its direct paste into Today is rejected",
         "desktopReviewPanel": "652:13964",
-        "desktopReviewNodes": ["675:14247", "675:14248", "675:14249", "675:14250", "675:14251", "675:14253"],
-        "desktopVocabularySources": ["62:2", "62:13", "148:323", "148:325"],
+        "rejectedBookplateNodesRemoved": ["675:14247", "675:14248", "675:14249", "675:14250", "675:14251", "675:14253"],
+        "recoveredHistoricalVocabularyArchive": "682:22",
+        "recoveredHistoricalTreatments": 12,
+        "archiveDecisionState": "NOT APPROVED — source recovery only",
         "hiddenRejectedPastedSweep": "666:14247",
         "hiddenSourceNodes": ["601:9793", "601:9795", "628:13637", "628:13639"],
         "hiddenReviewNodes": ["652:13965", "652:13967"],
         "pendingUntouchedNodes": ["601:9563", "601:8508", "652:13989", "667:14247", "667:14248", "666:14248"],
-        "scope": "Desktop review only: textile lattice, fine gold bookplate framing, floral terminal and finials replace only the disputed decorations. All content and geometry are frozen. Source and 390px propagation wait for owner approval."
+        "scope": "The invented textile-bookplate correction was removed. The exact historical vocabulary board is restored separately for source recovery. Today content/geometry and 390px evidence remain frozen; no recovered treatment is propagated without a job-specific owner decision."
       }
     },
     "responsiveSharedSystem": {
