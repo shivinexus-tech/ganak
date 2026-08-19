@@ -7,6 +7,7 @@ import { SADE_SATI_PHASE_COPY, SADE_SATI_METHOD_COPY, SADE_SATI_GUIDANCE } from 
 import { MANGAL_HOUSE_MEANINGS, MANGAL_METHOD_COPY, MANGAL_GUIDANCE, MANGAL_MITIGATION_COPY } from "../data/mangal-dosha-report";
 import { quickBirth, mangalDosha, kalaSarpa, pitraDosha, papaDosha, sadeSati, shraddhaTithi, panchaPakshi, westernNatal, westernRelationship } from "../engine/utility-calculators";
 import { zoneOffset } from "../engine/panchang";
+import { dateProblem, timeProblem, fieldMessage, type Bi } from "../components/birth-input";
 
 const METHODS:Record<string,{en:string;hi:string}> = {
   rashi:{en:"Lahiri sidereal Moon sign.",hi:"लाहिरी निरयन चन्द्र राशि।"}, "sun-sign":{en:"Lahiri sidereal Sun sign—not the tropical newspaper sign.",hi:"लाहिरी निरयन सूर्य राशि—सायन राशि नहीं।"},
@@ -62,31 +63,8 @@ function resolveZone(v:any,place:any):number|null{
 // at all, so year 1 or 9999 returned a confident chart from an ephemeris whose ΔT
 // polynomials only run 1800–2150. AGENTS.md: silent failure is unacceptable — say
 // WHICH field is wrong and WHY, and never correct a birth date on the reader's behalf.
-const YEAR_MIN=1800, YEAR_MAX=2150;
-const MONTH_HI=["जनवरी","फ़रवरी","मार्च","अप्रैल","मई","जून","जुलाई","अगस्त","सितम्बर","अक्टूबर","नवम्बर","दिसम्बर"];
-const MONTH_EN=["January","February","March","April","May","June","July","August","September","October","November","December"];
-const isLeap=(y:number)=>(y%4===0&&y%100!==0)||y%400===0;
-const daysInMonth=(y:number,m:number)=>[31,isLeap(y)?29:28,31,30,31,30,31,31,30,31,30,31][m-1];
-type Bi={en:string;hi:string};
-function dateProblem(raw:string,f:Bi):Bi|null{
-  const m=/^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(String(raw??"").trim());
-  if(!m)return {en:`Enter ${f.en} in full — year, month and day.`,hi:`${f.hi} पूरी भरें — वर्ष, मास और दिन।`};
-  const y=Number(m[1]),mo=Number(m[2]),d=Number(m[3]);
-  if(mo<1||mo>12)return {en:`${f.en} has month ${mo}, and there are only 12 months.`,hi:`${f.hi} में मास ${mo} है, जबकि मास केवल 12 होते हैं।`};
-  if(y<YEAR_MIN||y>YEAR_MAX)return {en:`${f.en} is in ${y}. Ganak calculates planetary positions for ${YEAR_MIN}–${YEAR_MAX}; outside that range the answer would not be trustworthy, so nothing was calculated.`,
-    hi:`${f.hi} ${y} की है। गणक ग्रह-स्थिति ${YEAR_MIN}–${YEAR_MAX} के लिए निकालता है; इससे बाहर उत्तर भरोसेमंद नहीं होगा, इसलिए गणना नहीं की गई।`};
-  if(d<1||d>daysInMonth(y,mo))return {en:`${MONTH_EN[mo-1]} ${y} has ${daysInMonth(y,mo)} days, so ${d} ${MONTH_EN[mo-1]} ${y} is not a real date. Ganak will not move it to the next day for you — please correct ${f.en}.`,
-    hi:`${MONTH_HI[mo-1]} ${y} में ${daysInMonth(y,mo)} दिन होते हैं, इसलिए ${d} ${MONTH_HI[mo-1]} ${y} कोई वास्तविक तिथि नहीं है। गणक इसे स्वयं अगले दिन नहीं बदलेगा — कृपया ${f.hi} ठीक करें।`};
-  return null;
-}
-function timeProblem(raw:string,f:Bi):Bi|null{
-  const m=/^(\d{1,2}):(\d{2})(?::\d{2})?$/.exec(String(raw??"").trim());
-  if(!m)return {en:`Enter ${f.en} as hours and minutes on a 24-hour clock.`,hi:`${f.hi} 24-घंटे की घड़ी में घंटा और मिनट के रूप में भरें।`};
-  const hh=Number(m[1]),mi=Number(m[2]);
-  if(hh>23)return {en:`${f.en} reads ${String(hh).padStart(2,"0")}:${m[2]}. A day ends at 23:59 — midnight is 00:00 of the next day.`,hi:`${f.hi} ${String(hh).padStart(2,"0")}:${m[2]} है। दिन 23:59 पर समाप्त होता है — मध्यरात्रि अगले दिन की 00:00 है।`};
-  if(mi>59)return {en:`${f.en} reads ${m[1]}:${m[2]}. An hour has 60 minutes.`,hi:`${f.hi} ${m[1]}:${m[2]} है। एक घंटे में 60 मिनट होते हैं।`};
-  return null;
-}
+// The guards themselves now live in src/components/birth-input.ts, shared with the
+// chart, matching and rectification screens so all four speak with one voice.
 // The offset actually used, shown next to the place so the reader can tell which
 // clock the answer was computed on.
 function offsetLabel(tz:number){const sign=tz<0?"\u2212":"+";const a=Math.abs(tz);const h=Math.floor(a);const mi=Math.round((a-h)*60);return `UTC${sign}${String(h).padStart(2,"0")}:${String(mi).padStart(2,"0")}`;}
@@ -184,7 +162,7 @@ export default function UtilityCalculatorScreen({route,lang,C,card,place,onPlace
     // Each field is checked separately and named in its own message. One shared
     // "check the date, time and place" left the reader guessing which of four
     // controls it meant — and two of them were never checked at all.
-    const fail=(p:Bi|null)=>{if(!p)return false;setResult(null);const m=hi?p.hi:p.en;setError(hi?m:m.charAt(0).toUpperCase()+m.slice(1));return true;};
+    const fail=(p:Bi|null)=>{if(!p)return false;setResult(null);setError(fieldMessage(p,hi));return true;};
     if(fail(dateProblem(birth.date,F_DATE)))return;
     if(fail(timeProblem(birth.time,F_TIME)))return;
     if(item.slug==="western-relationship"){

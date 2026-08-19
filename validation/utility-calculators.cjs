@@ -155,9 +155,23 @@ assert(/dateLabel=labels\?labels\.date:\(hi\?"जन्म तिथि":"Date o
 assert(!/hi\?"तिथि":"Date"/.test(screenSource), 'the bare तिथि label must not come back');
 
 // F9 — a birth date is never silently corrected, and every rejection names its field.
-assert(screenSource.includes('function dateProblem') && screenSource.includes('function timeProblem'),
+/* The guards moved OUT of this screen on 2026-08-18 and into
+   src/components/birth-input.ts, so the chart, matching and rectification
+   screens could stop inventing their own vaguer wording. The assertion follows
+   them and gets stricter: the screen must CALL the shared guards per field, and
+   the shared module must be their only home — a second local copy is how the
+   four screens drifted apart in the first place. */
+assert(/from "\.\.\/components\/birth-input"/.test(screenSource),
+  'the birth guards must come from the shared module, not a local copy');
+assert(screenSource.includes('dateProblem(') && screenSource.includes('timeProblem('),
   'date and time must be validated per field, not by one shared catch-all message');
-assert(/YEAR_MIN=1800, YEAR_MAX=2150/.test(screenSource),
+assert(!screenSource.includes('function dateProblem') && !screenSource.includes('function timeProblem'),
+  'a local copy of the guards must not come back — src/components/birth-input.ts is the one source');
+/* The range moved into the shared module with the guards. It is asserted at its
+   new home, and by VALUE rather than by source text, so widening it silently is
+   not possible — the span is the one over which ephemeris.ts has real ΔT fits. */
+const birthInput = loadApp('src/components/birth-input.ts');
+assert(birthInput.YEAR_MIN === 1800 && birthInput.YEAR_MAX === 2150,
   'a year range guard must exist — the ΔT polynomials in src/engine/ephemeris.ts only run 1800-2150');
 assert(!/:\s*"Could not calculate\. Check the date, time and place\."/.test(screenSource),
   'the one generic message that covered four different fields must not come back');

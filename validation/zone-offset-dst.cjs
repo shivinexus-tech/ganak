@@ -264,7 +264,7 @@ eq(zoneOffset('Mars/Nowhere', 1990, 6, 21, 9, 15), null, 'unknown zone returns n
     'src/screens/UtilityCalculatorScreen.tsx': { six: 1, four: 1, what: 'all 14 public calculators (resolveZone)' },
     'src/screens/MatchingScreen.tsx':          { six: 2, four: 0, what: "the two charts Dashakoota scores" },
     'src/screens/ChartScreen.tsx':             { six: 1, four: 1, what: 'the form offset, saved chart, cast chart and ayanamsa recompute (tzAtBirth)' },
-    'src/screens/RectifyScreen.tsx':           { six: 1, four: 1, what: 'birth-time rectification' },
+    'src/screens/RectifyScreen.tsx':           { six: 1, four: 0, what: 'birth-time rectification — the date-only fallback was REMOVED 2026-08-18: an unusable birth time is now refused with a named message instead of quietly resolving the offset at a fixed moment on the birth date' },
     'src/engine/medical-muhurat.ts':           { six: 1, four: 1, what: 'natalMoonSign (the 4-arg call is the finder DAY, correctly day-scoped)' },
     'src/engine/personal-muhurat.ts':          { six: 1, four: 0, what: 'natalAnchors — janma nakshatra, janma rashi and the Moon bhinnashtakavarga' },
   };
