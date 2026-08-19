@@ -236,7 +236,17 @@ eq(zoneOffset('Mars/Nowhere', 1990, 6, 21, 9, 15), null, 'unknown zone returns n
   /* Count TOP-LEVEL arguments of each `zoneOffset(...)` call: walk the characters
      from the opening paren, tracking nesting and string/template state, and count
      the commas at depth 1. Cheap, and exact for the shapes in this repo. */
-  function callArities(text) {
+  /* Comments are stripped first. Without this the scanner counted PROSE: the
+     matching screen's explanatory comment quoting `zoneOffset(...) ?? 5.5` was
+     read as a live date-only call, and the gate reported a defect in a file whose
+     only mention of the function is a sentence about the defect it used to have.
+     A gate that reads comments as code cannot be trusted about either. */
+  function stripComments(text) {
+    return text.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+  }
+
+  function callArities(raw) {
+    const text = stripComments(raw);
     const out = [];
     const re = /(^|[^.\w])zoneOffset\s*\(/g;
     let m;
@@ -262,7 +272,8 @@ eq(zoneOffset('Mars/Nowhere', 1990, 6, 21, 9, 15), null, 'unknown zone returns n
      fails, and so does adding a call nobody reviewed. */
   const BIRTH_SITES = {
     'src/screens/UtilityCalculatorScreen.tsx': { six: 1, four: 1, what: 'all 14 public calculators (resolveZone)' },
-    'src/screens/MatchingScreen.tsx':          { six: 2, four: 0, what: "the two charts Dashakoota scores" },
+    'src/components/birth-input.ts':           { six: 1, four: 1, what: 'the SHARED birth-zone resolver (resolveBirthZone): the 6-arg call is the birth clock, the 4-arg one is the "clock not typed yet" branch' },
+    'src/screens/PrashnaScreen.tsx':           { six: 1, four: 2, what: 'the moment of judgement is an instant, so it takes the clock (bug bash F4); the other two are a panchang-day context and a zone-validity probe' },
     'src/screens/ChartScreen.tsx':             { six: 1, four: 1, what: 'the form offset, saved chart, cast chart and ayanamsa recompute (tzAtBirth)' },
     'src/screens/RectifyScreen.tsx':           { six: 1, four: 0, what: 'birth-time rectification — the date-only fallback was REMOVED 2026-08-18: an unusable birth time is now refused with a named message instead of quietly resolving the offset at a fixed moment on the birth date' },
     'src/engine/medical-muhurat.ts':           { six: 1, four: 1, what: 'natalMoonSign (the 4-arg call is the finder DAY, correctly day-scoped)' },
@@ -291,6 +302,15 @@ eq(zoneOffset('Mars/Nowhere', 1990, 6, 21, 9, 15), null, 'unknown zone returns n
   for (const rel of Object.keys(BIRTH_SITES)) {
     if (!fs.existsSync(path.join(ROOT, rel))) fail(`call-site wiring: ${rel} no longer exists — re-point this inventory`);
   }
+  /* The matching screen stopped calling zoneOffset directly on 2026-08-19: its two
+     birth sites moved into the shared resolver above, which refuses rather than
+     defaulting. Delegation must still be asserted, or the screen would drop off
+     this inventory and silently stop being protected — which is exactly how the
+     ?? 5.5 default survived there in the first place. */
+  const matching = fs.readFileSync(path.join(ROOT, 'src/screens/MatchingScreen.tsx'), 'utf8');
+  if (!/resolveBirthZone\s*\(/.test(matching)) {
+    fail('call-site wiring: MatchingScreen.tsx no longer resolves birth zones through resolveBirthZone — a two-chart screen must not resolve offsets itself');
+  } else checks++;
   if (strays.length) fail(`call-site wiring: day-scoped caller(s) now pass a clock time: ${strays.join(', ')} — a panchang day is not a birth instant`);
   else checks++;
   console.log(`  · call sites: ${Object.keys(BIRTH_SITES).length} birth-instant files pass the clock; ${dayScoped} day-scoped calls in ${dayFiles} files stay on the 4-argument form`);
