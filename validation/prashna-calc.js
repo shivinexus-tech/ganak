@@ -152,11 +152,19 @@ function gmstDeg(jdUT, Tut) {
   return norm360(280.46061837 + 360.98564736629 * (jdUT - 2451545.0)
     + 0.000387933 * Tut * Tut - Tut * Tut * Tut / 38710000);
 }
+const raOfEcliptic = (lam, eps) => norm360(Math.atan2(cosD(eps) * sinD(lam), cosD(lam)) * R2D);
 function ascMcTropical(jdUT, Tut, latDeg, lonEastDeg) {
   const eps = meanObliquity(Tut);
   const ramc = norm360(gmstDeg(jdUT, Tut) + lonEastDeg);
   const mc = norm360(Math.atan2(sinD(ramc), cosD(ramc) * cosD(eps)) * R2D);
-  const asc = norm360(Math.atan2(cosD(ramc), -(sinD(ramc) * cosD(eps) + tanD(latDeg) * sinD(eps))) * R2D);
+  let asc = norm360(Math.atan2(cosD(ramc), -(sinD(ramc) * cosD(eps) + tanD(latDeg) * sinD(eps))) * R2D);
+  /* POLAR QUADRANT CORRECTION (2026-08-18) — must stay identical to PR_ascMc in
+     src/screens/PrashnaScreen.tsx. Above the polar circle the standard formula
+     returns the DESCENDANT for part of the day (Tromsø, 2026-08-18 18:00Z and
+     20:00Z). Everything on the eastern half of the horizon is rising; if the
+     computed point is west of the meridian, take its opposite. No-op below the
+     polar circle. */
+  if (sinD(norm360(ramc - raOfEcliptic(asc, eps))) > 0) asc = norm360(asc + 180);
   return { asc, mc, ramc, eps };
 }
 
@@ -184,14 +192,32 @@ function placidusCuspsTropical(ramc, eps, latDeg) {
   if ([c11, c12, c2, c3].some(v => v === null)) return null;
   return { c11, c12, c2, c3 };
 }
+/* Twelve tropical cusps from asc/MC/Placidus-quadrants. MUST stay byte-for-byte
+   equivalent to PR_ring in src/screens/PrashnaScreen.tsx — validation/
+   prashna-parity.js proves the two agree, and validation/prashna-high-latitude.cjs
+   proves BOTH against external published values rather than against each other.
+
+   High-latitude convention (2026-08-18, P0 fix): where Placidus is undefined the
+   fallback is EQUAL HOUSE from the ascendant — cusp h = asc + 30*(h-1) for all
+   twelve houses, MC included. In equal house the MC is not the tenth cusp. The
+   old code left cusp 10 as the real MC (and cusp 4 as the real IC) inside an
+   otherwise equal ring, which above ~60° made the ring non-monotonic, made the
+   twelve spans sum to 1080° and collapsed up to eight grahas into one house. */
+function cuspRing(asc, mc, p) {
+  const trop = new Array(13).fill(0);
+  if (!p) {
+    for (let h = 1; h <= 12; h++) trop[h] = norm360(asc + 30 * (h - 1));
+    return trop;
+  }
+  trop[1] = asc; trop[10] = mc;
+  trop[11] = p.c11; trop[12] = p.c12; trop[2] = p.c2; trop[3] = p.c3;
+  for (const h of [4,5,6,7,8,9]) trop[h] = norm360(trop[((h+5)%12)+1] + 180); // 4..9 opposite 10..3
+  return trop;
+}
 function houseCusps(jdUT, Tut, latDeg, lonEastDeg, T) { // sidereal, 1-indexed [1..12]
   const { asc, mc, ramc, eps } = ascMcTropical(jdUT, Tut, latDeg, lonEastDeg);
   const p = placidusCuspsTropical(ramc, eps, latDeg);
-  const trop = new Array(13).fill(0);
-  trop[1] = asc; trop[10] = mc;
-  if (p) { trop[11]=p.c11; trop[12]=p.c12; trop[2]=p.c2; trop[3]=p.c3; }
-  else for (const [h, off] of [[11,300],[12,330],[2,30],[3,60]]) trop[h] = norm360(asc + off); // equal fallback
-  for (const h of [4,5,6,7,8,9]) trop[h] = norm360(trop[((h+5)%12)+1] + 180); // 4..9 opposite 10..3
+  const trop = cuspRing(asc, mc, p);
   const sys = p ? 'placidus' : 'equal';
   return { cusps: trop.map((v,i)=> i===0?0:toSidereal(v,T)), system: sys, ascTrop: asc };
 }

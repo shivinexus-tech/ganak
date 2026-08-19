@@ -6,6 +6,9 @@ import { kpNumberToLagna, kpNumberInfo, KP_NUMBER_MIN, KP_NUMBER_MAX } from "../
 import { useDepth } from "../accessibility/ComfortProvider";
 import { Card, DataRow } from "../components/ui-primitives";
 import FeedbackCard from "../components/FeedbackCard";
+import { zoneOffset, sunEvents } from "../engine/panchang";
+import { computeRulingPlanets, WEEKDAY_LORDS } from "../engine/dasha";
+import { YEAR_MIN, YEAR_MAX } from "../components/birth-input";
 
 // ------------------------------------------------- PRASHNA TOKENS (app palette)
 const TOKENS = {
@@ -112,13 +115,33 @@ const PR_ayanamsa = T => 23.85236 + 1.3960 * T + 0.000139 * T * T;
 const PR_toSid = (trop, T) => norm360(trop - PR_ayanamsa(T));
 const PR_gmst = (jdUT, Tut) => norm360(280.46061837 + 360.98564736629 * (jdUT - 2451545)
   + 0.000387933 * Tut * Tut - Tut * Tut * Tut / 38710000);
+/* Right ascension of an ecliptic degree on the ecliptic itself (latitude 0):
+   tan(RA) = cos(eps) * tan(lambda). Used only by the polar quadrant correction
+   below. */
+const PR_raOfEcl = (lam, eps) => norm360(Math.atan2(cosD(eps) * sinD(lam), cosD(lam)) * R2D);
 function PR_ascMc(jdUT, Tut, lat, lonE) {
   const eps = PR_obliquity(Tut), ramc = norm360(PR_gmst(jdUT, Tut) + lonE);
-  return {
-    asc: norm360(Math.atan2(cosD(ramc), -(sinD(ramc) * cosD(eps) + tanD(lat) * sinD(eps))) * R2D),
-    mc: norm360(Math.atan2(sinD(ramc), cosD(ramc) * cosD(eps)) * R2D),
-    ramc, eps
-  };
+  let asc = norm360(Math.atan2(cosD(ramc), -(sinD(ramc) * cosD(eps) + tanD(lat) * sinD(eps))) * R2D);
+  const mc = norm360(Math.atan2(sinD(ramc), cosD(ramc) * cosD(eps)) * R2D);
+  /* POLAR QUADRANT CORRECTION (2026-08-18). The standard ascendant formula
+     returns ONE of the two antipodal points where the ecliptic cuts the horizon.
+     Below the polar circle that is always the eastern one. Above it -- Murmansk
+     68.96, Tromso 69.65, and everything nearer the pole -- the arctangent lands
+     in the other quadrant for part of the day and the function returns the
+     DESCENDANT instead: at Tromso on 2026-08-18 it did so at 18:00Z and 20:00Z,
+     handing back Scorpio 22 deg 57 min as the rising degree when that degree was
+     setting. The whole chart is then rotated by six houses.
+     Diurnal motion is uniform, so the fix is the definition itself: everything
+     on the eastern half of the horizon is rising and everything on the western
+     half is setting. Take the hour angle of the computed point; if it is west of
+     the meridian, the formula returned the descendant, so take its opposite.
+     Below the polar circle sin(H) is never positive here, so this is a no-op for
+     every latitude Ganak's earlier gates covered. Proven at 528 sampled
+     latitude/hour pairs by validation/prashna-high-latitude.cjs, which tests
+     "rising" against published spherical astronomy rather than against a second
+     copy of this code. */
+  if (sinD(norm360(ramc - PR_raOfEcl(asc, eps))) > 0) asc = norm360(asc + 180);
+  return { asc, mc, ramc, eps };
 }
 const PR_eclFromRA = (ra, eps) => norm360(Math.atan2(sinD(ra), cosD(ra) * cosD(eps)) * R2D);
 function PR_placidus(ramc, eps, lat) {
@@ -136,6 +159,49 @@ function PR_placidus(ramc, eps, lat) {
   const c11 = solve(ad => (90 + ad) / 3, 30), c12 = solve(ad => 2 * (90 + ad) / 3, 60);
   const c2 = solve(ad => 180 - 2 * (90 - ad) / 3, 120), c3 = solve(ad => 180 - (90 - ad) / 3, 150);
   return [c11, c12, c2, c3].some(v => v === null) ? null : { c11, c12, c2, c3 };
+}
+/* Build the twelve tropical cusps from the ascendant, the MC and the Placidus
+   quadrant solution (or null where Placidus is undefined).
+
+   HIGH-LATITUDE CONVENTION (implemented 2026-08-18, P0 fix): where Placidus is
+   undefined the fallback is the EQUAL HOUSE system reckoned from the ascendant --
+   cusp h = ascendant + 30*(h-1) for ALL twelve houses, the MC included. In equal
+   house the MC is NOT the tenth cusp; it is a separate sensitive point that may
+   fall in the 9th, 10th or 11th. That is the defining property of the system and
+   it is why the tenth cusp must not be pinned to the real MC here.
+
+   WHY: the previous code replaced only cusps 11, 12, 2 and 3 with 30-degree steps
+   and LEFT cusp 10 as the real MC (and so cusp 4 as the real IC) inside an
+   otherwise equal ring. Below ~60 deg latitude MC is approximately asc+270 so
+   nothing showed; above it the two real angles overtook their neighbours, the
+   ring stopped advancing monotonically, the twelve spans summed to 1080 deg
+   instead of 360 deg, and the linear `inHouse` scan dropped up to eight of the
+   nine grahas into a single house. At Tromso 166 of the 249 numbers were
+   affected. The screen's own disclosure already said "equal houses" in both
+   languages; the code simply did not build equal houses. This makes the two
+   agree.
+
+   WHY EQUAL HOUSE AND NOT SOMETHING ELSE: Krishnamurti's KP is a Placidus system
+   and the KP Readers record no polar convention at all, so nothing here can be
+   attributed to KSK. Equal house is the minimal, fully defined ring that (a)
+   exists at every latitude where an ascendant exists, (b) keeps the ascendant --
+   the one angle KP horary is actually judged from -- exact, and (c) is what the
+   shipped user-facing disclosure already names. It is recorded as a Ganak
+   product decision, NOT doctrine: plans/prashna-249-ksk-verify.md rule 9.
+
+   INVARIANTS, asserted externally by validation/prashna-high-latitude.cjs:
+   monotonic once round the zodiac, twelve spans summing to exactly 360 deg, no
+   degenerate or oversized house. */
+function PR_ring(asc, mc, p) {
+  const trop = new Array(13).fill(0);
+  if (!p) {
+    for (let h = 1; h <= 12; h++) trop[h] = norm360(asc + 30 * (h - 1));
+    return trop;
+  }
+  trop[1] = asc; trop[10] = mc;
+  trop[11] = p.c11; trop[12] = p.c12; trop[2] = p.c2; trop[3] = p.c3;
+  for (const h of [4, 5, 6, 7, 8, 9]) trop[h] = norm360(trop[((h + 5) % 12) + 1] + 180);
+  return trop;
 }
 const GRAHA = ['Ke','Ve','Su','Mo','Ma','Ra','Ju','Sa','Me'];
 const DASHA_YRS = { Ke:7, Ve:20, Su:6, Mo:10, Ma:7, Ra:18, Ju:16, Sa:19, Me:17 };
@@ -203,11 +269,7 @@ function PR_cast(ms, lat, lonE) {
   const { sid, jdUT, T, Tut } = PR_sidAll(ms);
   const { asc, mc, ramc, eps } = PR_ascMc(jdUT, Tut, lat, lonE);
   const p = PR_placidus(ramc, eps, lat);
-  const trop = new Array(13).fill(0);
-  trop[1] = asc; trop[10] = mc;
-  if (p) { trop[11]=p.c11; trop[12]=p.c12; trop[2]=p.c2; trop[3]=p.c3; }
-  else for (const [h, off] of [[11,300],[12,330],[2,30],[3,60]]) trop[h] = norm360(asc + off);
-  for (const h of [4,5,6,7,8,9]) trop[h] = norm360(trop[((h + 5) % 12) + 1] + 180);
+  const trop = PR_ring(asc, mc, p);
   const cusps = trop.map((v, i) => i === 0 ? 0 : PR_toSid(v, T));
   const inHouse = lon => {
     for (let h = 1; h <= 12; h++) {
@@ -369,11 +431,9 @@ function PR_castNumber(ms, lat, lonE, number) {
   const ramc = PR_ramcForAsc(ascTrop, eps, lat);
   const mc = norm360(Math.atan2(sinD(ramc), cosD(ramc) * cosD(eps)) * R2D);
   const p = PR_placidus(ramc, eps, lat);
-  const trop = new Array(13).fill(0);
-  trop[1] = ascTrop; trop[10] = mc;
-  if (p) { trop[11] = p.c11; trop[12] = p.c12; trop[2] = p.c2; trop[3] = p.c3; }
-  else for (const [h, off] of [[11, 300], [12, 330], [2, 30], [3, 60]]) trop[h] = norm360(ascTrop + off);
-  for (const h of [4, 5, 6, 7, 8, 9]) trop[h] = norm360(trop[((h + 5) % 12) + 1] + 180);
+  /* Same ring builder as the time mode, so the high-latitude equal-house
+     convention documented on PR_ring cannot drift between the two modes. */
+  const trop = PR_ring(ascTrop, mc, p);
   const cusps = trop.map((v, i) => i === 0 ? 0 : norm360(v - ayan)); // KP-New sidereal cusps
   /* The number DEFINES the nirayana ascendant. Converting it to tropical for the
      RAMC inversion and back is a lossy round-trip (up to 8.5e-14 deg), and the
@@ -477,8 +537,19 @@ function PR_shareCardCanvas(result, hi) {
   y += 56; g.strokeStyle = LINE; g.lineWidth = 2;
   g.beginPath(); g.moveTo(PAD, y); g.lineTo(W - PAD, y); g.stroke();
 
+  /* THE VERDICT (bug bash F11). The card used to paint the question, the lagna,
+     the judged cuspal sub-lord, all twelve cuspal sub-lords and the disclosures --
+     and never the answer. A recipient got the evidence with the answer removed,
+     from a button that sits under a verdict, in an app whose first principle is
+     answer-before-data. It leads here, exactly as it leads on screen. */
+  const isNumCard = result.mode === 'number';
+  const vstyle = isNumCard ? NUM_VERDICT[result.verdict.verdict] : VERDICT_STYLE[result.verdict.verdict];
+  y += 54; g.fillStyle = FLAG; g.font = font(44, 700);
+  g.fillText(isNumCard ? (hi ? vstyle.badge.hi : vstyle.badge.en) : (hi ? vstyle.hi : vstyle.en), PAD, y);
+  if (isNumCard) { y += 38; g.fillStyle = INK; g.font = font(25); g.fillText(hi ? vstyle.hi : vstyle.en, PAD, y); }
+
   // Lagna + the deciding cuspal sub-lord -- the two numbers an astrologer reads first.
-  y += 54; g.fillStyle = INK; g.font = font(30, 600);
+  y += 52; g.fillStyle = INK; g.font = font(30, 600);
   const L = result.chart.lagna;
   /* Number mode pins the lagna at an exact table degree; fmtDeg's rounding shows
      31/249 of them one arcminute low, so the card must format it exactly the way
@@ -519,7 +590,13 @@ function PR_shareCardCanvas(result, hi) {
             : 'latitude shapes the cusps; longitude does not']
       : []),
     `${hi ? 'अयनांश' : 'Ayanamsa'}: ${result.mode === 'number' ? 'KP-New' : 'Lahiri'} · ${hi ? 'मध्यम राहु/केतु' : 'mean Rahu/Ketu'}`,
-    `${hi ? 'भाव' : 'Houses'}: ${result.chart.system === 'placidus' ? 'Placidus' : 'Equal (high-latitude fallback)'}`,
+    /* The house-system line used to be hard-coded English in BOTH branches, so a
+       Hindi card carried the whole sentence "Equal (high-latitude fallback)" —
+       strictly less localised than the screen it exports, which already glosses
+       the same fact as समान भाव — उच्च अक्षांश विकल्प (bug bash F11). */
+    `${hi ? 'भाव' : 'Houses'}: ${result.chart.system === 'placidus'
+      ? (hi ? 'प्लेसिडस' : 'Placidus')
+      : (hi ? 'समान भाव — उच्च अक्षांश विकल्प' : 'Equal houses — high-latitude fallback')}`,
     `${hi ? 'सन्दर्भ' : 'Source'}: K.S. Krishnamurti, KP Reader VI`,
   ];
   lines.forEach((t, i) => g.fillText(t, PAD, y + i * 32));
@@ -613,13 +690,33 @@ const HOUSE_PLAIN_BY_Q = {
    they appear under "Working against it" — mirror tier-2's "for this question … counts
    against" framing, but without house numbers. Generic entries cover any question; BY_Q
    entries match sourced travel/4 and career/9 overrides in plans/prashna-house-glosses.md. */
+/* COMPLETED 2026-08-18 (bug bash F2). Six of the twelve houses were missing, and
+   `plainDeny` fell through to the FAVOUR vocabulary for them — so tier 1 and
+   tier 2 printed two different meanings for the same house in the same reading.
+   A health question denied on the 6th told the reader that "work and daily
+   duties" stood between them and recovery, three lines above the technical layer
+   saying the 6th is the house of illness. Sweeping all 249 numbers × 12 topics
+   showed the gaps were reachable on 4, 5, 6, 7, 8 and 12.
+
+   NOTHING NEW IS CLAIMED HERE. Each added line takes the house's OWN plain-language
+   area, already shipped in HOUSE_PLAIN, and states it in the tier-2 framing the
+   deny side already uses ("for this question, this counts against") — exactly as
+   the six original entries do. No house is given a signification it did not have.
+   Question-specific overrides below are limited to the two the source map already
+   carries. See plans/prashna-house-glosses.md. */
 const HOUSE_PLAIN_DENY = {
   1:  { en: 'your own position is not strong enough', hi: 'आपकी अपनी स्थिति पर्याप्त मज़बूत नहीं' },
   2:  { en: 'family and savings are not helping',     hi: 'परिवार और बचत सहायक नहीं' },
   3:  { en: 'effort alone may not be enough',         hi: 'केवल प्रयास पर्याप्त नहीं' },
+  4:  { en: 'home and settled life pull the other way', hi: 'घर और स्थिरता दूसरी ओर खींचते हैं' },
+  5:  { en: 'children and creative work are not supporting this', hi: 'संतान और सृजन इसमें साथ नहीं दे रहे' },
+  6:  { en: 'obstacles and daily demands stand in the way', hi: 'बाधाएँ और रोज़ की माँगें आड़े आ रही हैं' },
+  7:  { en: 'the other person is not going along with it', hi: 'दूसरा पक्ष इसमें साथ नहीं दे रहा' },
+  8:  { en: 'delays and setbacks weigh on it',        hi: 'देरी और रुकावटें इस पर भारी हैं' },
   9:  { en: 'fortune is not helping here',            hi: 'भाग्य यहाँ सहायक नहीं' },
   10: { en: 'career standing is a hurdle',            hi: 'करियर की प्रतिष्ठा बाधा बन रही है' },
   11: { en: 'hopes and gains are blocked',            hi: 'आशाएँ और लाभ रुकावट में हैं' },
+  12: { en: 'distance and expense work against it',   hi: 'दूरी और व्यय इसके विरुद्ध जाते हैं' },
 };
 const HOUSE_PLAIN_DENY_BY_Q = {
   travel: {
@@ -629,6 +726,17 @@ const HOUSE_PLAIN_DENY_BY_Q = {
   },
   career: {
     9:  { en: 'luck is not behind this career step',   hi: 'भाग्य इस करियर कदम के पीछे नहीं' },
+  },
+  /* Sourced in plans/prashna-house-glosses.md: for a HEALTH question the 6th is
+     genuinely the house of disease (the doc says so explicitly and keeps the
+     generic gloss for exactly that reason), and for a DISPUTE the 7th is the
+     opposing party — the same "other party" the generic label already names,
+     read for a court case. */
+  health: {
+    6:  { en: 'the illness itself still has the upper hand', hi: 'रोग स्वयं अभी भारी पड़ रहा है' },
+  },
+  litigation: {
+    7:  { en: 'the opposing side has the stronger hand', hi: 'विरोधी पक्ष अभी अधिक मज़बूत है' },
   },
 };
 
@@ -675,7 +783,12 @@ function buildPlain(v, lang) {
     if (byQDeny[h]) return hi ? byQDeny[h].hi : byQDeny[h].en;
     const d = HOUSE_PLAIN_DENY[h];
     if (d) return hi ? d.hi : d.en;
-    return P[h];
+    /* HOUSE_PLAIN_DENY covers all twelve houses, so this is unreachable today.
+       It must never again fall through to the FAVOUR phrase (bug bash F2): that
+       printed "fortune and support" under "Working against it". If a house ever
+       goes missing, wrap the neutral area in the deny framing instead of stating
+       its opposite. */
+    return hi ? `${P[h]} इसमें साथ नहीं दे रहा` : `${P[h]} is not supporting this`;
   };
   const uniq = (hs, plain) => [...new Set(hs.map(plain))];
   /* Separator is " · ", not "and": the phrases contain "and" themselves, so joining
@@ -758,10 +871,30 @@ function buildReasons(v, lang) {
   return lines;
 }
 
+/* Devanagari and Arabic-Indic digits are digits (bug bash F15). JavaScript's `\d`
+   matches ASCII 0-9 only and `Number('१३९')` is NaN, so a Hindi reader typing
+   १३९ -- a number that IS 139 and IS in range -- was told "the tradition only
+   takes a number from 1 to 249". The message described the wrong problem, in a
+   Hindi-first app where the number is the entire input. Fold the numeral systems
+   to ASCII before anything is validated. Only whole runs of one system fold;
+   mixed or decorated input still falls through as invalid, which is the point of
+   the punctuation rule below. */
+const PR_DIGIT_BASES = [0x0966 /* Devanagari ० */, 0x0660 /* Arabic-Indic ٠ */,
+                        0x06F0 /* Extended Arabic-Indic ۰ */, 0x0AE6 /* Gujarati ૦ */,
+                        0x09E6 /* Bengali ০ */, 0x0C66 /* Telugu ౦ */, 0x0BE6 /* Tamil ௦ */];
+function PR_toAsciiDigits(s) {
+  let out = '';
+  for (const ch of String(s)) {
+    const cp = ch.codePointAt(0);
+    const base = PR_DIGIT_BASES.find(b => cp >= b && cp <= b + 9);
+    out += base === undefined ? ch : String(cp - base);
+  }
+  return out;
+}
 // F8: preserve invalid punctuation so it remains visibly invalid. Removing "." or
 // "-" would silently turn 1.5→15 or -5→5 and cast a different number's chart.
 function PR_normalizeNumberInput(raw) {
-  const trimmed = String(raw).trim();
+  const trimmed = PR_toAsciiDigits(String(raw).trim());
   if (trimmed === '') return '';
   if (!/^\d+$/.test(trimmed)) return trimmed;
   const normalized = trimmed.replace(/^0+(?=\d)/, '');
@@ -779,8 +912,89 @@ function PR_fmtNumberDeg(deg) {
   return `${wholeDeg}°${String(minute).padStart(2, '0')}′`;
 }
 
+/* ---- The moment of judgement, resolved in the judging place's own zone ----
+
+   Bug bash F4. KP horary is cast for the moment AND PLACE of judgement, and this
+   screen offers exactly that override — but it read the typed `datetime-local`
+   with `new Date(customWhen)`, which JavaScript parses in the RUNTIME's zone. A
+   practitioner in London judging a question that arrived in Chennai typed 18:00
+   meaning IST and got 18:00 BST: the cuspal sub-lord changed for 11 of the 12
+   topics and five verdicts flipped. There was no field with which to express the
+   judging place's local time, so the override was structurally unable to do the
+   thing it is named for.
+
+   `zone` is an IANA name and reaches this screen as a prop. `zoneOffset` resolves
+   it for the typed wall clock (not for noon), which is what handles DST, historic
+   offsets and half-hour zones correctly.
+
+   Returns { ms, problem }. `problem` is a bilingual message, never null-and-wrong:
+
+   F5 — a wall clock that DOES NOT EXIST (the spring-forward gap) used to be
+        accepted and silently moved an hour, with the shifted time then printed
+        back on the verdict card and carried into the share PNG. The birth path
+        got a shared guard on 2026-08-18 that refuses such a date rather than
+        moving it ("Ganak will not move it to the next day for you"); the Prashna
+        judgment field never reached that helper. Detected by round-tripping the
+        resolved instant back to a wall clock and comparing it with what was typed.
+   F6 — the field had no `min`, no `max` and no range check at all, while the
+        engine's ΔT is a hard-coded 72 seconds, correct only around the present
+        decade. Year 9999 answered with full confidence. Same 1800–2150 range and
+        the same vocabulary as the four screens fixed on 2026-08-18. */
+function PR_resolveJudgmentMoment(raw, zone, hi) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(String(raw || '').trim());
+  if (!m) return { ms: NaN, problem: hi
+    ? 'निर्णय का समय पूरा भरें — वर्ष, मास, दिन और समय।'
+    : 'Enter the judgment moment in full — year, month, day and time.' };
+  const [y, mo, d, hh, mi] = m.slice(1).map(Number);
+  if (y < YEAR_MIN || y > YEAR_MAX) return { ms: NaN, problem: hi
+    ? `निर्णय का समय ${y} में है। गणक ग्रह-स्थिति ${YEAR_MIN}–${YEAR_MAX} के लिए निकालता है; इससे बाहर उत्तर भरोसेमंद नहीं होगा, इसलिए गणना नहीं की गई।`
+    : `The judgment moment is in ${y}. Ganak calculates planetary positions for ${YEAR_MIN}–${YEAR_MAX}; outside that range the answer would not be trustworthy, so nothing was calculated.` };
+  const off = (zone && zoneOffset(zone, y, mo, d, hh, mi));
+  // No zone (or an unknown one): fall back to the device, which is what the
+  // screen has always done — but the caption says so, and the panel now offers
+  // the zone when the app knows it.
+  const ms = off == null ? new Date(raw).getTime()
+                         : Date.UTC(y, mo - 1, d, hh, mi) - off * 3600000;
+  if (!Number.isFinite(ms)) return { ms: NaN, problem: hi
+    ? 'निर्णय का समय समझ नहीं आया — कृपया पुनः चुनें।'
+    : "Couldn't read that judgment time — please pick it again." };
+  if (off != null) {
+    const back = new Date(ms + off * 3600000);
+    const same = back.getUTCFullYear() === y && back.getUTCMonth() + 1 === mo
+      && back.getUTCDate() === d && back.getUTCHours() === hh && back.getUTCMinutes() === mi;
+    if (!same) {
+      const clock = `${String(hh).padStart(2, '0')}:${String(mi).padStart(2, '0')}`;
+      return { ms: NaN, problem: hi
+        ? `${zone} में उस दिन ${clock} का समय होता ही नहीं — घड़ियाँ आगे बढ़ा दी गई थीं। गणक इसे स्वयं आगे नहीं खिसकाएगा; कृपया निर्णय का समय ठीक करें।`
+        : `${clock} did not exist that day in ${zone} — the clocks went forward. Ganak will not move it forward for you; please correct the judgment moment.` };
+    }
+  }
+  return { ms, problem: null };
+}
+
+/* Ruling Planets for the moment of judgement (bug bash F9) — the weekday lord is
+   reckoned from SUNRISE, not from midnight, because that is what a vara is. Where
+   the sun neither rises nor sets (polar day or polar night, which this screen can
+   now reach honestly) `sunEvents` returns null and the civil weekday stands; the
+   UI says so rather than pretending. */
+function PR_judgmentVara(ms, zone, lat, lon) {
+  const off = (zone && zoneOffset(zone, new Date(ms).getUTCFullYear(),
+    new Date(ms).getUTCMonth() + 1, new Date(ms).getUTCDate())) ?? (-new Date(ms).getTimezoneOffset() / 60);
+  const local = new Date(ms + off * 3600000);
+  let dow = local.getUTCDay();
+  let sunriseKnown = false;
+  try {
+    const ev = sunEvents(local.getUTCFullYear(), local.getUTCMonth() + 1, local.getUTCDate(), off, lat, lon);
+    if (ev && ev.rise != null) {
+      sunriseKnown = true;
+      if (ms < ev.rise) dow = (dow + 6) % 7;   // before sunrise the previous vara still runs
+    }
+  } catch (e) { /* no sunrise available — civil weekday stands, and we say so */ }
+  return { dayLord: WEEKDAY_LORDS[dow], sunriseKnown };
+}
+
 // ------------------------------------------------------------ MAIN SCREEN
-function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', lang = 'en' }) {
+function PrashnaScreen({ lat = 28.6139, lon = 77.209, zone = null, placeLabel = 'New Delhi', lang = 'en' }) {
   // Guidance depth: Expert opens the astrologer-facing chart straight away, Guided adds a
   // plain-language orientation line. The verdict and every warning are identical at all
   // three depths — only how much supporting calculation is on screen changes.
@@ -808,6 +1022,11 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   const [customLon, setCustomLon] = useState(String(lon));
   const [customPlace, setCustomPlace] = useState(placeLabel);
   const [customWhen, setCustomWhen] = useState(''); // datetime-local, '' = now
+  /* F4: the override set latitude, longitude and a name but no ZONE, so a typed
+     judgment moment was read in the device's timezone. The app already knows the
+     place's zone and round-trips it through the URL; it now reaches this screen
+     as a prop, and a practitioner naming free coordinates can type one here. */
+  const [customZone, setCustomZone] = useState(zone || '');
 
   /* `Number('')` and `Number('   ')` are 0, which is finite -- so a cleared
      coordinate field silently read as latitude 0 and passed the range check.
@@ -820,9 +1039,13 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   const castLat = useCustom ? numOr(customLat, lat) : lat;
   const castLon = useCustom ? numOr(customLon, lon) : lon;
   const castPlaceLabel = useCustom ? (customPlace.trim() || placeLabel) : placeLabel;
+  const castZone = (useCustom ? (customZone.trim() || zone) : zone) || null;
+  /* An unknown IANA name must not silently fall back to the device — that is the
+     exact failure F4 reports. Say the zone is not recognised and refuse to cast. */
+  const zoneValid = !castZone || zoneOffset(castZone, 2026, 1, 1) != null;
   const latValid = !useCustom || (numOr(customLat, NaN) >= -90 && numOr(customLat, NaN) <= 90);
   const lonValid = !useCustom || (numOr(customLon, NaN) >= -180 && numOr(customLon, NaN) <= 180);
-  const placeValid = latValid && lonValid;
+  const placeValid = latValid && lonValid && zoneValid;
   // F9: the "New question" button appears in the exact tap target the "Cast" button
   // just vacated, so a phone double-tap on Cast would land its 2nd tap on New question
   // and wipe the just-cast answer. Record when the cast locked, and ignore a reset that
@@ -831,25 +1054,37 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   const DOUBLE_TAP_MS = 600;
 
   const clearResult = () => { setResult(null); setError(null); };
-  // F5: switching method must not unlock a cast number session — keep the lock (and its
-  // result) intact so a mode toggle can never re-enable recast of the same number.
-  const switchMode = (m) => { if (m !== mode) { setMode(m); if (!locked) clearResult(); } };
-  // F1/F4/F5 repeat protection: once a number is cast, only "New question" reopens it.
-  // F9 guard: swallow a reset landing within the double-tap window of the cast.
+  /* Bug bash F8. `switchMode` deliberately preserved a locked result, but the
+     result block is gated on `result.mode === mode` and nothing stopped a
+     TIME-mode cast from overwriting the locked NUMBER-mode result. The sequence
+     cast 139 → "Ask from this moment" → "Ask now" → back to number mode left the
+     screen locked, showing the read-only number and a "New question" button, with
+     NO reading on it at all — and the number-mode answer unrecoverable.
+     The method is part of the question, so while a reading is locked the toggle
+     is refused outright rather than half-preserved. The state that produced the
+     empty locked screen is now unreachable. */
+  const switchMode = (m) => { if (m !== mode && !locked) { setMode(m); clearResult(); } };
+  // Once a reading is cast, only "New question" reopens it.
+  // Double-tap guard: swallow a reset landing within the double-tap window of the cast.
   const newQuestion = () => {
     if (Date.now() - lockedAtRef.current < DOUBLE_TAP_MS) return;
     setLocked(false); setNumberInput(''); setResult(null); setError(null);
   };
-  // F3: a cast answer is judged for one place — a place change clears it and reopens the
-  // number session (a new place is a genuinely changed circumstance).
+  // A cast answer is judged for one place — a place change clears it and reopens the
+  // session (a new place is a genuinely changed circumstance).
   useEffect(() => { setResult(null); setError(null); setLocked(false); },
-    [castLat, castLon, castPlaceLabel]);
+    [castLat, castLon, castPlaceLabel, castZone]);
 
   const ask = () => {
     setError(null);
     try {
       const q = QUESTIONS.find(x => x.key === selected) || QUESTIONS[QUESTIONS.length - 1];
-      const ms = (useCustom && customWhen) ? new Date(customWhen).getTime() : Date.now();
+      let ms = Date.now();
+      if (useCustom && customWhen) {
+        const r = PR_resolveJudgmentMoment(customWhen, castZone, hi);
+        if (r.problem) { setError(r.problem); return; }
+        ms = r.ms;
+      }
       if (!Number.isFinite(ms)) {
         setError(hi ? 'निर्णय का समय समझ नहीं आया — कृपया पुनः चुनें।'
                     : "Couldn't read that judgment time — please pick it again.");
@@ -871,18 +1106,30 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         }
         const chart = PR_castNumber(ms, castLat, castLon, n);
         setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'number',
-          number: n, info: kpNumberInfo(n), placeLabel: castPlaceLabel });
-        setLocked(true);
-        lockedAtRef.current = Date.now(); // F9: start the double-tap guard window
+          number: n, info: kpNumberInfo(n), placeLabel: castPlaceLabel, zone: castZone,
+          ruling: PR_judgmentVara(ms, castZone, castLat, castLon) });
       } else {
         const chart = PR_cast(ms, castLat, castLon);
         setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'time',
-          placeLabel: castPlaceLabel });
+          placeLabel: castPlaceLabel, zone: castZone,
+          ruling: PR_judgmentVara(ms, castZone, castLat, castLon) });
       }
-      /* Chart-first must survive a cast: in Astrologer view the chart, cuspal
-         table and significator grid are the point, so casting opens them rather
-         than collapsing back to the answer-first layout. */
-      setShowFull(chartFirst);
+      /* Bug bash F10. The lock used to guard the NUMBER mode only. Time mode --
+         the default, the mode a first-time visitor lands in -- had none: "Ask
+         now" stayed live and recast on a fresh Date.now(). A sweep over 600
+         consecutive seconds at Delhi produced TWELVE distinct twelve-topic
+         readings, so a querent who disliked "Not the right moment" needed only to
+         wait two minutes and tap again. That is the same sincerity rule the number
+         mode enforces out loud, unguarded in the mode most people use. One
+         question at a time now means one question at a time in both methods. */
+      setLocked(true);
+      lockedAtRef.current = Date.now(); // start the double-tap guard window
+      /* Bug bash F16. This was `setShowFull(chartFirst)`, and `chartFirst`
+         defaults to false — so at Expert depth the chart opened on an EMPTY
+         screen (useState(showExpert)) and closed the moment there was something
+         to look at, forcing the practitioner to reopen "Full Prashna chart" after
+         every single cast. */
+      setShowFull(chartFirst || showExpert);
     } catch (e) {
       if (typeof console !== "undefined") console.error("prashna cast failed:", e);
       setError(hi ? "गणना नहीं हो सकी — कृपया पुनः प्रयास करें।" : "Couldn't complete the calculation — please try again.");
@@ -892,7 +1139,11 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
   const v = result && result.verdict;
   const isNum = result && result.mode === 'number';
   const vs = v && (isNum ? NUM_VERDICT[v.verdict] : VERDICT_STYLE[v.verdict]);
-  const numberLocked = mode === 'number' && locked;          // F1/F4/F5: locked until "New question"
+  /* `sessionLocked` is the whole reading — one question at a time, in BOTH
+     methods (F10). `numberLocked` is only the read-only styling of the number
+     field, which exists in one of them. */
+  const sessionLocked = locked;
+  const numberLocked = mode === 'number' && locked;
   const nTyped = numberInput === '' ? null : Number(numberInput);
   const numberIsValid = /^\d+$/.test(numberInput) && Number.isInteger(nTyped) &&
     nTyped >= KP_NUMBER_MIN && nTyped <= KP_NUMBER_MAX;
@@ -938,7 +1189,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
           {hi ? v.q.hi : v.q.en}{isNum ? ` · ${hi ? 'अंक' : 'number'} ${result.number}` : ''}
         </div>
       </div>
-      {isNum && <NumberSetBox info={result.info} favor={v.q.favor} hi={hi}
+      {isNum && <NumberSetBox info={result.info} favor={v.q.favor} deny={v.q.deny} cusp={v.q.cusp} hi={hi}
         cuspLabel={hi ? `${v.q.cusp}वें` : englishOrdinal(v.q.cusp)}
         cuspIsAscendant={v.q.cusp === 1} />}
       <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: "0.5rem" }}>
@@ -966,9 +1217,19 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         {isNum && (
           <div style={{ marginTop: "0.25rem", padding: '9px 11px', background: TOKENS.amberSoft,
             borderRadius: TOKENS.radius, border: `0.0625rem solid ${TOKENS.line}`, fontSize: "var(--font-label)", color: TOKENS.muted, lineHeight: 1.5 }}>
+            {/* Bug bash F14. This line used to attribute THE WHOLE judgment to
+                KSK. The citation index does not support that: the scoring
+                weights (±2 primary, ±1 secondary, −1 retrograde, the ≥2/≤−2
+                thresholds) and the twelve favour/deny house sets in QUESTIONS
+                are Ganak's and appear in no citation row; rule 7 (whose place
+                and time) is marked "by design, NOT KSK"; rule 8 (the rotational
+                12th-from negation every "counts against" line rests on) is
+                marked PARTIAL. The significator legend already sets the right
+                precedent by disclosing its own departure in plain words. So does
+                this now. See plans/prashna-249-ksk-verify.md. */}
             {hi
-              ? 'यह कृष्णमूर्ति पद्धति अंक विधि है, इसके नए अयनांश पर — गणक की सामान्य लाहिरी परिपाटी से भिन्न। निर्णय के नियम के॰ एस॰ कृष्णमूर्ति के के॰पी॰ रीडर्स (मुख्यतः रीडर VI, होरारी ज्योतिष) से लिए गए हैं।'
-              : 'This is the KP number method on the KP-New ayanamsa — distinct from Ganak’s usual Lahiri convention. The judgment rules are drawn from K.S. Krishnamurti’s KP Readers (principally Reader VI, Horary Astrology).'}
+              ? 'यह कृष्णमूर्ति पद्धति अंक विधि है, इसके नए अयनांश पर — गणक की सामान्य लाहिरी परिपाटी से भिन्न। 1–249 का अंक→लग्न मानचित्र और उप-स्वामी से निर्णय की विधि के॰ एस॰ कृष्णमूर्ति के के॰पी॰ रीडर्स (मुख्यतः रीडर VI, होरारी ज्योतिष) से हैं। किस भाव को पक्ष/विपक्ष में गिना जाए और उन्हें कितना भार मिले — यह गणक का अपना निर्णय है, कृष्णमूर्ति का उद्धरण नहीं।'
+              : 'This is the KP number method on the KP-New ayanamsa — distinct from Ganak’s usual Lahiri convention. The 1–249 number→ascendant map and the practice of judging through the cusp sub-lord come from K.S. Krishnamurti’s KP Readers (principally Reader VI, Horary Astrology). Which houses count for and against each question, and how heavily each is weighed, are Ganak’s own — not a quotation from Krishnamurti.'}
           </div>
         )}
       </div>
@@ -1007,16 +1268,30 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         ].map(m => {
           const on = mode === m.key;
           return (
+            /* F8: while a reading is locked the method cannot change. Disabled
+               visibly and told why, rather than half-changing into a locked
+               screen with no reading on it. */
             <button key={m.key} onClick={() => switchMode(m.key)}
+              disabled={sessionLocked && !on} aria-disabled={sessionLocked && !on}
               style={{ flex: 1, minHeight: TOKENS.ctrlH, padding: '8px 10px', borderRadius: TOKENS.radius, textAlign: 'left',
                 border: `0.0938rem solid ${on ? TOKENS.gold : TOKENS.line}`,
-                background: on ? TOKENS.goldSoft : TOKENS.card, color: TOKENS.ink, cursor: 'pointer', lineHeight: 1.3 }}>
+                background: on ? TOKENS.goldSoft : TOKENS.card,
+                color: (sessionLocked && !on) ? TOKENS.muted : TOKENS.ink,
+                cursor: (sessionLocked && !on) ? 'default' : 'pointer', lineHeight: 1.3 }}>
               <div style={{ fontFamily: hi ? TOKENS.devanagari : 'inherit', fontSize: "var(--font-body)", fontWeight: 600 }}>{hi ? m.hi : m.en}</div>
               <div style={{ fontSize: "var(--font-label)", color: TOKENS.muted, marginTop: "0.1875rem", lineHeight: 1.35 }}>{hi ? m.descHi : m.descEn}</div>
             </button>
           );
         })}
       </div>
+      {sessionLocked && (
+        <div role="status" style={{ marginTop: "-0.5rem", marginBottom: "0.75rem",
+          fontSize: "var(--font-label)", color: TOKENS.muted,
+          fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
+          {hi ? 'यह प्रश्न पूछा जा चुका है — विधि बदलने के लिए नीचे "नया प्रश्न" दबाएँ।'
+              : 'This question has been asked — tap “New question” below to change the method.'}
+        </div>
+      )}
 
       <Gloss>
         {mode === 'number'
@@ -1038,7 +1313,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         background: TOKENS.card, padding: '8px 10px', marginBottom: 4 }}>
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
           <input type="checkbox" checked={useCustom}
-            onChange={e => { if (numberLocked) return; setUseCustom(e.target.checked); clearResult(); }} />
+            onChange={e => { if (sessionLocked) return; setUseCustom(e.target.checked); clearResult(); }} />
           <span style={{ fontSize: "var(--font-small)", fontFamily: hi ? TOKENS.devanagari : 'inherit' }}>
             {hi ? 'निर्णय का समय और स्थान स्वयं चुनें' : 'Set the judgment moment & place myself'}
           </span>
@@ -1051,7 +1326,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         </div>
         {useCustom && (
           <div style={{ display: 'grid', gap: 6, marginTop: 8 }}>
-            <input value={customPlace} onChange={e => { if (numberLocked) return; setCustomPlace(e.target.value); clearResult(); }}
+            <input value={customPlace} onChange={e => { if (sessionLocked) return; setCustomPlace(e.target.value); clearResult(); }}
               aria-label={hi ? 'स्थान का नाम' : 'Place name'}
               placeholder={hi ? 'स्थान का नाम' : 'Place name'}
               style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, boxSizing: 'border-box',
@@ -1059,13 +1334,13 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                 fontSize: "var(--font-body)", padding: '0 10px' }} />
             <div style={{ display: 'flex', gap: 6 }}>
               <input inputMode="decimal" value={customLat}
-                onChange={e => { if (numberLocked) return; setCustomLat(e.target.value); clearResult(); }}
+                onChange={e => { if (sessionLocked) return; setCustomLat(e.target.value); clearResult(); }}
                 aria-label={hi ? 'अक्षांश' : 'Latitude'} placeholder={hi ? 'अक्षांश' : 'Latitude'}
                 style={{ flex: 1, minWidth: 0, height: TOKENS.ctrlH, borderRadius: TOKENS.radius,
                   boxSizing: 'border-box', background: TOKENS.bg, color: TOKENS.ink, fontSize: "var(--font-body)",
                   padding: '0 10px', border: `1.5px solid ${latValid ? TOKENS.line : TOKENS.sindoor}` }} />
               <input inputMode="decimal" value={customLon}
-                onChange={e => { if (numberLocked) return; setCustomLon(e.target.value); clearResult(); }}
+                onChange={e => { if (sessionLocked) return; setCustomLon(e.target.value); clearResult(); }}
                 aria-label={hi ? 'देशान्तर' : 'Longitude'} placeholder={hi ? 'देशान्तर' : 'Longitude'}
                 style={{ flex: 1, minWidth: 0, height: TOKENS.ctrlH, borderRadius: TOKENS.radius,
                   boxSizing: 'border-box', background: TOKENS.bg, color: TOKENS.ink, fontSize: "var(--font-body)",
@@ -1083,7 +1358,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               </div>
             )}
             <input type="datetime-local" value={customWhen}
-              onChange={e => { if (numberLocked) return; setCustomWhen(e.target.value); clearResult(); }}
+              onChange={e => { if (sessionLocked) return; setCustomWhen(e.target.value); clearResult(); }}
               aria-label={hi ? 'निर्णय का समय' : 'Judgment time'}
               style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, boxSizing: 'border-box',
                 border: `1.5px solid ${TOKENS.line}`, background: TOKENS.bg, color: TOKENS.ink,
@@ -1110,7 +1385,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         {QUESTIONS.map(q => {
           const on = selected === q.key;
           return (
-            <button key={q.key} onClick={() => { if (numberLocked) return; setSelected(q.key); clearResult(); }}
+            <button key={q.key} onClick={() => { if (sessionLocked) return; setSelected(q.key); clearResult(); }}
               style={{ minHeight: TOKENS.ctrlH, width: '100%', borderRadius: TOKENS.radius, padding: '6px 12px',
                 border: `0.0938rem solid ${on ? TOKENS.gold : TOKENS.line}`,
                 background: on ? TOKENS.goldSoft : TOKENS.card,
@@ -1143,7 +1418,7 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
               {hi ? `परम्परा 1 से ${KP_NUMBER_MAX} तक का अंक ही स्वीकारती है।` : `The tradition only takes a number from 1 to ${KP_NUMBER_MAX}.`}
             </div>
           )}
-          {numberLocked ? (
+          {sessionLocked ? (
             <Gloss>
               {hi ? 'यही प्रश्न, यही अंक। नए उत्तर के लिए नीचे "नया प्रश्न" दबाएँ।'
                   : 'Same question, same number. Tap “New question” below to ask again.'}
@@ -1157,13 +1432,23 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
         </div>
       )}
 
-      {numberLocked ? (
-        <button onClick={newQuestion}
-          style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
-            border: `0.0938rem solid ${TOKENS.gold}`, background: TOKENS.card, color: TOKENS.ink,
-            fontSize: "var(--font-body)", fontWeight: 600, cursor: 'pointer' }}>
-          {hi ? 'नया प्रश्न' : 'New question'}
-        </button>
+      {sessionLocked ? (
+        <>
+          <button onClick={newQuestion}
+            style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, width: '100%',
+              border: `0.0938rem solid ${TOKENS.gold}`, background: TOKENS.card, color: TOKENS.ink,
+              fontSize: "var(--font-body)", fontWeight: 600, cursor: 'pointer' }}>
+            {hi ? 'नया प्रश्न' : 'New question'}
+          </button>
+          {/* Time mode had no lock at all and no copy about one (F10). Now it has
+              both, in the same words the number method already used out loud. */}
+          {mode === 'time' && (
+            <Gloss>
+              {hi ? 'यह उत्तर इसी क्षण के लिए है — एक समय एक ही प्रश्न। दूसरा उत्तर पाने के लिए "नया प्रश्न" दबाएँ।'
+                  : 'This answer belongs to the moment you asked — one question at a time. Tap “New question” to ask a fresh one.'}
+            </Gloss>
+          )}
+        </>
       ) : (
         <>
           <button onClick={ask} disabled={!canAsk || numOutOfRange}
@@ -1484,7 +1769,7 @@ function NumRow({ label, value, gloss }) {
 
 /* "What your number set" — the owner-approved answer-card detail box. Every
    jargon term carries a plain-language gloss (plans/prashna-249-ksk-verify.md). */
-function NumberSetBox({ info, favor, hi, cuspLabel, cuspIsAscendant }) {
+function NumberSetBox({ info, favor, deny, cusp, hi, cuspLabel, cuspIsAscendant }) {
   const signName = hi ? RASHI_HI[info.sign] : RASHI_EN[info.sign];
   const nak = hi ? panchangTermAt("hi", "nakshatra", info.nakshatra) : NAK_EN[info.nakshatra];
   const star = hi ? panchangTerm("hi", "planet", info.starLord) : info.starLord;
@@ -1511,8 +1796,19 @@ function NumberSetBox({ info, favor, hi, cuspLabel, cuspIsAscendant }) {
             : `shows whether the question is genuine and ripens at all — the yes/no itself is read from the ${cuspLabel} cusp sub-lord`)} />
       <NumRow label={hi ? 'लग्न' : 'Ascendant'} value={`${signName} ${PR_fmtNumberDeg(info.signDeg)}`}
         gloss={hi ? 'जहाँ अंक ने कुण्डली स्थिर की' : 'where the number fixed your chart'} />
+      {/* Bug bash F1. This box used to print ONE row, "Houses judged", carrying
+          `q.favor` alone — so a Health question showed "1 · 5 · 11" two lines
+          under "the yes/no itself is read from the 6th cusp sub-lord" and three
+          lines above "your 6th house counts against the outcome". A practitioner
+          auditing the card read that as: houses 6 and 12 were not judged. They
+          were: PR_judge scores q.favor AND q.deny, and for four topics the judged
+          cusp itself is not in q.favor at all. Show all three scoring inputs,
+          each on its own labelled row, so the card agrees with its own reasoning. */}
       <div style={{ borderTop: `0.0625rem solid ${TOKENS.line}`, marginTop: "0.25rem", paddingTop: "0.1875rem" }}>
-        <NumRow label={hi ? 'विचारित भाव' : 'Houses judged'} value={favor.join(' · ')} />
+        <NumRow label={hi ? 'निर्णय जिस भाव पर' : 'Judged on'} value={hi ? `${cusp}वाँ भाव` : `house ${cusp}`}
+          gloss={hi ? 'इसी भाव के उप-स्वामी से हाँ/नहीं तय होता है' : 'the yes/no is taken from this house’s sub-lord'} />
+        <NumRow label={hi ? 'पक्ष में गिने भाव' : 'Counted in favour'} value={favor.join(' · ')} />
+        <NumRow label={hi ? 'विरुद्ध गिने भाव' : 'Counted against'} value={deny.length ? deny.join(' · ') : (hi ? 'कोई नहीं' : 'none')} />
       </div>
     </div>
   );
