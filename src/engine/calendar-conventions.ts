@@ -3,8 +3,11 @@
 import { solveCross, sunEvents, sunSidMs, zoneOffset } from "./panchang";
 import { panchangTerm } from "../i18n/panchang-terms";
 
-export type CalendarConventionId = "canonical" | "gregorian" | "amanta" | "north-purnimanta" | "tamil-solar" | "bengali-solar";
-export type RegionalCalendarFlags = { tamilSolar: boolean; bengaliSolar: boolean };
+export type CalendarConventionId = "canonical" | "gregorian" | "amanta" | "north-purnimanta" | "tamil-solar" | "bengali-solar" | "malayalam-solar";
+/* The three regional solar modes share one ingress engine and differ only in the
+   civil-day rule that decides which date carries day 1 of a month. */
+export type RegionalSolarId = "tamil-solar" | "bengali-solar" | "malayalam-solar";
+export type RegionalCalendarFlags = { tamilSolar: boolean; bengaliSolar: boolean; malayalamSolar: boolean };
 export type CalendarConvention = {
   id: CalendarConventionId;
   en: string;
@@ -16,7 +19,10 @@ export type CalendarConvention = {
   policy?: string;
 };
 
-export const DEFAULT_REGIONAL_CALENDAR_FLAGS: RegionalCalendarFlags = { tamilSolar:true, bengaliSolar:true };
+/* malayalamSolar ships FALSE and the mode itself ships enabled:false. Whether users
+   pick a calendar from a menu at all is an open owner decision (2026-08-18), so the
+   engine exists and is gated while the surface stays exactly as it is today. */
+export const DEFAULT_REGIONAL_CALENDAR_FLAGS: RegionalCalendarFlags = { tamilSolar:true, bengaliSolar:true, malayalamSolar:false };
 
 /* Retired convention ids that still resolve, so old links keep working.
    "amanta" was a separate switch that produced output identical to the default
@@ -34,6 +40,7 @@ export const CALENDAR_CONVENTIONS: CalendarConvention[] = [
   { id:"north-purnimanta", en:"North Indian lunar (Sawan etc.)", hi:"उत्तर भारतीय चंद्र (सावन आदि)", region:"Northern India", enabled:true },
   { id:"tamil-solar", en:"Tamil calendar", hi:"तमिल कैलेंडर", native:"தமிழ் நாட்காட்டி", region:"Tamil Nadu", enabled:true, flag:"tamilSolar", policy:"Lahiri sidereal ingress; Tamil sunset rule" },
   { id:"bengali-solar", en:"Bengali calendar", hi:"बंगाली कैलेंडर", native:"বাংলা পঞ্জিকা", region:"West Bengal", enabled:true, flag:"bengaliSolar", policy:"Lahiri sidereal ingress; Bengal next-sunrise rule" },
+  { id:"malayalam-solar", en:"Malayalam calendar", hi:"मलयालम कैलेंडर", native:"മലയാളം കലണ്ടർ", region:"Kerala", enabled:false, flag:"malayalamSolar", policy:"Lahiri sidereal ingress; Kerala aparahna rule; Kollam Era year" },
 ];
 
 const TAMIL_EN = ["Chithirai","Vaikasi","Aani","Aadi","Avani","Purattasi","Aippasi","Karthigai","Margazhi","Thai","Maasi","Panguni"];
@@ -42,10 +49,15 @@ const TAMIL_NATIVE = ["சித்திரை","வைகாசி","ஆனி
 const BENGALI_EN = ["Boishakh","Joishtho","Asharh","Shrabon","Bhadro","Ashwin","Kartik","Ogrohayon","Poush","Magh","Falgun","Choitro"];
 const BENGALI_HI = ["बैशाख","ज्येष्ठ","आषाढ़","श्रावण","भाद्र","आश्विन","कार्तिक","अग्रहायण","पौष","माघ","फाल्गुन","चैत्र"];
 const BENGALI_NATIVE = ["বৈশাখ","জ্যৈষ্ঠ","আষাঢ়","শ্রাবণ","ভাদ্র","আশ্বিন","কার্তিক","অগ্রহায়ণ","পৌষ","মাঘ","ফাল্গুন","চৈত্র"];
+/* Malayalam months are indexed by the same sidereal sign as the two modes above
+   (0 = Mesha), so Kerala's year-opening month Chingam sits at index 4 = Simha. */
+const MALAYALAM_EN = ["Medam","Edavam","Mithunam","Karkidakam","Chingam","Kanni","Thulam","Vrischikam","Dhanu","Makaram","Kumbham","Meenam"];
+const MALAYALAM_HI = ["मेडम","एडवम","मिथुनम","कर्कटकम","चिंगम","कन्नि","तुलाम","वृश्चिकम","धनु","मकरम","कुंभम","मीनम"];
+const MALAYALAM_NATIVE = ["മേടം","ഇടവം","മിഥുനം","കർക്കടകം","ചിങ്ങം","കന്നി","തുലാം","വൃശ്ചികം","ധനു","മകരം","കുംഭം","മീനം"];
 const TAMIL_YEARS_EN = ["Prabhava","Vibhava","Shukla","Pramodoota","Prajotpatti","Angirasa","Shrimukha","Bhava","Yuva","Dhata","Ishvara","Bahudhanya","Pramathi","Vikrama","Vrisha","Chitrabhanu","Svabhanu","Tarana","Parthiva","Vyaya","Sarvajit","Sarvadhari","Virodhi","Vikriti","Khara","Nandana","Vijaya","Jaya","Manmatha","Durmukhi","Hevilambi","Vilambi","Vikari","Sharvari","Plava","Shubhakrit","Shobhakrit","Krodhi","Vishvavasu","Parabhava","Plavanga","Kilaka","Saumya","Sadharana","Virodhikrit","Paridhavi","Pramadicha","Ananda","Rakshasa","Nala","Pingala","Kalayukti","Siddharthi","Raudra","Durmati","Dundubhi","Rudhirodgari","Raktakshi","Krodhana","Akshaya"];
 
 type Place = { lat:number; lon:number; zone:string };
-export type RegionalCalendarDate = { id:"tamil-solar"|"bengali-solar"; monthIndex:number; monthEn:string; monthHi:string; monthNative:string; day:number; year:number|string; yearName?:string; convention:string; startMs:number };
+export type RegionalCalendarDate = { id:RegionalSolarId; monthIndex:number; monthEn:string; monthHi:string; monthNative:string; day:number; year:number|string; yearName?:string; convention:string; startMs:number };
 
 const DAY=86400000;
 const civilParts=(ms:number,zone:string)=>{
@@ -68,7 +80,7 @@ function ingressForSign(sign:number,atMs:number,direction:"current"|"next"="curr
   ingressCache.set(key,value);return value;
 }
 
-function regionalMonthStart(id:"tamil-solar"|"bengali-solar",sign:number,ingress:number,place:Place){
+function regionalMonthStart(id:RegionalSolarId,sign:number,ingress:number,place:Place){
   const local=civilParts(ingress,place.zone);
   const tz=zoneOffset(place.zone,local.y,local.m,local.d) ?? 0;
   const events=sunEvents(local.y,local.m,local.d,tz,place.lat,place.lon);
@@ -78,12 +90,20 @@ function regionalMonthStart(id:"tamil-solar"|"bengali-solar",sign:number,ingress
     // Panchang day, so its month begins one further civil sunrise later.
     return addCivil(local,events.set != null && ingress < events.set ? 1 : 2);
   }
+  if(id==="malayalam-solar"){
+    // Kerala (Malabar) rule: the month begins on the ingress day itself when the
+    // sankranti falls before *aparahna* — the point three-fifths of the way from
+    // sunrise to sunset — and on the next civil date otherwise. Same ingress
+    // machinery as the other two modes; only this cut-off differs.
+    const aparahna = events.rise != null && events.set != null ? events.rise + 0.6*(events.set-events.rise) : null;
+    return aparahna != null && ingress < aparahna ? local : addCivil(local,1);
+  }
   // Tamil Thirukanitha: an ingress before local sunset gives day 1 on that
   // civil date; an ingress after sunset gives day 1 on the following date.
   return events.set != null && ingress < events.set ? local : addCivil(local,1);
 }
 
-export function regionalCalendarDate(id:"tamil-solar"|"bengali-solar",panchang:any,atMs:number,place:Place):RegionalCalendarDate {
+export function regionalCalendarDate(id:RegionalSolarId,panchang:any,atMs:number,place:Place):RegionalCalendarDate {
   const current=civilParts(atMs,place.zone);
   let sign=Math.floor(sunSidMs(atMs)/30);
   let ingress=ingressForSign(sign,atMs);
@@ -107,6 +127,14 @@ export function regionalCalendarDate(id:"tamil-solar"|"bengali-solar",panchang:a
     const yearIndex=((cycleYear-1987)%60+60)%60;
     return {id,monthIndex:sign,monthEn:TAMIL_EN[sign],monthHi:TAMIL_HI[sign],monthNative:TAMIL_NATIVE[sign],day,year:TAMIL_YEARS_EN[yearIndex],yearName:TAMIL_YEARS_EN[yearIndex],convention:"Thirukanitha · Tamil sunset rule",startMs:ingress};
   }
+  if(id==="malayalam-solar"){
+    // Kollam Era (ME 1 = 825 CE) turns over at Chingam 1, so Chingam (sign 4)
+    // through Dhanu (sign 8) fall in the Gregorian year the era year opened in
+    // (Aug-Dec), while Makaram (9) through Karkidakam (3) run on into the next
+    // Gregorian year (Jan-Jul) while keeping the same Kollam Era number.
+    const kollam=start.y-(sign>=4&&sign<=8?824:825);
+    return {id,monthIndex:sign,monthEn:MALAYALAM_EN[sign],monthHi:MALAYALAM_HI[sign],monthNative:MALAYALAM_NATIVE[sign],day,year:kollam,convention:"Kollavarsham · Kerala aparahna rule",startMs:ingress};
+  }
   const cycleYear=start.y-(sign>=9?1:0);
   const bangabda=cycleYear-593;
   return {id,monthIndex:sign,monthEn:BENGALI_EN[sign],monthHi:BENGALI_HI[sign],monthNative:BENGALI_NATIVE[sign],day,year:bangabda,convention:"Vishuddha Siddhanta · Bengal next-sunrise rule",startMs:ingress};
@@ -125,10 +153,12 @@ export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: num
   const term=(kind:any,value:any)=>panchangTerm(lang,kind,value);
   const lunarDay=`${term("paksha",panchang.paksha)} · ${lang === "hi" ? "चंद्र दिवस" : "lunar day"} ${panchang.tithiDay}`;
   if (id === "north-purnimanta") return lang === "hi" ? `पूर्णिमान्त · ${term("month",panchang.months.purnimanta)} · ${lunarDay}` : `Purnimanta · ${term("month",panchang.months.purnimanta)} · ${lunarDay}`;
-  if((id==="tamil-solar"||id==="bengali-solar")&&place){
+  if((id==="tamil-solar"||id==="bengali-solar"||id==="malayalam-solar")&&place){
     const d=regionalCalendarDate(id,panchang,atMs,place);
     const month=lang==="hi"?d.monthHi:d.monthEn;
-    const suffix=id==="tamil-solar"?(lang==="hi"?"तिरुकणित तमिल सौर":"Tamil solar · Thirukanitha"):(lang==="hi"?"विशुद्ध सिद्धान्त बंगाली सौर":"Bengali solar · Vishuddha Siddhanta");
+    const suffix=id==="tamil-solar"?(lang==="hi"?"तिरुकणित तमिल सौर":"Tamil solar · Thirukanitha")
+      :id==="bengali-solar"?(lang==="hi"?"विशुद्ध सिद्धान्त बंगाली सौर":"Bengali solar · Vishuddha Siddhanta")
+      :(lang==="hi"?"कोल्लवर्षम् मलयालम सौर":"Malayalam solar · Kollavarsham");
     return `${d.monthNative} · ${month} ${d.day}, ${d.year} · ${suffix}`;
   }
   /* Default = amanta (month + paksha + tithi). The old short form said
@@ -159,7 +189,7 @@ export function calendarMonthLabel(id: CalendarConventionId, panchang: any, atMs
   const term=(kind:any,value:any)=>panchangTerm(lang,kind,value);
   if(id==="gregorian") return "";
   if(id==="north-purnimanta") return term("month",panchang.months.purnimanta);
-  if((id==="tamil-solar"||id==="bengali-solar")&&place){
+  if((id==="tamil-solar"||id==="bengali-solar"||id==="malayalam-solar")&&place){
     const d=regionalCalendarDate(id,panchang,atMs,place);
     return lang==="hi"?d.monthHi:d.monthEn;
   }
