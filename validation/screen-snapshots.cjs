@@ -576,6 +576,83 @@ if (balaGaps.length) {
   failures++;
 }
 
+/* ------------------------------- 5. the yoga catalogue, exhaustively (YOGAS-HINDI-PARITY) */
+/* The positional check in § 4 now sees the yogas panel, because snapshot-results.cjs
+   mirrors it — but it only sees the SIX yogas the pinned fixture chart happens to
+   produce. 79 distinct English interpretations are reachable from detectYogas, so a
+   missing Hindi meaning could sit for years in a yoga no baseline lands on. This half
+   is exhaustive: every key, instantiated over every parameter set the detection rules
+   can hand it.
+
+   The invariant is content parity, not spelling: if two parameter sets produce two
+   DIFFERENT English sentences, they must produce two different Hindi sentences.
+   Reinstating a generic Hindi sentence fails here immediately, with no baseline
+   involved. Yoga significations carry religious weight, so a yoga with no English
+   text must not be given a Hindi one either — the key-set assertion holds both ways. */
+const classical = loadApp('src/engine/classical.ts');
+const yogaHi = loadApp('src/data/yoga-copy-hi.ts');
+const { YOGA_EN, YOGA_PARAM_SPACE } = classical;
+const { YOGA_HI } = yogaHi;
+
+const yogaMissing = Object.keys(YOGA_EN).filter((k) => !YOGA_HI[k]);
+const yogaExtra = Object.keys(YOGA_HI).filter((k) => !YOGA_EN[k]);
+const yogaUntested = Object.keys(YOGA_EN).filter((k) => !(YOGA_PARAM_SPACE[k] || []).length);
+if (yogaMissing.length) {
+  console.error(`FAIL YOGA_HI: ${yogaMissing.length} yoga(s) English-only: ${yogaMissing.join(', ')}`);
+  console.error('    Add the Hindi translation in src/data/yoga-copy-hi.ts — translate what Ganak already says, do not invent a signification.');
+  failures++;
+}
+if (yogaExtra.length) {
+  console.error(`FAIL YOGA_HI: Hindi yoga(s) with no English original: ${yogaExtra.join(', ')}`);
+  failures++;
+}
+if (yogaUntested.length) {
+  console.error(`FAIL YOGA_PARAM_SPACE: no parameter set for ${yogaUntested.join(', ')} — the yoga would go unchecked.`);
+  failures++;
+}
+
+let yogaRows = 0;
+const yogaEnToHiText = new Map(); // hindi sentence -> set of distinct english sentences
+const yogaEnToHiName = new Map();
+const yogaLatinInHi = [];
+const yogaBlank = [];
+for (const key of Object.keys(YOGA_EN)) {
+  if (!YOGA_HI[key]) continue;
+  for (const params of YOGA_PARAM_SPACE[key] || []) {
+    const en = { name: YOGA_EN[key].name(params), text: YOGA_EN[key].text(params) };
+    const hi = { name: YOGA_HI[key].name(params), text: YOGA_HI[key].text(params) };
+    yogaRows++;
+    for (const [field, e, h] of [['text', en.text, hi.text], ['name', en.name, hi.name]]) {
+      if (!e || !h) { yogaBlank.push(`${key} ${field} (${JSON.stringify(params)})`); continue; }
+      if (!DEVANAGARI.test(h)) yogaBlank.push(`${key} ${field}: Hindi is not Devanagari — "${h}"`);
+      if (/[A-Za-z]/.test(h)) yogaLatinInHi.push(`${key} ${field}: "${h}"`);
+      const bucket = field === 'text' ? yogaEnToHiText : yogaEnToHiName;
+      if (!bucket.has(h)) bucket.set(h, new Set());
+      bucket.get(h).add(e);
+    }
+  }
+}
+if (yogaBlank.length) {
+  console.error(`FAIL yoga copy: ${yogaBlank.length} empty or non-Devanagari Hindi string(s): ${yogaBlank.slice(0, 5).join(' | ')}`);
+  failures++;
+}
+if (yogaLatinInHi.length) {
+  console.error(`FAIL yoga copy: Latin script inside Hindi yoga copy: ${yogaLatinInHi.slice(0, 5).join(' | ')}`);
+  console.error('    Graha names come from planetName(lang, …) in src/i18n/panchang-terms.ts, never a hand-written spelling.');
+  failures++;
+}
+for (const [field, bucket] of [['text', yogaEnToHiText], ['name', yogaEnToHiName]]) {
+  for (const [hiLine, englishVariants] of bucket) {
+    if (englishVariants.size < 2) continue;
+    console.error(`FAIL yoga ${field}: ${englishVariants.size} distinct English yoga ${field}s collapse to one Hindi ${field}`);
+    console.error(`    hi: ${hiLine.slice(0, 110)}`);
+    [...englishVariants].slice(0, 3).forEach((v) => console.error(`    en: ${v.slice(0, 110)}`));
+    console.error('    A Hindi reader must get one meaning per yoga, not a generic sentence repeated.');
+    failures++;
+  }
+}
+const yogaEnTexts = new Set([...yogaEnToHiText.values()].flatMap((s) => [...s]));
+
 
 if (failures) {
   console.error(`\n✗ screen-snapshots FAILED (${failures})`);
@@ -587,6 +664,7 @@ const covered = SCREENS.filter((s) => !s.skip).length;
 const skipped = SCREENS.filter((s) => s.skip);
 console.log(`✓ screen-snapshots: ${fresh.size} baselines match · ${covered} screens × ${LANGS.length} languages + chart/transit results`);
 console.log(`✓ calculator cross-seeding: ${clean} mismatched-result renders identical to no result (0 crashes, 0 foreign answers) · ${answered} own-result renders still answer`);
+console.log(`✓ yoga content parity: ${Object.keys(YOGA_EN).length} yoga templates × ${yogaRows} parameter sets · ${yogaEnTexts.size} distinct English interpretations → ${yogaEnToHiText.size} distinct Hindi (no collapse)`);
 if (skipped.length) console.log(`  not covered (${skipped.length}): ${skipped.map((s) => s.key).join(', ')} — inner modules needing parent-computed data`);
 /* A green run must never be read as "this screen is fully proven". Screens whose
    answer only appears after the reader acts are covered in their INITIAL state
