@@ -164,6 +164,25 @@ chart-styles-ayanamsha.cjs OK — 4 ayanamshas (Raman shift verified) + South & 
   + no ayanamsha leak (3 modes x 16 casters, shared module graph)
 ```
 
+## Proof 4 — the whole board is green
+
+`bash scripts/run-all-gates.sh`:
+
+```
+PASS  chart-styles-ayanamsha.cjs                  46s
+...
+94 passed, 0 failed.
+```
+
+`npm run build`:
+
+```
+✓ built in 19.13s
+build-seo: sitemap 198 URLs, robots.txt written.
+build-seo: 10 legacy 301s written ahead of the base rules.
+build-seo: 198 route HTML files written.
+```
+
 ## What remains — one writer, and a handoff
 
 **`src/engine/today-panchang.ts` is now the only module left that sets the ambient
