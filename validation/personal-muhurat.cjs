@@ -106,11 +106,19 @@ if (res.mode === 'filter') {
      the finder itself labels "Better avoided" above "Highly auspicious" ones — 30% of test
      charts got the wrong day in the "Best day" card. A day Ganak considers worse must never
      outrank a better one, so kept[] must be non-increasing by score. */
-  /* Uses a range/category KNOWN to return a mixed-quality kept list (Delhi travel over six
-     months). The short wedding fixture above does NOT exercise this — every surviving day
-     happens to share a score, so the assertion would pass on the broken sort. That vacuity
-     is exactly how the bug shipped: one happy-path sample proved nothing. */
-  const mixed = muhuratScanRange(DELHI, 'lahiri', ymd(2026, 8, 3), ymd(2027, 2, 28), 'travel').filter((d) => d.valid);
+  /* Uses a range/category KNOWN to return a mixed-quality kept list (Delhi vehicle over six
+     months: 86 candidates, 11 kept, 5 distinct scores). The short wedding fixture above does
+     NOT exercise this — every surviving day happens to share a score, so the assertion would
+     pass on the broken sort. That vacuity is exactly how the bug shipped: one happy-path
+     sample proved nothing.
+
+     Category changed from 'travel' to 'vehicle' on 2026-08-19. The travel fixture became
+     vacuous when the inverted Chandra Bala was corrected (Muhurat bug bash F3): the waning
+     arm used to promote the 4th, 8th and 12th from the natal Moon and demote the 2nd, 5th
+     and 9th, so the days this HARD filter kept were a different, wider set. With the filter
+     corrected, travel keeps 6 days that all share one score. The fixture is re-pointed
+     rather than the assertion relaxed — the vacuity check is the whole point of it. */
+  const mixed = muhuratScanRange(DELHI, 'lahiri', ymd(2026, 8, 3), ymd(2027, 2, 28), 'vehicle').filter((d) => d.valid);
   const mixedRes = applyPersonalisation(mixed, anchors);
   if (mixedRes.mode !== 'filter') fail('ranking fixture did not reach filter mode — pick a range with more surviving days');
   const scores = mixedRes.kept.map((d) => d.score || 0);
