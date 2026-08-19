@@ -57,6 +57,13 @@ export function utilityFromPath(pathname: string) {
   // case (RASHI), a stray /calculators/foo, or bare /calculator/. Return a not-found
   // route so the screen shows a graceful state — never let Daily render silently
   // under an invalid calculator URL. Paths outside this namespace still return null.
-  if (/^\/calculators?(\/|$)/.test(pathname)) return { kind: "notfound" as const, requested: pathname };
+  // The namespace test is deliberately forgiving where the SLUG match is strict:
+  // "/Calculator/rashi" and "//calculator/rashi" are still calculator URLs, and used
+  // to fall through to null — which let the Daily screen render under a calculator
+  // address. Case and repeated slashes are normalised for the namespace check only,
+  // so a wrong-case or double-slashed URL lands on the not-found page rather than
+  // silently resolving to a calculator the reader did not type.
+  const namespaced = String(pathname).replace(/\/{2,}/g, "/").toLowerCase();
+  if (/^\/calculators?(\/|$)/.test(namespaced)) return { kind: "notfound" as const, requested: pathname };
   return null;
 }
