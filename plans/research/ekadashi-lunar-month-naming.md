@@ -151,7 +151,10 @@ the day the tithi begins. It only ever **adds** days; no existing day moved.
 The same kshaya rule may apply to Pradosh, Purnima and Amavasya — **not**
 investigated, **not** changed. Handoff.
 
-**(b) Adhika Masa is mis-detected in 2029 — NOT fixed (other agent's file).**
+**(b) Adhika Masa is mis-detected in 2029 — RESOLVED 2026-08-18, see
+`plans/research/adhik-masa-detection.md` and `validation/adhik-masa.cjs`. Kamada
+and Varuthini 2029 are named again and are no longer exceptions in the gate.
+The original finding is left below as written.**
 `src/engine/panchang.ts`, `ensureLmWindow`, samples the sun one hour after the
 new moon (`sunSidMs(prevNM + 3600000)`). Mesha Sankranti 2029 falls at
 14 Apr 2029 03:41 IST, **31 minutes after** the new moon at 03:10 IST, so that

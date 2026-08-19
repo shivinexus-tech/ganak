@@ -166,14 +166,47 @@ function lastNewMoonBefore(t) {
    Cache is keyed on the window AND the active ayanamsa (sun-sign edges shift with
    AYAN_MODE; the new-moon instants themselves cancel it out).
    Both `lunarMonthInfo` and `amantaMonthIdx` share this cache — festivals.ts calls
-   amantaMonthIdx once per scanned day, which used to recompute the window every time. */
+   amantaMonthIdx once per scanned day, which used to recompute the window every time.
+
+   ADHIKA MASA — SAMPLE THE MONTH'S REAL BOUNDS, NOT A GUESSED OFFSET (2026-08-18).
+   The month runs new moon → new moon and is Adhika when NO solar sankranti (entry
+   into the next sidereal rasi) falls inside it. This used to be decided by reading
+   the Sun's sign one hour INSIDE each end — `sunSidMs(prevNM + 3600000)` and
+   `sunSidMs(nextNM - 3600000)` — which blinds the test to any ingress in those two
+   one-hour slivers. Mesha Sankranti 2029 lands at 14 Apr 03:41 IST, 31 minutes after
+   the new moon at 03:10 IST: the probe skipped past it, the lunation looked
+   sankranti-free, and the engine reported Adhika Chaitra immediately followed by
+   Adhika Vaishakha — two intercalary months back to back, which cannot happen. Over
+   1900-2100 the shortcut invented four impossible months (1907, 1926, 2029, 2045)
+   and, because `adhik` shifts the month index, moved every festival keyed to a lunar
+   month in those years. Published references put exactly one Adhika Masa in 2029,
+   starting 16 March (prokerala.com/festivals/adhik-masam.html, fetched 2026-08-18).
+
+   BOUNDARY CONVENTION — the month owns [prevNM, nextNM), half-open:
+   - A sankranti at exactly the new-moon instant belongs to the month that OPENS
+     there, not the one that closes. So `sStart` is read AT `prevNM`, after any
+     ingress at that instant, which puts it inside this month.
+   - A sankranti in the final minutes before the next new moon still belongs to THIS
+     month. So `sEnd` is read at `nextNM - 1` ms, the last instant this month owns.
+     (Real case: Dhanu Sankranti 1963-12-16 06:47 IST, 48 minutes before the new moon
+     at 07:35 — the old probe missed it, the new bound catches it.)
+   The Sun never retrogrades, so `sStart !== sEnd` is exactly "at least one sankranti
+   instant lies in [prevNM, nextNM)"; validation/adhik-masa.cjs re-derives the actual
+   ingress instants independently and asserts the two agree.
+
+   NOT HANDLED — Kshaya Masa. A lunar month can rarely contain TWO sankrantis
+   (`sEnd - sStart === 2`), which decays a month name out of the calendar; it happens
+   only around Kartika/Margashirsha/Pausha and only twice in 1900-2100 (Nov 1963,
+   Jan 1983). Ganak has no compound "Margashirsha-Pausha" name for it; the month
+   takes `sEnd`, so the earlier name is the one that drops out. Left as-is
+   deliberately — see plans/research/adhik-masa-detection.md § 6. */
 let _lmCache = null;
 function ensureLmWindow(nowMs) {
   if (!_lmCache || _lmCache.ayan !== AYAN_MODE || nowMs < _lmCache.prevNM || nowMs >= _lmCache.nextNM) {
     const prevNM = lastNewMoonBefore(nowMs);
     const nextNM = solveCross(elongMs, prevNM + 86400000, 0, 34);
-    const sStart = Math.floor(sunSidMs(prevNM + 3600000) / 30);
-    const sEnd = Math.floor(sunSidMs(nextNM - 3600000) / 30);
+    const sStart = Math.floor(sunSidMs(prevNM) / 30);
+    const sEnd = Math.floor(sunSidMs(nextNM - 1) / 30);
     _lmCache = { ayan: AYAN_MODE, prevNM, nextNM, sStart, sEnd };
   }
   return _lmCache;

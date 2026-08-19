@@ -384,28 +384,27 @@ const CYCLE = [
 // Dates on which Ganak deliberately shows the plain "Ekadashi" label instead of
 // a named vrata. Every one of these is checked below to be UNNAMED, never
 // MIS-named — showing an ordinary month's name here is the defect this gate
-// exists to stop. Two distinct causes, both recorded, neither hidden:
+// exists to stop. ONE remaining cause:
 //
-//  (a) ADHIKA MASA. The intercalary month's two Ekadashis are Padmini (Shukla)
-//      and Parama (Krishna). Ganak has no route/guide page for either yet, and
-//      `festival-page-coverage` requires a page for every named label, so the
-//      engine falls back visibly rather than borrowing the ordinary month's name.
-//      Handoff: add the two labels + their two guide pages.
-//  (b) ENGINE DEFECT, src/engine/panchang.ts (NOT this agent's file).
-//      `ensureLmWindow` samples the sun one hour after the new moon
-//      (`sunSidMs(prevNM + 3600000)`). Mesha Sankranti 2029 falls 31 minutes
-//      AFTER the new moon of 14 Apr 2029, so that lunation looks sankranti-free
-//      and is flagged Adhika even though the real Adhika Chaitra is the previous
-//      one. Two consecutive Adhika months are astronomically impossible. The
-//      knock-on is wider than Ekadashi: amantaMonthIdx returns Vaishakha for a
-//      Chaitra month, which moves every 2029 festival keyed on the month index.
+//  ADHIKA MASA. The intercalary month's two Ekadashis are Padmini (Shukla)
+//  and Parama (Krishna). Ganak has no route/guide page for either yet, and
+//  `festival-page-coverage` requires a page for every named label, so the
+//  engine falls back visibly rather than borrowing the ordinary month's name.
+//  Handoff: add the two labels + their two guide pages.
+//
+// RESOLVED 2026-08-18 — the second cause is gone. `ensureLmWindow` in
+// src/engine/panchang.ts used to sample the sun one hour after the new moon, so
+// Mesha Sankranti 2029 (31 minutes after the new moon of 14 Apr) was skipped and
+// that lunation was wrongly flagged Adhika — giving two Adhika months back to
+// back. It now reads the sun's sign at the month's true bounds. Kamada
+// (2029-04-24) and Varuthini (2029-05-09) are named again and are asserted as
+// ordinary named fasts below, not as exceptions. See
+// plans/research/adhik-masa-detection.md and validation/adhik-masa.cjs.
 const EXPECTED_UNNAMED = {
   '2026-05-27': 'adhika-masa: Padmini',
   '2026-06-11': 'adhika-masa: Parama',
   '2029-03-26': 'adhika-masa: Padmini',
   '2029-04-09': 'adhika-masa: Parama',
-  '2029-04-24': 'panchang.ts adhika-boundary defect (Kamada)',
-  '2029-05-09': 'panchang.ts adhika-boundary defect (Varuthini)',
   '2031-08-28': 'adhika-masa: Padmini',
   '2031-09-12': 'adhika-masa: Parama',
   '2034-06-27': 'adhika-masa: Padmini',
