@@ -230,6 +230,10 @@ function dashakoota(boy: any, girl: any) {
       noteHi: vedha ? "दोनों जन्म नक्षत्र परस्पर वेध करते हैं" : "दोनों जन्म नक्षत्रों में वेध नहीं है" },
   ];
   const total = k.reduce((s, x) => s + x.got, 0);
+  /* The Dashakoota system's OWN band. Deliberately not rendered: the screen shows a
+     single verdict computed from both systems together (matchVerdict below), and
+     printing this one beside it is the F3 defect. Kept as engine output because the
+     gate pins it and a caller may legitimately want the per-system reading. */
   const verdict = total < 18 ? "poor" : total <= 22 ? "moderate" : total <= 25 ? "good" : total <= 28 ? "very-good" : "excellent";
   return {
     kootas: k, total, max: 36, verdict,
