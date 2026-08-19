@@ -371,3 +371,126 @@ give MuhuratHub a distinct message: name the latitude problem, say the Muhurat d
 defined there, and offer the nearest usable city — never "try a wider range". Gate: assert the
 polar branch renders a latitude-specific string, the way `validation/medical-muhurat.cjs`
 already does for its own screen.
+
+---
+
+### F6 — P0 · The Muhurat card offers wedding windows that sit inside Bhadra, on the same page that says "Avoid starting auspicious work during Bhadra"
+
+Two independent gaps compound:
+
+1. **Bhadra is sampled once, at sunrise.** `dayScore` (`muhurat.ts:176`) tests
+   `info.karana === "Vishti"`, and `info.karana` is the karana at the sunrise instant
+   (`muhurat.ts:117-118`, `kn = Math.floor(elong / 6)` computed from `ev.rise`). A Bhadra that
+   begins after sunrise is invisible to the finder — while `daily-windows.ts:67-80`
+   (`bhadraWindows`) already walks the whole sunrise→sunrise day and finds every one.
+2. **Even when Bhadra *is* detected it only costs the day two points.** It is never a blocker in
+   `muhuratShuddhi`, and `activityWindows` never subtracts the Bhadra interval, so an offered
+   "clean window" can lie wholly inside it.
+
+**Reproduction** — Wedding Muhurat, New Delhi, 2026-04-18 → 2026-04-22. Literal rendered text,
+top of the page:
+
+```
+Best days · Wedding · Apr 18, 2026 – Apr 22, 2026
+Best day
+Monday, April 20, 2026
+Rohini · tithi 3   Highly auspicious
+Why this day: Rohini nakshatra, Monday, 4 good day choghadiya
+Activity-specific clean windows
+✓ Panchaka Rahita   7:28 AM–9:08 AM
+✓ Panchaka Rahita  11:23 AM–1:43 PM
+✓ Panchaka Rahita   4:00 PM–6:17 PM
+✓ Panchaka Rahita   8:36 PM–10:55 PM
+✓ Panchaka Rahita   2:08 AM–2:41 AM, Apr 21
+✓ Panchaka Rahita   4:08 AM–4:15 AM, Apr 21
+```
+
+Further down **the same rendered page**, from `DailyWindowsCard`:
+
+```
+Today's decision windows
+Avoid starting auspicious work during Bhadra.
+```
+
+and its `Bhadra / Vishti · avoid` row for 2026-04-20 reads **17:50–04:15**. Cross-checked:
+
+```
+offered 07:28–09:08 (100 min)  overlapsBhadra = false
+offered 11:23–13:43 (140 min)  overlapsBhadra = false
+offered 16:00–18:17 (136 min)  overlapsBhadra = TRUE   (last 27 min)
+offered 20:36–22:55 (139 min)  overlapsBhadra = TRUE   (entirely)
+offered 02:08–02:41 ( 33 min)  overlapsBhadra = TRUE   (entirely)
+offered 04:08–04:15 (  7 min)  overlapsBhadra = TRUE   (entirely; Bhadra ends 04:15)
+muhurat.ts karana sampled at sunrise: "Gara"  -> the finder never mentions Bhadra at all
+```
+
+Four of the six wedding windows Ganak offers on its "Highly auspicious" best day are inside the
+interval the same page marks "Bhadra / Vishti · avoid", and the "Why this day" line does not
+name Bhadra because the karana at 05:50 was Gara.
+
+**Frequency** — New Delhi, 2026-01-01 → 2026-04-30, `valid` days only:
+
+```
+category      validDays  daysCarryingBhadra  finderNamedIt  daysWhose OFFERED window sits in Bhadra
+wedding          40            20                 9                     19
+housewarming     46            21                 7                     20
+vehicle          51            22                 7                     11
+business         31            13                 2                      4
+```
+
+**Expected** — Bhadra is a hard veto for marriage and Griha Pravesh in every published muhurta
+source, and the backlog records "Dedicated Bhadra/Vishti interval and warning" as *shipped*. It
+shipped on the Panchang card, not in the Muhurat selection. At minimum the finder should read
+`bhadraWindows` (the engine already exists and is already imported into the same screen through
+`todayP.dailyWindows`), subtract those intervals from `activityWindows`, and name any remaining
+Bhadra in the day's factors.
+
+**Cause** — `src/engine/muhurat.ts:117-118` (karana sampled once at sunrise), `muhurat.ts:176`
+(scored, never blocked), `muhurat.ts:412-429` (`activityWindows`/`cleanChoghadiyaWindows` never
+subtract Bhadra). The correct interval calculation already exists at
+`src/engine/daily-windows.ts:67-80` and is unused by `muhurat.ts`.
+
+**Suggested fix** — call `bhadraWindows(info.rise, info.nextRise)` in `activityWindows` and clip;
+add a `Bhadra HH:MM–HH:MM` factor whenever the day carries one. Gate: no offered
+`activityWindow` may intersect a `bhadra` interval for the same day.
+
+---
+
+### F7 — P2 · A 7-minute wedding window is offered as one of six equal "clean windows"
+
+Same day as F6, `2026-04-20`: the sixth offered wedding window is `4:08 AM–4:15 AM` — seven
+minutes, presented in the same `✓` list, same weight and same styling as the 140-minute one above
+it. `validation/panchaka-windows.cjs` guards the *Panchaka display* against sub-minute slivers
+(`SLIVER_MS = 60000`, `daily-windows`… `collapseSlivers`), but `activityWindows` inherits whatever
+survives the day-clamp at `muhurat.ts:425` and applies no usability floor of its own. Across
+Delhi 2026 Q1 no window was sub-minute (see CLEAN below), but short tail windows produced by the
+`Math.min(w.end, info.rise + 86400000)` clamp are routine.
+
+**Suggested fix** — drop or visually demote windows below a usable length (a muhurta is 48 min;
+even 15 min would be a defensible floor), or label the duration so the reader can see it.
+
+---
+
+### F8 — P1 · A range longer than 400 days is silently truncated
+
+`muhuratScanRange` caps its loop at `i < 400` (`muhurat.ts:435`) and returns without any signal.
+
+**Reproduction** — Vehicle Muhurat, New Delhi, 2026-01-01 → 2027-12-31 (730 days requested):
+
+```
+730 days requested -> 400 rows returned, 2026-01-01 .. 2027-02-04
+330 days dropped, no flag on the result, no message on the screen
+```
+
+The screen's own header keeps printing the range the reader asked for — `Best days · Vehicle ·
+Jan 1, 2026 – Dec 31, 2027` — over a list that stops in February 2027. A user hunting a wedding
+date across two years is shown a truncated answer as if it were complete, and the "no auspicious
+muhurat in this range" branch would tell them to "try a wider range" when a wider range is exactly
+what was discarded.
+
+**Cause** — `src/engine/muhurat.ts:431-448`; nothing in `MuhuratHub.tsx` validates or reports the
+span. (The 90-day preset means most users never hit it, which is why it is P1 and not P0.)
+
+**Suggested fix** — either cap the date inputs at 400 days with a visible message, or have
+`muhuratScanRange` return the truncation so the card can say "showing the first 400 days of your
+range". Silent truncation is the failure mode `AGENTS.md` names outright.
