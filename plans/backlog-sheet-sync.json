@@ -442,7 +442,14 @@
         81,
         82,
         83,
-        84
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91
       ]
     },
     {
@@ -963,6 +970,41 @@
     "84": {
       "section": "P0",
       "title": "Moonrise/moonset attributed to the wrong panchang day (`P0-MOON-DAY-WINDOW`)",
+      "technicalComplexity": "Medium"
+    },
+    "85": {
+      "section": "P0",
+      "title": "Festival day rules: kshaya tithi, Vat Savitri split, leap-month Ekadashi names (`FESTIVAL-DAY-RULES`)",
+      "technicalComplexity": "Low"
+    },
+    "86": {
+      "section": "P0",
+      "title": "Sutak windows followed the published prose, not the published rule (`ECLIPSE-SUTAK-PRAHAR`)",
+      "technicalComplexity": "Low"
+    },
+    "87": {
+      "section": "P0",
+      "title": "Matching resolved birth timezones by guess, and stated dosha as bare fact (`MATCHING-REMAINDER`)",
+      "technicalComplexity": "Medium"
+    },
+    "88": {
+      "section": "P0",
+      "title": "Muhurat suite: four contradictions between Ganak and itself (`BUGBASH-MUHURAT`)",
+      "technicalComplexity": "Medium"
+    },
+    "89": {
+      "section": "P0",
+      "title": "Chandra Bala was inverted for the whole of Krishna Paksha (`CHANDRA-BALA-INVERSION`)",
+      "technicalComplexity": "Low"
+    },
+    "90": {
+      "section": "P0",
+      "title": "KP horary was broken above 60° latitude, and its parity gate compared two copies of the same error (`PRASHNA-HIGH-LATITUDE`)",
+      "technicalComplexity": "Medium"
+    },
+    "91": {
+      "section": "P0",
+      "title": "Dasha and transit: three P0s, and no gate anywhere asserted a dasha date (`BUGBASH-DASHA-TRANSIT`)",
       "technicalComplexity": "Medium"
     }
   }
