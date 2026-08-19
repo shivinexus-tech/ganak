@@ -203,7 +203,35 @@ the English line above it.
 …
 ```
 
-## 6. Files
+## 6. What the reader actually sees, from the real screen
+
+The baseline mirror renders engine values. The one-line JSX change is in `ChartScreen`
+itself, so it was proved separately by driving the **real** `ChartScreen` with a real
+`computeKundli` result seeded into its state — the technique the B10 audit used, since
+`renderToStaticMarkup` cannot press Cast. Both languages, same fixture chart:
+
+```
+######## ChartScreen, lang=en ########      ######## ChartScreen, lang=hi ########
+Yogas detected · 6                          योग
+Sasa Mahapurusha                            शश महापुरुष
+auspicious                                  शुभ
+Saturn in its own or exaltation sign        शनि अपनी ही राशि या उच्च राशि में, केंद्र में —
+ in a kendra — one of the five marks         पंच महापुरुष लक्षणों में से एक।
+ of an exceptional person.
+Harsha Vipareeta Raja                       हर्ष विपरीत राजयोग
+auspicious                                  शुभ
+Lord of the 6th placed in a dusthana —      षष्ठ भाव का स्वामी दुःस्थान में —
+ gains rising out of adversity.              प्रतिकूलता में से उठता लाभ।
+Yogakaraka Mars                             योगकारक मंगल
+Durudhara                                   दुरुधरा
+Vasi                                        वासि
+Amala                                       अमल
+```
+
+Six yogas, six different meanings, in the reader's own script — where a Hindi reader
+previously got `Sasa Mahapurusha` in Latin followed by the same sentence six times.
+
+## 7. Files
 
 Changed: `src/engine/classical.ts`, `src/screens/ChartScreen.tsx`,
 `validation/screen-snapshots.cjs`, `validation/snapshot-results.cjs`,
@@ -222,7 +250,7 @@ without it the yogas panel cannot appear in any baseline at all, which was the w
 defect. No open reservation covers it — the lane that owned it (`CLAUDE-SNAPSHOT-COVERAGE-0818`)
 is merged.
 
-## 7. Honest limits
+## 8. Honest limits
 
 - **Rendered text only.** Several Hindi yoga sentences are longer than their English
   twins. Nobody has looked at the yoga cards at 375 px in Hindi; wrapping and card
@@ -231,8 +259,8 @@ is merged.
 - **Six of 33 yoga families are covered by a rendered baseline** — the ones the pinned
   fixture produces. The other 27 are covered by § 5's exhaustive catalogue check, which
   proves content parity but not layout.
-- **`Eyebrow` still prints `Yogas detected · N` in English above `योग` in Hindi mode.**
-  That is the app-wide Eyebrow convention (Devanagari + English label), the same one the
-  Bhrigu lane recorded as a design call rather than a defect. Untouched here.
+- **The panel heading was already clean** — checked, not assumed: `Eyebrow` prints
+  `Yogas detected · 6` in English and the bare `योग` in Hindi, one language per reader.
+  Nothing to fix there.
 - **The "a node" / "a luminary" imprecision in three English yoga texts** — see § 3.
   Recorded, not silently improved.
