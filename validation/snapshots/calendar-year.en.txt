@@ -16,7 +16,7 @@ Tue, 6 Jan 2026
 Sankashti Chaturthi
 Tue, 6 Jan 2026
 ›
-Safala Ekadashi
+Shattila Ekadashi
 Wed, 14 Jan 2026
 ›
 Makar Sankranti
@@ -55,7 +55,7 @@ Sun, 25 Jan 2026
 Masik Durgashtami
 Mon, 26 Jan 2026
 ›
-Pausha Putrada Ekadashi
+Jaya Ekadashi
 Thu, 29 Jan 2026
 ›
 Shukra Pradosh
@@ -77,7 +77,7 @@ Thu, 5 Feb 2026
 Kumbha Sankranti
 Fri, 13 Feb 2026
 ›
-Shattila Ekadashi
+Vijaya Ekadashi
 Fri, 13 Feb 2026
 ›
 Shani Pradosh
@@ -101,7 +101,7 @@ Sat, 21 Feb 2026
 Skanda Shashti
 Mon, 23 Feb 2026
 ›
-Jaya Ekadashi
+Amalaki Ekadashi
 Fri, 27 Feb 2026
 ›
 March
@@ -129,7 +129,7 @@ Wed, 11 Mar 2026
 Meena Sankranti
 Sun, 15 Mar 2026
 ›
-Vijaya Ekadashi
+Papmochani Ekadashi
 Sun, 15 Mar 2026
 ›
 Som Pradosh
@@ -177,7 +177,7 @@ Thu, 26 Mar 2026
 Swaminarayan Jayanti
 Fri, 27 Mar 2026
 ›
-Amalaki Ekadashi
+Kamada Ekadashi
 Sun, 29 Mar 2026
 ›
 Som Pradosh
@@ -196,7 +196,7 @@ Thu, 2 Apr 2026
 Sankashti Chaturthi
 Sun, 5 Apr 2026
 ›
-Papmochani Ekadashi
+Varuthini Ekadashi
 Mon, 13 Apr 2026
 ›
 Mesha Sankranti
@@ -238,7 +238,7 @@ Fri, 24 Apr 2026
 Sita Navami
 Sat, 25 Apr 2026
 ›
-Kamada Ekadashi
+Mohini Ekadashi
 Mon, 27 Apr 2026
 ›
 Bhaum Pradosh
@@ -266,7 +266,7 @@ Sat, 2 May 2026
 Sankashti Chaturthi
 Tue, 5 May 2026
 ›
-Varuthini Ekadashi
+Apara Ekadashi
 Wed, 13 May 2026
 ›
 Guru Pradosh
@@ -296,7 +296,7 @@ Sat, 23 May 2026
 Ganga Dussehra
 Mon, 25 May 2026
 ›
-Mohini Ekadashi
+Ekadashi
 Tue, 26 May 2026
 ›
 Guru Pradosh
@@ -312,7 +312,7 @@ June
 Sankashti Chaturthi
 Wed, 3 Jun 2026
 ›
-Apara Ekadashi
+Ekadashi
 Thu, 11 Jun 2026
 ›
 Shukra Pradosh
@@ -354,6 +354,9 @@ Mon, 29 Jun 2026
 July
 Sankashti Chaturthi
 Fri, 3 Jul 2026
+›
+Yogini Ekadashi
+Fri, 10 Jul 2026
 ›
 Ravi Pradosh
 Sun, 12 Jul 2026
@@ -703,6 +706,9 @@ Tue, 17 Nov 2026
 ›
 Masik Durgashtami
 Tue, 17 Nov 2026
+›
+Devutthana Ekadashi
+Fri, 20 Nov 2026
 ›
 Tulasi Vivah
 Sat, 21 Nov 2026

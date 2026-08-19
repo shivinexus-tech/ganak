@@ -1,7 +1,7 @@
 import { rev, sd } from "./ephemeris";
 import {
-  amantaMonthIdx, elongMs, moonEvents, moonSidMs, pitruPakshaDay, planetSidMs, solveCross,
-  sunEvents, sunSidMs, zoneOffset, karanaName,
+  amantaMonthIdx, elongMs, lunarMonthInfo, moonEvents, moonSidMs, pitruPakshaDay, planetSidMs,
+  solveCross, sunEvents, sunSidMs, zoneOffset, karanaName,
 } from "./panchang";
 
 /* Twelve solar sankrantis — Sun enters each sidereal sign (Lahiri). Makar (270°)
@@ -283,15 +283,19 @@ const EKADASHI_NAMES = {
 };
 /* Named Ekadashi identities use the Purnimanta month during Krishna Paksha.
    Thus Amanta Ashadha / Purnimanta Shravana is Kamika, not Yogini. This is an
-   observance identity rule, independent of the user's preferred date label. */
+   observance identity rule, independent of the user's preferred date label.
+   Sourced in plans/research/ekadashi-lunar-month-naming.md; swept for 2024-2035
+   by validation/ekadashi-lunar-naming.cjs. NEVER derive this from the civil
+   month — that was the 2026-08-18 defect that misnamed 111 of 297 fasts. */
 function ekadashiIdentityMonth(months, krishna) {
   if (!months) return null;
   const raw = typeof months === "string"
     ? months
     : ((krishna ? months.purnimanta : months.amanta) || months.purnimanta || months.amanta || null);
-  // Adhik-masa Ekadashis have separate identities (Padmini/Parama). Until those
-  // sourced routes exist, fall back visibly to generic Ekadashi rather than
-  // misnaming them as the ordinary month's vrata.
+  // Adhik-masa Ekadashis have separate identities: Padmini (Shukla) and Parama
+  // (Krishna). Their two guide pages do not exist yet and festival-page-coverage
+  // requires a route for every named label, so fall back VISIBLY to the generic
+  // Ekadashi rather than misnaming them as the ordinary month's vrata.
   if (/\(Adhik\)/.test(String(raw || ""))) return null;
   const keyByPanchangMonth = {
     Chaitra: "Chaitra", Vaishakha: "Vaisakha", Vaisakha: "Vaisakha", Jyeshtha: "Jyeshtha",
@@ -567,23 +571,34 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
   const DAY = 86400000, fasts = [], festivals = [], candidates = new Map();
   const start = new Date(fromMs + tz * 3600000);
   const sy = start.getUTCFullYear(), sm = start.getUTCMonth(), sd = start.getUTCDate();
-  const monthNames = ["Chaitra", "Vaisakha", "Jyeshtha", "Ashadha", "Shravan", "Bhadrapad", "Ashwin", "Kartik", "Margshirsh", "Paush", "Magh", "Phalgun"];
   for (let k = 0; k < days; k++) {
     const civil = new Date(Date.UTC(sy, sm, sd + k));
     const y = civil.getUTCFullYear(), m = civil.getUTCMonth() + 1, day = civil.getUTCDate();
     const parts = scanDayParts(y, m, day, tz, place), dow = civil.getUTCDay();
     if (k < fastDays) {
-      const month = monthNames[(m - 1 + 9) % 12]; // existing display-name mapping; date rules use lunar tithi below
       for (const rule of FAST_KALA_RULES) {
         for (const krishna of rule.krishna == null ? [false, true] : [rule.krishna]) {
           const target = targetTithiIndex(krishna, rule.tithi);
-          if (!tithiKalaOverlap(parts, rule.kala, target)) continue;
+          const overlap = tithiKalaOverlap(parts, rule.kala, target);
+          // A vrata tithi that never prevails at a sunrise is *kshaya* (skipped).
+          // Ekadashi is still observed — on the day the tithi BEGINS — so the fast
+          // must not vanish from the calendar. Drik, New Delhi, Yogini Ekadashi 2026:
+          // tithi 08:16 10-Jul → 05:22 11-Jul, sunrise 11-Jul 05:30, vrata on 10-Jul.
+          const kshaya = !overlap && rule.baseKey === "ekadashi" && rule.kala === "udaya"
+            && tithiIndexAt(parts.rise + 1000) === (target + 29) % 30
+            && tithiIndexAt(parts.nextRise + 1000) === (target + 1) % 30;
+          if (!overlap && !kshaya) continue;
+          // Named vrata identity rides on the LUNAR month, never the Gregorian one.
+          // Krishna-paksha names use the Purnimanta month (Drik: "Yogini Ekadashi
+          // falls during Krishna Paksha of Ashadha month according to North Indian
+          // calendar and … Jyaishta … according to South Indian calendar").
+          const month = ekadashiIdentityMonth(lunarMonthInfo(parts.rise, krishna), krishna);
           const obs = observancesFor(krishna, rule.tithi, month, dow, parts.noon, calendarConvention).filter((o) => obsKind(o.key) === rule.baseKey);
           for (const o of obs) {
             if (!o.fasting) continue;
             const prev = [...fasts].reverse().find((x) => x.key === o.key);
             if (prev && parts.noon - prev.ms <= 1.5 * DAY) continue;
-            fasts.push({ key: o.key, ms: parts.noon, decidingKala: rule.kala });
+            fasts.push({ key: o.key, ms: parts.noon, decidingKala: kshaya ? "kshaya-tithi-start" : rule.kala });
           }
         }
       }
