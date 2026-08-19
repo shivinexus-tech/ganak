@@ -202,6 +202,141 @@ eq(zoneOffset('Mars/Nowhere', 1990, 6, 21, 9, 15), null, 'unknown zone returns n
   console.log(`  · round trip: ${CASES.length} wall clocks resolve to an instant that really has the returned offset`);
 }
 
+
+/* ============================================================================
+   5. THE CALL SITES — the half that actually reaches a reader
+   ============================================================================
+   The engine fix above only makes the right answer AVAILABLE. Until 2026-08-18
+   every caller passed the birth DATE and nothing else, so the screen still
+   printed the noon-offset answer: New York 2024-03-10 00:30 came out as Purva
+   Bhadrapada pada 1, syllable "Se", when the truth is pada 2, "So".
+
+   Two assertions, because either alone can rot:
+     5a. STATIC — the birth-instant call sites still pass a clock time, and no
+         day-scoped caller has quietly acquired one. Pinned per file, so both a
+         dropped `hh, mi` and a new unreviewed call site fail here.
+     5b. BEHAVIOURAL — the two natal-anchor engines answer for the birth moment.
+         A static check cannot see a caller that passes the wrong hour.
+
+   `zoneOffset(zone, y, m, d)` — the four-argument form — is CORRECT and required
+   for the ~40 day-scoped panchang callers (today-panchang, festivals, muhurat,
+   daily-windows, panchaka, eclipse, navratri, chhath, the season clock, the
+   calendar screens…). Passing a clock time to those would be a new bug. */
+{
+  const fs = require('fs'), path = require('path');
+  const { ROOT } = require('./_load-app.cjs');
+  const SRC = path.join(ROOT, 'src');
+
+  const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+    const full = path.join(dir, e.name);
+    if (e.isDirectory()) return walk(full);
+    return /\.(ts|tsx)$/.test(e.name) ? [full] : [];
+  });
+
+  /* Count TOP-LEVEL arguments of each `zoneOffset(...)` call: walk the characters
+     from the opening paren, tracking nesting and string/template state, and count
+     the commas at depth 1. Cheap, and exact for the shapes in this repo. */
+  function callArities(text) {
+    const out = [];
+    const re = /(^|[^.\w])zoneOffset\s*\(/g;
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      let i = re.lastIndex, depth = 1, args = 1, q = null;
+      while (i < text.length && depth > 0) {
+        const c = text[i], prev = text[i - 1];
+        if (q) { if (c === q && prev !== '\\') q = null; }
+        else if (c === '"' || c === "'" || c === '`') q = c;
+        else if ('([{'.includes(c)) depth++;
+        else if (')]}'.includes(c)) { depth--; if (depth === 0) break; }
+        else if (c === ',' && depth === 1) args++;
+        i++;
+      }
+      out.push(args);
+    }
+    return out;
+  }
+
+  /* Pinned inventory. `six` = calls that pass the birth clock; `four` = calls that
+     are deliberately day-scoped, or the "clock not typed yet" fallback inside a
+     birth helper. Both numbers are asserted, so removing `hh, mi` from a birth site
+     fails, and so does adding a call nobody reviewed. */
+  const BIRTH_SITES = {
+    'src/screens/UtilityCalculatorScreen.tsx': { six: 1, four: 1, what: 'all 14 public calculators (resolveZone)' },
+    'src/screens/MatchingScreen.tsx':          { six: 2, four: 0, what: "the two charts Dashakoota scores" },
+    'src/screens/ChartScreen.tsx':             { six: 1, four: 1, what: 'the form offset, saved chart, cast chart and ayanamsa recompute (tzAtBirth)' },
+    'src/screens/RectifyScreen.tsx':           { six: 1, four: 1, what: 'birth-time rectification' },
+    'src/engine/medical-muhurat.ts':           { six: 1, four: 1, what: 'natalMoonSign (the 4-arg call is the finder DAY, correctly day-scoped)' },
+    'src/engine/personal-muhurat.ts':          { six: 1, four: 0, what: 'natalAnchors — janma nakshatra, janma rashi and the Moon bhinnashtakavarga' },
+  };
+
+  let dayScoped = 0, dayFiles = 0, strays = [];
+  for (const file of walk(SRC)) {
+    const rel = path.relative(ROOT, file);
+    if (rel === 'src/engine/panchang.ts') continue;           // the definition itself
+    const arities = callArities(fs.readFileSync(file, 'utf8'));
+    if (!arities.length) continue;
+    const six = arities.filter((n) => n >= 6).length;
+    const four = arities.filter((n) => n < 6).length;
+    const want = BIRTH_SITES[rel];
+    if (want) {
+      if (six !== want.six) fail(`call-site wiring: ${rel} passes the birth clock at ${six} call(s), expected ${want.six} — ${want.what}`);
+      else checks++;
+      if (four !== want.four) fail(`call-site wiring: ${rel} has ${four} date-only zoneOffset call(s), expected ${want.four} — a birth site must not resolve the offset at a fixed moment on the birth date`);
+      else checks++;
+    } else {
+      dayFiles++; dayScoped += four;
+      if (six) strays.push(`${rel} (${six})`);
+    }
+  }
+  for (const rel of Object.keys(BIRTH_SITES)) {
+    if (!fs.existsSync(path.join(ROOT, rel))) fail(`call-site wiring: ${rel} no longer exists — re-point this inventory`);
+  }
+  if (strays.length) fail(`call-site wiring: day-scoped caller(s) now pass a clock time: ${strays.join(', ')} — a panchang day is not a birth instant`);
+  else checks++;
+  console.log(`  · call sites: ${Object.keys(BIRTH_SITES).length} birth-instant files pass the clock; ${dayScoped} day-scoped calls in ${dayFiles} files stay on the 4-argument form`);
+
+  /* --- 5b. the natal anchors really answer for the birth MOMENT --------------- */
+  const NYP = { zone: NY, lat: 40.71, lon: -74.01 };
+  const { natalMoonSign } = loadApp('src/engine/medical-muhurat.ts');
+  const { natalAnchors } = loadApp('src/engine/personal-muhurat.ts');
+  // 1976-10-31: clocks went back at 02:00, so 01:30 was still EDT (−4). The
+  // day-level offset is −5, and it puts the natal Moon in the NEXT sign.
+  eq(natalMoonSign(NYP, 'lahiri', { y: 1976, m: 10, day: 31, hh: 1, mi: 30 }), 9,
+    'medical natalMoonSign: NY 1976-10-31 01:30 is EDT −4 (day-level −5 gives sign 10)');
+  // 1962-04-29: clocks went forward at 02:00, so 00:30 was still EST (−5). The
+  // day-level offset is −4, and it puts the birth Moon in the previous nakshatra.
+  eq(natalAnchors(NYP, 'lahiri', { y: 1962, m: 4, day: 29, hh: 0, mi: 30 }).janmaNak, 23,
+    'personal natalAnchors: NY 1962-04-29 00:30 is EST −5 (day-level −4 gives nakshatra 22)');
+  /* India — the core audience — cannot move, and that is asserted, not assumed.
+     Wiring the clock through can only change an answer where the day-level and
+     clock-level offsets differ, so the invariant to prove is that they never do
+     for an Indian birth. Every Indian gazetteer zone, 1930-2030, every hour. */
+  {
+    // CITY_DB rows are [label, lat, lon, zoneIndex] into ZONES.
+    const { CITY_DB, ZONES } = loadApp('src/data/places.ts');
+    const indian = CITY_DB.filter((row) => /,\s*India$/i.test(String(row[0])));
+    const zones = [...new Set(indian.map((row) => ZONES[row[3]]))].filter(Boolean);
+    if (!indian.length || !zones.length) fail('India invariance: no Indian cities found in the gazetteer — the sweep below proves nothing');
+    else checks++;
+    let n = 0, moved = 0;
+    for (const z of zones) {
+      for (let y = 1930; y <= 2030; y++) {
+        for (const [m, d] of [[1, 1], [3, 10], [6, 21], [9, 15], [11, 3], [12, 31]]) {
+          for (const hh of [0, 1, 2, 3, 12, 23]) {
+            n++;
+            if (zoneOffset(z, y, m, d, hh, 30) !== zoneOffset(z, y, m, d)) {
+              moved++;
+              if (moved < 4) fail(`India invariance: ${z} ${y}-${m}-${d} ${hh}:30 moved when the clock was wired through`);
+            }
+          }
+        }
+      }
+    }
+    if (moved === 0) checks++;
+    console.log(`  · India invariance: ${n} births across ${indian.length} Indian cities / ${zones.length} zone(s), 1930-2030 — ${moved} answers move when the birth clock is wired through`);
+  }
+}
+
 console.log(failures
   ? `zone-offset-dst: ${failures} FAILURES (${checks} passed)`
   : `zone-offset-dst: PASS — ${checks} checks · hour-aware offsets, skipped/repeated-hour conventions pinned, historical + fractional zones, day-level invariance`);

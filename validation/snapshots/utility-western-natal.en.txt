@@ -2,8 +2,8 @@ JYOTISH WORKSPACE
 KundliCalculators
 ← All calculatorsWestern natal chart
 Tropical Big Three and major aspects—separate from Vedic settings.
-Date
-Time
+Date of birth
+Time of birth
 Place
 Calculate
 Method & limitsWestern method: tropical zodiac and major Ptolemaic aspects. It is kept separate from Ganak's Vedic Lahiri defaults.

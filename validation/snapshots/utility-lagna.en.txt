@@ -2,8 +2,8 @@ JYOTISH WORKSPACE
 KundliCalculators
 ← All calculatorsAscendant (Lagna)
 The sign rising at your birth place and time.
-Date
-Time
+Date of birth
+Time of birth
 Place
 Calculate
 Method & limitsLahiri sidereal ascendant from exact time and place.

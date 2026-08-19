@@ -2,8 +2,8 @@ JYOTISH WORKSPACE
 KundliCalculators
 ← All calculatorsSade Sati
 Checks Saturn against your natal Moon sign for a chosen date.
-Date
-Time
+Date of birth
+Time of birth
 Place
 Check date
 Calculate

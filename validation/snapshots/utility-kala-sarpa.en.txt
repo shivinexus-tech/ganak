@@ -2,8 +2,8 @@ JYOTISH WORKSPACE
 KundliCalculators
 ← All calculatorsKala Sarpa pattern
 A transparent node-axis geometry check with caveats.
-Date
-Time
+Date of birth
+Time of birth
 Place
 Calculate
 Method & limitsStrict geometric convention: all seven classical planets must be inside one Rahu–Ketu semicircle. The named type follows Rahu's house. This is a pattern, not a prediction of harm.

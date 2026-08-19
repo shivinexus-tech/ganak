@@ -2,8 +2,8 @@ JYOTISH WORKSPACE
 KundliCalculators
 ← All calculatorsMoon sign (Rashi)
 Your sidereal Moon sign and emotional orientation.
-Date
-Time
+Date of birth
+Time of birth
 Place
 Calculate
 Method & limitsLahiri sidereal Moon sign.

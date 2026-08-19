@@ -2,12 +2,12 @@ JYOTISH WORKSPACE
 KundliCalculators
 ← All calculatorsWestern relationship
 Synastry contacts and a midpoint composite for two people.
-Date
-Time
+Date of birth
+Time of birth
 Place
 Second person
-Date
-Time
+Date of birth
+Time of birth
 Place
 Calculate
 Method & limitsWestern tropical synastry plus a shortest-arc midpoint composite; relationship themes are not compatibility verdicts.

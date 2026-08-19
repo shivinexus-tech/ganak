@@ -2,8 +2,8 @@ JYOTISH WORKSPACE
 KundliCalculators
 ← All calculatorsPitra Dosha
 Transparent ancestral-indication checks from the Sun and 9th house.
-Date
-Time
+Date of birth
+Time of birth
 Place
 Calculate
 Method & limitsTransparent same-sign checks from the Lagna: Sun with the nodes or Saturn, nodes in the 9th, an afflicted 9th lord, or an afflicted Sun in the 9th. Special aspects are not applied. Traditions differ; this is a reflective lens about honouring ancestors, not a curse or a verdict.

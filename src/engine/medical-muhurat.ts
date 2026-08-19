@@ -57,7 +57,11 @@ function syzygyOnDay(rise) {
    parallax is immaterial — only the birth instant matters. Returns 0..11. */
 function natalMoonSign(place, ayanamsa, birth) {
   setAyanMode(ayanamsa || "lahiri");
-  const tz = zoneOffset(place.zone, birth.y, birth.m, birth.day) ?? 5.5;
+  // The offset is resolved AT THE BIRTH CLOCK, not at a fixed moment on the birth
+  // date: on a daylight-saving transition day those are an hour apart, which can move
+  // the natal Moon into the neighbouring sign and so flip the janmaRashi flag on every
+  // day this finder returns.
+  const tz = zoneOffset(place.zone, birth.y, birth.m, birth.day, birth.hh || 0, birth.mi || 0) ?? 5.5;
   const ms = Date.UTC(birth.y, birth.m - 1, birth.day, birth.hh || 0, birth.mi || 0) - tz * 3600000;
   return Math.floor(moonSidMs(ms) / 30);
 }
