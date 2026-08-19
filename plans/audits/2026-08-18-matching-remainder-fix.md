@@ -123,6 +123,15 @@ that is fixing `panchang.ts`; this change makes matching immune to it either way
   can check the score instead of trusting it. `dashakoota().counts` exposes the three raw
   counts, and the gate asserts every row's stated rule agrees with its own points.
 
+**F23's third bullet — `kalaSarpa().direction`** — is *not* closed and was deliberately
+left alone. `src/engine/doshas.ts:67` computes udit/anudit from which side of the
+Rahu–Ketu axis holds the majority, and the calculator page prints it whether or not a
+full pattern exists. The engine change that would fix it (return no direction when the
+pattern is not full) makes the page *worse* on its own — the screen's ternary would then
+print "Anudit" for every chart — so it must land together with the one-line screen change
+in `UtilityCalculatorScreen.tsx`, which this branch may not edit. Adding a
+`directionMeaningful` flag that nothing renders would be the very defect F23 names.
+
 ### F19 (P2, but it moved real answers) — Jupiter's drishti and the exception table
 Jupiter casts a **full** aspect on the 5th, 7th and 9th from itself — Ganak's own
 `src/engine/bhava.ts` scores exactly that (`frac 60` at `hp` 5, 7 and 9). `mangal-dosha.ts`
@@ -255,4 +264,11 @@ These are religious-accuracy / product calls. Nothing here was chosen unilateral
    shipped city list is a data task, not a code task.
 5. **`UtilityCalculatorScreen` still carries its own copy of the birth-zone resolver.**
    The shared one now lives in `src/components/birth-input.ts`; adopting it there is a
-   one-line follow-up in a file this branch may not edit.
+   one-line follow-up in a file this branch may not edit. Proved safe rather than
+   assumed — the two behave identically:
+   ```
+   compared 8160 (zone, date, clock) triples · differences: 0
+   ```
+   (9 zones incl. DST, half-hour and unknown ones × 1960–2026 × spring-forward,
+   fall-back, midsummer and New Year × six clocks including the skipped and repeated
+   hours and a blank time.)
