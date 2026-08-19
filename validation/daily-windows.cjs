@@ -2,7 +2,7 @@
 'use strict';
 const { loadApp } = require('./_load-app.cjs');
 const fs=require('fs');
-const { computeDailyWindows, scanSpecialYogaCalendar } = loadApp('src/engine/daily-windows.ts');
+const { computeDailyWindows, scanSpecialYogaCalendar, chandraBala } = loadApp('src/engine/daily-windows.ts');
 const DAY=86400000, DELHI={lat:28.6139,lon:77.2090,zone:'Asia/Kolkata'}, ANAND={lat:22.5645,lon:72.9289,zone:'Asia/Kolkata'};
 const CHENNAI={lat:13.0827,lon:80.2707,zone:'Asia/Kolkata'}, KOLKATA={lat:22.5726,lon:88.3639,zone:'Asia/Kolkata'};
 let failures=0, windows=0;
@@ -70,5 +70,21 @@ const polar=computeDailyWindows({lat:69.6492,lon:18.9553,zone:'Europe/Oslo'},Dat
 if(polar!==null) fail('polar day should return an explicit unavailable result');
 const ui=fs.readFileSync('src/components/DailyWindowsCard.tsx','utf8');
 if(!ui.includes('Daily decision windows unavailable')||!ui.includes('दैनिक निर्णय-काल उपलब्ध नहीं')) fail('polar/unavailable bilingual recovery UI missing');
+/* Chandra Bala may never promote the avoided positions. Until 2026-08-19 the
+   waning arm read `[4,8,12]`, so on every Krishna-paksha day the 8th from the
+   Moon — Ashtama Chandra — was reported as supportive to a reader who had just
+   picked their own rashi, and was also let through one of the two HARD filters
+   in the personalised Muhurat finder. Assert both pakshas, from every transit
+   sign, so the inversion cannot come back in either arm. (2026-08-18 Muhurat
+   bug bash, F3.) */
+const CB_NEVER=[4,8,12], CB_ALWAYS=[1,3,6,7,10,11];
+for(const waxing of [true,false]) for(let sign=0;sign<12;sign++){
+  const rows=chandraBala(sign,waxing);
+  if(rows.length!==12) fail(`chandraBala sign ${sign} ${waxing?'waxing':'waning'}: expected 12 rows, got ${rows.length}`);
+  for(const d of CB_NEVER) if(rows.some(r=>r.distance===d&&r.good))
+    fail(`chandraBala ${waxing?'waxing':'waning'}, transit sign ${sign}: position ${d} reported supportive — 4/8/12 are the avoided positions in both pakshas`);
+  for(const d of CB_ALWAYS) if(!rows.some(r=>r.distance===d&&r.good))
+    fail(`chandraBala ${waxing?'waxing':'waning'}, transit sign ${sign}: position ${d} reported weak — 1/3/6/7/10/11 are supportive in both pakshas`);
+}
 if(failures){ console.error(`daily-windows FAILED: ${failures}`); process.exit(1); }
-console.log(`✓ daily-windows PASSED (${windows} intervals across 370 days; no zero/overlap defects; 3-city regional anchors; all 8 yoga calendars, ${cal.length} yoga dates)`);
+console.log(`✓ daily-windows PASSED (${windows} intervals across 370 days; no zero/overlap defects; 3-city regional anchors; Chandra Bala never promotes 4/8/12 in either paksha (24 sign x paksha checks); all 8 yoga calendars, ${cal.length} yoga dates)`);

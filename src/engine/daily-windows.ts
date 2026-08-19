@@ -173,9 +173,26 @@ const DISHA: Record<number, { en:string; hi:string }> = {
   3:{en:"North",hi:"उत्तर"}, 4:{en:"South",hi:"दक्षिण"}, 5:{en:"West",hi:"पश्चिम"}, 6:{en:"East",hi:"पूर्व"},
 };
 
+/* Chandra Bala counted from the reader's Janma Rashi to the transit Moon.
+   1, 3, 6, 7, 10 and 11 are supportive in both pakshas. 4, 8 and 12 are the
+   avoided positions in every published table — the 8th (Ashtama Chandra) most
+   emphatically — and are never promoted, in either paksha.
+
+   Until 2026-08-19 the waning arm read `[4,8,12]`, which inverted the rule: on
+   every Krishna-paksha day the 8th from the Moon was reported as supportive and
+   the 5th and 9th as weak. That mattered twice over — the Panchang stated it to
+   a reader who had just chosen their own rashi, and `personal-muhurat.ts` uses
+   this as one of two HARD filters, so Ashtama-Chandra days were kept and 9th-
+   position days set aside. Found by the 2026-08-18 Muhurat bug bash (F3).
+
+   The middling positions 2, 5 and 9 keep the behaviour they have always had:
+   counted as supportive only on a waxing day, when a strengthening Moon is held
+   to redeem them. That arm is UNSOURCED in this repo and is left untouched
+   deliberately — correcting the inversion needs no source, but changing the
+   middling convention would, and it is an open question for the owner. */
 function chandraBala(currentSign: number, waxing: boolean) {
   const base = new Set([1,3,6,7,10,11]);
-  const extra = waxing ? [2,5,9] : [4,8,12];
+  const extra = waxing ? [2,5,9] : [];
   return SIGN_EN_WESTERN.map((en, birthSign) => {
     const distance = ((currentSign - birthSign + 12) % 12) + 1;
     return { birthSign, en, hi:panchangTermAt("hi", "sign", birthSign), good:base.has(distance) || extra.includes(distance), distance };
