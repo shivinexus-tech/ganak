@@ -141,6 +141,15 @@ for (const birth of manglikCharts) {
     `matching and the calculator place Mars in different houses: ${where}`);
   assert.deepStrictEqual(fromMatching.refs.map((r) => r.key), ['lagna', 'moon', 'venus'],
     'matching must check the Lagna, the Moon and Venus — separately, in that order');
+  /* Bug bash remainder pass, 2026-08-18 (F19): the two copies of this convention must
+     agree on the MITIGATIONS too, not just on presence and strength. Jupiter's aspect
+     set and the tradition-specific exception table were fixed in both files on the same
+     day; this is the assertion that stops them drifting apart again on real charts. */
+  assert.deepStrictEqual(fromMatching.refs.map((r) => [...r.mitigations].sort()),
+    fromCalculator.refs.map((r) => [...r.mitigations].sort()),
+    `matching and the calculator find different mitigations: ${where}`);
+  assert.strictEqual(fromMatching.mitigationCount, fromCalculator.mitigationCount,
+    `matching and the calculator count mitigations differently: ${where}`);
   checked += 1;
   if (fromMatching.present) presentCount += 1;
   const lagnaOnly = fromMatching.refs[0].counted;
@@ -148,6 +157,15 @@ for (const birth of manglikCharts) {
   if (!fromMatching.present && lagnaOnly) lagnaOnlyWouldHaveInvented += 1;
 }
 assert.strictEqual(checked, manglikCharts.length, 'the Manglik sweep did not run');
+{
+  let jupiterMitigated = 0;
+  for (const birth of manglikCharts) {
+    const prof = manglikProfile(computeKundli(birth));
+    if (prof.refs.some((r) => r.mitigations.includes('jupiterSupport'))) jupiterMitigated += 1;
+  }
+  assert(jupiterMitigated > 0,
+    'no chart in the sweep carries a Jupiter-aspect mitigation — the mitigation-agreement assertion above would prove nothing');
+}
 assert(presentCount > 0 && presentCount < checked, 'the Manglik sweep must contain both Manglik and non-Manglik charts');
 /* Non-vacuous: the sweep must actually contain the charts the old Lagna-only rule got
    wrong. If this ever drops to zero the assertions above stop proving anything. */

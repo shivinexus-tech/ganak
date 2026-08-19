@@ -585,7 +585,7 @@ if (failures) {
 
 const covered = SCREENS.filter((s) => !s.skip).length;
 const skipped = SCREENS.filter((s) => s.skip);
-console.log(`✓ screen-snapshots: ${fresh.size} baselines match · ${covered} screens × ${LANGS.length} languages + chart/transit results`);
+console.log(`✓ screen-snapshots: ${fresh.size} baselines match · ${covered} screens × ${LANGS.length} languages + chart/transit/match results`);
 console.log(`✓ calculator cross-seeding: ${clean} mismatched-result renders identical to no result (0 crashes, 0 foreign answers) · ${answered} own-result renders still answer`);
 if (skipped.length) console.log(`  not covered (${skipped.length}): ${skipped.map((s) => s.key).join(', ')} — inner modules needing parent-computed data`);
 /* A green run must never be read as "this screen is fully proven". Screens whose

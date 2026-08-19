@@ -52,6 +52,76 @@ function chartText(lang) {
   return lines.join('\n');
 }
 
+/* ---------------------------------------------------------------- match result
+   The matching screen's committed baseline (validation/snapshots/matching.*.txt) is
+   eleven lines long and contains no koota, no dosha and no score, because
+   renderToStaticMarkup runs no handlers and therefore only ever sees the empty form.
+   Every defect the 2026-08-18 bug bash found on this screen — two contradictory
+   headline verdicts, a green "Very good match" above a standing Nadi dosha, eight
+   identical Hindi rows, an ISO date inside a Hindi report — was invisible to it.
+
+   So the single `useState(null)` slot that holds the result is seeded with a REAL
+   computeMatch output at the pinned fixture and the screen is rendered for real. The
+   interception matches on the initial value rather than on call order: `res` is the
+   only slot in MatchMaker initialised to null, so this stays correct if the component
+   gains or reorders state. Nothing is faked — the couple, the charts, the scores and
+   every string come from the shipping engine and the shipping JSX. */
+const MATCH_BOY = { y: 1985, m: 6, day: 1, hh: 9, mi: 30, tz: 5.5, lat: 28.61, lon: 77.21 };
+const MATCH_GIRL = { y: 1985, m: 6, day: 1, hh: 14, mi: 15, tz: 5.5, lat: 19.08, lon: 72.88 };
+
+function matchText(lang) {
+  const React = require('react');
+  const { renderToStaticMarkup } = require('react-dom/server');
+  const { toText } = require('./_snapshot-render.cjs');
+  const { C, card } = require('./_snapshot-env.cjs');
+  const fs = require('fs');
+  const path = require('path');
+  const { ROOT } = require('./_load-app.cjs');
+
+  const { computeKundli } = loadApp('src/engine/kundli.ts');
+  const { computeMatch } = loadApp('src/engine/matching.ts');
+  const result = computeMatch(computeKundli, MATCH_BOY, MATCH_GIRL);
+
+  /* Screen and ComfortProvider must come from ONE bundle — esbuild inlines a fresh
+     React context per bundle, exactly as _snapshot-render.cjs explains. */
+  const tmpRel = `src/.snapshot-match-${process.pid}.tsx`;
+  const tmpAbs = path.join(ROOT, tmpRel);
+  fs.writeFileSync(tmpAbs,
+    'export { ComfortProvider } from "./accessibility/ComfortProvider";\n' +
+    'export { default as Screen } from "./screens/MatchingScreen";\n', 'utf8');
+  let mod;
+  try { mod = loadApp(tmpRel); } finally { try { fs.unlinkSync(tmpAbs); } catch { /* gone */ } }
+
+  /* The form's own date/time slots are seeded to the SAME couple, and the "what this
+     was computed from" slot to the real offsets, so the printed header in the baseline
+     belongs to the scores underneath it. Without that the baseline would show the
+     component's default births above a different couple's kootas — a record of
+     something no reader ever sees. */
+  const iso = (b) => `${b.y}-${String(b.m).padStart(2, '0')}-${String(b.day).padStart(2, '0')}`;
+  const clock = (b) => `${String(b.hh).padStart(2, '0')}:${String(b.mi).padStart(2, '0')}`;
+  const SEED = new Map([
+    ['1990-04-12', iso(MATCH_BOY)], ['09:30', clock(MATCH_BOY)],
+    ['1992-11-20', iso(MATCH_GIRL)], ['14:15', clock(MATCH_GIRL)],
+  ]);
+  const USED = {
+    b: { label: 'New Delhi, India', tz: MATCH_BOY.tz, date: iso(MATCH_BOY), time: clock(MATCH_BOY) },
+    g: { label: 'Mumbai, India', tz: MATCH_GIRL.tz, date: iso(MATCH_GIRL), time: clock(MATCH_GIRL) },
+  };
+  const realUseState = React.useState;
+  React.useState = function seeded(init) {
+    if (init === null) return [result, () => {}];
+    if (init && typeof init === 'object' && 'b' in init && 'g' in init && init.b === null) return [USED, () => {}];
+    if (typeof init === 'string' && SEED.has(init)) return [SEED.get(init), () => {}];
+    return realUseState(init);
+  };
+  try {
+    return toText(renderToStaticMarkup(React.createElement(mod.ComfortProvider, null,
+      React.createElement(mod.Screen, { C, card, lang, computeKundli }))));
+  } finally {
+    React.useState = realUseState;
+  }
+}
+
 function transitText(lang) {
   const { upcomingEvents } = loadApp('src/engine/panchang.ts');
   const { transitLabel } = loadApp('src/engine/transit-copy.ts');
@@ -64,8 +134,9 @@ function generateResults() {
   for (const lang of ['en', 'hi']) {
     out.set(`chart.${lang}`, chartText(lang));
     out.set(`transits.${lang}`, transitText(lang));
+    out.set(`match-result.${lang}`, matchText(lang));
   }
   return out;
 }
 
-module.exports = { generateResults, chartText, transitText };
+module.exports = { generateResults, chartText, transitText, matchText };

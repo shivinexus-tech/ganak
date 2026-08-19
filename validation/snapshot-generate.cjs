@@ -70,7 +70,7 @@ const SCREENS = [
   { key: 'chart', entry: 'src/screens/ChartScreen.tsx', props: (lang) => ({ C, card, lang }),
     note: 'chart body appears only after a cast — covered by result snapshots' },
   { key: 'matching', entry: 'src/screens/MatchingScreen.tsx', props: base,
-    note: 'Dashakoota appears only after both charts are entered' },
+    note: 'empty form only — the scores, doshas and verdict are covered by the match-result baselines' },
   { key: 'medical', entry: 'src/screens/MedicalMuhuratScreen.tsx', props: base },
 
   /* Inner modules. The original skip note said these "need a pre-scanned calendar

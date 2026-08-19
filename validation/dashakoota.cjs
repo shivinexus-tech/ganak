@@ -4,10 +4,15 @@
    Rajju and Vedha hard-block doshas, and a real-chart anchor. */
 const assert = require('node:assert');
 const { loadApp } = require('./_load-app.cjs');
-const { dashakoota, gunaMilan, computeMatch, matchVerdict, VERDICT_COPY, VERDICT_ORDER, BLOCK_COPY } = loadApp('src/engine/matching.ts');
+const { dashakoota, gunaMilan, computeMatch, matchVerdict, VERDICT_COPY, VERDICT_ORDER, BLOCK_COPY,
+  MATCH_CONVENTION, NADI_EXCEPTION_COPY, BHAKOOT_EXCEPTION_COPY } = loadApp('src/engine/matching.ts');
 const fs = require('node:fs');
 const path = require('node:path');
 const matchScreen = fs.readFileSync(path.join(__dirname, '..', 'src/screens/MatchingScreen.tsx'), 'utf8');
+/* Comment-free copy. A banned pattern must be checked against CODE — the file's own
+   comments quote the very lines these assertions forbid, and a gate that fires on a
+   comment teaches the next agent to delete the explanation rather than the defect. */
+const matchCode = matchScreen.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 const { computeKundli } = loadApp('src/engine/kundli.ts');
 
 // ---- structure ----
@@ -100,6 +105,10 @@ const byInputs = new Map();   // (ashta,dasha,blocks) -> verdict key : proves ON
 const byLowScore = new Map(); // min(ashta,dasha) -> band, over block-free combos
 const seenBands = new Set();
 let minDistinctHiNotes = 99, missingHiNotes = 0, latinInHiNotes = 0, hiEqualsEn = 0;
+/* 2026-08-18 remainder pass — F11, F20, F23 counters, swept in the same loop. */
+let nadiDoshaCombos = 0, nadiWithException = 0, bhakootDoshaCombos = 0, bhakootWithException = 0;
+let exceptionOnCleanKoota = 0, unknownExceptionKey = 0, exceptionNotBilingual = 0;
+let dkMissingHiNote = 0, dkLatinInHiNote = 0, dkHiEqualsEn = 0, dkCountMismatch = 0, dkRuleMismatch = 0;
 
 for (let bn = 0; bn < 27; bn += 1) for (let br = 0; br < 12; br += 1)
 for (let gn = 0; gn < 27; gn += 1) for (let gr = 0; gr < 12; gr += 1) {
@@ -127,6 +136,42 @@ for (let gn = 0; gn < 27; gn += 1) for (let gr = 0; gr < 12; gr += 1) {
       `two block-free combinations with the same lower score (${low}/36) got different verdicts`);
     else byLowScore.set(low, v.key);
   }
+
+  /* ---- F11: the classical exceptions to Nadi and Bhakoot are REPORTED, NEVER APPLIED.
+     Ganak stated both doshas as bare facts with no mention that the tradition it
+     quotes also carries exceptions. The exception must appear only when the dosha is
+     actually standing, must never move the points or the flag, and must be bilingual. */
+  if (gm.nadiDosha) { nadiDoshaCombos += 1; if (gm.nadiExceptions.length) nadiWithException += 1; }
+  else if (gm.nadiExceptions.length) exceptionOnCleanKoota += 1;
+  if (gm.bhakootDosha) { bhakootDoshaCombos += 1; if (gm.bhakootExceptions.length) bhakootWithException += 1; }
+  else if (gm.bhakootExceptions.length) exceptionOnCleanKoota += 1;
+  for (const ex of [...gm.nadiExceptions, ...gm.bhakootExceptions]) {
+    if (!NADI_EXCEPTION_COPY[ex.key] && !BHAKOOT_EXCEPTION_COPY[ex.key]) unknownExceptionKey += 1;
+    if (!ex.en || !ex.hi || !DEVANAGARI.test(ex.hi) || /[A-Za-z]{3,}/.test(ex.hi) || DEVANAGARI.test(ex.en)) exceptionNotBilingual += 1;
+  }
+  // Reported, not applied: an exception may never change what the koota scored.
+  if (gm.nadiExceptions.length) assert.strictEqual(gm.kootas[7].got, 0, 'a Nadi exception changed the Nadi score');
+  if (gm.bhakootExceptions.length) assert.strictEqual(gm.kootas[6].got, 0, 'a Bhakoot exception changed the Bhakoot score');
+
+  /* ---- F20 / F23: every Dashakoota row must carry its own reading, in both languages,
+     and the reading must agree with the score. The notes existed and were discarded;
+     their Hindi did not exist at all, so a Hindi reader saw a static meaning and no
+     diagnosis, and nobody could check "Dina 3 / 3" against the count it came from. */
+  for (const k of dk.kootas) {
+    if (!k.noteHi) dkMissingHiNote += 1;
+    if (/[A-Za-z]/.test(k.noteHi || '')) dkLatinInHiNote += 1;
+    if (k.noteHi === k.note) dkHiEqualsEn += 1;
+  }
+  const dkBy = Object.fromEntries(dk.kootas.map((k) => [k.name, k]));
+  for (const [name, count] of [['Dina', dk.counts.dina], ['Mahendra', dk.counts.mahendra], ['Stree Deergha', dk.counts.streeDeergha]]) {
+    if (!new RegExp(`\\b${count}\\b`).test(dkBy[name].note)) dkCountMismatch += 1;
+    if (!new RegExp(`\\b${count}\\b`).test(dkBy[name].noteHi)) dkCountMismatch += 1;
+  }
+  if ((dk.counts.streeDeergha > 13) !== (dkBy['Stree Deergha'].got === 2)) dkRuleMismatch += 1;
+  if (/above 13/.test(dkBy['Stree Deergha'].note) !== (dkBy['Stree Deergha'].got === 2)) dkRuleMismatch += 1;
+  if (/not one of the Mahendra counts/.test(dkBy.Mahendra.note) !== (dkBy.Mahendra.got === 0)) dkRuleMismatch += 1;
+  if (/, even, so favourable/.test(dkBy.Dina.note) !== (dkBy.Dina.got === 3)) dkRuleMismatch += 1;
+  if ((dk.counts.dina % 9) % 2 === 0 !== (dkBy.Dina.got === 3)) dkRuleMismatch += 1;
 
   // F10 — the Hindi "Detail" column, swept.
   const hiNotes = gm.kootas.map((k) => k.noteHi);
@@ -165,6 +210,126 @@ assert.strictEqual(hiEqualsEn, 0, 'a Hindi koota detail is a copy of the English
 assert.strictEqual(minDistinctHiNotes, 8,
   `the Hindi Detail column repeats itself — worst case only ${minDistinctHiNotes} of 8 rows differ ` +
   '(before 2026-08-18 all eight were one filler sentence, so a Hindi reader saw no varna, yoni, gana, nadi or sign lord at all)');
+
+/* ============================================================================
+   Bug bash remainder pass, 2026-08-18 — F6, F11, F17, F18, F20, F21, F23.
+   Same rule as above: sweep, never anchor.
+   ========================================================================== */
+
+// ---------------------------------------------------------------- F11 sweep results
+assert.strictEqual(exceptionOnCleanKoota, 0,
+  'a classical exception was reported for a koota that carries no dosha');
+assert.strictEqual(unknownExceptionKey, 0, 'an exception key has no published copy behind it');
+assert.strictEqual(exceptionNotBilingual, 0,
+  'an exception is missing a language, or mixes scripts — both readers must be told the same thing');
+assert(nadiWithException > 0 && bhakootWithException > 0,
+  'no combination in the sweep carried an exception — the F11 assertions above would prove nothing');
+assert.strictEqual(nadiDoshaCombos, 34992, 'the Nadi dosha population moved — check the nadi table before the exceptions');
+assert.strictEqual(bhakootDoshaCombos, 52488, 'the Bhakoot dosha population moved');
+assert.strictEqual(nadiWithException, 6156,
+  'the number of couples told "Nadi dosha — present" while a published exception to that very rule stands');
+assert.strictEqual(bhakootWithException, 24786,
+  'the number of couples told "Bhakoot dosha — present" while a published exception stands');
+
+/* The exceptions are a DISCLOSURE, not a ruling: the score, the dosha flag and the
+   headline band must be byte-identical to what they were before the exception existed.
+   Whether a cancelled dosha should stop capping the band is an owner question recorded
+   in plans/audits/2026-08-18-matching-remainder-fix.md, not something this file decides. */
+{
+  const exBoy = { nak: 0, rashi: 0 }, exGirl = { nak: 5, rashi: 0 }; // same nadi, same rashi, different star
+  const g = gunaMilan(exBoy, exGirl);
+  assert(g.nadiExceptions.length > 0, 'fixture must carry a Nadi exception');
+  const v = matchVerdict(g, dashakoota(exBoy, exGirl), NO_MANGLIK);
+  assert(v.blocks.some((b) => b.key === 'nadi'),
+    'an exception must not remove the dosha from the headline — Ganak reports the rule and names the exception');
+}
+
+// ---------------------------------------------------- F20 / F23 sweep results
+assert.strictEqual(dkMissingHiNote, 0, 'a Dashakoota kuta has no Hindi reading');
+assert.strictEqual(dkLatinInHiNote, 0, 'a Hindi Dashakoota reading contains Latin letters');
+assert.strictEqual(dkHiEqualsEn, 0, 'a Hindi Dashakoota reading is a copy of the English one');
+assert.strictEqual(dkCountMismatch, 0,
+  'a count-based Dashakoota kuta does not print the star count it was scored from');
+assert.strictEqual(dkRuleMismatch, 0,
+  'a Dashakoota reading states a rule that disagrees with the points on the same row');
+assert(dashakoota({ nak: 0, rashi: 0 }, { nak: 5, rashi: 4 }).counts,
+  'Dashakoota must expose the raw star counts its three count-based kutas were scored from');
+
+// ------------------------------------------------------- F17: the stated convention
+assert.strictEqual(MATCH_CONVENTION.ayanamsa, 'lahiri',
+  'matching must be pinned to the ayanamsa AGENTS.md names as the app convention');
+assert(/Lahiri/.test(MATCH_CONVENTION.en) && /लाहिरी/.test(MATCH_CONVENTION.hi),
+  'the convention line must name Lahiri in both languages, the way /calculator/sade-sati does');
+assert(/mean Rahu\/Ketu/.test(MATCH_CONVENTION.en) && /मध्यम राहु/.test(MATCH_CONVENTION.hi),
+  'the convention line must name the node convention in both languages');
+assert(/res\.convention\.hi/.test(matchScreen) && /res\.convention\.en/.test(matchScreen),
+  'the matching screen must PRINT the convention it computed on, not just carry it');
+/* Behavioural, not a grep: matching used to pass birth details with no ayanamsa key at
+   all, so both charts were cast on whatever the chart screen's ayanamsa chips had last
+   left in the module-global AYAN_MODE. */
+{
+  const seen = [];
+  const spy = (d) => { seen.push(d.ayanamsa); return computeKundli(d); };
+  const r = computeMatch(spy, { y: 1990, m: 4, day: 12, hh: 9, mi: 30, tz: 5.5, lat: 28.61, lon: 77.21 },
+                              { y: 1992, m: 11, day: 20, hh: 14, mi: 15, tz: 5.5, lat: 19.08, lon: 72.88 });
+  assert.deepStrictEqual(seen, ['lahiri', 'lahiri'],
+    'computeMatch must pin the ayanamsa on BOTH charts instead of inheriting module-global state');
+  assert.strictEqual(r.convention.ayanamsa, 'lahiri', 'the result must carry the convention the screen prints');
+}
+
+// ------------------------------------------------------------------- F6: birth zone
+{
+  const { resolveBirthZone, zoneMessage } = loadApp('src/components/birth-input.ts');
+  assert.strictEqual(resolveBirthZone({ zone: 'Asia/Kolkata' }, '1990-06-15', '09:30'), 5.5,
+    'a known zone must resolve');
+  assert.strictEqual(resolveBirthZone({ zone: 'America/New_York' }, '1990-06-15', '09:30'), -4,
+    'a known DST zone must resolve at the birth clock');
+  for (const bad of [{ zone: null }, { zone: '' }, {}, { zone: 'Mars/Olympus' }, { zone: 'GMT+5:30' }, null]) {
+    assert.strictEqual(resolveBirthZone(bad, '1990-06-15', '09:30'), null,
+      `an unresolvable zone (${JSON.stringify(bad)}) must REFUSE, not fall back to a default`);
+  }
+  /* `zone: undefined` is the dangerous one: Intl reads it as "not supplied" and answers
+     with the reader's own device zone, so the same couple would score differently on a
+     phone in Delhi and a laptop in California. */
+  assert.strictEqual(resolveBirthZone({ label: 'Somewhere' }, '1990-06-15', '09:30'), null,
+    'a place with no zone key must refuse — Intl would otherwise answer with the READER\'s timezone');
+  for (const hi of [false, true]) {
+    const msg = zoneMessage({ label: 'X', zone: null }, hi, { en: 'The bride\'s place of birth', hi: 'कन्या का जन्म स्थान' });
+    assert(msg.includes(hi ? 'कन्या' : 'bride'), 'the zone message must say WHOSE place could not be resolved');
+    assert(hi ? DEVANAGARI.test(msg) : !DEVANAGARI.test(msg), 'the zone message must be in the reader\'s language');
+  }
+  assert(!/\?\?\s*5\.5/.test(matchCode),
+    'the matching screen still falls back to Indian Standard Time when a timezone cannot be resolved');
+  assert(/resolveBirthZone/.test(matchScreen) && /zoneMessage/.test(matchScreen),
+    'the matching screen must resolve the birth zone through the shared guard and surface the failure');
+}
+
+// -------------------------------------------------------- F18: the Dashakoota table
+/* The Ashtakoota table sets borderCollapse, per-cell padding and a minWidth inside its
+   overflow container; the Dashakoota table was a bare <table> with bare <th>, so ten rows
+   of Devanagari kuta names crowded against their scores at 375px. Source-read, not
+   measured — renderToStaticMarkup has no layout box. */
+{
+  const tables = matchCode.match(/<table[^>]*>/g) || [];
+  assert.strictEqual(tables.length, 2, 'the matching screen should render exactly two score tables');
+  for (const t of tables) {
+    assert(/borderCollapse/.test(t), `a score table has no borderCollapse: ${t.slice(0, 60)}`);
+    assert(/minWidth/.test(t), `a score table has no minWidth inside its overflow container: ${t.slice(0, 60)}`);
+  }
+  assert.strictEqual((matchCode.match(/<th>/g) || []).length, 0,
+    'a score table still has unstyled <th> cells with no padding');
+  assert(/hi \? k\.noteHi : k\.note/.test(matchScreen), 'the Dashakoota rows must print the engine reading in the reader\'s language');
+}
+
+// ---------------------------------------------------- F21: the printed report header
+assert(!/\(\{bDate\} · \{bTime\}/.test(matchCode),
+  'the printed header still puts a raw ISO date in front of a Hindi reader');
+assert(/printedBirth\(/.test(matchScreen), 'the printed header must format each birth for the reader\'s language');
+{
+  const { offsetLabel } = loadApp('src/components/birth-input.ts');
+  assert.strictEqual(offsetLabel(5.5), 'UTC+05:30', 'offset label');
+  assert.strictEqual(offsetLabel(-4), 'UTC\u221204:00', 'negative offset label uses a real minus sign');
+}
 
 // ------------------------------------------------- one-sided Manglik is a block too
 const clean = { nak: 0, rashi: 0 }, alsoClean = { nak: 1, rashi: 4 };
@@ -210,4 +375,6 @@ assert(/if \(!bConfirmed \|\| !gConfirmed\)/.test(matchScreen),
 
 console.log(`dashakoota.cjs OK — 36-pt structure, Rajju & Vedha hard-blocks, real-chart anchor (24/good); ` +
   `swept ${combos.toLocaleString('en-US')} combinations: one verdict per input, 0 favourable-with-dosha, ` +
-  `8/8 distinct Hindi koota details, stale-place guard wired`);
+  `8/8 distinct Hindi koota details, stale-place guard wired; ` +
+  `${nadiWithException.toLocaleString('en-US')} Nadi and ${bhakootWithException.toLocaleString('en-US')} Bhakoot combinations now name the classical exception they used to hide, ` +
+  `10/10 Dashakoota rows bilingual and agreeing with their own score, Lahiri pinned on both charts, birth zone refuses instead of defaulting to IST`);

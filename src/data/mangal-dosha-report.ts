@@ -49,8 +49,13 @@ export const MANGAL_MITIGATION_COPY = {
     hi: "मंगल स्व/उच्च राशि में है, इसलिए कई परम्पराएँ तीव्रता कम मानती हैं।",
   },
   jupiterSupport: {
-    en: "Jupiter supports Mars by conjunction or full 7th aspect in this simple model.",
-    hi: "इस सरल मॉडल में गुरु युति या पूर्ण सप्तम दृष्टि से मंगल को समर्थन देता है।",
+    /* Jupiter's full aspects are the 5th, 7th and 9th from itself — the same set
+       Ganak's own bhava.ts scores. This card used to say "full 7th aspect", and the
+       engine tested only the 7th, so two of Jupiter's three aspects were invisible
+       and the dosha read stronger than the stated method warranted, on a page about
+       someone's marriage (bug bash 2026-08-18, F19). */
+    en: "Jupiter supports Mars by conjunction, or by its full 5th, 7th or 9th aspect.",
+    hi: "गुरु मंगल को युति से, अथवा अपनी पूर्ण पंचम, सप्तम या नवम दृष्टि से समर्थन देता है।",
   },
   traditionSpecific: {
     en: "A house-sign exception is noted in some traditions; treat it as context, not universal cancellation.",

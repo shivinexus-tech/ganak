@@ -9,13 +9,28 @@ const REF_LABELS = {
   venus: { en: "Venus", hi: "शुक्र" },
 } as const;
 
-const TRADITION_SPECIFIC_EXCEPTIONS = {
+/* House → the signs in which Mars sitting there is treated as an exception by some
+   traditions. The 1st-house row was missing: every published version of this list
+   opens with Mars in its own sign in the Lagna, and Ganak's table jumped straight
+   to the 2nd (bug bash 2026-08-18, F19). The outcome does not move — those signs
+   are already caught by the own/exalted branch below — but a method table that is
+   published on the page must match the method it claims. */
+export const TRADITION_SPECIFIC_EXCEPTIONS = {
+  1: [0, 7],
   2: [2, 5],
   4: [0, 7],
   7: [3, 9],
   8: [8, 11],
   12: [1, 6],
 };
+
+/* Jupiter's drishti. Jupiter casts a FULL aspect on the 5th, 7th and 9th from
+   itself — Ganak's own bhava.ts scores exactly that (frac 60 at hp 5, 7 and 9) —
+   but this file credited the 7th alone, so two of Jupiter's three full aspects
+   were invisible and the dosha's `strength` was reported higher than the stated
+   method warrants, on a page about someone's marriage (bug bash F19). Kept as a
+   named constant so the next reader can see it is the classical set, not a guess. */
+export const JUPITER_FULL_ASPECTS = [5, 7, 9];
 
 function houseFrom(sign: number, refSign: number) {
   return ((sign - refSign + 12) % 12) + 1;
@@ -35,7 +50,7 @@ export function mangalDoshaReport(input) {
     const mitigations: string[] = [];
     if (counted && [0, 7, 9].includes(mars.sign)) mitigations.push("ownOrExalted");
     const jupiterDistance = houseFrom(jupiter.sign, mars.sign);
-    if (counted && (jupiter.sign === mars.sign || jupiterDistance === 7)) mitigations.push("jupiterSupport");
+    if (counted && (jupiter.sign === mars.sign || JUPITER_FULL_ASPECTS.includes(jupiterDistance))) mitigations.push("jupiterSupport");
     if (counted && TRADITION_SPECIFIC_EXCEPTIONS[house]?.includes(mars.sign)) mitigations.push("traditionSpecific");
     return {
       ...ref,
@@ -66,5 +81,6 @@ export function mangalDoshaReport(input) {
       ? "Mars is in its own or exaltation sign; some traditions treat this as mitigation, not automatic cancellation."
       : null,
     methodKey: "mars-1-2-4-7-8-12-from-lagna-moon-venus",
+    jupiterAspects: JUPITER_FULL_ASPECTS,
   };
 }
