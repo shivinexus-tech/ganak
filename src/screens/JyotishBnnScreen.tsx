@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { T } from "../components/ui-style-contract";
 import { fmtDateT } from "../components/format";
-import { signShort, planetName } from "../i18n/panchang-terms";
+import { signShort, panchangTerm } from "../i18n/panchang-terms";
 import {
   BNN_PLANETS, BNN_KARAKA, bnnRelations, bnnReading, bnnTiming,
   bcpTimeline, bspRules, jupiterProgression,
@@ -12,6 +12,11 @@ import { planetGochar } from "../engine/gochar";
 
 function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
   const hi = lang === "hi";
+  /* Planet names are engine keys, not display text: every screen must print them
+     through the one i18n table (E-1.0 / language-leak-scan). Caught 2026-08-18 by
+     the first rendered snapshot of this module, which showed "Venus" and "Saturn"
+     in Hindi mode. Colour maps and state still key off the English name. */
+  const PL = (name) => panchangTerm(lang, "planet", name);
   const [sex, setSex] = useState("male");
   const [ref, setRef] = useState("Jupiter");
   const setSexAnd = (sx) => { setSex(sx); setRef(sx === "male" ? "Jupiter" : "Venus"); };
@@ -61,7 +66,7 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
         <div style={{ flex: 1, minWidth: "10rem" }}>
           <label style={lab}>{hi ? "जिसे लग्न मानकर पढ़ें" : "Read from (lagna)"}</label>
           <select value={ref} onChange={(e) => setRef(e.target.value)} style={{ width: "100%", padding: "0.5625rem 0.75rem", borderRadius: "0.5rem", border: `0.0625rem solid ${C.line}`, background: "var(--surface-sunken)", color: C.ivory, fontFamily: "var(--font-body-family)", fontSize: "var(--font-body)" }}>
-            {BNN_PLANETS.map((p) => <option key={p} value={p}>{p}{p === "Jupiter" ? (hi ? " — जीव / स्वयं (वर)" : " — jeeva / self (male)") : p === "Venus" ? (hi ? " — जीवनसाथी / स्वयं (कन्या)" : " — spouse / self (female)") : ""}</option>)}
+            {BNN_PLANETS.map((p) => <option key={p} value={p}>{PL(p)}{p === "Jupiter" ? (hi ? " — जीव / स्वयं (वर)" : " — jeeva / self (male)") : p === "Venus" ? (hi ? " — जीवनसाथी / स्वयं (कन्या)" : " — spouse / self (female)") : ""}</option>)}
           </select>
         </div>
       </div>
@@ -75,7 +80,7 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
             {d.planets.length === 0 ? <div style={{ fontSize: "var(--font-small)", color: C.muted, fontStyle: "italic" }}>—</div> :
               d.planets.map((p) => (
                 <div key={p.name} style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem", fontSize: "var(--font-small)", padding: "0.125rem 0" }}>
-                  <span style={{ fontFamily: "var(--font-display-family)", color: C.ivory }}>{p.name}{p.retro ? <span style={{ color: C.sindoor, fontSize: "var(--font-label)" }}> ℞</span> : ""}</span>
+                  <span style={{ fontFamily: "var(--font-display-family)", color: C.ivory }}>{PL(p.name)}{p.retro ? <span style={{ color: C.sindoor, fontSize: "var(--font-label)" }}> ℞</span> : ""}</span>
                   <span style={{ color: C.muted, fontSize: "var(--font-label)", fontVariantNumeric: "tabular-nums" }}>{signShort(lang, p.sign)} {fmtD(p.deg)}</span>
                 </div>
               ))}
@@ -85,7 +90,7 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
 
       {/* relation grid from reference */}
       <div style={{ ...T.label, color: C.muted, margin: `${T.s5} 0 ${T.s2}` }}>
-        {hi ? `${ref} के साथ संबंध` : `Combinations with ${ref}`} <span style={{ textTransform: "none", letterSpacing: 0 }}>— {hi ? "पारंपरिक कारकत्व" : BNN_KARAKA[ref]}</span>
+        {hi ? `${PL(ref)} के साथ संबंध` : `Combinations with ${ref}`} <span style={{ textTransform: "none", letterSpacing: 0 }}>— {hi ? "पारंपरिक कारकत्व" : BNN_KARAKA[ref]}</span>
       </div>
       <div style={{ ...card, padding: "0.375rem 0.25rem" }}>
         {RELS.map(([key, title, sub], i) => {
@@ -101,7 +106,7 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
               <div style={{ paddingTop: "0.0625rem" }}>
                 {names.length === 0 ? <span style={{ fontSize: "var(--font-small)", color: C.line }}>—</span> :
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem 0.875rem" }}>
-                    {names.map((n) => tag(n, BNN_KARAKA[n].split(",")[0]))}
+                    {names.map((n) => tag(PL(n), BNN_KARAKA[n].split(",")[0]))}
                   </div>}
               </div>
             </div>
@@ -115,7 +120,7 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
         {bnn.coreCombos.map((c) => (
           <div key={c.pair.join()} style={{ ...card, padding: "0.6875rem 0.8125rem", borderLeft: `0.1875rem solid ${c.active ? "var(--good)" : C.line}`, opacity: c.active ? 1 : 0.6 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: c.active ? C.ivory : C.muted }}>{c.pair[0]} + {c.pair[1]}</span>
+              <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: c.active ? C.ivory : C.muted }}>{PL(c.pair[0])} + {PL(c.pair[1])}</span>
               <span style={{ fontSize: "var(--font-micro)", letterSpacing: ".1em", textTransform: "uppercase", color: c.active ? "var(--good)" : C.muted }}>{c.active ? (hi ? "सक्रिय" : "active") : "—"}</span>
             </div>
             <div style={{ fontSize: "var(--font-label)", color: C.muted, marginTop: "0.1875rem" }}>{c.relation}</div>
@@ -127,9 +132,9 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
       {/* modulators */}
       {(bnn.parivartana.length > 0 || (bnn.rahuKetu && (bnn.rahuKetu.rahuSide.length || bnn.rahuKetu.ketuSide.length)) || bnn.retroShadow.length > 0) && (
         <div style={{ ...card, padding: "0.8125rem 0.9375rem", marginTop: "1rem", fontSize: "var(--font-small)", color: C.muted, lineHeight: 1.6 }}>
-          {bnn.parivartana.length > 0 && <div><span style={{ color: C.gold, fontFamily: "var(--font-display-family)" }}>{hi ? "परिवर्तन योग" : "Parivartana"}</span> {hi ? "(राशि-विनिमय — दोनों को अपनी राशि जैसा पढ़ें)" : "(exchange — read each as in its own sign)"}: {bnn.parivartana.map((p) => p.join(" ⇄ ")).join("; ")}</div>}
-          {bnn.rahuKetu && <div style={{ marginTop: bnn.parivartana.length ? 6 : 0 }}><span style={{ color: C.gold, fontFamily: "var(--font-display-family)" }}>{hi ? "राहु–केतु विभाजन" : "Rahu–Ketu split"}</span> {hi ? "(अलग पक्ष के ग्रह पृथक कार्य करते हैं)" : "(separated planets act apart)"}: {hi ? "राहु पक्ष" : "Rahu side"} — {bnn.rahuKetu.rahuSide.join(", ") || "—"} · {hi ? "केतु पक्ष" : "Ketu side"} — {bnn.rahuKetu.ketuSide.join(", ") || "—"}</div>}
-          {bnn.retroShadow.length > 0 && <div style={{ marginTop: "0.375rem" }}><span style={{ color: C.gold, fontFamily: "var(--font-display-family)" }}>{hi ? "वक्री छाया" : "Retrograde shadow"}</span> {hi ? "(द्वादश राशि से भी पढ़ें)" : "(also reads from the 12th sign)"}: {bnn.retroShadow.map((r) => `${r.name} → ${signShort(lang, r.shadowSign)}`).join(", ")}</div>}
+          {bnn.parivartana.length > 0 && <div><span style={{ color: C.gold, fontFamily: "var(--font-display-family)" }}>{hi ? "परिवर्तन योग" : "Parivartana"}</span> {hi ? "(राशि-विनिमय — दोनों को अपनी राशि जैसा पढ़ें)" : "(exchange — read each as in its own sign)"}: {bnn.parivartana.map((p) => p.map(PL).join(" ⇄ ")).join("; ")}</div>}
+          {bnn.rahuKetu && <div style={{ marginTop: bnn.parivartana.length ? 6 : 0 }}><span style={{ color: C.gold, fontFamily: "var(--font-display-family)" }}>{hi ? "राहु–केतु विभाजन" : "Rahu–Ketu split"}</span> {hi ? "(अलग पक्ष के ग्रह पृथक कार्य करते हैं)" : "(separated planets act apart)"}: {hi ? "राहु पक्ष" : "Rahu side"} — {bnn.rahuKetu.rahuSide.map(PL).join(", ") || "—"} · {hi ? "केतु पक्ष" : "Ketu side"} — {bnn.rahuKetu.ketuSide.map(PL).join(", ") || "—"}</div>}
+          {bnn.retroShadow.length > 0 && <div style={{ marginTop: "0.375rem" }}><span style={{ color: C.gold, fontFamily: "var(--font-display-family)" }}>{hi ? "वक्री छाया" : "Retrograde shadow"}</span> {hi ? "(द्वादश राशि से भी पढ़ें)" : "(also reads from the 12th sign)"}: {bnn.retroShadow.map((r) => `${PL(r.name)} → ${signShort(lang, r.shadowSign)}`).join(", ")}</div>}
         </div>
       )}
 
@@ -153,12 +158,12 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem 0.375rem" }}>
                     {p.activated.map((a) => {
                       const c = a.relation === "conjunct" ? { bg: "var(--good-surface)", fg: "var(--good)", b: "var(--good)" } : a.relation === "trine" ? { bg: "transparent", fg: C.gold, b: C.line } : { bg: "transparent", fg: C.muted, b: C.line };
-                      return <span key={a.planet} title={themeText(a.theme)} style={{ fontSize: "var(--font-label)", padding: "0.125rem 0.5rem", borderRadius: "0.6875rem", border: `0.0625rem solid ${c.b}`, background: c.bg, color: c.fg }}>{a.planet} <span style={{ fontSize: "var(--font-micro)", opacity: 0.8 }}>{hi ? (relationHi[a.relation] || a.relation) : a.relation}</span></span>;
+                      return <span key={a.planet} title={themeText(a.theme)} style={{ fontSize: "var(--font-label)", padding: "0.125rem 0.5rem", borderRadius: "0.6875rem", border: `0.0625rem solid ${c.b}`, background: c.bg, color: c.fg }}>{PL(a.planet)} <span style={{ fontSize: "var(--font-micro)", opacity: 0.8 }}>{hi ? (relationHi[a.relation] || a.relation) : a.relation}</span></span>;
                     })}
                   </div>}
                 {isNow && !quiet && (
                   <div style={{ marginTop: "0.375rem", fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.45 }}>
-                    {p.activated.filter((a) => a.relation === "conjunct" || a.relation === "trine").slice(0, 2).map((a) => <div key={a.planet}>{hi ? "गुरु" : "Jupiter"} + {a.planet}: {themeText(a.theme)}</div>)}
+                    {p.activated.filter((a) => a.relation === "conjunct" || a.relation === "trine").slice(0, 2).map((a) => <div key={a.planet}>{hi ? "गुरु" : "Jupiter"} + {PL(a.planet)}: {themeText(a.theme)}</div>)}
                   </div>
                 )}
               </div>
@@ -168,18 +173,18 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
       </div>
 
       {/* Tier C — hedged traditional reading (themes, not prediction) */}
-      <div style={{ ...T.label, color: C.muted, margin: `${T.s5} 0 ${T.s2}` }}>{hi ? `परंपरा इसे कैसे पढ़ती है · ${ref}` : `How the tradition reads this · ${ref}`}</div>
+      <div style={{ ...T.label, color: C.muted, margin: `${T.s5} 0 ${T.s2}` }}>{hi ? `परंपरा इसे कैसे पढ़ती है · ${PL(ref)}` : `How the tradition reads this · ${ref}`}</div>
       <div style={{ ...card, padding: "1rem 1.125rem", borderTop: `0.1875rem solid ${C.gold}` }}>
         <div style={{ fontSize: "var(--font-small)", color: C.ivory, lineHeight: 1.6 }}>
-          {hi ? <><span style={{ fontFamily: "var(--font-display-family)", color: C.gold }}>{reading.self}</span> को संदर्भ मानकर बीएनएन परंपरा इन सक्रिय ग्रह-संबंधों को विषयों के रूप में पढ़ती है:</> : <>With <span style={{ fontFamily: "var(--font-display-family)", color: C.gold }}>{reading.self}</span> as the reference ({reading.selfKaraka}), BNN tradition reads its active combinations as these themes:</>}
+          {hi ? <><span style={{ fontFamily: "var(--font-display-family)", color: C.gold }}>{PL(reading.self)}</span> को संदर्भ मानकर बीएनएन परंपरा इन सक्रिय ग्रह-संबंधों को विषयों के रूप में पढ़ती है:</> : <>With <span style={{ fontFamily: "var(--font-display-family)", color: C.gold }}>{reading.self}</span> as the reference ({reading.selfKaraka}), BNN tradition reads its active combinations as these themes:</>}
         </div>
         {reading.active.length === 0 ? (
-          <div style={{ fontSize: "var(--font-small)", color: C.muted, marginTop: "0.625rem", fontStyle: "italic" }}>{hi ? `${reading.self} के साथ कोई ग्रह-संबंध नहीं है — इसे मुख्यतः उसकी राशि के गुणों से पढ़ें।` : `No planets stand in combination with ${reading.self} — the tradition would read it as largely on its own, taking the quality of its sign.`}</div>
+          <div style={{ fontSize: "var(--font-small)", color: C.muted, marginTop: "0.625rem", fontStyle: "italic" }}>{hi ? `${PL(reading.self)} के साथ कोई ग्रह-संबंध नहीं है — इसे मुख्यतः उसकी राशि के गुणों से पढ़ें।` : `No planets stand in combination with ${reading.self} — the tradition would read it as largely on its own, taking the quality of its sign.`}</div>
         ) : (
           <ul style={{ margin: "0.625rem 0 0", padding: 0, listStyle: "none" }}>
             {reading.active.map((a) => (
               <li key={a.planet} style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "0.625rem", padding: "0.375rem 0", borderTop: "0.0625rem solid var(--line-soft)", alignItems: "baseline" }}>
-                <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-small)", color: C.gold, whiteSpace: "nowrap" }}>+ {a.planet} <span style={{ fontSize: "var(--font-micro)", color: C.muted }}>{a.relation}</span></span>
+                <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-small)", color: C.gold, whiteSpace: "nowrap" }}>+ {PL(a.planet)} <span style={{ fontSize: "var(--font-micro)", color: C.muted }}>{a.relation}</span></span>
                 <span style={{ fontSize: "var(--font-small)", color: C.muted, lineHeight: 1.45 }}>{themeText(a.theme)}</span>
               </li>
             ))}
@@ -187,7 +192,7 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
         )}
         {reading.obstructed.length > 0 && (
           <div style={{ fontSize: "var(--font-label)", color: C.muted, marginTop: "0.75rem", lineHeight: 1.45 }}>
-            <span style={{ color: C.sindoor }}>{hi ? "अवरुद्ध रूप में पढ़ें" : "Read as obstructed"}</span> {hi ? "(गुप्त 4/6/8/10 भावों में)" : "(in the hidden 4/6/8/10 houses)"}: {reading.obstructed.map((o) => o.planet).join(", ")} — {hi ? "इन कारकत्वों को रुका हुआ या भीतर की ओर मुड़ा माना जाता है।" : "the tradition treats these significations as held back or turned inward."}
+            <span style={{ color: C.sindoor }}>{hi ? "अवरुद्ध रूप में पढ़ें" : "Read as obstructed"}</span> {hi ? "(गुप्त 4/6/8/10 भावों में)" : "(in the hidden 4/6/8/10 houses)"}: {reading.obstructed.map((o) => PL(o.planet)).join(", ")} — {hi ? "इन कारकत्वों को रुका हुआ या भीतर की ओर मुड़ा माना जाता है।" : "the tradition treats these significations as held back or turned inward."}
           </div>
         )}
         <div style={{ fontSize: "var(--font-label)", color: C.muted, marginTop: "0.875rem", paddingTop: "0.75rem", borderTop: `0.0625rem dashed ${C.line}`, lineHeight: 1.55, fontStyle: "italic" }}>
@@ -204,6 +209,7 @@ function BNNModule({ bnn, rows, tz, C, card, lang = "en" }) {
 
 function BhriguModule({ rows, ascSign, birthMs, tz, C, card, lang = "en" }) {
   const hi = lang === "hi";
+  const PL = (name) => panchangTerm(lang, "planet", name); // see BNNModule — engine key in, display name out
   const YEAR_MS = 365.25 * 86400000;
   const currentAge = Math.max(0, Math.floor((Date.now() - birthMs) / YEAR_MS));
   const birthYear = new Date(birthMs + tz * 3600000).getFullYear();
@@ -230,11 +236,11 @@ function BhriguModule({ rows, ascSign, birthMs, tz, C, card, lang = "en" }) {
               </div>
               <div>
                 <div style={{ fontSize: "var(--font-small)", color: C.ivory }}>{ord(b.houseNum)} · {signShort(lang, b.sign)}</div>
-                <div style={{ fontSize: "var(--font-micro)", letterSpacing: ".06em", color: lordColor[b.cycleLord] || C.muted }}>{planetName(lang, b.cycleLord)} {hi ? "चक्र" : "cycle"}</div>
+                <div style={{ fontSize: "var(--font-micro)", letterSpacing: ".06em", color: lordColor[b.cycleLord] || C.muted }}>{PL(b.cycleLord)} {hi ? "चक्र" : "cycle"}</div>
               </div>
               <div style={{ fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.4 }}>
                 {hi ? "इस वर्ष सक्रिय भाव के सामान्य जीवन-विषय" : b.theme}
-                {b.occupants.length > 0 && <span style={{ color: C.gold }}> · {b.occupants.map((pl: string) => planetName(lang, pl)).join(", ")} {hi ? "यहाँ" : "here"}</span>}
+                {b.occupants.length > 0 && <span style={{ color: C.gold }}> · {b.occupants.map(PL).join(", ")} {hi ? "यहाँ" : "here"}</span>}
               </div>
             </div>
           );
@@ -248,12 +254,12 @@ function BhriguModule({ rows, ascSign, birthMs, tz, C, card, lang = "en" }) {
         {bsp.map((r, i) => (
           <div key={i} style={{ display: "grid", gridTemplateColumns: "118px 1fr", gap: "0.625rem", padding: "0.5625rem 0.75rem", borderTop: i ? "0.0625rem solid var(--line-soft)" : "none", alignItems: "baseline" }}>
             <div>
-              <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-small)", color: lordColor[r.planet] || C.ivory }}>{r.planet}</div>
+              <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-small)", color: lordColor[r.planet] || C.ivory }}>{PL(r.planet)}</div>
               <div style={{ fontSize: "var(--font-micro)", color: C.muted }}>{r.age ? `${hi ? "आयु" : "age"} ${r.age}` : (hi ? "जीवनभर" : "lifelong")} · {hi ? `अपने से ${ord(r.from)}` : `${ord(r.from)} from self`}</div>
             </div>
             <div style={{ fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.45 }}>
               {hi ? "पड़ता है" : "lands on"} <span style={{ color: C.ivory }}>{signShort(lang, r.targetSign)}</span> ({hi ? `लग्न से ${ord(r.houseFromLagna)} भाव` : `${ord(r.houseFromLagna)} house`}) — {hi ? "इस भाव के विषय सक्रिय माने जाते हैं" : r.theme}
-              {r.occupants.length > 0 && <span style={{ color: C.gold }}> · {hi ? "साथ" : "with"} {r.occupants.join(", ")}</span>}
+              {r.occupants.length > 0 && <span style={{ color: C.gold }}> · {hi ? "साथ" : "with"} {r.occupants.map(PL).join(", ")}</span>}
             </div>
           </div>
         ))}
@@ -275,7 +281,7 @@ function BhriguModule({ rows, ascSign, birthMs, tz, C, card, lang = "en" }) {
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "0.1875rem 0.375rem" }}>
                     {p.activated.map((a) => {
                       const c = a.relation === "conjunct" ? "var(--good)" : a.relation === "trine" ? C.gold : C.muted;
-                      return <span key={a.planet} title={hi ? "ग्रह-संबंध सक्रिय" : a.theme} style={{ fontSize: "var(--font-label)", padding: "0.0625rem 0.4375rem", borderRadius: "0.625rem", border: `0.0625rem solid ${C.line}`, color: c }}>{a.planet} <span style={{ fontSize: "var(--font-micro)", opacity: 0.8 }}>{hi ? ({ conjunct: "युति", trine: "त्रिकोण", opposition: "विरोध" }[a.relation] || a.relation) : a.relation}</span></span>;
+                      return <span key={a.planet} title={hi ? "ग्रह-संबंध सक्रिय" : a.theme} style={{ fontSize: "var(--font-label)", padding: "0.0625rem 0.4375rem", borderRadius: "0.625rem", border: `0.0625rem solid ${C.line}`, color: c }}>{PL(a.planet)} <span style={{ fontSize: "var(--font-micro)", opacity: 0.8 }}>{hi ? ({ conjunct: "युति", trine: "त्रिकोण", opposition: "विरोध" }[a.relation] || a.relation) : a.relation}</span></span>;
                     })}
                   </div>}
               </div>
