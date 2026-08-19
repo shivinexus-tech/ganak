@@ -1,6 +1,6 @@
 # Festival day rules — sourcing note
 
-**Status:** IN PROGRESS (research complete, implementation under way)
+**Status:** IMPLEMENTED — gated by `validation/festival-day-rules.cjs`
 **Research date:** 2026-08-18
 **Scope:** which *kala* (part of the day) decides the civil date of an observance,
 for the three defects handed over by
@@ -15,7 +15,7 @@ for the three defects handed over by
 
 Ganak ran **every** Vaishakha festival on the sunrise (*udaya*) rule. Three of
 them do not use it: Narasimha Jayanti and Chhinnamasta Jayanti are decided at
-**sunset**, and Vat Savitri at **midday**. Because the wrong kala was being
+**sunset**, and Vat Savitri at the **Madhyahna/Aparahna junction**. Because the wrong kala was being
 asked, two festivals could vanish entirely and a third was up to a day late —
 in most years, not rare ones.
 
@@ -115,7 +115,7 @@ Jayanti share a tithi and land on different days.
 
 ---
 
-## 2. Vat Savitri — midday, not sunrise
+## 2. Vat Savitri — the Aparahna junction, not sunrise
 
 ### 2.1 The defect
 
@@ -125,22 +125,29 @@ early in the morning.
 
 ### 2.2 The rule implemented
 
-> **Take the day on which Amavasya prevails during Madhyahna** — the middle
-> fifth of the daytime. When Amavasya reaches into Madhyahna on two consecutive
-> days, take the day that holds the **greater share** of it.
+> **Take the day on which Amavasya is running at the moment Aparahna begins** —
+> three fifths of the way from sunrise to sunset, the junction between Madhyahna
+> and Aparahna. When Amavasya is running there on two consecutive days, take
+> the **earlier** (*purva*).
+
+This is the ordinary *aparahna-vyapini* test as panchang-makers apply it: a kala
+is pervaded when the tithi is running at its commencement, not merely when the
+tithi touches the interval somewhere. Ganak already probes sunrise (`udaya`) and
+sunset the same way, so this adds one more instant of the same kind rather than
+a new kind of rule.
 
 Shani Jayanti is left on the sunrise rule, which is what Drik's own Shani
 Jayanti pages reproduce ("Shani Jayanti is observed on Amavasya Tithi during
 Jyeshtha month according to North Indian Purnimanta calendar").
 
 **Source confidence: HIGH for the dates, MEDIUM for the rule statement.** No
-published source found states the kala for Vat Savitri. Drik publishes the
-dates and the tithi timestamps but no nirnaya sentence; Wikipedia ("Savitri
+published source found states the kala for Vat Savitri in words. Drik publishes
+the dates and the tithi timestamps but no nirnaya sentence; Wikipedia ("Savitri
 Vrata") records only the *tithi* dispute (Nirnayamrit: Jyeshtha Amavasya;
-Skanda Purana: Jyeshtha Purnima) which Ganak already models as Vat Savitri vs
-Vat Purnima. The kala below is therefore **derived from twelve years of
-published dates**, not quoted. See § 2.4 for the alternative formulation that
-fits the same data and the years where the two could differ.
+Skanda Purana: Jyeshtha Purnima), which Ganak already models as Vat Savitri vs
+Vat Purnima. The kala is therefore **derived from twelve published dates**, not
+quoted. § 2.4 records the rival reading that was tested and rejected, and how
+it was rejected.
 
 ### 2.3 Every published date checked
 
@@ -149,19 +156,26 @@ and `.../festivals/shani-jayanti/shani-jayanti-date-time.html`, all fetched 2026
 
 | Year | Jyeshtha Amavasya (Ganak) | Drik Vat Savitri | Drik Shani Jayanti | Ganak **before** |
 | --- | --- | --- | --- | --- |
+| 1969 | 15 May 12:34 → 16 May 13:56 | **15 May** | — | 16 May ✗ |
+| 1994 | 08 Jun 12:05 → 09 Jun 13:56 | **08 Jun** | — | 09 Jun ✗ |
+| 1995 | 28 May 12:29 → 29 May 14:57 | **28 May** | — | 29 May ✗ |
+| 1997 | 04 Jun 13:29 → 05 Jun 12:33 | **04 Jun** | — | 05 Jun ✗ |
 | 2024 | 05 Jun 19:55 → 06 Jun 18:07 | **06 Jun** | 06 Jun | 06 Jun |
 | 2025 | 26 May 12:12 → 27 May 08:32 | **26 May** | 27 May | 27 May ✗ |
 | 2026 | 16 May 05:11 → 17 May 01:31 | **16 May** | 16 May | 16 May |
 | 2028 | 23 May 14:10 → 24 May 13:46 | **24 May** | — | 24 May |
 | 2029 | 11 Jun 08:18 → 12 Jun 09:21 | **11 Jun** | 12 Jun | 12 Jun ✗ |
 | 2030 | 31 May 09:16 → 01 Jun 11:51 | **31 May** | **01 Jun** | 01 Jun ✗ |
-| 2031 | 20 May 11:15 → 21 May 12:47 | **20 May** | — | 21 May ✗ |
-| 2034 | 17 May 12:31 → 18 May 08:42 | **17 May** | — | 18 May ✗ |
+| 2031 | 20 May 11:15 → 21 May 12:47 | **20 May** | **21 May** | 21 May ✗ |
+| 2034 | 17 May 12:31 → 18 May 08:42 | **17 May** | **18 May** | 18 May ✗ |
 
-2028 is the case that rules out the simpler "always take the day Amavasya
-begins": Amavasya begins 14:10 on 23 May, **after** Madhyahna has closed
-(10:55–13:40), so the 23rd carries none of it and the 24th — which holds only
-its first five minutes — is the day Drik publishes. Ganak reproduces that.
+**2028 is the case that rules out "always take the day Amavasya begins".**
+Amavasya begins 14:10 on 23 May, *after* the Aparahna junction at 13:40, so the
+23rd does not pervade Aparahna at all; the 24th does — by six minutes, because
+Amavasya runs there until 13:46. Drik publishes 24 May and Ganak reproduces it.
+
+**1995 is the case that fixes the tie-break.** Amavasya runs across the Aparahna
+junction on *both* 28 and 29 May. Drik publishes 28 May, the earlier.
 
 **Second, independent source for the split:** `nayidrishtipanchang.com`
 (Hindi), "वट सावित्री व्रत 2029", gives **11 June 2029** with the same Amavasya
@@ -171,20 +185,25 @@ does *not* split the two. Drik does split them, and Drik is Ganak's declared
 benchmark (AGENTS.md), so Ganak follows Drik: Vat Savitri 11 June, Shani
 Jayanti 12 June 2029.
 
-### 2.4 The formulation question, left open honestly
+### 2.4 The rival reading, tested and rejected
 
-Two statements of the rule fit **all eight** published dates identically:
+An earlier draft of this fix used **(A) greatest share of Madhyahna** — the
+middle fifth of the daytime. It fits every one of the eight *modern* anchors
+(2024–2034) exactly as well as the implemented **(B) running at the Aparahna
+junction, earlier day if both**. The two are not equivalent: swept over
+1900–2100 they choose different days in **ten** years — 1932, 1933, 1944,
+**1969**, **1994**, **1995**, **1997**, 2057, 2084, 2090.
 
-- **(A) implemented** — Amavasya prevailing during Madhyahna; greater share wins.
-- **(B) alternative** — Amavasya prevailing at the *instant Aparahna begins*
-  (three fifths of the way from sunrise to sunset). Single-valued, no tie-break.
+Four of those ten are published, and **all four go to B**: Drik gives
+1969-05-15, 1994-06-08, 1995-05-28 and 1997-06-04, while A would have said
+16 May, 9 June, 29 May and 5 June. That is why B ships. The ten-year
+disagreement set is pinned in `validation/festival-day-rules.cjs` § 5, so the
+question cannot be quietly re-opened by a later edit.
 
-They can only diverge when Amavasya both starts inside Madhyahna on one day and
-ends inside Madhyahna on the next. § 5 of the gate reports how often that
-happens in 1900–2100. (A) was chosen because it reuses the existing, already
-gated `tithiKalaOverlap` machinery and is a standard *vyapini* formulation
-rather than an instant probe. **Open question for the owner / a sourcing pass:
-find a Dharmasindhu or Nirnayasindhu sentence that settles A vs B.**
+**Residual honesty.** 2084 is a knife-edge year: Amavasya begins within a minute
+of the Aparahna junction, so the day it lands on depends on rounding rather than
+on the rule. Nothing published covers it. It is not a defect to fix; it is a
+limit of the precision the rule itself has.
 
 ---
 

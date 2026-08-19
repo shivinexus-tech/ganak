@@ -279,7 +279,15 @@ const EKADASHI_NAMES = {
   "Margshirsh_Krishna_11": { en: "Utpanna Ekadashi", hi: "उत्पन्ना एकादशी" },
   "Paush_Krishna_11": { en: "Safala Ekadashi", hi: "सफला एकादशी" },
   "Magh_Krishna_11": { en: "Shattila Ekadashi", hi: "षट्तिला एकादशी" },
-  "Phalgun_Krishna_11": { en: "Vijaya Ekadashi", hi: "विजया एकादशी" }
+  "Phalgun_Krishna_11": { en: "Vijaya Ekadashi", hi: "विजया एकादशी" },
+  /* An Adhika (intercalary / Purushottama) month carries two Ekadashis of its
+     own, which do NOT borrow the surrounding month's vrata names. Sourced in
+     plans/research/ekadashi-lunar-month-naming.md § 5 (Drik's dated lists plus
+     Wikipedia's Ekadashi table). Until 2026-08-18 these two showed as a plain
+     unnamed "Ekadashi" because a named label needs a guide route; both now have
+     one. Affected years: 2026, 2029, 2031, 2034. */
+  "Adhik_Shukla_11": { en: "Padmini Ekadashi", hi: "पद्मिनी एकादशी" },
+  "Adhik_Krishna_11": { en: "Parama Ekadashi", hi: "परमा एकादशी" }
 };
 /* Named Ekadashi identities use the Purnimanta month during Krishna Paksha.
    Thus Amanta Ashadha / Purnimanta Shravana is Kamika, not Yogini. This is an
@@ -293,10 +301,9 @@ function ekadashiIdentityMonth(months, krishna) {
     ? months
     : ((krishna ? months.purnimanta : months.amanta) || months.purnimanta || months.amanta || null);
   // Adhik-masa Ekadashis have separate identities: Padmini (Shukla) and Parama
-  // (Krishna). Their two guide pages do not exist yet and festival-page-coverage
-  // requires a route for every named label, so fall back VISIBLY to the generic
-  // Ekadashi rather than misnaming them as the ordinary month's vrata.
-  if (/\(Adhik\)/.test(String(raw || ""))) return null;
+  // (Krishna). They never take the surrounding month's vrata name, so an Adhika
+  // month resolves to its own key rather than to Chaitra, Vaishakha and so on.
+  if (/\(Adhik\)/.test(String(raw || ""))) return "Adhik";
   const keyByPanchangMonth = {
     Chaitra: "Chaitra", Vaishakha: "Vaisakha", Vaisakha: "Vaisakha", Jyeshtha: "Jyeshtha",
     Ashadha: "Ashadha", Shravana: "Shravan", Shravan: "Shravan", Bhadrapada: "Bhadrapad",
@@ -376,10 +383,20 @@ const FESTIVALS = [
   { key: "sitaNavami", month: 1, krishna: false, tithi: 9, kala: "udaya" },
   { key: "naradaJayanti", month: 1, krishna: true, tithi: 1, kala: "udaya" },
   { key: "bagalamukhiJayanti", month: 1, krishna: false, tithi: 8, kala: "udaya" },
-  { key: "chhinnamastaJayanti", month: 1, krishna: false, tithi: 14, kala: "udaya" },
-  { key: "narasimhaJayanti", month: 1, krishna: false, tithi: 14, kala: "udaya" },
+  { key: "chhinnamastaJayanti", month: 1, krishna: false, tithi: 14, policy: "sunsetVyapini", selection: "last" },
+  { key: "narasimhaJayanti", month: 1, krishna: false, tithi: 14, policy: "sunsetVyapini", selection: "last" },
   { key: "buddhaPurnima", month: 1, krishna: false, tithi: 15, kala: "udaya" },
-  { key: "vatSavitri", month: 1, krishna: true, tithi: 15, kala: "udaya" },
+  /* Vat Savitri is Aparahna-vyapini, NOT udaya, which is why it separates from
+     Shani Jayanti when Jyeshtha Amavasya ends early in the morning (Drik 2029:
+     Vat Savitri 11 Jun, Shani Jayanti 12 Jun; both 16 May in 2026, an ordinary
+     year). Take the day on which Amavasya is running when Aparahna begins;
+     `selection: "first"` takes the earlier day when both are (Drik 1995:
+     Amavasya 28 May 12:29 - 29 May 14:57, published 28 May). Shani Jayanti
+     below keeps the sunrise rule. Twelve published dates, 1969-2034, are gated
+     by validation/festival-day-rules.cjs;
+     plans/research/festival-day-rules.md § 2 records that no source states the
+     kala in words — it is derived from those dates. */
+  { key: "vatSavitri", month: 1, krishna: true, tithi: 15, kala: "aparahnaBegins", selection: "first" },
   { key: "shaniJayanti", month: 1, krishna: true, tithi: 15, kala: "udaya" },
   { key: "vatPurnima", month: 2, krishna: false, tithi: 15, kala: "udaya", skipAdhik: true },
   { key: "dhumavatiJayanti", month: 2, krishna: false, tithi: 8, kala: "udaya", skipAdhik: true },
@@ -496,7 +513,18 @@ function scanDayParts(y, m, day, fallbackTz, place) {
     pratahkala: [rise, rise + dayLen / 5],
     purvahna: [rise, rise + 2 * dayLen / 5],
     madhyahna: [rise + 2 * dayLen / 5, rise + 3 * dayLen / 5],
+    /* The Madhyahna/Aparahna junction, probed the way `udaya` probes sunrise: a
+       tithi "pervades Aparahna" when it is running at the moment Aparahna
+       begins, not merely when it touches the interval somewhere. Vat Savitri is
+       decided here — see FESTIVALS below and
+       plans/research/festival-day-rules.md § 2. */
+    aparahnaBegins: [rise + 3 * dayLen / 5, rise + 3 * dayLen / 5 + 60000],
     aparahna: [rise + 3 * dayLen / 5, rise + 4 * dayLen / 5],
+    /* Sayahna is the fifth and last of the five equal day-parts. Drik publishes
+       it by name as the Narasimha Jayanti puja window and it matches exactly:
+       New Delhi 2024-05-21, sunrise 05:27, sunset 19:09, "Sayana Kala Puja Time
+       04:24 PM to 07:09 PM" = the final fifth of a 13h42m day. */
+    sayahna: [rise + 4 * dayLen / 5, set],
     sunset: [set - 60000, set + 60000],
     pradosha: [set - dayLen / 10, set + nightLen / 10],
     nishita: [nightMid - nightLen / 30, nightMid + nightLen / 30],
@@ -558,6 +586,25 @@ function festivalMatch(f, parts) {
     }
     return null;
   }
+  /* Sunset-vyapini (Narasimha Jayanti, Chhinnamasta Jayanti — Vaishakha Shukla
+     Chaturdashi). NOT the sunrise rule: Drik states the reason on every
+     Narasimha Jayanti page — "It is believed that Lord Narasimha was appeared
+     during sunset while Chaturdashi was prevailing" — and publishes the puja
+     window as Sayahna Kala. Take the day whose SUNSET carries the tithi; when
+     two consecutive sunsets carry it, `selection: "last"` takes the later
+     (Drik 2025: Chaturdashi 10 May 17:30 - 11 May 20:02, published 11 May).
+     When neither sunset carries it, fall back to the greater share of Sayahna
+     Kala (Drik 1996: tithi 1 May 19:59 - 2 May 18:56, published 2 May).
+     Sourced in plans/research/festival-day-rules.md § 1; 13 published dates and
+     both rare branches are gated by validation/festival-day-rules.cjs.
+     Scoped deliberately: this is NOT a general "skipped tithi" rule. */
+  if (f.policy === "sunsetVyapini") {
+    const atSunset = tithiKalaOverlap(parts, "sunset", target);
+    if (atSunset) return { rank: 0, reason: "sunset", overlap: atSunset };
+    const sayahna = tithiKalaOverlap(parts, "sayahna", target);
+    if (sayahna) return { rank: 1, reason: "sayahna-fallback", overlap: sayahna };
+    return null;
+  }
   if (f.policy === "holika") {
     const pradosha = tithiKalaOverlap(parts, "pradosha", target), udaya = tithiKalaOverlap(parts, "udaya", target);
     if (pradosha && !kalaIsBhadra(parts, "pradosha")) return { rank: 0, reason: "pradosha", overlap: pradosha };
@@ -616,7 +663,13 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
     const all = (candidates.get(f.key) || []).sort((a, b) => a.ms - b.ms);
     if (!all.length) continue;
     const occurrence = all.filter((x) => x.ms - all[0].ms <= 2.5 * DAY);
-    occurrence.sort((a, b) => a.rank - b.rank || (a.selection === "first" ? a.ms - b.ms : b.overlap - a.overlap || a.ms - b.ms));
+    // Ties break by the rule's own convention: "first" = the earlier day,
+    // "last" = the later day (para — the sunset-vyapini pair), and otherwise the
+    // day holding the greater share of the deciding kala.
+    occurrence.sort((a, b) => a.rank - b.rank
+      || (a.selection === "first" ? a.ms - b.ms
+        : a.selection === "last" ? b.ms - a.ms
+          : b.overlap - a.overlap || a.ms - b.ms));
     festivals.push(occurrence[0]);
   }
   const holika = festivals.find((f) => f.key === "holika");

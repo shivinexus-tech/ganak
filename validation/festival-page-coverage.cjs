@@ -40,15 +40,18 @@ function coverageProblems(entries, routes) {
 
 const liveCount = Object.keys(meta.FEST_NAME).length + Object.keys(meta.OBS_NAME).length;
 assert.strictEqual(FESTIVAL_PAGE_ENTRIES.length, liveCount, 'registry must contain every live openable label');
-assert.strictEqual(liveCount, 179, 'update the reviewed inventory when the live label count changes');
+// 179 -> 181 on 2026-08-18: Padmini and Parama Ekadashi, the two Adhika Masa
+// fasts, are named at last and each needs its own route (they used to show as a
+// plain unnamed "Ekadashi"). See plans/research/festival-day-rules.md § 3.
+assert.strictEqual(liveCount, 181, 'update the reviewed inventory when the live label count changes');
 assert.strictEqual(EXCLUDED_PAGE_KEYS.length, 4, 'only the four Chhath shared labels may be excluded from standalone routes');
-assert.strictEqual(REQUIRED_PAGE_ENTRIES.length, 162, '162 non-deferred labels must have dedicated routes');
+assert.strictEqual(REQUIRED_PAGE_ENTRIES.length, 164, '164 non-deferred labels must have dedicated routes');
 assert.strictEqual(SHARED_PAGE_ENTRIES.length, 17, 'four Chhath labels + twelve Tamil-month Amavasai labels + Hariyali Amavasya share existing pages');
 assert.strictEqual(DEFERRED_PAGE_ENTRIES.length, 0, 'no openable label may remain explicitly deferred');
 
 const existingStandalone = new Set(['hartalikaTeej', 'chaitraNavratri', 'sharadNavratri']);
 const newPages = REQUIRED_PAGE_ENTRIES.filter((entry) => !existingStandalone.has(entry.key));
-assert.strictEqual(newPages.length, 159, 'the registry must retain 154 generated pages plus 5 approved multi-day milestone pages');
+assert.strictEqual(newPages.length, 161, 'the registry must retain 156 generated pages plus 5 approved multi-day milestone pages');
 
 const problems = coverageProblems([...FESTIVAL_PAGE_ENTRIES, ...NAVADURGA_PAGE_ENTRIES], FESTIVAL_PAGE_ROUTES);
 assert.deepStrictEqual(problems, [], `festival page coverage problems:\n${problems.join('\n')}`);

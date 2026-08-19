@@ -269,24 +269,30 @@ assert.deepStrictEqual(wrong, [], 'Drik-published 2029 festival dates no longer 
 //    src/engine/festivals.ts (a different owner's file) — see the research note
 //    § 7 for the handoff.
 // ---------------------------------------------------------------------------
-// (i) Vat Savitri: Drik publishes 2029-06-11, Ganak says 2029-06-12. Ganak runs
-//     Vat Savitri on the same udaya-Amavasya rule as Shani Jayanti; Drik splits
-//     them when Amavasya ends early. NOT adhika-related — Ganak matches Drik
-//     exactly in ordinary years (both 2026-05-16, verified 2026-08-18).
-assert.strictEqual(fired.get('vatSavitri'), '2029-06-12',
-  'vatSavitri 2029 moved — if it is now 2029-06-11 the Drik split rule landed, delete this pin');
+// (i) Vat Savitri — RESOLVED 2026-08-19, pin inverted rather than deleted.
+//     This was pinned at Ganak's wrong 2029-06-12 with the instruction to delete
+//     the pin once the split rule landed. The rule landed (see
+//     plans/research/festival-day-rules.md): Drik separates Vat Savitri from
+//     Shani Jayanti when Amavasya ends soon after sunrise, and Ganak now agrees
+//     at 2029-06-11. Keeping the assertion, flipped to the published value, so
+//     the fix is held rather than merely un-pinned.
+assert.strictEqual(fired.get('vatSavitri'), '2029-06-11',
+  'vatSavitri 2029 must stay on Drik\'s published date once the split rule landed');
 
-// (ii) Narasimha Jayanti and Chhinnamasta Jayanti (Vaishakha Shukla Chaturdashi)
-//      are ABSENT from 2029: that tithi is KSHAYA in 2029 — it begins after the
-//      sunrise of 26 May and ends before the sunrise of 27 May, so it never
-//      prevails at a sunrise and the udaya rule emits nothing. Drik publishes
-//      2029-05-26. The same gap already drops them from 2028, a year this fix
-//      does not touch, which is what proves it is pre-existing and not caused
-//      here. The fix moved them out of the wrong month (2029-04-27) into the
-//      right month, where this separate gap swallows them.
+// (ii) Narasimha Jayanti and Chhinnamasta Jayanti — RESOLVED 2026-08-19, pin
+//      inverted rather than deleted. Vaishakha Shukla Chaturdashi is KSHAYA in
+//      2029: it begins after the sunrise of 26 May and ends before the sunrise
+//      of 27 May, so it never prevailed at a sunrise and the udaya rule emitted
+//      nothing — both observances vanished from 2029 entirely, and from 2028
+//      too, which is what proved the gap was pre-existing rather than caused by
+//      the adhika fix. The kshaya-tithi rule has since landed (see
+//      plans/research/festival-day-rules.md): an observance whose tithi never
+//      touches a sunrise falls on the day it begins. Both now fire on Drik's
+//      published 2029-05-26, and the assertion is kept, flipped, so the fix is
+//      held rather than merely un-pinned.
 for (const key of ['narasimhaJayanti', 'chhinnamastaJayanti']) {
-  assert.ok(!fired.has(key),
-    `${key} now fires in 2029 — the kshaya-tithi gap is fixed, delete this pin and add the Drik date 2029-05-26 above`);
+  assert.strictEqual(fired.get(key), '2029-05-26',
+    `${key} must stay on Drik's published 2029-05-26 now that the kshaya-tithi rule has landed`);
 }
 
 // ---------------------------------------------------------------------------
@@ -294,4 +300,4 @@ console.log(`✓ adhik-masa: ${months.length} lunar months swept ${Y0}-${Y1}`);
 console.log(`  ${adhikas.length} Adhika Masas · 0 back to back · mean spacing ${meanGap.toFixed(2)} months (published ~32.5)`);
 console.log(`  gaps ${Math.min(...gaps.filter((g) => g >= 27))}-${Math.max(...gaps)} months, plus 2 Kshaya-Masa short gaps: ${shortGaps.join(', ')}`);
 console.log(`  ${PUBLISHED.length} Adhika Masa years pinned to published sources · ${Object.keys(DRIK_2029).length} Drik 2029 festival dates pinned`);
-console.log('  2 known residuals pinned (Vat Savitri ±1 day, kshaya-tithi Chaturdashi) — festivals.ts handoffs');
+console.log('  both former residuals (Vat Savitri, kshaya-tithi Chaturdashi) are FIXED — their pins are inverted and now hold the published dates');
