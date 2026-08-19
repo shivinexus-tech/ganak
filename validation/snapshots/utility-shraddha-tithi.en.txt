@@ -1,0 +1,10 @@
+JYOTISH WORKSPACE
+KundliCalculators
+← All calculatorsShraddha Tithi
+Records the lunar tithi and paksha at the time of death.
+Date of passing
+Time of passing
+Place
+Calculate
+Method & limitsThe lunar tithi and paksha at the recorded time; annual observance selection uses the corresponding tithi with local aparahna precedence.
+Source note: classical and published bases are recorded in Ganak's method map.

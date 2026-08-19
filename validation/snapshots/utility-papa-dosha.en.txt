@@ -1,0 +1,41 @@
+JYOTISH WORKSPACE
+KundliCalculators
+← All calculatorsPapa Dosha (malefic load)
+Malefic-load index from Lagna, Moon and Venus — used for Papasamyam.
+Date
+Time
+Place
+Calculate
+Method & limitsEach natural malefic (Sun, Mars, Saturn, Rahu, Ketu) in a 1/2/4/7/8/12 house from Lagna, Moon or Venus scores one papa point. It is a comparative load index — its real use is Papasamyam in matching — not a standalone verdict of harm.
+Source note: classical and published bases are recorded in Ganak's method map.
+What is Papa Dosha (malefic load)?
+‘Papa’ means a natural malefic. Papa Dosha measures the ‘malefic load’ of a chart: each malefic — Sun, Mars, Saturn, Rahu, Ketu — sitting in a sensitive house (1, 2, 4, 7, 8 or 12) counted from the Lagna, the Moon and Venus scores one papa point. Its main traditional use is Papasamyam in marriage matching, where the two partners' loads are compared for balance. Mangal (Manglik) dosha is just the Mars-only slice of this same idea.
+What it means
+A higher count simply means more malefic emphasis on the areas those houses govern — the self, family and speech, home, partnership, longevity and expenses. On its own it is not a verdict. In matching, what tradition looks for is not a low number but balance: two comparable loads are considered harmonious, while a large gap is flagged for a closer look.
+What each sensitive house weighs
+Malefics are counted only in these six houses (from Lagna, Moon and Venus).
+1
+the self, body and overall temperament
+2
+family, wealth and speech
+4
+home, mother and inner comfort
+7
+marriage and partnership
+8
+longevity, upheaval and the spouse's wellbeing
+12
+losses, expenses and the marriage bed
+Myths vs reality
+Myth: A high papa count means a bad marriage or a hard life.
+Reality: It is a comparative index. Balance between partners and the strength of the whole chart matter far more than the raw number.
+Myth: A high-papa person cannot be matched.
+Reality: Papasamyam is precisely about finding a partner with a comparable load; astrologers then weigh many other factors.
+Myth: Only Mangal (Manglik) dosha matters for marriage.
+Reality: Mangal is Mars-specific; papa counting generalises the same logic to every natural malefic.
+Traditional remedies
+Because papa load is comparative, the ‘remedy’ is a balanced match and the whole chart — not a ritual for the number itself.
+Strengthening the benefics (Jupiter, Venus) and the 7th house through the chart's own indications, guided by an astrologer.
+Remedies are optional and devotional — not a fee you must pay to avoid harm.
+A grounded perspective
+Read papa load as one lens among several — alongside Guna Milan, the 7th house and its lord, Venus and Jupiter, and the running dashas. It is a starting point for conversation, never a stand-alone yes or no. A qualified astrologer comparing two full charts will give a far more meaningful answer than the count alone.

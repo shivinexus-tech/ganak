@@ -1,0 +1,20 @@
+JYOTISH WORKSPACE
+KundliCalculators
+Astrology calculators
+Choose a focused answer. Vedic and Western methods are clearly separated.
+VEDIC · LAHIRI
+Moon sign (Rashi)Your sidereal Moon sign and emotional orientation.
+Vedic Sun signYour sidereal Sun sign using Lahiri ayanamsa.
+Ascendant (Lagna)The sign rising at your birth place and time.
+Birth NakshatraYour Moon's nakshatra, pada and naming sounds.
+Baby-name initialsTraditional starting sounds from birth nakshatra and pada.
+Mangal DoshaThree-reference analysis from Lagna, Moon and Venus.
+Kala Sarpa patternA transparent node-axis geometry check with caveats.
+Pitra DoshaTransparent ancestral-indication checks from the Sun and 9th house.
+Papa Dosha (malefic load)Malefic-load index from Lagna, Moon and Venus — used for Papasamyam.
+Sade SatiChecks Saturn against your natal Moon sign for a chosen date.
+Shraddha TithiRecords the lunar tithi and paksha at the time of death.
+Pancha PakshiBirth bird from nakshatra and lunar fortnight.
+WESTERN · TROPICAL
+Western natal chartTropical Big Three and major aspects—separate from Vedic settings.
+Western relationshipSynastry contacts and a midpoint composite for two people.

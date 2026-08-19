@@ -1,0 +1,11 @@
+JYOTISH WORKSPACE
+KundliCalculators
+← All calculatorsSade Sati
+Checks Saturn against your natal Moon sign for a chosen date.
+Date
+Time
+Place
+Check date
+Calculate
+Method & limitsSaturn in the 12th, same or 2nd sign from the natal Moon. Results are descriptive, not deterministic.
+Source note: classical and published bases are recorded in Ganak's method map.
