@@ -48,6 +48,25 @@ function chartText(lang) {
   const RP = r.rulingPlanets;
   lines.push(`Ruling planets: ${[RP.ascSignLord, RP.ascStarLord, RP.ascSubLord, RP.moonSignLord, RP.moonStarLord, RP.moonSubLord, RP.dayLord].map((pl) => planetName(lang, pl)).join(' · ')}`);
   lines.push(`Dasha lords: ${r.dashas.map((d) => planetName(lang, d.lord)).join(' · ')}`);
+
+  /* YOGAS-HINDI-PARITY, 2026-08-18. The yogas panel had NO baseline anywhere — it
+     exists only after a cast — so for months a Hindi reader got one generic sentence
+     under every detected yoga while an English reader got a distinct interpretation
+     each time, and nothing could see it. Mirrored here exactly as ChartScreen prints
+     it, which is what puts the panel inside the positional en/hi content-parity check
+     in screen-snapshots.cjs § 4: six distinct English meanings against one repeated
+     Hindi sentence is now a failure, not an invisible product gap.
+
+     The yoga NAME and the yoga TEXT go on separate lines on purpose. § 4 compares the
+     two baselines line for line, so a name glued to the front of the meaning would make
+     every line unique and the collapsed-meaning check would silently pass on a panel
+     that was entirely generic underneath. Measured: with "name — text" on one line the
+     reinstated generic sentence slipped past § 4; split, it is caught. */
+  lines.push('--- classical yogas ---');
+  for (const y of r.yogas) {
+    lines.push(`yoga: ${lang === 'hi' ? y.nameHi : y.name} (${y.kind})`);
+    lines.push(lang === 'hi' ? y.textHi : y.text);
+  }
   lines.push(`Compact lord labels: ${r.dashas.map((d) => planetShort(lang, d.lord)).join(' ')}`);
   return lines.join('\n');
 }

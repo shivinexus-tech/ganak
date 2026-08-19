@@ -645,10 +645,16 @@ export default function ChartScreen({ C, card, lang }) {
                 {r.yogas.map((yg) => (
                   <div key={yg.name} className="rise" style={{ ...card, padding: "0.875rem 1rem", borderLeft: `0.1875rem solid ${yg.kind === "good" ? C.gold : C.sindoor}` }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.5rem", marginBottom: "0.375rem", flexWrap: "wrap" }}>
-                      <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: yg.kind === "good" ? C.gold : C.sindoor }}>{yg.name}</span>
+                      <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: yg.kind === "good" ? C.gold : C.sindoor }}>{hi ? yg.nameHi : yg.name}</span>
                       <span style={{ fontSize: "var(--font-micro)", letterSpacing: ".12em", textTransform: "uppercase", color: C.muted, whiteSpace: "nowrap" }}>{yg.kind === "good" ? (hi ? "शुभ" : "auspicious") : (hi ? "चुनौतीपूर्ण" : "challenging")}</span>
                     </div>
-                    <div style={{ fontSize: "var(--font-small)", lineHeight: 1.55 }}>{hi ? "यह योग ग्रहों और भावों के एक विशेष संबंध से बनता है। इसका फल ग्रहबल, दशा और पूरी कुंडली के संदर्भ में देखें।" : yg.text}</div>
+                    {/* YOGAS-HINDI-PARITY, 2026-08-18: this line used to be
+                        `hi ? "<one generic sentence>" : yg.text` — every detected yoga
+                        got the same Hindi sentence while English got a distinct meaning
+                        each time. The meaning now travels with the yoga in both
+                        languages (src/engine/classical.ts + src/data/yoga-copy-hi.ts),
+                        so the screen only chooses which one to print. */}
+                    <div style={{ fontSize: "var(--font-small)", lineHeight: 1.55 }}>{hi ? yg.textHi : yg.text}</div>
                   </div>
                 ))}
               </div>
