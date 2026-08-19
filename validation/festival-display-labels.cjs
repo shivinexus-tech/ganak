@@ -66,7 +66,13 @@ assert.ok(genericPradosh.length > 1 && genericPradosh.every((x) => x.key.startsW
 const somPradosh = searchUpcoming('Som Pradosh', FROM, 5.5, 24, DELHI);
 assert.ok(somPradosh.length > 0 && somPradosh.every((x) => x.key === 'pradosh_Monday'), 'Som Pradosh search must use modern Monday key');
 const genericEkadashi = searchUpcoming('एकादशी', FROM, 5.5, 24, DELHI);
-assert.ok(genericEkadashi.length > 1 && genericEkadashi.every((x) => /_11$/.test(x.key)), 'generic Hindi Ekadashi search must return upcoming sequence');
+// Every result must be an Ekadashi identity. 2026 carries an Adhika Masa, whose
+// two Ekadashis (Padmini and Parama) have no route/guide page yet, so the engine
+// shows the plain `ekadashi` label rather than borrowing an ordinary month's name.
+// The count below keeps that fallback from spreading: at most the Adhika pair may
+// be unnamed. Naming itself is swept by validation/ekadashi-lunar-naming.cjs.
+assert.ok(genericEkadashi.length > 1 && genericEkadashi.every((x) => /_11$/.test(x.key) || x.key === 'ekadashi'), 'generic Hindi Ekadashi search must return upcoming sequence');
+assert.ok(genericEkadashi.filter((x) => /_11$/.test(x.key)).length >= genericEkadashi.length - 2, 'at most the Adhika Masa pair may fall back to the unnamed Ekadashi label');
 const putrada = searchUpcoming('Putrada Ekadashi', FROM, 5.5, 24, DELHI);
 assert.ok(new Set(putrada.map((x) => x.key)).size >= 2, 'unqualified Putrada search must include both canonical variants');
 
