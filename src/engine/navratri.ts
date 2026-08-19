@@ -11,12 +11,17 @@
 
 import { ascendantAt, rev } from "./ephemeris";
 import {
-  ayanAt, elongMs, jdOf, setAyanMode, solveCross, sunEvents, zoneOffset,
+  sidereal, jdOf, solveCross, sunEvents, zoneOffset,
 } from "./panchang";
 
 const DAY = 86400000;
 const MINUTE = 60000;
 const DUAL_SIGNS = new Set([2, 5, 8, 11]); // Mithuna, Kanya, Dhanu, Meena
+
+/* Navratri is a Lahiri-only surface (project invariant). Binding the accessors
+   once states that in code instead of leaning on whatever mode the last caster
+   happened to leave in a module global — see bug-bash F8. */
+const S = sidereal("lahiri");
 
 function requirePlace(place) {
   if (!place || !place.zone || !Number.isFinite(place.lat) || !Number.isFinite(place.lon)) {
@@ -50,8 +55,8 @@ function solarDay(place, civil) {
 }
 
 function shuklaPratipadaBounds(referenceMs) {
-  const start = solveCross(elongMs, referenceMs - 3 * DAY, 0, 5);
-  const end = start == null ? null : solveCross(elongMs, start + MINUTE, 12, 2);
+  const start = solveCross(S.elongMs, referenceMs - 3 * DAY, 0, 5);
+  const end = start == null ? null : solveCross(S.elongMs, start + MINUTE, 12, 2);
   if (start == null || end == null || !(start < end)) throw new Error("pratipada-not-found");
   return { start, end };
 }
@@ -66,7 +71,7 @@ function dualSignWindows(place, start, end) {
   if (!(end > start)) return [];
   const signAt = (ms) => {
     const jd = jdOf(ms);
-    return Math.floor(rev(ascendantAt(jd, place.lat, place.lon, ayanAt(jd))) / 30);
+    return Math.floor(rev(ascendantAt(jd, place.lat, place.lon, S.ayanAt(jd))) / 30);
   };
   const out = [];
   let segmentStart = start, sign = signAt(start);
@@ -114,7 +119,7 @@ function ghatasthapanaFor(place, referenceMs, tithi) {
 }
 
 function navratriParanaFor(place, tithi) {
-  const navamiEnd = solveCross(elongMs, tithi.start + 7 * DAY, 108, 4);
+  const navamiEnd = solveCross(S.elongMs, tithi.start + 7 * DAY, 108, 4);
   if (navamiEnd == null) throw new Error("navami-end-not-found");
   const local = localDateAt(navamiEnd, place.zone);
   const day = solarDay(place, local);
@@ -146,7 +151,6 @@ function navratriParanaFor(place, tithi) {
 function navratriTimings(place, navratriStartMs) {
   requirePlace(place);
   if (!Number.isFinite(navratriStartMs)) throw new Error("start-required");
-  setAyanMode("lahiri");
   const local = localDateAt(navratriStartMs, place.zone);
   const tithi = shuklaPratipadaBounds(navratriStartMs);
   return {
@@ -165,14 +169,13 @@ function navadurgaDatesFor(place, navratriStartMs, formDay) {
   requirePlace(place);
   if (!Number.isFinite(navratriStartMs)) throw new Error("start-required");
   if (!Number.isInteger(formDay) || formDay < 1 || formDay > 9) throw new Error("form-day-required");
-  setAyanMode("lahiri");
   const startCivil = localDateAt(navratriStartMs, place.zone);
   const dates = [];
   for (let offset = 0; offset < 12; offset++) {
     const civil = shiftCivilDate(startCivil, offset);
     const solar = solarDay(place, civil);
     if (solar.rise == null) continue;
-    const tithiIndex = Math.floor(elongMs(solar.rise) / 12);
+    const tithiIndex = Math.floor(S.elongMs(solar.rise) / 12);
     const shuklaTithi = tithiIndex < 15 ? tithiIndex + 1 : null;
     if ((formDay === 1 && offset === 0) || (formDay > 1 && shuklaTithi === formDay)) {
       dates.push({ y: solar.y, m: solar.m, day: solar.day, tz: solar.tz, rise: solar.rise, tithi: shuklaTithi });

@@ -2,7 +2,7 @@
 
 import { rev, sunPos } from "./ephemeris";
 import {
-  setAyanMode, sunSidMs, sunEvents, solveCross, zoneOffset, SIGNS,
+  sidereal, sunEvents, solveCross, zoneOffset, SIGNS,
 } from "./panchang";
 
 const RITU_DEFS = Object.freeze([
@@ -73,17 +73,17 @@ function nextTropicalEvent(fromMs) {
 }
 
 function computeVedicSeasonClock(place, ayanamsa = "lahiri", atMs = null) {
-  setAyanMode(ayanamsa);
+  const S = sidereal(ayanamsa);   // bound to THIS call — never a shared global (F8)
   const now = atMs != null ? atMs : Date.now();
   const probe = new Date(now);
   const tz = zoneOffset(place.zone, probe.getUTCFullYear(), probe.getUTCMonth() + 1, probe.getUTCDate()) ?? 5.5;
-  const sunSid = sunSidMs(now);
+  const sunSid = S.sunSidMs(now);
   const signIdx = Math.floor(sunSid / 30);
   const rituIdx = Math.floor(sunSid / 60) % 6;
   const ritu = RITU_DEFS[rituIdx];
   const nextBoundaryDeg = ((rituIdx + 1) * 60) % 360;
-  const rituStart = solveCross(sunSidMs, now - 70 * 86400000, rituIdx * 60, 70);
-  const rituNext = solveCross(sunSidMs, now, nextBoundaryDeg === 0 ? 360 : nextBoundaryDeg, 70);
+  const rituStart = solveCross(S.sunSidMs, now - 70 * 86400000, rituIdx * 60, 70);
+  const rituNext = solveCross(S.sunSidMs, now, nextBoundaryDeg === 0 ? 360 : nextBoundaryDeg, 70);
   const nextRitu = RITU_DEFS[(rituIdx + 1) % 6];
   const sunPair = sunrisePair(place, now, tz);
   const ghati = sunPair ? ghatiFromSunrise(now, sunPair.sunrise, sunPair.nextSunrise) : null;

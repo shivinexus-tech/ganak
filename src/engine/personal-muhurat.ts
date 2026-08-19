@@ -24,7 +24,7 @@
    ------------------------------------------------------------------------- */
 
 import { rev } from "./ephemeris";
-import { setAyanMode, zoneOffset, moonSidMs, sunSidMs } from "./panchang";
+import { sidereal, zoneOffset } from "./panchang";
 import { taraBala, chandraBala } from "./daily-windows";
 import { computeKundli } from "./kundli";
 
@@ -40,13 +40,16 @@ const SPECIAL_ORD: { [k: number]: string } = {
    (a whole-sign/whole-nakshatra property — the birth instant is what matters). moonBav is
    the Moon's Bhinnashtakavarga (12 signs, always sums to 49), read from the full chart. */
 function natalAnchors(place: any, ayanamsa: any, birth: any) {
-  setAyanMode(ayanamsa || "lahiri");
+  /* The mode travels ON the anchors, so personalFit below reads the same
+     ayanamsa this call was made with — not whatever a chart cast on another
+     screen left in a module global (bug-bash F8). */
+  const S = sidereal(ayanamsa);
   // Resolved at the birth CLOCK, not at a fixed moment on the birth date — on a
   // daylight-saving transition day the two differ by an hour, which can move the
   // birth Moon into the next nakshatra and re-cut every Tara Bala row below.
   const tz = zoneOffset(place.zone, birth.y, birth.m, birth.day, birth.hh || 0, birth.mi || 0) ?? 5.5;
   const ms = Date.UTC(birth.y, birth.m - 1, birth.day, birth.hh || 0, birth.mi || 0) - tz * 3600000;
-  const moonLon = moonSidMs(ms);
+  const moonLon = S.moonSidMs(ms);
   const janmaNak = Math.floor(moonLon / _NW);
   const janmaSign = Math.floor(moonLon / 30);
   let moonBav: number[] | null = null;
@@ -54,7 +57,7 @@ function natalAnchors(place: any, ayanamsa: any, birth: any) {
     const k = computeKundli({ y: birth.y, m: birth.m, day: birth.day, hh: birth.hh || 0, mi: birth.mi || 0, tz, lat: place.lat, lon: place.lon, ayanamsa: ayanamsa || "lahiri" });
     if (k && k.av && Array.isArray(k.av.bav?.Moon)) moonBav = k.av.bav.Moon;
   } catch (e) { moonBav = null; }
-  return { janmaNak, janmaSign, moonBav };
+  return { ayanamsa: S.mode, janmaNak, janmaSign, moonBav };
 }
 
 /* Bucket a Moon-bindu count (0..8) into a 1..4 strength (the ●●●○ dots). */
@@ -71,11 +74,12 @@ function strengthOf(bindu: number | null) {
    which is Lahiri. Returns the two hard-filter verdicts (feed coreOk), the soft strength,
    and the soft Adhanadi caution. */
 function personalFit(anchors: any, day: any) {
+  const S = sidereal(anchors && anchors.ayanamsa);
   const rise = day.rise;
-  const moonLon = moonSidMs(rise);
+  const moonLon = S.moonSidMs(rise);
   const moonNak = Math.floor(moonLon / _NW);
   const moonSign = Math.floor(moonLon / 30);
-  const waxing = (day.tn != null ? day.tn : Math.floor(rev(moonLon - sunSidMs(rise)) / 12)) < 15;
+  const waxing = (day.tn != null ? day.tn : Math.floor(rev(moonLon - S.sunSidMs(rise)) / 12)) < 15;
 
   const jn = anchors.janmaNak, js = anchors.janmaSign;
 

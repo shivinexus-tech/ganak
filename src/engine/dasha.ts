@@ -2,7 +2,7 @@
    Includes KP sub-lord chain (same 9-fold proportions). Shell may still hold copies until wired. */
 
 import { rev, tropicalLongitudes, ascendantAt } from "./ephemeris";
-import { SIGN_LORD, ayanAt, setAyanMode } from "./panchang";
+import { SIGN_LORD, ayanAt } from "./panchang";
 import { vargaSign } from "./varga";
 
 const DASHA_SEQ = [["Ketu", 7], ["Venus", 20], ["Sun", 6], ["Moon", 10], ["Mars", 7], ["Rahu", 18], ["Jupiter", 16], ["Saturn", 19], ["Mercury", 17]];
@@ -123,10 +123,9 @@ function vimSub(startLord, startMs, durMs) {
    rebuilds the Vimshottari Maha timeline per candidate time (the balance shifts ~2 days per
    birth-minute, so event-dasha boundaries move). An instrument, not an auto-verdict. */
 function rectAtMin(y, m, day, tz, lat, lon, ayanamsa, totalMin) {
-  setAyanMode(ayanamsa);
   const utcMs = Date.UTC(y, m - 1, day) + totalMin * 60000 - tz * 3600000;
   const jd = utcMs / 86400000 + 2440587.5;
-  const ascSid = ascendantAt(jd, lat, lon, ayanAt(jd));
+  const ascSid = ascendantAt(jd, lat, lon, ayanAt(jd, ayanamsa));
   const sign = Math.floor(ascSid / 30), NK = 360 / 27;
   return {
     totalMin, utcMs, ascSid, sign, deg: ascSid - sign * 30,
@@ -146,10 +145,9 @@ function rectSweep(y, m, day, tz, lat, lon, ayanamsa, centerMin, halfWinMin, ste
   return steps;
 }
 function mahaTimelineAt(y, m, day, tz, totalMin, ayanamsa) {
-  setAyanMode(ayanamsa);
   const utcMs = Date.UTC(y, m - 1, day) + totalMin * 60000 - tz * 3600000;
   const jd = utcMs / 86400000 + 2440587.5, dd = jd - 2451543.5;
-  const moonSid = rev(tropicalLongitudes(dd).Moon - ayanAt(jd));
+  const moonSid = rev(tropicalLongitudes(dd).Moon - ayanAt(jd, ayanamsa));
   const NK = 360 / 27, YEAR = 365.25 * 86400000;
   const nakIdx = Math.floor(moonSid / NK), frac = (moonSid % NK) / NK, startSeq = nakIdx % 9;
   const tl = []; let cursor = utcMs;

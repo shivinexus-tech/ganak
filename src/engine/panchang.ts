@@ -112,20 +112,51 @@ const AYANAMSA = {
   kp: { label: "KP (Krishnamurti)", offset: -0.096667 }, // KP Old = Lahiri − 5'48"
   trueChitra: { label: "True Chitrapaksha", offset: -0.0003 }, // Spica fixed at 180°; coincides with Lahiri to the arc-second
 };
-let AYAN_MODE = "lahiri";
-const ayanAt = (JD) => 23.853 + 0.0139651 * ((JD - 2451545.0) / 365.25) + AYANAMSA[AYAN_MODE].offset;
-const sunSidMs = (ms) => { const JD = jdOf(ms); return rev(sunPos(JD - 2451543.5).lon - ayanAt(JD)); };
-const moonSidMs = (ms) => { const JD = jdOf(ms); return rev(moonLon(JD - 2451543.5) - ayanAt(JD)); };
-const elongMs = (ms) => rev(moonSidMs(ms) - sunSidMs(ms));
-const lunYogaMs = (ms) => rev(moonSidMs(ms) + sunSidMs(ms));
-const planetSidMs = (name, ms) => {
-  const JD = jdOf(ms), d = JD - 2451543.5, ay = ayanAt(JD);
+/* AGENTS.md invariant: Lahiri is THE convention. A caller that wants anything
+   else must say so ON THE CALL — the mode is a parameter, never a handshake.
+   `AYAN_MODE` used to be a module-global that `computeKundli` wrote and never
+   restored, so one reader casting a Raman chart silently shifted the free
+   Panchang by 1.479° for everyone else in the session (bug-bash F8,
+   2026-08-18). Every caster now threads its own mode; the ambient survives only
+   as the Lahiri default for readers that pass nothing. */
+const AYAN_DEFAULT = "lahiri";
+let AYAN_MODE = AYAN_DEFAULT;
+function ayanOffset(mode) {
+  const key = mode || AYAN_MODE;
+  const entry = AYANAMSA[key];
+  if (!entry) throw new Error(`unknown ayanamsa: ${key}`);
+  return entry.offset;
+}
+const ayanAt = (JD, mode?) => 23.853 + 0.0139651 * ((JD - 2451545.0) / 365.25) + ayanOffset(mode);
+const sunSidMs = (ms, mode?) => { const JD = jdOf(ms); return rev(sunPos(JD - 2451543.5).lon - ayanAt(JD, mode)); };
+const moonSidMs = (ms, mode?) => { const JD = jdOf(ms); return rev(moonLon(JD - 2451543.5) - ayanAt(JD, mode)); };
+const elongMs = (ms, mode?) => rev(moonSidMs(ms, mode) - sunSidMs(ms, mode));
+const lunYogaMs = (ms, mode?) => rev(moonSidMs(ms, mode) + sunSidMs(ms, mode));
+const planetSidMs = (name, ms, mode?) => {
+  const JD = jdOf(ms), d = JD - 2451543.5, ay = ayanAt(JD, mode);
   if (name === "Sun") return rev(sunPos(d).lon - ay);
   if (name === "Moon") return rev(moonLon(d) - ay);
   if (name === "Rahu") return rev(125.1228 - 0.0529538083 * d - ay);
   if (name === "Ketu") return rev(125.1228 - 0.0529538083 * d - ay + 180);
   return rev(planetGeoLon(name, d) - ay);
 };
+/* The supported way to work in a non-default ayanamsa: bind the accessors once
+   and pass the bound set down. Nothing global moves, so a chart cast on Raman
+   cannot reach anybody else's Panchang, and callbacks (solveCross et al.) can be
+   handed `S.moonSidMs` directly. */
+function sidereal(mode?) {
+  const m = mode || AYAN_DEFAULT;
+  ayanOffset(m); // fail loudly, at the boundary, on an unknown mode
+  return {
+    mode: m,
+    ayanAt: (JD) => ayanAt(JD, m),
+    sunSidMs: (ms) => sunSidMs(ms, m),
+    moonSidMs: (ms) => moonSidMs(ms, m),
+    elongMs: (ms) => elongMs(ms, m),
+    lunYogaMs: (ms) => lunYogaMs(ms, m),
+    planetSidMs: (name, ms) => planetSidMs(name, ms, m),
+  };
+}
 
 /* first time after startMs that fn (slowly increasing mod 360) crosses targetDeg */
 function solveCross(fn, startMs, targetDeg, maxDays) {
@@ -409,8 +440,15 @@ function zoneOffset(zone, y, m, d, hh = 12, mi = 0) {
   return Math.min(...cands);                          // skipped hour -> pre-change offset (see above)
 }
 
+/* LEGACY ambient setter. Kept only for `today-panchang.ts`, the last module that
+   still sets the mode and then reads bare accessors. Everything else threads the
+   mode explicitly via `sidereal(mode)` or the trailing `mode` argument — see the
+   AYANAMSA block above and plans/audits/2026-08-18-ayanamsa-leak-fix.md.
+   DO NOT add new call sites: validation/chart-styles-ayanamsha.cjs fails the
+   build if one appears. */
 function setAyanMode(ayanamsa) {
-  AYAN_MODE = ayanamsa;
+  ayanOffset(ayanamsa || AYAN_DEFAULT); // reject an unknown mode at the setter, not 40 frames later
+  AYAN_MODE = ayanamsa || AYAN_DEFAULT;
 }
 
 // Vimshottari dasha lord sequence -- moved from the shell (SPLIT-UI-03d).
@@ -423,8 +461,8 @@ export {
   SIGN_LORD, VIM_LORDS,
   SIGNS, NAKSHATRAS, YOGAS, TITHIS, KARANAS_MOV, karanaName,
   sunEvents, moonEvents, RAHU_SEGMENT, YAMA_SEGMENT, GULIKA_SEGMENT,
-  setAyanMode, ayanAt, sunSidMs, moonSidMs, elongMs, lunYogaMs, planetSidMs,
-  jdOf, AYANAMSA,
+  setAyanMode, sidereal, ayanAt, sunSidMs, moonSidMs, elongMs, lunYogaMs, planetSidMs,
+  jdOf, AYANAMSA, AYAN_DEFAULT,
   solveCross, lunarMonthInfo, samvatInfo, upcomingEvents, choghaSlots,
   amantaMonthIdx, pitruPakshaDay, zoneOffset,
 };

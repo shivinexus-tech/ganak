@@ -3,7 +3,7 @@
 // Panchaka display labels stay with the UI.
 
 import { rev, ascendantAt } from "./ephemeris";
-import { setAyanMode, ayanAt, zoneOffset, sunEvents, jdOf, elongMs, moonSidMs } from "./panchang";
+import { sidereal, zoneOffset, sunEvents, jdOf } from "./panchang";
 
 const PANCHAKA_TYPE = { 1: "mrityu", 2: "agni", 4: "raja", 6: "chora", 8: "roga" };
 const panchakaRem = (t30, vaara, n27, lagna12) => (t30 + vaara + n27 + lagna12) % 9;
@@ -31,7 +31,7 @@ function collapseSlivers(list, keyOf) {
   return merged;
 }
 function computeLagnaPanchaka(place, ayanamsa = "lahiri", atMs) {
-  setAyanMode(ayanamsa);
+  const S = sidereal(ayanamsa);   // bound to THIS call — never a shared global (F8)
   const now = atMs != null ? atMs : Date.now();
   const probe = new Date(now);
   const tz = zoneOffset(place.zone, probe.getUTCFullYear(), probe.getUTCMonth() + 1, probe.getUTCDate()) ?? 5.5;
@@ -44,9 +44,9 @@ function computeLagnaPanchaka(place, ayanamsa = "lahiri", atMs) {
   if (rise == null || nextRise == null) return { rise, nextRise, tz, lagnaSchedule: [], panchakaWindows: [] };
   const at = (ms) => {
     const jd = jdOf(ms);
-    const sign = Math.floor(rev(ascendantAt(jd, place.lat, place.lon, ayanAt(jd))) / 30);
-    const t30 = Math.floor(rev(elongMs(ms)) / 12) + 1;
-    const n27 = Math.floor(rev(moonSidMs(ms)) / (360 / 27)) + 1;
+    const sign = Math.floor(rev(ascendantAt(jd, place.lat, place.lon, S.ayanAt(jd))) / 30);
+    const t30 = Math.floor(rev(S.elongMs(ms)) / 12) + 1;
+    const n27 = Math.floor(rev(S.moonSidMs(ms)) / (360 / 27)) + 1;
     return { sign, rem: panchakaRem(t30, vaara, n27, sign + 1) };
   };
   const step = 60000, segs = [];
