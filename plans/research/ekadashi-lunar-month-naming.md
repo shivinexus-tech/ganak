@@ -15,8 +15,18 @@ date defects it uncovered.
 month (`monthNames[(m - 1 + 9) % 12]`). Ekadashi names are lunar-month names, so
 the two drifted apart. The audit
 `plans/audits/2026-08-18-snapshot-coverage-extension.md` (item 3) caught the 2027
-symptoms; the sweep below shows the damage was much wider — 167 of 297 fasts
-across 2024–2035 carried the wrong name.
+symptoms; the sweep below shows the damage was much wider. Matching Ganak's
+output date-for-date against the published reference for New Delhi, 2024–2035:
+
+| | before | after |
+| --- | --- | --- |
+| named correctly | 155 | 270 |
+| **named wrongly** | **111** | **0** |
+| shown unnamed (Adhika Masa) | 0 | 8 |
+| no fast shown on that date | 31 | 19 |
+
+The 19 remaining are all ±1 day and are a separate, pre-existing tithi-boundary
+precision item (§ 7); the other 12 were genuinely absent and are fixed in § 6a.
 
 The naming table itself was **not** re-derived from the app's code, because the
 app's code was the thing under suspicion. It is established here against two

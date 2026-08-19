@@ -286,7 +286,7 @@ const EKADASHI_NAMES = {
    observance identity rule, independent of the user's preferred date label.
    Sourced in plans/research/ekadashi-lunar-month-naming.md; swept for 2024-2035
    by validation/ekadashi-lunar-naming.cjs. NEVER derive this from the civil
-   month — that was the 2026-08-18 defect that misnamed 167 of 297 fasts. */
+   month — that was the 2026-08-18 defect that misnamed 111 of 297 fasts. */
 function ekadashiIdentityMonth(months, krishna) {
   if (!months) return null;
   const raw = typeof months === "string"
