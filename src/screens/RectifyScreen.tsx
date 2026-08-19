@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { T } from "../components/ui-style-contract";
 import { fmtDateT } from "../components/format";
-import { signShort, panchangTerm } from "../i18n/panchang-terms";
+import { signShort, panchangTerm, padaText, planetName, planetShort } from "../i18n/panchang-terms";
 import { SIGNS, NAKSHATRAS, zoneOffset, SIGN_LORD } from "../engine/panchang";
 import { rectSweep, mahaTimelineAt, runDashaAt, VIM_LORDS, rectAtMin } from "../engine/dasha";
 
@@ -60,7 +60,7 @@ function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
           <div style={{ display: "flex", gap: "0.3125rem" }}>{[15, 30, 60].map((w) => <button key={w} onClick={() => setHalfWin(w)} style={{ padding: "0.3125rem 0.75rem", borderRadius: "0.4375rem", fontFamily: "var(--font-display-family)", fontSize: "var(--font-small)", cursor: "pointer", border: `0.0625rem solid ${halfWin === w ? C.gold : C.line}`, background: halfWin === w ? "var(--accent-soft)" : "transparent", color: halfWin === w ? C.gold : C.muted }}>±{w}m</button>)}</div>
         </div>
         <div>
-          <div style={{ ...T.label, color: C.muted, marginBottom: "0.3125rem" }}>{hi ? "चरण" : "Step"}</div>
+          <div style={{ ...T.label, color: C.muted, marginBottom: "0.3125rem" }}>{hi ? "अंतराल" : "Step"}</div>
           <div style={{ display: "flex", gap: "0.3125rem" }}>{[1, 2, 4].map((st) => <button key={st} onClick={() => setStepMin(st)} style={{ padding: "0.3125rem 0.75rem", borderRadius: "0.4375rem", fontFamily: "var(--font-display-family)", fontSize: "var(--font-small)", cursor: "pointer", border: `0.0625rem solid ${stepMin === st ? C.gold : C.line}`, background: stepMin === st ? "var(--accent-soft)" : "transparent", color: stepMin === st ? C.gold : C.muted }}>{st}m</button>)}</div>
         </div>
       </div>
@@ -72,11 +72,11 @@ function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
           <span style={{ fontSize: "var(--font-label)", color: C.muted }}>{hi ? "संभावित जन्म समय" : "candidate birth time"} {Math.abs(selC - centerMin) < 0.1 ? (hi ? "(दर्ज समय)" : "(as entered)") : (selC > centerMin ? "+" : "−") + fmtMin(Math.abs(selC - centerMin)).slice(3) + (hi ? " मिनट" : " min")}</span>
         </div>
         <input type="range" min={lo} max={hiMin} step={0.25} value={selC} onChange={(e) => setSel(+e.target.value)} style={{ width: "100%", accentColor: C.gold, marginBottom: "0.875rem" }} />
-        <Marker label={hi ? "लग्न" : "Lagna"} color={C.ivory}>{signShort(lang, mk.sign)} {dms(mk.deg)} · {panchangTerm(lang, "nakshatra", NAKSHATRAS[mk.nak])} {hi ? "पाद" : "pada"} {mk.pada}</Marker>
+        <Marker label={hi ? "लग्न" : "Lagna"} color={C.ivory}>{signShort(lang, mk.sign)} {dms(mk.deg)} · {panchangTerm(lang, "nakshatra", NAKSHATRAS[mk.nak])} {padaText(lang, mk.pada)}</Marker>
         <Marker label={hi ? "नवांश D-9 लग्न" : "Navamsa D-9 lagna"} color={C.gold}>{signShort(lang, mk.d9)}</Marker>
         <Marker label={hi ? "षष्ट्यांश D-60 लग्न" : "Shashtiamsa D-60 lagna"} color={C.gold}>{signShort(lang, mk.d60)}</Marker>
-        <Marker label={hi ? "केपी लग्न उप-स्वामी" : "KP ascendant sub-lord"} color={lordColor[mk.subLord]}>{mk.subLord}</Marker>
-        <Marker label={hi ? "आरंभिक महादशा" : "Starting mahadasha"} color={lordColor[startMaha.lord]}>{startMaha.lord} · {startBal.toFixed(2)} {hi ? "वर्ष शेष" : "yrs balance"}</Marker>
+        <Marker label={hi ? "केपी लग्न उप-स्वामी" : "KP ascendant sub-lord"} color={lordColor[mk.subLord]}>{planetName(lang, mk.subLord)}</Marker>
+        <Marker label={hi ? "आरंभिक महादशा" : "Starting mahadasha"} color={lordColor[startMaha.lord]}>{planetName(lang, startMaha.lord)} · {startBal.toFixed(2)} {hi ? "वर्ष शेष" : "yrs balance"}</Marker>
       </div>
 
       {/* sweep table */}
@@ -92,7 +92,7 @@ function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
             <div key={i} onClick={() => setSel(r.totalMin)} style={{ display: "grid", gridTemplateColumns: "62px 1fr 46px 46px 64px", gap: "0.375rem", padding: "0.375rem 0.75rem", borderTop: i ? "0.0625rem solid var(--line-soft)" : "none", fontSize: "var(--font-small)", cursor: "pointer", background: isSel ? "var(--accent-soft)" : r.chSign ? "var(--bad-surface)" : "transparent", alignItems: "baseline", fontVariantNumeric: "tabular-nums" }}>
               <span style={{ color: isSel ? C.gold : C.ivory }}>{fmtMin(r.totalMin).slice(0, 5)}</span>
               <span style={{ color: r.chSign ? C.sindoor : C.ivory, fontWeight: r.chSign ? 600 : 400 }}>{signShort(lang, r.sign)} {dms(r.deg)}{r.chSign ? " ⟵ sign" : ""}</span>
-              {ch(r.chD9, signShort(lang, r.d9))}{ch(r.chD60, signShort(lang, r.d60))}{ch(r.chSub, r.subLord.slice(0, 3))}
+              {ch(r.chD9, signShort(lang, r.d9))}{ch(r.chD60, signShort(lang, r.d60))}{ch(r.chSub, planetShort(lang, r.subLord))}
             </div>
           );
         })}
@@ -105,7 +105,7 @@ function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
         <div style={{ display: "flex", gap: "0.4375rem", flexWrap: "wrap", marginBottom: "0.875rem", alignItems: "center" }}>
           <input type="date" value={evDate} onChange={(e) => setEvDate(e.target.value)} style={{ padding: "0.5rem 0.625rem", borderRadius: "0.4375rem", border: `0.0625rem solid ${C.line}`, background: "var(--surface-sunken)", color: C.ivory, fontFamily: "var(--font-body-family)", fontSize: "var(--font-small)" }} />
           <select value={evHouse} onChange={(e) => setEvHouse(+e.target.value)} style={{ padding: "0.5rem 0.625rem", borderRadius: "0.4375rem", border: `0.0625rem solid ${C.line}`, background: "var(--surface-sunken)", color: C.ivory, fontFamily: "var(--font-body-family)", fontSize: "var(--font-small)" }}>
-            {HOUSES.map(([h, lbl]) => <option key={h} value={h}>{lbl} ({h}H)</option>)}
+            {HOUSES.map(([h, lbl]) => <option key={h} value={h}>{lbl} ({hi ? `${h} भाव` : `${h}H`})</option>)}
           </select>
           <button onClick={addEvent} style={{ padding: "0.5rem 1rem", borderRadius: "0.4375rem", fontFamily: "var(--font-display-family)", fontSize: "var(--font-small)", cursor: "pointer", border: `0.0625rem solid ${C.gold}`, background: "var(--surface-hover)", color: C.gold }}>{hi ? "जोड़ें" : "Add"}</button>
         </div>
@@ -118,11 +118,11 @@ function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
               return (
                 <div key={e.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.625rem", padding: "0.5rem 0.6875rem", border: `0.0625rem solid ${C.line}`, borderRadius: "0.5rem" }}>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-small)", color: C.ivory }}>{lbl} <span style={{ color: C.muted, fontSize: "var(--font-label)" }}>· {e.house}H (lord {hl})</span></div>
+                    <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-small)", color: C.ivory }}>{lbl} <span style={{ color: C.muted, fontSize: "var(--font-label)" }}>· {hi ? `${e.house} भाव` : `${e.house}H`} ({hi ? "स्वामी" : "lord"} {planetName(lang, hl)})</span></div>
                     <div style={{ fontSize: "var(--font-label)", color: C.muted }}>{e.date}</div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
-                    {rd ? <span style={{ fontSize: "var(--font-small)", color: C.ivory }}><span style={{ color: lordColor[rd.maha] }}>{rd.maha}</span>–<span style={{ color: lordColor[rd.antar] }}>{rd.antar}</span></span> : <span style={{ color: C.muted, fontSize: "var(--font-label)" }}>—</span>}
+                    {rd ? <span style={{ fontSize: "var(--font-small)", color: C.ivory }}><span style={{ color: lordColor[rd.maha] }}>{planetName(lang, rd.maha)}</span>–<span style={{ color: lordColor[rd.antar] }}>{planetName(lang, rd.antar)}</span></span> : <span style={{ color: C.muted, fontSize: "var(--font-label)" }}>—</span>}
                     {hit && <span style={{ fontSize: "var(--font-small)", color: "var(--good)" }} title={hi ? "दशा स्वामी घटना-भाव का भी स्वामी है" : "dasha lord rules the event house"}>✓</span>}
                     <button onClick={() => setEvents(events.filter((x) => x.id !== e.id))} style={{ padding: "0.1875rem 0.5rem", borderRadius: "0.375rem", fontSize: "var(--font-label)", cursor: "pointer", border: `0.0625rem solid ${C.line}`, background: "transparent", color: C.muted }}>✕</button>
                   </div>

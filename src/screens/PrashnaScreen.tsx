@@ -1304,7 +1304,10 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, placeLabel = 'New Delhi', 
                       </td>
                       <td>{hi ? RASHI_HI[p.sign] : RASHI_EN[p.sign]} {fmtDeg(p.deg)}</td>
                       <td>{hi ? panchangTermAt("hi", "nakshatra", p.nak.idx) : p.nak.en}-{p.nak.pada}</td>
-                      <td>{p.star}/{p.sub}</td>
+                      {/* KP writes star/sub as two-letter abbreviations; in Devanagari the
+                          graha names are already short, so Hindi gets the name itself
+                          rather than a transliterated stub (B10, 2026-08-18). */}
+                      <td>{hi ? `${GRAHA_HI[p.star]}/${GRAHA_HI[p.sub]}` : `${p.star}/${p.sub}`}</td>
                       <td>{p.house}</td>
                     </tr>
                   ))}

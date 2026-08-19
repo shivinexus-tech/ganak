@@ -105,6 +105,61 @@ export function signShort(lang: string, index: unknown): string {
   return lang === "hi" ? SIGN_SHORT_HI[i] : SIGN_SHORT_EN[i];
 }
 
+/* ------------------------------------------------------------------ padas + lords
+   B10. Two label families were centralised late, in 2026-08-18, because nothing
+   ever audited them: the nakshatra PADA (quarter) and the KP lord labels
+   (star lord / sub lord / sub-sub / sign lord / dasha lord).
+
+   Pada: the app shipped three spellings of one word — "पाद" on the chart summary
+   and the rectifier, "चरण" in the quick calculators. Hindi almanacs say चरण, and
+   it is the word already used on the plain-language calculator a householder
+   meets first, so चरण wins and every caller now asks for it here. The NUMBER
+   stays in Latin digits: Ganak writes every other number that way in Hindi
+   (degrees, times, years), and one Devanagari numeral in a Latin table reads as
+   a typo rather than as care.
+
+   Lord: a KP lord is a GRAHA, so its display name is already owned by PLANET_HI.
+   The defect was never the table — it was that a dozen render sites printed the
+   engine's raw English ("Venus") straight into a Hindi screen. planetName is
+   deliberately a named entry point rather than another panchangTerm(…, "planet", …)
+   call so that the lord sites are greppable and the gate can require it. */
+const PADA_LABEL = { en: "pada", hi: "चरण" } as const;
+
+/** The word for a nakshatra quarter, in the reader's language. */
+export function padaLabel(lang: string): string {
+  return lang === "hi" ? PADA_LABEL.hi : PADA_LABEL.en;
+}
+
+/** A full pada readout — "pada 3" / "चरण 3". Out-of-range padas return "". */
+export function padaText(lang: string, pada: unknown): string {
+  const n = Number(pada);
+  if (!Number.isInteger(n) || n < 1 || n > 4) return "";
+  return `${padaLabel(lang)} ${n}`;
+}
+
+/** The display name of a graha held as a lord value ("Venus" -> शुक्र). */
+export function planetName(lang: string, value: unknown): string {
+  return panchangTerm(lang, "planet", value);
+}
+
+/* Compact lord labels for narrow columns (the rectifier sweep, KP house lists).
+   English abbreviates because "Mercury" does not fit; Hindi does NOT, because the
+   Devanagari names are already two aksharas and every shortening collides —
+   शुक्र and शनि both become श, which is precisely the "which column am I in"
+   failure that SIGN_SHORT_HI was widened to three aksharas to avoid. */
+const PLANET_SHORT_EN: Record<string, string> = {
+  Sun: "Sun", Moon: "Moo", Mars: "Mar", Mercury: "Mer", Jupiter: "Jup",
+  Venus: "Ven", Saturn: "Sat", Rahu: "Rah", Ketu: "Ket",
+};
+
+/** Compact graha label for a dense column. */
+export function planetShort(lang: string, value: unknown): string {
+  const text = String(value ?? "").trim();
+  if (!text) return "";
+  if (lang === "hi") return PLANET_HI[text] || text;
+  return PLANET_SHORT_EN[text] || text.slice(0, 3);
+}
+
 const ORDERS = { sign: SIGN_ORDER, nakshatra: NAKSHATRA_ORDER } as const;
 
 const TABLES = { tithi: TITHI_HI, paksha: PAKSHA_HI, month: MONTH_HI, sign: SIGN_HI, nakshatra: NAKSHATRA_HI, planet: PLANET_HI };
@@ -171,7 +226,7 @@ export function signLabel(lang: string, value: unknown): string {
   return signName(lang, i);
 }
 
-export { TITHI_HI, PAKSHA_HI, MONTH_HI, SIGN_HI, NAKSHATRA_HI, PLANET_HI,
+export { TITHI_HI, PAKSHA_HI, MONTH_HI, SIGN_HI, NAKSHATRA_HI, PLANET_HI, PADA_LABEL, PLANET_SHORT_EN,
   SIGN_ORDER, NAKSHATRA_ORDER, SIGN_EN_WESTERN,
   WEEKDAY_EN, WEEKDAY_SHORT_EN, WEEKDAY_HI, WEEKDAY_SHORT_HI,
   SIGN_SHORT_HI, SIGN_SHORT_EN };

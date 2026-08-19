@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { T } from "../components/ui-style-contract";
 import { fmtDateT } from "../components/format";
-import { signShort } from "../i18n/panchang-terms";
+import { signShort, planetName } from "../i18n/panchang-terms";
 import {
   BNN_PLANETS, BNN_KARAKA, bnnRelations, bnnReading, bnnTiming,
   bcpTimeline, bspRules, jupiterProgression,
@@ -230,11 +230,11 @@ function BhriguModule({ rows, ascSign, birthMs, tz, C, card, lang = "en" }) {
               </div>
               <div>
                 <div style={{ fontSize: "var(--font-small)", color: C.ivory }}>{ord(b.houseNum)} · {signShort(lang, b.sign)}</div>
-                <div style={{ fontSize: "var(--font-micro)", letterSpacing: ".06em", color: lordColor[b.cycleLord] || C.muted }}>{b.cycleLord} {hi ? "चक्र" : "cycle"}</div>
+                <div style={{ fontSize: "var(--font-micro)", letterSpacing: ".06em", color: lordColor[b.cycleLord] || C.muted }}>{planetName(lang, b.cycleLord)} {hi ? "चक्र" : "cycle"}</div>
               </div>
               <div style={{ fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.4 }}>
                 {hi ? "इस वर्ष सक्रिय भाव के सामान्य जीवन-विषय" : b.theme}
-                {b.occupants.length > 0 && <span style={{ color: C.gold }}> · {b.occupants.join(", ")} {hi ? "यहाँ" : "here"}</span>}
+                {b.occupants.length > 0 && <span style={{ color: C.gold }}> · {b.occupants.map((pl: string) => planetName(lang, pl)).join(", ")} {hi ? "यहाँ" : "here"}</span>}
               </div>
             </div>
           );

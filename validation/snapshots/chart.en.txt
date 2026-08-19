@@ -13,3 +13,29 @@ Venus — Aries · Bharani
 Saturn — Capricorn · Uttara Ashadha
 Rahu — Capricorn · Shravana
 Ketu — Cancer · Pushya
+--- KP lords (star · sub · sub-sub) ---
+Sun — Mars · Mercury · Mercury
+Moon — Rahu · Venus · Saturn
+Mars — Mercury · Mercury · Venus
+Mercury — Moon · Mars · Jupiter
+Jupiter — Jupiter · Saturn · Saturn
+Venus — Venus · Mercury · Venus
+Saturn — Sun · Rahu · Mercury
+Rahu — Moon · Saturn · Saturn
+Ketu — Saturn · Jupiter · Venus
+--- cuspal sub-lords ---
+1: Jupiter · Rahu · Venus
+2: Mercury · Saturn · Mercury
+3: Sun · Sun · Jupiter
+4: Mars · Saturn · Sun
+5: Jupiter · Rahu · Saturn
+6: Ketu · Sun · Jupiter
+7: Sun · Jupiter · Rahu
+8: Mars · Saturn · Mercury
+9: Jupiter · Venus · Sun
+10: Mercury · Saturn · Sun
+11: Sun · Jupiter · Mercury
+12: Mars · Venus · Moon
+Ruling planets: Moon · Jupiter · Rahu · Saturn · Rahu · Venus · Venus
+Dasha lords: Rahu · Jupiter · Saturn · Mercury · Ketu · Venus · Sun · Moon · Mars
+Compact lord labels: Rah Jup Sat Mer Ket Ven Sun Moo Mar
