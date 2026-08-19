@@ -80,9 +80,20 @@ function validate(content) {
 }
 
 assert.strictEqual(nullGuideKeys.length, 77, 'expected the audited 77 null-guide routes');
-assert.strictEqual(ekadashiKeys.length, 24, 'expected 24 named Ekadashi variants');
+/* 26 = the 24 Ekadashis of an ordinary lunar year plus Padmini and Parama, the two
+   that belong to Adhika Masa. Raised from 24 on 2026-08-19: the Ekadashi naming fix
+   deliberately left the leap-month pair showing as an unnamed "Ekadashi" rather than
+   letting them borrow a wrong name, and the festival day-rules lane then gave them
+   their real names and routes, pinned to 8 published dates across 2026, 2029, 2031
+   and 2034. This is a completeness count, so it must rise when a real variant is
+   added — see plans/research/ekadashi-lunar-month-naming.md. */
+assert.strictEqual(ekadashiKeys.length, 26, 'expected 24 ordinary + 2 Adhika Masa named Ekadashi variants');
 assert.strictEqual(pradoshKeys.length, 7, 'expected 7 named Pradosh variants');
-assert.strictEqual(expectedKeys.length, 108, 'expected 108 semantic route gaps');
+/* 110 = 77 null-guide routes + 26 named Ekadashis + 7 named Pradoshas. Raised from
+   108 on 2026-08-19 by exactly the two Adhika Masa Ekadashis above — this total is the
+   arithmetic sum of the three counts asserted immediately above it, so it moves with
+   them and is not a separate quality signal. */
+assert.strictEqual(expectedKeys.length, 110, 'expected 110 semantic route gaps (77 null-guide + 26 Ekadashi + 7 Pradosh)');
 
 const problems = validate(FESTIVAL_ROUTE_CONTENT);
 assert.deepStrictEqual(problems, [], `Festival route content problems (${problems.length}):\n- ${problems.join('\n- ')}`);

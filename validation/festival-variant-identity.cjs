@@ -107,12 +107,23 @@ for (const fixture of [
   const atMs = Date.UTC(y, m - 1, d, 6, 30);
   const panchang = today.computeTodayPanchang({ label: 'Delhi', lat: 28.6139, lon: 77.2090, zone: 'Asia/Kolkata' }, 'lahiri', atMs);
   assert(/\(Adhik\)/.test(panchang.months.amanta), `${fixture.paksha} fixture must remain Adhik`);
+  /* Inverted 2026-08-19. This used to assert `null` — the Adhika Masa Ekadashis were
+     deliberately left generic rather than borrowing a neighbouring month's name. They
+     are now sourced and named (Padmini in Shukla, Parama in Krishna), pinned to 8
+     published dates across 2026, 2029, 2031 and 2034, so the assertion is flipped to
+     hold the identity rather than deleted. See plans/research/ekadashi-lunar-month-naming.md. */
   const identityMonth = engine.ekadashiIdentityMonth(panchang.months, panchang.krishna);
-  assert.strictEqual(identityMonth, null, `${fixture.paksha} Adhik identity must stay generic until Padmini/Parama is sourced`);
+  assert.ok(identityMonth, `${fixture.paksha} Adhik Ekadashi must now carry its sourced identity (Padmini/Parama)`);
   const occurrence = engine.observancesFor(panchang.krishna, 11, identityMonth, panchang.dow, panchang.anchor)[0];
-  assert.strictEqual(occurrence.key, 'ekadashi', `${fixture.paksha} Adhik must not inherit an ordinary-month name`);
+  /* The intent of this assertion is unchanged — an Adhika Masa Ekadashi must never
+     borrow a neighbouring ordinary month's name. What satisfies it has changed: it
+     used to be the generic `ekadashi` key, and is now the leap-month's own key. Both
+     halves are asserted so the check is stricter than it was, not merely re-pointed. */
+  assert.match(occurrence.key, /^Adhik_(Shukla|Krishna)_11$/, `${fixture.paksha} Adhik must carry its own leap-month key, got ${occurrence.key}`);
+  assert.ok(!/^(Chaitra|Vaishakha|Jyeshtha|Ashadha|Shravana|Bhadrapada|Ashwina|Kartika|Margashirsha|Pausha|Magha|Phalguna)_/.test(occurrence.key),
+    `${fixture.paksha} Adhik must not inherit an ordinary-month name, got ${occurrence.key}`);
 }
-console.log('PASS  Adhik Shukla/Krishna Ekadashis stay generic instead of being misnamed');
+console.log('PASS  Adhik Shukla/Krishna Ekadashis carry their own sourced leap-month identity (Padmini/Parama) and never an ordinary month name');
 
 for (const [oldPath, canonicalPath] of Object.entries(pages.FESTIVAL_LEGACY_PATH_REDIRECTS)) {
   assert(!pages.FESTIVAL_PAGE_ROUTES[oldPath], `${oldPath} must not remain a second live identity`);
