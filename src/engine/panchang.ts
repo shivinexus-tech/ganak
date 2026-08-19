@@ -282,11 +282,70 @@ function pitruPakshaDay(rise, set) {
 }
 
 
-/* UTC offset (hours) of an IANA zone on the birth date — handles historical DST */
-function zoneOffset(zone, y, m, d) {
+/* ---- timezone offset resolution -------------------------------------------
+   `zoneOffset` answers "what UTC offset, in hours, does this IANA zone have?"
+   for a moment expressed as a LOCAL WALL CLOCK (y, m, d, hh, mi).
+
+   It used to resolve the offset at `Date.UTC(y, m-1, d, 12)` — noon UTC on the
+   given date — which is a different instant from the one the caller means. On a
+   DST-transition day that lands on the wrong side of the transition, so a birth
+   at 00:30 on a spring-forward morning was computed with the after-the-change
+   offset. Measured over 110,684 births in 7 DST cities, 1960-2026, that put 275
+   births an hour out and printed a different ascendant for 131 of them
+   (`plans/audits/2026-08-18-bugbash-utility-calculators.md`, finding F1).
+   Noon UTC also lands on the WRONG LOCAL DATE for far-eastern zones — for
+   Pacific/Auckland (+13) it is 01:00 the next local day — so a whole Auckland or
+   Sydney day could take the neighbouring day's offset.
+
+   A wall clock is genuinely circular: converting it to an instant needs the
+   offset, and the offset is defined on instants. So we generate the candidate
+   offsets in force around the target and keep the ones that are self-consistent:
+   an offset `o` is valid for wall clock W iff the zone really is at `o` at the
+   instant `W - o`.
+
+   Two wall clocks are pathological, and this code picks a side deliberately:
+
+   * SKIPPED HOUR (spring forward) — e.g. America/New_York 2024-03-10 02:30,
+     a wall clock that never existed. No candidate is self-consistent.
+     CONVENTION: use the offset in force BEFORE the change (the smaller one).
+     That maps the missing time forward by the size of the gap (02:30 becomes
+     the real instant 07:30 UTC = 03:30 EDT). This is what java.time
+     `ZonedDateTime`, moment-timezone and Temporal ("compatible" disambiguation)
+     all do, and it is the only choice that keeps later wall clocks mapping to
+     later instants. A birth certificate showing a skipped time is a recording
+     error; shifting forward keeps the record and the chart in the same order.
+
+   * REPEATED HOUR (autumn fall back) — e.g. America/New_York 2024-11-03 01:30,
+     a wall clock that happens twice. Two candidates are self-consistent.
+     CONVENTION: use the offset in force BEFORE the change (the larger one),
+     i.e. the FIRST of the two passes. Same default as java.time, Python's
+     `fold=0`, moment-timezone and Temporal "compatible". It is also the
+     likelier reading of a birth record: the clocks had not been turned back
+     yet when the time was written down. The second pass is unreachable through
+     this function; a caller that needs it must pass the UTC instant instead.
+
+   Callers that pass only (zone, y, m, d) get the offset at LOCAL NOON on that
+   date — the representative offset of that civil day, which is what the
+   panchang day engines want. Callers that know a clock time (births) should
+   pass `hh, mi` so the birth instant, not midday, decides.                    */
+
+const ZONE_FMT = new Map();
+function zoneFmt(zone) {
+  let f = ZONE_FMT.get(zone);
+  if (f === undefined) {
+    try { f = new Intl.DateTimeFormat("en-US", { timeZone: zone, timeZoneName: "longOffset" }); }
+    catch { f = null; }
+    ZONE_FMT.set(zone, f);
+  }
+  return f;
+}
+
+/* UTC offset (hours) of an IANA zone at a real UTC instant. null = unknown zone. */
+function zoneOffsetAt(zone, utcMs) {
+  const f = zoneFmt(zone);
+  if (!f) return null;
   try {
-    const dt = new Date(Date.UTC(y, m - 1, d, 12));
-    const parts = new Intl.DateTimeFormat("en-US", { timeZone: zone, timeZoneName: "longOffset" }).formatToParts(dt);
+    const parts = f.formatToParts(new Date(utcMs));
     const v = (parts.find((p) => p.type === "timeZoneName") || {}).value || "";
     if (v === "GMT" || v === "UTC") return 0;
     const mch = v.match(/GMT([+-])(\d{1,2})(?::(\d{2}))?/);
@@ -295,6 +354,26 @@ function zoneOffset(zone, y, m, d) {
   } catch {
     return null;
   }
+}
+
+/* UTC offset (hours) of an IANA zone at a local wall clock — handles historical
+   DST, half-hour and quarter-hour zones. See the conventions note above. */
+function zoneOffset(zone, y, m, d, hh = 12, mi = 0) {
+  const H = 3600000;
+  const naive = Date.UTC(y, m - 1, d, hh, mi);   // the wall clock read as if it were UTC
+  const seed = zoneOffsetAt(zone, naive);
+  if (seed == null) return null;
+  /* The true instant is within 14h of `naive` (no zone is further from UTC than
+     that), so probing +/-18h brackets any transition that can affect it, and no
+     zone has ever changed offset twice inside 36 hours. */
+  const cands = [];
+  for (const probe of [seed, zoneOffsetAt(zone, naive - 18 * H), zoneOffsetAt(zone, naive + 18 * H)]) {
+    if (probe != null && !cands.includes(probe)) cands.push(probe);
+  }
+  const valid = cands.filter((o) => zoneOffsetAt(zone, naive - o * H) === o);
+  if (valid.length === 1) return valid[0];
+  if (valid.length > 1) return Math.max(...valid);   // repeated hour -> first pass (see above)
+  return Math.min(...cands);                          // skipped hour -> pre-change offset (see above)
 }
 
 function setAyanMode(ayanamsa) {
