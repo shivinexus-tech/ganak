@@ -90,7 +90,8 @@
     62,
     66,
     70,
-    71
+    71,
+    "84"
   ],
   "sourceNotApplicableItemIds": [
     5,
@@ -440,7 +441,8 @@
         80,
         81,
         82,
-        83
+        83,
+        84
       ]
     },
     {
@@ -956,6 +958,11 @@
     "83": {
       "section": "P0",
       "title": "Malayalam Kollavarsham calendar engine, shipped dark (`C4-MALAYALAM-KOLLAVARSHAM`)",
+      "technicalComplexity": "Medium"
+    },
+    "84": {
+      "section": "P0",
+      "title": "Moonrise/moonset attributed to the wrong panchang day (`P0-MOON-DAY-WINDOW`)",
       "technicalComplexity": "Medium"
     }
   }

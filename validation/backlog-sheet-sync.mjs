@@ -15,13 +15,17 @@ const config = JSON.parse(await readFile(new URL("../plans/backlog-sheet-sync.js
 const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md", import.meta.url), "utf8");
 const base = parseRegister(markdown, config, "test base");
 
-assert.equal(base.rows.size, 83);
+assert.equal(base.rows.size, 84);
 
 // 76-83 added 2026-08-18: the defects a five-lane audit-and-fix sweep found and
 // closed in one day. Registered as closed work with gate evidence, except 76 and
 // 80, whose remaining share is named honestly in the register rather than rounded up.
 assert.equal(base.rows.get("76").section, "P0");
 assert.equal(base.rows.get("83").section, "P0");
+
+// 84 added 2026-08-19: moon events attributed to the wrong panchang day — found
+// while re-measuring a stale branch against main, still live in production.
+assert.equal(base.rows.get("84").section, "P0");
 
 // 73, 74 and 75 added 2026-08-14: the three reference-source divergences the
 // 2026-08-12 Drik cross-check left open (C3). All three shipped with the row, so
@@ -285,7 +289,7 @@ assert.throws(
 );
 assert.equal(
   parseRegister(preAutomationMarkdown, config, "bootstrap historical fixture", { allowMetadataTitleMismatch: true }).rows.size,
-  83,
+  84,
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 
