@@ -237,7 +237,7 @@ together.
 KP horary is cast for the moment **and place of judgement**. `PrashnaScreen` offers exactly that
 override — "Set the judgment moment & place myself" — with fields for place name, latitude,
 longitude and a `datetime-local`. There is no timezone field, and
-`src/screens/PrashnaScreen.tsx:860` reads the typed moment as
+`src/screens/PrashnaScreen.tsx:852` reads the typed moment as
 
 ```js
 const ms = (useCustom && customWhen) ? new Date(customWhen).getTime() : Date.now();
@@ -252,7 +252,7 @@ London judging a question that arrived in Chennai types `18:00` meaning IST and 
 <PrashnaScreen lat={panchEff?.lat} lon={panchEff?.lon} placeLabel={panchEff?.label} lang={lang} />
 ```
 
-`panchEff` is `{ label, lat, lon, zone }` (`src/kundli-app.tsx:122-123`) — the **zone is present,
+`panchEff` is `{ label, lat, lon, zone }` (`src/kundli-app.tsx:122`) — the **zone is present,
 round-trips through the URL (`?zone=`), and is simply not passed on.** Every other place-consuming
 screen receives the whole `place` object; Prashna is the only one destructured down to lat/lon.
 
@@ -279,7 +279,7 @@ ACTUAL 18:00 BST       lagna=Ar 13.858  sub=Ve
 
 **Partially disclosed, not fixed.** The panel does carry a micro caption — *"Time is read in your
 device's timezone." / "समय आपके उपकरण के समयक्षेत्र में पढ़ा जाता है।"*
-(`src/screens/PrashnaScreen.tsx:1091-1093`). That keeps this off P0, but reading it does not help:
+(`src/screens/PrashnaScreen.tsx:1092-1093`). That keeps this off P0, but reading it does not help:
 there is no field with which to express the judging place's local time, so the override is
 structurally unable to do the thing it is named for.
 
@@ -309,7 +309,7 @@ with no warning, and the share card carries the shifted time into the PNG.
 refused rather than quietly moved ("Ganak will not move it to the next day for you"). The Prashna
 judgment-time field never reaches that helper.
 
-**Cause** — `src/screens/PrashnaScreen.tsx:860`; no guard, and `src/components/birth-input.ts` is
+**Cause** — `src/screens/PrashnaScreen.tsx:852`; no guard, and `src/components/birth-input.ts` is
 not imported by this screen.
 
 **Suggested fix** — round-trip the parsed instant back to a local wall-clock string and refuse the
@@ -321,7 +321,7 @@ input when it does not match what was typed, with the birth-input vocabulary.
 which `src/engine/ephemeris.ts` has real ΔT polynomial fits. Widening it is a product call" — and
 today's fix makes four screens refuse to calculate outside it. The Prashna `datetime-local` has no
 `min`, no `max` and no validation, and the inlined engine uses a **hard-coded** `PR_DELTA_T = 72`
-seconds (`src/screens/PrashnaScreen.tsx:24`), correct only around the present decade.
+seconds (`src/screens/PrashnaScreen.tsx:23`), correct only around the present decade.
 
 **Observed** (`.scratch/bugbash/bounds.cjs`) — every one of these answers with full confidence:
 
@@ -334,8 +334,8 @@ year 9999  asc=109.157 sunLon=311.912 moonLon=43.818
 
 **Expected** — the same refusal, in the same words, as the four screens fixed today.
 
-**Cause** — `src/screens/PrashnaScreen.tsx:1085-1090` (the `datetime-local` input) and the `ask()`
-validation at `src/screens/PrashnaScreen.tsx:861-865`, which only checks `Number.isFinite(ms)`.
+**Cause** — `src/screens/PrashnaScreen.tsx:1085` (the `datetime-local` input) and the `ask()`
+validation at `src/screens/PrashnaScreen.tsx:853-857`, which only checks `Number.isFinite(ms)`.
 
 ### F7 — P1 · Switching tabs destroys the reading **and** the one-question lock, so the same number can be re-cast at a new moment. Nothing about a reading round-trips through the URL.
 
@@ -349,13 +349,13 @@ That is not only lost work. The number-mode lock exists to enforce a **Tier-1 pa
 one question at a time), and the screen says so out loud — *"This is not a lucky number — the first
 sincere number is the one; don't change it. One question at a time."* A tab tap resets it. The
 elaborate in-screen guards (F1/F4/F5 lock, the F9 600 ms double-tap window at
-`src/screens/PrashnaScreen.tsx:826-831`) are all defeated by the cheapest gesture on the screen.
+`src/screens/PrashnaScreen.tsx:839-842`) are all defeated by the cheapest gesture on the screen.
 
 **Reproduction** — number mode, topic Marriage, number 139, Cast. Tap **Daily**. Tap **Prashna**.
 The number field is empty and editable, no topic is selected, and 139 can be cast again against a
 different sky.
 
-**Related:** `src/kundli-app.tsx:96-123` puts `lang`, `screen`, `city/lat/lon/zone` and `muhurat`
+**Related:** `src/kundli-app.tsx:96-109` puts `lang`, `screen`, `city/lat/lon/zone` and `muhurat`
 in the URL. Nothing about a Prashna reading is there, so a reading survives neither a reload nor a
 Back, and there is no shareable link — only the PNG card, which carries no verdict (see F9).
 
@@ -366,9 +366,9 @@ it round-trips like every other Ganak state.
 
 ### F8 — P1 · Round-tripping the method toggle while a number session is locked leaves the screen locked with **no reading at all**
 
-`switchMode` deliberately preserves a locked result (`src/screens/PrashnaScreen.tsx:820`:
+`switchMode` deliberately preserves a locked result (`src/screens/PrashnaScreen.tsx:836`:
 `if (!locked) clearResult()`), but the result block is gated on
-`result.mode === mode` (`src/screens/PrashnaScreen.tsx:1198`). Nothing keeps a *time*-mode cast from
+`result.mode === mode` (`src/screens/PrashnaScreen.tsx:1196`). Nothing keeps a *time*-mode cast from
 overwriting the locked *number*-mode result.
 
 **Reproduction**
@@ -393,6 +393,237 @@ the reading it says is locked no longer exists. The number-mode answer is unreco
 **Expected** — either the lock should scope to the mode it was taken in, or step 3 should be
 refused while a number session is locked.
 
-**Cause** — `src/screens/PrashnaScreen.tsx:820` (`switchMode`) vs
-`src/screens/PrashnaScreen.tsx:1198` (`result.mode === mode`) and
-`src/screens/PrashnaScreen.tsx:888` / `:895` (`setResult` in both branches writes the same slot).
+**Cause** — `src/screens/PrashnaScreen.tsx:836` (`switchMode`) vs
+`src/screens/PrashnaScreen.tsx:1196` (`result.mode === mode`) and
+`src/screens/PrashnaScreen.tsx:873` / `:879` (`setResult` in both branches writes the same slot).
+
+### F9 — P1 · Ruling Planets — the citation index lists them as a shipped engine rule, and the Prashna path never computes them
+
+`plans/prashna-249-ksk-verify.md` "The citation index (**rule → tier → source**)" is headed
+*"Engine rule (what Ganak will do)"* and row 4 reads:
+
+> **Ruling Planets** = day-lord, ascendant sign-lord & star-lord, Moon sign-lord & star-lord;
+> common planets between RPs and significators survive — ✅ **Tier 1 — page-pinned** … Reader VI
+> Section V, scan p.175: *"the lords of the day, Moon sign, star and lagna at the moment of
+> judgement"*; p.209 (RP-at-judgement = RP-at-fructification).
+
+`computeRulingPlanets` exists (`src/engine/dasha.ts:72-101`) and is called from exactly one place —
+`src/engine/kundli.ts:176`, for the **birth** chart on the Jyotish screen. Grep confirms the string
+"ruling" appears nowhere in `src/screens/PrashnaScreen.tsx`. So the one rule KSK ties explicitly to
+*"the moment of judgement"* is the one rule the horary screen does not apply, and the
+significator/RP intersection that decides which significator actually fructifies is absent.
+
+This matters more than a missing feature because of what the screen asks its readers:
+
+```
+⚖️ Astrologers — is this reading correct?
+This practitioner view is new and has not yet been checked by a working astrologer. If you read KP:
+are the cuspal sub-lords and significators above correct?
+```
+
+An astrologer answering that question will look for the Ruling Planets first, because in KP they
+are the filter applied to exactly the two tables shown. There is nothing on the page saying they
+were deliberately left out.
+
+**Suggested fix** — either compute the RP set for the judgment moment (`computeRulingPlanets` is
+already pure and takes `ascSid`, `moonSid`, `dayLord`, so the Prashna chart has everything it needs
+once the Hindu vara is available — see F14) and show it beside the significator grid, or mark rule 4
+in the citation index as *cited but not implemented*, and say so on the screen. Right now the
+document and the product disagree.
+
+### F10 — P1 · The default method has no one-question lock, and its reading changes every ~2 minutes
+
+Number mode is protected by an elaborate lock (F1/F4/F5 result lock, the F9 600 ms double-tap
+window). **Time mode — the default `mode = 'time'`, the mode a first-time visitor lands in — has
+none.** The "Ask now" button stays live; tapping it recasts on a new `Date.now()`.
+
+**Observed** (`.scratch/bugbash/moment.cjs`, Delhi, 2026-08-18 12:00 IST, all 12 topics):
+
+```
+  +   1s : 0/12 topics changed
+  +  60s : 0/12 topics changed
+  + 120s : 4/12 topics changed
+           health: Rahu/unfavourable  ->  Jupiter/mixed
+           travel: Rahu/unfavourable  ->  Jupiter/mixed
+  + 600s : 12/12 topics changed
+12 distinct 12-topic readings in 600 consecutive seconds
+```
+
+So a querent who does not like "Not the right moment" need only wait two minutes and tap again —
+the same sincerity rule the number mode enforces out loud (*"the first sincere number is the one;
+don't change it. One question at a time"*), and which `plans/prashna-249-ksk-verify.md` rule 6 pins
+to Reader VI p.43, is completely unguarded in the mode most users will actually use. Nothing on the
+time-mode surface even mentions it.
+
+For contrast — and this is worth recording as *correct* behaviour — number mode is genuinely
+stable: **1** distinct reading across the same 600 seconds and **2** across 24 hourly casts, because
+the number fixes the cusps and only the planets move. The lock there is protecting the ritual, not
+papering over numeric instability.
+
+**Suggested fix** — carry the same lock and the same "one question at a time" copy into time mode.
+
+### F11 — P2 · The share card carries the chart but not the answer, and its technical labels stay English in Hindi
+
+`PR_shareCardCanvas` (`src/screens/PrashnaScreen.tsx:429-530`) paints the question, the mode, the
+lagna, the judged cuspal sub-lord, all twelve cuspal sub-lords and the disclosures — and **never the
+verdict**. Captured by shimming the canvas (`.scratch/bugbash/sharecard.cjs`), number 11 / Health,
+whose on-screen verdict is *"Not yet — Not the right moment"*:
+
+```
+Prashna chart
+Health · KP number method · #11
+Lagna: Aries 15°33′  ·  Bharani-1
+6th cusp sub-lord: Saturn
+CUSPAL SUB-LORDS
+ 1  Aries — Sun      …  12  Pisces — Saturn
+Cast: … / Place: New Delhi / latitude shapes the cusps; longitude does not
+Ayanamsa: KP-New · mean Rahu/Ketu / Houses: Placidus / Source: K.S. Krishnamurti, KP Reader VI
+```
+
+Every number matches the screen exactly — that half held up. But the button is labelled *"Share
+chart card" / "कुण्डली कार्ड साझा करें"* and sits under a verdict, so a recipient gets the evidence
+with the answer removed. Ganak's own principle is answer-before-data; this export is data-only.
+
+**Hindi leak in the same card** (`.scratch/bugbash/sharecard2.cjs`, `hi`, Reykjavik):
+
+```
+भाव: Equal (high-latitude fallback)
+भाव: Placidus                      ← (Delhi)
+अयनांश: KP-New · मध्यम राहु/केतु
+सन्दर्भ: K.S. Krishnamurti, KP Reader VI
+```
+
+`Equal (high-latitude fallback)` is a whole English sentence inside a Hindi card. The **in-app**
+gloss for the same fact is properly translated — `समान भाव — उच्च अक्षांश विकल्प` and
+`प्लेसिडस भाव — कृष्णमूर्ति पद्धति का मानक` (`src/screens/PrashnaScreen.tsx:1330-1331`) — so the
+card is strictly less localised than the screen it exports. Cause:
+`src/screens/PrashnaScreen.tsx:518` (`Houses:` line, both branches hard-coded English).
+
+For the record, the in-app Hindi surface itself is clean: a full Latin-script scan of the seeded
+Hindi result page returned only `Rx` (glossed in place: `Rx = वक्री, आकाश में पीछे चलता प्रतीत होता है`),
+the `A B C D` grid headers (glossed below the grid), and `VI` in the Reader citation.
+
+### F12 — P1 · Gulika/Mandi uses the civil weekday while the same chart's Ruling Planets use the Hindu vara
+
+`src/engine/kundli.ts:173-174` gets the vara right for Ruling Planets:
+
+```js
+let dowB = new Date(utcMs + tz * 3600000).getUTCDay();
+if (evB.rise != null && utcMs < evB.rise) dowB = (dowB + 6) % 7;   // Hindu sunrise reckoning
+```
+
+`src/engine/special-points.ts:39`, inside the Gulika block, computes its own and never corrects it:
+
+```js
+const dow = new Date(birthMs + tz * 3600000).getUTCDay(); // 0=Sun
+```
+
+For any birth between midnight and sunrise the two disagree by one weekday, and Gulika's night-part
+index shifts by one eighth of the night.
+
+**Reproduction** — 2026-08-18 **03:00 IST**, New Delhi (28.6139, 77.209). Sunrise that day is
+05:52 IST, so the Hindu vara is still Monday while the civil weekday is Tuesday.
+
+**Observed** (`.scratch/bugbash/gulika.cjs`, `gulika2.cjs`):
+
+```
+Ruling planets dayLord (sunrise-reckoned) : Moon      (Monday)
+weekday lord used by special-points.ts    : Mars      (Tuesday)
+
+civil Tuesday  -> night-start lord Saturn, part 0, 18:58 IST -> Gulika Aquarius  1°29′   [SHIPPED]
+Hindu Monday   -> night-start lord Venus,  part 1, 20:19 IST -> Gulika Aquarius 29°36′
+```
+
+**Expected** — one vara per chart. Gulika/Mandi is a Saturn-part construction reckoned from the
+*vara*, and the same page prints both values.
+
+**Suggested fix** — pass the already-corrected `dowB` into `computeSpecialPoints` in the ctx rather
+than letting it recompute, and keep the sunrise correction in exactly one place.
+
+### F13 — P2 · The ruling-planet summary explains the winner by a number it did not rank on
+
+`computeRulingPlanets` ranks by **weight** (`src/engine/dasha.ts:90`:
+`b.weight - a.weight || b.count - a.count || …`), where sign lords score 3, star and sub lords 2 and
+the day lord 1. The summary sentence explains the winner by **count**
+(`src/screens/ChartScreen.tsx:781`):
+
+> The strongest Ruling Planet at this birth moment is **Mars** — it appears through 2 sources. In
+> KP, repeated ruling planets are read as higher-priority witnesses…
+
+**Observed** (`.scratch/bugbash/rp.cjs`, sweeping ascendant × Moon × weekday):
+
+```
+top  : Mars  count=2 weight=6 sources=ascSignLord,moonSignLord
+other: Venus count=3 weight=5 sources=moonStarLord,moonSubLord,dayLord
+6456 sampled charts where the top-ranked ruling planet has FEWER sources than another
+```
+
+The chip row directly beneath shows Venus three times and Mars twice, so the sentence's stated
+reason ("it appears through 2 sources", "repeated … are read as higher-priority") contradicts the
+evidence next to it. Ganak's own weighting is defensible — it just isn't what the sentence says.
+
+**Suggested fix** — state the weighting (as the Prashna significator legend already honestly does
+for its own A/C-over-B/D departure), or rank by count.
+
+### F14 — P2 · The on-screen provenance line is broader than the citation index behind it
+
+Every number-mode reading ends with:
+
+> This is the KP number method on the KP-New ayanamsa — distinct from Ganak's usual Lahiri
+> convention. **The judgment rules are drawn from K.S. Krishnamurti's KP Readers** (principally
+> Reader VI, Horary Astrology).
+
+`plans/prashna-249-ksk-verify.md` does not support the unqualified claim:
+
+- rule **7** (whose place/time) is *"⚠️ Tier 2 — by design, NOT KSK … a Ganak product decision …
+  no KSK backing claimed, and it must not be upgraded"*;
+- rule **8** (rotational 12th-from negation, which is what every "counts against the outcome" line
+  rests on) is *"PARTIAL … a primary-text house meaning + a standard-KP derivation … not
+  overclaimed as a verbatim KSK '12th-from' rule"*;
+- the **scoring weights** (primary ±2, secondary ±1, retrograde −1, the `score ≥ 2` /
+  `score ≤ −2` thresholds) and the twelve `favor`/`deny` house sets in
+  `src/screens/PrashnaScreen.tsx:229-241` are Ganak's, and appear in no citation row at all.
+
+The significator grid already sets the right precedent by disclosing its own departure in plain
+words ("Ganak's verdict weights A and C above B and D, rather than the classical A > B > C > D").
+The provenance line should do the same rather than attributing the whole judgment to KSK.
+
+### F15 — P2 · Devanagari digits are rejected with a message that misdescribes the problem
+
+`PR_normalizeNumberInput` and every validity test use `/^\d+$/`, which in JavaScript matches ASCII
+`0-9` only. `Number('१३९')` is `NaN`.
+
+**Reproduction** — Hindi mode, KP number field, type `१३९` (or Arabic-Indic `١٣٩`).
+
+**Observed** — the field turns red and shows
+`परम्परा 1 से 249 तक का अंक ही स्वीकारती है।` ("the tradition only accepts a number from 1 to 249"),
+and the Cast button stays dead. But १३९ **is** 139, and it is in range. The user is told their
+number is out of range when the real problem is the numeral system.
+
+**Cause** — `src/screens/PrashnaScreen.tsx:762-769` (`PR_normalizeNumberInput`) and
+`src/screens/PrashnaScreen.tsx:900`/`:914` (the `/^\d+$/` gates).
+
+**Suggested fix** — normalise Devanagari and Arabic-Indic digits to ASCII before validating, in a
+Hindi-first app where the number is the whole input.
+
+### F16 — P2 · Casting collapses the chart that Expert depth exists to open
+
+`src/screens/PrashnaScreen.tsx:794` opens the astrologer view at Expert depth —
+`const [showFull, setShowFull] = useState(showExpert)` — with the comment *"Expert opens the
+astrologer-facing chart straight away."* But the last statement of `ask()`
+(`src/screens/PrashnaScreen.tsx:885`) is `setShowFull(chartFirst)`, and `chartFirst` defaults to
+`false`. So at Expert depth the chart is open on an **empty** screen and closes the moment there is
+something to look at; the practitioner must reopen "Full Prashna chart" after every single cast.
+
+**Suggested fix** — `setShowFull(chartFirst || showExpert)`.
+
+### F17 — P2 · Two Placidus implementations with two different cutoffs and two different fallbacks
+
+The Jyotish path uses `src/engine/houses.ts` `placidusCusps`, whose degeneracy test is geometric
+(`Math.abs(adArg) >= 1`, i.e. circumpolar, effectively ≈66.5°) and whose fallback is announced as
+`"Porphyry (Placidus undefined at this latitude)"` (`src/engine/kundli.ts:151-153`). The Prashna
+path uses its own `PR_placidus`, which cuts at a flat `Math.abs(lat) > 60`
+(`src/screens/PrashnaScreen.tsx:136`) and falls back to "equal houses". Between 60° and 66.5° the
+same place therefore gets Placidus KP cusps on the Jyotish screen and non-Placidus cusps on the
+Prashna screen, under two different names, and a KP practitioner comparing the two will find they
+disagree. (Above 60° the Prashna fallback is also broken — see **F3**.)
