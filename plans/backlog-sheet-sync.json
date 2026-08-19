@@ -432,7 +432,15 @@
         63,
         64,
         66,
-        73
+        73,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83
       ]
     },
     {
@@ -909,6 +917,46 @@
       "section": "P1",
       "title": "Godhuli convention divergence ~14 min (`C3-GODHULI-DRIK`)",
       "technicalComplexity": "Low"
+    },
+    "76": {
+      "section": "P0",
+      "title": "Ekadashi names derived from the Gregorian month (`EKADASHI-LUNAR-NAMING`)",
+      "technicalComplexity": "Low"
+    },
+    "77": {
+      "section": "P0",
+      "title": "Sade Sati reported impossible cycles (`SADESATI-RETROGRADE-MERGE`)",
+      "technicalComplexity": "Medium"
+    },
+    "78": {
+      "section": "P0",
+      "title": "Marriage matching contradicted Ganak's own Manglik calculator and itself (`MATCHING-VERDICT-CONSISTENCY`)",
+      "technicalComplexity": "Medium"
+    },
+    "79": {
+      "section": "P0",
+      "title": "Calculators crashed or answered as the previous calculator (`CALC-STALE-RESULT`)",
+      "technicalComplexity": "Medium"
+    },
+    "80": {
+      "section": "P0",
+      "title": "Birth timezone resolved at noon instead of at the birth moment (`DST-ZONE-OFFSET`)",
+      "technicalComplexity": "Medium"
+    },
+    "81": {
+      "section": "P0",
+      "title": "Hindi readers got one generic sentence where English got real interpretations (`JYOTISH-HINDI-PARITY`)",
+      "technicalComplexity": "Medium"
+    },
+    "82": {
+      "section": "P0",
+      "title": "Rendered-output proof extended from 7 surfaces to 27 screens (`VERIFY-SNAPSHOTS`, row #65 continuation)",
+      "technicalComplexity": "Medium"
+    },
+    "83": {
+      "section": "P0",
+      "title": "Malayalam Kollavarsham calendar engine, shipped dark (`C4-MALAYALAM-KOLLAVARSHAM`)",
+      "technicalComplexity": "Medium"
     }
   }
 }
