@@ -252,10 +252,14 @@ last contrast corrections. The integrator therefore created section `652:13736` 
 
 The desktop frames are the two owner visual-direction decisions. The 390px frames are
 responsive-website QA companions only. On 2026-08-19 the owner also rejected the
-minimal vertical floral edge and lower flourish inside the ordinary-Today hero. The
-integrator hid only those ornaments in both Today source candidates and both review
-clones (`601:9793`, `601:9795`, `628:13637`, `628:13639`, `652:13965`, `652:13967`,
-`652:13996`, `652:13998`); no other Today geometry, content or styling changed.
+minimal vertical floral edge and detached lower-right ornament inside the ordinary-
+Today hero, then clarified that they must be replaced rather than merely removed.
+The integrator traced the original approved design-vocabulary source and replaced the
+two fragments with the complete bright botanical sweep `485:51`, fully visible as one
+left/bottom structural composition. New source nodes are `667:14247`, `667:14248`;
+owner-review nodes are `666:14247`, `666:14248`. The old fragments remain hidden at
+`601:9793`, `601:9795`, `628:13637`, `628:13639`, `652:13965`, `652:13967`,
+`652:13996`, `652:13998`; no other Today geometry, content or styling changed.
 
 This is not production-readiness approval. The source candidates remain
 `CHANGES REQUESTED` for interaction implementation: several current Figma reactions
