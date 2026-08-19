@@ -462,3 +462,179 @@ The cheapest gate that would have caught the most: pin the five anchor charts ab
 recorded), assert each maha boundary to the day, assert `antars[0].start >= birthMs`, and assert
 the four-level tiling that this pass verified clean.
 
+---
+
+### F16 — P1 · On any Panchang date except today, every planetary event is labelled "Today"
+
+**Reproduction:** Daily screen → pick any past date in the Panchang date picker → read the
+"Upcoming planetary events" card. `node -e` on `eventDetail` reproduces it directly:
+
+```
+   -200 days from now -> {"timeStr":"Today","days":-200,"hours":0}
+    -30 days from now -> {"timeStr":"Today","days":-30, "hours":0}
+    -1.5 days from now -> {"timeStr":"Today","days":-2, "hours":-12}
+     3.2 days from now -> {"timeStr":"3d 4h"}
+```
+
+`src/screens/DailyScreen.tsx:102-108` recomputes `todayP` — and therefore
+`todayP.events = upcomingEvents(now)` (`today-panchang.ts:124`) — from the **selected** date,
+but `DailyScreen.tsx:358` calls `eventDetail(e2, Date.now())` with the **real** clock. For a
+past date every `until` is negative, and `transit-copy.ts:37` has no negative branch, so the
+`days > 0 ? … : hours > 0 ? … : "Today"` chain falls to `"Today"` for all of them. Each row then
+carries its own timestamp ("17 Aug 2026") next to the word "Today" while the app is showing
+1 January 2026 — a contradiction inside a single row.
+
+**Fix:** measure the countdown from the same reference the events were generated from, and give
+`eventDetail` an explicit past branch ("2 months ago" / "2 माह पहले").
+
+---
+
+### F17 — P2 · The Ruling Planets strip loses all its colour coding in Hindi
+
+**Reproduction:** `node .scratch/bugbash/p11-rp.cjs` — Delhi 1990-01-01 12:00, rendered markup
+of the seven lord chips:
+
+```
+--- en ---
+  <span style="color:color-mix(in srgb, #9A7000, var(--ink) 26%);font-weight:700;">Jupiter</span>
+  <span style="color:color-mix(in srgb, #46588F, var(--ink) 26%);font-weight:700;">Saturn</span>
+--- hi ---
+  <span style="font-weight:700;">गुरु</span>
+  <span style="font-weight:700;">शनि</span>
+```
+
+The `color` declaration is simply absent in Hindi. `src/screens/ChartScreen.tsx:781-787` passes
+`pl={planetName(lang, RP.ascSignLord)}` — an **already-localised** name — into `RPItem`, which
+then does `PLANET_COLOR[pl]`. `PLANET_COLOR` (`ChartScreen.tsx:56`) is keyed by the English
+name, so in Hindi every lookup misses and the graha colour that distinguishes seven adjacent
+one-word chips disappears. The text still reads correctly only because `planetName` falls
+through on an unknown value.
+
+**Fix:** pass the canonical English lord into `RPItem`/`Chip` and localise inside, next to the
+colour lookup. `validation/ruling-planets.cjs` asserts only that six UI marker *strings* exist,
+so it cannot see this.
+
+---
+
+## Probed and found CLEAN
+
+Recorded so the coverage claim is honest and the next agent does not redo it.
+
+**Vimshottari arithmetic — re-derived, correct:**
+- `DASHA_SEQ` — the nine lords in the right order with the right years
+  (Ketu 7, Venus 20, Sun 6, Moon 10, Mars 7, Rahu 18, Jupiter 16, Saturn 19, Mercury 17 = 120).
+- **Star lord from the Moon** — `nakLordOf` = `VIM_LORDS[nak % 9]` reproduces the classical
+  lordship for all 27 stars (checked at the cusp: Purva Bhadrapada → Jupiter, Uttara Bhadrapada
+  → Saturn).
+- **Balance of dasha** — `(1 − frac) × yrs` where `frac` is the elapsed fraction of the star.
+  Verified against the five published Drik anchors above and by hand for Delhi 1990.
+- **Nakshatra-cusp behaviour** — at the exact minute the Moon crosses a cusp the balance hands
+  over to the new lord with a near-full period, and the old lord's balance goes to near zero.
+  Observed: `11:19 → Jupiter 0.005903 y`, `11:20 → Saturn 18.993328 y`. No off-by-one.
+- **Tiling is exact, to the millisecond, four levels deep.** For all nine lords, at every level
+  from antar to prana, `subs[8].end − (parent.start + parent.duration) === 0 ms` and every
+  internal gap is `0 ms` — no overlap, no gap, the last sub ends exactly with its parent.
+  (`p1-vim.cjs`: `worst 4-level end error: 0 ms`.) This is the check the brief flagged as having
+  caught a real defect elsewhere today; here it is genuinely clean, because
+  `vimSub` accumulates with `c += span` from an exact `(yrs/120) × dur` and the nine spans sum
+  without residue in IEEE-754.
+- **Total table span** — `120 − frac × yrs₀` in every sampled chart, to six decimals.
+- **The five-level chain** — `Maha › Antar › Pratyantar › Sookshma › Prana`; `DASHA_LEVELS`
+  and its Hindi counterpart line up, drilling stops correctly at prana (`level < 3`).
+- **Period selection is half-open** (`now >= start && now < end`) at every level, so the levels
+  tile with no instant belonging to two periods or to none.
+- **The antardasha convention is right**: sub-periods of a balance mahadasha are proportioned
+  over the *notional full* span (`fullStart = end − yrs × YEAR`), not over the truncated one.
+  F2 is a rendering defect on top of a correct calculation.
+- **`vimSub` is used identically** by `kundli.ts:104-113`, `DashaTree.tsx:18` and
+  `marriage-timing.ts:31`, so the drill-down cannot diverge from the summary.
+- **Leap and century arithmetic** — 2000-02-29 and 2024-02-29 births compute normally; the
+  365.25-day Vimshottari year is applied consistently and is the standard convention.
+- **Determinism** — the same input twice gives byte-identical `dashas` and `antars`, including
+  after a chart on a different ayanamsa is computed in between (`setAyanMode` leaves no residue
+  in the dasha path).
+- **KP `subLordChain`** — the 249 scheme, sub spans `yrs/120 × 13°20′`, recursed once for the
+  sub-sub; boundaries handled from below with a 1e-9° epsilon.
+- **Ruling Planets `dayLord`** — correctly uses **Hindu sunrise reckoning**, not the civil day
+  (`kundli.ts:173-174` rolls the weekday back when the birth precedes sunrise). The seven
+  witnesses, the 3/2/2/3/2/2/1 weighting and the weight-sorted ranking are all as documented.
+
+**Transits — three independent code paths, no contradiction:**
+- `panchang.ts upcomingEvents` (Daily card), `gochar.ts planetGochar` (the expanded panel) and
+  `planet-calendar.ts retrogradeEvents` (the planet-calendar card) were compared instant by
+  instant across 2026. **Every sign ingress agrees to under 0.3 seconds; all 12 station events
+  agree to 0.0 seconds and on direction.** (`p3-transit.cjs` §B, §C.) The 1-day step in
+  `upcomingEvents` versus the 0.5-day step in `gochar` does not move any root.
+- **The gochar "now here" marker agrees with a direct `planetSidMs` reading** for all nine
+  grahas including both nodes (`p3-transit.cjs` §D) — the timeline's current-sign highlight
+  cannot drift from the ephemeris.
+- **The headline event and the timeline row for the same ingress print the same instant** —
+  `Sun enters Leo · Sankranti  Aug 17 · 7:48 AM` above, `Leo … Aug 17, 2026 · 7:48 AM` below.
+- **Nodes** use the mean-node formula (`125.1228 − 0.0529538083 d`) in `gochar.ts` and
+  `panchang.ts planetSidMs` identically, matching the AGENTS.md mean-Rahu/Ketu convention;
+  the retrograde-motion branch bisects correctly for backwards-moving bodies.
+- **`transitLabel`** is genuinely clean on the axis its gate covers: no Devanagari in English
+  mode, no Latin planet or sign name in Hindi mode, `Sankranti` correctly kept Sanskrit in both,
+  the lunation gloss correctly dressed in both, unknown values falling through unchanged.
+  F9 is about grammar, not leakage.
+
+**Copy:**
+- The marriage card's caveat is strong, non-fatalistic and equivalent in both languages
+  ("This is not a prediction… Read it with the full chart and a qualified astrologer" /
+  "यह भविष्यवाणी नहीं है…"), and the card names its activators openly.
+- The Ruling-Planets summary explicitly says *"a priority signal, not a promise"* /
+  *"इसे वादा नहीं, प्राथमिकता-सूचक मानें"* — correct framing in both languages.
+- The gochar footnote declares its own tolerance ("±1 day for slow planets") — good practice
+  that the dasha card should copy (F10).
+
+---
+
+## What this pass could NOT cover — read this before treating anything as passed
+
+1. **No browser and no dev-server pass.** Every "observed" block is `react-dom/server` text or
+   markup. Nothing here proves layout, overflow, contrast, focus order, touch targets, the
+   drill-down *interaction*, or anything at 375 px. F17 is proved from the emitted `style`
+   attribute, not from a screenshot.
+2. **No effects and no event handlers ran.** The drill-down state (`openD`) was seeded, not
+   clicked; F16's date-picker path is proved from the component contract
+   (`DailyScreen.tsx:102-108` + `:358`) plus a direct `eventDetail` reproduction, not from a
+   live interaction.
+3. **No live production check.** Everything is local, against this worktree at `8752753`.
+4. **The external cross-check reaches the Moon, not the planets.** The five Drik anchors pin the
+   Moon's nakshatra-exit instant — the one input the balance of dasha depends on — to 1–2
+   minutes. They say nothing about Mars, Jupiter, Saturn, the ascendant, or the house cusps, so
+   this pass makes **no claim** that Ganak's transit ingress instants match Drik; it only proves
+   Ganak's three transit surfaces agree with each other. A future pass should pin two or three
+   published sign-ingress dates against Drik's own transit pages.
+5. **No independent Vimshottari table was obtained.** Drik's dasha calculator is a JS/POST
+   surface and was not scraped. The arithmetic was verified by re-derivation from the classical
+   rule plus the Moon anchors — which pins the balance but not, independently, a published
+   period table.
+6. **Not audited:** the KP significator tables (A/B/C/D hierarchy) beyond structure, the
+   rectifier's `rectSweep`/`runDashaAt` output as rendered, `JyotishBnnScreen`'s Saturn gochar,
+   combustion windows, `MuhuratHub`'s use of `searchUpcoming`, Chara/Yogini/Ashtottari or any
+   non-Vimshottari dasha (none appear to exist), and the print/PDF rendering of the dasha table.
+7. **Ayanamsa variation was only spot-checked** (`lahiri` vs `kp`, one chart). The other modes
+   in `ayanAt` were not swept.
+8. **No fixes and no new gates were written.** This is a finder's pass; it loses its value if
+   the finder also fixes. The obvious next step — pinning the five anchor charts in a new
+   `validation/vimshottari-anchors.cjs` with a tiling assertion and an
+   `antars[0].start >= birthMs` assertion — is left to the implementing agent.
+
+---
+
+## Summary
+
+| Severity | Count | Findings |
+|---|---|---|
+| **P0** — wrong period, or a claim contradicting another Ganak surface | 3 | F1, F2, F3 |
+| **P1** — broken journey | 6 | F4, F5, F6, F7, F8, F16 |
+| **P2** — polish | 8 | F9, F10, F11, F12, F13, F14, F15, F17 |
+| **Total** | **17** | |
+
+All 17 pass `validation/ruling-planets.cjs`, `validation/transit-event-language.cjs` and the
+committed screen snapshots. The Vimshottari **arithmetic** is sound and now has published
+anchors; the defects are in what the engine's correct numbers are then made to say — a
+sub-period list that predates the birth, a whole panel that vanishes on two-thirds of the
+supported date range, a Hindi footnote naming the opposite zodiac, and a tithi search that
+answers one date in Latin and another in Devanagari.
