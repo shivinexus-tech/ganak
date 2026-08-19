@@ -26,7 +26,7 @@ import { JyotishPanelNav } from "../components/JyotishPanelNav";
 import { BNNModule, BhriguModule } from "./JyotishBnnScreen";
 import { RectifyModule } from "./RectifyScreen";
 import { SIGNS, NAKSHATRAS, AYANAMSA, zoneOffset } from "../engine/panchang";
-import { panchangTerm, signLabel, signShort, SIGN_SHORT_EN } from "../i18n/panchang-terms";
+import { panchangTerm, signLabel, signShort, SIGN_SHORT_EN, padaText, planetName, planetShort } from "../i18n/panchang-terms";
 import LifeInterpretationCard from "../components/LifeInterpretationCard";
 import { buildLifeReading, SIGN_TRAITS } from "../data/life-interpretation";
 
@@ -486,7 +486,7 @@ export default function ChartScreen({ C, card, lang }) {
               {[
                 [hi ? "लग्न" : "Lagna (Ascendant)", `${signLabel(lang, SIGNS[r.ascSign])} ${fmtDeg(r.ascDeg)}`],
                 [hi ? "राशि (चन्द्र राशि)" : "Rashi (Moon sign)", signLabel(lang, SIGNS[r.moon.sign])],
-                [hi ? "जन्म नक्षत्र" : "Janma Nakshatra", `${panchangTerm(lang, "nakshatra", NAKSHATRAS[r.moon.nak])} · ${hi ? "पाद" : "pada"} ${r.moon.pada}`],
+                [hi ? "जन्म नक्षत्र" : "Janma Nakshatra", `${panchangTerm(lang, "nakshatra", NAKSHATRAS[r.moon.nak])} · ${padaText(lang, r.moon.pada)}`],
                 [hi ? "सूर्य राशि" : "Surya (Sun sign)", signLabel(lang, SIGNS[r.sun.sign])],
               ].map(([k, v]) => (
                 <div key={k} style={{ ...card, padding: "0.875rem 1rem" }}>
@@ -616,7 +616,7 @@ export default function ChartScreen({ C, card, lang }) {
                     <div style={{ display: "flex", alignItems: "center", gap: "0.4375rem", marginBottom: "0.5rem" }}>
                       <span style={{ width: "0.4375rem", height: "0.4375rem", borderRadius: "0.1875rem", background: p.color || C.gold, flexShrink: 0 }} />
                       <span style={{ fontSize: "var(--font-small)", fontWeight: 600, color: C.ivory, flex: 1, overflowWrap: "break-word" }}>
-                        {p.n}{p.retro && <span style={{ color: C.sindoor, marginLeft: "0.125rem" }}>℞</span>}
+                        {p.n === "Lagna" ? (hi ? "लग्न" : "Lagna") : planetName(lang, p.n)}{p.retro && <span style={{ color: C.sindoor, marginLeft: "0.125rem" }}>℞</span>}
                       </span>
                     </div>
                     <div style={{ fontSize: "var(--font-label)", color: C.muted, lineHeight: 1.4 }}>
@@ -650,13 +650,13 @@ export default function ChartScreen({ C, card, lang }) {
                   {r.rows.map((p) => (
                     <tr key={p.name} style={{ borderTop: "0.0625rem solid var(--line-soft)" }}>
                       <td style={{ padding: "0.4375rem 0.625rem", whiteSpace: "nowrap" }}>
-                        <span style={{ color: PLANET_COLOR[p.name], fontWeight: 600 }}>{PLANET_GLYPH[p.name]}</span> {p.name}{p.retro ? <span style={{ color: C.sindoor }}> ℞</span> : ""}
+                        <span style={{ color: PLANET_COLOR[p.name], fontWeight: 600 }}>{PLANET_GLYPH[p.name]}</span> {planetName(lang, p.name)}{p.retro ? <span style={{ color: C.sindoor }}> ℞</span> : ""}
                       </td>
                       <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, whiteSpace: "nowrap" }}>{signShort(lang, p.sign)} {fmtDeg(p.deg)}</td>
                       <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, fontSize: "var(--font-label)" }}>{panchangTerm(lang, "nakshatra", NAKSHATRAS[p.nak])}</td>
-                      <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.starLord] }}>{p.kp.starLord}</td>
-                      <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.subLord], fontWeight: 700 }}>{p.kp.subLord}</td>
-                      <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.subSub] }}>{p.kp.subSub}</td>
+                      <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.starLord] }}>{planetName(lang, p.kp.starLord)}</td>
+                      <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.subLord], fontWeight: 700 }}>{planetName(lang, p.kp.subLord)}</td>
+                      <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[p.kp.subSub] }}>{planetName(lang, p.kp.subSub)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -667,7 +667,7 @@ export default function ChartScreen({ C, card, lang }) {
             </p>
 
             <div style={{ ...T.label, color: C.muted, margin: "1.125rem 0 0.5rem" }}>
-              {hi ? "भाव-संधि उप-स्वामी" : "Cuspal sub-lords"} · {r.kpData.houseSystem}
+              {hi ? "भाव-संधि उप-स्वामी" : "Cuspal sub-lords"} · {hi ? (r.kpData.houseSystem === "Placidus" ? "प्लासिडस" : "पॉर्फ़िरी") : r.kpData.houseSystem}
             </div>
             <div className="rise" style={{ ...card, padding: "0.5rem 0.25rem", overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--font-small)", minWidth: "22.5rem" }}>
@@ -689,12 +689,12 @@ export default function ChartScreen({ C, card, lang }) {
                     const angular = h === 1 || h === 4 || h === 7 || h === 10;
                     return (
                       <tr key={h} style={{ borderTop: "0.0625rem solid var(--line-soft)", background: angular ? "var(--surface-hover)" : "transparent" }}>
-                        <td style={{ padding: "0.4375rem 0.625rem", fontFamily: "var(--font-display-family)", color: angular ? C.gold : C.ivory, whiteSpace: "nowrap" }}>{h}{h === 1 ? " (Asc)" : h === 10 ? " (MC)" : ""}</td>
+                        <td style={{ padding: "0.4375rem 0.625rem", fontFamily: "var(--font-display-family)", color: angular ? C.gold : C.ivory, whiteSpace: "nowrap" }}>{h}{h === 1 ? (hi ? " (लग्न)" : " (Asc)") : h === 10 ? (hi ? " (दशम)" : " (MC)") : ""}</td>
                         <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, whiteSpace: "nowrap" }}>{signShort(lang, Math.floor(L / 30))} {fmtDeg(L % 30)}</td>
                         <td style={{ padding: "0.4375rem 0.625rem", color: C.muted, fontSize: "var(--font-label)" }}>{panchangTerm(lang, "nakshatra", NAKSHATRAS[nakIdx])}</td>
-                        <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.starLord] }}>{sl.starLord}</td>
-                        <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.subLord], fontWeight: 700 }}>{sl.subLord}</td>
-                        <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.subSub] }}>{sl.subSub}</td>
+                        <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.starLord] }}>{planetName(lang, sl.starLord)}</td>
+                        <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.subLord], fontWeight: 700 }}>{planetName(lang, sl.subLord)}</td>
+                        <td style={{ padding: "0.4375rem 0.625rem", color: PLANET_COLOR[sl.subSub] }}>{planetName(lang, sl.subSub)}</td>
                       </tr>
                     );
                   })}
@@ -713,13 +713,13 @@ export default function ChartScreen({ C, card, lang }) {
               const Chip = ({ pl, dim }) => (
                 <span style={{ display: "inline-block", padding: "0.125rem 0.4375rem", borderRadius: "0.375rem", fontSize: "var(--font-label)", fontWeight: 600, margin: "0.125rem 0.1875rem 0.125rem 0",
                   color: dim ? C.muted : "var(--on-accent)", background: dim ? "transparent" : PLANET_COLOR[pl], border: dim ? `0.0625rem solid ${PLANET_COLOR[pl]}` : "none" }}>
-                  {pl}
+                  {planetName(lang, pl)}
                 </span>
               );
               const RPItem = ({ label, pl }) => (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3125rem", marginRight: "0.75rem", marginBottom: "0.25rem" }}>
                   <span style={{ fontSize: "var(--font-micro)", color: C.muted, textTransform: "uppercase", letterSpacing: ".04em" }}>{label}</span>
-                  <span style={{ color: PLANET_COLOR[pl], fontWeight: 700, fontSize: "var(--font-small)" }}>{pl}</span>
+                  <span style={{ color: PLANET_COLOR[pl], fontWeight: 700, fontSize: "var(--font-small)" }}>{planetName(lang, pl)}</span>
                 </span>
               );
               return (
@@ -735,13 +735,13 @@ export default function ChartScreen({ C, card, lang }) {
                   <div className="rise" style={{ ...card, padding: "0.875rem 1rem", borderLeft: "0.1875rem solid var(--accent)", marginBottom: "0.875rem" }}>
                     <div style={{ ...T.label, color: C.gold, marginBottom: "0.5rem" }}>{hi ? "शासक ग्रह · जन्म क्षण" : "Ruling Planets · birth moment"}</div>
                     <div style={{ display: "flex", flexWrap: "wrap", rowGap: "0.25rem" }}>
-                      <RPItem label={hi ? "लग्न स्वामी" : "Asc lord"} pl={RP.ascSignLord} />
-                      <RPItem label={hi ? "लग्न नक्षत्र" : "Asc star"} pl={RP.ascStarLord} />
-                      <RPItem label={hi ? "लग्न उप" : "Asc sub"} pl={RP.ascSubLord} />
-                      <RPItem label={hi ? "चन्द्र स्वामी" : "Moon lord"} pl={RP.moonSignLord} />
-                      <RPItem label={hi ? "चन्द्र नक्षत्र" : "Moon star"} pl={RP.moonStarLord} />
-                      <RPItem label={hi ? "चन्द्र उप" : "Moon sub"} pl={RP.moonSubLord} />
-                      <RPItem label={hi ? "वार स्वामी" : "Day lord"} pl={RP.dayLord} />
+                      <RPItem label={hi ? "लग्न स्वामी" : "Asc lord"} pl={planetName(lang, RP.ascSignLord)} />
+                      <RPItem label={hi ? "लग्न नक्षत्र" : "Asc star"} pl={planetName(lang, RP.ascStarLord)} />
+                      <RPItem label={hi ? "लग्न उप" : "Asc sub"} pl={planetName(lang, RP.ascSubLord)} />
+                      <RPItem label={hi ? "चन्द्र स्वामी" : "Moon lord"} pl={planetName(lang, RP.moonSignLord)} />
+                      <RPItem label={hi ? "चन्द्र नक्षत्र" : "Moon star"} pl={planetName(lang, RP.moonStarLord)} />
+                      <RPItem label={hi ? "चन्द्र उप" : "Moon sub"} pl={planetName(lang, RP.moonSubLord)} />
+                      <RPItem label={hi ? "वार स्वामी" : "Day lord"} pl={planetName(lang, RP.dayLord)} />
                     </div>
                   </div>
 
@@ -752,7 +752,7 @@ export default function ChartScreen({ C, card, lang }) {
                         {RP.ranked.map((rp, idx) => (
                           <div key={rp.planet} style={{ display: "grid", gridTemplateColumns: "1.75rem minmax(3.375rem, 4.375rem) 1fr", alignItems: "center", gap: "0.5rem" }}>
                             <span style={{ color: C.muted, fontSize: "var(--font-micro)" }}>#{idx + 1}</span>
-                            <span style={{ color: PLANET_COLOR[rp.planet], fontWeight: 700 }}>{hi ? (panchangTerm("hi", "planet", rp.planet) || rp.planet) : rp.planet}</span>
+                            <span style={{ color: PLANET_COLOR[rp.planet], fontWeight: 700 }}>{planetName(lang, rp.planet)}</span>
                             <span style={{ color: C.muted, fontSize: "var(--font-micro)", lineHeight: 1.4 }}>
                               {rp.sources.map((s) => hi ? RP_SOURCE_LABELS[s].hi : RP_SOURCE_LABELS[s].en).join(" · ")}
                             </span>
@@ -795,7 +795,7 @@ export default function ChartScreen({ C, card, lang }) {
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.5rem" }}>
                     {KP_PLANETS.map((pl) => (
                       <div key={pl} className="rise" style={{ ...card, padding: "0.5625rem 0.75rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <span style={{ color: PLANET_COLOR[pl], fontWeight: 700, fontSize: "var(--font-small)", minWidth: "3.25rem" }}>{PLANET_GLYPH[pl]} {pl.slice(0, 3)}</span>
+                        <span style={{ color: PLANET_COLOR[pl], fontWeight: 700, fontSize: "var(--font-small)", minWidth: "3.25rem" }}>{PLANET_GLYPH[pl]} {planetShort(lang, pl)}</span>
                         <span style={{ color: C.ivory, fontSize: "var(--font-small)", fontVariantNumeric: "tabular-nums" }}>{r.kpSig.housesOf[pl].length ? r.kpSig.housesOf[pl].join(", ") : "—"}</span>
                       </div>
                     ))}
@@ -1128,7 +1128,7 @@ export default function ChartScreen({ C, card, lang }) {
                     return (
                       <tr key={dsh.start} style={isNow ? { background: "var(--surface-hover)" } : null}>
                         <td style={{ color: isNow ? C.gold : C.ivory, fontWeight: isNow ? 600 : 400 }}>
-                          {dsh.lord}{isNow && (hi ? " · वर्तमान" : " · current")}
+                          {planetName(lang, dsh.lord)}{isNow && (hi ? " · वर्तमान" : " · current")}
                         </td>
                         <td>{fmtDateT(dsh.start, r.tz, false)}</td>
                         <td>{fmtDateT(dsh.end, r.tz, false)}</td>
@@ -1145,7 +1145,7 @@ export default function ChartScreen({ C, card, lang }) {
                     return (
                       <div style={{ margin: "1rem 0.125rem 0.25rem" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--font-micro)", color: C.muted, letterSpacing: ".14em", textTransform: "uppercase", marginBottom: "0.4375rem" }}>
-                          <span>{r.current.lord} {hi ? "महादशा" : "mahadasha"}</span>
+                          <span>{planetName(lang, r.current.lord)} {hi ? "महादशा" : "mahadasha"}</span>
                           <span style={{ color: C.gold }}>{pct.toFixed(0)}% {hi ? "पूर्ण" : "elapsed"}</span>
                         </div>
                         <div style={{ height: "0.375rem", background: "var(--surface-sunken)", borderRadius: "0.1875rem", overflow: "hidden", border: `0.0625rem solid ${C.line}` }}>
@@ -1155,7 +1155,7 @@ export default function ChartScreen({ C, card, lang }) {
                     );
                   })()}
                   <p style={{ fontSize: "var(--font-body)", lineHeight: 1.6, color: C.ivory, margin: "1rem 0 0.625rem" }}>
-                    {hi ? <>अभी <span style={{ color: C.gold }}>{r.current.lord} महादशा</span> चल रही है—यह अवधि उस ग्रह के कारकत्व, स्थिति और स्वामित्व वाले भावों को प्रमुख बनाती है।</> : <>The native runs <span style={{ color: C.gold }}>{r.current.lord} mahadasha</span> — a period classically associated with {DASHA_NOTE[r.current.lord]}.</>}
+                    {hi ? <>अभी <span style={{ color: C.gold }}>{planetName(lang, r.current.lord)} महादशा</span> चल रही है—यह अवधि उस ग्रह के कारकत्व, स्थिति और स्वामित्व वाले भावों को प्रमुख बनाती है।</> : <>The native runs <span style={{ color: C.gold }}>{planetName(lang, r.current.lord)} mahadasha</span> — a period classically associated with {DASHA_NOTE[r.current.lord]}.</>}
                   </p>
                   {r.curAntar && (
                     <div style={{ margin: "1.125rem 0 0.375rem", padding: "0.8125rem 0.875rem", borderRadius: "0.625rem", background: "var(--surface-hover)", border: `0.0625rem solid ${C.line}` }}>
@@ -1167,7 +1167,7 @@ export default function ChartScreen({ C, card, lang }) {
                               {i > 0 && <span style={{ color: C.line, fontSize: "var(--font-small)" }}>›</span>}
                               <span style={{ display: "inline-flex", flexDirection: "column", lineHeight: 1.25 }}>
                                 <span style={{ fontSize: "var(--font-micro)", letterSpacing: ".1em", textTransform: "uppercase", color: C.muted }}>{lvl}</span>
-                                <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: C.gold }}>{lord}</span>
+                                <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: C.gold }}>{planetName(lang, lord)}</span>
                               </span>
                             </React.Fragment>
                           ) : null
@@ -1175,13 +1175,13 @@ export default function ChartScreen({ C, card, lang }) {
                       </div>
                       {r.curPrana && (
                         <div style={{ fontSize: "var(--font-label)", color: C.muted, marginTop: "0.5625rem" }}>
-                          {hi ? "वर्तमान प्राण" : "Current prana"}: {r.curPrana.lord} · {fmtDateT(r.curPrana.start, r.tz, true)} – {fmtDateT(r.curPrana.end, r.tz, true)}
+                          {hi ? "वर्तमान प्राण" : "Current prana"}: {planetName(lang, r.curPrana.lord)} · {fmtDateT(r.curPrana.start, r.tz, true)} – {fmtDateT(r.curPrana.end, r.tz, true)}
                         </div>
                       )}
                     </div>
                   )}
                   <div style={{ ...T.label, color: C.muted, margin: "1rem 0 0.25rem" }}>
-                    {r.current.lord} {hi ? "के भीतर अंतरदशाएँ — आगे के स्तर खोलने के लिए किसी अवधि को दबाएँ" : "Antardashas — tap any period to drill down"}
+                    {planetName(lang, r.current.lord)} {hi ? "के भीतर अंतरदशाएँ — आगे के स्तर खोलने के लिए किसी अवधि को दबाएँ" : "Antardashas — tap any period to drill down"}
                   </div>
                   <DashaTree periods={r.antars} level={0} now={Date.now()} openD={openD} toggle={toggleD} C={C} tz={r.tz} lang={lang} />
                 </>
@@ -1197,8 +1197,8 @@ export default function ChartScreen({ C, card, lang }) {
                 <div className="rise" style={{ ...card, padding: "1rem 1.25rem" }}>
                   <p style={{ fontSize: "var(--font-small)", lineHeight: 1.6, color: C.ivory, margin: "0 0 0.75rem" }}>
                     {hi
-                      ? <>विवाह के कारक — शुक्र व गुरु, सप्तम भाव का स्वामी (<strong>{panchangTerm("hi", "planet", mw.seventhLord)}</strong>){mw.occ7.length ? <> तथा सप्तम में स्थित ग्रह</> : null} — जिन दशा-अवधियों में सक्रिय होते हैं, परम्परा उन्हें विवाह हेतु अनुकूल मानती है।</>
-                      : <>Periods run by the marriage significators — Venus &amp; Jupiter, the 7th lord (<strong>{mw.seventhLord}</strong>){mw.occ7.length ? <> and planets in the 7th</> : null} — are traditionally seen as supportive for marriage.</>}
+                      ? <>विवाह के कारक — शुक्र व गुरु, सप्तम भाव का स्वामी (<strong>{planetName(lang, mw.seventhLord)}</strong>){mw.occ7.length ? <> तथा सप्तम में स्थित ग्रह</> : null} — जिन दशा-अवधियों में सक्रिय होते हैं, परम्परा उन्हें विवाह हेतु अनुकूल मानती है।</>
+                      : <>Periods run by the marriage significators — Venus &amp; Jupiter, the 7th lord (<strong>{planetName(lang, mw.seventhLord)}</strong>){mw.occ7.length ? <> and planets in the 7th</> : null} — are traditionally seen as supportive for marriage.</>}
                   </p>
                   {mw.windows.length === 0 ? (
                     <p style={{ color: C.muted, fontSize: "var(--font-small)" }}>{hi ? "आगामी बीस वर्षों में कोई स्पष्ट अनुकूल अवधि नहीं मिली।" : "No clearly supportive window found in the next twenty years."}</p>
@@ -1207,7 +1207,7 @@ export default function ChartScreen({ C, card, lang }) {
                       {mw.windows.map((w, i) => (
                         <div key={i} style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", padding: "0.5rem 0.125rem", borderBottom: "0.0625rem solid var(--line-soft)" }}>
                           <span style={{ color: C.gold, fontSize: "var(--font-small)", minWidth: "8rem", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{fmtY(w.start)} – {fmtY(w.end)}</span>
-                          <span style={{ fontSize: "var(--font-small)", color: C.ivory, flex: 1 }}>{hi ? `${panchangTerm("hi", "planet", w.maha)} / ${panchangTerm("hi", "planet", w.antar)} दशा` : `${w.maha} / ${w.antar} dasha`}</span>
+                          <span style={{ fontSize: "var(--font-small)", color: C.ivory, flex: 1 }}>{hi ? `${planetName(lang, w.maha)} / ${planetName(lang, w.antar)} दशा` : `${planetName(lang, w.maha)} / ${planetName(lang, w.antar)} dasha`}</span>
                         </div>
                       ))}
                     </div>

@@ -44,6 +44,29 @@ SIGN_ORDER.forEach((s, i) => {
 NAKSHATRA_ORDER.forEach((n, i) =>
   assert.strictEqual(panchangTermAt('hi', 'nakshatra', i), NAKSHATRA_HI[n], `nakshatra index ${i} drifted`));
 
+/* B10 — pada + lord label helpers. Same contract as the name tables above: one
+   spelling, index/string accessors agree, bad input degrades instead of throwing. */
+const { padaLabel, padaText, planetName, planetShort, PADA_LABEL, PLANET_SHORT_EN } = terms;
+assert.strictEqual(padaLabel('hi'), PADA_LABEL.hi, 'Hindi pada label drifted');
+assert.strictEqual(padaLabel('en'), PADA_LABEL.en, 'English pada label drifted');
+[1, 2, 3, 4].forEach((n) => {
+  assert.strictEqual(padaText('hi', n), `${PADA_LABEL.hi} ${n}`, `Hindi pada ${n} drifted`);
+  assert.strictEqual(padaText('en', n), `${PADA_LABEL.en} ${n}`, `English pada ${n} drifted`);
+});
+[0, 5, 'x', null, undefined, 2.5].forEach((bad) =>
+  assert.strictEqual(padaText('hi', bad), '', `a nakshatra has four padas — ${String(bad)} must render ""`));
+Object.entries(PLANET_HI).forEach(([en, hi]) => {
+  assert.strictEqual(planetName('hi', en), hi, `lord ${en} must localise through the graha table`);
+  assert.strictEqual(planetName('en', en), en, `lord ${en} must pass through in English`);
+  assert.strictEqual(planetShort('hi', en), hi, `Devanagari graha names are already short — ${en} must not be clipped`);
+  assert(PLANET_SHORT_EN[en], `no compact English label for lord ${en}`);
+});
+/* The compact English labels must stay distinguishable — the whole point of having
+   a table instead of .slice(0, 3) is that a collision would be silent. */
+assert.strictEqual(new Set(Object.values(PLANET_SHORT_EN)).size, 9, 'two grahas share one compact label');
+assert.strictEqual(planetName('hi', ''), '', 'empty lord must render ""');
+assert.strictEqual(planetShort('en', 'Nibiru'), 'Nib', 'unknown lord must degrade, not throw');
+
 /* out-of-range and unknown input must degrade, never throw */
 assert.strictEqual(panchangTermAt('hi', 'sign', 99), '', 'out-of-range index must return ""');
 assert.strictEqual(panchangTermAt('hi', 'sign', undefined), '', 'undefined index must return ""');
@@ -205,6 +228,80 @@ assert.strictEqual(jsxLeaks.length, 0,
   `Text that ignores the language toggle:\n  ${jsxLeaks.join('\n  ')}\n` +
   'Branch on lang, or add a genuinely language-neutral token to ENGLISH_OK.');
 
+/* ------------------------------------- 1e. pada labels come from ONE place only */
+/* B10, 2026-08-18. The 27 nakshatra names were centralised in E-1.0; their four
+   PADAS were not, and nobody had ever looked. Three sites, two Hindi words:
+   "पाद" on the chart's birth summary and in the rectifier, "चरण" in the quick
+   calculators — the same reader's own birth pada, spelled two ways on two
+   screens, which is precisely the defect E-1.0 exists to prevent. The label now
+   lives in padaLabel/padaText and nowhere else. */
+/* "पाद" also names the FEET group of the Rajju koota in marriage matching — a body
+   part, not a nakshatra quarter. Same word, different quantity, so it is exempted by
+   the name of its own table rather than by a blanket rule that could widen silently. */
+const PADA_HOMONYM = /RAJJU_NAMES_HI/;
+const PADA_WORD_EN = /^(pada|padas)$/i;
+const PADA_WORD_HI = /^(पाद|चरण)$/;
+const padaLabels = [];
+for (const file of files) {
+  const rel = path.relative(root, file).split(path.sep).join('/');
+  if (rel.startsWith(I18N_DIR)) continue;
+  fs.readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
+    const st = line.trim();
+    if (st.startsWith('//') || st.startsWith('*') || PADA_HOMONYM.test(line)) return;
+    const literals = [];
+    for (const m of line.matchAll(STRING_LITERAL)) literals.push((m[1] ?? m[2] ?? m[3] ?? '').trim());
+    // "पाद" standing alone is only ever the quarter. "चरण" also means a phase
+    // (Sade Sati) or a step, so it only counts when the line is about padas.
+    const aboutPada = /\bpada\b/i.test(line) || literals.some((l) => PADA_WORD_EN.test(l));
+    const hits = literals.filter((l) => l === 'पाद' || (aboutPada && (PADA_WORD_HI.test(l) || PADA_WORD_EN.test(l))));
+    if (hits.length) padaLabels.push(`${rel}:${i + 1} — pada label written by hand: ${[...new Set(hits)].join(', ')}`);
+  });
+}
+assert.strictEqual(padaLabels.length, 0,
+  `A second spelling of the pada label:\n  ${padaLabels.join('\n  ')}\n` +
+  'Call padaText(lang, n) — or padaLabel(lang) for the bare word — from src/i18n/panchang-terms.ts.');
+
+/* --------------- 1f. a lord value must never be rendered as the engine spells it */
+/* Same shape as 1b, for the OTHER family nobody audited: KP star lords, sub-lords,
+   sub-sub lords, sign lords and dasha lords. The engine returns them in English
+   ("Venus"), so `{p.kp.subLord}` printed "Venus" into a Hindi screen — three KP
+   tables, the ruling-planet strip, the whole Vimshottari tree and the rectifier
+   sweep, on 2026-08-18. A snapshot could not see it: every one of those surfaces
+   exists only after the reader casts a chart. So it is caught here, by shape:
+   a lord-valued expression may not be interpolated raw — wrap it in planetName
+   (or planetShort for a narrow column). */
+const LORD_PATH = String.raw`[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*\.(?:[A-Za-z]*[Ll]ord|subSub|cuspSub|star|sub)`;
+const RAW_LORD = new RegExp(String.raw`[{](?:\s*)(` + LORD_PATH + String.raw`)\s*[}]|\$\{\s*(` + LORD_PATH + String.raw`)\s*\}`);
+/* A bare `{lord}` / `{pl}` in JSX TEXT is the same defect one destructuring away.
+   Anchored to text position on purpose: `pl={pl}` and `key={pl}` pass the value on
+   to something that localises it, and flagging those would teach agents to silence
+   the gate rather than to fix the leak. */
+const BARE_LORD = /(?:^\s*|>)\{\s*(lord|pl|planet)\s*\}(?:\s*$|<)/;
+const HAND_SHORT = new RegExp(String.raw`(?:` + LORD_PATH + String.raw`|\bpl)\.slice\(`);
+const rawLords = [];
+for (const file of files) {
+  const rel = path.relative(root, file).split(path.sep).join('/');
+  if (!/^src\/(screens|components)\//.test(rel)) continue;
+  fs.readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
+    const st = line.trim();
+    if (st.startsWith('//') || st.startsWith('*')) return;
+    /* A line that already branches on language AND localises one side is showing the
+       reader's own script on the Hindi side; the raw value on the English side is the
+       engine's English, which is what an English reader should get. (Prashna prints the
+       KP two-letter abbreviations Me/Ju in English and the Devanagari names in Hindi.)
+       Both halves of the condition are required, so an unbranched raw lord is still caught. */
+    const localisedBranch = /\bhi\s*\?/.test(line)
+      && /(GRAHA_HI|panchangTerm|panchangTermAt|planetName|planetShort)\s*[([]/.test(line);
+    if (localisedBranch) return;
+    const m = RAW_LORD.exec(line) || BARE_LORD.exec(line);
+    if (m) rawLords.push(`${rel}:${i + 1} — lord rendered unlocalised: {${(m[1] || m[2] || m[0]).trim()}}`);
+    else if (HAND_SHORT.test(line)) rawLords.push(`${rel}:${i + 1} — lord name clipped by hand: ${st.slice(0, 90)}`);
+  });
+}
+assert.strictEqual(rawLords.length, 0,
+  `A KP/dasha lord reaches the screen in the engine's own language:\n  ${rawLords.join('\n  ')}\n` +
+  'Wrap it: planetName(lang, x.subLord) — or planetShort(lang, x.subLord) in a narrow column.');
+
 /* ------------------------------- 2. the one unavoidable copy is pinned, not trusted */
 /* PrashnaScreen's engine is validated by prashna-parity, which evaluates the region
    between its ENGINE markers as plain, self-contained JS — it can carry neither an
@@ -219,4 +316,5 @@ assert.deepStrictEqual(inlined, [...NAKSHATRA_ORDER],
   'It cannot import (parity evaluates that region as standalone JS), so it must match by value.');
 
 console.log(`✓ language-leak-scan: ${files.length} files · 1 source of truth · ` +
-  `12 rashi (+12 English aliases) · 27 nakshatra · 9 grahas · index and string accessors agree`);
+  `12 rashi (+12 English aliases) · 27 nakshatra · 9 grahas · 4 padas · 9 lord labels · ` +
+  `index and string accessors agree`);
