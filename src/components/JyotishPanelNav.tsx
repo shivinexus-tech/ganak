@@ -1,6 +1,10 @@
 import React from "react";
 import { T } from "./ui-style-contract";
 import { SIGN_TRAITS } from "../data/life-interpretation";
+/* The calculator link must carry the city the reader already chose. utilityHref is
+   the one place that builds that query string correctly; a second hand-written
+   `?lang=` here is exactly how the city got dropped at the entry door. */
+import { utilityHref } from "../screens/UtilityCalculatorScreen";
 
 const JYOTISH_GROUPS = [
   {
@@ -62,7 +66,7 @@ const JYOTISH_GROUPS = [
 // link that scrolls to nothing — a dead-end is worse than a missing entry.
 const TECHNICAL_ANCHORS = new Set(["#shadbala", "#av"]);
 
-function JyotishPanelNav({ lang, C, showTechnical = true, activeGroup = "kundli", onSelectGroup = () => {} }) {
+function JyotishPanelNav({ lang, C, place = null, showTechnical = true, activeGroup = "kundli", onSelectGroup = () => {} }) {
   const hi = lang === "hi";
   const showReading = SIGN_TRAITS.every((entry) => entry.status === "owner-verified");
   return (
@@ -129,7 +133,7 @@ function JyotishPanelNav({ lang, C, showTechnical = true, activeGroup = "kundli"
               {group.items.filter(([href]) => (showReading || href !== "#reading") && (showTechnical || !TECHNICAL_ANCHORS.has(href))).map(([href, en, itemHi]) => (
                 <a
                   key={href}
-                  href={href.startsWith("/") ? `${href}?lang=${lang}` : href}
+                  href={href.startsWith("/") ? utilityHref(href, lang, place) : href}
                   style={{
                     minHeight: T.ctrlH,
                     display: "flex",

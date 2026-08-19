@@ -24,6 +24,9 @@ import { DashaTree } from "../components/DashaTree";
 import { ChartVault } from "../components/ChartVault";
 import { JyotishPanelNav } from "../components/JyotishPanelNav";
 import { BNNModule, BhriguModule } from "./JyotishBnnScreen";
+/* Same reason as JyotishPanelNav: the "browse all calculators" card used to emit a
+   bare ?lang=, silently discarding the reader's city on the way in. */
+import { utilityHref } from "./UtilityCalculatorScreen";
 import { RectifyModule } from "./RectifyScreen";
 import { SIGNS, NAKSHATRAS, AYANAMSA, zoneOffset } from "../engine/panchang";
 import { panchangTerm, signLabel, signShort, SIGN_SHORT_EN, padaText, planetName, planetShort } from "../i18n/panchang-terms";
@@ -43,6 +46,21 @@ const DASHA_NOTE = {
 };
 
 const PLANET_COLOR = { Sun: "color-mix(in srgb, #C05A0C, var(--ink) 26%)", Moon: "color-mix(in srgb, #4E6E96, var(--ink) 26%)", Mars: "color-mix(in srgb, #BB3A2A, var(--ink) 26%)", Mercury: "color-mix(in srgb, #2C7D4F, var(--ink) 26%)", Jupiter: "color-mix(in srgb, #9A7000, var(--ink) 26%)", Venus: "color-mix(in srgb, #B3537F, var(--ink) 26%)", Saturn: "color-mix(in srgb, #46588F, var(--ink) 26%)", Rahu: "color-mix(in srgb, #6E5C82, var(--ink) 26%)", Ketu: "color-mix(in srgb, #8A5A36, var(--ink) 26%)" };
+
+/* Jaimini chara karakas. The engine names the role and its signification in
+   English only; before 2026-08-18 the Hindi screen replaced all SEVEN meanings
+   with one generic sentence and printed the role and the graha in Latin — the
+   same "Hindi reader gets a thinner product" defect the BNN screen had. Same
+   {en, hi} shape as HOUSE_TOPICS below, keyed by the engine's role name. */
+const CHARA_KARAKA_HI = {
+  Atmakaraka: { role: "आत्मकारक", meaning: "आत्मा, जीवन का केंद्रीय सूत्र" },
+  Amatyakaraka: { role: "अमात्यकारक", meaning: "आजीविका और परामर्श" },
+  Bhratrikaraka: { role: "भ्रातृकारक", meaning: "भाई-बहन और गुरु" },
+  Matrikaraka: { role: "मातृकारक", meaning: "माता और पालन-पोषण" },
+  Putrakaraka: { role: "पुत्रकारक", meaning: "संतान और शिष्य" },
+  Gnatikaraka: { role: "ज्ञातिकारक", meaning: "बंधु-बांधव, प्रतिद्वंद्वी और बाधाएँ" },
+  Darakaraka: { role: "दारकारक", meaning: "जीवनसाथी और साझेदारी" },
+};
 
 const HOUSE_TOPICS = [
   { en: "self and vitality", hi: "स्वभाव और जीवन-बल" },
@@ -317,7 +335,7 @@ export default function ChartScreen({ C, card, lang }) {
     <>
       {r && (
         <Card density="compact" tone="sunken" elevated={false} style={{ padding: 0, marginBottom: T.s3 }}>
-          <JyotishPanelNav lang={lang} C={C} showTechnical={showTechnical} activeGroup={activePanel} onSelectGroup={setActivePanel} />
+          <JyotishPanelNav lang={lang} C={C} place={place} showTechnical={showTechnical} activeGroup={activePanel} onSelectGroup={setActivePanel} />
         </Card>
       )}
           <>
@@ -434,7 +452,7 @@ export default function ChartScreen({ C, card, lang }) {
               : "Vedic Lahiri and Western Tropical methods stay clearly separated."}
           </p>
           <a
-            href={`/calculators?lang=${lang}`}
+            href={utilityHref("/calculators", lang, place)}
             className="comfort-focus"
             style={{ minHeight: T.ctrlH, display: "inline-flex", alignItems: "center", padding: `0 ${T.s4}`, border: `0.0625rem solid ${C.gold}`, borderRadius: T.rMd, color: C.gold, textDecoration: "none", fontWeight: 700 }}
           >
@@ -519,7 +537,7 @@ export default function ChartScreen({ C, card, lang }) {
                     <button key={rf.k} onClick={() => setRefPt(rf.k)}
                       style={{ padding: "0.5rem 0.25rem", borderRadius: "0.5625rem", cursor: "pointer", fontFamily: "var(--font-body-family)", fontSize: "var(--font-small)", lineHeight: 1.25, border: rf.k === refPt ? `0.0625rem solid ${C.accentLine || "var(--accent-line)"}` : "0.0625rem solid transparent", background: rf.k === refPt ? "var(--surface-active)" : "transparent", color: rf.k === refPt ? C.gold : C.muted, boxShadow: rf.k === refPt ? "var(--elevation-1)" : "none", fontWeight: rf.k === refPt ? 600 : 400 }}>
                       <span style={{ fontFamily: "var(--font-display-family)", display: "block", fontSize: "var(--font-small)" }}>{rf.deva}</span>
-                      {hi ? rf.deva : rf.en}
+                      {hi ? null : rf.en}
                     </button>
                   ))}
                 </div>
@@ -812,13 +830,13 @@ export default function ChartScreen({ C, card, lang }) {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "0.75rem" }}>
               {r.karakas.map((kk, i) => (
                 <div key={kk.role} style={{ ...card, padding: "0.8125rem 0.9375rem", border: `0.0625rem solid ${i === 0 ? C.gold : C.line}`, boxShadow: i === 0 ? `0 0 22px var(--accent-soft), ${card.boxShadow}` : card.boxShadow }}>
-                  <div style={{ ...T.label, color: i === 0 ? C.gold : C.muted, marginBottom: "0.375rem" }}>{kk.role}</div>
+                  <div style={{ ...T.label, color: i === 0 ? C.gold : C.muted, marginBottom: "0.375rem" }}>{hi ? (CHARA_KARAKA_HI[kk.role] || {}).role || kk.role : kk.role}</div>
                   <div style={{ fontSize: "var(--font-body)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                     <span style={{ width: "0.5rem", height: "0.5rem", borderRadius: "0.25rem", background: PLANET_COLOR[kk.planet], boxShadow: `0 0 6px ${PLANET_COLOR[kk.planet]}55`, flexShrink: 0 }} />
-                    {kk.planet}
+                    {panchangTerm(lang, "planet", kk.planet)}
                     <span style={{ color: C.muted, fontSize: "var(--font-small)", fontVariantNumeric: "tabular-nums" }}>{fmtDeg(kk.deg)} {signLabel(lang, SIGNS[kk.sign])}</span>
                   </div>
-                  <div style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.3125rem" }}>{hi ? "यह चर कारक जीवन के इस प्रमुख विषय और उससे जुड़ी सीख को दर्शाता है।" : kk.meaning}</div>
+                  <div style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.3125rem" }}>{hi ? (CHARA_KARAKA_HI[kk.role] || {}).meaning || kk.meaning : kk.meaning}</div>
                 </div>
               ))}
             </div>
@@ -837,7 +855,7 @@ export default function ChartScreen({ C, card, lang }) {
               {BALA_PARTS.map((b) => (
                 <span key={b.k} style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "var(--font-label)", color: C.muted }}>
                   <span style={{ width: "0.625rem", height: "0.625rem", borderRadius: "0.1875rem", background: b.color }} />
-                  {hi ? ({ sthana: "स्थान", dig: "दिग्", kala: "काल", cheshta: "चेष्टा", naisargika: "नैसर्गिक", drik: "दृक्" }[b.k] || b.label) : b.label} <span style={{ opacity: 0.7 }}>({hi ? ({ sthana: "स्थिति", dig: "दिशा", kala: "समय", cheshta: "गति", naisargika: "प्राकृतिक", drik: "दृष्टि" }[b.k] || b.note) : b.note})</span>
+                  {hi ? b.labelHi : b.label} <span style={{ opacity: 0.7 }}>({hi ? b.noteHi : b.note})</span>
                 </span>
               ))}
             </div>
@@ -852,7 +870,7 @@ export default function ChartScreen({ C, card, lang }) {
                       <div key={p} className="rise" style={{ ...card, padding: "0.875rem 1rem" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.625rem" }}>
                           <span style={{ width: "0.5625rem", height: "0.5625rem", borderRadius: "0.3125rem", background: PLANET_COLOR[p], flexShrink: 0 }} />
-                          <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-title)", color: C.ivory }}>{panchangTerm("hi", "planet", p)} <span style={{ fontFamily: "var(--font-body-family)", fontSize: "var(--font-body)" }}>{p}</span></span>
+                          <span style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-title)", color: C.ivory }}>{hi ? panchangTerm("hi", "planet", p) : p}</span>
                           <span style={{ marginLeft: "auto", fontSize: "var(--font-label)", color: C.muted }}>#{rank + 1}</span>
                           <span style={{ fontSize: "var(--font-micro)", fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase", padding: "0.1875rem 0.5rem", borderRadius: "0.625rem", color: strong ? "var(--good)" : C.sindoor, background: strong ? "rgba(63,126,46,.1)" : "var(--bad-surface)" }}>{strong ? (hi ? "प्रबल" : "strong") : (hi ? "निर्बल" : "weak")}</span>
                         </div>
@@ -863,13 +881,13 @@ export default function ChartScreen({ C, card, lang }) {
                         <div style={{ display: "flex", height: "0.625rem", borderRadius: "0.3125rem", overflow: "hidden", background: "var(--surface-sunken)", marginBottom: "0.5rem" }}>
                           {BALA_PARTS.map((b) => {
                             const w = Math.max(0, x[b.k]) / 60 / maxR * 100;
-                            return w > 0 ? <span key={b.k} title={`${b.label}: ${(x[b.k] / 60).toFixed(2)}`} style={{ width: `${w}%`, background: b.color }} /> : null;
+                            return w > 0 ? <span key={b.k} title={`${hi ? b.labelHi : b.label}: ${(x[b.k] / 60).toFixed(2)}`} style={{ width: `${w}%`, background: b.color }} /> : null;
                           })}
                         </div>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.1875rem 0.625rem", fontSize: "var(--font-label)" }}>
                           {BALA_PARTS.map((b) => (
                             <span key={b.k} style={{ color: C.muted, display: "flex", justifyContent: "space-between" }}>
-                              <span style={{ color: b.color }}>{b.label}</span>
+                              <span style={{ color: b.color }}>{hi ? b.labelHi : b.label}</span>
                               <span style={{ fontVariantNumeric: "tabular-nums", color: x[b.k] < 0 ? C.sindoor : C.ivory }}>{(x[b.k] / 60).toFixed(2)}</span>
                             </span>
                           ))}
@@ -1093,7 +1111,7 @@ export default function ChartScreen({ C, card, lang }) {
                         <div style={{ ...T.label, color: cd.hot ? C.gold : C.muted, marginBottom: "0.375rem" }}>{cd.head}</div>
                         <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-title)", color: cd.hot ? C.gold : C.ivory, lineHeight: 1.35 }}>{cd.answer}</div>
                         <div style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.375rem", lineHeight: 1.5 }}>{cd.detail}</div>
-                        <a href={`/calculator/${cd.id}?lang=${lang}`} style={{ display: "inline-block", marginTop: "0.5rem", fontSize: "var(--font-label)", color: C.gold, textDecoration: "none" }}>
+                        <a href={utilityHref(`/calculator/${cd.id}`, lang, place)} style={{ display: "inline-block", marginTop: "0.5rem", fontSize: "var(--font-label)", color: C.gold, textDecoration: "none" }}>
                           {hi ? "विस्तृत पृष्ठ →" : "Full page →"}
                         </a>
                       </div>

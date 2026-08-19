@@ -339,6 +339,85 @@ if (!/चल रहा है|आने वाला|बीत चुका/.tes
   failures++;
 }
 
+/* ------------------------------------------------- 4. content parity, not just language */
+/* The defect this exists for (JYOTISH-HINDI-PARITY, 2026-08-18): the BNN and Bhrigu
+   screens printed ONE generic Hindi sentence in place of EVERY meaning — the same
+   sentence 7× in bnn.hi and 19× in bhrigu.hi — while an English reader got a
+   distinct interpretation each time. Every existing gate was green: nothing leaked,
+   no language mixed, the copy was fluent Hindi. It was simply a thinner product,
+   and only a human reading two baselines side by side could see it.
+
+   So compare the two baselines POSITIONALLY. Both languages render the same JSX, so
+   an en/hi pair with the same line count is aligned line for line: if English says
+   two different things at lines i and j, Hindi saying the identical thing at both is
+   a meaning that was collapsed, not translated.
+
+   Only lines long enough to be a phrase count (a repeated one-word label such as
+   "secondary" is legitimately the same word twice). The floor is 12 characters; at
+   the time of writing this check finds nothing even at 8, so the margin is generous
+   rather than tuned to hide something. */
+const PHRASE_MIN = 12;
+const parityKeys = [...new Set([...fresh.keys()]
+  .filter((k) => k.endsWith('.en')).map((k) => k.slice(0, -3)))]
+  .filter((k) => fresh.has(`${k}.hi`));
+
+for (const key of parityKeys) {
+  const en = fresh.get(`${key}.en`).split('\n');
+  const hi = fresh.get(`${key}.hi`).split('\n');
+  if (en.length !== hi.length) continue; // structures diverge; positions mean nothing
+  const byHindi = new Map();
+  en.forEach((line, i) => {
+    if (line.length < PHRASE_MIN || !line.includes(' ')) return;
+    if (!byHindi.has(hi[i])) byHindi.set(hi[i], new Set());
+    byHindi.get(hi[i]).add(line);
+  });
+  for (const [hiLine, englishVariants] of byHindi) {
+    if (englishVariants.size < 2) continue;
+    console.error(`FAIL ${key}: ${englishVariants.size} distinct English meanings collapse to one Hindi sentence`);
+    console.error(`    hi: ${hiLine.slice(0, 100)}`);
+    [...englishVariants].slice(0, 3).forEach((v) => console.error(`    en: ${v.slice(0, 100)}`));
+    console.error('    Hindi readers must get one meaning per row, not a generic sentence repeated.');
+    failures++;
+  }
+}
+
+/* --------------------------- 4. every English signification has a Hindi twin */
+/* The rendered check above only sees the rows this fixture happens to produce. This
+   half is exhaustive: a signification table and its Hindi twin must carry exactly the
+   same keys, so adding an English meaning without a Hindi one fails at once instead
+   of waiting for a chart that lands on it. Astrological significations carry religious
+   weight — the twin must be a TRANSLATION of the English Ganak already states, never a
+   meaning invented to fill a hole. */
+const bhriguEn = loadApp('src/engine/bhrigu.ts');
+const bhriguHi = loadApp('src/data/bhrigu-copy-hi.ts');
+const TWINS = [
+  ['BNN_KARAKA', bhriguEn.BNN_KARAKA, bhriguHi.BNN_KARAKA_HI],
+  ['BNN_MEANING', bhriguEn.BNN_MEANING, bhriguHi.BNN_MEANING_HI],
+  ['BCP_HOUSE_THEME', bhriguEn.BCP_HOUSE_THEME, bhriguHi.BCP_HOUSE_THEME_HI],
+];
+for (const [name, english, hindi] of TWINS) {
+  const missing = Object.keys(english).filter((k) => !hindi[k]);
+  const extra = Object.keys(hindi).filter((k) => !english[k]);
+  if (missing.length) {
+    console.error(`FAIL ${name}: ${missing.length} signification(s) English-only: ${missing.slice(0, 6).join(', ')}`);
+    console.error('    Add the Hindi translation in src/data/bhrigu-copy-hi.ts — do not invent a meaning.');
+    failures++;
+  }
+  if (extra.length) {
+    console.error(`FAIL ${name}: Hindi key(s) with no English original: ${extra.slice(0, 6).join(', ')}`);
+    failures++;
+  }
+}
+/* Shadbala's six sub-strengths carry their own Hindi label; the table used to be
+   English-only and the Hindi chart printed "Sthana Dig Kala Cheshta Naisargika Drik". */
+const { BALA_PARTS } = loadApp('src/engine/shadbala.ts');
+const balaGaps = BALA_PARTS.filter((b) => !b.labelHi || !b.noteHi).map((b) => b.k);
+if (balaGaps.length) {
+  console.error(`FAIL BALA_PARTS: no Hindi label for ${balaGaps.join(', ')}`);
+  failures++;
+}
+
+
 if (failures) {
   console.error(`\n✗ screen-snapshots FAILED (${failures})`);
   console.error('If the change was intentional: node validation/snapshot-generate.cjs --write, then commit the diff.');

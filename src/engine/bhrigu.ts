@@ -3,6 +3,11 @@
 
 import { SIGN_LORD } from "./panchang";
 import { planetGochar } from "./gochar";
+/* Hindi twins of every signification this module states in English. The engine
+   attaches both languages to each row so the screens never have to reconstruct a
+   meaning from a key — and so a missing Hindi entry is impossible to ship
+   silently (validation/screen-snapshots.cjs asserts the two tables match). */
+import { BNN_KARAKA_HI, BCP_HOUSE_THEME_HI, bnnMeaningHi, bnnRelationHi } from "../data/bhrigu-copy-hi";
 
 /* ---------------- Bhrigu Nandi Nadi (BNN) — Tier A: pure calculation ----------------
    Lagna-less (read from any reference planet, default Jupiter male / Venus female),
@@ -44,7 +49,9 @@ function bnnComboBetween(rows, a, b) {
 }
 function bnnCoreCombos(rows) {
   return BNN_CORE.map(([a, b]) => { const rel = bnnComboBetween(rows, a, b);
-    return { pair: [a, b], active: !!rel, relation: rel || "hidden — not in combination", meaning: bnnMeaning(a, b) }; });
+    const relation = rel || "hidden — not in combination";
+    return { pair: [a, b], active: !!rel, relation, relationHi: bnnRelationHi(relation),
+      meaning: bnnMeaning(a, b), meaningHi: bnnMeaningHi(a, b) }; });
 }
 function bnnParivartana(rows) {
   const out = [];
@@ -114,9 +121,11 @@ function bnnReading(rows, ref) {
   const order = [["conjunct", "conjunct"], ["h5", "5th · trine"], ["h9", "9th · trine"], ["h2", "2nd · ahead"], ["h12", "12th · behind"], ["h7", "7th · opposition"], ["h3", "3rd"], ["h11", "11th"]];
   const active = [];
   for (const [key, label] of order) for (const name of rel.buckets[key])
-    active.push({ planet: name, relation: label, karaka: BNN_KARAKA[name], theme: bnnMeaning(ref, name) });
-  const obstructed = rel.buckets.hidden.map((name) => ({ planet: name, karaka: BNN_KARAKA[name] }));
-  return { self: ref, selfKaraka: BNN_KARAKA[ref], active, obstructed };
+    active.push({ planet: name, relation: label, relationHi: bnnRelationHi(label),
+      karaka: BNN_KARAKA[name], karakaHi: BNN_KARAKA_HI[name],
+      theme: bnnMeaning(ref, name), themeHi: bnnMeaningHi(ref, name) });
+  const obstructed = rel.buckets.hidden.map((name) => ({ planet: name, karaka: BNN_KARAKA[name], karakaHi: BNN_KARAKA_HI[name] }));
+  return { self: ref, selfKaraka: BNN_KARAKA[ref], selfKarakaHi: BNN_KARAKA_HI[ref], active, obstructed };
 }
 // BNN timing: real Jupiter transit (R.G. Rao's gochar method). As transit-Jupiter
 // passes each sign, it activates natal planets it conjuncts (or trines / opposes);
@@ -134,7 +143,7 @@ function bnnTiming(rows, fromMs, spanDays) {
       const h = ((natal[name] - s.sign + 12) % 12) + 1;
       let rel = null;
       if (h === 1) rel = "conjunct"; else if (h === 5 || h === 9) rel = "trine"; else if (h === 7) rel = "opposition";
-      if (rel) activated.push({ planet: name, relation: rel, theme: bnnMeaning("Jupiter", name) });
+      if (rel) activated.push({ planet: name, relation: rel, theme: bnnMeaning("Jupiter", name), themeHi: bnnMeaningHi("Jupiter", name) });
     }
     return { sign: s.sign, enter: s.enter, exit: s.exit, activated };
   });
@@ -175,7 +184,8 @@ function bcpForAge(ascSign, rows, age) {
   const lord = SIGN_LORD[sign];
   const lordRow = rows.find((p) => p.name === lord);
   const lordHouse = lordRow ? _bcpHouse(ascSign, lordRow.sign) : null;
-  return { age, houseNum, cycleLord, sign, occupants, lord, lordHouse, theme: BCP_HOUSE_THEME[houseNum] };
+  return { age, houseNum, cycleLord, sign, occupants, lord, lordHouse,
+    theme: BCP_HOUSE_THEME[houseNum], themeHi: BCP_HOUSE_THEME_HI[houseNum] };
 }
 function bcpTimeline(ascSign, rows, fromAge, toAge) {
   const out = [];
@@ -188,7 +198,8 @@ function bspRules(ascSign, rows) {
     const targetSign = (pr.sign + r.from - 1) % 12;
     const houseFromLagna = _bcpHouse(ascSign, targetSign);
     const occupants = rows.filter((p) => BNN_PLANETS.includes(p.name) && p.sign === targetSign).map((p) => p.name);
-    return { ...r, planetSign: pr.sign, targetSign, houseFromLagna, occupants, theme: BCP_HOUSE_THEME[houseFromLagna] };
+    return { ...r, planetSign: pr.sign, targetSign, houseFromLagna, occupants,
+      theme: BCP_HOUSE_THEME[houseFromLagna], themeHi: BCP_HOUSE_THEME_HI[houseFromLagna] };
   }).filter(Boolean);
 }
 function jupiterProgression(rows, fromAge, toAge) {
@@ -201,7 +212,7 @@ function jupiterProgression(rows, fromAge, toAge) {
       const r = rows.find((x) => x.name === name); if (!r) continue;
       const h = _bcpHouse(progSign, r.sign);
       let rel = null; if (h === 1) rel = "conjunct"; else if (h === 5 || h === 9) rel = "trine"; else if (h === 7) rel = "opposition";
-      if (rel) activated.push({ planet: name, relation: rel, theme: bnnMeaning("Jupiter", name) });
+      if (rel) activated.push({ planet: name, relation: rel, theme: bnnMeaning("Jupiter", name), themeHi: bnnMeaningHi("Jupiter", name) });
     }
     out.push({ age: a, progSign, activated });
   }
@@ -221,6 +232,7 @@ export {
   jupiterProgression,
   BNN_PLANETS,
   BNN_KARAKA,
+  BNN_MEANING,
   BCP_CYCLE_LORDS,
   BCP_HOUSE_THEME,
 };
