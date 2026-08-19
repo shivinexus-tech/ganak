@@ -112,13 +112,33 @@ const PR_ayanamsa = T => 23.85236 + 1.3960 * T + 0.000139 * T * T;
 const PR_toSid = (trop, T) => norm360(trop - PR_ayanamsa(T));
 const PR_gmst = (jdUT, Tut) => norm360(280.46061837 + 360.98564736629 * (jdUT - 2451545)
   + 0.000387933 * Tut * Tut - Tut * Tut * Tut / 38710000);
+/* Right ascension of an ecliptic degree on the ecliptic itself (latitude 0):
+   tan(RA) = cos(eps) * tan(lambda). Used only by the polar quadrant correction
+   below. */
+const PR_raOfEcl = (lam, eps) => norm360(Math.atan2(cosD(eps) * sinD(lam), cosD(lam)) * R2D);
 function PR_ascMc(jdUT, Tut, lat, lonE) {
   const eps = PR_obliquity(Tut), ramc = norm360(PR_gmst(jdUT, Tut) + lonE);
-  return {
-    asc: norm360(Math.atan2(cosD(ramc), -(sinD(ramc) * cosD(eps) + tanD(lat) * sinD(eps))) * R2D),
-    mc: norm360(Math.atan2(sinD(ramc), cosD(ramc) * cosD(eps)) * R2D),
-    ramc, eps
-  };
+  let asc = norm360(Math.atan2(cosD(ramc), -(sinD(ramc) * cosD(eps) + tanD(lat) * sinD(eps))) * R2D);
+  const mc = norm360(Math.atan2(sinD(ramc), cosD(ramc) * cosD(eps)) * R2D);
+  /* POLAR QUADRANT CORRECTION (2026-08-18). The standard ascendant formula
+     returns ONE of the two antipodal points where the ecliptic cuts the horizon.
+     Below the polar circle that is always the eastern one. Above it -- Murmansk
+     68.96, Tromso 69.65, and everything nearer the pole -- the arctangent lands
+     in the other quadrant for part of the day and the function returns the
+     DESCENDANT instead: at Tromso on 2026-08-18 it did so at 18:00Z and 20:00Z,
+     handing back Scorpio 22 deg 57 min as the rising degree when that degree was
+     setting. The whole chart is then rotated by six houses.
+     Diurnal motion is uniform, so the fix is the definition itself: everything
+     on the eastern half of the horizon is rising and everything on the western
+     half is setting. Take the hour angle of the computed point; if it is west of
+     the meridian, the formula returned the descendant, so take its opposite.
+     Below the polar circle sin(H) is never positive here, so this is a no-op for
+     every latitude Ganak's earlier gates covered. Proven at 528 sampled
+     latitude/hour pairs by validation/prashna-high-latitude.cjs, which tests
+     "rising" against published spherical astronomy rather than against a second
+     copy of this code. */
+  if (sinD(norm360(ramc - PR_raOfEcl(asc, eps))) > 0) asc = norm360(asc + 180);
+  return { asc, mc, ramc, eps };
 }
 const PR_eclFromRA = (ra, eps) => norm360(Math.atan2(sinD(ra), cosD(ra) * cosD(eps)) * R2D);
 function PR_placidus(ramc, eps, lat) {
@@ -136,6 +156,49 @@ function PR_placidus(ramc, eps, lat) {
   const c11 = solve(ad => (90 + ad) / 3, 30), c12 = solve(ad => 2 * (90 + ad) / 3, 60);
   const c2 = solve(ad => 180 - 2 * (90 - ad) / 3, 120), c3 = solve(ad => 180 - (90 - ad) / 3, 150);
   return [c11, c12, c2, c3].some(v => v === null) ? null : { c11, c12, c2, c3 };
+}
+/* Build the twelve tropical cusps from the ascendant, the MC and the Placidus
+   quadrant solution (or null where Placidus is undefined).
+
+   HIGH-LATITUDE CONVENTION (implemented 2026-08-18, P0 fix): where Placidus is
+   undefined the fallback is the EQUAL HOUSE system reckoned from the ascendant --
+   cusp h = ascendant + 30*(h-1) for ALL twelve houses, the MC included. In equal
+   house the MC is NOT the tenth cusp; it is a separate sensitive point that may
+   fall in the 9th, 10th or 11th. That is the defining property of the system and
+   it is why the tenth cusp must not be pinned to the real MC here.
+
+   WHY: the previous code replaced only cusps 11, 12, 2 and 3 with 30-degree steps
+   and LEFT cusp 10 as the real MC (and so cusp 4 as the real IC) inside an
+   otherwise equal ring. Below ~60 deg latitude MC is approximately asc+270 so
+   nothing showed; above it the two real angles overtook their neighbours, the
+   ring stopped advancing monotonically, the twelve spans summed to 1080 deg
+   instead of 360 deg, and the linear `inHouse` scan dropped up to eight of the
+   nine grahas into a single house. At Tromso 166 of the 249 numbers were
+   affected. The screen's own disclosure already said "equal houses" in both
+   languages; the code simply did not build equal houses. This makes the two
+   agree.
+
+   WHY EQUAL HOUSE AND NOT SOMETHING ELSE: Krishnamurti's KP is a Placidus system
+   and the KP Readers record no polar convention at all, so nothing here can be
+   attributed to KSK. Equal house is the minimal, fully defined ring that (a)
+   exists at every latitude where an ascendant exists, (b) keeps the ascendant --
+   the one angle KP horary is actually judged from -- exact, and (c) is what the
+   shipped user-facing disclosure already names. It is recorded as a Ganak
+   product decision, NOT doctrine: plans/prashna-249-ksk-verify.md rule 9.
+
+   INVARIANTS, asserted externally by validation/prashna-high-latitude.cjs:
+   monotonic once round the zodiac, twelve spans summing to exactly 360 deg, no
+   degenerate or oversized house. */
+function PR_ring(asc, mc, p) {
+  const trop = new Array(13).fill(0);
+  if (!p) {
+    for (let h = 1; h <= 12; h++) trop[h] = norm360(asc + 30 * (h - 1));
+    return trop;
+  }
+  trop[1] = asc; trop[10] = mc;
+  trop[11] = p.c11; trop[12] = p.c12; trop[2] = p.c2; trop[3] = p.c3;
+  for (const h of [4, 5, 6, 7, 8, 9]) trop[h] = norm360(trop[((h + 5) % 12) + 1] + 180);
+  return trop;
 }
 const GRAHA = ['Ke','Ve','Su','Mo','Ma','Ra','Ju','Sa','Me'];
 const DASHA_YRS = { Ke:7, Ve:20, Su:6, Mo:10, Ma:7, Ra:18, Ju:16, Sa:19, Me:17 };
@@ -203,11 +266,7 @@ function PR_cast(ms, lat, lonE) {
   const { sid, jdUT, T, Tut } = PR_sidAll(ms);
   const { asc, mc, ramc, eps } = PR_ascMc(jdUT, Tut, lat, lonE);
   const p = PR_placidus(ramc, eps, lat);
-  const trop = new Array(13).fill(0);
-  trop[1] = asc; trop[10] = mc;
-  if (p) { trop[11]=p.c11; trop[12]=p.c12; trop[2]=p.c2; trop[3]=p.c3; }
-  else for (const [h, off] of [[11,300],[12,330],[2,30],[3,60]]) trop[h] = norm360(asc + off);
-  for (const h of [4,5,6,7,8,9]) trop[h] = norm360(trop[((h + 5) % 12) + 1] + 180);
+  const trop = PR_ring(asc, mc, p);
   const cusps = trop.map((v, i) => i === 0 ? 0 : PR_toSid(v, T));
   const inHouse = lon => {
     for (let h = 1; h <= 12; h++) {
@@ -369,11 +428,9 @@ function PR_castNumber(ms, lat, lonE, number) {
   const ramc = PR_ramcForAsc(ascTrop, eps, lat);
   const mc = norm360(Math.atan2(sinD(ramc), cosD(ramc) * cosD(eps)) * R2D);
   const p = PR_placidus(ramc, eps, lat);
-  const trop = new Array(13).fill(0);
-  trop[1] = ascTrop; trop[10] = mc;
-  if (p) { trop[11] = p.c11; trop[12] = p.c12; trop[2] = p.c2; trop[3] = p.c3; }
-  else for (const [h, off] of [[11, 300], [12, 330], [2, 30], [3, 60]]) trop[h] = norm360(ascTrop + off);
-  for (const h of [4, 5, 6, 7, 8, 9]) trop[h] = norm360(trop[((h + 5) % 12) + 1] + 180);
+  /* Same ring builder as the time mode, so the high-latitude equal-house
+     convention documented on PR_ring cannot drift between the two modes. */
+  const trop = PR_ring(ascTrop, mc, p);
   const cusps = trop.map((v, i) => i === 0 ? 0 : norm360(v - ayan)); // KP-New sidereal cusps
   /* The number DEFINES the nirayana ascendant. Converting it to tropical for the
      RAMC inversion and back is a lossy round-trip (up to 8.5e-14 deg), and the
