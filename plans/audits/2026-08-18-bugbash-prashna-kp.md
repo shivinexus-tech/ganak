@@ -693,15 +693,18 @@ was needed at all.
    and freezes the whole reading into one immutable `result` object holding `chart`, `verdict`,
    `askedAt`, `number`, `info` and `placeLabel`. Nothing recomputes on re-render.
 7. **A language switch does not move the ruling numbers.** `lang` is a prop and `PrashnaScreen` is
-   not keyed, so toggling hi/en re-renders the *same* frozen `result`. Rendering one seeded result
-   in both languages gives identical lagna, nakshatra, pada, cusp sub-lord, all twelve cuspal
-   sub-lords and the same verdict class. `PR_castNumber` is deterministic — two calls with the same
-   millisecond serialise byte-identically.
+   not keyed, so toggling hi/en re-renders the *same* frozen `result`. Over **40 seeded renderings**
+   (8 numbers spanning the table extremes × 5 topics, each in both languages,
+   `.scratch/bugbash/enhi2.cjs`) the degree tokens, the nakshatra padas, the verdict class and the
+   full nine-graha roster were **identical in 40/40** — the Hindi page carries every planet the
+   English page does, through the one shared lookup. `PR_castNumber` is deterministic: two calls
+   with the same millisecond serialise byte-identically.
 8. **Answer-before-data holds, in both languages.** The rendered text order is verdict badge →
    plain-language verdict → "What your number set" → disclosures → `Full Prashna chart` → tables.
    In Astrologer view the inversion is deliberate and owner-approved, and the verdict is still
-   present behind a labelled disclosure (`Plain-language reading` / `सरल भाषा में उत्तर`) rather
-   than dropped.
+   present behind a labelled disclosure — verified by rendering `chartFirst: true`: the verdict text
+   is still on the page and the summary reads `Plain-language reading` / `सरल भाषा में उत्तर` in the
+   respective language. It is demoted, not dropped.
 9. **The in-app Hindi surface is clean.** A full Latin-script scan of the seeded Hindi result page
    surfaced only `Rx` (glossed on the very next line), the `A B C D` grid headers (glossed below the
    grid) and `VI` in the Reader citation. Rashi, nakshatra and graha names all resolve through the
