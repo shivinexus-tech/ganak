@@ -13,7 +13,7 @@ Government holidays
 Hide holidays
 National holidays
 Central gazetted holidays
-Amanta · Shravana · Shukla Paksha · lunar day 2
+Vikram Samvat 2083 · Amanta · Shravana · Shukla Paksha · lunar day 2
 Not sure? Keep the default. This only changes the date and month names; timings and observances for Mumbai, India stay the same.
 Today
 Friday
