@@ -24,13 +24,17 @@ const NF = {
 };
 const VARGA7 = ["D1", "D2", "D3", "D7", "D9", "D12", "D30"];
 const CHESHTA_SPD = { Mars: [0.79, -0.40], Mercury: [2.20, -1.40], Jupiter: [0.24, -0.14], Venus: [1.26, -0.63], Saturn: [0.13, -0.08] };
+/* The six sub-strengths, with the Hindi label and gloss alongside the English pair.
+   Before 2026-08-18 only the English existed, so the Shadbala table read
+   "Sthana Dig Kala Cheshta Naisargika Drik" to a Hindi reader while the section
+   intro two lines above already used the Devanagari words. */
 const BALA_PARTS = [
-  { k: "sthana", label: "Sthana", note: "positional", color: "color-mix(in srgb, #A86A12, var(--ink) 26%)" },
-  { k: "dig", label: "Dig", note: "directional", color: "color-mix(in srgb, #C2451E, var(--ink) 26%)" },
-  { k: "kala", label: "Kala", note: "temporal", color: "color-mix(in srgb, #2C7D4F, var(--ink) 26%)" },
-  { k: "cheshta", label: "Cheshta", note: "motional", color: "color-mix(in srgb, #46588F, var(--ink) 26%)" },
-  { k: "naisargika", label: "Naisargika", note: "natural", color: "color-mix(in srgb, #9A7000, var(--ink) 26%)" },
-  { k: "drik", label: "Drik", note: "aspectual", color: "color-mix(in srgb, #6E5C82, var(--ink) 26%)" },
+  { k: "sthana", label: "Sthana", labelHi: "स्थान", note: "positional", noteHi: "स्थिति", color: "color-mix(in srgb, #A86A12, var(--ink) 26%)" },
+  { k: "dig", label: "Dig", labelHi: "दिग्", note: "directional", noteHi: "दिशा", color: "color-mix(in srgb, #C2451E, var(--ink) 26%)" },
+  { k: "kala", label: "Kala", labelHi: "काल", note: "temporal", noteHi: "समय", color: "color-mix(in srgb, #2C7D4F, var(--ink) 26%)" },
+  { k: "cheshta", label: "Cheshta", labelHi: "चेष्टा", note: "motional", noteHi: "गति", color: "color-mix(in srgb, #46588F, var(--ink) 26%)" },
+  { k: "naisargika", label: "Naisargika", labelHi: "नैसर्गिक", note: "natural", noteHi: "प्राकृतिक", color: "color-mix(in srgb, #9A7000, var(--ink) 26%)" },
+  { k: "drik", label: "Drik", labelHi: "दृक्", note: "aspectual", noteHi: "दृष्टि", color: "color-mix(in srgb, #6E5C82, var(--ink) 26%)" },
 ];
 
 function naturalRel(A, B) {

@@ -25,7 +25,14 @@ assert(shell.includes('["chart", lang === "hi" ? "ज्योतिष" : "Jyot
 assert(shell.includes('mode === "chart"'), "the shell must render ChartScreen");
 assert(screen.includes("<JyotishPanelNav lang={lang} C={C}"), "ChartScreen must use the grouped Jyotish navigation");
 assert(nav.includes('["/calculators", "Quick calculators", "त्वरित कैलकुलेटर"]'), "Tools navigation must expose the calculator catalogue in both languages");
-assert(screen.includes('href={`/calculators?lang=${lang}`}'), "Jyotish home must link directly to the calculator catalogue and preserve language");
+/* This used to pin the literal `href={`/calculators?lang=${lang}`}` — which pinned the
+   DEFECT: that href carried the language and silently dropped the city the reader had
+   already chosen, so the catalogue opened blank (JYOTISH-HINDI-PARITY, 2026-08-18).
+   The guarantee is unchanged and now stricter: a direct link to the catalogue, built by
+   the one helper that preserves language AND place. */
+assert(screen.includes('href={utilityHref("/calculators", lang, place)}'), "Jyotish home must link directly to the calculator catalogue, preserving language and the chosen city");
+assert(nav.includes("utilityHref(href, lang, place)"), "the Tools navigation must build its calculator link with utilityHref so the chosen city survives");
+assert(!/\?lang=\$\{lang\}/.test(screen + nav), "a hand-written ?lang= link drops the reader's city — use utilityHref");
 assert(screen.includes('hi="त्वरित कैलकुलेटर" en="QUICK CALCULATORS"'), "Jyotish home must introduce calculators as a secondary Jyotish section");
 // Guided depth hides the two practitioner-only panels, so the nav must hide exactly those
 // entries too — an anchor that scrolls to nothing is the dead-end pattern this repo bans.
