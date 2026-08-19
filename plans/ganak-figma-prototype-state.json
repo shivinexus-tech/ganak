@@ -261,13 +261,16 @@
       "scope": "Owner decision is visual direction only and is carried by the two desktop masters. The two 390px frames are responsive mobile-web QA companions, not separate design directions or Ganak Phone/native work. Unsupported or internal-only routes, state preservation and production interaction mapping remain open.",
       "todayHeroOrnamentCorrection": {
         "ownerDecisionRecorded": "2026-08-19",
-        "decision": "FIXED — OWNER REVIEW: the minimal vertical floral edge and detached lower-right ornament were never approved; the owner required replacement rather than removal",
-        "replacementVocabularySource": "485:51",
-        "replacementSourceNodes": ["667:14247", "667:14248"],
-        "replacementReviewNodes": ["666:14247", "666:14248"],
+        "decision": "CHANGES REQUESTED — DESKTOP OWNER REVIEW: replace both disputed ornaments without rebuilding the approved ordinary-Today screen",
+        "rejectedUniversalAssetAssumption": "485:51 is Festival/Vrat hero vocabulary only; its direct paste into Today is rejected",
+        "desktopReviewPanel": "652:13964",
+        "desktopReviewNodes": ["675:14247", "675:14248", "675:14249", "675:14250", "675:14251", "675:14253"],
+        "desktopVocabularySources": ["62:2", "62:13", "148:323", "148:325"],
+        "hiddenRejectedPastedSweep": "666:14247",
         "hiddenSourceNodes": ["601:9793", "601:9795", "628:13637", "628:13639"],
-        "hiddenReviewNodes": ["652:13965", "652:13967", "652:13996", "652:13998"],
-        "scope": "The old fragments remain hidden and are replaced by one complete, fully visible bright botanical sweep from the approved vocabulary. All other Today content, geometry and styling remain unchanged."
+        "hiddenReviewNodes": ["652:13965", "652:13967"],
+        "pendingUntouchedNodes": ["601:9563", "601:8508", "652:13989", "667:14247", "667:14248", "666:14248"],
+        "scope": "Desktop review only: textile lattice, fine gold bookplate framing, floral terminal and finials replace only the disputed decorations. All content and geometry are frozen. Source and 390px propagation wait for owner approval."
       }
     },
     "responsiveSharedSystem": {
