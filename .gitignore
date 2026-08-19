@@ -1,4 +1,7 @@
-node_modules/
+# Match the directory AND a symlink of the same name: agent worktrees link
+# node_modules to the main checkout, and 'node_modules/' alone does not ignore a
+# symlink, so 'git add -A' would otherwise commit a machine-specific absolute path.
+node_modules
 dist/
 .DS_Store
 *.tmp.cjs
