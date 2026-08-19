@@ -1,0 +1,10 @@
+JYOTISH WORKSPACE
+KundliCalculators
+← All calculatorsVedic Sun sign
+Your sidereal Sun sign using Lahiri ayanamsa.
+Date
+Time
+Place
+Calculate
+Method & limitsLahiri sidereal Sun sign—not the tropical newspaper sign.
+Source note: classical and published bases are recorded in Ganak's method map.

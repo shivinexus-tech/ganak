@@ -1,0 +1,121 @@
+Move the birth time and watch what's sensitive to it. The lagna shifts ~1° every 4 minutes; the navamsa (D-9) and shashtiamsa (D-60) ascendants and the KP sub-lord move faster — these are what a rectifier narrows by. Add known life events below to see which candidate time lands them on a fitting dasha. This is an instrument for your judgement, not an automatic answer.
+Window
+±15m
+±30m
+±60m
+Step
+1m
+2m
+4m
+08:30:00
+candidate birth time (as entered)
+Lagna
+Cn 2°50' · Punarvasu pada 4
+Navamsa D-9 lagna
+Cn
+Shashtiamsa D-60 lagna
+Sg
+KP ascendant sub-lord
+Rahu
+Starting mahadasha
+Rahu · 4.52 yrs balance
+Sweep · transitions highlighted
+Time
+Lagna
+D9
+D60
+Sub
+08:00
+Ge 26°10'
+Ta
+Li
+Ket
+08:04
+Ge 27°03'
+Ge ←
+Sg ←
+Ven ←
+08:08
+Ge 27°57'
+Ge
+Cp ←
+Ven
+08:12
+Ge 28°50'
+Ge
+Pi ←
+Sun ←
+08:16
+Ge 29°43'
+Ge
+Ta ←
+Moo ←
+08:20
+Cn 0°37' ⟵ sign
+Cn ←
+Le ←
+Mar ←
+08:24
+Cn 1°30'
+Cn
+Li ←
+Rah ←
+08:28
+Cn 2°24'
+Cn
+Sc ←
+Rah
+08:32
+Cn 3°17'
+Cn
+Cp ←
+Rah
+08:36
+Cn 4°10'
+Le ←
+Pi ←
+Sat ←
+08:40
+Cn 5°04'
+Le
+Ta ←
+Sat
+08:44
+Cn 5°57'
+Le
+Ge ←
+Mer ←
+08:48
+Cn 6°51'
+Vi ←
+Le ←
+Mer
+08:52
+Cn 7°44'
+Vi
+Li ←
+Ket ←
+08:56
+Cn 8°38'
+Vi
+Sg ←
+Ven ←
+09:00
+Cn 9°32'
+Vi
+Aq ←
+Ven
+Event anchors · dasha fit
+Add dated life events. For the candidate time above, each shows the running mahadasha–antardasha; a ✓ marks where that lord also rules the event's house. The fit that holds across all events points to the time.
+Marriage (7H)
+Childbirth (5H)
+New job / career (10H)
+Property / home (4H)
+Foreign move (12H)
+Higher education / father (9H)
+Wealth / family event (2H)
+Illness / surgery (6H)
+Bereavement / upheaval (8H)
+Add
+No events yet — marriage, a child's birth, or a career change are the usual anchors.
+Rectification is judgement, not arithmetic — these markers and dasha fits narrow the field; they don't certify a time to the second. The ✓ checks only whether a running dasha lord rules the event house; a full rectification also weighs antardasha lords' placements, transits over the natal lagna, and the navamsa. Treat this as a workbench, and confirm against several independent events before trusting a time.

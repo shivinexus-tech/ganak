@@ -91,7 +91,7 @@ function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
           return (
             <div key={i} onClick={() => setSel(r.totalMin)} style={{ display: "grid", gridTemplateColumns: "62px 1fr 46px 46px 64px", gap: "0.375rem", padding: "0.375rem 0.75rem", borderTop: i ? "0.0625rem solid var(--line-soft)" : "none", fontSize: "var(--font-small)", cursor: "pointer", background: isSel ? "var(--accent-soft)" : r.chSign ? "var(--bad-surface)" : "transparent", alignItems: "baseline", fontVariantNumeric: "tabular-nums" }}>
               <span style={{ color: isSel ? C.gold : C.ivory }}>{fmtMin(r.totalMin).slice(0, 5)}</span>
-              <span style={{ color: r.chSign ? C.sindoor : C.ivory, fontWeight: r.chSign ? 600 : 400 }}>{signShort(lang, r.sign)} {dms(r.deg)}{r.chSign ? " ⟵ sign" : ""}</span>
+              <span style={{ color: r.chSign ? C.sindoor : C.ivory, fontWeight: r.chSign ? 600 : 400 }}>{signShort(lang, r.sign)} {dms(r.deg)}{r.chSign ? (hi ? " ⟵ राशि" : " ⟵ sign") : ""}</span>
               {ch(r.chD9, signShort(lang, r.d9))}{ch(r.chD60, signShort(lang, r.d60))}{ch(r.chSub, planetShort(lang, r.subLord))}
             </div>
           );

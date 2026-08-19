@@ -1,0 +1,203 @@
+Bhrigu Chakra · one house per year
+From the Ascendant, year 1 is the 1st house, year 2 the 2nd, and so on — the chakra rotating every 12 years. Each 12-year cycle carries a Cycle Lord (Chakra Swami) that colours it.
+age 33
+~2023
+9th · Pi
+Venus cycle
+fortune, dharma, father, guru, travel · Mars here
+age 34
+~2024
+10th · Ar
+Venus cycle
+career, status, karma, authority · Venus here
+age 35
+~2025
+11th · Ta
+Venus cycle
+gains, income, networks, fulfilment of desires · Mercury here
+age 36 NOW
+~2026
+12th · Ge
+Venus cycle
+loss, expense, foreign lands, retreat, spirituality · Sun, Jupiter here
+age 37
+~2027
+1st · Cn
+Sun cycle
+self, body, vitality, new beginnings · Ketu here
+age 38
+~2028
+2nd · Le
+Sun cycle
+wealth, family, speech, food
+age 39
+~2029
+3rd · Vi
+Sun cycle
+courage, siblings, effort, communication
+age 40
+~2030
+4th · Li
+Sun cycle
+home, mother, comfort, property, schooling
+age 41
+~2031
+5th · Sc
+Sun cycle
+children, intellect, romance, creativity
+age 42
+~2032
+6th · Sg
+Sun cycle
+obstacles, debt, disease, service, rivals
+age 43
+~2033
+7th · Cp
+Sun cycle
+marriage, partnership, business, others · Saturn, Rahu here
+age 44
+~2034
+8th · Aq
+Sun cycle
+upheaval, transformation, inheritance, the hidden · Moon here
+age 45
+~2035
+9th · Pi
+Sun cycle
+fortune, dharma, father, guru, travel · Mars here
+age 46
+~2036
+10th · Ar
+Sun cycle
+career, status, karma, authority · Venus here
+age 47
+~2037
+11th · Ta
+Sun cycle
+gains, income, networks, fulfilment of desires · Mercury here
+age 48
+~2038
+12th · Ge
+Sun cycle
+loss, expense, foreign lands, retreat, spirituality · Sun, Jupiter here
+age 49
+~2039
+1st · Cn
+Mars cycle
+self, body, vitality, new beginnings · Ketu here
+age 50
+~2040
+2nd · Le
+Mars cycle
+wealth, family, speech, food
+age 51
+~2041
+3rd · Vi
+Mars cycle
+courage, siblings, effort, communication
+age 52
+~2042
+4th · Li
+Mars cycle
+home, mother, comfort, property, schooling
+Bhrigu Saral · implements-rules (documented subset)
+Each rule fixes a year when a planet "implements" a particular house counted from itself. Shown as the house it lands on in this chart, with significations — a structural map, not an event forecast.
+Saturn
+lifelong · 4th from self
+lands on Ar
+(10th house) — career, status, karma, authority · with Venus
+Mars
+age 27 · 10th from self
+lands on Sg
+(6th house) — obstacles, debt, disease, service, rivals
+Rahu
+age 38 · 6th from self
+lands on Ge
+(12th house) — loss, expense, foreign lands, retreat, spirituality · with Sun, Jupiter
+Ketu
+age 24 · 12th from self
+lands on Ge
+(12th house) — loss, expense, foreign lands, retreat, spirituality · with Sun, Jupiter
+Jupiter
+age 32 · 5th from self
+lands on Li
+(4th house) — home, mother, comfort, property, schooling
+Jupiter
+age 40 · 9th from self
+lands on Aq
+(8th house) — upheaval, transformation, inheritance, the hidden · with Moon
+Saturn
+age 20 · 3rd from self
+lands on Pi
+(9th house) — fortune, dharma, father, guru, travel · with Mars
+Jupiter progression · 1 sign / year
+The symbolic counterpart to the real-transit timing in the BNN section: natal Jupiter advanced one sign per year of age. The two methods diverge — that divergence is itself a thing practitioners weigh.
+age 34
+Ar
+Venus conjunct
+age 35
+Ta
+Mercury conjunct
+Saturn trine
+Rahu trine
+age 36 NOW
+Ge
+Sun conjunct
+Moon trine
+age 37
+Cn
+Mars trine
+Saturn opposition
+Rahu opposition
+Ketu conjunct
+age 38
+Le
+Moon opposition
+Venus trine
+age 39
+Vi
+Mars opposition
+Mercury trine
+Saturn trine
+Rahu trine
+age 40
+Li
+Sun trine
+Moon trine
+Venus opposition
+age 41
+Sc
+Mars trine
+Mercury opposition
+Ketu trine
+age 42
+Sg
+Sun opposition
+Venus trine
+age 43
+Cp
+Mercury trine
+Saturn conjunct
+Rahu conjunct
+Ketu opposition
+age 44
+Aq
+Sun trine
+Moon conjunct
+age 45
+Pi
+Mars conjunct
+Ketu trine
+age 46
+Ar
+Venus conjunct
+age 47
+Ta
+Mercury conjunct
+Saturn trine
+Rahu trine
+age 48
+Ge
+Sun conjunct
+Moon trine
+These are progression mechanics — which house or sign a method points to in a given year — surfaced with the standard significations of those houses. They are a structured map of when the tradition would have you look, not a forecast of what will happen. The BSP set is a widely-documented subset, not the complete proprietary system, and the longevity rules are deliberately excluded. Read alongside a practitioner, not in place of one.

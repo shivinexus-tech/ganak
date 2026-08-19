@@ -1,0 +1,10 @@
+JYOTISH WORKSPACE
+KundliCalculators
+← All calculatorsPancha Pakshi
+Birth bird from nakshatra and lunar fortnight.
+Date
+Time
+Place
+Calculate
+Method & limitsBirth-bird mapping from nakshatra group and waxing/waning fortnight. Lineage-specific sub-yama schedules are intentionally not invented.
+Source note: classical and published bases are recorded in Ganak's method map.

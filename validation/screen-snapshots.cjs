@@ -117,4 +117,12 @@ const covered = SCREENS.filter((s) => !s.skip).length;
 const skipped = SCREENS.filter((s) => s.skip);
 console.log(`✓ screen-snapshots: ${fresh.size} baselines match · ${covered} screens × ${LANGS.length} languages + chart/transit results`);
 if (skipped.length) console.log(`  not covered (${skipped.length}): ${skipped.map((s) => s.key).join(', ')} — inner modules needing parent-computed data`);
+/* A green run must never be read as "this screen is fully proven". Screens whose
+   answer only appears after the reader acts are covered in their INITIAL state
+   only, and the gate says so out loud rather than leaving it implied. */
+const partial = SCREENS.filter((s) => !s.skip && s.note);
+if (partial.length) {
+  console.log(`  initial state only (${partial.length}): ${[...new Set(partial.map((s) => s.key.replace(/^utility-.*/, 'utility-*')))].join(', ')}`);
+  console.log('    — the answer appears after Calculate / Cast; static render cannot press a button.');
+}
 console.log('  scope: rendered TEXT only — layout, overflow and contrast still need a human at 375px.');

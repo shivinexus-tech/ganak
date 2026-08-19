@@ -1,0 +1,10 @@
+JYOTISH WORKSPACE
+KundliCalculators
+← All calculatorsBirth Nakshatra
+Your Moon's nakshatra, pada and naming sounds.
+Date
+Time
+Place
+Calculate
+Method & limitsMoon divided into 27 equal nakshatras and four padas.
+Source note: classical and published bases are recorded in Ganak's method map.
