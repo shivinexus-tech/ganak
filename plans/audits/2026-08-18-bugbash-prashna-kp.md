@@ -287,7 +287,7 @@ structurally unable to do the thing it is named for.
 label the time field with the effective zone, and resolve `customWhen` against that zone rather than
 the device. A zone field belongs beside the lat/lon pair for the free-coordinate case.
 
-### F5 — P1 · A judgment time that does not exist (DST spring-forward) is silently moved, and the card then echoes back a time the user never typed
+### F5 — P2 · A judgment time that does not exist (DST spring-forward) is accepted and silently moved
 
 The same `new Date(customWhen)` accepts a wall-clock time that the local calendar skips.
 
@@ -311,6 +311,10 @@ judgment-time field never reaches that helper.
 
 **Cause** — `src/screens/PrashnaScreen.tsx:852`; no guard, and `src/components/birth-input.ts` is
 not imported by this screen.
+
+**Why P2 and not P1** — the shifted time *is* printed back on the verdict card and on the share
+card, so a careful reader can catch it, and the window is one hour per zone per year. It is graded
+down deliberately; the acceptance is silent, the output is not.
 
 **Suggested fix** — round-trip the parsed instant back to a local wall-clock string and refuse the
 input when it does not match what was typed, with the birth-input vocabulary.
@@ -407,7 +411,7 @@ refused while a number session is locked.
 > Section V, scan p.175: *"the lords of the day, Moon sign, star and lagna at the moment of
 > judgement"*; p.209 (RP-at-judgement = RP-at-fructification).
 
-`computeRulingPlanets` exists (`src/engine/dasha.ts:73-102`) and is called from exactly one place —
+`computeRulingPlanets` exists (`src/engine/dasha.ts:74`) and is called from exactly one place —
 `src/engine/kundli.ts:176`, for the **birth** chart on the Jyotish screen. Grep confirms the string
 "ruling" appears nowhere in `src/screens/PrashnaScreen.tsx`. So the one rule KSK ties explicitly to
 *"the moment of judgement"* is the one rule the horary screen does not apply, and the
@@ -627,3 +631,174 @@ path uses its own `PR_placidus`, which cuts at a flat `Math.abs(lat) > 60`
 same place therefore gets Placidus KP cusps on the Jyotish screen and non-Placidus cusps on the
 Prashna screen, under two different names, and a KP practitioner comparing the two will find they
 disagree. (Above 60° the Prashna fallback is also broken — see **F3**.)
+
+---
+
+## What I probed and found CLEAN
+
+This suite is the best-tested thing in the repo and most of it held. These are not assumptions —
+each line below is an executed probe with its output.
+
+**Gate baseline — all nine Prashna gates green before and after this pass, plus the two cross-cutting
+ones. Every finding above is invisible to all eleven.**
+
+```
+prashna-parity.js             ✓ parity EXACT: 198 values across 6 charts | worst numeric diff 5.68e-14° | 0 mismatch(es)
+prashna-calc.js               ALL TESTS PASSED  (24 pass / 0 fail)
+prashna-249.cjs               ALL TESTS PASSED  (33 pass / 0 fail)
+prashna-249-chart.cjs         ALL TESTS PASSED  (20 pass / 0 fail)
+prashna-249-input.cjs         PRASHNA 249 INPUT REGRESSION PASSED
+prashna-practitioner.cjs      ✓ practitioner: 54 passed, 0 failed
+prashna-sublord-boundary.cjs  ✓ sublord-boundary: 11205 passed, 0 failed
+prashna-sublord-labels.cjs    ✓ sublord-labels: 5 passed, 0 failed
+prashna-copy.cjs              Prashna copy gate passed
+language-leak-scan.cjs        ✓ 126 files · 1 source of truth · 12 rashi · 27 nakshatra · 9 grahas
+screen-snapshots.cjs          all baselines match
+```
+
+`validation/snapshots/prashna.en.txt` is **37 lines long** and contains zero occurrences of
+"favourable", "lagna", "cusp" or "sub-lord" — it ends at `Ask now` / `Choose what your question is
+about, above`. The entire result surface has never been in a baseline, which is why a seeding probe
+was needed at all.
+
+1. **The 1–249 number map is exact and agrees with itself everywhere.** `kp-horary.ts`'s
+   `KP_NUMBER_MIN/MAX`, `kpNumberToLagna` and `kpNumberInfo` agree with `PrashnaScreen`'s
+   independently built `PR_SUBS` on **249/249** numbers — sign, degree, nakshatra, pada, star lord
+   and sub lord — across five moments and five latitudes (1,245 charts, 0 mismatches,
+   `.scratch/bugbash/p1-sweep.cjs`). Boundary rows behave: `n=1 → Aries 0°00′00″`,
+   `n=249 → Pisces 27°53′20″`, table extremes `n=145 → 29°26′` and `n=147 → 0°33′`; nothing lands
+   at 29°59′59″, so the "one arcminute low" rounding class that `PR_fmtNumberDeg` exists to fix is
+   genuinely closed on the surfaces that use it.
+2. **The KSK worked anchor reproduces.** `plans/prashna-249-ksk-verify.md` rule 1 cites Reader VI
+   scan p.269: *"the ascendant as 20° Libra-Nirayana which is the position for the number 139."*
+   Ganak returns **Libra 20.0000°** for number 139, and the rendered card prints `Ascendant: Libra
+   20°00′`. Rule 1's other anchor (scan p.107, *"number 48 refers to Mercury sign…"*) also holds:
+   `n=48 → Gemini 8°40′` — Gemini is a Mercury sign.
+3. **The practitioner tables are the same model as the verdict, not a parallel one.** I re-derived
+   both by hand and then swept **17,928 judgements** (249 numbers × 12 topics × 6 moments/places,
+   `.scratch/bugbash/p1-grid.cjs`) asserting three things: the cusp sub-lord chip equals the
+   highlighted cuspal-table row; every house the verdict scored lists the sub-lord in the
+   significator grid; and every grid-signified favour/deny house was scored. **0 / 0 / 0
+   mismatches.** The grid's A∪B∪C∪D membership is provably the same set as
+   `PR_significations`' primary∪secondary. The legend's honesty about weighting A and C above
+   B and D — rather than claiming the classical A > B > C > D — is accurate.
+4. **The wrap-safe RAMC inversion (the old F14) is solid.** Recovering the ascendant from the RAMC
+   `PR_ramcForAsc` produced, across 249 numbers × 7 latitudes from −60° to +59.9°, gives a worst
+   error of **0.00 arcsec** — exact.
+5. **Below |lat| 60° the cusp ring is perfect.** 1,743 charts: twelve spans summing to exactly 360°
+   with no house wider than 120°. The breakage in **F3** is confined to the fallback branch, with a
+   sharp cliff at the Placidus cutoff.
+6. **The moment of judgement is captured at submit, and it is the right one.** `ask()` reads
+   `Date.now()` once (`src/screens/PrashnaScreen.tsx:852`) — not at screen open, not per keystroke —
+   and freezes the whole reading into one immutable `result` object holding `chart`, `verdict`,
+   `askedAt`, `number`, `info` and `placeLabel`. Nothing recomputes on re-render.
+7. **A language switch does not move the ruling numbers.** `lang` is a prop and `PrashnaScreen` is
+   not keyed, so toggling hi/en re-renders the *same* frozen `result`. Rendering one seeded result
+   in both languages gives identical lagna, nakshatra, pada, cusp sub-lord, all twelve cuspal
+   sub-lords and the same verdict class. `PR_castNumber` is deterministic — two calls with the same
+   millisecond serialise byte-identically.
+8. **Answer-before-data holds, in both languages.** The rendered text order is verdict badge →
+   plain-language verdict → "What your number set" → disclosures → `Full Prashna chart` → tables.
+   In Astrologer view the inversion is deliberate and owner-approved, and the verdict is still
+   present behind a labelled disclosure (`Plain-language reading` / `सरल भाषा में उत्तर`) rather
+   than dropped.
+9. **The in-app Hindi surface is clean.** A full Latin-script scan of the seeded Hindi result page
+   surfaced only `Rx` (glossed on the very next line), the `A B C D` grid headers (glossed below the
+   grid) and `VI` in the Reader citation. Rashi, nakshatra and graha names all resolve through the
+   one shared lookup; nothing leaks the other way either. (The **share card** is the exception —
+   F11.)
+10. **The share card's numbers match the screen exactly.** Lagna, nakshatra-pada, judged cusp
+    sub-lord and all twelve cuspal sub-lords were captured by shimming the canvas and compared
+    against the rendered screen for the same result: identical, including the `PR_fmtNumberDeg`
+    formatting that keeps the card from disagreeing with the Lagna chip by an arcminute. Its
+    omission is the verdict, not a number.
+11. **Number mode is genuinely time-stable, so its lock is protecting the ritual, not hiding
+    instability.** One distinct 12-topic reading across 600 consecutive seconds, two across 24
+    hourly casts.
+12. **Input validation on the number field is careful and the reasons are visible.** Non-digits are
+    preserved rather than silently stripped (`1.5` does not become `15`, `-5` does not become `5`),
+    leading zeros normalise, >3 digits are refused, `0` and `250` are refused, the field turns red
+    with an inline reason, and the disabled Cast button names the one missing prerequisite in
+    priority order. Blank latitude/longitude are rejected rather than coerced to 0. Errors surface
+    in the UI, never only in the console. (`ask()` also wraps the whole cast in try/catch with a
+    visible bilingual message.)
+13. **Latitude extremes do not crash.** ±90°, 89.9°, 85°, 69.65°, exactly 60° and 59.999° all return
+    finite cusps and finite planet longitudes in both modes; `tanD(90)` does not produce NaN
+    anywhere. (What they *do* produce above 60° is F3.)
+14. **The place-change guard works.** Changing the inherited city clears the result and reopens a
+    locked number session — a new place is a genuinely changed circumstance, and it is handled.
+15. **`src/engine/kp-horary.ts` is genuinely pure** — no time, no place, no ephemeris — and reuses
+    `VIM_LORDS`/`VIM_YEARS` from `dasha.ts`, so the 249 subdivision cannot drift from the KP
+    sub-lord chain used elsewhere. I checked for a second copy of the Vimshottari proportions and
+    found none.
+
+---
+
+## What I could not cover
+
+1. **No browser.** Everything here is `renderToStaticMarkup` text plus direct engine calls. Layout,
+   overflow, contrast, tap-target size, the horizontal scrollers on the graha/cuspal/significator
+   tables at 320–375 px, and the actual `datetime-local` widget behaviour on iOS and Android are
+   untested. F5 and F6 in particular would benefit from a real mobile date picker check.
+2. **No real interaction.** The seeding technique sets state directly; it does not press buttons.
+   F7, F8, F10 and F16 are proven from the state machine and from the rendered output of the exact
+   state each sequence produces, not from a live click-through. The 600 ms double-tap guard
+   (`DOUBLE_TAP_MS`) was read, not exercised.
+3. **The share card was captured through a shimmed canvas**, so text content and ordering are
+   proven; wrapping, overflow past 1080 px, font fallback for Devanagari and the actual PNG are not.
+   `navigator.share` vs the download fallback was not exercised at all.
+4. **No primary-text access.** I could not open the KP Readers myself. Pass 1 checked Ganak against
+   the citations *recorded in* `plans/prashna-249-ksk-verify.md` (which are page-pinned and
+   printed-folio confirmed) and reproduced the two worked anchors quoted there. I did not verify
+   those page pins independently, and I did not attempt to source the deny-side house sets or the
+   scoring weights — F14 reports that they are *unsourced*, not that they are *wrong*.
+5. **No practising astrologer.** The core correctness question the screen itself asks —
+   "are the cuspal sub-lords and significators above correct?" — still needs a KP practitioner.
+   This pass proves internal consistency and the number map; it cannot ratify doctrine.
+6. **`src/engine/special-points.ts` and `src/engine/houses.ts` are not on the Prashna path at all**
+   (Prashna carries its own inlined Placidus). I probed them because they were in scope and found
+   F12 and F17 there, but I did not audit the other upagrahas, the four special lagnas, Bhrigu
+   Bindu, the Yogi/Avayogi points or Indu lagna beyond reading them.
+7. **Not tested:** ChartVault save/load of a Prashna reading (there is none), concurrent tabs,
+   the online place-search path, `PR_DELTA_T = 72` against real ΔT for back-dated judgments
+   (flagged under F6 but not quantified), the feedback endpoint, and production behaviour on
+   ganak.pages.dev — everything here is localhost/Node.
+8. **No fixes and no new gates were written.** This is a finder's pass; an independent pass loses
+   its value if the finder also fixes. Nothing under `src/` or `validation/` was modified, and
+   nothing inside the parity-frozen markers was touched. The obvious next step — a gate asserting
+   the twelve cusp spans sum to 360° with none over 120° at latitudes 60.01/64.15/69.65 in both
+   modes, which catches **F3** outright — is left to the implementing agent.
+
+---
+
+## Summary
+
+| Severity | Count | Findings |
+|---|---|---|
+| **P0** — wrong answer / a verdict contradicting its own chart | 1 | F3 |
+| **P1** — broken journey | 8 | F1, F2, F4, F7, F8, F9, F10, F12 |
+| **P2** — polish | 8 | F5, F6, F11, F13, F14, F15, F16, F17 |
+| **Total** | **17** | |
+
+All seventeen pass all nine Prashna gates, `language-leak-scan`, and the committed screen snapshots.
+
+The three most serious:
+
+- **F3 (P0)** — Helsinki (60.17), time mode, "Ask now": cusps 4 and 10 stay real angles inside an
+  equal-house ring, the ring runs out of order, and **eight of nine planets are read into house 4**.
+  Affects every reading above 60° latitude — Helsinki, Anchorage, Reykjavik, Fairbanks, Tromsø —
+  about half the hours of the day and 129–198 of the 249 numbers. Sits inside the parity-frozen
+  region; both gates that touch it compare two copies of the same wrong code.
+- **F4 (P1)** — the judgment-place override sets latitude, longitude and a place name but no
+  timezone, and `src/kundli-app.tsx:268` drops the `zone` the app already has. A practitioner in
+  London judging for Chennai gets the cusp sub-lord wrong for 11 of 12 topics and five verdicts
+  flip.
+- **F1 (P1)** — the answer card's "Houses judged" prints only the favouring set, so for a Health
+  question it says `1 · 5 · 11` on the same card that scores houses 6 and 12 against the outcome
+  and names the 6th cusp as the one the reading was taken from.
+
+The pattern behind most of the P1s is the same one: the *maths* is carefully guarded and the
+*frame around it* is not. The number map is exact to the arcsecond and the significator grid is
+provably the verdict's own model — and then the reading is lost by tapping another tab, the place
+override cannot express a timezone, and the plain-language layer disagrees with the technical layer
+it sits on top of.
