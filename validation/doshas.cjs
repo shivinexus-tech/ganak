@@ -96,4 +96,108 @@ const psSelf = doshas.papasamyam(cA, cA);
 assert.strictEqual(psSelf.diff, 0, 'identical charts have zero papa gap');
 assert.strictEqual(psSelf.balanced, true, 'identical charts are balanced');
 
-console.log('doshas.cjs OK — Kala Sarpa (12 types + geometry), Pitra Dosha, Papa Dosha & Papasamyam');
+/* ============================================================================
+   Manglik consistency — matching vs Ganak's own Mangal Dosha calculator.
+   Bug bash 2026-08-18 F1: the matching card said "The groom is Manglik … while the
+   other is not" for a couple whose two charts BOTH come back present=true from
+   /calculator/mangal-dosha. Matching read the Lagna only; the calculator reads the
+   Lagna, the Moon AND Venus, which is the convention Ganak publishes and which
+   validation/mangal-dosha.cjs already asserts. Two surfaces, one birth record, two
+   opposite answers. This sweeps real charts so the two can never drift again.
+   ========================================================================== */
+const { manglikProfile, computeMatch } = loadApp('src/engine/matching.ts');
+const { mangalDoshaReport } = loadApp('src/engine/mangal-dosha.ts');
+
+const MANGLIK_PLACES = [
+  { lat: 28.61, lon: 77.21, tz: 5.5 },   // Delhi
+  { lat: 19.08, lon: 72.88, tz: 5.5 },   // Mumbai
+  { lat: 13.08, lon: 80.27, tz: 5.5 },   // Chennai
+  { lat: 51.51, lon: -0.13, tz: 0 },     // London
+  { lat: -33.87, lon: 151.21, tz: 10 },  // Sydney
+  { lat: 40.71, lon: -74.01, tz: -5 },   // New York
+];
+const manglikCharts = [];
+for (let i = 0; i < 96; i += 1) {
+  const p = MANGLIK_PLACES[i % MANGLIK_PLACES.length];
+  manglikCharts.push({
+    y: 1948 + ((i * 7) % 78), m: 1 + (i % 12), day: 1 + ((i * 5) % 28),
+    hh: (i * 11) % 24, mi: (i * 17) % 60, tz: p.tz, lat: p.lat, lon: p.lon,
+  });
+}
+
+let checked = 0, presentCount = 0, lagnaOnlyWouldHaveMissed = 0, lagnaOnlyWouldHaveInvented = 0;
+for (const birth of manglikCharts) {
+  const fromMatching = manglikProfile(computeKundli(birth));
+  const fromCalculator = mangalDoshaReport(birth);
+  const where = `${birth.y}-${birth.m}-${birth.day} ${birth.hh}:${birth.mi} @${birth.lat},${birth.lon}`;
+  assert.strictEqual(fromMatching.present, fromCalculator.present,
+    `matching and /calculator/mangal-dosha disagree on WHETHER this chart is Manglik: ${where}`);
+  assert.strictEqual(fromMatching.rawCount, fromCalculator.rawCount,
+    `matching and the calculator count a different number of Manglik references: ${where}`);
+  assert.strictEqual(fromMatching.strength, fromCalculator.strength,
+    `matching and the calculator grade the strength differently: ${where}`);
+  assert.deepStrictEqual(fromMatching.refs.map((r) => [r.key, r.house, r.counted]),
+    fromCalculator.refs.map((r) => [r.key, r.house, r.counted]),
+    `matching and the calculator place Mars in different houses: ${where}`);
+  assert.deepStrictEqual(fromMatching.refs.map((r) => r.key), ['lagna', 'moon', 'venus'],
+    'matching must check the Lagna, the Moon and Venus — separately, in that order');
+  checked += 1;
+  if (fromMatching.present) presentCount += 1;
+  const lagnaOnly = fromMatching.refs[0].counted;
+  if (fromMatching.present && !lagnaOnly) lagnaOnlyWouldHaveMissed += 1;
+  if (!fromMatching.present && lagnaOnly) lagnaOnlyWouldHaveInvented += 1;
+}
+assert.strictEqual(checked, manglikCharts.length, 'the Manglik sweep did not run');
+assert(presentCount > 0 && presentCount < checked, 'the Manglik sweep must contain both Manglik and non-Manglik charts');
+/* Non-vacuous: the sweep must actually contain the charts the old Lagna-only rule got
+   wrong. If this ever drops to zero the assertions above stop proving anything. */
+assert(lagnaOnlyWouldHaveMissed > 0,
+  'the sweep contains no chart that is Manglik from the Moon or Venus but not the Lagna — the very case F1 was about');
+
+/* Pair semantics. "Cancelled" is MUTUAL Manglik. Two people who are both clear are
+   clear, not cancelled — the old code conflated the two and printed "Clear — neither
+   partner is Manglik" for a couple who were in fact both Manglik from the Moon. */
+let both = 0, neither = 0, oneSided = 0;
+for (let i = 0; i + 1 < manglikCharts.length; i += 2) {
+  const boy = manglikCharts[i], girl = manglikCharts[i + 1];
+  const m = computeMatch(computeKundli, boy, girl).manglik;
+  const rBoy = mangalDoshaReport(boy), rGirl = mangalDoshaReport(girl);
+  assert.strictEqual(m.boy, rBoy.present, 'the match card and the calculator disagree about the groom');
+  assert.strictEqual(m.girl, rGirl.present, 'the match card and the calculator disagree about the bride');
+  assert.strictEqual(m.both, m.boy && m.girl, 'both-Manglik flag is wrong');
+  assert.strictEqual(m.neither, !m.boy && !m.girl, 'neither-Manglik flag is wrong');
+  assert.strictEqual(m.oneSided, m.boy !== m.girl, 'one-sided flag is wrong');
+  assert.strictEqual(m.cancelled, m.boy && m.girl,
+    'mutual cancellation must mean BOTH partners are Manglik — never "both are clear"');
+  assert.strictEqual(m.clear, !m.boy && !m.girl, 'clear must mean neither partner is Manglik');
+  assert(!(m.cancelled && m.clear), 'a couple cannot be both cancelled and clear');
+  if (m.both) both += 1; else if (m.neither) neither += 1; else oneSided += 1;
+}
+assert(both > 0 && oneSided > 0, 'the pair sweep must contain both mutual and one-sided Manglik couples');
+
+/* The audit's own fixture couple, pinned. Before the fix the card read
+   "The groom is Manglik … while the other is not" while the calculator said both were. */
+const F1_BOY = { y: 1985, m: 1, day: 5, hh: 9, mi: 30, tz: 5.5, lat: 28.61, lon: 77.21 };
+const F1_GIRL = { y: 1991, m: 7, day: 15, hh: 14, mi: 15, tz: 5.5, lat: 19.08, lon: 72.88 };
+const f1 = computeMatch(computeKundli, F1_BOY, F1_GIRL).manglik;
+assert.strictEqual(f1.boy, true, 'F1 groom is Manglik (Lagna + Venus)');
+assert.strictEqual(f1.girl, true, 'F1 bride is Manglik (Moon + Venus) — matching used to say she was not');
+assert.strictEqual(f1.oneSided, false, 'F1 couple must no longer render the one-sided card');
+assert.strictEqual(f1.cancelled, true, 'F1 couple are mutually Manglik');
+assert.strictEqual(f1.boyProfile.rawCount, 2, 'F1 groom counts 2 of 3 references, as the calculator reports');
+assert.strictEqual(f1.girlProfile.rawCount, 2, 'F1 bride counts 2 of 3 references, as the calculator reports');
+
+/* Second instance from the audit: identical birth data for both partners. The card
+   rendered green "Clear — neither partner is Manglik from the Lagna" while both were
+   Manglik from the Moon. Identical charts must agree with the calculator too. */
+const TWIN = { y: 1990, m: 6, day: 15, hh: 8, mi: 30, tz: 5.5, lat: 28.61, lon: 77.21 };
+const twin = computeMatch(computeKundli, TWIN, TWIN).manglik;
+const twinReport = mangalDoshaReport(TWIN);
+assert.strictEqual(twin.boy, twinReport.present, 'identical charts must match the calculator');
+assert.strictEqual(twin.girl, twinReport.present, 'identical charts must match the calculator');
+assert.strictEqual(twin.clear, !twinReport.present,
+  'a couple may only be told they are clear when the calculator agrees they are clear');
+
+console.log(`doshas.cjs OK — Kala Sarpa (12 types + geometry), Pitra Dosha, Papa Dosha & Papasamyam; ` +
+  `Manglik matching↔calculator agreement swept over ${checked} charts and ${checked / 2} couples ` +
+  `(${lagnaOnlyWouldHaveMissed} of them Manglik from the Moon/Venus but not the Lagna)`);

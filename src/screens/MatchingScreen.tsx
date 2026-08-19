@@ -19,7 +19,7 @@ function DoshaCard({ C, card, ok, title, good, bad }) {
   );
 }
 
-function MatchPerson({ C, card, title, name, setName, date, setDate, time, setTime, place, setPlace, lang }) {
+function MatchPerson({ C, card, title, name, setName, date, setDate, time, setTime, place, setPlace, lang, onConfirmed, idPrefix }) {
   const hi = lang === "hi";
   const inp = { width: "100%", padding: "0.625rem 0.75rem", background: "var(--surface-sunken)", border: `0.0625rem solid ${C.line}`, borderRadius: "0.5rem", color: C.ivory, fontFamily: "var(--font-body-family)", fontSize: "var(--font-body)", boxSizing: "border-box" };
   const lab = { display: "block", ...T.label, color: C.muted, marginBottom: "0.3125rem" };
@@ -32,7 +32,7 @@ function MatchPerson({ C, card, title, name, setName, date, setDate, time, setTi
           <div><label style={lab}>{hi ? "जन्म तिथि" : "Date of birth"}</label><input style={inp} type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
           <div><label style={lab}>{hi ? "जन्म समय" : "Time"}</label><input style={inp} type="time" value={time} onChange={(e) => setTime(e.target.value)} /></div>
         </div>
-        <div><label style={lab}>{hi ? "जन्म स्थान" : "Place of birth"}</label><PlaceInput value={place} onPick={setPlace} C={C} lang={lang} /></div>
+        <div><label style={lab} htmlFor={`${idPrefix}-place`}>{hi ? "जन्म स्थान" : "Place of birth"}</label><PlaceInput inputId={`${idPrefix}-place`} value={place} onPick={setPlace} onConfirmed={onConfirmed} C={C} lang={lang} /></div>
       </div>
     </div>
   );
@@ -50,6 +50,13 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
   const [gPlace, setGPlace] = useState({ label: "Mumbai, India", lat: 19.08, lon: 72.88, zone: "Asia/Kolkata" });
   const [res, setRes] = useState(null);
   const [err, setErr] = useState("");
+  /* Stale-place guard (bug bash 2026-08-18, F5). PlaceInput's strict mode exists for
+     exactly this — every other calculator wires it. Without it, typing "Chennai" over
+     "New Delhi" and pressing Match computed the whole reading, and printed the PDF
+     header, for Delhi. Default false because a place is only "confirmed" once
+     PlaceInput has told us the visible text still matches the selected place. */
+  const [bConfirmed, setBConfirmed] = useState(false);
+  const [gConfirmed, setGConfirmed] = useState(false);
   // Editing either person invalidates the previous match: drop the old result so
   // stale scores don't linger AND the print-only header (which only renders when
   // `res` exists) can never pair new birth details with old scores (Codex F2).
@@ -63,6 +70,13 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
     const [ghh, gmi] = (gTime || "").split(":").map(Number);
     if (!by || isNaN(bhh) || !gy || isNaN(ghh)) { setErr(hi ? "दोनों व्यक्तियों की पूरी जन्म तिथि और समय भरें।" : "Enter a complete date and time of birth for both people."); return; }
     if (!bPlace || !gPlace) { setErr(hi ? "दोनों व्यक्तियों का जन्म स्थान सुझावों में से चुनें।" : "Pick a birth place for both people from the suggestions."); return; }
+    if (!bConfirmed || !gConfirmed) {
+      const who = !bConfirmed && !gConfirmed ? (hi ? "दोनों व्यक्तियों" : "both people") : !bConfirmed ? (hi ? "वर" : "the groom") : (hi ? "कन्या" : "the bride");
+      setRes(null);
+      setErr(hi ? `गणना से पहले ${who} का जन्म स्थान सुझावों में से चुनें — जो नाम टाइप किया गया है वह अभी चुने हुए स्थान से मेल नहीं खाता।`
+                : `Choose a birth place from the suggestions for ${who} before matching — the typed name does not match the selected place yet.`);
+      return;
+    }
     const btz = zoneOffset(bPlace.zone, by, bm, bd) ?? 5.5;
     const gtz = zoneOffset(gPlace.zone, gy, gm, gd) ?? 5.5;
     setRes(computeMatch(computeKundli,
@@ -72,23 +86,33 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
     setTimeout(() => { const el = document.getElementById("matchresult"); if (el) el.scrollIntoView({ behavior: "smooth" }); }, 150);
   };
 
-  const verdict = (t) => t >= 33 ? [hi ? "उत्कृष्ट मिलान" : "Excellent match", "var(--good)"] : t >= 25 ? [hi ? "बहुत अच्छा मिलान" : "Very good match", C.gold] : t >= 18 ? [hi ? "स्वीकार्य मिलान" : "Acceptable match", "var(--accent)"] : [hi ? "सावधानी आवश्यक" : "Not recommended", C.sindoor];
+  /* ONE verdict, computed once in the engine (matching.ts → matchVerdict) and rendered
+     here. The screen used to band the Ashtakoota total on its own AND print the
+     Dashakoota band as a second headline, so 1,826 of the 104,976 combinations showed
+     two opposite answers on one scroll, and the English low band read as a refusal
+     where the Hindi only asked for care (bug bash F3/F4). The per-system numbers
+     below are now SCORES; they are never labelled as a verdict. */
+  const TONE = { good: "var(--good)", gold: C.gold, accent: "var(--accent)", caution: C.sindoor };
   const kootaHi = { Varna: "वर्ण", Vashya: "वश्य", Tara: "तारा", Yoni: "योनि", "Graha Maitri": "ग्रह मैत्री", Gana: "गण", Bhakoot: "भकूट", Nadi: "नाड़ी" };
 
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "0.875rem" }}>
-        <MatchPerson C={C} card={card} lang={lang} title={hi ? "वर" : "Groom"} name={boyName} setName={setBoyName} date={bDate} setDate={setBDate} time={bTime} setTime={setBTime} place={bPlace} setPlace={setBPlace} />
-        <MatchPerson C={C} card={card} lang={lang} title={hi ? "कन्या" : "Bride"} name={girlName} setName={setGirlName} date={gDate} setDate={setGDate} time={gTime} setTime={setGTime} place={gPlace} setPlace={setGPlace} />
+        <MatchPerson C={C} card={card} lang={lang} idPrefix="match-groom" onConfirmed={setBConfirmed} title={hi ? "वर" : "Groom"} name={boyName} setName={setBoyName} date={bDate} setDate={setBDate} time={bTime} setTime={setBTime} place={bPlace} setPlace={setBPlace} />
+        <MatchPerson C={C} card={card} lang={lang} idPrefix="match-bride" onConfirmed={setGConfirmed} title={hi ? "कन्या" : "Bride"} name={girlName} setName={setGirlName} date={gDate} setDate={setGDate} time={gTime} setTime={setGTime} place={gPlace} setPlace={setGPlace} />
       </div>
       <button onClick={run} style={{ marginTop: "1rem", width: "100%", padding: "0.8125rem 0", background: "linear-gradient(180deg, var(--accent), var(--accent-strong) 55%, var(--accent))", color: "var(--on-accent)", border: "0.0625rem solid var(--gold)", borderRadius: "0.5625rem", fontFamily: "var(--font-display-family)", fontWeight: 700, fontSize: "var(--font-title)", letterSpacing: "0.06em", cursor: "pointer", boxShadow: "0 6px 18px var(--accent-soft)" }}>
         {hi ? "कुंडलियों का मिलान करें" : "Match the kundalis"}
       </button>
-      {err && <p style={{ color: C.sindoor, fontSize: "var(--font-small)", marginTop: "0.625rem" }}>{err}</p>}
+      {err && <p role="alert" style={{ color: C.sindoor, fontSize: "var(--font-small)", marginTop: "0.625rem" }}>{err}</p>}
 
       {res && (() => {
-        const [vlabel, vcolor] = verdict(res.total);
-        const mBoy = res.manglik.boy, mGirl = res.manglik.girl, mOk = res.manglik.cancelled;
+        const V = res.verdict;
+        const vcolor = TONE[V.tone] || C.gold;
+        const vlabel = hi ? V.labelHi : V.labelEn;
+        const mBoy = res.manglik.boy, mGirl = res.manglik.girl, mOk = !res.manglik.oneSided;
+        const mProf = mBoy ? res.manglik.boyProfile : res.manglik.girlProfile;
+        const mRefs = mProf.refs.filter((r) => r.counted).map((r) => (hi ? r.labelHi : r.labelEn)).join(hi ? ", " : ", ");
         return (
           <div id="matchresult" style={{ marginTop: "1.25rem" }}>
             <div className="no-print" style={{ display: "flex", justifyContent: "flex-end", marginBottom: "0.375rem" }}>
@@ -104,12 +128,28 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
               <div style={{ fontSize: "var(--font-label)", color: C.muted, marginTop: "0.1875rem", letterSpacing: ".08em" }}>Ganak · ganak.pages.dev</div>
             </div>
             <div style={{ ...card, padding: "1.375rem 1.25rem", textAlign: "center", borderTop: `0.1875rem solid ${vcolor}` }}>
-              <div style={{ ...T.label, color: C.muted }}>{hi ? "अष्टकूट गुण मिलान" : "Ashtakoota Guna Milan"}</div>
-              <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-display)", color: vcolor, lineHeight: 1.1, margin: "0.25rem 0" }}>{res.total}<span style={{ fontSize: "var(--font-heading)", color: C.muted }}> / 36</span></div>
-              <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-heading)", color: vcolor }}>{vlabel}</div>
+              <div style={{ ...T.label, color: C.muted }}>{hi ? "मिलान का निष्कर्ष" : "Match verdict"}</div>
+              <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-heading)", color: vcolor, lineHeight: 1.2, margin: "0.375rem 0 0.5rem" }}>{vlabel}</div>
+              <div style={{ color: C.muted, fontSize: "var(--font-small)", fontVariantNumeric: "tabular-nums" }}>
+                {hi ? "अष्टकूट" : "Ashtakoota"} {V.ashta} / {V.ashtaMax} &nbsp;·&nbsp; {hi ? "दशकूट" : "Dashakoota"} {V.dasha} / {V.dashaMax}
+              </div>
+              {V.blocks.length > 0 && (
+                <div style={{ color: C.sindoor, fontSize: "var(--font-small)", marginTop: "0.4375rem", lineHeight: 1.5 }}>
+                  {hi ? "साथ में देखने योग्य" : "Standing alongside the score"}: {V.blocks.map((b) => (hi ? b.hi : b.en)).join(", ")}
+                </div>
+              )}
+              {V.systemsDiffer && (
+                <div style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.375rem", lineHeight: 1.5 }}>
+                  {hi ? "दोनों पद्धतियाँ इस जोड़ी को अलग-अलग पढ़ती हैं; ऊपर का निष्कर्ष अधिक सतर्क पाठ के अनुसार है।" : "The two systems read this pairing differently; the verdict above follows the more cautious of the two."}
+                </div>
+              )}
+              <div style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.5rem", lineHeight: 1.5 }}>
+                {hi ? "अंक बातचीत का आरम्भ-बिन्दु हैं, अंतिम निर्णय नहीं।" : "The scores open the conversation; they do not close it."}
+              </div>
             </div>
 
-            <div style={{ ...card, padding: "0.5rem 0.25rem", overflowX: "auto", marginTop: "0.875rem" }}>
+            <div style={{ ...T.label, color: C.muted, margin: "0.875rem 0 0.5rem" }}>{hi ? "अष्टकूट गुण मिलान" : "Ashtakoota Guna Milan"}</div>
+            <div style={{ ...card, padding: "0.5rem 0.25rem", overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--font-small)", minWidth: "22.5rem" }}>
                 <thead><tr style={{ color: C.muted, textAlign: "left", fontSize: "var(--font-label)", letterSpacing: ".05em", textTransform: "uppercase" }}>
                   <th style={{ padding: "0.4375rem 0.625rem" }}>{hi ? "कूट" : "Koota"}</th><th style={{ padding: "0.4375rem 0.625rem" }}>{hi ? "विवरण" : "Detail"}</th><th style={{ padding: "0.4375rem 0.625rem", textAlign: "right" }}>{hi ? "अंक" : "Points"}</th>
@@ -120,7 +160,7 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
                     return (
                       <tr key={k.name} style={{ borderTop: "0.0625rem solid var(--line-soft)" }}>
                         <td style={{ padding: "0.5rem 0.625rem", fontFamily: "var(--font-display-family)", color: C.ivory, whiteSpace: "nowrap" }}>{hi ? (kootaHi[k.name] || k.name) : k.name}</td>
-                        <td style={{ padding: "0.5rem 0.625rem", color: C.muted, fontSize: "var(--font-small)" }}>{hi ? "चंद्र राशि और जन्म नक्षत्र पर आधारित संगति" : k.note}</td>
+                        <td style={{ padding: "0.5rem 0.625rem", color: C.muted, fontSize: "var(--font-small)" }}>{hi ? k.noteHi : k.note}</td>
                         <td style={{ padding: "0.5rem 0.625rem", textAlign: "right", fontVariantNumeric: "tabular-nums", color: zero ? C.sindoor : full ? "var(--good)" : C.gold, fontWeight: 700, whiteSpace: "nowrap" }}>{k.got} / {k.max}</td>
                       </tr>
                     );
@@ -139,8 +179,16 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
               <DoshaCard C={C} card={card} ok={!res.bhakootDosha} title={hi ? "भकूट दोष" : "Bhakoot dosha"}
                 good={hi ? "स्पष्ट — चंद्र राशियों का संबंध अनुकूल है।" : "Clear — the Moon signs are favourably placed."} bad={hi ? "उपस्थित — चंद्र राशियाँ 2/12, 5/9 या 6/8 संबंध में हैं। भावनात्मक सामंजस्य और समृद्धि के लिए पूरी कुंडली देखें।" : "Present — the Moon signs form a 2/12, 5/9 or 6/8 axis, said to bear on emotional harmony, health and prosperity."} />
               <DoshaCard C={C} card={card} ok={mOk} title={hi ? "मांगलिक दोष" : "Manglik (Mangal) dosha"}
-                good={hi ? ((mBoy || mGirl) ? "दोनों मांगलिक हैं — परंपरा में दोष का परस्पर निरसन माना जाता है।" : "स्पष्ट — लग्न से कोई भी मांगलिक नहीं है।") : ((mBoy || mGirl) ? "Both partners are Manglik — the dosha is considered mutually cancelled." : "Clear — neither partner is Manglik from the Lagna.")}
-                bad={hi ? `${mBoy ? "वर" : "कन्या"} मांगलिक है और दूसरा व्यक्ति नहीं। विवाह निर्णय से पहले किसी योग्य ज्योतिषी से संपूर्ण परीक्षण कराएँ।` : (mBoy ? "The groom" : "The bride") + " is Manglik (Mars falls in house 1, 2, 4, 7, 8 or 12 from the Lagna) while the other is not. Traditionally flagged for marriage; an astrologer can advise on remedies and the Moon/Venus-based checks."} />
+                good={hi
+                  ? (res.manglik.both
+                      ? `दोनों मांगलिक हैं — वर की ${res.manglik.boyProfile.rawCount}/3 और कन्या की ${res.manglik.girlProfile.rawCount}/3 सन्दर्भ-स्थितियों में; परंपरा में परस्पर मांगलिक को निरस्त माना जाता है।`
+                      : "स्पष्ट — लग्न, चन्द्र और शुक्र—तीनों सन्दर्भों से किसी की भी मांगलिक स्थिति नहीं बनती।")
+                  : (res.manglik.both
+                      ? `Both partners carry Manglik indications — ${res.manglik.boyProfile.rawCount} of 3 references for the groom, ${res.manglik.girlProfile.rawCount} of 3 for the bride. A mutual Manglik is traditionally treated as cancelling.`
+                      : "Clear — Mars falls in no Manglik house from the Lagna, the Moon or Venus for either partner.")}
+                bad={hi
+                  ? `${mBoy ? "वर" : "कन्या"} की कुंडली में मांगलिक स्थिति बनती है (${mRefs} से मंगल 1, 2, 4, 7, 8 या 12 भाव में), दूसरे की नहीं। ${mProf.mitigationCount > 0 ? "कुछ शमन-योग भी उपस्थित हैं। " : ""}पूरी कुंडली किसी योग्य ज्योतिषी से देखने पर ही निर्णय लें।`
+                  : `${mBoy ? "The groom" : "The bride"} carries Manglik indications and the other does not — Mars falls in house 1, 2, 4, 7, 8 or 12 counted from the ${mRefs}, the same Lagna/Moon/Venus check Ganak's Mangal Dosha calculator uses.${mProf.mitigationCount > 0 ? " Traditional mitigations are also present." : ""} Read it with the full charts and an astrologer before drawing a conclusion.`} />
               <DoshaCard C={C} card={card} ok={res.papa.balanced} title={hi ? "पापसाम्य (पाप-भार)" : "Papasamyam (papa load)"}
                 good={hi ? `संतुलित — वर ${res.papa.boy.total}/15, कन्या ${res.papa.girl.total}/15। दोनों का पापग्रह-भार तुलनीय है, जिसे परम्परा में अनुकूल माना जाता है।` : `Balanced — groom ${res.papa.boy.total}/15, bride ${res.papa.girl.total}/15. Comparable malefic loads, traditionally considered favourable.`}
                 bad={hi ? `असंतुलित — वर ${res.papa.boy.total}/15, कन्या ${res.papa.girl.total}/15। ${res.papa.heavier === "boy" ? "वर" : "कन्या"} पर पापग्रह-भार अधिक है। यह अनेक पारम्परिक दृष्टियों में से एक है, अंतिम निर्णय नहीं।` : `Uneven — groom ${res.papa.boy.total}/15, bride ${res.papa.girl.total}/15. The ${res.papa.heavier === "boy" ? "groom" : "bride"} carries the heavier malefic load (Sun, Mars, Saturn, Rahu, Ketu in houses 1,2,4,7,8,12 from Lagna, Moon and Venus). One traditional lens among many, not a verdict.`} />
@@ -164,8 +212,6 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
                 Rajju: { hi: "रज्जु", en: "stability & longevity of the marriage", mHi: "विवाह की स्थिरता व दीर्घता" },
                 Vedha: { hi: "वेध", en: "mutual obstruction", mHi: "परस्पर बाधा" },
               };
-              const V = { poor: [hi ? "सावधानी आवश्यक" : "Needs caution", C.sindoor], moderate: [hi ? "मध्यम" : "Moderate", "var(--accent)"], good: [hi ? "अच्छा मिलान" : "Good match", C.gold], "very-good": [hi ? "बहुत अच्छा" : "Very good", "var(--good)"], excellent: [hi ? "उत्कृष्ट" : "Excellent", "var(--good)"] };
-              const [vl, vc] = V[d.verdict];
               return (
                 <div style={{ marginTop: "1.25rem" }}>
                   <div style={{ ...T.label, color: C.muted, marginBottom: "0.5rem" }}>{hi ? "दशकूट मिलान · दक्षिण भारतीय · 10 कूट" : "Dashakoota · South Indian · 10 kutas"}</div>
@@ -183,7 +229,7 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
                             </tr>
                           );
                         })}
-                        <tr><td style={{ fontFamily: "var(--font-display-family)", color: C.gold }} colSpan={2}>{hi ? "कुल" : "Total"}</td><td style={{ textAlign: "right", fontFamily: "var(--font-display-family)", fontWeight: 700, color: vc, whiteSpace: "nowrap" }}>{d.total} / 36 · {vl}</td></tr>
+                        <tr><td style={{ fontFamily: "var(--font-display-family)", color: C.gold }} colSpan={2}>{hi ? "कुल" : "Total"}</td><td style={{ textAlign: "right", fontFamily: "var(--font-display-family)", fontWeight: 700, color: C.gold, whiteSpace: "nowrap" }}>{d.total} / 36</td></tr>
                       </tbody>
                     </table>
                   </div>
@@ -195,7 +241,7 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
                     </p>
                   )}
                   <p style={{ color: C.muted, fontSize: "var(--font-label)", marginTop: "0.625rem", lineHeight: 1.55 }}>
-                    {hi ? "दशकूट दक्षिण भारत में प्रचलित है और अष्टकूट के साथ-साथ देखा जाता है। रज्जु और वेध सबसे संवेदनशील माने जाते हैं। दोनों पद्धतियाँ एक ही मान्य नक्षत्र-राशि गणित पर आधारित हैं; अंक आरम्भ-बिन्दु हैं, अंतिम निर्णय नहीं।" : "Dashakoota is the South-Indian counterpart, read alongside Ashtakoota. Rajju and Vedha are treated as the most sensitive factors. Both systems use the same validated nakshatra/rashi maths; the score is a starting point for conversation, never a final verdict."}
+                    {hi ? "दशकूट दक्षिण भारत में प्रचलित है और अष्टकूट के साथ-साथ देखा जाता है। रज्जु और वेध सबसे संवेदनशील माने जाते हैं। दोनों पद्धतियाँ एक ही मान्य नक्षत्र-राशि गणित पर आधारित हैं। यहाँ केवल अंक दिए गए हैं; ऊपर दिया गया एक ही निष्कर्ष दोनों पद्धतियों और उपस्थित दोषों—दोनों को साथ लेकर बना है।" : "Dashakoota is the South-Indian counterpart, read alongside Ashtakoota. Rajju and Vedha are treated as the most sensitive factors. Both systems use the same validated nakshatra/rashi maths. This table gives the score only — the single verdict at the top of the page already reads both systems together with any dosha that is standing."}
                   </p>
                 </div>
               );
