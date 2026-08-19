@@ -119,3 +119,255 @@ dropping them whole, since Panchaka windows are long). Add a gate assertion: for
 every valid day, no returned `activityWindow` may overlap that day's `rahu`, `gulika` or `yama`.
 `validation/deep-muhurats.cjs` already walks these rows, so the assertion costs one loop.
 
+
+---
+
+### F2 — P0 · The Muhurat hub prints the same interval, to the minute, under "Good windows today" and "Best avoided today"
+
+`MuhuratHub`'s today strip (`src/screens/MuhuratHub.tsx:458`) builds its good list as
+
+```js
+const goodSlots = allChogha.filter((c) => ev.good.includes(c.key) && c.end > nowMs).slice(0, 6);
+const avoidSlots = [["rahu", todayP.rahu], ["gulika", todayP.gulika], ["yama", todayP.yama]].filter(...)
+```
+
+`goodSlots` is never tested against `avoidSlots`. Choghadiya and Rahu/Gulika/Yamaganda are both
+carved from the same eighths of the day, so a bad eighth does not merely *overlap* a good
+Choghadiya — it **is** one, boundary for boundary. The two columns then render side by side.
+
+**Reproduction** — rendered text of MuhuratHub, New Delhi, panchang day 2026-02-26, English,
+result state seeded with a real `muhuratScanRange` wedding run
+(`.scratch/bugbash/render-muhurat.cjs` + `r1.cjs`). Literal harness output:
+
+```
+Good windows today
+Shubh        6:49 AM–8:15 AM
+Labh        12:34 PM–2:00 PM
+Amrit        2:00 PM–3:26 PM
+Shubh        4:52 PM–6:18 PM
+Amrit        6:18 PM–7:52 PM
+Shubh        9:26 PM–10:59 PM
+Abhijit Muhurat  12:11 PM–12:57 PM
+Best avoided today
+Rahu Kalam   2:00 PM–3:26 PM
+Gulika Kalam 9:41 AM–11:07 AM
+Yamaganda    6:49 AM–8:15 AM
+```
+
+`Amrit 2:00 PM–3:26 PM` **is** `Rahu Kalam 2:00 PM–3:26 PM`. `Shubh 6:49 AM–8:15 AM` **is**
+`Yamaganda 6:49 AM–8:15 AM`. Two of the six windows offered for a wedding that day are the two
+windows the same card tells the reader to avoid.
+
+**Frequency** — Delhi, 20 days from 2026-02-01, all six event chips:
+
+```
+New purchase             23 / 137 good windows are a Rahu/Gulika/Yamaganda interval
+New venture / business   23 / 137
+Puja / ritual            23 / 137
+Travel                   29 / 183
+Housewarming             23 / 137
+Wedding-related          23 / 137
+  2026-02-02 [travel]   good "char"  13:56–15:17  ==  avoid "Gulika Kalam" 13:56–15:17
+  2026-02-03 [purchase] good "amrit" 12:34–13:56  ==  avoid "Gulika Kalam" 12:34–13:56
+  2026-02-03 [purchase] good "shubh" 15:18–16:40  ==  avoid "Rahu Kalam"   15:18–16:40
+```
+
+**Expected** — the Choghadiya recommendation excludes the three belts, exactly as
+`muhurat.ts:52` (`dayMuhurat`) and `muhurat.ts:412-418` (`cleanChoghadiyaWindows`) already do.
+This is not a matter of taste: **the same screen already states this policy as its own rule.**
+`src/screens/MuhuratHub.tsx:100-104` says of the hora dial —
+
+> "Default OFF — the default behaviour is a hard block: a favourable hora that falls inside
+> Rahu Kaal/Gulika/Yamaganda is never offered as a clean recommendation."
+
+The Choghadiya strip fifteen hundred lines below breaks that stated rule, and there is no
+practitioner toggle for it either.
+
+**Cause** — `src/screens/MuhuratHub.tsx:458`. One `.filter` is missing; `avoidSlots` is built on the
+very next line, so the data is already in hand.
+
+**Suggested fix** — filter `goodSlots` against `avoidSlots` (or reuse
+`cleanChoghadiyaWindows`), and — since a blocked window is information a practitioner wants —
+either grey it with the belt named, matching the hora dial's `showBlockedHoras` behaviour, or
+drop it. Gate: for every day and every event chip, no `goodSlot` may overlap `rahu`, `gulika`
+or `yama`.
+
+---
+
+### F3 — P0 · Chandra Bala is inverted for the whole of Krishna Paksha: Ashtama Chandra (8th from the natal Moon) is reported as "supportive", and the 5th/9th as "weak"
+
+`src/engine/daily-windows.ts:176-183`
+
+```ts
+function chandraBala(currentSign: number, waxing: boolean) {
+  const base = new Set([1,3,6,7,10,11]);
+  const extra = waxing ? [2,5,9] : [4,8,12];
+  ...good: base.has(distance) || extra.includes(distance)
+}
+```
+
+`base` is the standard good set. The `extra` arm is where it goes wrong: on a waning
+(Krishna-paksha) day the function adds **4, 8 and 12** — the three positions every published
+Chandra Bala table treats as the ones to avoid, the 8th (Ashtama Chandra) most emphatically —
+and simultaneously demotes 2, 5 and 9 to "weak". The recognised refinement runs the other way:
+2/5/9 are the *middling* positions that a strong Moon can redeem; nothing promotes the 8th or
+the 12th. No comment, spec or gate in the repo names a source or a competing convention for this,
+and `personal-muhurat.ts:11` describes the call only as "waxing/waning aware".
+
+**Reproduction A — the Panchang's Chandra Bala line.** `computeDailyWindows(New Delhi, 2026-08-01)`,
+transit Moon in Aquarius, Krishna paksha. Rendered by `DailyWindowsCard.tsx:75`:
+
+```
+Chandra Bala supports birth signs: Aries, Taurus, Cancer, Leo, Virgo, Scorpio, Sagittarius, Aquarius, Pisces
+  -> Cancer is the 8TH from the transit Moon (Ashtama Chandra) — listed as supportive
+  -> Pisces is the 12TH                                        — listed as supportive
+  -> Libra  is the 5th  — Ganak: "weak — get a personal check for a major beginning"
+```
+
+Over 40 consecutive days from 2026-08-01, Delhi, the 8th-from-Moon sign is called "supportive" on
+**24** of them — i.e. on every Krishna-paksha day. `DailyWindowsCard.tsx:81` states the verdict
+personally, to a reader who has just picked their own rashi from a dropdown:
+`Chandra Bala: supportive` / `चन्द्र बल: अनुकूल`.
+
+**Reproduction B — it removes and keeps days in the personalised Muhurat finder.**
+`chandraBala` is one of the two **hard filters** in `personal-muhurat.ts:96`
+(`coreOk = taraGood && chandraGood`). Birth `1990-06-25 09:30` New Delhi → Janma Rashi Cancer.
+Vehicle Muhurat, New Delhi, 2026-08-01 → 2026-08-05:
+
+```
+2026-08-01 transitMoon=Aquarius  8th from Janma  chandraGood=true  => coreOk=true   (day KEPT, badged "Chandra Bala ✓")
+2026-08-02 transitMoon=Aquarius  8th from Janma  chandraGood=true  => coreOk=true   (day KEPT)
+2026-08-04 transitMoon=Pisces    9th from Janma  chandraGood=false => coreOk=false  (day SET ASIDE, "Chandra Bala weak")
+```
+
+Ganak keeps the two Ashtama-Chandra days and sets aside the 9th-house day, then prints the count
+as though the filter had protected the reader.
+
+**Expected** — `extra` should add nothing on a waning day (or, if a sourced tradition really does
+soften 4/8/12, that tradition must be named on the surface per the project's own
+"state which convention you follow" rule). 1, 3, 6, 7, 10, 11 stay good in both pakshas; 4, 8, 12
+stay avoided in both.
+
+**Cause** — `src/engine/daily-windows.ts:178`, single line. Consumed at
+`daily-windows.ts:233`, `src/components/DailyWindowsCard.tsx:44,75,81`,
+`src/engine/personal-muhurat.ts:86,96`.
+
+**Suggested fix** — `const extra = waxing ? [2,5,9] : [];`, then re-baseline
+`validation/daily-windows.cjs` and `validation/personal-muhurat.cjs` (neither asserts the
+distance→verdict mapping today, which is why this survived both). Add a table assertion:
+distances 4, 8 and 12 are never `good`, in either paksha.
+
+---
+
+### F4 — P1 · The Property rule set offers registration days on nakshatras Ganak's own Panchang flags as Ganda Moola, and prints the flagged nakshatra as the *reason* the day is good
+
+`MUHURTA_RULES.property.auspNak` (`src/engine/muhurat.ts:309`) is
+`{4, 6, 8, 9, 10, 15, 16, 18, 19, 24, 25, 26}` = Mrigashira, Punarvasu, **Ashlesha**, Magha,
+Purva Phalguni, Vishakha, Anuradha, **Mula**, Purva Ashadha, **Purva Bhadrapada**, Uttara
+Bhadrapada, Revati.
+
+Three of those — Ashlesha (8), Mula (18), Purva Bhadrapada (24) — are members of the set the very
+same file defines twenty lines earlier as
+`INAUSP_NAK = new Set([1, 5, 8, 17, 18, 24]); // broadly avoided for new/auspicious work`
+(`muhurat.ts:84`). Property is the only category where this happens without a classical warrant:
+
+```
+category       auspNak ∩ the engine's own INAUSP_NAK
+wedding        Mula                                    <- correct: Mula IS one of the 11 classical Vivah nakshatras
+engagement     Mula                                    <- same list, same warrant
+mundan         Jyeshtha
+property       Ashlesha, Mula, Purva Bhadrapada        <- three, no stated source
+vidyarambha    Ardra, Ashlesha, Mula, Purva Bhadrapada <- 22 of 27 nakshatras admitted; see F9
+every other    (none)
+```
+
+**Reproduction** — Property Muhurat, New Delhi, Lahiri, 2026-01-01 → 2026-06-30. **15 of the 34
+valid days offered fall on a nakshatra Ganak's own Panchang flags.** For each, the finder's
+"Why this day" line names that nakshatra as a positive reason and scores the day 6 = "Highly
+auspicious":
+
+```
+2026-01-16  Mula              score 6
+   Muhurat finder "Why this day": Mula nakshatra, Friday, 3 good day choghadiya
+   Same date, Ganak's daily-windows card: "Ganda Moola"  auspicious=false
+2026-02-13  Mula              score 6   -> finder: "Mula nakshatra"        panchang: Ganda Moola, avoid
+2026-03-20  Revati            score 6   -> finder: "Revati nakshatra"      panchang: Ganda Moola, avoid
+2026-05-14  Revati            score 6   -> finder: "Revati nakshatra"      panchang: Ganda Moola, avoid
+2026-01-23  Purva Bhadrapada  score 6   -> finder: "Purva Bhadrapada nakshatra"  (INAUSP_NAK member)
+```
+
+**Observed** — a reader choosing a property-registration date is told "Highly auspicious · Why this
+day: **Mula nakshatra**", and the same app on the same date tells them the day carries Ganda Moola.
+Nothing on either surface reconciles the two. `grep` confirms the word Ganda Moola appears in
+exactly two files (`src/engine/daily-windows.ts`, `src/components/DailyWindowsCard.tsx`) — no
+Muhurat surface mentions it at all.
+
+**Expected** — two separable things:
+1. The `property` nakshatra set needs a stated source. As written it admits Ashlesha and Mula,
+   both Gandamoola, while excluding Rohini, Pushya, Hasta, Uttara Phalguni, Uttara Ashadha,
+   Dhanishta and Shatabhisha — the stable/fixed stars every other property-type category in this
+   same file (`bhoomi`, `construction`, `housewarming`) uses. It is also inconsistent within Ganak:
+   `PURCHASE_ACTIONS.property` offers "Sale deed signing" and "Registration" as steps, and those
+   route through the `property` rules — while `MUHURTA_RULES.document`, whose own label says
+   "Document signing and registration", uses a completely different and much more conventional
+   nakshatra list. Ask the same registration question two ways and Ganak answers with two rule sets.
+2. Wherever a Muhurat day carries Ganda Moola, that should show as a caution on the Muhurat card,
+   the way `muhuratShuddhi` already surfaces Pitru Paksha and Adhik Masa. Silence is what makes it
+   a contradiction rather than a stated convention choice.
+
+**Cause** — `src/engine/muhurat.ts:309` (the set), `muhurat.ts:164` (`dayScore` renders any member
+of `categoryAuspNak` as a green `g:true` factor, so the flagged star becomes the headline reason),
+and the absence of any Ganda Moola term in the Muhurat surfaces.
+
+**Suggested fix** — source or replace the `property` list; either way add a Ganda Moola caution to
+`muhuratShuddhi`/`dayScore` so no Ganak surface silently disagrees with another. Gate: for every
+category, assert `auspNak ∩ INAUSP_NAK` is empty **or** carries an explicit, commented classical
+warrant (wedding/engagement's Mula qualifies; property's three do not today).
+
+---
+
+### F5 — P1 · At a polar latitude the finder returns nothing and blames the wrong thing, then tells the reader to "try a wider range" — the same defect Codex already fixed once, in the medical finder
+
+`muhuratForDate` returns `null` when there is no sunrise (`muhurat.ts:109`), and
+`muhuratScanRange` silently `continue`s (`muhurat.ts:437-438`). At Tromsø in June the scan returns
+**zero rows**, so the blocker tally is empty and the screen falls through to the generic
+no-result copy.
+
+**Reproduction** — Wedding Muhurat, Tromsø (69.65 N), 2026-06-01 → 2026-06-20. Literal rendered
+text of MuhuratHub:
+
+```
+--- en ---
+Best days · Wedding · Jun 1, 2026 – Jun 20, 2026
+No auspicious muhurat in this range.
+When it's possible: Blocked during Devshayana (roughly mid-July to late November), Kharmas
+(mid-December to mid-January, mid-March to mid-April) and while Venus or Jupiter is combust.
+Try a wider range.
+
+--- hi ---
+शुभ दिन · विवाह · 1 जून 2026 – 20 जून 2026
+इस अवधि में कोई शुभ मुहूर्त नहीं।
+शुभ काल: देवशयन काल, खरमास तथा शुक्र/गुरु अस्त में विवाह वर्जित. बड़ी अवधि आज़माएँ।
+```
+
+**Observed** — three separate untruths in four lines. (a) June 1–20 is *before* Devshayani Ekadashi
+(≈25 July 2026), so none of the named blocks apply. (b) "Try a wider range" is advice that cannot
+work: every day of the Tromsø summer, and every day of the polar night, fails identically. (c) The
+real reason — Ganak's Hindu day is defined from local sunrise, and there is no sunrise — is never
+stated, which is exactly the silent failure `AGENTS.md` forbids ("the user must always be able to
+tell what the app is doing").
+
+**Regression note** — this is a recurrence, in the sibling engine, of a defect the backlog records
+as already found and fixed: *"independent Codex bug bash fixed safety-wall order, **polar
+no-sunrise copy** and bypassed future birth dates"* (P0-MEDICAL-MUHURAT closure, 2026-07-28).
+`MedicalMuhuratScreen` handles it; `MuhuratHub` never got the same treatment.
+
+**Cause** — `src/engine/muhurat.ts:437-438` drops no-sunrise days without recording that it did;
+`src/screens/MuhuratHub.tsx:1033-1039` has no branch for "the scan produced no rows at all", only
+for "no row passed".
+
+**Suggested fix** — have `muhuratScanRange` report skipped days (e.g. `{rows, noSunriseDays}`) and
+give MuhuratHub a distinct message: name the latitude problem, say the Muhurat day cannot be
+defined there, and offer the nearest usable city — never "try a wider range". Gate: assert the
+polar branch renders a latitude-specific string, the way `validation/medical-muhurat.cjs`
+already does for its own screen.
