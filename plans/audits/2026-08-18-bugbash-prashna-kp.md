@@ -407,7 +407,7 @@ refused while a number session is locked.
 > Section V, scan p.175: *"the lords of the day, Moon sign, star and lagna at the moment of
 > judgement"*; p.209 (RP-at-judgement = RP-at-fructification).
 
-`computeRulingPlanets` exists (`src/engine/dasha.ts:72-101`) and is called from exactly one place —
+`computeRulingPlanets` exists (`src/engine/dasha.ts:73-102`) and is called from exactly one place —
 `src/engine/kundli.ts:176`, for the **birth** chart on the Jyotish screen. Grep confirms the string
 "ruling" appears nowhere in `src/screens/PrashnaScreen.tsx`. So the one rule KSK ties explicitly to
 *"the moment of judgement"* is the one rule the horary screen does not apply, and the
@@ -464,7 +464,7 @@ papering over numeric instability.
 
 ### F11 — P2 · The share card carries the chart but not the answer, and its technical labels stay English in Hindi
 
-`PR_shareCardCanvas` (`src/screens/PrashnaScreen.tsx:429-530`) paints the question, the mode, the
+`PR_shareCardCanvas` (`src/screens/PrashnaScreen.tsx:446-531`) paints the question, the mode, the
 lagna, the judged cuspal sub-lord, all twelve cuspal sub-lords and the disclosures — and **never the
 verdict**. Captured by shimming the canvas (`.scratch/bugbash/sharecard.cjs`), number 11 / Health,
 whose on-screen verdict is *"Not yet — Not the right moment"*:
@@ -495,9 +495,9 @@ with the answer removed. Ganak's own principle is answer-before-data; this expor
 
 `Equal (high-latitude fallback)` is a whole English sentence inside a Hindi card. The **in-app**
 gloss for the same fact is properly translated — `समान भाव — उच्च अक्षांश विकल्प` and
-`प्लेसिडस भाव — कृष्णमूर्ति पद्धति का मानक` (`src/screens/PrashnaScreen.tsx:1330-1331`) — so the
+`प्लेसिडस भाव — कृष्णमूर्ति पद्धति का मानक` (`src/screens/PrashnaScreen.tsx:1323-1324`) — so the
 card is strictly less localised than the screen it exports. Cause:
-`src/screens/PrashnaScreen.tsx:518` (`Houses:` line, both branches hard-coded English).
+`src/screens/PrashnaScreen.tsx:522` (`Houses:` line, both branches hard-coded English).
 
 For the record, the in-app Hindi surface itself is clean: a full Latin-script scan of the seeded
 Hindi result page returned only `Rx` (glossed in place: `Rx = वक्री, आकाश में पीछे चलता प्रतीत होता है`),
@@ -582,7 +582,7 @@ Every number-mode reading ends with:
   overclaimed as a verbatim KSK '12th-from' rule"*;
 - the **scoring weights** (primary ±2, secondary ±1, retrograde −1, the `score ≥ 2` /
   `score ≤ −2` thresholds) and the twelve `favor`/`deny` house sets in
-  `src/screens/PrashnaScreen.tsx:229-241` are Ganak's, and appear in no citation row at all.
+  `src/screens/PrashnaScreen.tsx:229-241` (`QUESTIONS`) are Ganak's, and appear in no citation row at all.
 
 The significator grid already sets the right precedent by disclosing its own departure in plain
 words ("Ganak's verdict weights A and C above B and D, rather than the classical A > B > C > D").
@@ -600,8 +600,8 @@ The provenance line should do the same rather than attributing the whole judgmen
 and the Cast button stays dead. But १३९ **is** 139, and it is in range. The user is told their
 number is out of range when the real problem is the numeral system.
 
-**Cause** — `src/screens/PrashnaScreen.tsx:762-769` (`PR_normalizeNumberInput`) and
-`src/screens/PrashnaScreen.tsx:900`/`:914` (the `/^\d+$/` gates).
+**Cause** — `src/screens/PrashnaScreen.tsx:763-770` (`PR_normalizeNumberInput`),
+`src/screens/PrashnaScreen.tsx:897` (`numberIsValid`) and the ask() gate at `src/screens/PrashnaScreen.tsx:859`.
 
 **Suggested fix** — normalise Devanagari and Arabic-Indic digits to ASCII before validating, in a
 Hindi-first app where the number is the whole input.
@@ -623,7 +623,7 @@ The Jyotish path uses `src/engine/houses.ts` `placidusCusps`, whose degeneracy t
 (`Math.abs(adArg) >= 1`, i.e. circumpolar, effectively ≈66.5°) and whose fallback is announced as
 `"Porphyry (Placidus undefined at this latitude)"` (`src/engine/kundli.ts:151-153`). The Prashna
 path uses its own `PR_placidus`, which cuts at a flat `Math.abs(lat) > 60`
-(`src/screens/PrashnaScreen.tsx:136`) and falls back to "equal houses". Between 60° and 66.5° the
+(`src/screens/PrashnaScreen.tsx:125`) and falls back to "equal houses". Between 60° and 66.5° the
 same place therefore gets Placidus KP cusps on the Jyotish screen and non-Placidus cusps on the
 Prashna screen, under two different names, and a KP practitioner comparing the two will find they
 disagree. (Above 60° the Prashna fallback is also broken — see **F3**.)
