@@ -1,8 +1,8 @@
 import { rev } from "./ephemeris";
 import {
   NAKSHATRAS, KARANAS_MOV, sunEvents, moonEvents,
-  RAHU_SEGMENT, YAMA_SEGMENT, GULIKA_SEGMENT, setAyanMode,
-  sunSidMs, moonSidMs, elongMs, planetSidMs, solveCross,
+  RAHU_SEGMENT, YAMA_SEGMENT, GULIKA_SEGMENT, sidereal,
+  solveCross,
   lunarMonthInfo, choghaSlots, pitruPakshaDay, zoneOffset,
 } from "./panchang";
 import { ayyappaMandalaFor } from "./festivals";
@@ -37,12 +37,13 @@ function tithiScore(tNum, krishna) {
   if ([2, 3, 7, 11, 13].includes(tNum)) return 1; // Bhadra/Jaya-leaning
   return 0;
 }
-function dayMuhurat(y, m, day, place, tz, eventKey, goodChogha) {
+function dayMuhurat(y, m, day, place, tz, eventKey, goodChogha, ayanamsa?) {
+  const S = sidereal(ayanamsa);   // bound to THIS call — never a shared global (F8)
   const ev = sunEvents(y, m, day, tz, place.lat, place.lon);
   if (ev.rise === null || ev.set === null) return null;
   const dow = new Date(Date.UTC(y, m - 1, day)).getUTCDay();
   const rise = ev.rise, set = ev.set, dayLen = set - rise;
-  const sun = sunSidMs(rise), moon = moonSidMs(rise), elong = rev(moon - sun);
+  const sun = S.sunSidMs(rise), moon = S.moonSidMs(rise), elong = rev(moon - sun);
   const tn = Math.floor(elong / 12), krishna = tn >= 15, tNum = (tn % 15) + 1;
   const nakIdx = Math.floor(moon / (360 / 27));
   const eighth = (seg) => ({ start: rise + ((seg - 1) / 8) * dayLen, end: rise + (seg / 8) * dayLen });
@@ -57,20 +58,21 @@ function dayMuhurat(y, m, day, place, tz, eventKey, goodChogha) {
   const score = ts + ns + Math.min(windows.length, 3) * 0.6;
   return { ms: rise, rise, set, tNum, krishna, nakIdx, windows, score, tithiOk: ts >= 0, nakOk: ns > 0 };
 }
-function findMuhurat(startMs, endMs, place, tz, eventKey, goodChogha) {
+function findMuhurat(startMs, endMs, place, tz, eventKey, goodChogha, ayanamsa?) {
+  const S = sidereal(ayanamsa);   // bound to THIS call — never a shared global (F8)
   const DAY = 86400000;
   let nDays = Math.max(1, Math.min(Math.round((endMs - startMs) / DAY) + 1, 366));
   const ld = (k) => { const d = new Date(startMs + k * DAY + tz * 3600000); return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, day: d.getUTCDate(), ms: Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12) - tz * 3600000 }; };
   const coarse = [];
   for (let k = 0; k < nDays; k++) {
-    const D = ld(k), moon = moonSidMs(D.ms), elong = rev(moon - sunSidMs(D.ms));
+    const D = ld(k), moon = S.moonSidMs(D.ms), elong = rev(moon - S.sunSidMs(D.ms));
     const tn = Math.floor(elong / 12), krishna = tn >= 15, tNum = (tn % 15) + 1, nakIdx = Math.floor(moon / (360 / 27));
     coarse.push({ ...D, cs: tithiScore(tNum, krishna) + ((NAK_GOOD[eventKey] || NAK_GOOD.general).includes(nakIdx) ? 2 : 0) });
   }
   coarse.sort((a, b) => b.cs - a.cs);
   const fine = [];
   for (const c of coarse.slice(0, Math.min(18, coarse.length))) {
-    const dm = dayMuhurat(c.y, c.m, c.day, place, tz, eventKey, goodChogha);
+    const dm = dayMuhurat(c.y, c.m, c.day, place, tz, eventKey, goodChogha, S.mode);
     if (dm && dm.windows.length) fine.push(dm);
   }
   fine.sort((a, b) => b.score - a.score || a.ms - b.ms);
@@ -103,7 +105,7 @@ const WEEKDAY_FAV = {
 const WN_SHORT = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const WN_HI = ["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"];
 function muhuratForDate(place, ayanamsa, y, m, day) {
-  setAyanMode(ayanamsa || "lahiri");
+  const S = sidereal(ayanamsa);   // bound to THIS call — never a shared global (F8)
   const tz = zoneOffset(place.zone, y, m, day) ?? 5.5;
   const ev = sunEvents(y, m, day, tz, place.lat, place.lon);
   if (ev.rise === null || ev.set === null) return null;
@@ -113,7 +115,7 @@ function muhuratForDate(place, ayanamsa, y, m, day) {
   const evNext = sunEvents(y, m, day + 1, tz, place.lat, place.lon);
   const nextRise = evNext.rise !== null ? evNext.rise : ev.rise + 86400000;
   const dow = new Date(ev.rise + tz * 3600000).getUTCDay();
-  const sun = sunSidMs(ev.rise), moon = moonSidMs(ev.rise), elong = rev(moon - sun);
+  const sun = S.sunSidMs(ev.rise), moon = S.moonSidMs(ev.rise), elong = rev(moon - sun);
   const tn = Math.floor(elong / 12), nak = Math.floor(moon / _NAKW), kn = Math.floor(elong / 6);
   const karanaAt = (k) => { const kk = ((k % 60) + 60) % 60; return kk === 0 ? "Kimstughna" : kk >= 57 ? ["Shakuni", "Chatushpada", "Naga"][kk - 57] : KARANAS_MOV[(kk - 1) % 7]; };
   const dayLen = ev.set - ev.rise;
@@ -123,14 +125,14 @@ function muhuratForDate(place, ayanamsa, y, m, day) {
   const tithiNum0 = (tn % 15) + 1, krishna0 = tn >= 15, lm = lmi.idx;
   const devshayana = (lm === 3 && (krishna0 || tithiNum0 >= 11)) || (lm >= 4 && lm <= 6) || (lm === 7 && !krishna0 && tithiNum0 < 11);
   const sep = (a, b) => Math.abs(((a - b + 540) % 360) - 180);
-  const venusAsta = sep(planetSidMs("Venus", ev.rise), sun) < 7;
-  const guruAsta = sep(planetSidMs("Jupiter", ev.rise), sun) < 11;
+  const venusAsta = sep(S.planetSidMs("Venus", ev.rise), sun) < 7;
+  const guruAsta = sep(S.planetSidMs("Jupiter", ev.rise), sun) < 11;
   // panchang sampled every 3h across the civil day — a date qualifies for an
   // activity if some window has both nakshatra and tithi clean, not just sunrise
   const samples = [];
   for (let k = 0; k <= 8; k++) {
     const t = ev.rise + k * 10800000;
-    const mo = moonSidMs(t), el = rev(mo - sunSidMs(t)), stn = Math.floor(el / 12);
+    const mo = S.moonSidMs(t), el = rev(mo - S.sunSidMs(t)), stn = Math.floor(el / 12);
     samples.push({ nak: Math.floor(mo / _NAKW), tn: stn, tithiNum: (stn % 15) + 1 });
   }
   return {
@@ -183,7 +185,7 @@ function dayScore(info, category) {
    Hari Bhakti Vilasa 12.316); else fast shifts to next day. If Ekadashi holds at two successive
    sunrises, the second day is taken. (Nakshatra-based Mahadvadashis not modelled.) */
 function vaishnavaEkadashi(place, ayanamsa, ms) {
-  setAyanMode(ayanamsa);
+  const S = sidereal(ayanamsa);   // bound to THIS call — never a shared global (F8)
   const probe = new Date(ms);
   const tz = zoneOffset(place.zone, probe.getUTCFullYear(), probe.getUTCMonth() + 1, probe.getUTCDate()) ?? 5.5;
   const local = new Date(ms + tz * 3600000);
@@ -191,7 +193,7 @@ function vaishnavaEkadashi(place, ayanamsa, ms) {
   const ev = sunEvents(y, m, day, tz, place.lat, place.lon);
   const evN = sunEvents(y, m, day + 1, tz, place.lat, place.lon);
   if (ev.rise == null || evN.rise == null) return { fastMs: ms, shifted: false, reason: null };
-  const tIdx = (t) => Math.floor(rev(elongMs(t)) / 12);
+  const tIdx = (t) => Math.floor(rev(S.elongMs(t)) / 12);
   const aru = ev.rise - 96 * 60000;
   const viddha = tIdx(aru) === 9 || tIdx(aru) === 24;                 // Dashami touches Arunodaya
   const twoRise = tIdx(evN.rise) === 10 || tIdx(evN.rise) === 25;      // Ekadashi at both sunrises
@@ -204,8 +206,8 @@ function vaishnavaEkadashi(place, ayanamsa, ms) {
     if (evP.rise != null) {
       if (!shifted) {
         const krishna = tIdx(ms) >= 15, startDeg = krishna ? 312 : 132;
-        const t1 = solveCross(elongMs, ms - 86400000, startDeg, 4);
-        const t2 = t1 ? solveCross(elongMs, t1 + 3600000, (startDeg + 12) % 360, 3) : null;
+        const t1 = solveCross(S.elongMs, ms - 86400000, startDeg, 4);
+        const t2 = t1 ? solveCross(S.elongMs, t1 + 3600000, (startDeg + 12) % 360, 3) : null;
         parana = t1 && t2 ? { start: Math.max(evP.rise, t1 + 0.25 * (t2 - t1)) } : { start: evP.rise };
       } else parana = { start: evP.rise };
     }
@@ -214,7 +216,7 @@ function vaishnavaEkadashi(place, ayanamsa, ms) {
 }
 /* per-vrat computed detail: lunar identity + fast-breaking time (parana / moonrise / sunset) */
 function vratDetail(place, ayanamsa, ms, timing) {
-  setAyanMode(ayanamsa);
+  const S = sidereal(ayanamsa);   // bound to THIS call — never a shared global (F8)
   const probe = new Date(ms);
   const tz = zoneOffset(place.zone, probe.getUTCFullYear(), probe.getUTCMonth() + 1, probe.getUTCDate()) ?? 5.5;
   const local = new Date(ms + tz * 3600000);
@@ -225,8 +227,8 @@ function vratDetail(place, ayanamsa, ms, timing) {
   try {
     if (timing === "parana") {
       const startDeg = info.krishna ? 312 : 132;
-      const t1 = solveCross(elongMs, ms - 86400000, startDeg, 4);
-      const t2 = t1 ? solveCross(elongMs, t1 + 3600000, (startDeg + 12) % 360, 3) : null;
+      const t1 = solveCross(S.elongMs, ms - 86400000, startDeg, 4);
+      const t2 = t1 ? solveCross(S.elongMs, t1 + 3600000, (startDeg + 12) % 360, 3) : null;
       const evN = sunEvents(y, m, day + 1, tz, place.lat, place.lon);
       if (t1 && t2 && evN.rise != null) {
         const hvEnd = t1 + 0.25 * (t2 - t1);
@@ -261,7 +263,7 @@ function vratDetail(place, ayanamsa, ms, timing) {
    arunodaya (96 min before sunrise). Dashami touching arunodaya (viddha) shifts the fast one
    day; Ekadashi pure at two consecutive arunodayas is observed on the second day. */
 function vaishnavaEkadashiDay(place, ayanamsa, ms) {
-  setAyanMode(ayanamsa);
+  const S = sidereal(ayanamsa);   // bound to THIS call — never a shared global (F8)
   const probe = new Date(ms);
   const tz = zoneOffset(place.zone, probe.getUTCFullYear(), probe.getUTCMonth() + 1, probe.getUTCDate()) ?? 5.5;
   const local = new Date(ms + tz * 3600000);
@@ -269,7 +271,7 @@ function vaishnavaEkadashiDay(place, ayanamsa, ms) {
   const ekAt = (dOff) => {
     const ev = sunEvents(y, m, day + dOff, tz, place.lat, place.lon);
     if (ev.rise == null) return null;
-    const e = rev(elongMs(ev.rise - 5760000));
+    const e = rev(S.elongMs(ev.rise - 5760000));
     return (e >= 120 && e < 132) || (e >= 300 && e < 312);
   };
   const e0 = ekAt(0);
@@ -365,7 +367,7 @@ const SAMSKARA_LAGNA_AVOID = {
 };
 const GRAHAS = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const MALEFICS = new Set(["Sun","Mars","Saturn","Rahu","Ketu"]);
-function grahaSigns(ms) { return Object.fromEntries(GRAHAS.map(p=>[p,Math.floor(planetSidMs(p,ms)/30)])); }
+function grahaSigns(S, ms) { return Object.fromEntries(GRAHAS.map(p=>[p,Math.floor(S.planetSidMs(p,ms)/30)])); }
 function houseOf(sign,lagna) { return ((sign-lagna+12)%12)+1; }
 function maleficAspectsLagna(signs,lagna) {
   for (const p of MALEFICS) {
@@ -379,6 +381,7 @@ function maleficAspectsLagna(signs,lagna) {
    as usable when every lagna interval fails the Samskara's own conditions. */
 function samskaraWindows(place, ayanamsa, info, category) {
   if (!SAMSKARA_CATEGORIES.has(category)) return [];
+  const S = sidereal(ayanamsa);   // bound to THIS call — never a shared global (F8)
   const schedule=computeLagnaPanchaka(place,ayanamsa,info.rise).lagnaSchedule||[];
   const cutoff=(category==="naming"||category==="annaprashana") ? info.rise+(info.set-info.rise)/2 : info.rise+86400000;
   const out=[];
@@ -388,7 +391,7 @@ function samskaraWindows(place, ayanamsa, info, category) {
     // visible as a secondary caution, but is not a classical hard veto here.
     if (end<=w.start) continue;
     if (SAMSKARA_LAGNA_AVOID[category]?.has(w.sign)) continue;
-    const mid=(w.start+end)/2, signs=grahaSigns(mid);
+    const mid=(w.start+end)/2, signs=grahaSigns(S,mid);
     const occupied=(house)=>GRAHAS.some(p=>houseOf(signs[p],w.sign)===house);
     if ((category==="naming"||category==="vidyarambha") && occupied(8)) continue;
     if (category==="naming" && maleficAspectsLagna(signs,w.sign)) continue;

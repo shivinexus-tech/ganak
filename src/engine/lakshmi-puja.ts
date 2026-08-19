@@ -5,7 +5,7 @@
 
 import { rev } from "./ephemeris";
 import { computeLagnaPanchaka } from "./panchaka";
-import { elongMs, setAyanMode, solveCross, sunEvents, zoneOffset } from "./panchang";
+import { sidereal, solveCross, sunEvents, zoneOffset } from "./panchang";
 
 const VRISHABHA_SIGN = 1;
 const MINUTE = 60000;
@@ -22,21 +22,21 @@ function intersectWindow(a, b) {
   return end > start ? { start, end } : null;
 }
 
-function amavasyaBounds(referenceMs) {
-  const start = solveCross(elongMs, referenceMs - 2 * 86400000, 348, 5);
+function amavasyaBounds(S, referenceMs) {
+  const start = solveCross(S.elongMs, referenceMs - 2 * 86400000, 348, 5);
   if (start == null) return null;
-  const end = solveCross(elongMs, start + MINUTE, 0, 3);
+  const end = solveCross(S.elongMs, start + MINUTE, 0, 3);
   if (end == null || !(end > start)) return null;
   return { start, end };
 }
 
-function tithiIsAmavasya(ms) {
-  return Math.floor(rev(elongMs(ms)) / 12) === 29;
+function tithiIsAmavasya(S, ms) {
+  return Math.floor(rev(S.elongMs(ms)) / 12) === 29;
 }
 
 function lakshmiPujaTimings(place, ayanamsa = "lahiri", ms) {
   requirePlace(place);
-  setAyanMode(ayanamsa);
+  const S = sidereal(ayanamsa);   // bound to THIS call — never a shared global (F8)
   const probe = new Date(ms);
   const tz = zoneOffset(place.zone, probe.getUTCFullYear(), probe.getUTCMonth() + 1, probe.getUTCDate()) ?? 5.5;
   const local = new Date(ms + tz * 3600000);
@@ -57,7 +57,7 @@ function lakshmiPujaTimings(place, ayanamsa = "lahiri", ms) {
     if (!inPradosh || inPradosh.start < ev.set) continue;
     if (!vrishabha || w.start >= vrishabha.start) vrishabha = w;
     const mid = (inPradosh.start + inPradosh.end) / 2;
-    if (!tithiIsAmavasya(mid)) continue;
+    if (!tithiIsAmavasya(S, mid)) continue;
     if (!primary || inPradosh.start > primary.start) primary = inPradosh;
   }
   return {
@@ -68,7 +68,7 @@ function lakshmiPujaTimings(place, ayanamsa = "lahiri", ms) {
     vrishabha,
     primary,
     nishita,
-    amavasya: amavasyaBounds(ms),
+    amavasya: amavasyaBounds(S, ms),
   };
 }
 

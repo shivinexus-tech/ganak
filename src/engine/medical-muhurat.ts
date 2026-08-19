@@ -31,8 +31,8 @@
 
 import { rev } from "./ephemeris";
 import {
-  NAKSHATRAS, setAyanMode, zoneOffset, sunEvents,
-  sunSidMs, moonSidMs, RAHU_SEGMENT,
+  NAKSHATRAS, sidereal, zoneOffset, sunEvents,
+  RAHU_SEGMENT,
 } from "./panchang";
 
 const _NAKW = 360 / 27;
@@ -42,10 +42,10 @@ const _NAKW = 360 / 27;
    and matches the civil day a full/new moon is popularly attributed to (within ±1 day
    of the published festival date, which is all the sunrise-vs-festival convention
    allows). Returns "purnima", "amavasya", or null. */
-function syzygyOnDay(rise) {
+function syzygyOnDay(S, rise) {
   for (let k = 0; k <= 8; k++) {
     const t = rise + k * 10800000; // +3h steps across 24h
-    const tn = Math.floor(rev(moonSidMs(t) - sunSidMs(t)) / 12); // 0..29
+    const tn = Math.floor(rev(S.moonSidMs(t) - S.sunSidMs(t)) / 12); // 0..29
     if (tn === 14) return "purnima";  // Shukla Purnima (tithi 15, bright)
     if (tn === 29) return "amavasya"; // Krishna Amavasya (tithi 15, dark)
   }
@@ -56,14 +56,14 @@ function syzygyOnDay(rise) {
    date/time and the place's timezone. Moon sign is a whole-sign property, so topocentric
    parallax is immaterial — only the birth instant matters. Returns 0..11. */
 function natalMoonSign(place, ayanamsa, birth) {
-  setAyanMode(ayanamsa || "lahiri");
+  const S = sidereal(ayanamsa);   // bound to THIS call — never a shared global (F8)
   // The offset is resolved AT THE BIRTH CLOCK, not at a fixed moment on the birth
   // date: on a daylight-saving transition day those are an hour apart, which can move
   // the natal Moon into the neighbouring sign and so flip the janmaRashi flag on every
   // day this finder returns.
   const tz = zoneOffset(place.zone, birth.y, birth.m, birth.day, birth.hh || 0, birth.mi || 0) ?? 5.5;
   const ms = Date.UTC(birth.y, birth.m - 1, birth.day, birth.hh || 0, birth.mi || 0) - tz * 3600000;
-  return Math.floor(moonSidMs(ms) / 30);
+  return Math.floor(S.moonSidMs(ms) / 30);
 }
 
 /* natalSign is optional (null/undefined = the v1 no-birth-chart behaviour). When a valid
@@ -71,7 +71,7 @@ function natalMoonSign(place, ayanamsa, birth) {
    janmaRashi — a traditional personal caution. It is an overlay: it never changes the
    syzygy `clean`/`reason` fields, so the general finder is unchanged. */
 function medicalMuhuratDay(place, ayanamsa, y, m, day, natalSign) {
-  setAyanMode(ayanamsa || "lahiri");
+  const S = sidereal(ayanamsa);   // bound to THIS call — never a shared global (F8)
   const tz = zoneOffset(place.zone, y, m, day) ?? 5.5;
   const ev = sunEvents(y, m, day, tz, place.lat, place.lon);
   if (ev.rise === null || ev.set === null) return null;
@@ -83,13 +83,13 @@ function medicalMuhuratDay(place, ayanamsa, y, m, day, natalSign) {
     end: ev.rise + (seg / 8) * dayLen,
   });
 
-  const moonLon = moonSidMs(ev.rise);
-  const sunriseElong = rev(moonLon - sunSidMs(ev.rise));
+  const moonLon = S.moonSidMs(ev.rise);
+  const sunriseElong = rev(moonLon - S.sunSidMs(ev.rise));
   const nakIdx = Math.floor(moonLon / _NAKW);
   const moonSign = Math.floor(moonLon / 30);
   const janmaRashi = natalSign != null && natalSign >= 0 && natalSign <= 11 && moonSign === natalSign;
 
-  const reason = syzygyOnDay(ev.rise);
+  const reason = syzygyOnDay(S, ev.rise);
   const clean = reason === null;
 
   // On a clean day, report the sunrise tithi; on an excluded day, report the

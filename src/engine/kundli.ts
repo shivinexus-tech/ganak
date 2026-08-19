@@ -4,7 +4,7 @@ import {
   rev, sd, cdg, tdg, atan2d, tropicalLongitudes, ascendantAt, moonLon,
 } from "./ephemeris";
 import {
-  setAyanMode, ayanAt, SIGN_LORD, NAKSHATRAS, SIGNS,
+  ayanAt, SIGN_LORD, NAKSHATRAS, SIGNS,
   TITHIS, YOGAS, karanaName, sunEvents,
 } from "./panchang";
 import { placidusCusps } from "./houses";
@@ -20,11 +20,14 @@ import { computeBhavaChalit } from "./bhava";
 import { computeBNN } from "./bhrigu";
 
 function computeKundli({ y, m, day, hh, mi, tz, lat, lon, ayanamsa = "lahiri" }) {
-  setAyanMode(ayanamsa);
+  /* The chosen ayanamsa is a LOCAL of this call. It used to be pushed into a
+     module global that nothing ever restored, so casting one Raman chart moved
+     the whole app's Panchang by 1.479° (bug-bash F8). See
+     plans/audits/2026-08-18-ayanamsa-leak-fix.md. */
   const utcMs = Date.UTC(y, m - 1, day, hh, mi) - tz * 3600000;
   const JD = utcMs / 86400000 + 2440587.5;
   const d = JD - 2451543.5; // Schlyter epoch
-  const ayan = ayanAt(JD);
+  const ayan = ayanAt(JD, ayanamsa);
 
   const trop = tropicalLongitudes(d);
   const tropPrev = tropicalLongitudes(d - 0.5);
