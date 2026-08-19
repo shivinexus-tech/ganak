@@ -225,10 +225,12 @@ screen is fixed; every existing affected candidate must be swept.
 
 ### Smallest owner-approval batch — owner directive 2026-08-19
 
-The next owner-facing website batch is deliberately limited to four primary frames:
-Today/Panchang desktop EN + 390px EN, and Festival/Vrat detail desktop EN + 390px
-EN. Hindi and 320px frames remain mandatory attached QA evidence, but they are not
-additional visual decisions for the owner. Only exact-node independent-QA `PASS`
+The next owner-facing website batch is deliberately limited to two visual-direction
+decisions: Today/Panchang desktop EN and Festival/Vrat detail desktop EN. Each has a
+390px EN companion only to prove responsive mobile-web reflow; the 390px frame is not
+a second design direction and is not Ganak Phone/native work. Hindi and 320px frames
+also remain mandatory attached QA evidence, but none are additional visual decisions
+for the owner. Only exact-node independent-QA `PASS`
 candidates may enter a section named `OWNER REVIEW · WEBSITE PILOT 01`; failed,
 experimental, parked-phone and `CHANGES REQUESTED` work stays outside it.
 
@@ -247,6 +249,13 @@ last contrast corrections. The integrator therefore created section `652:13736` 
 - Today/Panchang 390px EN `652:13989` <- candidate `601:8508`;
 - Festival/Vrat detail desktop EN `652:14035` <- candidate `535:7265`;
 - Festival/Vrat detail 390px EN `652:14120` <- candidate `544:8016`.
+
+The desktop frames are the two owner visual-direction decisions. The 390px frames are
+responsive-website QA companions only. On 2026-08-19 the owner also rejected the
+minimal vertical floral edge and lower flourish inside the ordinary-Today hero. The
+integrator hid only those ornaments in both Today source candidates and both review
+clones (`601:9793`, `601:9795`, `628:13637`, `628:13639`, `652:13965`, `652:13967`,
+`652:13996`, `652:13998`); no other Today geometry, content or styling changed.
 
 This is not production-readiness approval. The source candidates remain
 `CHANGES REQUESTED` for interaction implementation: several current Figma reactions

@@ -229,14 +229,16 @@
     "state": "OWNER REVIEW — VISUAL DIRECTION ONLY; PRODUCTION INTERACTIONS CHANGES REQUESTED",
     "queueRule": "Do not place a pilot, wrapper or comparison board in the Owner Review Queue until same-viewport integrator comparison and exact-node independent QA pass every applicable GDF rule.",
     "feedbackLedger": "plans/ganak-design-feedback-ledger.md",
-    "canonicalFeedbackIds": "GDF-001 through GDF-053",
+    "canonicalFeedbackIds": "GDF-001 through GDF-055",
     "independentQaTask": "01a018d9-dca3-70b3-a851-b46eccd965cf",
     "todayPanchangSource": "116:49",
     "festivalVratSources": ["135:1312", "485:24"],
-    "ownerPrimaryReviewSet": [
+    "ownerVisualDecisionSet": [
       "Today/Panchang desktop EN",
+      "Festival/Vrat detail desktop EN"
+    ],
+    "responsiveQaCompanions": [
       "Today/Panchang 390px EN",
-      "Festival/Vrat detail desktop EN",
       "Festival/Vrat detail 390px EN"
     ],
     "attachedQaEvidence": [
@@ -256,7 +258,14 @@
         "festivalVratDesktopEnglish": { "reviewNode": "652:14035", "sourceCandidate": "535:7265" },
         "festivalVrat390English": { "reviewNode": "652:14120", "sourceCandidate": "544:8016" }
       },
-      "scope": "Owner decision is visual direction only. Unsupported or internal-only routes, state preservation and production interaction mapping remain open."
+      "scope": "Owner decision is visual direction only and is carried by the two desktop masters. The two 390px frames are responsive mobile-web QA companions, not separate design directions or Ganak Phone/native work. Unsupported or internal-only routes, state preservation and production interaction mapping remain open.",
+      "todayHeroOrnamentCorrection": {
+        "ownerDecisionRecorded": "2026-08-19",
+        "decision": "REJECTED DIRECTION — the minimal vertical floral edge and detached lower flourish were never approved for the ordinary-Today hero",
+        "hiddenSourceNodes": ["601:9793", "601:9795", "628:13637", "628:13639"],
+        "hiddenReviewNodes": ["652:13965", "652:13967", "652:13996", "652:13998"],
+        "scope": "Only these ornaments were hidden; all other Today content, geometry and styling remain unchanged."
+      }
     },
     "responsiveSharedSystem": {
       "page": "583:3",
