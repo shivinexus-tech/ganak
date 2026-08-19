@@ -3,6 +3,7 @@ import { T } from "../components/ui-style-contract";
 import PlaceInput from "../components/PlaceInput";
 import { zoneOffset } from "../engine/panchang";
 import { computeMatch } from "../engine/matching";
+import { dateProblem, timeProblem, fieldMessage } from "../components/birth-input";
 
 /* Kundali Matching UI — pure extraction (SPLIT-UI-MATCH-01).
    computeKundli is injected from the shell until the chart engine is extracted. */
@@ -62,14 +63,35 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
   // `res` exists) can never pair new birth details with old scores (Codex F2).
   useEffect(() => { setRes(null); setErr(""); }, [boyName, girlName, bDate, bTime, bPlace, gDate, gTime, gPlace]);
 
+  /* WHOSE birth detail is wrong. This screen holds two people, so a message that
+     only says "the date of birth" sends the reader to check both cards. The stale-
+     place guard below already established the pattern (it names the groom or the
+     bride); every field message now follows it. */
+  const F_BOY_DATE = { en: "the groom's date of birth", hi: "वर की जन्म तिथि" };
+  const F_BOY_TIME = { en: "the groom's time of birth", hi: "वर का जन्म समय" };
+  const F_GIRL_DATE = { en: "the bride's date of birth", hi: "कन्या की जन्म तिथि" };
+  const F_GIRL_TIME = { en: "the bride's time of birth", hi: "कन्या का जन्म समय" };
+
   const run = () => {
     setErr("");
-    const [by, bm, bd] = (bDate || "").split("-").map(Number);
-    const [bhh, bmi] = (bTime || "").split(":").map(Number);
-    const [gy, gm, gd] = (gDate || "").split("-").map(Number);
-    const [ghh, gmi] = (gTime || "").split(":").map(Number);
-    if (!by || isNaN(bhh) || !gy || isNaN(ghh)) { setErr(hi ? "दोनों व्यक्तियों की पूरी जन्म तिथि और समय भरें।" : "Enter a complete date and time of birth for both people."); return; }
-    if (!bPlace || !gPlace) { setErr(hi ? "दोनों व्यक्तियों का जन्म स्थान सुझावों में से चुनें।" : "Pick a birth place for both people from the suggestions."); return; }
+    /* Each field is checked on its own, and named. One shared "Enter a complete
+       date and time of birth for both people" covered four controls across two
+       people — and checked only that a year and an hour PARSED, so 29 February in
+       a non-leap year was matched as 1 March, a birth in year 999 was scored from
+       an ephemeris that cannot reach it, 24:00 became midnight of the next day, and
+       a half-typed date ("1990-06") crashed the screen to the error boundary.
+       Ganak must never change someone's birth date and then score their marriage
+       on it (bug bash 2026-08-18, F9; shared guards in components/birth-input). */
+    const fail = (p) => { if (!p) return false; setRes(null); setErr(fieldMessage(p, hi)); return true; };
+    if (fail(dateProblem(bDate, F_BOY_DATE))) return;
+    if (fail(timeProblem(bTime, F_BOY_TIME))) return;
+    if (fail(dateProblem(gDate, F_GIRL_DATE))) return;
+    if (fail(timeProblem(gTime, F_GIRL_TIME))) return;
+    const [by, bm, bd] = bDate.split("-").map(Number);
+    const [bhh, bmi] = bTime.split(":").map(Number);
+    const [gy, gm, gd] = gDate.split("-").map(Number);
+    const [ghh, gmi] = gTime.split(":").map(Number);
+    if (!bPlace || !gPlace) { setRes(null); setErr(hi ? "दोनों व्यक्तियों का जन्म स्थान सुझावों में से चुनें।" : "Pick a birth place for both people from the suggestions."); return; }
     if (!bConfirmed || !gConfirmed) {
       const who = !bConfirmed && !gConfirmed ? (hi ? "दोनों व्यक्तियों" : "both people") : !bConfirmed ? (hi ? "वर" : "the groom") : (hi ? "कन्या" : "the bride");
       setRes(null);

@@ -6,18 +6,26 @@ import { fmtDateT } from "../components/format";
 import { signShort, panchangTerm, padaText, planetName, planetShort } from "../i18n/panchang-terms";
 import { SIGNS, NAKSHATRAS, zoneOffset, SIGN_LORD } from "../engine/panchang";
 import { rectSweep, mahaTimelineAt, runDashaAt, VIM_LORDS, rectAtMin } from "../engine/dasha";
+import { dateProblem, timeProblem, fieldMessage, F_BIRTH_DATE, F_BIRTH_TIME } from "../components/birth-input";
 
 function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
   const hi = lang === "hi";
-  const [y, m, day] = (form.date || "1995-08-15").split("-").map(Number);
-  const [hhB, miB] = (form.time || "06:30").split(":").map(Number);
+  /* This workbench used to invent a birth when it was not given one: an empty date
+     silently became 1995-08-15 and an empty time 06:30, so the sweep, the D-9/D-60
+     markers and the whole dasha timeline belonged to a stranger — presented as the
+     reader's own candidate times. An impossible date was worse: 29 February in a
+     non-leap year rectified 1 March, and a half-typed date ("1990-06") threw and
+     took the whole app to the error boundary. A screen whose job is MINUTES must
+     not guess DAYS. Refuse, name the field, and show nothing else — the same words
+     the chart, matching and calculator screens use (components/birth-input). */
+  const problem = dateProblem(form && form.date, F_BIRTH_DATE) || timeProblem(form && form.time, F_BIRTH_TIME);
+  const [y, m, day] = problem ? [NaN, NaN, NaN] : form.date.split("-").map(Number);
+  const [hhB, miB] = problem ? [NaN, NaN] : form.time.split(":").map(Number);
   // Rectification sweeps minutes around the recorded birth clock, so the offset must
   // be the one in force at that clock. Resolving it at a fixed moment on the birth
   // date put every transition-day birth on the wrong side of a daylight-saving change
   // — an hour of error in the very screen whose job is minutes.
-  const tz = (Number.isFinite(hhB)
-    ? zoneOffset(place.zone, y, m, day, hhB, Number.isFinite(miB) ? miB : 0)
-    : zoneOffset(place.zone, y, m, day)) ?? 5.5;
+  const tz = (problem ? null : zoneOffset(place.zone, y, m, day, hhB, miB)) ?? 5.5;
   const centerMin = hhB * 60 + miB;
   const aya = ayanamsa || "lahiri";
   const [halfWin, setHalfWin] = useState(30);
@@ -30,9 +38,18 @@ function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
 
   const lo = centerMin - halfWin, hiMin = centerMin + halfWin;
   const selC = Math.max(lo, Math.min(hiMin, sel));
-  const sweep = useMemo(() => rectSweep(y, m, day, tz, place.lat, place.lon, aya, centerMin, halfWin, stepMin), [y, m, day, tz, place.lat, place.lon, aya, centerMin, halfWin, stepMin]);
-  const mk = useMemo(() => rectAtMin(y, m, day, tz, place.lat, place.lon, aya, selC), [y, m, day, tz, place.lat, place.lon, aya, selC]);
-  const dash = useMemo(() => mahaTimelineAt(y, m, day, tz, selC, aya), [y, m, day, tz, selC, aya]);
+  /* Every hook still runs unconditionally — React requires that — but with an
+     invalid birth they compute nothing, and the component returns the message
+     below before anything reads them. */
+  const sweep = useMemo(() => (problem ? [] : rectSweep(y, m, day, tz, place.lat, place.lon, aya, centerMin, halfWin, stepMin)), [problem, y, m, day, tz, place.lat, place.lon, aya, centerMin, halfWin, stepMin]);
+  const mk = useMemo(() => (problem ? null : rectAtMin(y, m, day, tz, place.lat, place.lon, aya, selC)), [problem, y, m, day, tz, place.lat, place.lon, aya, selC]);
+  const dash = useMemo(() => (problem ? null : mahaTimelineAt(y, m, day, tz, selC, aya)), [problem, y, m, day, tz, selC, aya]);
+
+  if (problem) return (
+    <p role="alert" style={{ color: C.sindoor, fontSize: "var(--font-body)", lineHeight: 1.55, margin: "0 0 0.875rem" }}>
+      <span aria-hidden="true">⚠ </span>{fieldMessage(problem, hi)}
+    </p>
+  );
 
   const YEAR = 365.25 * 86400000;
   const fmtMin = (t) => { const hh = Math.floor(t / 60), mm = Math.floor(t % 60), ss = Math.round((t - hh * 60 - mm) * 60); return `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}:${String(Math.min(59, ss)).padStart(2, "0")}`; };

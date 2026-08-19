@@ -29,6 +29,7 @@ import { BNNModule, BhriguModule } from "./JyotishBnnScreen";
 import { utilityHref } from "./UtilityCalculatorScreen";
 import { RectifyModule } from "./RectifyScreen";
 import { SIGNS, NAKSHATRAS, AYANAMSA, zoneOffset } from "../engine/panchang";
+import { dateProblem, timeProblem, fieldMessage, F_BIRTH_DATE, F_BIRTH_TIME } from "../components/birth-input";
 
 /* The UTC offset AT THE BIRTH MOMENT. `zoneOffset` resolves a local wall clock, so a
    birth on a daylight-saving transition day gets the offset that was actually in force
@@ -241,9 +242,15 @@ export default function ChartScreen({ C, card, lang }) {
     setForm(c.form); setPlace(c.place); setQuery(c.place.label);
     setTzOverride(c.tzOverride != null ? c.tzOverride : ""); setAyanamsa(c.ayanamsa || "lahiri");
     setErr("");
+    /* A saved chart is only as good as what was saved. Vault entries predating the
+       guards above (and any hand-edited or shared payload) can still carry an
+       impossible birth date, and computeKundli would quietly roll it forward. Same
+       rule as the form: refuse, and name the field. */
+    const sp = dateProblem(c.form.date, F_BIRTH_DATE) || timeProblem(c.form.time, F_BIRTH_TIME);
+    if (sp) { setResult(null); setChartContext(null); setErr(fieldMessage(sp, hi)); return; }
     try {
-      const [y, m, day] = (c.form.date || "").split("-").map(Number);
-      const [hh, mi] = (c.form.time || "").split(":").map(Number);
+      const [y, m, day] = c.form.date.split("-").map(Number);
+      const [hh, mi] = c.form.time.split(":").map(Number);
       const tz = c.tzOverride !== "" && c.tzOverride != null ? parseFloat(c.tzOverride) : tzAtBirth(c.place.zone, y, m, day, hh, mi);
       setResult(computeKundli({ y, m, day, hh, mi, tz, lat: c.place.lat, lon: c.place.lon, ayanamsa: c.ayanamsa || "lahiri" }));
       setChartContext({ form: { ...c.form }, place: { ...c.place }, ayanamsa: c.ayanamsa || "lahiri" });
@@ -255,9 +262,22 @@ export default function ChartScreen({ C, card, lang }) {
     // Drop any prior chart up front: if this cast fails validation below, the user
     // is left with the guard message and no stale result (Codex F1).
     setResult(null); setChartContext(null);
-    const [y, m, day] = (form.date || "").split("-").map(Number);
-    const [hh, mi] = (form.time || "").split(":").map(Number);
-    if (!y || isNaN(hh)) { setErr(lang === "hi" ? "जन्म की पूरी तारीख़ और समय भरें।" : "Enter a complete date and time of birth."); return; }
+    /* Each field is checked on its own, and named. "Enter a complete date and time
+       of birth" only asked whether a year and an hour PARSED, so three impossible
+       births sailed through and were cast as though they were real:
+         · 29 February 1990 was cast FOR 1 MARCH 1990, while the report header
+           printed 1990-02-29 — two different birthdays on one page.
+         · Year 999 was answered from an ephemeris whose ΔT fits stop at 1800.
+         · 24:00 was read as 00:00 of the next day — a whole sign of ascendant.
+       And a half-typed date ("1990-06") reached the timezone step, where the reader
+       was told the PLACE could not be resolved. Never correct a birth date on the
+       reader's behalf; say which field is wrong and why (components/birth-input). */
+    const dp = dateProblem(form.date, F_BIRTH_DATE);
+    if (dp) { setErr(fieldMessage(dp, hi)); return; }
+    const tp = timeProblem(form.time, F_BIRTH_TIME);
+    if (tp) { setErr(fieldMessage(tp, hi)); return; }
+    const [y, m, day] = form.date.split("-").map(Number);
+    const [hh, mi] = form.time.split(":").map(Number);
     // Use the picked place if present; otherwise, if the typed text resolves to
     // exactly one known place, adopt it and cast in the same click (no second press).
     let effPlace = place;
