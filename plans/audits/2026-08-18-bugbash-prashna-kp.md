@@ -155,8 +155,8 @@ touch this path — `validation/prashna-parity.js` (whose case list literally na
 equal-house fallback"*) and `validation/prashna-calc.js` — compare two copies of the same code, so
 neither can see it.
 
-**Cause** — `src/screens/PrashnaScreen.tsx:205-211` (`PR_cast`) and the identical block at
-`src/screens/PrashnaScreen.tsx:398-404` (`PR_castNumber`):
+**Cause** — `src/screens/PrashnaScreen.tsx:207-210` (`PR_cast`, **inside the parity-frozen markers**) and the
+identical block at `src/screens/PrashnaScreen.tsx:373-376` (`PR_castNumber`):
 
 ```js
 trop[1] = asc; trop[10] = mc;                       // <-- cusp 10 stays the REAL MC
@@ -231,3 +231,168 @@ asserts the twelve cusp spans sum to exactly 360° and each is < 120°, at latit
 and 69.65 in **both** modes — that single assertion catches this class outright. Note the fix
 touches the parity-frozen region, so it must land in `validation/prashna-calc.js` and the screen
 together.
+
+### F4 — P1 · The judgment-place override sets latitude, longitude and a place name but **not a timezone**, so the judgment moment is read in the *device's* zone. Ganak already knows the place's zone and throws it away.
+
+KP horary is cast for the moment **and place of judgement**. `PrashnaScreen` offers exactly that
+override — "Set the judgment moment & place myself" — with fields for place name, latitude,
+longitude and a `datetime-local`. There is no timezone field, and
+`src/screens/PrashnaScreen.tsx:860` reads the typed moment as
+
+```js
+const ms = (useCustom && customWhen) ? new Date(customWhen).getTime() : Date.now();
+```
+
+A bare `datetime-local` string is parsed by JS in the **runtime's** timezone. So a practitioner in
+London judging a question that arrived in Chennai types `18:00` meaning IST and gets 18:00 BST.
+
+**Root cause is one line up the tree.** `src/kundli-app.tsx:268`:
+
+```jsx
+<PrashnaScreen lat={panchEff?.lat} lon={panchEff?.lon} placeLabel={panchEff?.label} lang={lang} />
+```
+
+`panchEff` is `{ label, lat, lon, zone }` (`src/kundli-app.tsx:122-123`) — the **zone is present,
+round-trips through the URL (`?zone=`), and is simply not passed on.** Every other place-consuming
+screen receives the whole `place` object; Prashna is the only one destructured down to lat/lon.
+
+**Reproduction** — device timezone `Europe/London`; override place = Chennai (13.0827, 80.2707);
+judgment time typed as `2026-08-18T18:00`. Intended instant 12:30 UTC; actual instant 17:00 UTC.
+
+**Observed** (`.scratch/bugbash/tz.cjs`) — the cuspal sub-lord changes for **11 of the 12 topics**
+and five verdicts flip:
+
+```
+INTENDED 18:00 IST     lagna=Cp 24.370  sub=Ra
+   marriage   cuspSub=Rahu     score= -1 mixed
+   money      cuspSub=Saturn   score=  2 favourable
+   travel     cuspSub=Mercury  score=  0 mixed
+   lost       cuspSub=Moon     score=  0 mixed
+   general    cuspSub=Rahu     score=  5 favourable
+ACTUAL 18:00 BST       lagna=Ar 13.858  sub=Ve
+   marriage   cuspSub=Mercury  score= -2 unfavourable
+   money      cuspSub=Sun      score= -2 unfavourable
+   travel     cuspSub=Venus    score= -3 unfavourable
+   lost       cuspSub=Rahu     score= -3 unfavourable
+   general    cuspSub=Venus    score= -1 mixed
+```
+
+**Partially disclosed, not fixed.** The panel does carry a micro caption — *"Time is read in your
+device's timezone." / "समय आपके उपकरण के समयक्षेत्र में पढ़ा जाता है।"*
+(`src/screens/PrashnaScreen.tsx:1091-1093`). That keeps this off P0, but reading it does not help:
+there is no field with which to express the judging place's local time, so the override is
+structurally unable to do the thing it is named for.
+
+**Suggested fix** — pass the whole `place` object (including `zone`) from `src/kundli-app.tsx:268`,
+label the time field with the effective zone, and resolve `customWhen` against that zone rather than
+the device. A zone field belongs beside the lat/lon pair for the free-coordinate case.
+
+### F5 — P1 · A judgment time that does not exist (DST spring-forward) is silently moved, and the card then echoes back a time the user never typed
+
+The same `new Date(customWhen)` accepts a wall-clock time that the local calendar skips.
+
+**Reproduction** — device timezone `Europe/London`, judgment time typed `2026-03-29T01:30`
+(the hour 01:00–02:00 does not exist that morning).
+
+**Observed:**
+
+```
+2026-03-29T01:30 -> epoch 1774747800000 -> Sun Mar 29 2026 02:30:00 GMT+0100 (British Summer Time)
+America/New_York  2026-03-08T02:30 -> Sun Mar 08 2026 03:30:00 GMT-0400 (EDT)
+```
+
+The verdict card then prints `Cast for 3/29/2026, 2:30:00 AM` — an hour later than what was typed —
+with no warning, and the share card carries the shifted time into the PNG.
+
+**Expected** — the same treatment the app gave the birth path **today**:
+`src/components/birth-input.ts` was added on 2026-08-18 precisely so a date that does not exist is
+refused rather than quietly moved ("Ganak will not move it to the next day for you"). The Prashna
+judgment-time field never reaches that helper.
+
+**Cause** — `src/screens/PrashnaScreen.tsx:860`; no guard, and `src/components/birth-input.ts` is
+not imported by this screen.
+
+**Suggested fix** — round-trip the parsed instant back to a local wall-clock string and refuse the
+input when it does not match what was typed, with the birth-input vocabulary.
+
+### F6 — P2 · The judgment date has no range at all, while the app's own new shared guard refuses anything outside 1800–2150
+
+`src/components/birth-input.ts:31-33` fixes `YEAR_MIN = 1800, YEAR_MAX = 2150` — "the span over
+which `src/engine/ephemeris.ts` has real ΔT polynomial fits. Widening it is a product call" — and
+today's fix makes four screens refuse to calculate outside it. The Prashna `datetime-local` has no
+`min`, no `max` and no validation, and the inlined engine uses a **hard-coded** `PR_DELTA_T = 72`
+seconds (`src/screens/PrashnaScreen.tsx:24`), correct only around the present decade.
+
+**Observed** (`.scratch/bugbash/bounds.cjs`) — every one of these answers with full confidence:
+
+```
+year 1     asc=218.296 sunLon=61.184  moonLon=46.635
+year 1200  asc=228.716 sunLon=71.328  moonLon=14.806
+year 3000  asc=203.719 sunLon=47.178  moonLon=295.707
+year 9999  asc=109.157 sunLon=311.912 moonLon=43.818
+```
+
+**Expected** — the same refusal, in the same words, as the four screens fixed today.
+
+**Cause** — `src/screens/PrashnaScreen.tsx:1085-1090` (the `datetime-local` input) and the `ask()`
+validation at `src/screens/PrashnaScreen.tsx:861-865`, which only checks `Number.isFinite(ms)`.
+
+### F7 — P1 · Switching tabs destroys the reading **and** the one-question lock, so the same number can be re-cast at a new moment. Nothing about a reading round-trips through the URL.
+
+`src/kundli-app.tsx:267-269` renders the screen behind `mode === "prashna" &&`, so tapping
+**Daily** or **Jyotish** unmounts `PrashnaScreen` and every piece of its state — `result`,
+`locked`, `numberInput`, `selected`, the whole judgment-place override — is gone. Coming back
+gives a blank form.
+
+That is not only lost work. The number-mode lock exists to enforce a **Tier-1 page-pinned** rule
+(`plans/prashna-249-ksk-verify.md` rule 6, Reader VI scan p.43: the first sincere number stands,
+one question at a time), and the screen says so out loud — *"This is not a lucky number — the first
+sincere number is the one; don't change it. One question at a time."* A tab tap resets it. The
+elaborate in-screen guards (F1/F4/F5 lock, the F9 600 ms double-tap window at
+`src/screens/PrashnaScreen.tsx:826-831`) are all defeated by the cheapest gesture on the screen.
+
+**Reproduction** — number mode, topic Marriage, number 139, Cast. Tap **Daily**. Tap **Prashna**.
+The number field is empty and editable, no topic is selected, and 139 can be cast again against a
+different sky.
+
+**Related:** `src/kundli-app.tsx:96-123` puts `lang`, `screen`, `city/lat/lon/zone` and `muhurat`
+in the URL. Nothing about a Prashna reading is there, so a reading survives neither a reload nor a
+Back, and there is no shareable link — only the PNG card, which carries no verdict (see F9).
+
+**Suggested fix** — keep the reading in the `preferences` store via
+`src/storage/approved-storage.ts` (the only approved adapter), or at minimum keep the screen
+mounted and hidden; and put the cast reading (number, topic, judgment instant, place) in the URL so
+it round-trips like every other Ganak state.
+
+### F8 — P1 · Round-tripping the method toggle while a number session is locked leaves the screen locked with **no reading at all**
+
+`switchMode` deliberately preserves a locked result (`src/screens/PrashnaScreen.tsx:820`:
+`if (!locked) clearResult()`), but the result block is gated on
+`result.mode === mode` (`src/screens/PrashnaScreen.tsx:1198`). Nothing keeps a *time*-mode cast from
+overwriting the locked *number*-mode result.
+
+**Reproduction**
+1. Number mode, topic Marriage, number `139`, **Cast the answer** → locked, answer shown.
+2. Tap **Ask from this moment**. (The result hides; `locked` stays true.)
+3. Tap **Ask now** → a time-mode chart replaces `result`.
+4. Tap **KP number method (1–249)**.
+
+**Observed** (literal harness output of that exact state, `.scratch/bugbash/lockstate.cjs`):
+
+```
+Same question, same number. Tap “New question” below to ask again.
+New question
+
+(any verdict/chart on screen? NO — nothing but the locked field)
+```
+
+The number field shows `139`, read-only and gold-highlighted; the only control is *New question*;
+the reading it says is locked no longer exists. The number-mode answer is unrecoverable — tapping
+*New question* wipes the number too.
+
+**Expected** — either the lock should scope to the mode it was taken in, or step 3 should be
+refused while a number session is locked.
+
+**Cause** — `src/screens/PrashnaScreen.tsx:820` (`switchMode`) vs
+`src/screens/PrashnaScreen.tsx:1198` (`result.mode === mode`) and
+`src/screens/PrashnaScreen.tsx:888` / `:895` (`setResult` in both branches writes the same slot).
