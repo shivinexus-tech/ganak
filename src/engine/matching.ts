@@ -256,11 +256,13 @@ function dashakoota(boy: any, girl: any) {
    Lagna alone, so the two screens gave a couple opposite answers about the same
    birth record (bug bash 2026-08-18, F1). The convention below is a copy of the
    calculator's, not a new one — validation/doshas.cjs now sweeps real charts and
-   fails if the two ever disagree again. */
-/* Mirrors src/engine/mangal-dosha.ts exactly — including the 1st-house row and
-   Jupiter's three FULL aspects (5th, 7th and 9th), both restored on 2026-08-18
-   (bug bash F19). validation/doshas.cjs sweeps real charts and fails if these two
-   copies of the convention ever disagree again. */
+   fails if the two ever disagree again.
+
+   The two tables below mirror mangal-dosha.ts exactly, including the 1st-house
+   exception row and Jupiter's three FULL aspects (5th, 7th and 9th), both restored
+   on 2026-08-18 (bug bash F19). validation/mangal-dosha.cjs compares the two copies
+   directly, and validation/doshas.cjs sweeps real charts for the same agreement, so
+   they cannot drift apart again. */
 const MANGAL_TRADITION_EXCEPTIONS = { 1: [0, 7], 2: [2, 5], 4: [0, 7], 7: [3, 9], 8: [8, 11], 12: [1, 6] };
 const MANGAL_JUPITER_FULL_ASPECTS = [5, 7, 9];
 const MANGLIK_REF_LABELS = {
