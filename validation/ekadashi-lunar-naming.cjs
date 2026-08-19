@@ -384,32 +384,26 @@ const CYCLE = [
 // Dates on which Ganak deliberately shows the plain "Ekadashi" label instead of
 // a named vrata. Every one of these is checked below to be UNNAMED, never
 // MIS-named — showing an ordinary month's name here is the defect this gate
-// exists to stop. ONE remaining cause:
+// exists to stop.
 //
-//  ADHIKA MASA. The intercalary month's two Ekadashis are Padmini (Shukla)
-//  and Parama (Krishna). Ganak has no route/guide page for either yet, and
-//  `festival-page-coverage` requires a page for every named label, so the
-//  engine falls back visibly rather than borrowing the ordinary month's name.
-//  Handoff: add the two labels + their two guide pages.
+// BOTH original causes are now resolved, so this list is EMPTY and must stay
+// empty. Do not re-populate it to make a failure go away.
 //
-// RESOLVED 2026-08-18 — the second cause is gone. `ensureLmWindow` in
-// src/engine/panchang.ts used to sample the sun one hour after the new moon, so
-// Mesha Sankranti 2029 (31 minutes after the new moon of 14 Apr) was skipped and
-// that lunation was wrongly flagged Adhika — giving two Adhika months back to
-// back. It now reads the sun's sign at the month's true bounds. Kamada
-// (2029-04-24) and Varuthini (2029-05-09) are named again and are asserted as
-// ordinary named fasts below, not as exceptions. See
-// plans/research/adhik-masa-detection.md and validation/adhik-masa.cjs.
-const EXPECTED_UNNAMED = {
-  '2026-05-27': 'adhika-masa: Padmini',
-  '2026-06-11': 'adhika-masa: Parama',
-  '2029-03-26': 'adhika-masa: Padmini',
-  '2029-04-09': 'adhika-masa: Parama',
-  '2031-08-28': 'adhika-masa: Padmini',
-  '2031-09-12': 'adhika-masa: Parama',
-  '2034-06-27': 'adhika-masa: Padmini',
-  '2034-07-12': 'adhika-masa: Parama',
-};
+//  RESOLVED 2026-08-18 (a) — Adhika Masa. The intercalary month's two Ekadashis
+//  are Padmini (Shukla) and Parama (Krishna). They used to show as a plain
+//  "Ekadashi" because `festival-page-coverage` requires a route for every named
+//  label and neither had one. Both are now named and both have guide pages at
+//  /festival/padmini-ekadashi and /festival/parama-ekadashi. See
+//  plans/research/festival-day-rules.md § 3 and validation/festival-day-rules.cjs.
+//
+//  RESOLVED 2026-08-18 (b) — `ensureLmWindow` in src/engine/panchang.ts used to
+//  sample the sun one hour after the new moon, so Mesha Sankranti 2029
+//  (31 minutes after the new moon of 14 Apr) was skipped and that lunation was
+//  wrongly flagged Adhika — giving two Adhika months back to back. It now reads
+//  the sun's sign at the month's true bounds. Kamada (2029-04-24) and Varuthini
+//  (2029-05-09) are named again. See plans/research/adhik-masa-detection.md.
+const EXPECTED_UNNAMED = {};
+const ADHIKA_KEYS = ['Adhik_Shukla_11', 'Adhik_Krishna_11'];
 
 // New Delhi — the place the published reference above was fetched for.
 const TZ = 5.5;
@@ -491,7 +485,7 @@ for (const date of Object.keys(EXPECTED_UNNAMED)) {
 let windows = 0;
 for (let i = 0; i + 24 <= observed.length; i += 1) {
   const win = observed.slice(i, i + 24);
-  if (win.some((r) => r.name === null)) continue;
+  if (win.some((r) => r.name === null || ADHIKA_KEYS.includes(r.key))) continue;
   const keys = new Set(win.map((r) => r.key));
   assert.strictEqual(keys.size, 24,
     `${win[0].date}..${win[23].date}: a lunar year repeats a name — ${win.map((r) => r.name).join(', ')}`);
@@ -504,16 +498,20 @@ assert(windows >= 170, `expected a wide sweep of clean lunar years, got ${window
 // Consecutive named Ekadashis advance exactly one step around the cycle.
 for (let i = 1; i < observed.length; i += 1) {
   if (observed[i].name === null || observed[i - 1].name === null) continue;
+  if (ADHIKA_KEYS.includes(observed[i].key) || ADHIKA_KEYS.includes(observed[i - 1].key)) continue;
   const prev = CYCLE.indexOf(observed[i - 1].key), cur = CYCLE.indexOf(observed[i].key);
   assert.strictEqual(cur, (prev + 1) % 24,
     `${observed[i].date}: identity jumped ${observed[i - 1].key} -> ${observed[i].key}`);
 }
 
-// An Adhika Masa Ekadashi must never borrow an ordinary month's name.
+// An Adhika Masa Ekadashi carries its OWN name and must never borrow an
+// ordinary month's. Before 2026-08-18 it showed unnamed; now it must be exactly
+// Padmini or Parama, and never Mohini, Kamada or any other lunar-month vrata.
 for (const [date, name] of flatDrik) {
   if (!/^(Padmini|Parama) /.test(name)) continue;
   const got = observed[flatDrik.findIndex((row) => row[0] === date)];
-  assert.strictEqual(got.name, null, `${date} is ${name}; Ganak must not call it ${got.name}`);
+  assert.strictEqual(got.name, name, `${date} is ${name}; Ganak calls it ${got.name}`);
+  assert.ok(ADHIKA_KEYS.includes(got.key), `${date} must use an Adhika Masa key, not ${got.key}`);
 }
 
 // ------------------------------------------------------------------ 4. tables
@@ -523,7 +521,13 @@ for (const key of CYCLE) {
   assert.strictEqual(meta.OBS_NAME[key].en, engine.EKADASHI_NAMES[key].en, `${key} label drift`);
   assert.strictEqual(meta.OBS_NAME[key].hi, engine.EKADASHI_NAMES[key].hi, `${key} Hindi label drift`);
 }
-assert.strictEqual(Object.keys(engine.EKADASHI_NAMES).length, 24, 'exactly 24 named Ekadashi identities');
+for (const key of ADHIKA_KEYS) {
+  assert(engine.EKADASHI_NAMES[key], `engine table missing ${key}`);
+  assert.strictEqual(meta.OBS_NAME[key].en, engine.EKADASHI_NAMES[key].en, `${key} label drift`);
+  assert.strictEqual(meta.OBS_NAME[key].hi, engine.EKADASHI_NAMES[key].hi, `${key} Hindi label drift`);
+}
+assert.strictEqual(Object.keys(engine.EKADASHI_NAMES).length, 26,
+  'exactly 24 ordinary named Ekadashi identities plus the Adhika Masa pair');
 
 // Date precision is a SEPARATE, pre-existing item (sunrise/tithi boundary), not
 // a naming defect. Pinned so it can shrink but never silently grow.
@@ -531,5 +535,5 @@ const drift = observed.length - exactDates;
 assert(drift <= 19, `Ekadashi date drift grew to ${drift} of ${observed.length} (was 19)`);
 
 console.log(`✓ ekadashi-lunar-naming: ${observed.length} Ekadashis over ${YEARS[0]}-${YEARS[YEARS.length - 1]} match the published reference`);
-console.log(`  ${windows} clean 24-fast lunar-year windows · 4 Adhika Masa years · ${Object.keys(EXPECTED_UNNAMED).length} documented unnamed days`);
+console.log(`  ${windows} clean 24-fast lunar-year windows · 4 Adhika Masa years · Padmini/Parama named · ${Object.keys(EXPECTED_UNNAMED).length} unnamed days remaining`);
 console.log(`  dates: ${exactDates}/${observed.length} exact, ${drift} within one day (separate tithi-boundary item)`);

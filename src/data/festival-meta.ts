@@ -73,6 +73,12 @@ Object.assign(OBS_NAME, {
   Paush_Krishna_11: { en: "Safala Ekadashi", hi: "सफला एकादशी" },
   Magh_Krishna_11: { en: "Shattila Ekadashi", hi: "षट्तिला एकादशी" },
   Phalgun_Krishna_11: { en: "Vijaya Ekadashi", hi: "विजया एकादशी" },
+  // The Adhika (Purushottama) month's own two Ekadashis. They belong to no
+  // ordinary month and never borrow an ordinary month's vrata name. Sourced in
+  // plans/research/ekadashi-lunar-month-naming.md § 5; dates and routes gated by
+  // validation/festival-day-rules.cjs.
+  Adhik_Shukla_11: { en: "Padmini Ekadashi", hi: "पद्मिनी एकादशी" },
+  Adhik_Krishna_11: { en: "Parama Ekadashi", hi: "परमा एकादशी" },
 });
 
 export const OBS_META = {
