@@ -2,8 +2,8 @@ JYOTISH WORKSPACE
 KundliCalculators
 ← All calculatorsMangal Dosha
 Three-reference analysis from Lagna, Moon and Venus.
-Date
-Time
+Date of birth
+Time of birth
 Place
 Calculate
 Method & limitsMars in houses 1, 2, 4, 7, 8 or 12, checked separately from Lagna, Moon and Venus. Mitigations are shown but do not silently erase a result.

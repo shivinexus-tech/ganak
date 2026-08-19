@@ -2,7 +2,7 @@
 'use strict';
 const assert = require('node:assert');
 const fs = require('node:fs');
-const { loadApp } = require('./_load-app.cjs');
+const { loadApp, ROOT } = require('./_load-app.cjs');
 const data = loadApp('src/data/utility-calculators.ts');
 const calc = loadApp('src/engine/utility-calculators.ts');
 
@@ -147,5 +147,88 @@ assert(screenSource.includes('offsetLabel(shown.tz)'), 'the screen must show whi
 // standing rule is that a user can always tell what the app is doing.
 assert(screenSource.includes('setBusy(true)') && screenSource.includes('disabled={busy}') && screenSource.includes('aria-busy={busy}'), 'Calculate must show a busy state while it computes');
 assert(screenSource.includes('window.setTimeout(run,0)'), 'the blocking computation must yield to a paint first, or the busy state never appears');
+
+// F14 — the birth-date field was labelled `तिथि`, which everywhere else in Ganak means
+// the lunar day, not a calendar date. Two other screens already say `जन्म तिथि`.
+assert(/dateLabel=labels\?labels\.date:\(hi\?"जन्म तिथि":"Date of birth"\)/.test(screenSource),
+  'the birth-date field must be labelled जन्म तिथि / Date of birth — तिथि alone means the lunar day');
+assert(!/hi\?"तिथि":"Date"/.test(screenSource), 'the bare तिथि label must not come back');
+
+// F9 — a birth date is never silently corrected, and every rejection names its field.
+assert(screenSource.includes('function dateProblem') && screenSource.includes('function timeProblem'),
+  'date and time must be validated per field, not by one shared catch-all message');
+assert(/YEAR_MIN=1800, YEAR_MAX=2150/.test(screenSource),
+  'a year range guard must exist — the ΔT polynomials in src/engine/ephemeris.ts only run 1800-2150');
+assert(!/:\s*"Could not calculate\. Check the date, time and place\."/.test(screenSource),
+  'the one generic message that covered four different fields must not come back');
+
+// F11 — the error boundary must let go of a crash when the reader navigates away.
+// It used to clear `error` only from the Try again button, and this app navigates by
+// pushState + popstate, so after one crash every later route still rendered
+// "Something went wrong" — with document.title, <link rel=canonical> and the meta
+// description frozen on the page that crashed, because the crashed screen's effects
+// never ran again. Nine navigations were observed in that state in the 2026-08-18
+// bug bash. The boundary is a class with lifecycle, so this is driven directly rather
+// than through renderToStaticMarkup, which runs no lifecycle at all.
+{
+  const React = require('react');
+  const { renderToStaticMarkup } = require('react-dom/server');
+  // The boundary imports the error reporter, which reads `import.meta.env` — a Vite
+  // build-time value the shared loader does not define. Bundle it here with that one
+  // definition supplied, rather than changing a loader other lanes share.
+  globalThis.__viteEnvStub = {};
+  const esbuild = require('esbuild');
+  const path = require('node:path');
+  const tmp = path.join(__dirname, `.boundary-${process.pid}.tmp.cjs`);
+  let Boundary;
+  try {
+    esbuild.buildSync({
+      entryPoints: [path.join(ROOT, 'src/components/AppErrorBoundary.tsx')],
+      outfile: tmp, bundle: true, format: 'cjs', platform: 'node', target: 'node18',
+      jsx: 'transform', logLevel: 'silent',
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      define: { 'import.meta.env.VITE_SENTRY_DSN': 'undefined', 'import.meta.env': 'globalThis.__viteEnvStub' },
+    });
+    Boundary = require(tmp).default;
+  } finally { try { fs.unlinkSync(tmp); } catch (e) { /* gone */ } }
+
+  const listeners = {};
+  const realWindow = global.window, realLocation = global.location;
+  global.window = {
+    addEventListener: (t, fn) => { (listeners[t] = listeners[t] || []).push(fn); },
+    removeEventListener: (t, fn) => { listeners[t] = (listeners[t] || []).filter((f) => f !== fn); },
+  };
+  global.location = { search: '?lang=en', reload() {} };
+  try {
+    const b = new Boundary({ children: null });
+    b.setState = (patch) => { b.state = { ...b.state, ...patch }; };
+    assert(typeof b.componentDidMount === 'function', 'the error boundary must subscribe to route changes — it has no componentDidMount at all, so a crash is permanent for the session');
+    b.componentDidMount();
+    assert((listeners.popstate || []).length === 1, 'the error boundary must listen for popstate — a route change is when to try again');
+
+    b.state = { error: new Error('boom') };
+    listeners.popstate.forEach((fn) => fn());
+    assert.strictEqual(b.state.error, null, 'a route change must clear the crash state, or every later page keeps showing "Something went wrong"');
+
+    // …and the crash screen itself must offer a way back INTO the app. Try again
+    // re-renders the same broken route and Reload reloads it; without a link the
+    // reader is stuck on the crash screen whatever they press.
+    for (const [lang, wantLabel] of [['en', 'panchang'], ['hi', 'पंचांग']]) {
+      global.location = { search: `?lang=${lang}`, reload() {} };
+      const inst = new Boundary({ children: null });
+      inst.state = { error: new Error('boom') };
+      const html = renderToStaticMarkup(inst.render());
+      assert(/<a [^>]*href="\/\?lang=/.test(html), `the crash screen must link back into the app (${lang})`);
+      assert(html.includes(wantLabel), `the crash screen's way back must be labelled in the reader's language (${lang})`);
+    }
+
+    assert(typeof b.componentWillUnmount === 'function', 'the error boundary must remove its popstate listener on unmount');
+    b.componentWillUnmount();
+    assert((listeners.popstate || []).length === 0, 'the popstate listener must be removed on unmount');
+  } finally {
+    if (realWindow === undefined) delete global.window; else global.window = realWindow;
+    if (realLocation === undefined) delete global.location; else global.location = realLocation;
+  }
+}
 
 console.log(`UTILITY CALCULATORS PASSED (${expected.length} bilingual permanent journeys; Jyotish context bridge; 108 Drik-aligned English/Hindi pairs; F1-F7 + 2026-08-18 F2/F3/F8/F10 regressions)`);

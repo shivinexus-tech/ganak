@@ -29,6 +29,13 @@ import { BNNModule, BhriguModule } from "./JyotishBnnScreen";
 import { utilityHref } from "./UtilityCalculatorScreen";
 import { RectifyModule } from "./RectifyScreen";
 import { SIGNS, NAKSHATRAS, AYANAMSA, zoneOffset } from "../engine/panchang";
+
+/* The UTC offset AT THE BIRTH MOMENT. `zoneOffset` resolves a local wall clock, so a
+   birth on a daylight-saving transition day gets the offset that was actually in force
+   when it happened instead of the one the rest of that civil day happens to use. Falls
+   back to the day-level form only when the clock has not been typed yet. */
+const tzAtBirth = (zone: string, y: number, m: number, day: number, hh: number, mi: number) =>
+  (Number.isFinite(hh) ? zoneOffset(zone, y, m, day, hh, Number.isFinite(mi) ? mi : 0) : zoneOffset(zone, y, m, day));
 import { panchangTerm, signLabel, signShort, SIGN_SHORT_EN, padaText, planetName, planetShort } from "../i18n/panchang-terms";
 import LifeInterpretationCard from "../components/LifeInterpretationCard";
 import { buildLifeReading, SIGN_TRAITS } from "../data/life-interpretation";
@@ -220,9 +227,14 @@ export default function ChartScreen({ C, card, lang }) {
     setTzOverride("");
   };
 
-  // resolve the UTC offset automatically from the place's timezone on the birth date
+  // Resolve the UTC offset automatically from the place's timezone at the birth
+  // MOMENT — the date alone is not enough. On a daylight-saving transition day the
+  // offset changes partway through the day, so a birth before the change was shown
+  // (and computed) with the offset that only began afterwards. That is an hour of
+  // error: ~15° of ascendant, and a whole nakshatra pada.
   const [yy, mm2, dd2] = (form.date || "").split("-").map(Number);
-  const autoTz = place && place.zone && yy ? zoneOffset(place.zone, yy, mm2, dd2) : null;
+  const [hhA, miA] = (form.time || "").split(":").map(Number);
+  const autoTz = place && place.zone && yy ? tzAtBirth(place.zone, yy, mm2, dd2, hhA, miA) : null;
 
   const loadChart = (c) => {
     if (!c || !c.form || !c.place) return;
@@ -232,7 +244,7 @@ export default function ChartScreen({ C, card, lang }) {
     try {
       const [y, m, day] = (c.form.date || "").split("-").map(Number);
       const [hh, mi] = (c.form.time || "").split(":").map(Number);
-      const tz = c.tzOverride !== "" && c.tzOverride != null ? parseFloat(c.tzOverride) : zoneOffset(c.place.zone, y, m, day);
+      const tz = c.tzOverride !== "" && c.tzOverride != null ? parseFloat(c.tzOverride) : tzAtBirth(c.place.zone, y, m, day, hh, mi);
       setResult(computeKundli({ y, m, day, hh, mi, tz, lat: c.place.lat, lon: c.place.lon, ayanamsa: c.ayanamsa || "lahiri" }));
       setChartContext({ form: { ...c.form }, place: { ...c.place }, ayanamsa: c.ayanamsa || "lahiri" });
     } catch (e) { setErr(lang === "hi" ? "यह सहेजी हुई कुंडली नहीं खुल सकी — शायद यह ख़राब है। कोई और सहेजी कुंडली आज़माएँ या विवरण फिर से भरें।" : "This saved chart couldn't be loaded — it may be corrupted. Try another saved chart, or re-enter the details."); }
@@ -254,7 +266,7 @@ export default function ChartScreen({ C, card, lang }) {
       if (offline.length === 1) { effPlace = offline[0]; choosePlace(offline[0]); }
       else { setErr(lang === "hi" ? "जन्म स्थान लिखना शुरू करें और सुझावों में से चुनें।" : "Start typing the birth place and pick it from the suggestions."); return; }
     }
-    const tz = tzOverride !== "" ? parseFloat(tzOverride) : zoneOffset(effPlace.zone, y, m, day);
+    const tz = tzOverride !== "" ? parseFloat(tzOverride) : tzAtBirth(effPlace.zone, y, m, day, hh, mi);
     if (tz === null || isNaN(tz)) { setErr(lang === "hi" ? "इस स्थान का समय-क्षेत्र नहीं मिला — कृपया नीचे UTC ऑफ़सेट स्वयं भरें।" : "Couldn't resolve the timezone for this place — enter the UTC offset manually below."); return; }
     setCasting(true);
     setActivePanel("kundli");
@@ -279,7 +291,7 @@ export default function ChartScreen({ C, card, lang }) {
     if (c.ayanamsa === ayanamsa) return;
     const [y, m, day] = (c.form.date || "").split("-").map(Number);
     const [hh, mi] = (c.form.time || "").split(":").map(Number);
-    const tz = tzOverride !== "" ? parseFloat(tzOverride) : zoneOffset(c.place.zone, y, m, day);
+    const tz = tzOverride !== "" ? parseFloat(tzOverride) : tzAtBirth(c.place.zone, y, m, day, hh, mi);
     if (!y || isNaN(hh) || tz == null || isNaN(tz)) return;
     setResult(computeKundli({ y, m, day, hh, mi, tz, lat: c.place.lat, lon: c.place.lon, ayanamsa }));
     setChartContext({ ...c, ayanamsa });

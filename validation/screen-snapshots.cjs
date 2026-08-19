@@ -168,11 +168,17 @@ const realUseState = React.useState;
    button element is created by jsx()/jsxs(), never by React.createElement. */
 const jsxRuntime = require('react/jsx-runtime');
 const realJsx = { jsx: jsxRuntime.jsx, jsxs: jsxRuntime.jsxs };
-function renderCalc({ slug, lang, seed, press }) {
-  const store = []; let idx = 0; let captured = null;
+function renderCalc({ slug, lang, seed, press, birth }) {
+  const store = []; let idx = 0; let captured = null; let birthSeeded = false;
   React.useState = function patchedUseState(init) {
     const i = idx++;
-    if (!(i in store)) store[i] = typeof init === 'function' ? init() : init;
+    if (!(i in store)) {
+      let v = typeof init === 'function' ? init() : init;
+      // `birth` is the FIRST {date,time} state the screen declares. Seeding it is how
+      // the gate types a birth into the form before pressing Calculate.
+      if (birth && !birthSeeded && v && typeof v === 'object' && 'date' in v && 'time' in v) { birthSeeded = true; v = { ...birth }; }
+      store[i] = v;
+    }
     // The result state is the only one that starts as null; seeding it is exactly the
     // post-navigation state a route change leaves behind.
     if (seed !== undefined && store[i] === null && !store.seeded) { store.seeded = true; store[i] = seed; }
@@ -326,6 +332,48 @@ for (const lang of LANGS) {
   }
 }
 
+/* --- 3f. the birth CLOCK, not just the birth date, picks the timezone (F1) --- */
+/* The engine fix landed on 2026-08-18; the call sites did not, so for one more day
+   the screen still printed the noon-offset answer. This is the rendered half: type a
+   birth on a daylight-saving transition day, press Calculate, and read what a reader
+   would read. Sections 1-2 can never see this — they render initial state only.
+   Offsets below are the IANA rules for those dates, not values copied from the app. */
+const NY_PLACE = { ...PLACE, label: 'New York, United States', name: 'New York, United States', lat: 40.71, lon: -74.01, zone: 'America/New_York' };
+const DST_CASES = [
+  // 2024-03-10: DST began at 02:00, so 00:30 was still EST (−5). The noon-UTC offset
+  // was −4, which printed pada 1 / "Se" — one whole pada, i.e. a different name.
+  { slug: 'nakshatra', birth: { date: '2024-03-10', time: '00:30' }, place: NY_PLACE, expect: /Purva Bhadrapada, pada 2\b/, wrong: /pada 1\b/, offset: 'UTC−05:00', why: 'NY 2024-03-10 00:30 is EST −5 (DST starts at 02:00)' },
+  { slug: 'baby-name', birth: { date: '2024-03-10', time: '00:30' }, place: NY_PLACE, expect: /Suggested starting sound: So\b/, wrong: /sound: Se\b/, offset: 'UTC−05:00', why: 'the naming syllable follows the pada' },
+  // 1961-10-29: clocks went back at 02:00, so 00:30 was still EDT (−4). The noon-UTC
+  // offset was −5, which printed Leo instead of Cancer — a different ascendant.
+  { slug: 'lagna', birth: { date: '1961-10-29', time: '00:30' }, place: NY_PLACE, expect: /ascendant is Cancer\b/, wrong: /ascendant is Leo\b/, offset: 'UTC−04:00', why: 'NY 1961-10-29 00:30 is EDT −4 (DST ends at 02:00)' },
+];
+for (const c of DST_CASES) {
+  const text = safeRender(`${c.slug}.en (DST day)`, { slug: c.slug, lang: 'en', place: NY_PLACE, birth: c.birth, press: { props: { place: c.place } } });
+  if (text === null) continue;
+  const line = text.split('\n').find((l) => c.expect.test(l) || c.wrong.test(l)) || '(no answer line)';
+  if (!c.expect.test(text) || c.wrong.test(text)) {
+    console.error(`FAIL ${c.slug}.en (DST day): ${c.why}. The screen printed: ${line}`);
+    console.error('    The birth CLOCK must reach zoneOffset — zoneOffset(zone, y, m, day, hh, mi).');
+    failures++;
+  }
+  if (!text.includes(c.offset)) {
+    console.error(`FAIL ${c.slug}.en (DST day): the offset shown to the reader should be ${c.offset}.`);
+    failures++;
+  }
+}
+/* …and an Indian birth at the same clock is untouched. India has never used DST, so
+   wiring the clock through must be invisible to the audience this app is built for. */
+for (const lang of LANGS) {
+  const withClock = safeRender(`rashi.${lang} (India, 00:30)`, { slug: 'rashi', lang, birth: { date: '2024-03-10', time: '00:30' }, press: {} });
+  const noon = safeRender(`rashi.${lang} (India, 12:00)`, { slug: 'rashi', lang, birth: { date: '2024-03-10', time: '12:00' }, press: {} });
+  if (withClock === null || noon === null) continue;
+  if (!withClock.includes('UTC+05:30') || !noon.includes('UTC+05:30')) {
+    console.error(`FAIL rashi.${lang}: an Indian birth must be computed at UTC+05:30 whatever the clock says.`);
+    failures++;
+  }
+}
+
 const ss = { en: safeRender('sade-sati.en', { slug: 'sade-sati', lang: 'en', seed: tagged('sade-sati') }) || '',
              hi: safeRender('sade-sati.hi', { slug: 'sade-sati', lang: 'hi', seed: tagged('sade-sati') }) || '' };
 for (const raw of ['current', 'upcoming', 'past']) {
@@ -337,6 +385,117 @@ for (const raw of ['current', 'upcoming', 'past']) {
 if (!/चल रहा है|आने वाला|बीत चुका/.test(ss.hi)) {
   console.error('FAIL sade-sati.hi: the cycle status must be rendered in Hindi.');
   failures++;
+}
+
+/* --- 3g. answer-line copy that only exists AFTER Calculate (F12, F13, Sade Sati) --- */
+/* None of this is in a baseline: it renders only once a result exists, which is why
+   four separate copy defects sat in the most-read calculator pages unseen. */
+const ANS = {};
+for (const slug of SLUGS) for (const lang of LANGS) ANS[`${slug}.${lang}`] = safeRender(`${slug}.${lang} (copy)`, { slug, lang, seed: tagged(slug) }) || '';
+
+/* Hindi jyotish names a भाव with a Sanskrit ordinal (प्रथम, द्वितीय, तृतीय …), which is
+   what src/data/dosha-explainers.ts prints on the same page. "1वें"/"7वें" is a digit
+   with a Hindi suffix glued on — the page was speaking two dialects of its own subject. */
+for (const slug of SLUGS) {
+  const bad = ANS[`${slug}.hi`].split('\n').filter((l) => /[0-9]+वें/.test(l));
+  if (bad.length) {
+    console.error(`FAIL ${slug}.hi: digit-plus-suffix house ordinal instead of a Hindi ordinal:`);
+    bad.slice(0, 3).forEach((l) => console.error(`    ${l}`));
+    console.error('    A भाव is प्रथम / द्वितीय / तृतीय …, never "1वें".');
+    failures++;
+  }
+}
+/* Every Hindi answer sentence ends the way Hindi sentences end. Three of them ended
+   with a Latin full stop and no verb — "आपका जन्म-पक्षी: मोर." */
+for (const slug of ['nakshatra', 'pancha-pakshi', 'western-relationship', 'rashi', 'lagna', 'sun-sign']) {
+  const lines = ANS[`${slug}.hi`].split('\n');
+  const i = lines.findIndex((l) => /सीधा उत्तर/.test(l));
+  const line = i < 0 ? '' : (lines[i].replace(/^.*सीधा उत्तर/, '').trim() || lines[i + 1] || '');
+  if (line && !/।$/.test(line)) {
+    console.error(`FAIL ${slug}.hi: the answer sentence does not end in a danda: ${line}`);
+    console.error('    Hindi sentences close with ।, and read as sentences (…है।), not as a label plus a full stop.');
+    failures++;
+  }
+}
+/* "n/7 planets are enclosed" could never read below 4/7 — the Rahu–Ketu axis halves
+   the chart, so the larger half always holds at least four. A reader saw 4/7 and heard
+   "more than halfway to the yoga" when it is in fact the floor. */
+for (const lang of LANGS) {
+  const t = ANS[`kala-sarpa.${lang}`];
+  // Matches the COUNT being called "enclosed", not the word itself — the explainer
+  // legitimately speaks of "the enclosed planets" once the pattern is present.
+  if (/\d+\s*(?:\/\s*7|of the seven)[^.\n]*enclos|enclos[^.\n]*\d+\s*(?:\/\s*7|of the seven)/.test(t)
+      || /\d+[^.\n]*(?:fall inside|inside) the Rahu–Ketu arc/.test(t)
+      || /\d+\s*\/\s*7\s*ग्रह घिरे/.test(t) || /ग्रह राहु–केतु अर्धवृत्त के भीतर आते हैं/.test(t)) {
+    console.error(`FAIL kala-sarpa.${lang}: the count is described as "enclosed", which cannot fall below 4 of 7 and so reads as partial progress.`);
+    console.error('    Say what the number is: the largest group on one side of the axis.');
+    failures++;
+  }
+  if (!/largest group on one side|एक ओर सबसे बड़ा समूह/.test(t)) {
+    console.error(`FAIL kala-sarpa.${lang}: the answer must say the count is the largest group on one side of the Rahu–Ketu axis.`);
+    failures++;
+  }
+}
+/* The Sade Sati footnote described a defect that was fixed on 2026-08-18: retrograde
+   re-entries are merged into one passage, so phases no longer split into segments.
+   The sentence outlived the bug and became false. */
+for (const lang of LANGS) {
+  const t = ANS[`sade-sati.${lang}`];
+  if (/shows those segments separately|खंड अलग-अलग दिखाता है/.test(t)) {
+    console.error(`FAIL sade-sati.${lang}: the phase list still tells the reader Ganak splits a phase into separate retrograde segments. It does not — the returns are merged into one passage.`);
+    failures++;
+  }
+  // Scoped to the footnote's own words: SADE_SATI_METHOD_COPY further down the page
+  // already says "same passage", so a looser check would pass on a deleted footnote.
+  if (!/one continuous span|एक सतत अवधि/.test(t)) {
+    console.error(`FAIL sade-sati.${lang}: the phase list must say each phase is one continuous span, in the merged-passage wording src/data/sade-sati-report.ts already uses.`);
+    failures++;
+  }
+}
+
+/* --- 3h. a bad field is named, and a birth date is never silently corrected (F9) --- */
+/* 29 February 1990 was accepted and quietly became 1 March: Ganak changed someone's
+   birth date and then answered with confidence. One message — "Check the date, time
+   and place" — also covered four different controls, including a Check-date field it
+   did not mention at all. */
+const BAD_INPUTS = [
+  { what: '29 Feb in a non-leap year', birth: { date: '1990-02-29', time: '12:00' }, must: [/29 February 1990 is not a real date/, /will not move it/] },
+  { what: 'a year outside the ephemeris', birth: { date: '0999-06-21', time: '09:15' }, must: [/1800–2150/] },
+  { what: 'an impossible clock', birth: { date: '1990-06-21', time: '24:00' }, must: [/time of birth/, /23:59/] },
+];
+for (const c of BAD_INPUTS) {
+  const text = safeRender(`rashi.en (${c.what})`, { slug: 'rashi', lang: 'en', birth: c.birth, press: {} });
+  if (text === null) continue;
+  if (ANSWER_MARK.test(text)) {
+    console.error(`FAIL rashi.en (${c.what}): Ganak answered instead of saying what was wrong. Silent correction of a birth date is not acceptable.`);
+    failures++;
+  }
+  for (const re of c.must) {
+    if (!re.test(text)) {
+      console.error(`FAIL rashi.en (${c.what}): the message must match ${re} — it has to name the field and say why.`);
+      console.error(`    got: ${text.split('\n').filter((l) => /Enter|not a real|1800|23:59|calculat/i.test(l)).slice(0, 2).join(' | ') || '(no message)'}`);
+      failures++;
+    }
+  }
+}
+/* Hindi readers get the same named field, not an English message or a generic one. */
+for (const c of [{ what: '29 Feb in a non-leap year', birth: { date: '1990-02-29', time: '12:00' }, must: /जन्म तिथि/ },
+                 { what: 'an impossible clock', birth: { date: '1990-06-21', time: '24:00' }, must: /जन्म समय/ }]) {
+  const text = safeRender(`rashi.hi (${c.what})`, { slug: 'rashi', lang: 'hi', birth: c.birth, press: {} });
+  if (text === null) continue;
+  if (ANSWER_MARK.test(text) || !c.must.test(text)) {
+    console.error(`FAIL rashi.hi (${c.what}): the Hindi reader must get the same named-field message, not an answer.`);
+    failures++;
+  }
+}
+
+/* The Sade Sati check date is its own field and must be named as one. */
+{
+  const text = safeRender('sade-sati.en (blank check date)', { slug: 'sade-sati', lang: 'en', press: { props: {} }, birth: { date: '1990-01-01', time: '12:00' } });
+  if (text && !/check date/i.test(text) && !ANSWER_MARK.test(text)) {
+    console.error('FAIL sade-sati.en: a rejected calculation must name the check date field when that is the field at fault.');
+    failures++;
+  }
 }
 
 /* ------------------------------------------------- 4. content parity, not just language */

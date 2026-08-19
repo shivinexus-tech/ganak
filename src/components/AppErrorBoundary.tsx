@@ -24,6 +24,28 @@ export default class AppErrorBoundary extends React.Component {
     super(props);
     this.state = { error: null };
     this.retry = this.retry.bind(this);
+    this.onNavigate = this.onNavigate.bind(this);
+  }
+
+  /* A crash used to be permanent for the rest of the session. `error` was cleared
+     only by the Try again button, and this app navigates by pushState + popstate
+     (src/screens/UtilityCalculatorScreen.tsx followUtilityLink), so every later
+     route still rendered "Something went wrong" — and because the crashed screen's
+     effects never ran again, document.title, <link rel=canonical> and the meta
+     description stayed frozen on the page that crashed. Observed in the 2026-08-18
+     bug bash: nine consecutive navigations, all showing the crash screen, all
+     titled "Baby-name initials | Ganak". A route change is a new render tree, so
+     it is exactly the moment to try again. */
+  componentDidMount() {
+    try { window.addEventListener("popstate", this.onNavigate); } catch (e) { /* no window */ }
+  }
+
+  componentWillUnmount() {
+    try { window.removeEventListener("popstate", this.onNavigate); } catch (e) { /* no window */ }
+  }
+
+  onNavigate() {
+    if (this.state.error) this.setState({ error: null });
   }
 
   static getDerivedStateFromError(error) {
@@ -52,6 +74,11 @@ export default class AppErrorBoundary extends React.Component {
         : "The calculation stopped. Your birth details were not sent anywhere. Please try again.";
     const retryLbl = lang === "hi" ? "फिर से कोशिश करें" : "Try again";
     const reloadLbl = lang === "hi" ? "पृष्ठ फिर लोड करें" : "Reload page";
+    /* Without this a reader whose current page crashes has nowhere to go: Try again
+       re-renders the same broken route, Reload reloads it, and Back only redraws the
+       crash screen. A plain link to the panchang always leaves the app reachable. */
+    const homeLbl = lang === "hi" ? "गणक पंचांग पर जाएँ" : "Go to Ganak's panchang";
+    const homeHref = `/?lang=${lang}`;
 
     return (
       <div
@@ -116,6 +143,23 @@ export default class AppErrorBoundary extends React.Component {
           >
             {reloadLbl}
           </button>
+          <a
+            href={homeHref}
+            style={{
+              height: "2.625rem",
+              padding: "0 1.375rem",
+              borderRadius: "0.6875rem",
+              border: "0.0625rem solid var(--line)",
+              display: "inline-flex",
+              alignItems: "center",
+              fontFamily: "var(--font-display-family)",
+              fontSize: "var(--font-body)",
+              color: "var(--ink)",
+              textDecoration: "none",
+            }}
+          >
+            {homeLbl}
+          </a>
         </div>
       </div>
     );

@@ -10,8 +10,14 @@ import { rectSweep, mahaTimelineAt, runDashaAt, VIM_LORDS, rectAtMin } from "../
 function RectifyModule({ form, place, ayanamsa, C, card, lang = "en" }) {
   const hi = lang === "hi";
   const [y, m, day] = (form.date || "1995-08-15").split("-").map(Number);
-  const tz = (zoneOffset(place.zone, y, m, day)) ?? 5.5;
   const [hhB, miB] = (form.time || "06:30").split(":").map(Number);
+  // Rectification sweeps minutes around the recorded birth clock, so the offset must
+  // be the one in force at that clock. Resolving it at a fixed moment on the birth
+  // date put every transition-day birth on the wrong side of a daylight-saving change
+  // — an hour of error in the very screen whose job is minutes.
+  const tz = (Number.isFinite(hhB)
+    ? zoneOffset(place.zone, y, m, day, hhB, Number.isFinite(miB) ? miB : 0)
+    : zoneOffset(place.zone, y, m, day)) ?? 5.5;
   const centerMin = hhB * 60 + miB;
   const aya = ayanamsa || "lahiri";
   const [halfWin, setHalfWin] = useState(30);

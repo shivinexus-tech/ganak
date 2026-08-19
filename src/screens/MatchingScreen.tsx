@@ -77,8 +77,12 @@ function MatchMaker({ C, card, computeKundli, lang = "en" }) {
                 : `Choose a birth place from the suggestions for ${who} before matching — the typed name does not match the selected place yet.`);
       return;
     }
-    const btz = zoneOffset(bPlace.zone, by, bm, bd) ?? 5.5;
-    const gtz = zoneOffset(gPlace.zone, gy, gm, gd) ?? 5.5;
+    // The birth CLOCK decides the offset, not just the birth date: resolving at a
+    // fixed moment on the date takes the wrong side of a daylight-saving change, so
+    // a 00:30 birth on a spring-forward morning was matched an hour out — enough to
+    // move the Moon's pada, and with it the nakshatra kootas this whole screen scores.
+    const btz = zoneOffset(bPlace.zone, by, bm, bd, bhh, bmi || 0) ?? 5.5;
+    const gtz = zoneOffset(gPlace.zone, gy, gm, gd, ghh, gmi || 0) ?? 5.5;
     setRes(computeMatch(computeKundli,
       { y: by, m: bm, day: bd, hh: bhh, mi: bmi, tz: btz, lat: bPlace.lat, lon: bPlace.lon },
       { y: gy, m: gm, day: gd, hh: ghh, mi: gmi, tz: gtz, lat: gPlace.lat, lon: gPlace.lon }

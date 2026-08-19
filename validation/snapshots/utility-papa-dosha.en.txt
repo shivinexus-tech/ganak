@@ -2,8 +2,8 @@ JYOTISH WORKSPACE
 KundliCalculators
 ← All calculatorsPapa Dosha (malefic load)
 Malefic-load index from Lagna, Moon and Venus — used for Papasamyam.
-Date
-Time
+Date of birth
+Time of birth
 Place
 Calculate
 Method & limitsEach natural malefic (Sun, Mars, Saturn, Rahu, Ketu) in a 1/2/4/7/8/12 house from Lagna, Moon or Venus scores one papa point. It is a comparative load index — its real use is Papasamyam in matching — not a standalone verdict of harm.

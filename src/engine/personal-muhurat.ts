@@ -41,7 +41,10 @@ const SPECIAL_ORD: { [k: number]: string } = {
    the Moon's Bhinnashtakavarga (12 signs, always sums to 49), read from the full chart. */
 function natalAnchors(place: any, ayanamsa: any, birth: any) {
   setAyanMode(ayanamsa || "lahiri");
-  const tz = zoneOffset(place.zone, birth.y, birth.m, birth.day) ?? 5.5;
+  // Resolved at the birth CLOCK, not at a fixed moment on the birth date — on a
+  // daylight-saving transition day the two differ by an hour, which can move the
+  // birth Moon into the next nakshatra and re-cut every Tara Bala row below.
+  const tz = zoneOffset(place.zone, birth.y, birth.m, birth.day, birth.hh || 0, birth.mi || 0) ?? 5.5;
   const ms = Date.UTC(birth.y, birth.m - 1, birth.day, birth.hh || 0, birth.mi || 0) - tz * 3600000;
   const moonLon = moonSidMs(ms);
   const janmaNak = Math.floor(moonLon / _NW);
