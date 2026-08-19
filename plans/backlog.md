@@ -291,6 +291,21 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
   - [x] Dedicated Sarvartha Siddhi, Amrita Siddhi, Ravi Yoga, Ravi/Guru Pushya,
         Dwipushkar, Tripushkar and Ganda Moola calculations/calendars.
   - [x] Ritu/season, solstice/equinox and Vedic/Ghati clock.
+  - [ ] **P0 LIVE DEFECT — moonrise and moonset times land on the wrong day.**
+        About a quarter of reported moon events are attributed to the wrong panchang
+        day: **184 of 717 tested for Delhi across 2026** (92 moonrise, 92 moonset),
+        clustered in runs of roughly six consecutive days each month. Corroborated
+        against Drik on dates chosen because they fail — 3 Jan Ganak reports a
+        moonset on 4 Jan where Drik reports none; 4 Jan Ganak reports 08:55 on 5 Jan
+        where Drik reports 08:03 the same day — the same sequence shifted one day, so
+        Ganak is selecting the next occurrence rather than miscomputing a time. A
+        control date agrees within three minutes. The 2026-08-18 `moonEvents` rewrite
+        moved the error instead of removing it: the rise is bounded to the civil day
+        while the paired set is left unbounded, so it now overshoots where it used to
+        undershoot. **Live in production.** Finding, reference corroboration and a
+        reusable day-contract test: `plans/audits/claude-moon-day-window-finding-2026-08-19.md`.
+        The files sit on an active bug-bash lane — run the task-log pre-flight before
+        editing. _(P0-MOON-DAY-WINDOW; found 2026-08-19)_
   - [ ] **Direct date entry and better Panchang date picker.** The current calendar
         popup forces month-by-month navigation, which is painful when checking a
         far-future or past Panchang date. Add a direct typed date input plus a

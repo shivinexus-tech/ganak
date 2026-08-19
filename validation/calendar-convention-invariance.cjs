@@ -36,6 +36,19 @@ for(const [id,name] of Object.entries({canonical:'South & West Indian lunar (def
 const kamikaPanchang=computeTodayPanchang(CITIES[0],'lahiri',Date.UTC(2026,7,9,6,30));
 const kamikaCalendarLabel=calendarLabel('canonical',kamikaPanchang,kamikaPanchang.rise,'en',CITIES[0]);
 if(!kamikaCalendarLabel.includes('lunar day 11')||kamikaCalendarLabel.includes(' 25')) { console.error(`FAIL selected-day lunar ordinal: ${kamikaCalendarLabel}`); failures++; }
+for(const lang of ['en','hi']){
+  const era=lang==='hi'?'विक्रम संवत्':'Vikram Samvat';
+  for(const mode of ['canonical','north-purnimanta']){
+    const label=calendarLabel(mode,kamikaPanchang,kamikaPanchang.rise,lang,CITIES[0]);
+    if(!label.includes(`${era} ${kamikaPanchang.samvat.vikram.match(/^\d+/)[0]}`)){console.error(`FAIL ${mode}/${lang}: Vikram year missing from lunar date line: ${label}`);failures++;}
+  }
+  for(const mode of ['gregorian','tamil-solar','bengali-solar']){
+    const label=calendarLabel(mode,kamikaPanchang,kamikaPanchang.rise,lang,CITIES[0]);
+    if(label.includes(era)){console.error(`FAIL ${mode}/${lang}: Vikram year leaked into non-lunar date line: ${label}`);failures++;}
+  }
+}
+const missingEra={...kamikaPanchang,samvat:{...kamikaPanchang.samvat,vikram:undefined}};
+if(calendarLabel('canonical',missingEra,kamikaPanchang.rise,'en',CITIES[0]).includes('undefined ·')) { console.error('FAIL absent Vikram year rendered an empty value'); failures++; }
 for(const [mode,expected] of [['canonical','Ashadha'],['north-purnimanta','Shravana'],['gregorian',''],['tamil-solar','Aadi'],['bengali-solar','Shrabon']]){
   const got=calendarMonthLabel(mode,kamikaPanchang,kamikaPanchang.rise,'en',CITIES[0]);
   if(got!==expected){console.error(`FAIL Today-card month ${mode}: got ${got}, expected ${expected}`);failures++;}

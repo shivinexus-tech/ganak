@@ -152,7 +152,9 @@ export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: num
   if (id === "gregorian") return new Date(atMs+(panchang.tz||0)*3600000).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-IN", { day:"numeric", month:"long", year:"numeric", timeZone:"UTC" });
   const term=(kind:any,value:any)=>panchangTerm(lang,kind,value);
   const lunarDay=`${term("paksha",panchang.paksha)} · ${lang === "hi" ? "चंद्र दिवस" : "lunar day"} ${panchang.tithiDay}`;
-  if (id === "north-purnimanta") return lang === "hi" ? `पूर्णिमान्त · ${term("month",panchang.months.purnimanta)} · ${lunarDay}` : `Purnimanta · ${term("month",panchang.months.purnimanta)} · ${lunarDay}`;
+  const vikramYear=String(panchang.samvat?.vikram ?? "").trim().match(/^\d+/)?.[0];
+  const lunarEra=vikramYear ? `${lang === "hi" ? "विक्रम संवत्" : "Vikram Samvat"} ${vikramYear} · ` : "";
+  if (id === "north-purnimanta") return lang === "hi" ? `${lunarEra}पूर्णिमान्त · ${term("month",panchang.months.purnimanta)} · ${lunarDay}` : `${lunarEra}Purnimanta · ${term("month",panchang.months.purnimanta)} · ${lunarDay}`;
   if((id==="tamil-solar"||id==="bengali-solar"||id==="malayalam-solar")&&place){
     const d=regionalCalendarDate(id,panchang,atMs,place);
     const month=lang==="hi"?d.monthHi:d.monthEn;
@@ -174,12 +176,12 @@ export function calendarLabel(id: CalendarConventionId, panchang: any, atMs: num
   const monthsDiffer = purnMonth && purnMonth !== amantaMonth;
   if (lang === "hi") {
     return monthsDiffer
-      ? `${amantaMonth} (अमान्त) / ${purnMonth} (पूर्णिमान्त) · ${lunarDay}`
-      : `अमान्त · ${amantaMonth} · ${lunarDay}`;
+      ? `${lunarEra}${amantaMonth} (अमान्त) / ${purnMonth} (पूर्णिमान्त) · ${lunarDay}`
+      : `${lunarEra}अमान्त · ${amantaMonth} · ${lunarDay}`;
   }
   return monthsDiffer
-    ? `${amantaMonth} (Amanta) / ${purnMonth} (Purnimanta) · ${lunarDay}`
-    : `Amanta · ${amantaMonth} · ${lunarDay}`;
+    ? `${lunarEra}${amantaMonth} (Amanta) / ${purnMonth} (Purnimanta) · ${lunarDay}`
+    : `${lunarEra}Amanta · ${amantaMonth} · ${lunarDay}`;
 }
 
 /* Compact month text for prominent date cards. Unlike calendarLabel(), this
