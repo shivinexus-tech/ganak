@@ -13,6 +13,8 @@ export async function loadRegionalCalendarFlags():Promise<RegionalCalendarFlagRe
     if(!response.ok) return FALLBACK;
     const value=await response.json();
     if(typeof value?.tamilSolar!=="boolean"||typeof value?.bengaliSolar!=="boolean") return FALLBACK;
-    return {tamilSolar:value.tamilSolar,bengaliSolar:value.bengaliSolar,revision:String(value.revision||"runtime"),source:value.source==="kv"?"kv":"default"};
+    /* malayalamSolar is a DARK mode (2026-08-18): the edge endpoint does not emit it
+       yet, and an absent value must mean OFF, never "inherit the default". */
+    return {tamilSolar:value.tamilSolar,bengaliSolar:value.bengaliSolar,malayalamSolar:value.malayalamSolar===true,revision:String(value.revision||"runtime"),source:value.source==="kv"?"kv":"default"};
   }catch{return FALLBACK;}
 }
