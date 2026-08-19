@@ -18,8 +18,8 @@ export const SADE_SATI_PHASE_COPY = {
 };
 
 export const SADE_SATI_METHOD_COPY = {
-  en: "Ganak uses the standard sidereal rule: Sade Sati is active when Saturn transits the sign before the natal Moon, the Moon sign itself, or the sign after it. Dates are calculated with Ganak's Lahiri/mean-node panchang engine and shown as interpretive periods, not as fear-based predictions.",
-  hi: "गणक मानक निरयन नियम लेता है: जब शनि जन्म चन्द्र से पिछली राशि, जन्म चन्द्र राशि, या अगली राशि में गोचर करे तो साढ़ेसाती सक्रिय मानी जाती है। तिथियाँ गणक के लाहिरी/मीन-नोड पंचांग इंजन से निकाली जाती हैं और इन्हें भय-आधारित भविष्यवाणी नहीं, विवेचनात्मक अवधि माना गया है।",
+  en: "Ganak uses the standard sidereal rule: Sade Sati is active when Saturn transits the sign before the natal Moon, the Moon sign itself, or the sign after it. Saturn turns retrograde twice inside every Sade Sati and briefly steps back into the sign it just left; Ganak counts those returns as part of the same passage, so a cycle runs from Saturn's first entry into the sign before the natal Moon to its final departure from the sign after it — the span published Sade Sati tables use. Dates are calculated with Ganak's Lahiri/mean-node panchang engine and shown as interpretive periods, not as fear-based predictions.",
+  hi: "गणक मानक निरयन नियम लेता है: जब शनि जन्म चन्द्र से पिछली राशि, जन्म चन्द्र राशि, या अगली राशि में गोचर करे तो साढ़ेसाती सक्रिय मानी जाती है। हर साढ़ेसाती में शनि दो बार वक्री होकर थोड़े समय के लिए पिछली राशि में लौट आता है; गणक इन वापसियों को उसी एक गोचर का भाग मानता है, इसलिए चक्र शनि के जन्म चन्द्र से पिछली राशि में पहले प्रवेश से लेकर अगली राशि से अन्तिम निकास तक चलता है — यही अवधि प्रकाशित साढ़ेसाती तालिकाओं में दी जाती है। तिथियाँ गणक के लाहिरी/मीन-नोड पंचांग इंजन से निकाली जाती हैं और इन्हें भय-आधारित भविष्यवाणी नहीं, विवेचनात्मक अवधि माना गया है।",
 };
 
 export const SADE_SATI_GUIDANCE = {
