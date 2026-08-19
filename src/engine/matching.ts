@@ -4,7 +4,20 @@
 
 import { SIGN_LORD } from "./panchang";
 import { papasamyam } from "./doshas";
-import { planetName } from "../i18n/panchang-terms";
+import { planetName, signName } from "../i18n/panchang-terms";
+
+/* The calculation convention this whole screen rests on. Matching produces a
+   verdict about a marriage and used to name no convention at all — the closing
+   caveat said only "the same validated ephemeris as the rest of the app", which
+   stopped being a stable claim once the chart screen let a reader pick Raman
+   (bug bash 2026-08-18, F17). computeMatch now pins Lahiri explicitly instead of
+   inheriting a module default, and the screen prints this line in both languages,
+   the way /calculator/sade-sati already does. */
+const MATCH_CONVENTION = {
+  ayanamsa: "lahiri",
+  en: "Both charts are cast with Ganak's Lahiri ayanamsa and mean Rahu/Ketu, whatever ayanamsa is selected elsewhere in the app.",
+  hi: "दोनों कुंडलियाँ गणक के लाहिरी अयनांश तथा मध्यम राहु/केतु से बनाई जाती हैं — ऐप में अन्यत्र चुना गया अयनांश यहाँ लागू नहीं होता।",
+};
 
 const NF = {
   Sun: { F: ["Moon", "Mars", "Jupiter"], E: ["Venus", "Saturn"] },
@@ -88,7 +101,63 @@ function gunaMilan(boy, girl) {
       noteHi: pairHi(NADI_NAMES_HI[nB], NADI_NAMES_HI[nG]) },
   ];
   const total = k.reduce((s,x)=>s+x.got,0);
-  return { kootas:k, total, max:36, nadiDosha:k[7].got===0, bhakootDosha:k[6].got===0 };
+  const nadiDosha = k[7].got === 0, bhakootDosha = k[6].got === 0;
+  return { kootas:k, total, max:36, nadiDosha, bhakootDosha,
+    nadiExceptions: nadiExceptionsFor(boy, girl, nadiDosha),
+    bhakootExceptions: bhakootExceptionsFor(lB, lG, bhakootDosha) };
+}
+
+/* ---------------- classical exceptions to Nadi and Bhakoot (bug bash F11) ----------------
+   REPORTED, NEVER APPLIED. Ganak scored both doshas as a bare binary and the card
+   stated the result as fact, with no mention anywhere in the file that the classical
+   exceptions exist — the word "cancel" appeared once in the whole engine, on the
+   Manglik line. A reader was told "Present" about their own marriage without being
+   told that the tradition being quoted also carries the exception that may apply to
+   them.
+
+   This follows the precedent Ganak already set on /calculator/mangal-dosha, where
+   `mitigations` soften how a dosha is READ and never erase that it is present:
+   the exception is named, the reader is told traditions differ on whether it
+   cancels, and the points, the verdict band and the dosha flags are untouched.
+   Whether a cancelled dosha should stop capping the headline band is a religious
+   -accuracy call for the owner, recorded in
+   plans/audits/2026-08-18-matching-remainder-fix.md — not a ruling this file invents. */
+const NADI_EXCEPTION_COPY = {
+  sameRashiDifferentStar: {
+    en: "both Moons are in the same rashi but in different nakshatras",
+    hi: "दोनों की चन्द्र राशि एक है पर जन्म नक्षत्र अलग-अलग हैं",
+  },
+  sameStarDifferentRashi: {
+    en: "both share the nakshatra but their Moon rashis differ",
+    hi: "दोनों का जन्म नक्षत्र एक है पर चन्द्र राशियाँ अलग हैं",
+  },
+};
+const BHAKOOT_EXCEPTION_COPY = {
+  sameLord: {
+    en: "one and the same planet rules both Moon signs",
+    hi: "दोनों चन्द्र राशियों का स्वामी एक ही ग्रह है",
+  },
+  friendlyLords: {
+    en: "the two sign lords are mutual friends, so Graha Maitri stands at its full 5",
+    hi: "दोनों राशि-स्वामी परस्पर मित्र हैं, इसलिए ग्रह मैत्री पूरे 5 अंक पर है",
+  },
+};
+function nadiExceptionsFor(boy: any, girl: any, dosha: boolean) {
+  if (!dosha) return [];
+  const keys: string[] = [];
+  if (boy.rashi === girl.rashi && boy.nak !== girl.nak) keys.push("sameRashiDifferentStar");
+  if (boy.nak === girl.nak && boy.rashi !== girl.rashi) keys.push("sameStarDifferentRashi");
+  return keys.map((key) => ({ key, en: NADI_EXCEPTION_COPY[key].en, hi: NADI_EXCEPTION_COPY[key].hi }));
+}
+function bhakootExceptionsFor(lB: string, lG: string, dosha: boolean) {
+  if (!dosha) return [];
+  const keys: string[] = [];
+  /* Same lord and mutual friendship are the two published exceptions. "Graha Maitri
+     is full" is not a third: _maitri returns 5 for exactly these two cases, so
+     listing it separately would print the same fact twice. */
+  if (lB === lG) keys.push("sameLord");
+  else if (_gmRel(lB, lG) === "F" && _gmRel(lG, lB) === "F") keys.push("friendlyLords");
+  return keys.map((key) => ({ key, en: BHAKOOT_EXCEPTION_COPY[key].en, hi: BHAKOOT_EXCEPTION_COPY[key].hi }));
 }
 
 /* ---------------- Dashakoota (South-Indian, 10 kutas, 36 points) ----------------
@@ -108,35 +177,74 @@ const isVedha = (a: number, b: number) => VEDHA_PAIRS.some(([x, y]) => (a === x 
 const GANA_D = [[4, 4, 1], [3, 4, 0], [1, 0, 4]];
 const countStar = (from: number, to: number) => ((to - from + 27) % 27) + 1; // 1..27
 
+/* Every Dashakoota row carries the ACTUAL reading — the star count, the pair of
+   groups, the rule that fired — in both languages, exactly as the Ashtakoota table
+   does. It used to carry a generic sentence about what the kuta means, computed
+   notes that no surface ever rendered, and a separate English-only meaning map in
+   the screen (bug bash F23, and F10's Hindi half repeated here). A practitioner
+   reading "Dina 3 / 3" could not see the count it came from; now the count is on
+   the row, so the score can be checked against the rule instead of trusted. */
 function dashakoota(boy: any, girl: any) {
+  const cDina = countStar(girl.nak, boy.nak);
   const dinaFav = _taraFav(girl.nak, boy.nak);
   const cMah = countStar(girl.nak, boy.nak);
   const cStree = countStar(girl.nak, boy.nak);
   const rB = rajjuOf(boy.nak), rG = rajjuOf(girl.nak);
   const vedha = isVedha(boy.nak, girl.nak);
   const bhakootBad = [2, 5, 6, 8, 9, 12].includes(((girl.rashi - boy.rashi + 12) % 12) + 1);
+  const gB = NAK_GANA[boy.nak], gG = NAK_GANA[girl.nak];
+  const yB = NAK_YONI[boy.nak], yG = NAK_YONI[girl.nak];
+  const lB = SIGN_LORD[boy.rashi], lG = SIGN_LORD[girl.rashi];
+  const wB = SIGN_VASHYA[boy.rashi], wG = SIGN_VASHYA[girl.rashi];
+  const mahFav = [4, 7, 10, 13, 16, 19, 22, 25].includes(cMah);
+  const cnt = (n: number) => `${n}`;
   const k = [
-    { name: "Dina", got: dinaFav ? 3 : 0, max: 3, note: "day-to-day harmony & fortune" },
-    { name: "Gana", got: GANA_D[NAK_GANA[boy.nak]][NAK_GANA[girl.nak]], max: 4,
-      note: GANA_NAMES[NAK_GANA[boy.nak]] + " / " + GANA_NAMES[NAK_GANA[girl.nak]] },
-    { name: "Mahendra", got: [4, 7, 10, 13, 16, 19, 22, 25].includes(cMah) ? 2 : 0, max: 2, note: "wellbeing & progeny support" },
-    { name: "Stree Deergha", got: cStree > 13 ? 2 : 0, max: 2, note: "protection & longevity for the wife" },
-    { name: "Yoni", got: YONI_MATRIX[NAK_YONI[boy.nak]][NAK_YONI[girl.nak]], max: 4,
-      note: YONI_NAMES[NAK_YONI[boy.nak]] + " / " + YONI_NAMES[NAK_YONI[girl.nak]] },
-    { name: "Rasi", got: bhakootBad ? 0 : 7, max: 7, note: "emotional & prosperity axis (Bhakoot)" },
-    { name: "Rasyadhipati", got: _maitri(SIGN_LORD[boy.rashi], SIGN_LORD[girl.rashi]), max: 5,
-      note: SIGN_LORD[boy.rashi] + " / " + SIGN_LORD[girl.rashi] + " — sign-lord friendship" },
-    { name: "Vashya", got: SIGN_VASHYA[boy.rashi] === SIGN_VASHYA[girl.rashi] ? 2 : VASHYA_MATRIX[SIGN_VASHYA[boy.rashi]][SIGN_VASHYA[girl.rashi]], max: 2,
-      note: "mutual attraction & control" },
-    { name: "Rajju", got: rB === rG ? 0 : 5, max: 5, note: rB === rG ? "same " + RAJJU_NAMES[rB] + " rajju — dosha" : RAJJU_NAMES[rB] + " / " + RAJJU_NAMES[rG] },
-    { name: "Vedha", got: vedha ? 0 : 2, max: 2, note: vedha ? "vedha (obstruction) star pair" : "no obstruction" },
+    { name: "Dina", got: dinaFav ? 3 : 0, max: 3,
+      note: `star count ${cnt(cDina)} from the bride's star — remainder ${cDina % 9} of 9, ${dinaFav ? "even, so favourable" : "odd, so not favourable"}`,
+      noteHi: `कन्या के नक्षत्र से गणना ${cnt(cDina)} — नौ का शेष ${cDina % 9}, ${dinaFav ? "सम होने से अनुकूल" : "विषम होने से अनुकूल नहीं"}` },
+    { name: "Gana", got: GANA_D[gB][gG], max: 4,
+      note: pairEn(GANA_NAMES[gB], GANA_NAMES[gG]),
+      noteHi: pairHi(GANA_NAMES_HI[gB], GANA_NAMES_HI[gG]) },
+    { name: "Mahendra", got: mahFav ? 2 : 0, max: 2,
+      note: `star count ${cnt(cMah)} — ${mahFav ? "a Mahendra count (4, 7, 10, 13, 16, 19, 22, 25)" : "not one of the Mahendra counts (4, 7, 10, 13, 16, 19, 22, 25)"}`,
+      noteHi: `नक्षत्र गणना ${cnt(cMah)} — ${mahFav ? "महेन्द्र गणना (4, 7, 10, 13, 16, 19, 22, 25) में है" : "महेन्द्र गणना (4, 7, 10, 13, 16, 19, 22, 25) में नहीं है"}` },
+    { name: "Stree Deergha", got: cStree > 13 ? 2 : 0, max: 2,
+      note: `star count ${cnt(cStree)} — ${cStree > 13 ? "above 13, so full marks" : "13 or below, so no marks under the rule Ganak applies"}`,
+      noteHi: `नक्षत्र गणना ${cnt(cStree)} — ${cStree > 13 ? "13 से अधिक, इसलिए पूरे अंक" : "13 या उससे कम, इसलिए गणक के लागू नियम से अंक नहीं"}` },
+    { name: "Yoni", got: YONI_MATRIX[yB][yG], max: 4,
+      note: pairEn(YONI_NAMES[yB], YONI_NAMES[yG]),
+      noteHi: pairHi(YONI_NAMES_HI[yB], YONI_NAMES_HI[yG]) },
+    { name: "Rasi", got: bhakootBad ? 0 : 7, max: 7,
+      note: `${pairEn(signName("en", boy.rashi), signName("en", girl.rashi))} — ${bhakootBad ? "a 2/12, 5/9 or 6/8 axis" : "not a 2/12, 5/9 or 6/8 axis"}`,
+      noteHi: `${pairHi(signName("hi", boy.rashi), signName("hi", girl.rashi))} — ${bhakootBad ? "2/12, 5/9 या 6/8 अक्ष" : "2/12, 5/9 या 6/8 अक्ष नहीं"}` },
+    { name: "Rasyadhipati", got: _maitri(lB, lG), max: 5,
+      note: pairEn(lB, lG), noteHi: pairHi(lordHi(lB), lordHi(lG)) },
+    { name: "Vashya", got: wB === wG ? 2 : VASHYA_MATRIX[wB][wG], max: 2,
+      note: pairEn(VASHYA_NAMES[wB], VASHYA_NAMES[wG]),
+      noteHi: pairHi(VASHYA_NAMES_HI[wB], VASHYA_NAMES_HI[wG]) },
+    { name: "Rajju", got: rB === rG ? 0 : 5, max: 5,
+      note: rB === rG ? `both in the ${RAJJU_NAMES[rB]} rajju` : pairEn(RAJJU_NAMES[rB], RAJJU_NAMES[rG]),
+      noteHi: rB === rG ? `दोनों ${RAJJU_NAMES_HI[rB]} रज्जु में` : pairHi(RAJJU_NAMES_HI[rB], RAJJU_NAMES_HI[rG]) },
+    { name: "Vedha", got: vedha ? 0 : 2, max: 2,
+      note: vedha ? "the two birth stars are a vedha (obstruction) pair" : "the two birth stars are not a vedha pair",
+      noteHi: vedha ? "दोनों जन्म नक्षत्र परस्पर वेध करते हैं" : "दोनों जन्म नक्षत्रों में वेध नहीं है" },
   ];
   const total = k.reduce((s, x) => s + x.got, 0);
+  /* The Dashakoota system's OWN band. Deliberately not rendered: the screen shows a
+     single verdict computed from both systems together (matchVerdict below), and
+     printing this one beside it is the F3 defect. Kept as engine output because the
+     gate pins it and a caller may legitimately want the per-system reading. */
   const verdict = total < 18 ? "poor" : total <= 22 ? "moderate" : total <= 25 ? "good" : total <= 28 ? "very-good" : "excellent";
   return {
     kootas: k, total, max: 36, verdict,
     rajjuDosha: rB === rG, rajjuGroup: rB === rG ? RAJJU_NAMES[rB] : null, rajjuGroupHi: rB === rG ? RAJJU_NAMES_HI[rB] : null,
     vedhaDosha: vedha,
+    /* The raw counts the three count-based kutas were scored from, so a gate — and
+       a practitioner — can check the score against the rule rather than trust it.
+       The tier granularity itself (Stree Deergha is graded 0/1/2 in some published
+       tables, Dina in more than two steps) is a source-variation question recorded
+       for the owner, not changed here. */
+    counts: { dina: cDina, mahendra: cMah, streeDeergha: cStree },
   };
 }
 
@@ -148,8 +256,15 @@ function dashakoota(boy: any, girl: any) {
    Lagna alone, so the two screens gave a couple opposite answers about the same
    birth record (bug bash 2026-08-18, F1). The convention below is a copy of the
    calculator's, not a new one — validation/doshas.cjs now sweeps real charts and
-   fails if the two ever disagree again. */
-const MANGAL_TRADITION_EXCEPTIONS = { 2: [2, 5], 4: [0, 7], 7: [3, 9], 8: [8, 11], 12: [1, 6] };
+   fails if the two ever disagree again.
+
+   The two tables below mirror mangal-dosha.ts exactly, including the 1st-house
+   exception row and Jupiter's three FULL aspects (5th, 7th and 9th), both restored
+   on 2026-08-18 (bug bash F19). validation/mangal-dosha.cjs compares the two copies
+   directly, and validation/doshas.cjs sweeps real charts for the same agreement, so
+   they cannot drift apart again. */
+const MANGAL_TRADITION_EXCEPTIONS = { 1: [0, 7], 2: [2, 5], 4: [0, 7], 7: [3, 9], 8: [8, 11], 12: [1, 6] };
+const MANGAL_JUPITER_FULL_ASPECTS = [5, 7, 9];
 const MANGLIK_REF_LABELS = {
   lagna: { en: "Lagna", hi: "लग्न" },
   moon: { en: "Moon", hi: planetName("hi", "Moon") },
@@ -171,7 +286,7 @@ function manglikProfile(c: any) {
     const counted = MANGLIK_HOUSES.includes(house);
     const mitigations: string[] = [];
     if (counted && [0, 7, 9].includes(mars.sign)) mitigations.push("ownOrExalted");
-    if (counted && (jupiter.sign === mars.sign || houseFrom(jupiter.sign, mars.sign) === 7)) mitigations.push("jupiterSupport");
+    if (counted && (jupiter.sign === mars.sign || MANGAL_JUPITER_FULL_ASPECTS.includes(houseFrom(jupiter.sign, mars.sign)))) mitigations.push("jupiterSupport");
     if (counted && MANGAL_TRADITION_EXCEPTIONS[house]?.includes(mars.sign)) mitigations.push("traditionSpecific");
     return { ...ref, labelEn: MANGLIK_REF_LABELS[ref.key].en, labelHi: MANGLIK_REF_LABELS[ref.key].hi, house, counted, mitigations };
   });
@@ -244,7 +359,16 @@ function matchVerdict(gm: any, dasha: any, manglik: any) {
 
 /** Build a match report using an injected kundli engine (usually shell computeKundli). */
 export function computeMatch(computeKundli, boyDetails, girlDetails) {
-  const cb = computeKundli(boyDetails), cg = computeKundli(girlDetails);
+  /* Ayanamsa is pinned here, not inherited. `AYAN_MODE` in panchang.ts is module-
+     global mutable state that the chart screen's ayanamsa chips write to, and
+     matching used to pass birth details with no `ayanamsa` key at all — so the
+     couple's charts were cast on whatever convention the last caster happened to
+     leave behind, while the screen claimed "the same validated ephemeris as the
+     rest of the app" (bug bash F8/F17). Every calculator that answers about a
+     dosha already pins Lahiri the same way (mangal-dosha.ts, sade-sati-report.ts).
+     A caller may still override deliberately; what it can no longer do is drift. */
+  const withConvention = (d: any) => ({ ayanamsa: MATCH_CONVENTION.ayanamsa, ...d });
+  const cb = computeKundli(withConvention(boyDetails)), cg = computeKundli(withConvention(girlDetails));
   const ex = (c) => { const mars=c.rows.find(p=>p.name==="Mars"); const mp = manglikProfile(c);
     return { nak:c.moon.nak, rashi:c.moon.sign, lord:SIGN_LORD[c.moon.sign], marsSign:mars.sign,
       marsHouseLagna:mp.marsHouseLagna, marsHouseMoon:mp.marsHouseMoon, marsHouseVenus:mp.marsHouseVenus,
@@ -268,7 +392,9 @@ export function computeMatch(computeKundli, boyDetails, girlDetails) {
   const papa = papasamyam(cb, cg);
   const dasha = dashakoota(boy, girl);
   const verdict = matchVerdict(gm, dasha, manglik);
-  return { boy, girl, ...gm, manglik, papa, dasha, verdict, charts:{ boy:cb, girl:cg } };
+  return { boy, girl, ...gm, manglik, papa, dasha, verdict, convention: MATCH_CONVENTION, charts:{ boy:cb, girl:cg } };
 }
 
-export { gunaMilan, dashakoota, manglikProfile, matchVerdict, NF, MANGLIK_HOUSES, VERDICT_COPY, BLOCK_COPY, VERDICT_ORDER };
+export { gunaMilan, dashakoota, manglikProfile, matchVerdict, NF, MANGLIK_HOUSES, VERDICT_COPY, BLOCK_COPY, VERDICT_ORDER,
+  MATCH_CONVENTION, NADI_EXCEPTION_COPY, BHAKOOT_EXCEPTION_COPY,
+  MANGAL_TRADITION_EXCEPTIONS, MANGAL_JUPITER_FULL_ASPECTS };

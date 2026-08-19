@@ -26,6 +26,8 @@
    app speaks with one voice. Screens supply the FIELD NAME (`Bi`) — which is how
    a two-person screen says whose birth detail is at fault. */
 
+import { zoneOffset } from "../engine/panchang";
+
 export type Bi = { en: string; hi: string };
 
 /* Not a round number chosen for looks: the span over which src/engine/ephemeris.ts
@@ -81,4 +83,57 @@ export function fieldMessage(p: Bi, hi: boolean): string {
    order instead of being sent back and forth. */
 export function birthProblem(date: string, time: string, fDate: Bi, fTime: Bi): Bi | null {
   return dateProblem(date, fDate) || timeProblem(time, fTime);
+}
+
+/* ---------------------------------------------------------------- birth TIMEZONE
+   The fourth birth input, and the only one that had no guard at all on the
+   matching screen: `zoneOffset(place.zone, ...) ?? 5.5` (bug bash 2026-08-18, F6).
+   Two ways a real reader reaches that fallback:
+
+     · the online geocoder returns a place with no timezone — src/data/places.ts
+       maps it to `zone: null` — so a Kundali match for a New York birth was
+       computed on Indian Standard Time, silently, and the PDF said nothing;
+     · a place object with no `zone` key at all. This one is worse than IST:
+       `Intl.DateTimeFormat` reads `timeZone: undefined` as "not supplied" and
+       answers with the READER'S OWN device zone, so the same two birth records
+       would score differently on a phone in Delhi and a laptop in California.
+
+   AGENTS.md: silent failure is unacceptable, and a wrong offset is a wrong chart —
+   it moves the Moon's pada, and the pada is what every nakshatra koota is scored
+   from. So resolution is either a number or a refusal, never a default.
+
+   The BIRTH CLOCK, not just the birth date, picks the side of a daylight-saving
+   transition; `zoneOffset` is hour-aware, so it is handed the clock the reader
+   typed. src/screens/UtilityCalculatorScreen.tsx still carries its own private
+   copy of this (`resolveZone`); adopting this one is a one-line follow-up recorded
+   in plans/audits/2026-08-18-matching-remainder-fix.md. */
+export function resolveBirthZone(place: any, date: string, time: string): number | null {
+  const [y, m, d] = String(date ?? "").split("-").map(Number);
+  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return null;
+  const [hh, mi] = String(time ?? "").split(":").map(Number);
+  const zone = typeof place?.zone === "string" ? place.zone.trim() : "";
+  if (!zone) return null;
+  const off = Number.isFinite(hh) && Number.isFinite(mi)
+    ? zoneOffset(zone, y, m, d, hh, mi)
+    : zoneOffset(zone, y, m, d);
+  return typeof off === "number" && Number.isFinite(off) ? off : null;
+}
+
+/* The message shown when resolution refuses. `whose` lets a two-person screen say
+   which of the two places is at fault, the way its date and time messages already do. */
+export function zoneMessage(place: any, hi: boolean, whose?: Bi): string {
+  const named = place?.label ? String(place.label) : (hi ? "इस स्थान" : "this place");
+  const zone = place?.zone ? String(place.zone) : "\u2014";
+  const owner = whose ? (hi ? `${whose.hi} — ` : `${whose.en} — `) : "";
+  return hi
+    ? `${owner}${named} का समय-क्षेत्र (${zone}) गणक पहचान नहीं सका, इसलिए कुछ भी गणना नहीं की गई — गलत समय-क्षेत्र से कुंडली गलत बनती है। कृपया यह स्थान सुझावों में से फिर चुनें।`
+    : `${owner}Ganak could not recognise the timezone of ${named} (${zone}), so nothing was calculated — a wrong timezone gives a wrong chart. Please pick that place again from the suggestions.`;
+}
+
+/* The offset actually used, so the reader can see which clock the answer was built
+   on. Same shape the calculator screen prints. */
+export function offsetLabel(tz: number): string {
+  const sign = tz < 0 ? "\u2212" : "+";
+  const a = Math.abs(tz), h = Math.floor(a), mi = Math.round((a - h) * 60);
+  return `UTC${sign}${String(h).padStart(2, "0")}:${String(mi).padStart(2, "0")}`;
 }
