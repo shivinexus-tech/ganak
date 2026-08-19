@@ -108,4 +108,44 @@ assert(screenSource.match(/utilityHref\("\/calculators\/",lang,place\)/g)?.lengt
 assert(screenSource.includes('params.set("city",String(place.label))')&&screenSource.includes('params.set("zone",String(place.zone))'), 'calculator journey URLs must carry the selected city and timezone');
 assert((screenSource.match(/onClick=\{followUtilityLink\}/g)||[]).length>=5&&screenSource.includes('window.dispatchEvent(new PopStateEvent("popstate"))'), 'calculator-internal links must navigate without reloading and re-asking an accepted linked-city choice');
 
-console.log(`UTILITY CALCULATORS PASSED (${expected.length} bilingual permanent journeys; Jyotish context bridge; 108 Drik-aligned English/Hindi pairs; F1-F7 regressions)`);
+/* ---- 2026-08-18 bug-bash fixes (F2, F3, F8, F10) ---- */
+
+// Negative assertions read the CODE, not the comments: the comments deliberately
+// quote the defect they replaced (`?? 5.5`), and a comment must never fail a gate.
+const screenCode = screenSource.split('\n').map((l) => l.replace(/^\s*\/\/.*$/, '')).join('\n');
+
+// F10 — the not-found guard was case-sensitive and assumed a single leading slash,
+// so "/Calculator/rashi" and "//calculator/rashi" fell through to null and the DAILY
+// screen rendered under a calculator address. A wrong-case namespace must land on the
+// not-found page, and must NOT be quietly resolved to a calculator nobody typed.
+for (const p of ['/Calculator/rashi','//calculator/rashi','//calculators','/CALCULATORS/','/Calculators/rashi','///calculator/rashi'])
+  assert.strictEqual(data.utilityFromPath(p)?.kind, 'notfound', `wrong-case or double-slashed calculator URL must be not-found: ${p}`);
+// …while the real routes and the non-calculator routes are untouched.
+assert.strictEqual(data.utilityFromPath('/calculator/rashi')?.calculator?.slug, 'rashi', 'the canonical calculator route must still resolve');
+assert.strictEqual(data.utilityFromPath('/calculators')?.kind, 'catalogue', 'the catalogue route must still resolve');
+for (const p of ['/','/festival/diwali','/prashna','/calendar/2026']) assert.strictEqual(data.utilityFromPath(p), null, `non-calculator path must stay null: ${p}`);
+
+// F2 — the stale-answer guard must be a RENDER-TIME invariant, not an effect. An
+// effect runs after the render that already handed the previous calculator's result
+// to the new calculator's renderer. The rendered proof is in screen-snapshots.cjs
+// (728 mismatched-result renders); these guard the shape it depends on.
+assert(screenSource.includes('setResult({slug:item.slug,data:r'), 'a result must record the calculator it was computed for');
+assert(screenSource.includes('const shown = result && item && result.slug===item.slug ? result : null;'), 'the answer must be gated on result.slug === the route slug at render time');
+assert(!/\{result&&/.test(screenCode), 'no renderer may read the raw result state — render through the slug-matched value');
+assert(!/const q=result/.test(screenCode), 'answer/detail/report must read the slug-matched result, never the raw state');
+
+// F3 — a malformed zone in a shared or hand-edited URL must fail visibly instead of
+// silently computing the chart in Indian Standard Time (a New York birth came back
+// two signs away, with no message anywhere).
+assert(!screenCode.includes('?? 5.5') && !screenCode.includes('??5.5'), 'the IST fallback for an unresolvable timezone must not come back');
+assert(screenSource.includes('if(tzA===null){setResult(null);setError(zoneError(hi,place));return;}'), 'an unusable timezone must block the calculation with a visible error');
+assert(/zoneError=\(hi:boolean,place:any\)=>hi/.test(screenSource), 'the timezone error must be bilingual');
+assert(screenSource.includes('typeof place?.zone==="string"'), 'a non-string zone must be rejected before Intl, which would otherwise answer with the READER\'s own timezone');
+assert(screenSource.includes('offsetLabel(shown.tz)'), 'the screen must show which UTC offset the answer was computed on');
+
+// F8 — up to six seconds of blocking compute must show a busy state; the owner's
+// standing rule is that a user can always tell what the app is doing.
+assert(screenSource.includes('setBusy(true)') && screenSource.includes('disabled={busy}') && screenSource.includes('aria-busy={busy}'), 'Calculate must show a busy state while it computes');
+assert(screenSource.includes('window.setTimeout(run,0)'), 'the blocking computation must yield to a paint first, or the busy state never appears');
+
+console.log(`UTILITY CALCULATORS PASSED (${expected.length} bilingual permanent journeys; Jyotish context bridge; 108 Drik-aligned English/Hindi pairs; F1-F7 + 2026-08-18 F2/F3/F8/F10 regressions)`);
