@@ -248,20 +248,24 @@ node/screenshot evidence. A candidate, wrapper or comparison board remains
 source at the same viewport/state. A GLOBAL or PATTERN item cannot close after one
 screen is fixed; every existing affected candidate must be swept.
 
-### Smallest owner-approval batch — owner directive 2026-08-19
+### Owner-review Batch 01 — owner directive 2026-08-19, expanded cadence
 
-The next owner-facing website batch is deliberately limited to two visual-direction
-decisions: Today/Panchang desktop EN and Festival/Vrat detail desktop EN. Each has a
-390px EN companion only to prove responsive mobile-web reflow; the 390px frame is not
-a second design direction and is not Ganak Phone/native work. Hindi and 320px frames
-also remain mandatory attached QA evidence, but none are additional visual decisions
-for the owner. Only exact-node independent-QA `PASS` candidates may enter an
-integrator-owned owner-review surface. Batch 01 section `769:17254` previously
-passed an earlier P0 re-QA, but that PASS was withdrawn after the exact screenshot-
-crop correction in §4.2. It remains `CHANGES REQUESTED · RE-QA PENDING` until all
-twelve exact desktop primaries pass `GDF-012`, `GDF-062` and `GDF-063`. Former
-baseline `652:13736` also remains `CHANGES REQUESTED` historical evidence and is not
-review authority.
+The owner-review cadence was expanded to one balanced twelve-screen checkpoint:
+four Today/Panchang, four Festivals/Vrat and four Muhurat/Prashna desktop-English
+primaries. Responsive 390/320 and Hindi frames remain attached QA evidence, not
+additional owner-choice screens; responsive website proof is never Ganak Phone/native
+work. Only exact-node independent-QA `PASS` candidates may enter an integrator-owned
+owner-review surface. Batch 01 section `769:17254` is now
+`OWNER REVIEW · BATCH 01 · 12-SCREEN QUALITY CHECKPOINT`. On 2026-08-20 the
+permanent ornament/surface reviewer and independent exact-node QA both passed all
+twelve desktop-English primaries after the targeted contrast and composition
+corrections. The final audit found zero denied dominant surfaces, zero active
+`REJ-016` hash/name reuse, zero active `REJ-017` exact-crop reuse, zero sub-12px
+visible text, zero overflow, zero reviewer prose and zero Phone/native lineage.
+This is a desktop visual-direction and screenshot-visible accessibility gate only;
+production routes, keyboard/focus behavior, responsive reflow and assistive-
+technology semantics remain separately gated. Former baseline `652:13736` remains
+`CHANGES REQUESTED` historical evidence and is not review authority.
 
 The responsive shared system above was created before lane resumption. Its linked
 EN/HI 390px proof has no text below 13px, no mapped target below 42px, no missing
