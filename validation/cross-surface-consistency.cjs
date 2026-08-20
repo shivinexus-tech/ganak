@@ -693,13 +693,20 @@ const src = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
       }
     }
     COVERAGE.push(`§7  ${listed} windows rendered under the "Rahu, Gulika and Yamaganda are excluded" note, checked against those three belts`);
+    /* RESOLVED 2026-08-19, the same day it was pinned — and the pin is what caught it.
+       This lane measured 630 violating windows and pinned them; a concurrent lane
+       fixed the cause in the engine (the panchaka-rahita branch now goes through the
+       same belt subtraction the choghadiya branch always did). On the merged tree the
+       measurement fell to 0 and this gate refused to stay green over a stale pin —
+       exactly what a pin is for. Kept as an assertion at 0 rather than deleted: the
+       claim printed under those windows is only true while this stays 0. */
     pin({
       id: 'XS-EXCLUSION-CLAIM',
       section: '§7 claims',
-      title: 'the screen says Rahu, Gulika and Yamaganda are excluded from these windows, and for six activities they are not',
-      expect: 630,
+      title: 'every window rendered under the "Rahu, Gulika and Yamaganda are excluded" note is genuinely clear of all three belts',
+      expect: 0,
       measure: violating,
-      resolve: 'run the panchaka-rahita branch of src/engine/muhurat.ts activityWindows (424-429) through the same belt subtraction cleanChoghadiyaWindows already applies at 417-419 — or stop printing the exclusion note over windows that were never filtered. Then re-measure and delete this pin',
+      resolve: 'this is now an invariant, not a known defect — if it is above 0 the screen is printing a promise the engine no longer keeps',
       evidence: rows.concat([
         `${violating} of ${listed} windows rendered under that note overlap a belt`,
         'The seven choghadiya-driven activities (travel, business, venture, document, property, vehicle, purchase) are clean;',
