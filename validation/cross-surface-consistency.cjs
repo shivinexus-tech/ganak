@@ -935,6 +935,63 @@ const RENDERED = (() => {
 }
 
 // ===========================================================================
+// §11  HIGH LATITUDE: TWO SURFACES, TWO HOUSE RINGS — BOTH MUST SAY SO
+//      Above roughly 66° Placidus is undefined, and Ganak's two chart surfaces
+//      fall back differently: the Jyotish chart's KP panel switches to
+//      PORPHYRY (src/engine/kundli.ts:205) and Prashna switches to EQUAL
+//      (src/screens/PrashnaScreen.tsx:289). One moment at Tromso therefore has
+//      two different sets of cusps on two screens — "Reykjavik gets two
+//      different house systems on two screens, 19 degrees apart".
+//
+//      This lane does NOT rule on which fallback is right: KP horary has its
+//      own doctrine and validation/prashna-high-latitude.cjs owns that question.
+//      What is assertable, and what protects the reader, is that EACH surface
+//      names the ring it used, in BOTH languages — the same standard §3 holds
+//      the dosha panel to. A silent fallback is how this became a defect.
+// ===========================================================================
+{
+  const chartSrc = src('src/screens/ChartScreen.tsx');
+  const prashnaSrc = src('src/screens/PrashnaScreen.tsx');
+  const disclosures = [
+    ['the Jyotish chart KP panel must print the house system it used',
+      /kpData\.houseSystem/.test(chartSrc), 'src/screens/ChartScreen.tsx'],
+    ['computeKundli must publish which ring it fell back to',
+      /Porphyry \(Placidus undefined at this latitude\)/.test(src('src/engine/kundli.ts')), 'src/engine/kundli.ts'],
+    ['Prashna must name its ring in English',
+      /Equal houses — high-latitude fallback/.test(prashnaSrc), 'src/screens/PrashnaScreen.tsx'],
+    ['Prashna must name its ring in Hindi',
+      /समान भाव — उच्च अक्षांश विकल्प/.test(prashnaSrc), 'src/screens/PrashnaScreen.tsx'],
+  ];
+  for (const [what, present, where] of disclosures) {
+    if (!present) {
+      disagree('§11 high latitude', 'a high-latitude house-system fallback stopped disclosing itself', [
+        what, `expected in ${where}`,
+        'Above ~66° the two chart surfaces use different rings. Silently is how that became a defect.',
+      ]);
+    } else ok();
+  }
+
+  /* And the fallback must actually engage where it is claimed to. Measured
+     through computeKundli itself, not re-derived. */
+  const latRows = [];
+  for (const [name, lat, lon, wantFallback] of [
+    ['Delhi', 28.6139, 77.2090, false],
+    ['Reykjavik', 64.1466, -21.9426, false],
+    ['Tromso', 69.6496, 18.9560, true],
+  ]) {
+    const k = computeKundli({ y: 2026, m: 8, day: 19, hh: 6, mi: 30, tz: 0, lat, lon, ayanamsa: 'lahiri' });
+    const fellBack = /Porphyry/.test(k.kpData.houseSystem);
+    if (fellBack !== wantFallback) {
+      latRows.push(`${name} (${lat}°N): chart reports "${k.kpData.houseSystem}", expected ${wantFallback ? 'the Porphyry fallback' : 'Placidus'}`);
+    } else ok();
+  }
+  if (latRows.length) {
+    disagree('§11 high latitude', 'the chart\'s high-latitude fallback no longer engages where it says it does', latRows);
+  }
+  COVERAGE.push('§11 both chart surfaces\' high-latitude house-system disclosures, and the fallback engaging at 3 latitudes');
+}
+
+// ===========================================================================
 // REPORT
 // ===========================================================================
 const SECTION_TITLES = [
@@ -948,6 +1005,7 @@ const SECTION_TITLES = [
   '§8 languages    every rendered screen, English vs Hindi',
   '§9 conventions  nirayana / sayana',
   '§10 duplicates  where the next one will come from',
+  '§11 high lat.   two chart surfaces, two house rings, both must say so',
 ];
 
 console.log('cross-surface consistency — does Ganak say the same thing twice?');

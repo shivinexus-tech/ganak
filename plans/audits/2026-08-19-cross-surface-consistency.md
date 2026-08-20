@@ -59,6 +59,7 @@ agreements verified** on a green run.
 | §8 | every rendered screen in English · the same screen in Hindi | clock times, worded and numeric dates, years, score fractions |
 | §9 | English "Sidereal"/"Tropical" · Hindi निरयण/सायन, on every rendered surface | one convention, one word, both languages |
 | §10 | the source tree against itself | duplicated literal tables, duplicated speed estimators |
+| §11 | the Jyotish chart's KP panel · the Prashna chart, above 66° | each must name the house ring it fell back to, in both languages |
 
 **§8 proves its own detector first.** A text comparison that quietly extracts nothing passes every
 surface it looks at, so nine self-tests run before the sweep: four historical defect shapes (a lunar
@@ -258,9 +259,30 @@ Named explicitly, because "found nothing new" is a result only if you say what w
   "27 August in Latin, 28 August in Devanagari" survives anywhere the snapshot harness can see.
 - **निरयण / सायन.** No rendered surface names the opposite zodiac in the two languages.
 
+- **High-latitude house systems.** Both chart surfaces still name the ring they fell back to, in both
+  languages, and the chart's Porphyry fallback still engages exactly where it claims to (Delhi and
+  Reykjavík stay on Placidus; Tromsø falls back).
+
 Two cosmetic differences were observed and deliberately **not** reported as failures, because the
 value agrees: the Daily ghati sentence writes `6:19 am` in English and `6:19 AM` in Hindi, and the
 date header writes `14 अग` where the rest of the Hindi render writes `15 अग॰`.
+
+### One observation NOT turned into a pin, and why
+
+**The two chart surfaces still fall back to different house rings above ~66°.** Measured at Tromsø
+(69.65°N), 2026-08-19 06:30 UTC:
+
+```
+Jyotish chart (src/engine/kundli.ts:205)      → "Porphyry (Placidus undefined at this latitude)"
+Prashna       (src/screens/PrashnaScreen.tsx:289) → system: 'equal'   ("Equal houses — high-latitude fallback")
+```
+
+That is the shape of "Reykjavík gets two different house systems on two screens". It is **not**
+pinned as a defect here for two reasons: KP horary has its own doctrine about high-latitude rings and
+`validation/prashna-high-latitude.cjs` owns that question, not this lane; and, crucially, **both
+surfaces now disclose which ring they used, in both languages** — the same resolution-by-disclosure
+the dosha panel reached on 2026-08-19. §11 holds those four disclosures in place, so the fallback can
+never go silent again. Whether the two *should* share one policy is a product call, not a gate's.
 
 ---
 
