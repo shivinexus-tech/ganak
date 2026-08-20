@@ -453,8 +453,14 @@ told not to touch. Each is repeated here with its exact change.
 
 ## Gates
 
-`bash scripts/run-all-gates.sh` — summary pasted in the branch report and the task-log row.
-`npm run build` clean.
+```
+bash scripts/run-all-gates.sh
+101 passed, 0 failed.
+```
+`npm run build` clean (`✓ built in 1.71s` · sitemap 200 URLs · 200 route HTML files written).
+
+The first full run came back `100 passed, 1 failed`, and that one failure was
+`ruling-planets.cjs` pinning the wrong heading — see the section above.
 
 New assertions, all in files this lane owns:
 
