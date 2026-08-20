@@ -344,10 +344,11 @@
   },
   "ownerReviewBatch01": {
     "assembled": "2026-08-19",
-    "decisionState": "CHANGES REQUESTED · FULL EXACT-NODE RE-QA PENDING",
-    "independentQa": "PREVIOUS PASS WITHDRAWN after REJ-017 exact screenshot-crop correction; current cleanup sweeps are evidence, not full Batch approval",
+    "decisionState": "OWNER REVIEW · DESKTOP VISUAL DIRECTION + SCREENSHOT ACCESSIBILITY PASS",
+    "independentQa": "PASS 2026-08-20 — permanent ornament/surface reviewer and independent exact-node QA each passed all twelve desktop primaries; production routing, keyboard/focus, responsive reflow and assistive-technology semantics remain separate gates",
     "section": "769:17254",
-    "sectionName": "CHANGES REQUESTED · BATCH 01 · EXACT ORNAMENT CORRECTION · RE-QA PENDING",
+    "sectionName": "OWNER REVIEW · BATCH 01 · 12-SCREEN QUALITY CHECKPOINT",
+    "finalSectionScreenshotAudit": "PASS 2026-08-20 — full 12-screen section captured after status promotion; no layout regression",
     "desktopEnglishPrimaries": {
       "01TodayOrdinary": "769:17261",
       "02TodaySpecial": "769:17610",
@@ -385,7 +386,7 @@
       "ordinaryTodayComparison": "811:18395",
       "ordinaryTodayWinner": "811:19095",
       "ordinaryTodayDecision": "C — no added ornament",
-      "fullBatchReQa": "PENDING"
+      "fullBatchReQa": "PASS 2026-08-20 — zero active exact-crop hits"
     },
     "reviewQuestions": ["Does this now feel like one coherent Ganak website?", "Which screens feel weakest?", "Is any earlier mistake repeating?"]
   },
@@ -454,7 +455,8 @@
   },
   "currentTwoScreenQualityGate": {
     "ownerDecisionRecorded": "2026-08-19",
-    "state": "CHANGES REQUESTED — REJ-017 CORRECTED; FULL EXACT-NODE RE-QA PENDING",
+    "state": "SUPERSEDED BY ownerReviewBatch01 — twelve-screen desktop visual QA PASS",
+    "supersededBy": "ownerReviewBatch01",
     "queueRule": "Do not place a pilot, wrapper or comparison board in the Owner Review Queue until same-viewport integrator comparison and exact-node independent QA pass every applicable GDF rule.",
     "feedbackLedger": "plans/ganak-design-feedback-ledger.md",
     "canonicalFeedbackIds": "GDF-001 through GDF-063",
@@ -474,7 +476,7 @@
       "320px responsive website reflow",
       "long, special, sparse and error state specimens"
     ],
-    "ownerReviewSectionRule": "Only exact-node candidates that pass GDF-012 dominant-surface enforcement, GDF-062 rejected-asset enforcement and GDF-063 exact-crop enforcement may be OWNER REVIEW. Batch 01 section 769:17254 is CHANGES REQUESTED pending a full twelve-screen exact-node re-QA; baseline section 652:13736 remains CHANGES REQUESTED historical evidence.",
+    "ownerReviewSectionRule": "Only exact-node candidates that pass GDF-012 dominant-surface enforcement, GDF-062 rejected-asset enforcement and GDF-063 exact-crop enforcement may be OWNER REVIEW. Batch 01 section 769:17254 passed the twelve-screen desktop visual/accessibility gate on 2026-08-20; baseline section 652:13736 remains CHANGES REQUESTED historical evidence.",
     "ownerReviewVisualBatch": {
       "section": "652:13736",
       "sectionName": "CHANGES REQUESTED · WEBSITE BASELINE · P0 REJECTED FLORAL REMOVED",

@@ -509,12 +509,15 @@ visible as rejection evidence. Library inclusion does not mean use everywhere.
 Section `652:13736` retains exactly four direct children as historical baseline
 evidence, but it is now `CHANGES REQUESTED`. Exact rejected hash descendants
 `652:14062` and `652:14131` are hidden and the Vrat frames are no longer owner-review
-authority. Batch section `769:17254` is again `CHANGES REQUESTED` pending a complete
-exact-node re-QA after REJ-017. Its twelve sources/clones and shared context remain
-corrected from denied dominant values `#F9FAF9`, `#FCFBF8`, `#FFFDFC`, `#FAF9F4`;
-its Vrat screen uses unrelated approved component `760:4`, not `485:51`. Current
-page sweeps report zero active REJ-016 hash/name reuse and zero active REJ-017 exact
-crop reuse; this is cleanup evidence, not a full Batch re-approval.
+authority. Batch section `769:17254` is now `OWNER REVIEW · BATCH 01 · 12-SCREEN
+QUALITY CHECKPOINT`. Its twelve sources/clones and shared context remain corrected
+from denied dominant values `#F9FAF9`, `#FCFBF8`, `#FFFDFC`, `#FAF9F4`; its Vrat
+screen uses unrelated approved component `760:4`, not `485:51`. On 2026-08-20 the
+permanent ornament/surface reviewer and independent exact-node QA both passed all
+twelve desktop primaries. Final sweeps report zero active REJ-016 hash/name reuse,
+zero active REJ-017 exact-crop reuse and zero denied dominant surface hits. The PASS
+is limited to desktop visual direction and screenshot-visible accessibility;
+production interaction and responsive behavior remain separately gated.
 
 | Role | Review node | Source candidate |
 |---|---:|---:|
