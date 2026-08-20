@@ -476,12 +476,36 @@ Evidence labels used below:
   off-white — informally, one whose red channel exceeds its blue channel. Ganak's approved
   grounds are cool: canvas `#F9FCFD`, surface `#FFFFFF`, secondary `#ECF4F7`, all of which
   pass because blue is greater than or equal to red.
-- **Open verification, flagged not asserted:** the Batch 01 desktop primaries as
-  screenshotted read as a warm cream page ground, warmer than any of the four swept values.
-  The recorded sweep reports `deniedHitsAcrossSourcesSharedAndBatchAfterSweep: 0`, which is
-  consistent with the ground being a warm value that was simply not on the four-item list.
-  If that is confirmed, the thing the owner says "made Ganak look dull" is the current
-  approved batch's page background, not only the rejected ornament.
+- **Measured 2026-08-20 — confirmed in the shipped code.** The live light-theme page
+  ground is `--theme-bg-light: #FAF5EA` in `src/styles/design-tokens.css`. That is
+  `rgb(250,245,234)`: red exceeds blue by **+16**, the warmest value in the system, and it
+  is the page background of every screen. Comparison against the recorded intent and the
+  previously denied values:
+
+  | Value | Role | r−b | Warm? |
+  |---|---|---|---|
+  | `#FAF5EA` | **shipped page ground** | **+16** | **yes** |
+  | `#FAF9F4` | denied by the Batch 01 sweep | +6 | yes |
+  | `#FCFBF8` | denied by the Batch 01 sweep | +4 | yes |
+  | `#FFFDFC` | denied by the Batch 01 sweep | +3 | yes |
+  | `#F9FAF9` | denied by the Batch 01 sweep | 0 | no |
+  | `#F9FCFD` | recorded approved canvas | −4 | no |
+  | `#ECF4F7` | recorded approved secondary | −11 | no |
+
+  The shipped ground is warmer than **all four** values the sweep denied, and it was not on
+  the list — which is exactly why that sweep reported
+  `deniedHitsAcrossSourcesSharedAndBatchAfterSweep: 0` while the screens still read cream.
+  The approved cool canvas `#F9FCFD` exists in the design record and **not** in the code.
+
+  The warmth is systemic, not a single token: `--theme-line-light: #D8CBAF` is a warm tan,
+  the elevation shadows are warm brown (`rgba(80,60,20,…)`), and a `data-warmth="soft"`
+  preference mixes a further 5% of `#D79B50` into the ground, making the warm reading
+  stronger still. Dark mode is unaffected (`#18151C`, r−b −4).
+
+  **Not measured:** the Batch 01 Figma frames themselves. Figma renders to a WebGL canvas
+  whose drawing buffer is cleared before it can be read, so the design file's own fill
+  values need someone with edit access to read off directly. The finding above concerns
+  the shipped application.
 - **Related rules:** `REJ-004`, `REJ-017A`; slot table §3 rule 7.
 - **Confidence / limitation:** owner instruction verbatim and unambiguous; high. The Batch
   01 ground value is an observation from screenshots and needs a pixel check.
