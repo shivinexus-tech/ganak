@@ -3,6 +3,39 @@
   "fileKey": "ynavdn3IEdBoGsIP43c4bD",
   "phase": "phase7-clickable-prototype",
   "step": "today-special-regular-festival-a-b-d-detail-1-2-3-wired",
+  "designRejectionRegister": {
+    "path": "plans/ganak-design-rejection-log.md",
+    "role": "canonical rejection vocabulary; the GDF ledger remains the regression/action register",
+    "canonicalRejectIds": "REJ-001 through REJ-014",
+    "nodeMap": {
+      "REJ-001": { "rejectedNodes": ["47:2"] },
+      "REJ-002": { "rejectedNodes": ["79:12"] },
+      "REJ-003": { "rejectedNodes": ["111:49"] },
+      "REJ-004": {
+        "relatedNodes": ["47:2", "79:12"],
+        "correctedReviewNodes": ["652:13737", "652:13738", "652:13754", "652:13762", "I652:13762;206:108", "I652:13762;206:115", "I652:13762;274:690", "652:13786", "652:13825", "652:13918", "652:13964", "652:13979", "652:14060", "I652:14060;206:108", "I652:14060;206:115", "I652:14060;274:690", "652:14092"],
+        "approvedSafeBases": { "canvas": "#F9FCFD", "surface": "#FFFFFF", "secondary": "#ECF4F7", "exclusivePalette": false },
+        "permittedSourceDerivedFamilies": ["navy", "crimson/burgundy", "luminous/antique gold", "powder blue", "botanical greens", "other evidenced source colours with approved roles"]
+      },
+      "REJ-005": { "referenceNodesOnly": ["31:2"], "rejectedNodeRecovery": "TODO — exact old crop node not yet recovered" },
+      "REJ-006": { "rejectedNodeRecovery": "TODO — exact older Muhurat accent nodes not yet recovered" },
+      "REJ-007": { "hiddenNodes": ["652:13965", "652:13967"] },
+      "REJ-008": { "hiddenNodes": ["666:14247"], "approvedSourcePreserved": ["485:51"] },
+      "REJ-009": { "removedNodes": ["675:14247", "675:14248", "675:14249", "675:14250", "675:14251", "675:14252", "675:14253"] },
+      "REJ-010": { "historicalEvidenceNodes": ["544:8046", "544:8049", "546:32", "546:35"] },
+      "REJ-011": { "rejectedNodeRecovery": "TODO — source-claim evidence is in task history" },
+      "REJ-012": { "rejectedNodeRecovery": "TODO — exact older Quick Access colour variants not yet recovered" },
+      "REJ-013": {
+        "rejectedDirection": "cross-track reuse in website",
+        "parkedPhoneNodesNotRejected": ["537:7450", "537:7480", "537:7510", "537:7557", "537:7604", "537:7650", "537:7717", "537:7882", "537:7825", "537:7920"]
+      },
+      "REJ-014": {
+        "hiddenNodes": ["116:400", "277:961", "513:6978", "513:7319", "562:8043", "562:8296", "562:8549", "562:8864", "562:9212", "562:9560", "562:9910", "601:9802", "622:10525", "652:13974"],
+        "visibleWebsiteOccurrencesAfterSweep": 0,
+        "substituteAdded": false
+      }
+    }
+  },
   "entities": {
     "pages": {
       "websitePrototype": "30:2",
@@ -30,6 +63,7 @@
       ,"parkedPhoneLaneA": "554:7622"
       ,"parkedPhoneLaneB": "556:2"
       ,"responsiveSharedSystemQa": "596:66"
+      ,"ownerReviewVisualVocabulary": "707:14247"
     },
     "frames": {
       "approvedDesktopMaster": "31:2",
@@ -139,11 +173,25 @@
   },
   "approvedFestivalBackgroundSystem": {
     "ownerApproved": "2026-08-11",
-    "direction": "Pale blue and white",
+    "direction": "Pale blue and clean white are approved-safe bases, not the complete or exclusive palette",
     "canvas": "#F9FCFD",
     "surface": "#FFFFFF",
     "secondary": "#ECF4F7",
+    "permittedSourceDerivedRoles": ["navy ink/depth", "crimson/burgundy action and devotional emphasis", "luminous/antique gold structure", "powder-blue textile/lattice", "botanical-green support"],
+    "approvalBoundary": "Every extracted source swatch or ornament still needs a named role, relationship, density and contrast rule; extraction alone is not approval.",
     "scopeApplied": ["135:50", "135:254", "135:458", "135:662", "135:866", "135:1089", "135:1312"]
+  },
+  "visualVocabularyReview": {
+    "ownerDecisionRecorded": "2026-08-19",
+    "decisionState": "OWNER REVIEW",
+    "section": "707:14247",
+    "sectionName": "OWNER REVIEW · VISUAL VOCABULARY",
+    "board": "707:14248",
+    "sourcesOnly": ["31:2", "116:49", "116:387", "116:388", "485:24", "485:51", "682:22"],
+    "contains": ["palette roles and proven contrast combinations", "ornament families", "placement and density rules", "three small composition swatches", "anti-vocabulary", "controlled-improvisation rule", "exact source references"],
+    "controlledImprovisation": "New work may vary motif, density and colour balance only within named evidenced families and roles. A genuinely new family or an existing extraction used in a new structural job returns to the owner.",
+    "screenDesignsCreated": 0,
+    "screenshotSanity": "PASS"
   },
   "approvedVratBotanicalTreatment": {
     "ownerDecisionRecorded": "2026-08-18",
@@ -226,10 +274,10 @@
   },
   "currentTwoScreenQualityGate": {
     "ownerDecisionRecorded": "2026-08-19",
-    "state": "OWNER REVIEW — VISUAL DIRECTION ONLY; PRODUCTION INTERACTIONS CHANGES REQUESTED",
+    "state": "OWNER REVIEW — WEBSITE BASELINE CORRECTED; OWNER CONFIRMATION PENDING; PRODUCTION INTERACTIONS CHANGES REQUESTED",
     "queueRule": "Do not place a pilot, wrapper or comparison board in the Owner Review Queue until same-viewport integrator comparison and exact-node independent QA pass every applicable GDF rule.",
     "feedbackLedger": "plans/ganak-design-feedback-ledger.md",
-    "canonicalFeedbackIds": "GDF-001 through GDF-055",
+    "canonicalFeedbackIds": "GDF-001 through GDF-057",
     "independentQaTask": "01a018d9-dca3-70b3-a851-b46eccd965cf",
     "todayPanchangSource": "116:49",
     "festivalVratSources": ["135:1312", "485:24"],
@@ -246,10 +294,10 @@
       "320px responsive website reflow",
       "long, special, sparse and error state specimens"
     ],
-    "ownerReviewSectionRule": "Only exact-node independent-QA PASS frames may be placed in OWNER REVIEW · WEBSITE PILOT 01; failed, experimental, parked-phone and CHANGES REQUESTED work stays outside.",
+    "ownerReviewSectionRule": "Section 652:13736 is the only current OWNER REVIEW · WEBSITE BASELINE · TODAY + VRAT surface; it contains exactly four visual-baseline frames. Failed, experimental, parked-phone and production-interaction CHANGES REQUESTED work stays outside.",
     "ownerReviewVisualBatch": {
       "section": "652:13736",
-      "sectionName": "OWNER REVIEW · WEBSITE PILOT 01 · VISUAL DIRECTION ONLY",
+      "sectionName": "OWNER REVIEW · WEBSITE BASELINE · TODAY + VRAT",
       "independentVisualQa": "PASS",
       "productionRouteInteractionQa": "FAIL — remains CHANGES REQUESTED",
       "frames": {
@@ -259,12 +307,32 @@
         "festivalVrat390English": { "reviewNode": "652:14120", "sourceCandidate": "544:8016" }
       },
       "scope": "Owner decision is visual direction only and is carried by the two desktop masters. The two 390px frames are responsive mobile-web QA companions, not separate design directions or Ganak Phone/native work. Unsupported or internal-only routes, state preservation and production interaction mapping remain open.",
+      "bindingBaselineCorrection": {
+        "ownerDecisionRecorded": "2026-08-19",
+        "scope": "Freeze all other composition, content, hierarchy and responsive behavior; correct only the never-approved Shashthi mark and actual ivory/cream surface drift.",
+        "shashthiMark": {
+          "decisionState": "REJECTED / HIDDEN",
+          "hiddenNodes": ["116:400", "277:961", "513:6978", "513:7319", "562:8043", "562:8296", "562:8549", "562:8864", "562:9212", "562:9560", "562:9910", "601:9802", "622:10525", "652:13974"],
+          "visibleWebsiteOccurrencesAfterSweep": 0,
+          "substituteAdded": false
+        },
+        "safeBaseSystem": {
+          "canvas": "#F9FCFD",
+          "surface": "#FFFFFF",
+          "secondary": "#ECF4F7",
+          "exclusivePalette": false,
+          "purposefulRolesPreserved": ["navy", "crimson/burgundy", "luminous/antique gold", "powder blue", "botanical greens", "botanical art"]
+        },
+        "fourFrameScreenshotSanity": "PASS",
+        "parkedPhoneChanged": false,
+        "recoveredArchiveChanged": false
+      },
       "todayHeroOrnamentCorrection": {
         "ownerDecisionRecorded": "2026-08-19",
         "decision": "CHANGES REQUESTED — DESKTOP OWNER REVIEW: replace both disputed ornaments without rebuilding the approved ordinary-Today screen",
         "rejectedUniversalAssetAssumption": "485:51 is Festival/Vrat hero vocabulary only; its direct paste into Today is rejected",
         "desktopReviewPanel": "652:13964",
-        "rejectedBookplateNodesRemoved": ["675:14247", "675:14248", "675:14249", "675:14250", "675:14251", "675:14253"],
+        "rejectedBookplateNodesRemoved": ["675:14247", "675:14248", "675:14249", "675:14250", "675:14251", "675:14252", "675:14253"],
         "recoveredHistoricalVocabularyArchive": "682:22",
         "recoveredHistoricalTreatments": 12,
         "archiveDecisionState": "NOT APPROVED — source recovery only",
@@ -381,8 +449,10 @@
     ,"responsive-shared-system-linked-instance-proof-596-67-596-258"
     ,"responsive-shared-system-structure-contrast-target-audit-pass-2026-08-19"
     ,"shared-context-base-unbound-and-pilot-instance-state-binding-2026-08-19"
+    ,"owner-review-visual-vocabulary-board-707-14247-created-from-existing-evidence-2026-08-19"
   ],
   "pendingValidations": [
+    "owner-approval-or-changes-on-visual-vocabulary-707-14247-before-family-propagation",
     "owner-click-through-sign-off-on-wired-prototype",
     "posthog-festival-navigation-validation-after-launch",
     "remaining-desktop-screen-state-prototypes",

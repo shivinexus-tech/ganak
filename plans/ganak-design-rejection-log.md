@@ -1,0 +1,449 @@
+# Ganak Design Rejection Log
+
+**Status:** canonical rejection and prohibited-reuse register
+**Owner:** Shivie
+**Product:** Ganak responsive website; Ganak Phone/native is a separate parked track
+**Last recovered:** 2026-08-19
+
+## Purpose and authority
+
+This file records what the owner rejected, why it failed, and the reusable
+ornament-language or product-design lesson. It prevents a rejected visual from being
+rediscovered and presented again simply because it still exists in Figma, chat
+history or an archive.
+
+This is the canonical register for **rejection vocabulary**. The separate
+[`ganak-design-feedback-ledger.md`](ganak-design-feedback-ledger.md) remains the
+regression and action register: it tells lanes what to test and propagate. A
+`REJ-*` entry says what must not be reused; a `GDF-*` entry says what current work
+must do.
+
+Evidence labels used below:
+
+- **Verbatim:** retained owner wording.
+- **Faithful paraphrase:** the decision is directly recorded, but the complete
+  owner sentence is not retained in the current evidence set.
+- **Inference:** the lesson is derived from the approved/rejected comparison and is
+  explicitly not presented as owner wording.
+- **TODO:** evidence not recovered in the minimum safe pass. It does not block the
+  current owner baseline review, but must not be invented.
+
+## Rejection register
+
+### REJ-001 — Editable Today V1 exploration (`47:2`)
+
+- **Decision date / status:** by 2026-08-10 · `REJECTED / DO NOT REUSE`
+- **Track / scope:** Website · `SCREEN`
+- **Figma / archive evidence:** node `47:2`; canonical prototype-state record;
+  [direct node](https://www.figma.com/design/ynavdn3IEdBoGsIP43c4bD/Ganak?node-id=47-2)
+- **Rejected:** the earlier editable Today exploration as an implementation or
+  visual-authority source.
+- **Owner reason:** **Faithful paraphrase:** this was an earlier rejected
+  exploration; later approved editable website masters superseded it. Exact owner
+  sentence is not recovered in the minimum pass.
+- **Underlying ornament-language/design lesson:** editability does not make a frame
+  authoritative. A historical reconstruction cannot replace the exact later
+  approved composition.
+- **Prohibited reuse:** no cloning, cropping or component lineage from `47:2` for
+  website screens.
+- **Still approved / parked:** Today special `104:49`, ordinary Today `116:49`, and
+  locked visual reference `31:2` remain separate approved website sources.
+- **Related rules:** `GDF-002`.
+- **Confidence / limitation:** high decision confidence; exact rejection wording and
+  screenshot are TODO.
+
+### REJ-002 — Today editable reconstruction drift (`79:12`)
+
+- **Decision date / status:** by 2026-08-10 · `REJECTED / DO NOT REUSE`
+- **Track / scope:** Website · `SCREEN`
+- **Figma / archive evidence:** node `79:12`; authority §5; prototype-state
+  `rejectedFrames`; [direct node](https://www.figma.com/design/ynavdn3IEdBoGsIP43c4bD/Ganak?node-id=79-12)
+- **Rejected:** the editable Today reconstruction because its visual result drifted
+  from the approved master.
+- **Owner reason:** **Faithful paraphrase:** it did not look like the approved design.
+  The complete owner sentence is not retained in the minimum pass.
+- **Underlying ornament-language/design lesson:** fidelity is judged by the whole
+  approved composition—hierarchy, spacing, palette, ornaments and module balance—not
+  by copying isolated labels or decorative motifs.
+- **Prohibited reuse:** no visual, layout or ornamental sourcing from `79:12`.
+- **Still approved / parked:** `104:49` and `116:49` remain approved for their exact
+  scopes; this rejection does not invalidate shared website components.
+- **Related rules:** `GDF-002`, `GDF-008`, `GDF-030`.
+- **Confidence / limitation:** high decision confidence; direct historical screenshot
+  is TODO.
+
+### REJ-003 — Ordinary Today with a mandatory hero block (`111:49`)
+
+- **Decision date / status:** 2026-08-10 · `SUPERSEDED / DO NOT REUSE`
+- **Track / scope:** Website · `SCREEN`
+- **Figma / archive evidence:** node `111:49`; prototype-state `rejectedFrames`;
+  [direct node](https://www.figma.com/design/ynavdn3IEdBoGsIP43c4bD/Ganak?node-id=111-49)
+- **Rejected:** the ordinary-day concept that retained a large hero-style visual
+  block even when no special observance required one.
+- **Owner reason:** **Faithful paraphrase:** a regular/non-festival day should not be
+  forced into a festival hero treatment.
+- **Underlying ornament-language/design lesson:** imagery and ornament must answer
+  the day's job. Sacred art collapses when it is not relevant; decorative space is
+  not a reason to invent a deity/festival hero.
+- **Prohibited reuse:** do not make a deity image or hero frame mandatory on ordinary
+  Today.
+- **Still approved / parked:** owner-selected no-hero ordinary state `116:49`;
+  special Today `104:49` may use relevant event imagery.
+- **Related rules:** `GDF-021`, `GDF-030`.
+- **Confidence / limitation:** high; exact historical owner quote is TODO.
+
+### REJ-004 — Dominant dull ivory/cream wash and unrelated palette drift
+
+- **Decision date / status:** 2026-07-30 through 2026-08-19 · `REJECTED DIRECTION`
+- **Track / scope:** Website · `GLOBAL`
+- **Figma / archive evidence:** historical explorations including `47:2` and `79:12`;
+  approved contrast source `31:2`; owner-supplied approved screenshot
+  `/Users/shivie/Downloads/GanakPanchangApprovedWebsite.png`; redesign requirements
+  §10/discussion log. On 2026-08-19 the current review baseline was corrected at
+  `652:13737`, `652:13738`, `652:13754`, `652:13762`,
+  `I652:13762;206:108`, `I652:13762;206:115`, `I652:13762;274:690`,
+  `652:13786`, `652:13825`, `652:13918`, `652:13964`, `652:13979`,
+  `652:14060`, `I652:14060;206:108`, `I652:14060;206:115`,
+  `I652:14060;274:690` and `652:14092`.
+- **Rejected:** dull ivory/cream wash as the dominant website atmosphere; muddy
+  orangish gradients; unrelated generic palette substitutions; repeated ivory drift
+  in headers, breadcrumbs, panels and footers.
+- **Owner reason:** **Verbatim evidence includes:** “too dark”; “the background is
+  still very dull and gradient in the background doesn't look professional”; “i am
+  not liking that ivory background everywhere”; and repeated “why ... ivory?”
+- **Underlying ornament-language/design lesson:** pale blue and clean white are safe
+  bases, not the whole palette. Ganak should feel lively through coherent,
+  source-derived relationships among navy, crimson/burgundy, luminous/antique gold,
+  powder blue, botanical greens and other evidenced colours. Warmth and variety need
+  a named role; they must not collapse into an aged beige wash.
+- **Prohibited reuse:** no dominant dull-ivory/cream atmosphere and no unrelated
+  generic palette substitution. Do not interpret this as a ban on every warm,
+  cream-adjacent, gold or botanical source colour.
+- **Still approved / parked:** canvas `#F9FCFD`, surface `#FFFFFF` and secondary
+  `#ECF4F7` are approved-safe bases. Source-derived navy, crimson/burgundy,
+  luminous/antique gold, powder blue, botanical greens and other evidenced colours
+  remain permitted candidates when their roles, combinations and contrast are
+  defined. Extraction alone is not approval. Board `707:14247` is the current owner
+  review surface for those role and combination rules.
+- **Related rules:** `GDF-012`, `GDF-024`, `GDF-029`, `GDF-045`, `GDF-046`.
+- **Confidence / limitation:** high. The four current review frames now use exact
+  `#F9FCFD`, `#FFFFFF` and `#ECF4F7` surface roles where drift was found; the older
+  rejected experiment-to-colour node map remains TODO.
+
+### REJ-005 — Full invitation/card crop and mandatory deity frame
+
+- **Decision date / status:** recovered by 2026-08-19 · `REJECTED DIRECTION`
+- **Track / scope:** Website · `PATTERN`
+- **Figma / archive evidence:** locked composition reference `31:2`; owner-supplied
+  textile/card reference `/Users/shivie/Downloads/avif_xLarge.avif`; `GDF-020`.
+- **Rejected:** placing or cropping the complete invitation/card artwork as a website
+  banner, and treating its full border as a mandatory frame around deity art.
+- **Owner reason:** **Faithful paraphrase:** the supplied artwork was a reference for
+  colours and approved ornament elements, not a literal website asset or universal
+  frame.
+- **Underlying ornament-language/design lesson:** extract the approved **kinds** of
+  flowers, vines, lattice, borders and colours into job-specific structural roles;
+  do not paste a complete source composition into unrelated UI.
+- **Prohibited reuse:** no direct crop of the full reference and no mandatory
+  invitation border around every sacred image.
+- **Still approved / parked:** powder-blue lattice, red roses, green vines/leaves,
+  thin antique-gold rules and coordinated floral transitions remain valid only when
+  used in an approved screen-specific composition.
+- **Related rules:** `GDF-019`, `GDF-020`, `GDF-056`.
+- **Confidence / limitation:** high rule confidence; exact rejected generated-node
+  IDs and screenshots are TODO.
+
+### REJ-006 — Muhurat grouped-list accent experiments
+
+- **Decision date / status:** recovered 2026-08-19 · `REJECTED DIRECTION`; replacement
+  still open
+- **Track / scope:** Website · `PATTERN`
+- **Figma / archive evidence:** Muhurat workbench/history; `GDF-045`–`GDF-046`.
+  Exact rejected accent-node IDs: **TODO**.
+- **Rejected:** the coral/sage/blue three-colour mix; strong coral that reads as a
+  caution; disconnected sage; pale blue for that grouped list; and the later dull,
+  generic light-gold substitute.
+- **Owner reason:** **Verbatim:** “3 colors are too much and stronger coral is looking
+  like caution and sage just doesnt blend in”; pale blue “isnt looking nice”; the
+  later gold was “very dull” and did not match the new design.
+- **Underlying ornament-language/design lesson:** an accent must belong to the
+  approved website palette, support hierarchy without implying danger, and have
+  enough luminosity/contrast to feel intentional rather than washed out.
+- **Prohibited reuse:** none of the named accent treatments may be revived as a
+  default grouped-list colour.
+- **Still approved / parked:** Muhurat Option B hierarchy and restrained floral
+  corner sprig remain approved. Replacement list accent remains an owner decision.
+- **Related rules:** `GDF-045`, `GDF-046`.
+- **Confidence / limitation:** high on rejected colours; exact nodes/screenshots are
+  TODO.
+
+### REJ-007 — Today thin floral edge and detached lower flourish
+
+- **Decision date / status:** 2026-08-19 · `REJECTED / HIDDEN`
+- **Track / scope:** Website · `SCREEN` (ordinary Today answer card)
+- **Figma / archive evidence:** hidden nodes `652:13965` and `652:13967`, parent
+  `652:13964`; verified hidden 2026-08-19; current source candidates `601:9563` /
+  `601:8508` untouched.
+- **Rejected:** the minimal vertical floral edge and the detached lower-right floral
+  fragment as the ordinary Today ornament solution.
+- **Owner reason:** **Verbatim:** “minimum floral edge in hero wasnt approved - doesnt
+  match with design”; the owner also required that the elements be **replaced, not
+  merely removed**.
+- **Underlying ornament-language/design lesson:** floral elements must form a
+  coherent structural composition. A thin edge plus an unrelated corner fragment
+  reads as arbitrary decoration, not the approved ornament language.
+- **Prohibited reuse:** never surface `652:13965` or `652:13967`; do not reproduce the
+  same edge/fragment composition elsewhere.
+- **Still approved / parked:** the underlying ordinary Today information architecture
+  and content modules remain intact. The correct replacement must come from approved
+  screen-specific ornament elements, not from a new generic decoration.
+- **Related rules:** `GDF-008`, `GDF-019`, `GDF-030`, `GDF-054`, `GDF-056`.
+- **Confidence / limitation:** exact node and verbatim evidence; high.
+
+### REJ-008 — Direct Vrat botanical sweep pasted into Today
+
+- **Decision date / status:** 2026-08-19 · `REJECTED / HIDDEN`
+- **Track / scope:** Website · `PATTERN` boundary
+- **Figma / archive evidence:** hidden rejected node `666:14247`, parent
+  `652:13964`; source asset `485:51`; approved Vrat hero `485:24`.
+- **Rejected:** treating Vrat botanical asset `485:51` as the whole Ganak ornament
+  system and pasting it directly into the ordinary Today card.
+- **Owner reason:** **Verbatim:** it looked “mindlessly placed,” “doesnt make any
+  sense,” and was only one element among many previously created elements.
+- **Underlying ornament-language/design lesson:** approval is scoped by archetype.
+  A beautiful element approved inside the Vrat hero does not become a universal
+  asset; Today and Vrat need different compositions using the same broader approved
+  flowers/vines/lattice/border character.
+- **Prohibited reuse:** `485:51` is not a Today source and `666:14247` must remain
+  hidden/rejected.
+- **Still approved / parked:** `485:24` and `485:51` remain approved for the
+  Festival/Vrat hero scope only; their rejection in Today does not revoke that.
+- **Related rules:** `GDF-019`, `GDF-040`, `GDF-054`, `GDF-056`.
+- **Confidence / limitation:** exact nodes and verbatim evidence; high.
+
+### REJ-009 — Invented textile-bookplate Today correction
+
+- **Decision date / status:** 2026-08-19 · `REJECTED / REMOVED`
+- **Track / scope:** Website · `SCREEN`
+- **Figma / archive evidence:** removed nodes `675:14247`, `675:14248`,
+  `675:14249`, `675:14250`, `675:14251`, `675:14252`, `675:14253`; former parent
+  `652:13964`; recovered historical source board `682:22` is explicitly
+  `NOT APPROVED`; [archive](https://www.figma.com/design/ynavdn3IEdBoGsIP43c4bD/Ganak?node-id=682-22).
+- **Rejected:** the newly invented textile-bookplate composition offered as the
+  Today ornament correction.
+- **Owner reason:** **Verbatim:** “rejected ... doesnt even match approved design
+  vocab... this work was already done, retreive it from figma if you are unable to
+  generate properly.”
+- **Underlying ornament-language/design lesson:** retrieval must precede generation.
+  Do not approximate an approved family from memory or recombine motifs until the
+  original approved elements and their roles are identified.
+- **Prohibited reuse:** deleted bookplate nodes must not be recreated; `682:22` is
+  evidence/source recovery, not an approved screen or permission to paste a treatment.
+- **Still approved / parked:** current four-frame owner baseline is preserved; no
+  Today screen content or geometry was changed by removal.
+- **Related rules:** `GDF-002`, `GDF-008`, `GDF-019`, `GDF-054`, `GDF-056`.
+- **Confidence / limitation:** exact nodes and verbatim evidence; high. The archive
+  contains twelve historical treatments but their individual approval statuses are
+  unresolved/TODO.
+
+### REJ-010 — QA and reviewer prose inside user-facing screens
+
+- **Decision date / status:** recovered 2026-08-18/19 · `REJECTED PATTERN`
+- **Track / scope:** Website · `GLOBAL`
+- **Figma / archive evidence:** examples `544:8046` (“SPARSE PROOF”), `544:8049`
+  (“VISIBLE ERROR”), Hindi counterparts `546:32`, `546:35`; migration contract
+  §10.6.1 lists additional removed strings.
+- **Rejected:** reviewer, implementation, proof and fixture commentary occupying
+  devotee-facing content positions.
+- **Owner reason:** **Faithful paraphrase:** the user screen must speak to the user,
+  not explain clipping, verification status or test coverage to a reviewer.
+- **Underlying ornament-language/design lesson:** QA evidence is external to the
+  product composition. Empty/error/sparse screens still require real user copy.
+- **Prohibited reuse:** phrases including “SPARSE PROOF,” “VISIBLE ERROR,” “displayed
+  without clipping,” “Only verified content appears,” and similar reviewer prose.
+- **Still approved / parked:** external QA boards and annotations may retain proof
+  labels when clearly outside buildable/user-facing frames.
+- **Related rules:** `GDF-017`, `GDF-041`.
+- **Confidence / limitation:** high for named examples; complete historical list is
+  in the migration contract.
+
+### REJ-011 — Unsupported source attribution
+
+- **Decision date / status:** recovered 2026-08-14 · `REJECTED CLAIM`
+- **Track / scope:** Website · `GLOBAL`
+- **Figma / archive evidence:** owner task history; `GDF-010`. Exact former node is
+  not retained in the minimum evidence set: **TODO**.
+- **Rejected:** displaying “Sourced from Drik Panchang” when the screen/data did not
+  have a defensible mapped source basis.
+- **Owner reason:** **Verbatim:** “and why it shows sourced from Drik Panchang ?”
+- **Underlying ornament-language/design lesson:** source and method notes are trust
+  signals, not decoration. They must be accurate, scoped to the actual calculation
+  and never added to make a prototype appear authoritative.
+- **Prohibited reuse:** no unsupported attribution to Drik Panchang or another source.
+- **Still approved / parked:** Ganak may use verified source/method notes and named
+  engine fixtures when the claim is true and recorded.
+- **Related rules:** `GDF-010`, `GDF-041`.
+- **Confidence / limitation:** high owner rejection; exact node/screenshot TODO.
+
+### REJ-012 — Quick Access colour drift and per-screen recolouring
+
+- **Decision date / status:** recovered 2026-08-14/19 · `REJECTED PATTERN`
+- **Track / scope:** Website · `PATTERN`
+- **Figma / archive evidence:** approved ordinary Today Quick Access `116:342`;
+  responsive shared components EN `593:174`, HI `594:174`; rejected variant node IDs
+  are **TODO**. Owner screenshot evidence includes the blue Quick Access panel query.
+- **Rejected:** green Quick Access on Today, arbitrary blue Quick Access treatments,
+  cluttered variants and inconsistent colours across screens.
+- **Owner reason:** **Verbatim evidence:** “Today page - i dont like green color in
+  quick access”; later, “why this is blue” and “why the inconsistencies?”
+- **Underlying ornament-language/design lesson:** Quick Access is one reusable
+  utility pattern. Its colour, icon family, spacing and hierarchy should be shared;
+  screen context changes destinations, not the component's visual identity.
+- **Prohibited reuse:** no local Quick Access recolouring and no invented colour
+  variant outside the approved component API.
+- **Still approved / parked:** the compact aligned shared Quick Access structure and
+  truthful capability set remain approved; exact destinations still follow the
+  migration contract.
+- **Related rules:** `GDF-006`, `GDF-022`, `GDF-028`.
+- **Confidence / limitation:** high rule confidence; exact rejected nodes/screenshots
+  remain TODO.
+
+### REJ-013 — Using Ganak Phone/native work as website lineage
+
+- **Decision date / status:** 2026-08-18 · `REJECTED CROSS-TRACK USE`; frames are
+  `PARKED PHONE`, **not rejected**
+- **Track / scope:** Website · `GLOBAL`; Ganak Phone · parked
+- **Figma / archive evidence:** parked sections `554:7622`, `556:2`; parked frames
+  `537:7450`, `537:7480`, `537:7510`, `537:7557`, `537:7604`, `537:7650`,
+  `537:7717`, `537:7882`, `537:7825`, `537:7920`.
+- **Rejected:** using native bottom navigation, Phone shell/IA or `518:*`, `1:932`,
+  `1:972` as responsive website sources.
+- **Owner reason:** **Faithful paraphrase:** the website and Android/iPhone product
+  are different tracks; responsive web must derive from the approved website.
+- **Underlying ornament-language/design lesson:** a narrow viewport is not a native
+  app. Product-track boundaries govern shell, IA and components even when both are
+  mobile-sized.
+- **Prohibited reuse:** parked nodes may not enter website source lineage, QA or
+  integration.
+- **Still approved / parked:** every listed frame remains preserved as `PARKED PHONE`
+  for future native-app evaluation. Parking is neither rejection nor approval.
+- **Related rules:** `GDF-003`, `GDF-004`, `GDF-048`.
+- **Confidence / limitation:** exact nodes and durable owner decision; high.
+
+### REJ-014 — Shashthi devotional mark
+
+- **Decision date / status:** 2026-08-19 · `REJECTED / HIDDEN`; zero visible website
+  occurrences after sweep
+- **Track / scope:** Website · `PATTERN`
+- **Figma / archive evidence:** exact hidden nodes `116:400`, `277:961`,
+  `513:6978`, `513:7319`, `562:8043`, `562:8296`, `562:8549`, `562:8864`,
+  `562:9212`, `562:9560`, `562:9910`, `601:9802`, `622:10525` and
+  owner-review clone node `652:13974`. The mark did not exist in review companions
+  `652:13989`, `652:14035` or `652:14120`.
+- **Rejected:** the abstract plant-like “Shashthi devotional mark.” It was never an
+  approved Ganak ornament or icon.
+- **Owner reason:** **Verbatim/final binding decision:** the mark “was NEVER
+  approved.”
+- **Underlying ornament-language/design lesson:** a tithi or devotional association
+  does not authorize a newly invented sacred symbol. If a validated icon is absent,
+  omit the mark; do not decorate the gap with invented religious symbolism.
+- **Prohibited reuse:** every listed node remains hidden and visibly named
+  `REJECTED DIRECTION`; no substitute symbol may be generated without a distinct
+  owner/content decision.
+- **Still approved / parked:** Shashthi text, Tithi/Paksha/Nakshatra data, answer-first
+  hierarchy and approved flowers/vines/lattice/borders remain intact. No parked Phone
+  or historical archive node was changed.
+- **Related rules:** `GDF-002`, `GDF-008`, `GDF-019`, `GDF-021`, `GDF-057`.
+- **Confidence / limitation:** exact owner decision, complete website-page sweep and
+  exact node list; high.
+
+## Approved ornament-language boundary
+
+The owner corrected the phrase “design vocabulary.” The intended source of truth is
+the **approved elements within Ganak's ornament language and approved colours**:
+
+- flowers: crimson/red roses and small coordinated blossoms;
+- foliage: green leaves and connected vines;
+- textile structure: powder/pale-blue lattice;
+- borders: fine antique-gold rules and edging;
+- composition: purposeful edge clusters, floral/vine transitions, card niches,
+  small functional sprigs and the full-width floral footer band;
+- safe bases: clean white/pale blue;
+- permitted source-derived roles: deep navy, crimson/burgundy, antique/luminous
+  gold, powder blue, restrained botanical greens and other evidenced source colours.
+
+These are element families, not interchangeable assets or automatically approved
+swatches. The exact approved website
+reference is the owner-supplied
+`/Users/shivie/Downloads/GanakPanchangApprovedWebsite.png` and Figma locked reference
+`31:2`. Vrat hero source `485:24` / botanical node `485:51` remains a separately
+scoped approval and is not the Today ornament source. Compact owner-review board
+`707:14247` turns this evidence into explicit role, placement, density, contrast and
+controlled-improvisation decisions before broader propagation.
+
+## Read-only recovery inventory for owner
+
+### Approved website baseline sources
+
+| Family | Exact nodes / reference | Safe interpretation |
+|---|---|---|
+| Locked visual reference | `31:2`; owner screenshot `/Users/shivie/Downloads/GanakPanchangApprovedWebsite.png` | Appearance reference only; never crop or ship the raster. |
+| Today special / ordinary | `104:49`, `116:49` | Approved editable website archetypes for their exact states. |
+| Festivals discovery | `135:50`, `135:254`, `135:662` | Default list A, Calendar B, returning personalised D. |
+| Festival detail | `135:866`, `135:1089`, `135:1312` | General, story and vrat intent templates. |
+| Vrat hero treatment | `485:24`; asset `485:51` | Approved only for Festival/Vrat hero composition. |
+| Shared date context/footer | `206:135`, `552:2`, footer set `349:14` | Desktop website shared sources. |
+| Responsive website system | headers `588:204`/`590:268`; context `584:116`/`587:116`; footer `591:161`/`592:161`; Quick Access `593:174`/`594:174` | Website-responsive components; not Ganak Phone. |
+
+### Current visual baseline review
+
+Verified on 2026-08-19: section `652:13736` contains exactly four direct children,
+with no rejected bookplate node present and all retained rejected ornament nodes
+hidden. The binding correction also removed the Shashthi mark and corrected only
+confirmed dull-ivory drift to approved-safe white/pale-blue bases without changing
+purposeful source colour, content, hierarchy or responsive behavior.
+
+| Role | Review node | Source candidate |
+|---|---:|---:|
+| Today desktop website | `652:13737` | `601:9563` |
+| Today responsive website QA companion | `652:13989` | `601:8508` |
+| Festival/Vrat desktop website | `652:14035` | `535:7265` |
+| Festival/Vrat responsive website QA companion | `652:14120` | `544:8016` |
+
+Section name: `OWNER REVIEW · WEBSITE BASELINE · TODAY + VRAT`.
+
+### Rejected and removed inventory
+
+- implementation-source frames: `47:2`, `79:12`, `111:49`;
+- hidden ordinary-Today ornaments: `652:13965`, `652:13967`, `666:14247`;
+- hidden Shashthi-mark website sweep: `116:400`, `277:961`, `513:6978`,
+  `513:7319`, `562:8043`, `562:8296`, `562:8549`, `562:8864`, `562:9212`,
+  `562:9560`, `562:9910`, `601:9802`, `622:10525`, `652:13974`;
+- removed bookplate nodes: `675:14247`–`675:14253` (including `675:14252`, absent
+  in the earlier partial list);
+- recovered archive `682:22`: `NOT APPROVED` source recovery only.
+
+### Parked Phone inventory — explicitly not rejected
+
+- section `554:7622`: `537:7450`, `537:7480`, `537:7510`, `537:7557`,
+  `537:7604`, `537:7650`;
+- section `556:2`: `537:7717`, `537:7882`, `537:7825`, `537:7920`.
+
+### Current missing decisions / TODO
+
+1. Owner yes/changes on compact visual-vocabulary section `707:14247` before broader
+   family propagation.
+2. The correct ordinary-Today ornament replacement remains parked; do not infer
+   approval from archive `682:22` and do not reopen it during vocabulary review.
+3. Muhurat grouped-list replacement accent remains unresolved.
+4. Exact rejected nodes/screenshots for the older palette, invitation-crop, Muhurat
+   accent, unsupported-source and Quick Access experiments remain recovery TODOs,
+   not blockers for visual-vocabulary approval.
+
+## Archive rule
+
+Archive `682:22` is named `RECOVERED ARCHIVE · Answer-first card vocabulary · 12
+historical treatments · NOT APPROVED`. It remains source-recovery evidence only. No
+archived treatment may be copied into a screen until the owner approves that exact
+job-specific use. Rejected/deleted art must not be recreated merely to make the
+archive visually complete.

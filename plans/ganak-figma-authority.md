@@ -42,6 +42,7 @@ an approved change across families.
 4. `plans/ganak-figma-prototype-state.json`
 5. This authority record
 6. `plans/ganak-design-feedback-ledger.md`
+7. `plans/ganak-design-rejection-log.md`
 
 Each lane writer must name the source component/frame nodes, its exclusive workbench
 subtree and the intended decision
@@ -120,8 +121,11 @@ The full node inventory and historical approval dates live in
 - Festivals calendar: `135:254`
 - Festivals returning personalised state: `135:662`
 - Festival detail normal/story/vrat: `135:866`, `135:1089`, `135:1312`
-- Festival background system: pale blue and white — canvas `#F9FCFD`, surface
-  `#FFFFFF`, secondary `#ECF4F7`
+- Approved-safe website bases: canvas `#F9FCFD`, surface `#FFFFFF`, secondary
+  `#ECF4F7`. These are not the complete or exclusive palette. The wider visual
+  grammar permits source-evidenced navy, crimson/burgundy, luminous/antique gold,
+  powder blue and botanical greens when their role, relationship, contrast and
+  density are explicit; extraction alone is not approval.
 - Current Vrat botanical editorial treatment is a specialist handoff into the
   canonical writer. It does not supersede shared components or approve unrelated
   layout changes.
@@ -164,6 +168,12 @@ shared component/variable/style. The canonical integrator owns every mutation an
 propagation outside that isolated workbench.
 
 ## 5. Rejected and non-authoritative sources
+
+The canonical rejection vocabulary, exact node evidence, owner reasons and
+prohibited-reuse rules live in
+[`plans/ganak-design-rejection-log.md`](ganak-design-rejection-log.md). This section
+is only the short authority deny-list; it must not be expanded independently of that
+register.
 
 - `79:12` — visual drift from the approved master
 - `47:2` — earlier rejected exploration
@@ -230,9 +240,10 @@ decisions: Today/Panchang desktop EN and Festival/Vrat detail desktop EN. Each h
 390px EN companion only to prove responsive mobile-web reflow; the 390px frame is not
 a second design direction and is not Ganak Phone/native work. Hindi and 320px frames
 also remain mandatory attached QA evidence, but none are additional visual decisions
-for the owner. Only exact-node independent-QA `PASS`
-candidates may enter a section named `OWNER REVIEW · WEBSITE PILOT 01`; failed,
-experimental, parked-phone and `CHANGES REQUESTED` work stays outside it.
+for the owner. Only exact-node independent-QA `PASS` candidates may enter the
+integrator-owned review surface, now named
+`OWNER REVIEW · WEBSITE BASELINE · TODAY + VRAT`; failed, experimental,
+parked-phone and production-interaction `CHANGES REQUESTED` work stays outside it.
 
 The responsive shared system above was created before lane resumption. Its linked
 EN/HI 390px proof has no text below 13px, no mapped target below 42px, no missing
@@ -242,8 +253,8 @@ copy or scaled desktop shell is not acceptable evidence of shared lineage.
 
 **Visual-direction review batch created 2026-08-19.** Independent QA passed the
 visual-direction and accessibility gate on the exact primary source pairs after the
-last contrast corrections. The integrator therefore created section `652:13736` —
-`OWNER REVIEW · WEBSITE PILOT 01 · VISUAL DIRECTION ONLY` — containing only:
+last contrast corrections. The integrator therefore created section `652:13736`, now
+named `OWNER REVIEW · WEBSITE BASELINE · TODAY + VRAT`, containing only:
 
 - Today/Panchang desktop EN `652:13737` <- candidate `601:9563`;
 - Today/Panchang 390px EN `652:13989` <- candidate `601:8508`;
@@ -278,11 +289,42 @@ router. Owner review of `652:13736` approves or rejects visual direction only; r
 state-preservation and interaction acceptance stay open under `GDF-009`, `GDF-011`,
 `GDF-025` and `GDF-047`.
 
+**Binding owner correction, 2026-08-19.** Most of the four-frame baseline is
+approved/acceptable and its composition, content, hierarchy and responsive behavior
+are frozen. Two recurrent defects alone were corrected:
+
+1. the never-approved `Shashthi devotional mark` is hidden across every website-page
+   occurrence: `116:400`, `277:961`, `513:6978`, `513:7319`, `562:8043`,
+   `562:8296`, `562:8549`, `562:8864`, `562:9212`, `562:9560`, `562:9910`,
+   `601:9802`, `622:10525`, `652:13974`; the page sweep reports zero visible
+   occurrences and no substitute symbol was added; and
+2. confirmed dull-ivory/off-system background drift in the four review frames was
+   restored to approved-safe bases: canvas `#F9FCFD`, surface `#FFFFFF`, secondary
+   `#ECF4F7`. This was a targeted correction, not a rule to make every surface pale
+   blue. Navy, crimson, gold, botanical art and purposeful source-derived colour
+   relationships were not changed.
+
+The rejected mark and palette drift are recorded as `REJ-014` and `REJ-004` in the
+canonical rejection log and as `GDF-057` / `GDF-012` in the regression ledger.
+Parked Phone and archive `682:22` were not changed.
+
+**Visual-vocabulary clarification, 2026-08-19.** Pale blue/clean white are safe
+bases, not a three-colour prison. Section `707:14247`,
+`OWNER REVIEW · VISUAL VOCABULARY`, is the compact pre-propagation decision surface.
+It uses approved/current source fills plus recovered archive `682:22` to show role
+palettes and contrast combinations, ornament families, placement/density rules,
+three composition swatches, anti-vocabulary, controlled improvisation and exact
+source references. It creates no new screen or production component. New work may
+vary motif, density and colour balance only within a named, evidenced family and
+role; a genuinely new family—or an old extraction in a new structural job—returns
+to the owner.
+
 ## 8. Communication
 
 All design feedback is durable only when added to this authority record, the
-prototype-state register, feedback ledger, or the applicable canonical contract. Conversation-only
-decisions must be written here before another task relies on them.
+prototype-state register, feedback ledger, rejection log, or the applicable
+canonical contract. Conversation-only decisions must be written here before another
+task relies on them.
 
 Specialist handoffs must include: exact node IDs; screenshots; what the owner
 approved/rejected; shared components touched; unresolved decisions; and a clear

@@ -266,10 +266,14 @@ Those later approvals supersede this document's original July 30 note that the t
 was unsettled.
 
 - The editable Figma file `ynavdn3IEdBoGsIP43c4bD` is the website visual master.
-- The approved direction is a light, pale-blue-and-white devotional shell with
-  deep-navy ink, crimson action, antique-gold structure and restrained botanical
-  green/floral ornament. It is warm and alive without becoming a saturated or dark
-  jewel theme.
+- Pale blue and clean white are approved-safe bases, not the complete or exclusive
+  palette. The wider visual grammar derives from the supplied/approved source:
+  deep-navy ink and depth, crimson/burgundy action and devotional emphasis,
+  antique/luminous-gold structure, powder-blue textile/lattice and restrained
+  botanical greens, plus other evidenced source colours whose role, relationship,
+  contrast and density are explicitly defined. Extraction alone is not approval.
+  Reject dull ivory/cream as the dominant atmosphere; do not compensate by making
+  every surface monotonously pale blue.
 - Ornament is structural: ribbon, frame, transition, niche or footer. Do not paste
   isolated flower clusters onto unrelated layouts or invent a second ornamental
   vocabulary per screen.
@@ -279,6 +283,10 @@ was unsettled.
   Exploration and rejected frames are never implementation sources.
 - An owner approval applies to the exact named frame/component and its recorded
   scope. It does not silently approve unrelated screen changes.
+- Compact Figma section `707:14247`, `OWNER REVIEW · VISUAL VOCABULARY`, is the
+  current pre-propagation role/combination decision surface. Controlled improvisation
+  stays within named evidenced families and roles; a genuinely new family or an old
+  extraction used in a new job returns to the owner.
 - The website remains legible for dense practitioner information, responsive from
   phone to desktop, bilingual, imagery-forward, accessible and restrained.
 
