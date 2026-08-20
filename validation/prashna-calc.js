@@ -170,9 +170,17 @@ function ascMcTropical(jdUT, Tut, latDeg, lonEastDeg) {
 
 // --------------------------------------------------- [9] PLACIDUS CUSPS
 function eclFromRA(raDeg, eps) { return norm360(Math.atan2(sinD(raDeg), cosD(raDeg) * cosD(eps)) * R2D); }
+/* Iterated semi-arc trisection. Placidus is undefined exactly where a cusp-defining
+   ecliptic point is circumpolar (|tan(lat)·tan(dec)| >= 1, the test inside solve());
+   an ecliptic point's declination never exceeds the obliquity, so that first bites at
+   the polar circle (~66.56°), where PR_ring/cuspRing falls back to equal house. There
+   used to be a flat `if (Math.abs(latDeg) > 60) return null` one step earlier, with no
+   source behind the 60, and src/engine/houses.ts (the Jyotish screen's Placidus) never
+   had it — so 60°–66.56° got Placidus cusps on one screen and equal cusps on the other,
+   ~19° apart at Reykjavík (bug bash F17, fixed 2026-08-19). MUST stay behaviourally
+   identical to PR_placidus in src/screens/PrashnaScreen.tsx: changing one copy only
+   would keep validation/prashna-parity.js green while the two engines disagreed. */
 function placidusCuspsTropical(ramc, eps, latDeg) {
-  // iterated semi-arc trisection; falls back to equal-house beyond |lat| 60
-  if (Math.abs(latDeg) > 60) return null;
   function solve(offsetFn, start) {
     let ra = norm360(ramc + start);
     for (let i = 0; i < 24; i++) {
@@ -468,4 +476,7 @@ if (require.main === module) {
     process.exit(runTests() ? 0 : 1);
   }
 }
-module.exports = { castChart, judge, QUESTIONS, subLordOf, nakOf, ayanamsaLahiri, RASHI_EN, RASHI_HI, GRAHA_EN, GRAHA_HI };
+/* placidusCuspsTropical is exported for the differential check that proves this
+   copy and the screen's frozen copy make the same house-division decision at
+   every latitude, not merely on the six charts prashna-parity.js casts. */
+module.exports = { castChart, judge, QUESTIONS, subLordOf, nakOf, ayanamsaLahiri, RASHI_EN, RASHI_HI, GRAHA_EN, GRAHA_HI, placidusCuspsTropical };

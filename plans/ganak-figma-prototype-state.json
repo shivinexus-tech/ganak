@@ -70,6 +70,9 @@
       ,"responsiveSharedSystemQa": "596:66"
       ,"ownerReviewVisualVocabulary": "707:14247"
       ,"ownerReviewExpandedFloralArtFamily": "743:16083"
+      ,"ownerDecisionNonFloralAtlas": "755:16083"
+      ,"approvedOrnamentLibrary": "753:2"
+      ,"ownerReviewBatch01TwelveScreenCheckpoint": "769:17254"
     },
     "frames": {
       "approvedDesktopMaster": "31:2",
@@ -201,16 +204,16 @@
   },
   "expandedFloralArtReview": {
     "ownerDecisionRecorded": "2026-08-19",
-    "decisionState": "OWNER REVIEW",
+    "decisionState": "APPROVED VOCABULARY ELEMENTS",
     "section": "743:16083",
-    "sectionName": "OWNER REVIEW · EXPANDED FLORAL ART FAMILY",
+    "sectionName": "APPROVED VOCABULARY · FLORAL ART FAMILY · PER-ELEMENT USE",
     "board": "743:16084",
     "correctedOriginSource": {
       "path": "/Users/shivie/Downloads/avif_xLarge.avif",
       "sha256": "7c9fc29a761eb7876c7eb18c473a834dddcff61e52aff679b6de70e2eace4222",
       "status": "SOURCE / INSPIRATION; not a shippable asset or blanket approval"
     },
-    "explorationArtworkNodes": ["743:16091", "743:16097", "743:16103", "743:16109", "743:16115", "743:16121", "743:16127", "743:16133", "743:16139"],
+    "approvedArtworkNodes": ["743:16091", "743:16097", "743:16103", "743:16109", "743:16115", "743:16121", "743:16127", "743:16133", "743:16139"],
     "approvedQualityControl": {
       "sourceNode": "485:51",
       "reviewCloneNode": "743:16145",
@@ -221,6 +224,57 @@
     "screenDesignsCreated": 0,
     "screensChanged": 0,
     "screenshotSanity": "PASS"
+  },
+  "nonFloralAtlasDecision": {
+    "ownerDecisionRecorded": "2026-08-19",
+    "section": "755:16083",
+    "sectionName": "OWNER DECISION · NON-FLORAL ATLAS · STRUCTURAL BORDERS APPROVED · CEREMONIAL FESTIVAL-ONLY",
+    "correctedSourceImageNode": "755:16090",
+    "atlasImageNode": "755:16095",
+    "floralReferenceClone": "755:16101",
+    "crossSiteClassificationNode": "757:2",
+    "festivalCeremonialClassificationNode": "757:4",
+    "crossSiteApproved": ["fine antique/luminous-gold rules", "narrow textile/lattice bands", "clean crimson/navy/gold edge systems", "subtle connected corners/edges", "single ending bands"],
+    "festivalVratOnly": ["arches", "niches", "temple-like frames", "elaborate cartouches/ribbons", "scalloped crowns/brackets"],
+    "prohibited": ["full wedding-card frame", "heavy ceremonial enclosure outside Festival/Vrat", "repetitive band on every card", "dull ivory", "ornament competing with data"]
+  },
+  "approvedOrnamentLibraryV1": {
+    "ownerDecisionRecorded": "2026-08-19",
+    "componentsPage": "38:3",
+    "section": "753:2",
+    "crossSiteStructuralBorderSet": "759:20",
+    "crossSiteVariants": ["757:6", "759:2", "759:4", "759:6", "759:8", "759:10", "759:12", "759:14", "759:16", "759:18"],
+    "approvedFloralSet": "760:20",
+    "approvedFloralVariants": ["760:2", "760:4", "760:6", "760:8", "760:10", "760:12", "760:14", "760:16", "760:18"],
+    "celebratoryVratHeroSweep": "760:21",
+    "celebratorySourceHero": "485:24",
+    "celebratorySourceBotanical": "485:51",
+    "usageModes": { "Restrained": "approved", "Rich": "approved", "Celebratory": "Festival/Vrat hero only", "Balanced": "rejected" },
+    "deferred": "Festival ceremonial arches/niches/cartouches/ribbons remain uncomponentized until a later exact need; lanes may not crop them locally."
+  },
+  "ownerReviewBatch01": {
+    "assembled": "2026-08-19",
+    "decisionState": "OWNER REVIEW · VISUAL DIRECTION AND ACCESSIBILITY ONLY",
+    "independentQa": "PASS on all twelve exact source candidates before cloning",
+    "section": "769:17254",
+    "sectionName": "OWNER REVIEW · BATCH 01 · 12-SCREEN QUALITY CHECKPOINT",
+    "desktopEnglishPrimaries": {
+      "01TodayOrdinary": "769:17261",
+      "02TodaySpecial": "769:17610",
+      "03FullPanchang": "769:17962",
+      "04CalendarSelectedDay": "769:18390",
+      "05FestivalsDefault": "769:18558",
+      "06FestivalCalendar": "769:18753",
+      "07FestivalStory": "769:18984",
+      "08VratGuide": "769:19148",
+      "09MuhuratHub": "769:19326",
+      "10PropertyFinder": "769:19487",
+      "11PrashnaAsk": "769:19662",
+      "12PrashnaAnswer": "769:19843"
+    },
+    "scopeBoundary": "Desktop English carries the owner visual-direction decision. Hindi and 390/320 remain adjacent workbench QA evidence. Production routes/interactions are a separate gate.",
+    "fixtureCorrection": "Shravana Putrada is coherent across Calendar, Festivals and Vrat as Monday 24 August 2026 for the New Delhi/Amanta fixture.",
+    "reviewQuestions": ["Does this now feel like one coherent Ganak website?", "Which screens feel weakest?", "Is any earlier mistake repeating?"]
   },
   "approvedVratBotanicalTreatment": {
     "ownerDecisionRecorded": "2026-08-18",
@@ -306,7 +360,7 @@
     "state": "OWNER REVIEW — WEBSITE BASELINE CORRECTED; OWNER CONFIRMATION PENDING; PRODUCTION INTERACTIONS CHANGES REQUESTED",
     "queueRule": "Do not place a pilot, wrapper or comparison board in the Owner Review Queue until same-viewport integrator comparison and exact-node independent QA pass every applicable GDF rule.",
     "feedbackLedger": "plans/ganak-design-feedback-ledger.md",
-    "canonicalFeedbackIds": "GDF-001 through GDF-057",
+    "canonicalFeedbackIds": "GDF-001 through GDF-061",
     "independentQaTask": "01a018d9-dca3-70b3-a851-b46eccd965cf",
     "todayPanchangSource": "116:49",
     "festivalVratSources": ["135:1312", "485:24"],

@@ -167,9 +167,21 @@ ok(PR_castNumber(ms, DELHI.lat, DELHI.lon, 0) === null && PR_castNumber(ms, DELH
 
 // 6. high-latitude equal-house fallback (same as time mode) ------------------
 console.log('--- high-latitude fallback ---');
+/* This used to assert that Reykjavík fell back to equal houses, which was only
+   true because PR_placidus bailed at a flat |lat| > 60 that no source supports
+   (bug bash F17, fixed 2026-08-19). Reykjavík is BELOW the polar circle, where
+   Placidus is perfectly well defined and where the Jyotish chart screen had been
+   using it all along — the two screens disagreed by up to 81°. The check is now
+   two-sided, which is strictly more than it asserted before: Placidus where
+   Placidus exists, the declared equal-house fallback only above the polar circle
+   where it does not. */
 {
-  const c = PR_castNumber(ms, 64.1466, -21.9426, 108); // Reykjavik
-  ok(c.system === 'equal', `Reykjavik number chart falls back to equal houses (got ${c.system})`);
+  const c = PR_castNumber(ms, 64.1466, -21.9426, 108); // Reykjavik, 64.15°N — below the polar circle
+  ok(c.system === 'placidus', `Reykjavik number chart uses Placidus, which is defined at 64.15° (got ${c.system})`);
+  const t = PR_castNumber(ms, 69.6496, 18.9560, 108);  // Tromsø, 69.65°N — above it
+  ok(t.system === 'equal', `Tromso number chart falls back to equal houses above the polar circle (got ${t.system})`);
+  const a = PR_castNumber(ms, 66.0, 18.9560, 108);     // inside the old dead band
+  ok(a.system === 'placidus', `66°N number chart still gets Placidus (got ${a.system})`);
 }
 
 console.log(`\n${fail === 0 ? 'ALL TESTS PASSED' : 'FAILURES PRESENT'}  (${pass} pass / ${fail} fail)`);

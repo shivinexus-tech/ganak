@@ -319,6 +319,33 @@ vary motif, density and colour balance only within a named, evidenced family and
 role; a genuinely new family—or an old extraction in a new structural job—returns
 to the owner.
 
+**Ornament-family owner decision and shared V1, 2026-08-19.** The owner approved
+the nine isolatable floral artworks in section `743:16083` as reusable vocabulary
+elements, not universal placements. The owner also approved a cross-site family of
+restrained structural border elements from the corrected AVIF: fine antique-gold
+rules, narrow textile/lattice bands, clean crimson/navy/gold edge systems, subtle
+corner/edge framing and single ending bands. Ornate arches, niches, temple-like
+frames, elaborate cartouches/ribbons, scalloped crowns and similarly architectural
+pieces are **Festival/Vrat-only ceremonial vocabulary**. They are not approved for
+Today, Full Panchang, Calendar, Muhurat, Prashna or Jyotish.
+
+The minimum stable shared library is section `753:2` on components page `38:3`:
+
+- cross-site structural-border component set `759:20`, variants `757:6`, `759:2`,
+  `759:4`, `759:6`, `759:8`, `759:10`, `759:12`, `759:14`, `759:16`, `759:18`;
+- approved floral-vocabulary set `760:20`, variants `760:2`, `760:4`, `760:6`,
+  `760:8`, `760:10`, `760:12`, `760:14`, `760:16`, `760:18`; and
+- Festival/Vrat-only celebratory hero sweep `760:21`, preserving exact source
+  `485:51` and approved hero composition `485:24`.
+
+`Restrained` and `Rich` are contextual usage modes, not competing themes.
+`Celebratory` is reserved for Festival/Vrat heroes. `Balanced` remains rejected
+under `REJ-015`. Full invitation frames, repeated bands on every card, dull ivory,
+detached stickers, invented devotional marks and ornament that competes with data
+remain prohibited. The owner-review atlas classification is visible at `755:16083`.
+Ceremonial non-floral components beyond the stable V1 are deferred rather than
+locally redrawn by lanes.
+
 ## 8. Communication
 
 All design feedback is durable only when added to this authority record, the
