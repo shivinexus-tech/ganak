@@ -267,6 +267,35 @@ production routes, keyboard/focus behavior, responsive reflow and assistive-
 technology semantics remain separately gated. Former baseline `652:13736` remains
 `CHANGES REQUESTED` historical evidence and is not review authority.
 
+#### Superseding operational recovery admission — 2026-08-20
+
+The executable admission gate now records `BATCH-01-RECOVERY` as
+`FULL_SCREEN_PASS` with zero blockers for this exact active desktop-English node
+set, in review order:
+
+1. Today ordinary `851:18729`;
+2. Today special `858:2`;
+3. Full Panchang `858:266`;
+4. Calendar selected day/return `851:19585`;
+5. Festivals discovery `851:19660`;
+6. Festival calendar `851:19762`;
+7. Story-led festival detail `851:20865`;
+8. Vrat guide `851:20938`;
+9. Muhurat hub `851:21024`;
+10. Property finder `851:21080`;
+11. Prashna ask `851:21162`;
+12. Prashna answer `851:21250`.
+
+This exact set supersedes earlier Batch 01 node lists for **operational recovery
+admission only**. Historical `OWNER REVIEW`, `QA PASS`, rejected and predecessor
+records remain preserved as decision history and must not be deleted or rewritten
+as though they were the active set. The pass proves current static-Figma geometry,
+reaction attachment metadata, visible text/overflow/contrast checks, rejected-use
+checks and shared-instance lineage. It does not prove browser DOM or tab order,
+keyboard execution, assistive-technology semantics, responsive reflow/zoom, or
+production routing. Owner communication remains with the root communication task;
+this record does not itself publish an owner link.
+
 The responsive shared system above was created before lane resumption. Its linked
 EN/HI 390px proof has no text below 13px, no mapped target below 42px, no missing
 font, no prohibited Phone/native instance, and a measured minimum text contrast of

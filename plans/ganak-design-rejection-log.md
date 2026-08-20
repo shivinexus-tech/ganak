@@ -519,6 +519,16 @@ zero active REJ-017 exact-crop reuse and zero denied dominant surface hits. The 
 is limited to desktop visual direction and screenshot-visible accessibility;
 production interaction and responsive behavior remain separately gated.
 
+The superseding **operational recovery** set is `851:18729`, `858:2`, `858:266`,
+`851:19585`, `851:19660`, `851:19762`, `851:20865`, `851:20938`, `851:21024`,
+`851:21080`, `851:21162`, `851:21250`. Executable gate
+`BATCH-01-RECOVERY` reports `FULL_SCREEN_PASS` with zero blockers and zero active
+`REJ-016`/`REJ-017` or denied-surface violations for that exact set. This update
+does not delete or overwrite the historical review nodes above; it only identifies
+which descendants are operationally current. Static-Figma limitations remain:
+browser DOM/tab order, keyboard execution, assistive-technology semantics,
+responsive reflow/zoom and production routing are not proved by this admission.
+
 | Role | Review node | Source candidate |
 |---|---:|---:|
 | Today desktop website | `652:13737` | `601:9563` |

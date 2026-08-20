@@ -363,6 +363,43 @@
       "11PrashnaAsk": "769:19662",
       "12PrashnaAnswer": "769:19843"
     },
+    "operationalRecoveryAdmission": {
+      "gateId": "BATCH-01-RECOVERY",
+      "decisionState": "FULL_SCREEN_PASS",
+      "date": "2026-08-20",
+      "blockerCount": 0,
+      "supersedesEarlierNodeListsFor": "operational recovery admission only",
+      "historicalReviewRecordsPreserved": true,
+      "finalDesktopEnglishPrimaries": {
+        "01TodayOrdinary": "851:18729",
+        "02TodaySpecial": "858:2",
+        "03FullPanchang": "858:266",
+        "04CalendarSelectedDay": "851:19585",
+        "05FestivalsDefault": "851:19660",
+        "06FestivalCalendar": "851:19762",
+        "07FestivalStory": "851:20865",
+        "08VratGuide": "851:20938",
+        "09MuhuratHub": "851:21024",
+        "10PropertyFinder": "851:21080",
+        "11PrashnaAsk": "851:21162",
+        "12PrashnaAnswer": "851:21250"
+      },
+      "staticFigmaEvidence": [
+        "current node geometry",
+        "reaction attachment metadata",
+        "visible language, type and overflow",
+        "denied-use checks",
+        "shared-instance lineage"
+      ],
+      "notProved": [
+        "browser DOM or tab order",
+        "keyboard execution",
+        "assistive-technology semantics",
+        "responsive reflow or zoom",
+        "production routing"
+      ],
+      "ownerCommunicationOwner": "root communication task"
+    },
     "scopeBoundary": "Desktop English carries the owner visual-direction decision. Hindi and 390/320 remain adjacent workbench QA evidence. Production routes/interactions are a separate gate.",
     "fixtureCorrection": "Shravana Putrada is coherent across Calendar, Festivals and Vrat as Monday 24 August 2026 for the New Delhi/Amanta fixture.",
     "p0FloralCorrection": {
