@@ -358,3 +358,13 @@ GREEN exit=0
 ```
 
 The product edit was reverted; `git status` is clean apart from this lane's own two files.
+
+## Full gate suite
+
+`bash scripts/run-all-gates.sh`, run twice — once mid-lane and once against the final commit:
+
+```
+PASS  cross-surface-consistency.cjs               72s
+
+102 passed, 0 failed.
+```
