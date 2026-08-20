@@ -69,4 +69,66 @@ for (const key of COVERED) {
   });
 }
 
-console.log(`festival-aarti: OK (${COVERED.length} guide(s), ${COVERED.reduce((n, k) => n + VRAT_VIDHI[k].aartis.length, 0)} aartis)`);
+/* ------------------------------------------------------------------------
+   Standalone deity aartis (P2-FESTIVAL-AARTI-BREADTH, Tier 1).
+
+   The checks above reach an aarti only through a festival guide, so a deity
+   aarti that belongs to a weekday vrat or a pilgrimage rather than to one
+   festival — Shani, Santoshi, Khatu Shyam — would be entered and validated by
+   nothing at all. These are keyed by the exported constant instead, and hold
+   the same contract: bilingual title and intro, refrain + cue + stanzas,
+   Devanagari only, and the refrain opening pinned so a text cannot be quietly
+   swapped for a different aarti.
+
+   The anchor is the identity of the aarti. It is the one thing that must not
+   drift: everything else about a devotional text can be re-sourced, but if the
+   opening changes, it is a different hymn.
+   ------------------------------------------------------------------------ */
+const AARTI_TEXTS = loadApp('src/data/aarti-texts.ts');
+
+const DEITY_AARTIS = {
+  SHANI_AARTI: 'जय जय श्री शनिदेव भक्तन हितकारी',
+  SANTOSHI_AARTI: 'जय सन्तोषी माता',
+  SARASWATI_AARTI: 'जय सरस्वती माता',
+  SURYA_AARTI: 'जय कश्यप-नन्दन',
+  KHATU_SHYAM_AARTI: 'ॐ जय श्री श्याम हरे',
+  VAISHNO_AARTI: 'जय वैष्णवी माता',
+  GANGA_AARTI: 'ॐ जय गंगे माता',
+};
+
+for (const [name, anchor] of Object.entries(DEITY_AARTIS)) {
+  const a = AARTI_TEXTS[name];
+  assert(a, `deity aarti ${name} is not exported from src/data/aarti-texts.ts`);
+  assert(a.title && a.title.en && a.title.hi, `${name}: title {en,hi} required`);
+  assert(a.intro && a.intro.en && a.intro.hi, `${name}: intro {en,hi} required`);
+  assert(typeof a.refrain === 'string' && a.refrain.trim(), `${name}: refrain required`);
+  assert(typeof a.cue === 'string' && a.cue.trim(), `${name}: cue required`);
+  assert(Array.isArray(a.stanzas) && a.stanzas.length >= 3, `${name}: needs at least 3 stanzas, has ${(a.stanzas || []).length}`);
+
+  const allText = [a.refrain, a.cue, ...a.stanzas].join('\n');
+  assert(DEVANAGARI.test(allText), `${name}: text must contain Devanagari`);
+  assert(!LATIN.test(allText), `${name}: aarti text must be Devanagari only (no Latin)`);
+  assert(!/ओम्/.test(allText), `${name}: use ॐ, not ओम्`);
+  assert(firstLine(a.refrain).includes(anchor), `${name}: refrain must open with "${anchor}" — a different opening means a different aarti`);
+  assert(nonEmptyLines(a.cue).length === 1, `${name}: cue must be a single short line`);
+  assert(a.cue.length < a.refrain.length, `${name}: the cue must be shorter than the refrain it stands in for`);
+
+  // The refrain is shown once at the top and marked afterwards by the cue, so it
+  // must not also be repeated as a stanza (plans/festival-aarti-standard.md §2).
+  const refrainFirst = firstLine(a.refrain);
+  for (const [i, s] of a.stanzas.entries()) {
+    assert(firstLine(s) !== refrainFirst, `${name}: stanza ${i + 1} repeats the refrain — the cue already marks the return`);
+  }
+
+  // Every stanza is a sung couplet or longer, and ends a full stanza with ॥.
+  for (const [i, s] of a.stanzas.entries()) {
+    assert(nonEmptyLines(s).length >= 2, `${name}: stanza ${i + 1} is a single line — aarti stanzas are couplets or longer`);
+    assert(/॥\s*$/.test(s.trim()), `${name}: stanza ${i + 1} must end with a double danda ॥`);
+  }
+  assert(/॥\s*$/.test(a.refrain.trim()), `${name}: the refrain must end with a double danda ॥`);
+}
+
+const deityCount = Object.keys(DEITY_AARTIS).length;
+const deityStanzas = Object.keys(DEITY_AARTIS).reduce((n, k) => n + AARTI_TEXTS[k].stanzas.length, 0);
+
+console.log(`festival-aarti: OK (${COVERED.length} guide(s), ${COVERED.reduce((n, k) => n + VRAT_VIDHI[k].aartis.length, 0)} aartis; plus ${deityCount} standalone deity aartis, ${deityStanzas} stanzas)`);

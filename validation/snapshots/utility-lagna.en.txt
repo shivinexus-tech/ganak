@@ -8,3 +8,14 @@ Place
 Calculate
 Method & limitsLahiri sidereal ascendant from exact time and place.
 Source note: classical and published bases are recorded in Ganak's method map.
+What is Ascendant (Lagna)?
+The Lagna, or ascendant, is the zodiac sign that was rising on the eastern horizon at your exact place and minute of birth. Because the earth turns, it moves through all twelve signs in a single day, changing roughly every two hours. That makes it the most time-sensitive figure in the whole chart, and the reason astrologers insist on an accurate birth time: it fixes the first house, and every other house is counted from there.
+What it means
+Where the Moon sign describes the inner weather, the ascendant describes the frame — physical constitution, outward manner, the impression you make before you speak, and the lens through which the rest of the chart is interpreted. Two people born on the same day with different ascendants get substantially different readings from the same planetary positions, because the houses land differently. It is the single most useful thing to get right.
+Myths vs reality
+Myth: A rough birth time is good enough for the ascendant.
+Reality: It often is not. The rising sign changes about every two hours, so an error of an hour or two can move it entirely and shift every house with it. If your recorded time is uncertain, treat the ascendant as provisional and say so.
+Myth: The ascendant sign alone tells you what you look like.
+Reality: It contributes, but any planet sitting in or aspecting the first house changes the picture, and so does its ruling planet's placement. Appearance is read from a combination, not from the rising sign on its own.
+A grounded perspective
+If your birth time came from memory rather than a record, it is worth finding the certificate or hospital note before leaning on any reading built on the ascendant. Where no reliable time exists, astrologers work from the Moon sign instead and say plainly that the houses are uncertain — an honest limitation, and a better basis than a confident chart built on a guess.

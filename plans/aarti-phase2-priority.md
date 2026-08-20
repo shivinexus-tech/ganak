@@ -20,6 +20,20 @@ aartis may stand alone.
 
 ---
 
+## Tier 1 — ✅ ENTERED 2026-08-20 (`CLAUDE-AARTI-TIER1-BREADTH-2026-08-20`)
+
+All seven texts are in `src/data/aarti-texts.ts`, cross-validated with per-aarti citations in
+`plans/festival-aarti-standard.md` §6, and covered by a new standalone-deity section in
+`validation/festival-aarti.cjs` (7 aartis, 46 stanzas) that pins each refrain opening — the one
+thing that must not drift, since a changed opening means a different hymn.
+
+**Not yet done, and deliberately so:** these have no URLs of their own. They are deity aartis
+rather than festival-specific ones, so their homes are the standalone routes in
+`P2-FESTIVAL-AARTI-FINDER`, which is a separate unbuilt row. Until that lands they are entered
+and validated but not yet reachable by a reader. Owner skim sign-off also still outstanding.
+
+Original priority list below.
+
 ## Tier 1 — highest search · everyday/weekly · pan-India (do first)
 
 | # | Aarti (first line) | Deity | Demand driver |

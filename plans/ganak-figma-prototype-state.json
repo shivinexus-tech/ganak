@@ -6,7 +6,7 @@
   "designRejectionRegister": {
     "path": "plans/ganak-design-rejection-log.md",
     "role": "canonical rejection vocabulary; the GDF ledger remains the regression/action register",
-    "canonicalRejectIds": "REJ-001 through REJ-015",
+    "canonicalRejectIds": "REJ-001 through REJ-017",
     "nodeMap": {
       "REJ-001": { "rejectedNodes": ["47:2"] },
       "REJ-002": { "rejectedNodes": ["79:12"] },
@@ -14,13 +14,19 @@
       "REJ-004": {
         "relatedNodes": ["47:2", "79:12"],
         "correctedReviewNodes": ["652:13737", "652:13738", "652:13754", "652:13762", "I652:13762;206:108", "I652:13762;206:115", "I652:13762;274:690", "652:13786", "652:13825", "652:13918", "652:13964", "652:13979", "652:14060", "I652:14060;206:108", "I652:14060;206:115", "I652:14060;274:690", "652:14092"],
+        "deniedDominantSurfaceHex": ["#F9FAF9", "#FCFBF8", "#FFFDFC", "#FAF9F4"],
+        "semanticOrAreaGate": "deny on canvas/page/header/card/panel/context/breadcrumb/footer/input/hero/empty-region roles, or any filled area >=2% of root; small warm rules/strokes/icons/art require explicit role evidence",
+        "correctedSharedContextNodes": ["206:108", "206:115", "274:690", "552:61", "552:68", "552:86"],
+        "correctedBatchSourceRoots": ["762:16084", "762:16339", "762:16597", "762:16932", "730:15152", "730:15339", "730:15940", "763:17139", "730:14646", "730:14805", "730:16288", "730:16467"],
+        "correctedBatchReviewSection": "769:17254",
+        "postCorrectionDeniedSurfaceHits": 0,
         "approvedSafeBases": { "canvas": "#F9FCFD", "surface": "#FFFFFF", "secondary": "#ECF4F7", "exclusivePalette": false },
         "permittedSourceDerivedFamilies": ["navy", "crimson/burgundy", "luminous/antique gold", "powder blue", "botanical greens", "other evidenced source colours with approved roles"]
       },
       "REJ-005": { "referenceNodesOnly": ["31:2"], "rejectedNodeRecovery": "TODO — exact old crop node not yet recovered" },
       "REJ-006": { "rejectedNodeRecovery": "TODO — exact older Muhurat accent nodes not yet recovered" },
       "REJ-007": { "hiddenNodes": ["652:13965", "652:13967"] },
-      "REJ-008": { "hiddenNodes": ["666:14247"], "approvedSourcePreserved": ["485:51"] },
+      "REJ-008": { "hiddenNodes": ["666:14247"], "supersededAssetException": "485:51 is globally rejected under REJ-016" },
       "REJ-009": { "removedNodes": ["675:14247", "675:14248", "675:14249", "675:14250", "675:14251", "675:14252", "675:14253"] },
       "REJ-010": { "historicalEvidenceNodes": ["544:8046", "544:8049", "546:32", "546:35"] },
       "REJ-011": { "rejectedNodeRecovery": "TODO — source-claim evidence is in task history" },
@@ -38,7 +44,63 @@
         "rejectedNodes": ["730:14247"],
         "reason": "No meaningful ornament structure; elements were placed rather than composing a frame, path or transition.",
         "stillLikedNotApproved": ["restrained direction", "rich direction"]
+      },
+      "REJ-016": {
+        "decisionState": "REJECTED / ARCHIVE ONLY / MACHINE ENFORCED",
+        "rejectedNode": "485:51",
+        "rejectedHash": "b7559c796e972db13b8aa54daba3a1405264f488",
+        "rejectedComposition": "485:24",
+        "historicalInstances": ["493:22", "495:22", "495:23", "495:24"],
+        "archivedSharedComponent": "760:21",
+        "archivedSharedChild": "760:22",
+        "componentArchiveSection": "778:2",
+        "replacementSharedComponent": "760:4",
+        "replacementInstances": ["781:2", "781:4"],
+        "activeWholeFileHashHitsAfterSweep": 0,
+        "activeWholeFileApprovalNameHitsAfterSweep": 0,
+        "enforcement": "active APPROVED / OWNER REVIEW / QA PASS subtrees deny exact hash, node/derived lineage and approval-name claims"
+      },
+      "REJ-017": {
+        "decisionState": "REJECTED / ARCHIVE ONLY / EXACT CROP SIGNATURE",
+        "ownerScreenshot": "/Users/shivie/Desktop/Screenshot 2026-08-19 at 11.54.47 PM.png",
+        "canonicalWrapper": "107:50",
+        "canonicalRaster": "107:51",
+        "sourceWrapper": "116:391",
+        "sourceRaster": "116:392",
+        "batchWrapper": "762:16314",
+        "batchRaster": "762:16315",
+        "cropSignature": { "wrapperWidth": 88, "wrapperHeight": 446, "clipsContent": true, "rasterWidth": 1536, "rasterHeight": 1119, "rasterX": -21, "rasterY": -253 },
+        "sharedSourceSheetHashNotGloballyRejected": "c69d89b16c8068f8f06ea86b4a3852a19db33732",
+        "activeExactCropHitsAfterSweep": 0,
+        "broadBotanicalFamilyRejection": false,
+        "ordinaryTodaySlotDecision": { "comparison": "811:18395", "winner": "811:19095", "choice": "no added ornament", "rejectedOnlyForThisSlot": ["811:18400", "811:18747"] }
       }
+    }
+  },
+  "machineEnforcement": {
+    "rejectedAssetDenylist": {
+      "nodes": ["485:51"],
+      "containingRejectedCompositions": ["485:24"],
+      "imageHashes": ["b7559c796e972db13b8aa54daba3a1405264f488"],
+      "prohibitedApprovalNamePatterns": ["Hero floral stem / exact approved crop", "approved botanical 485:51", "approved Vrat botanical sweep"],
+      "activeDecisionSubtrees": ["APPROVED", "OWNER REVIEW", "QA PASS"],
+      "allowedOnlyUnderAncestorStates": ["REJECTED", "ARCHIVE ONLY", "HISTORICAL"],
+      "lastWholeFileSweep": { "date": "2026-08-19", "activeHashHits": 0, "activeApprovalNameHits": 0 }
+    },
+    "dominantSurfaceDenylist": {
+      "fullOpacityHex": ["#F9FAF9", "#FCFBF8", "#FFFDFC", "#FAF9F4"],
+      "semanticRoles": ["canvas", "page", "background", "header", "card", "panel", "context", "breadcrumb", "footer", "input", "hero", "empty region"],
+      "areaThresholdPercentOfRoot": 2,
+      "allowlistedUse": "small rules, strokes, icons, text punctuation or artwork with exact role evidence",
+      "lastBatchSweep": { "date": "2026-08-19", "sourceSharedAndReviewHits": 0 }
+    },
+    "exactScreenshotCropDenylist": {
+      "rule": "match exact crop geometry, raster offset and content nodes; do not deny the shared source-sheet hash globally",
+      "canonicalNodes": ["107:50", "107:51"],
+      "signature": { "wrapperWidth": 88, "wrapperHeight": 446, "clipsContent": true, "rasterWidth": 1536, "rasterHeight": 1119, "rasterX": -21, "rasterY": -253 },
+      "sourceSheetHashNotGloballyDenied": "c69d89b16c8068f8f06ea86b4a3852a19db33732",
+      "activeExactCropHitsAfterSweep": 0,
+      "broadAspectRatioOrBotanicalHeuristic": false
     }
   },
   "entities": {
@@ -58,8 +120,8 @@
       ,"backgroundSystemComparison": "148:2"
       ,"markedBackgroundComparison": "150:2"
       ,"backgroundCloseupComparison": "152:2"
-      ,"vratGuidePack": "357:2"
-      ,"vratBotanicalApprovedSource": "485:22"
+      ,"vratGuidePackHistoricalRejected": "357:2"
+      ,"vratBotanicalRejectedSource": "485:22"
       ,"workbenchATodayPanchang": "512:4210"
       ,"workbenchBFestivalsVrat": "512:4211"
       ,"workbenchCMuhuratPrashna": "512:4212"
@@ -73,6 +135,8 @@
       ,"ownerDecisionNonFloralAtlas": "755:16083"
       ,"approvedOrnamentLibrary": "753:2"
       ,"ownerReviewBatch01TwelveScreenCheckpoint": "769:17254"
+      ,"completeOrnamentInventoryOwnerView": "800:2"
+      ,"todayOrdinaryOrnamentComparison": "811:18395"
     },
     "frames": {
       "approvedDesktopMaster": "31:2",
@@ -101,7 +165,7 @@
       "vratFixtureB": "357:212",
       "vratFixtureC": "357:419",
       "vratFixtureD": "357:627",
-      "vratBotanicalApprovedHero": "485:24",
+      "vratBotanicalRejectedHero": "485:24",
       "routeStateMap": "32:2",
       "foundationDocumentation": "39:2",
       "screenInventoryBoard": "73:16"
@@ -155,20 +219,22 @@
       "baseReactionState": "unbound",
       "validatedPilotFamilies": ["Today", "Festival/Vrat"]
     },
-    "vratHeroes": {
-      "official": {
+    "historicalRejectedVratHeroes": {
+      "decisionState": "REJECTED / ARCHIVE ONLY",
+      "historicalCompositions": {
         "A": "357:117",
         "B": "357:325",
         "C": "357:532",
         "D": "357:740"
       },
-      "botanicalInstances": {
+      "historicalExactHashInstances": {
         "A": "493:22",
         "B": "495:22",
         "C": "495:23",
         "D": "495:24"
       },
-      "botanicalAsset": "485:51"
+      "rejectedBotanicalAsset": "485:51",
+      "rejectedImageHash": "b7559c796e972db13b8aa54daba3a1405264f488"
     }
   },
   "approvedMaster": {
@@ -196,7 +262,8 @@
     "section": "707:14247",
     "sectionName": "OWNER REVIEW · VISUAL VOCABULARY",
     "board": "707:14248",
-    "sourcesOnly": ["31:2", "116:49", "116:387", "116:388", "485:24", "485:51", "682:22"],
+    "sourcesOnly": ["31:2", "116:49", "116:387", "116:388", "682:22"],
+    "rejectedHistoricalEvidenceOnly": ["485:24", "485:51"],
     "contains": ["palette roles and proven contrast combinations", "ornament families", "placement and density rules", "three small composition swatches", "anti-vocabulary", "controlled-improvisation rule", "exact source references"],
     "controlledImprovisation": "New work may vary motif, density and colour balance only within named evidenced families and roles. A genuinely new family or an existing extraction used in a new structural job returns to the owner.",
     "screenDesignsCreated": 0,
@@ -214,10 +281,10 @@
       "status": "SOURCE / INSPIRATION; not a shippable asset or blanket approval"
     },
     "approvedArtworkNodes": ["743:16091", "743:16097", "743:16103", "743:16109", "743:16115", "743:16121", "743:16127", "743:16133", "743:16139"],
-    "approvedQualityControl": {
+    "rejectedHistoricalControl": {
       "sourceNode": "485:51",
       "reviewCloneNode": "743:16145",
-      "scope": "Festival/Vrat hero only"
+      "decisionState": "REJECTED / HIDDEN / ARCHIVE ONLY; not a quality control"
     },
     "artworkKinds": ["side-growing restrained sweep", "side-growing rich sweep", "side-growing editorial sweep", "horizontal botanical transition", "vertical climbing vine", "bottom-right corner garden", "open floral arch", "wide botanical ending band", "deity-adjacent foliage"],
     "isolatableTransparentAssets": true,
@@ -246,18 +313,41 @@
     "crossSiteVariants": ["757:6", "759:2", "759:4", "759:6", "759:8", "759:10", "759:12", "759:14", "759:16", "759:18"],
     "approvedFloralSet": "760:20",
     "approvedFloralVariants": ["760:2", "760:4", "760:6", "760:8", "760:10", "760:12", "760:14", "760:16", "760:18"],
-    "celebratoryVratHeroSweep": "760:21",
-    "celebratorySourceHero": "485:24",
-    "celebratorySourceBotanical": "485:51",
+    "rejectedFormerCelebratoryComponent": "760:21",
+    "rejectedFormerCelebratoryChild": "760:22",
+    "rejectedComponentArchiveSection": "778:2",
+    "rejectedSourceHero": "485:24",
+    "rejectedSourceBotanical": "485:51",
+    "currentBatchVratFloralComponent": "760:4",
+    "currentBatchVratFloralInstances": ["781:2", "781:4"],
     "usageModes": { "Restrained": "approved", "Rich": "approved", "Celebratory": "Festival/Vrat hero only", "Balanced": "rejected" },
     "deferred": "Festival ceremonial arches/niches/cartouches/ribbons remain uncomponentized until a later exact need; lanes may not crop them locally."
   },
+  "completeOrnamentInventoryOwnerView": {
+    "created": "2026-08-20",
+    "section": "800:2",
+    "sectionName": "ORNAMENT LIBRARY · COMPLETE INVENTORY · OWNER VIEW",
+    "board": "800:3",
+    "sourceReference": "800:9",
+    "counts": {
+      "activeOwnerLikedFloral": 9,
+      "crossSiteStructuralBordersRules": 7,
+      "textileLatticeGeometric": 6,
+      "festivalVratCeremonial": 14,
+      "dividersTransitionsCornersFramesCartouches": 17,
+      "rejectedArchiveOnly": 15,
+      "total": 68
+    },
+    "rejectedZone": "806:21",
+    "audit": { "blankPreviews": 0, "cardOverflow": 0, "broadRejectionRuleHits": 0 },
+    "usageBoundary": "Library inclusion does not mean use everywhere; each item remains governed by its status, role and allowed scope."
+  },
   "ownerReviewBatch01": {
     "assembled": "2026-08-19",
-    "decisionState": "OWNER REVIEW · VISUAL DIRECTION AND ACCESSIBILITY ONLY",
-    "independentQa": "PASS on all twelve exact source candidates before cloning",
+    "decisionState": "CHANGES REQUESTED · FULL EXACT-NODE RE-QA PENDING",
+    "independentQa": "PREVIOUS PASS WITHDRAWN after REJ-017 exact screenshot-crop correction; current cleanup sweeps are evidence, not full Batch approval",
     "section": "769:17254",
-    "sectionName": "OWNER REVIEW · BATCH 01 · 12-SCREEN QUALITY CHECKPOINT",
+    "sectionName": "CHANGES REQUESTED · BATCH 01 · EXACT ORNAMENT CORRECTION · RE-QA PENDING",
     "desktopEnglishPrimaries": {
       "01TodayOrdinary": "769:17261",
       "02TodaySpecial": "769:17610",
@@ -274,19 +364,42 @@
     },
     "scopeBoundary": "Desktop English carries the owner visual-direction decision. Hindi and 390/320 remain adjacent workbench QA evidence. Production routes/interactions are a separate gate.",
     "fixtureCorrection": "Shravana Putrada is coherent across Calendar, Festivals and Vrat as Monday 24 August 2026 for the New Delhi/Amanta fixture.",
+    "p0FloralCorrection": {
+      "rejectedNode": "485:51",
+      "rejectedHash": "b7559c796e972db13b8aa54daba3a1405264f488",
+      "removedBatchNode": "769:19175",
+      "replacementComponent": "760:4",
+      "replacementInstance": "781:4",
+      "activeWholeFileReuseAfterSweep": 0
+    },
+    "p0SurfaceCorrection": {
+      "deniedHex": ["#F9FAF9", "#FCFBF8", "#FFFDFC", "#FAF9F4"],
+      "safeRoleMapping": { "canvas": "#F9FCFD", "surface": "#FFFFFF", "secondaryHero": "#ECF4F7" },
+      "deniedHitsAcrossSourcesSharedAndBatchAfterSweep": 0
+    },
+    "p0ExactScreenshotCropCorrection": {
+      "ownerScreenshot": "/Users/shivie/Desktop/Screenshot 2026-08-19 at 11.54.47 PM.png",
+      "rejectedCropNodes": ["107:50", "107:51", "116:391", "116:392", "762:16314", "762:16315"],
+      "sourceSheetHashNotGloballyRejected": "c69d89b16c8068f8f06ea86b4a3852a19db33732",
+      "activeExactCropHitsAfterSweep": 0,
+      "ordinaryTodayComparison": "811:18395",
+      "ordinaryTodayWinner": "811:19095",
+      "ordinaryTodayDecision": "C — no added ornament",
+      "fullBatchReQa": "PENDING"
+    },
     "reviewQuestions": ["Does this now feel like one coherent Ganak website?", "Which screens feel weakest?", "Is any earlier mistake repeating?"]
   },
-  "approvedVratBotanicalTreatment": {
-    "ownerDecisionRecorded": "2026-08-18",
-    "decisionState": "APPROVED",
-    "scope": "Vrat/Festival Guide hero visual treatment only",
+  "rejectedVratBotanicalTreatment": {
+    "ownerDecisionRecorded": "2026-08-19",
+    "decisionState": "REJECTED / ARCHIVE ONLY / SUPERSEDES PRIOR APPROVAL CLAIM",
+    "scope": "Exact asset/composition historical evidence only",
     "sourceSection": "485:22",
     "sourceHero": "485:24",
     "botanicalAssetNode": "485:51",
     "figmaImageHash": "b7559c796e972db13b8aa54daba3a1405264f488",
     "officialScreens": ["357:4", "357:212", "357:419", "357:627"],
     "officialHeroInstances": ["493:22", "495:22", "495:23", "495:24"],
-    "instanceGeometry": {
+    "historicalInstanceGeometry": {
       "width": 927.36,
       "height": 410.32,
       "x": 0,
@@ -294,30 +407,14 @@
       "scaleFromSelectedAsset": 0.92,
       "anchor": "bottom-left"
     },
-    "visualRules": [
-      "white or pale-blue-white shell",
-      "deep navy, burgundy/crimson and luminous clean gold",
-      "restrained fresh blue and green support",
-      "large crisp floral sweep from the left and bottom-left",
-      "mapped deity artwork at right with a thin gold edge",
-      "ornament varies structurally by purpose and is not pasted everywhere"
+    "prohibitedReuse": [
+      "no exact/cropped/derived/hash-equivalent presentation",
+      "no approval-name claim",
+      "no resize/recolour/trace substitute",
+      "no use as quality control"
     ],
-    "scopeExclusions": [
-      "does not approve the generated or raster source as a production asset",
-      "does not approve parent screen data, copy or layout",
-      "does not supersede shared components or semantic variables",
-      "does not permit the sparse guide to omit Follow"
-    ],
-    "parentFrameState": "OWNER REVIEW",
-    "blockingProof": [
-      "regenerate all A-D calculated values from named Ganak engine fixtures",
-      "correct sparse D Follow omission",
-      "audit shared footer and Date & Calendar Context linkage",
-      "prove EN and HI, phone and desktop, long-content and sparse states"
-    ],
-    "resolvedGovernance": [
-      "invalid SELECTED naming replaced by APPROVED hero-treatment names and OWNER REVIEW parent-frame names on 2026-08-18"
-    ],
+    "parentFrameState": "REJECTED / ARCHIVE ONLY",
+    "componentArchiveSection": "778:2",
     "specialistTask": "01a00933-7378-7331-a468-574b8e9cd62c",
     "specialistWriteStatus": "WORKBENCH B ONLY — official/shared writes stopped; handoff complete"
   },
@@ -357,13 +454,13 @@
   },
   "currentTwoScreenQualityGate": {
     "ownerDecisionRecorded": "2026-08-19",
-    "state": "OWNER REVIEW — WEBSITE BASELINE CORRECTED; OWNER CONFIRMATION PENDING; PRODUCTION INTERACTIONS CHANGES REQUESTED",
+    "state": "CHANGES REQUESTED — REJ-017 CORRECTED; FULL EXACT-NODE RE-QA PENDING",
     "queueRule": "Do not place a pilot, wrapper or comparison board in the Owner Review Queue until same-viewport integrator comparison and exact-node independent QA pass every applicable GDF rule.",
     "feedbackLedger": "plans/ganak-design-feedback-ledger.md",
-    "canonicalFeedbackIds": "GDF-001 through GDF-061",
+    "canonicalFeedbackIds": "GDF-001 through GDF-063",
     "independentQaTask": "01a018d9-dca3-70b3-a851-b46eccd965cf",
     "todayPanchangSource": "116:49",
-    "festivalVratSources": ["135:1312", "485:24"],
+    "festivalVratSources": ["135:1312", "760:20"],
     "ownerVisualDecisionSet": [
       "Today/Panchang desktop EN",
       "Festival/Vrat detail desktop EN"
@@ -377,11 +474,11 @@
       "320px responsive website reflow",
       "long, special, sparse and error state specimens"
     ],
-    "ownerReviewSectionRule": "Section 652:13736 is the only current OWNER REVIEW · WEBSITE BASELINE · TODAY + VRAT surface; it contains exactly four visual-baseline frames. Failed, experimental, parked-phone and production-interaction CHANGES REQUESTED work stays outside.",
+    "ownerReviewSectionRule": "Only exact-node candidates that pass GDF-012 dominant-surface enforcement, GDF-062 rejected-asset enforcement and GDF-063 exact-crop enforcement may be OWNER REVIEW. Batch 01 section 769:17254 is CHANGES REQUESTED pending a full twelve-screen exact-node re-QA; baseline section 652:13736 remains CHANGES REQUESTED historical evidence.",
     "ownerReviewVisualBatch": {
       "section": "652:13736",
-      "sectionName": "OWNER REVIEW · WEBSITE BASELINE · TODAY + VRAT",
-      "independentVisualQa": "PASS",
+      "sectionName": "CHANGES REQUESTED · WEBSITE BASELINE · P0 REJECTED FLORAL REMOVED",
+      "independentVisualQa": "PREVIOUS PASS WITHDRAWN; P0 re-QA required",
       "productionRouteInteractionQa": "FAIL — remains CHANGES REQUESTED",
       "frames": {
         "todayDesktopEnglish": { "reviewNode": "652:13737", "sourceCandidate": "601:9563" },
@@ -413,7 +510,7 @@
       "todayHeroOrnamentCorrection": {
         "ownerDecisionRecorded": "2026-08-19",
         "decision": "CHANGES REQUESTED — DESKTOP OWNER REVIEW: replace both disputed ornaments without rebuilding the approved ordinary-Today screen",
-        "rejectedUniversalAssetAssumption": "485:51 is Festival/Vrat hero vocabulary only; its direct paste into Today is rejected",
+        "rejectedUniversalAssetAssumption": "485:51 is rejected globally under REJ-016; its direct paste into Today was one recurrence",
         "desktopReviewPanel": "652:13964",
         "rejectedBookplateNodesRemoved": ["675:14247", "675:14248", "675:14249", "675:14250", "675:14251", "675:14252", "675:14253"],
         "recoveredHistoricalVocabularyArchive": "682:22",
@@ -422,7 +519,7 @@
         "hiddenRejectedPastedSweep": "666:14247",
         "hiddenSourceNodes": ["601:9793", "601:9795", "628:13637", "628:13639"],
         "hiddenReviewNodes": ["652:13965", "652:13967"],
-        "pendingUntouchedNodes": ["601:9563", "601:8508", "652:13989", "667:14247", "667:14248", "666:14248"],
+        "archivedOrHiddenRejectedNodes": ["667:14247", "667:14248", "666:14248"],
         "scope": "The invented textile-bookplate correction was removed. The exact historical vocabulary board is restored separately for source recovery. Today content/geometry and 390px evidence remain frozen; no recovered treatment is propagated without a job-specific owner decision."
       }
     },

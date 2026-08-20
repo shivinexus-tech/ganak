@@ -251,7 +251,21 @@ traditions + regional + beyond-Drik, see §C-SCOPE):**
       just a highlight. Then roll the full template to the remaining calculators
       (Mangal Dosha, Sade Sati, Rashi, Nakshatra, Lagna, etc.). Applies
       retroactively to the shipped `CLAUDE-P0-DOSHAS-01` pages
-      (`/calculator/kala-sarpa`, `/pitra-dosha`, `/papa-dosha`). _(P0-CALCULATOR-DEPTH)_
+      (`/calculator/kala-sarpa`, `/pitra-dosha`, `/papa-dosha`).
+      **PARTIAL 2026-08-19 — the nine non-dosha calculators now teach**
+      (`CLAUDE-CALCULATOR-DEPTH-NONDOSHA-2026-08-19`, commit `58ba80b`; committed, not merged/pushed).
+      Measured before starting: only **3 of 14** calculators had any teaching content, all of them dosha pages.
+      The teaching block is keyed by slug and renders nothing when a page has no entry, so eleven pages looked
+      identical to working ones and nothing failed. rashi, sun-sign, lagna, nakshatra, baby-name, shraddha-tithi,
+      pancha-pakshi, western-natal and western-relationship now carry what/meaning/myths/perspective in EN + HI.
+      Gate `validation/calculator-depth.cjs` fails on a missing entry, a section too thin to teach, absent or
+      copy-pasted Hindi, English leaking into Hindi, or fatalistic wording. 91/91 gates green; browser-verified
+      in both languages with zero 375px overflow.
+      **Still open on this row:** (a) mangal-dosha and sade-sati, held by `CLAUDE-MATCHING-AUDIT-REMAINDER-2026-08-18`;
+      (b) the 2026-07-26 follow-up — per-type IMPACT notes on the 12 Kala Sarpa types, 5 Pitra forms and 6 papa
+      houses, plus the personalised expanded read for the user's own type — which is dosha copy and belongs to the
+      same matching lane; (c) `TEST-STD-CALCULATORS`, whose 4–5 recorded adversarial interaction rounds were **not**
+      done here. _(P0-CALCULATOR-DEPTH)_
 - [ ] **TESTING STANDARD — calculator-type features need 4–5 recorded adversarial
       rounds before Done (owner, 2026-07-25).** Prompted by a stale-result bug the
       owner caught on the live dosha calculators (result did not visibly refresh

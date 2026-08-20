@@ -117,6 +117,37 @@ singing along:**
 Cross-validated Devanagari sources. drikpanchang.com is the primary anchor (an
 app-approved host); a second/third source is checked per aarti during drafting.
 
+### Tier-1 deity aartis (verified 2026-08-20, `P2-FESTIVAL-AARTI-BREADTH`)
+
+Primary anchor drikpanchang (hi) in every case, cross-checked against at least one
+independent source before entry. Where sources agreed on the words but differed on
+spelling, the primary anchor's form is kept per §1 — the observed variants are noted
+so a future re-check does not read them as drift.
+
+- **Shani — जय जय श्री शनिदेव:** drikpanchang `/lyrics/aarti/lord-shanidev/shri-shanidev-aarti.html` (hi).
+  Refrain + 4 stanzas. Cross-checked against BhaktiBharat and Bhajan Diary, which agree on
+  structure and substance. Variants seen: श्याम अंग/अंक, वक्र-दृष्टि/वक्र दृष्ट, सहज/रजित, माल/माला.
+- **Santoshi Mata — जय सन्तोषी माता:** drikpanchang `/lyrics/aarti/santoshi-mata/santoshi-mata-aarti.html` (hi).
+  Refrain + 11 stanzas. Cross-checked against BhaktiBharat and Times Now Navbharat. Variant: सुख सम्पत्ति/सुख सम्पति.
+- **Saraswati — जय सरस्वती माता:** drikpanchang `/lyrics/aarti/saraswati-mata/saraswati-mata-aarti.html` (hi).
+  Refrain + 6 stanzas. Cross-checked against HinduNidhi and Times Now Hindi. The trailing
+  refrain repeat printed by some sources is dropped per §2 (the cue marks the return).
+- **Surya — जय कश्यप-नन्दन:** drikpanchang `/lyrics/aarti/lord-surya/surya-deva-aarti.html` (hi).
+  Refrain + 6 stanzas. Cross-checked against BhaktiTak and bhakti.dev. Spaced hyphens in the
+  source (`त्रिभुवन - तिमिर - निकन्दन`) are normalised to tight hyphens per §1 whitespace rules.
+- **Khatu Shyam — ॐ जय श्री श्याम हरे:** drikpanchang `/lyrics/aarti/shyam-baba/shyam-baba-aarti.html` (hi).
+  Refrain + 8 stanzas. Cross-checked against BhaktiBharat, SriMandir and Aaj Tak. Quote marks
+  around श्री श्याम बिहारीजी in the source are dropped as typography, not text.
+- **Vaishno Devi — जय वैष्णवी माता:** drikpanchang `/lyrics/aarti/vaishno-mata/vaishno-mata-aarti.html` (hi).
+  Refrain + 7 stanzas. Cross-checked against BhaktiBharat and Astroyogi.
+- **Ganga — ॐ जय गंगे माता:** drikpanchang `/lyrics/aarti/ganga-mata/ganga-mata-aarti.html` (hi).
+  Refrain + 4 stanzas. Cross-checked against Bhajan Diary and Yugal Sarkar. Variants seen:
+  मनवांछित/मन वांछित, कृपा/किरपा, मातु/मात, सेवक/दास.
+
+**Confidence:** HIGH for all seven — each is a widely-sung, stable text and every source
+agreed on the refrain, the stanza order and the substance of every verse. Owner skim
+sign-off is still the final step before these are called complete.
+
 ### Diwali proof slice (verified 2026-07-26)
 - **Ganesh — Jai Ganesh Deva:** drikpanchang `/lyrics/aarti/shree-ganesh/jay-ganesh-aarti.html` (hi). Standard couplet form; parenthetical regional variants and `x2` repeat markers dropped for a clean single reading.
 - **Lakshmi — Om Jai Lakshmi Mata:** drikpanchang `/lyrics/aarti/lakshmi-mata/lakshmi-mata-aarti.html` (hi). Full 8-stanza form.
