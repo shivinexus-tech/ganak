@@ -69,6 +69,13 @@ carried no structure.
    role before making a new one (`REJ-009`).
 5. **Never competes with data.** Ornament loses to any timing, date or value.
 6. **No repetition.** No band on every card; no universal edge; no full enclosure.
+7. **The rejected stem is excluded whole and in part, everywhere.** Owner instruction,
+   2026-08-20: *"that or any part of it shouldnt come on any screen."* This covers exact
+   node `485:51`, image hash `b7559c796e972db13b8aa54daba3a1405264f488`, archived
+   component `760:21` and child `760:22`, the faded crop of `REJ-017`, and **any fragment,
+   partial crop, resize, recolour, trace, redraw or derivative of any of them**. A new
+   piece may not quote a portion of it. This rule is unconditional and is not relaxed by
+   any approval in §4, including §6.
 
 ## 4. The slot table
 
@@ -86,8 +93,8 @@ authorisation before any new work, because it puts a family into a job it has no
 | Card or panel corner | `CORNER` | anchor | Restrained | Pre-authorised | Yes |
 | Page ending, above footer | `ENDING` | ending | Restrained | Pre-authorised | Yes |
 | Footer band | `FLORAL-TRANSITION` | ending | Rich | Pre-authorised | No |
-| **Today — non-hero panel, left** | `FLORAL-SWEEP` | anchor | Restrained | **Owner** — opens a floral family to an everyday screen | No |
-| **Today — answer card edge** | `FLORAL-SWEEP` | anchor | Restrained | **Owner** — same decision as above | Yes |
+| Today — non-hero panel, left | `FLORAL-SWEEP` | anchor | Restrained | Pre-authorised — owner, 2026-08-20; §3 rule 7 applies | No |
+| Today — answer card edge | `FLORAL-SWEEP` | anchor | Restrained | Pre-authorised — owner, 2026-08-20; §3 rule 7 applies | Yes |
 
 ### 4.2 Festival and Vrat screens
 
@@ -124,17 +131,28 @@ stems with something better."*
 An agent that cannot name the family, role, mode and slot for a piece it is about to
 place has not been given a job yet, and must ask rather than choose.
 
-## 6. The single owner decision now outstanding
+## 6. Owner decision — recorded 2026-08-20
 
-Two slots in §4.1 are marked `Owner`: **Today's non-hero left panel** and **the Today
-answer-card edge**. Both put a floral family into an everyday screen for the first time.
+**Approved:** `FLORAL-SWEEP` in the `anchor` role at `Restrained` density is now legal on
+**Today's non-hero left panel** and **Today's answer-card edge**. This is the first time a
+floral family has been opened to an everyday screen.
 
-This is the decision that has been sitting unrecorded underneath several iterations. The
-recorded comparison for that panel (`811:18395`) chose *"C — no added ornament"* because
-no other option was legal, not because nothing suited it.
+The approval covers both routes:
 
-Once the owner authorises `FLORAL-SWEEP · anchor · Restrained` for those two slots, new
-work there becomes pre-authorised like every other row, and the panel stops being unfixable.
+- **Existing family members** — `01 Side-growing Restrained` (`760:2`) and its siblings at
+  restrained density — may now be placed in these two slots. Under controlled
+  improvisation this was previously an owner decision, because it puts an existing
+  extraction into a new structural job. That decision is this entry.
+- **Newly generated pieces** in the same family, role and density are pre-authorised and
+  do not return to the owner.
+
+**Excluded without exception:** the rejected stem, whole or in part, per §3 rule 7. The
+owner attached this condition to the approval itself — the approval opens the family, not
+the rejected asset or any fragment of it.
+
+**What this unblocks:** the recorded comparison for that panel (`811:18395`) chose
+*"C — no added ornament"* because no other option was legal. It now has legal options, and
+subsequent work there does not need to come back to the owner.
 
 ## 7. Enforcement
 
