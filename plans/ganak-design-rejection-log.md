@@ -455,6 +455,37 @@ Evidence labels used below:
 - **Confidence / limitation:** exact owner screenshot, crop geometry, source-sheet
   relationship, 14-instance cleanup and independent visual-art ranking; high.
 
+### REJ-004A — Amendment: no ivory or cream ground anywhere, at any size
+
+- **Decision date / status:** 2026-08-20 · `REJECTED / GROUND RULE` · sharpens `REJ-004`
+- **Track / scope:** Website · `GLOBAL` surface authority
+- **Owner reason:** **Verbatim:** "ivory ground is what i am hating most .. thats what made
+  Ganak live dull .. so nothing like it." Given while rejecting the faded coral stem, and
+  identifying its ivory backing as the primary objection rather than its shape or flowers.
+- **Rejected:** ivory, cream, bone, oatmeal and warm off-white as the ground of **anything**
+  — page canvas, card and panel surfaces, ribbons, context bands, ornament backings,
+  artwork grounds and exported assets. `REJ-004` rejected it as the *dominant* website
+  atmosphere; this amendment removes the dominance qualifier. Extent is not a defence: a
+  small warm-cream card is the same defect at smaller scale.
+- **Underlying ornament-language/design lesson:** the previous rule was enforced as a list
+  of four denied hex values (`#F9FAF9`, `#FCFBF8`, `#FFFDFC`, `#FAF9F4`). A denylist of
+  exact values cannot hold a colour rule, because any neighbouring warm off-white is a
+  different value and therefore legal. This is the same failure mode as banning an
+  ornament by node id — identity bans do not stop a look returning.
+- **Expected rule form:** a warmth test, not a value list. A ground fails if it is a warm
+  off-white — informally, one whose red channel exceeds its blue channel. Ganak's approved
+  grounds are cool: canvas `#F9FCFD`, surface `#FFFFFF`, secondary `#ECF4F7`, all of which
+  pass because blue is greater than or equal to red.
+- **Open verification, flagged not asserted:** the Batch 01 desktop primaries as
+  screenshotted read as a warm cream page ground, warmer than any of the four swept values.
+  The recorded sweep reports `deniedHitsAcrossSourcesSharedAndBatchAfterSweep: 0`, which is
+  consistent with the ground being a warm value that was simply not on the four-item list.
+  If that is confirmed, the thing the owner says "made Ganak look dull" is the current
+  approved batch's page background, not only the rejected ornament.
+- **Related rules:** `REJ-004`, `REJ-017A`; slot table §3 rule 7.
+- **Confidence / limitation:** owner instruction verbatim and unambiguous; high. The Batch
+  01 ground value is an observation from screenshots and needs a pixel check.
+
 ### REJ-017A — Amendment: the faded coral stem is rejected by resemblance
 
 - **Decision date / status:** 2026-08-20 · `REJECTED / RESEMBLANCE RULE` · supersedes the

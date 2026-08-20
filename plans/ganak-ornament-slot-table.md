@@ -98,6 +98,12 @@ carried no structure.
    not: the owner has now extended the rejection to visual resemblance in the palette
    above. Where this entry and `REJ-017` conflict, this entry governs.
 
+   **Grounds.** Per `REJ-004A`, the ivory/cream ground is rejected independently of the
+   ornament, everywhere and at any size — page canvas, card and panel surfaces, ribbons,
+   context bands, ornament backings and exported artwork. The owner identifies this ground
+   as the primary reason Ganak reads dull. Approved grounds are cool: `#F9FCFD`, `#FFFFFF`,
+   `#ECF4F7`. Any new ornament must be produced on a transparent or cool ground.
+
    This rule is unconditional, applies to every slot in §4, and is not relaxed by any
    approval in this document, including §6.
 
