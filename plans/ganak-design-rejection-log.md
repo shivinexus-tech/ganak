@@ -373,11 +373,11 @@ Evidence labels used below:
   composition.
 - **Prohibited reuse:** do not cite, clone or propagate `730:14247` as an approved
   layout, density recipe or ornament source.
-- **Still approved / liked / exploratory:** the owner liked the separate Restrained
-  and Rich directions as evidence, but did not approve them as reusable layouts.
-  Approved botanical `485:51` remains Festival/Vrat-hero-only. New isolatable
-  artworks in `743:16083` remain `EXPLORATION` until individually selected.
-- **Related rules:** `GDF-019`, `GDF-040`, `GDF-056`.
+- **Still approved / liked / exploratory:** the owner subsequently approved
+  `Restrained` and `Rich` as contextual usage modes—not reusable layouts or competing
+  themes—and approved the nine isolatable artworks in `743:16083` as per-element
+  vocabulary. Approved botanical `485:51` remains Festival/Vrat-hero-only.
+- **Related rules:** `GDF-019`, `GDF-040`, `GDF-056`, `GDF-058`–`GDF-060`.
 - **Confidence / limitation:** exact owner decision and exact rejected node; high.
 
 ## Approved ornament-language boundary
@@ -405,7 +405,12 @@ recovery. Figma locked reference `31:2` remains appearance evidence only. Vrat h
 source `485:24` / botanical node `485:51` remains a separately scoped approval and
 is not a universal ornament source. Compact board `707:14247` records guardrails;
 expanded owner-review section `743:16083` shows nine real isolatable
-`EXPLORATION` artworks beside `485:51` as the Vrat-only approved quality control.
+artworks now approved as per-element vocabulary beside `485:51` as the Vrat-only
+approved quality control. Cross-site structural borders are shared set `759:20`;
+the floral vocabulary is shared set `760:20`; exact Vrat celebratory sweep component
+`760:21` preserves source `485:51`. Ornate architectural pieces remain
+Festival/Vrat-only, while full invitation framing and universal border repetition
+remain prohibited.
 
 ## Read-only recovery inventory for owner
 
