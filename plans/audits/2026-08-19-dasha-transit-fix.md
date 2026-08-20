@@ -250,6 +250,13 @@ matching it: `kundli.ts` now calls `planetSpeed` from `planet-calendar.ts` — t
 `planetStatesAt` uses — so the two surfaces cannot drift apart again. `ChartScreen.tsx` needed
 no change.
 
+One behavioural nuance worth recording: `planetSpeed` reads the shared ephemeris rather than
+the chart's selected ayanamsa. That is correct and intended — retrograde is the sign of a
+*difference*, so the ayanamsa cancels out except for its own ~50″/year drift, which is
+negligible against planetary motion and identical on both surfaces. It also means the ℞ flag
+no longer depends on which ayanamsa the reader has chosen, which is right: apparent retrograde
+motion is an observational fact, not a coordinate convention.
+
 (The 12 residual samples in the raw sweep were a harness artefact: the chart carries
 minute resolution and the station instants have seconds, so the two surfaces were being asked
 about slightly different moments. Asked about the same truncated instant: zero.)
