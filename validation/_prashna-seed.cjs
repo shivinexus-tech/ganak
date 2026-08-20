@@ -90,14 +90,34 @@ function renderReading(r, lang) {
     if (seeded === 13 && r.override && 'zone' in r.override) return [r.override.zone, () => {}]; // customZone
     return realUseState(init);
   };
+  let text;
   try {
-    return toText(renderToStaticMarkup(React.createElement(ComfortProvider, null,
+    text = toText(renderToStaticMarkup(React.createElement(ComfortProvider, null,
       React.createElement(Screen, {
         C, card, lang, lat: r.lat, lon: r.lon, zone: r.zone, placeLabel: r.placeLabel,
       }))));
   } finally {
     React.useState = realUseState;
   }
+  /* Seeding by hook POSITION is the only way in — the slots are local `useState`
+     calls with no handle on them — and a position is exactly the thing an
+     unrelated edit can shift. So refuse to hand back a render that does not
+     contain the reading it was asked for. Without this, adding one `useState` to
+     PrashnaScreen would quietly turn every prashna-result baseline back into a
+     picture of the empty form, and the gate would go on passing on it. */
+  if (!r.unlocked) {
+    const verdict = lang === 'hi'
+      ? ['अनुकूल', 'प्रतिकूल', 'मिश्रित', 'अभी नहीं']
+      : ['Favourable', 'Not favourable', 'Mixed', 'Not yet'];
+    const marker = lang === 'hi' ? 'शासक ग्रह' : 'Ruling Planets';
+    if (!verdict.some((w) => text.includes(w)) || !text.includes(marker)) {
+      throw new Error(
+        `prashna seed: the ${r.key}/${lang} render carries no verdict and/or no astrologer tables. ` +
+        'The state slots are seeded by hook position and PrashnaScreen\'s useState order has ' +
+        'moved — re-derive the indices in validation/_prashna-seed.cjs before re-baselining.');
+    }
+  }
+  return text;
 }
 
 function prashnaResultText(lang) {
