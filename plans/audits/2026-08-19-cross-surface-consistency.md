@@ -60,6 +60,16 @@ agreements verified** on a green run.
 | §9 | English "Sidereal"/"Tropical" · Hindi निरयण/सायन, on every rendered surface | one convention, one word, both languages |
 | §10 | the source tree against itself | duplicated literal tables, duplicated speed estimators |
 
+**§8 proves its own detector first.** A text comparison that quietly extracts nothing passes every
+surface it looks at, so nine self-tests run before the sweep: four historical defect shapes (a lunar
+date one day apart, a clock an hour apart, a shifted numeric date, a shifted score out of 36) must be
+flagged, and five legitimate language differences ("Sept" vs "सित॰", `8/18/2026` vs `18/8/2026`,
+`6:19 am` vs `6:19 AM`, and "Mars 34" not being read as a March date) must be ignored. If any of the
+nine behaves wrongly the gate says so and states that every "no disagreement" below it is worthless.
+
+The gate needs no registration: `scripts/run-all-gates.sh` picks up every `validation/*.cjs` whose
+name does not begin with `_`.
+
 Coverage actually swept, printed by the gate itself:
 
 ```
@@ -69,7 +79,7 @@ Coverage actually swept, printed by the gate itself:
   §5  750 activity-days of the Muhurat hub's own two lanes
   §6  100 city-evenings of Pradosha (Panchang daily-windows card vs the festival guide's Lakshmi Puja panel)
   §7  3192 windows rendered under the "Rahu, Gulika and Yamaganda are excluded" note, checked against those three belts
-  §8  30 rendered surfaces compared English-vs-Hindi (clock times, worded and numeric dates, years, score fractions)
+  §8  30 rendered surfaces compared English-vs-Hindi (clock times, worded and numeric dates, years, score fractions), after 9 self-tests proving the detector flags the four historical defect shapes and ignores the five legitimate language differences
   §10 127 source files scanned for duplicated literal tables and duplicated speed estimators
 ```
 
