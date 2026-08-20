@@ -69,13 +69,37 @@ carried no structure.
    role before making a new one (`REJ-009`).
 5. **Never competes with data.** Ornament loses to any timing, date or value.
 6. **No repetition.** No band on every card; no universal edge; no full enclosure.
-7. **The rejected stem is excluded whole and in part, everywhere.** Owner instruction,
-   2026-08-20: *"that or any part of it shouldnt come on any screen."* This covers exact
-   node `485:51`, image hash `b7559c796e972db13b8aa54daba3a1405264f488`, archived
-   component `760:21` and child `760:22`, the faded crop of `REJ-017`, and **any fragment,
-   partial crop, resize, recolour, trace, redraw or derivative of any of them**. A new
-   piece may not quote a portion of it. This rule is unconditional and is not relaxed by
-   any approval in §4, including §6.
+7. **The faded coral stem is excluded by resemblance, not only by identity.** Owner
+   instruction, 2026-08-20, shown against the element itself: *"i dont want it on any
+   screen ... any part of this ... any similarity to this not allowed - hated this colour
+   and everything about it."*
+
+   **Identity.** Exact node `485:51`, image hash
+   `b7559c796e972db13b8aa54daba3a1405264f488`, archived component `760:21` and child
+   `760:22`, the `REJ-017` crop signature (an `88x446` clipped wrapper over a `1536x1119`
+   raster at `x=-21,y=-253`), and any fragment, partial crop, resize, recolour, trace,
+   redraw or derivative. A new piece may not quote a portion of it.
+
+   **Resemblance.** Independently of lineage, no ornament on any screen may use this
+   palette: **faded coral / salmon / orange-red blooms, washed-out sage green foliage,
+   thin gold curl tendrils, on an ivory or cream ground.** Shape is not the test and is
+   not restricted — a tall, narrow, vertical, side-growing or climbing botanical remains
+   permitted in Ganak's own colours.
+
+   **The distinguishing test.** Ganak's approved florals are deep crimson blooms with
+   strong green foliage on white or pale blue. The rejected element is faded coral on
+   ivory. If a piece reads as the second, it fails regardless of where it came from.
+   This is consistent with `REJ-004`, which already rejected a dominant dull ivory/cream
+   atmosphere.
+
+   **Supersession.** `REJ-017` recorded that the owner rejected only the exact element and
+   had cancelled any categorical rejection of vertical, tall, narrow, side-growing or
+   botanical compositions. The shape half of that narrowing stands. The colour half does
+   not: the owner has now extended the rejection to visual resemblance in the palette
+   above. Where this entry and `REJ-017` conflict, this entry governs.
+
+   This rule is unconditional, applies to every slot in §4, and is not relaxed by any
+   approval in this document, including §6.
 
 ## 4. The slot table
 

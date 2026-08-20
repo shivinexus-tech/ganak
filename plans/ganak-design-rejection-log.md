@@ -455,6 +455,34 @@ Evidence labels used below:
 - **Confidence / limitation:** exact owner screenshot, crop geometry, source-sheet
   relationship, 14-instance cleanup and independent visual-art ranking; high.
 
+### REJ-017A — Amendment: the faded coral stem is rejected by resemblance
+
+- **Decision date / status:** 2026-08-20 · `REJECTED / RESEMBLANCE RULE` · supersedes the
+  colour half of `REJ-017`
+- **Track / scope:** Website · `GLOBAL` palette authority
+- **Evidence:** owner shown the element directly at its `88x446` selected size and
+  responding in the same turn.
+- **Rejected:** the element, any part of it, and **any ornament resembling it** — faded
+  coral/salmon/orange-red blooms, washed-out sage foliage, thin gold curl tendrils, on an
+  ivory or cream ground — regardless of lineage, source or how it was produced.
+- **Owner reason:** **Verbatim:** "i dont want it on any screen ... any part of this ...
+  any similarity to this not allowed - hated this colour and everything about it ... it
+  doesnt match at all." Recorded cost: ten iterations, repeatedly reinstated in the same
+  and other positions.
+- **Underlying ornament-language/design lesson:** an exact-identity ban (node, hash, crop
+  geometry) cannot stop a look from returning, because each reappearance is a new asset
+  and therefore legal under the previous rule. Where the owner's objection is to the
+  palette, the rule must be written against the palette.
+- **Prohibited reuse:** no active surface may render this palette in any shape or size.
+- **Still approved / parked:** shape is explicitly not restricted. Tall, narrow, vertical,
+  side-growing and climbing botanicals remain approved in Ganak's own colours — deep
+  crimson blooms, strong green foliage, white or pale-blue ground. The nine approved
+  floral components `760:2`-`760:18` are unaffected.
+- **Related rules:** `REJ-004` (dull ivory atmosphere already rejected), `REJ-016`,
+  `REJ-017`; slot table §3 rule 7.
+- **Confidence / limitation:** owner shown the exact element and answering directly; high.
+  The resemblance test is a human/visual judgement until a palette check exists.
+
 ## Approved ornament-language boundary
 
 The owner corrected the phrase “design vocabulary.” The intended source of truth is
