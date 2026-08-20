@@ -1,9 +1,10 @@
 /* Upcoming observances search (SPLIT-UI-03e-engine). Wire deferred. */
 
-import { TITHIS, moonSidMs, sunSidMs } from "./panchang";
+import { TITHIS, moonSidMs, sunSidMs, sunEvents, zoneOffset } from "./panchang";
 import { rev } from "./ephemeris";
 import { EKADASHI_NAMES, PRADOSH_NAMES_BY_DAY, obsKind, scanPanchangCalendar } from "./festivals";
 import { FEST_NAME, OBS_NAME } from "../data/festival-meta";
+import { TITHI_HI } from "../i18n/panchang-terms";
 
 function searchUpcoming(query, fromMs, tz, maxN = 24, place = null) {
   const q = (query || "").trim().toLowerCase();
@@ -11,8 +12,7 @@ function searchUpcoming(query, fromMs, tz, maxN = 24, place = null) {
   if (!q) return [];
   
   const DAY = 86400000;
-  const noon = (k) => { const d = new Date(fromMs + k * DAY + tz * 3600000); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12) - tz * 3600000; };
-  
+
   const genericEkadashi = q === "ekadashi" || qraw === "एकादशी";
   const genericPradosh = q === "pradosh" || q === "pradosh vrat" || qraw === "प्रदोष" || qraw === "प्रदोष व्रत";
 
@@ -49,34 +49,76 @@ function searchUpcoming(query, fromMs, tz, maxN = 24, place = null) {
     return out.slice(0, maxN);
   }
   
-  // Generic tithi search
+  /* Generic tithi search.
+
+     Both halves of this used to be wrong (bug-bash 2026-08-18 F3, F14):
+
+     1. The matchers were Latin-only, so a Devanagari query never reached this
+        branch at all — it fell through to the festival matcher and came back with
+        whatever festival happened to contain the word ("सप्तमी" returned Durga Puja
+        Saptami and Ratha Saptami, not the next Saptami tithis). Same query, same
+        toggle, different answer set. `TITHI_HI` is the app's one source of truth
+        for Devanagari tithi names, so both scripts now enter here.
+
+     2. The date was picked by sampling the tithi at local NOON and reporting the
+        first civil day on which the tithi was current then. Purnima runs 27 Aug
+        09:10 → 28 Aug 09:50 IST in 2026, so noon on the 27th sat inside it and the
+        search answered 27 Aug — while Ganak's event card and the Devanagari path
+        both answered 28 Aug. The app's own observance rule for purnima/amavasya
+        (`FAST_KALA_RULES`, kala "udaya") is the *sunrise* rule: the day belongs to
+        the tithi prevailing at its sunrise. That is the majority reading in the
+        Hindu calendar tradition and already what every other Ganak surface applies,
+        so the tithi branch now applies it too and the two scripts agree by
+        construction. A tithi that never prevails at any sunrise is *kshaya* — it
+        has no calendar day and is not listed, exactly as festivals.ts treats it. */
   const lowerT = TITHIS.map((t) => t.toLowerCase());
-  const tIdx = lowerT.findIndex((t) => t === q || t.startsWith(q) || q.startsWith(t));
-  const isPurnima = q === "purnima" || "purnima".startsWith(q) || q.includes("poornima");
-  const isAmavasya = q === "amavasya" || "amavasya".startsWith(q) || q.includes("amavas");
+  const hiOf = (name) => TITHI_HI[name] || "";
+  const matchesTithi = (name) => {
+    const en = name.toLowerCase(), hi = hiOf(name);
+    return en === q || en.startsWith(q) || q.startsWith(en) || (!!hi && (qraw === hi || hi.startsWith(qraw)));
+  };
+  const tIdx = lowerT.findIndex((t, i) => matchesTithi(TITHIS[i]));
+  const isPurnima = matchesTithi("Purnima") || "purnima".startsWith(q) || q.includes("poornima");
+  const isAmavasya = matchesTithi("Amavasya") || "amavasya".startsWith(q) || q.includes("amavas");
   const out = [];
-  
+
   let targets = [];
   if (tIdx >= 0 && tIdx <= 13) targets = [tIdx, tIdx + 15];
   else if (isPurnima) targets = [14];
   else if (isAmavasya) targets = [29];
-  
+
   if (targets.length) {
     const nameOf = (tg) => tg === 14 ? "Purnima" : tg === 29 ? "Amavasya" : TITHIS[tg % 15];
-    let prevTn = null;
+    const zone = place && place.zone;
+    const lat = Number(place && place.lat), lon = Number(place && place.lon);
+    // `Number(null)` is 0, not NaN — testing only isFinite would silently take
+    // every place-less search to sunrise on the equator at longitude 0.
+    const hasPlace = !!place && place.lat != null && place.lon != null
+      && Number.isFinite(lat) && Number.isFinite(lon);
+    /* Sunrise for civil day k, mirroring scanDayParts: the selected place's real
+       sunrise when we have coordinates, and the same 06:00-local fallback that
+       festivals.ts uses when we do not, so both paths degrade identically. */
+    const sunriseOf = (k) => {
+      const d = new Date(fromMs + k * DAY + tz * 3600000);
+      const y = d.getUTCFullYear(), m = d.getUTCMonth() + 1, day = d.getUTCDate();
+      const off = (zone && zoneOffset(zone, y, m, day)) ?? tz;
+      if (!hasPlace) return Date.UTC(y, m - 1, day, 6) - off * 3600000;
+      const ev = sunEvents(y, m, day, off, lat, lon);
+      return ev && ev.rise != null ? ev.rise : Date.UTC(y, m - 1, day, 6) - off * 3600000;
+    };
     for (let k = 0; k < 430 && out.length < maxN + 2; k++) {
-      const ms = noon(k), tn = Math.floor(rev(moonSidMs(ms) - sunSidMs(ms)) / 12);
-      for (const tg of targets) {
-        let hit = tn === tg;
-        if (!hit && prevTn !== null) { const diff = (tn - prevTn + 30) % 30; for (let st = 1; st < diff; st++) if ((prevTn + st) % 30 === tg) hit = true; }
-        if (hit && !out.find((o) => o._tg === tg && ms - o.ms < 20 * DAY)) out.push({ ms, kind: "tithi", label: nameOf(tg), paksha: (tg === 14 || tg === 29) ? null : (tg >= 15 ? "Krishna" : "Shukla"), _tg: tg });
-      }
-      prevTn = tn;
+      const rise = sunriseOf(k);
+      const tn = Math.floor(rev(moonSidMs(rise) - sunSidMs(rise)) / 12);
+      if (!targets.includes(tn)) continue;
+      // A vriddhi tithi prevails at two consecutive sunrises; list its first day only.
+      const prev = [...out].reverse().find((o) => o._tg === tn);
+      if (prev && rise - prev.ms <= 1.5 * DAY) continue;
+      out.push({ ms: rise, kind: "tithi", label: nameOf(tn), paksha: (tn === 14 || tn === 29) ? null : (tn >= 15 ? "Krishna" : "Shukla"), _tg: tn });
     }
     out.sort((a, b) => a.ms - b.ms);
     return out.slice(0, maxN).map((o) => ({ ms: o.ms, kind: o.kind, label: o.label, paksha: o.paksha }));
   }
-  
+
   // Festival/fast name search (generic fasts without variants)
   const matchN = (dict, key) => { const e = dict[key]; return !!e && (key.toLowerCase().includes(q) || (e.en && e.en.toLowerCase().includes(q)) || (e.hi && e.hi.includes(qraw))); };
   const r = scanPanchangCalendar(fromMs, tz, 430, 430, place);
