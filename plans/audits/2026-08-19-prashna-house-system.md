@@ -250,3 +250,67 @@ Placidus solutions compared        111,228
 Plus `prashna-parity.js`: **✓ parity EXACT: 198 values across 6 charts | worst numeric diff
 5.68e-14° | 0 mismatch(es)**.
 
+## 7. Gate board
+
+`bash scripts/run-all-gates.sh`, whole repository, on the final tree (`fa894ab`):
+
+```
+101 passed, 0 failed.
+```
+
+The Prashna lane inside it:
+
+```
+PASS  prashna-249.cjs                 PASS  prashna-high-latitude.cjs
+PASS  prashna-249-chart.cjs           PASS  prashna-judgment-zone.cjs
+PASS  prashna-249-input.cjs           PASS  prashna-ruling-planets.cjs
+PASS  prashna-copy.cjs                PASS  screen-snapshots.cjs
+PASS  prashna-practitioner.cjs        PASS  prashna-parity.js
+PASS  prashna-sublord-boundary.cjs    PASS  prashna-calc.js
+PASS  prashna-sublord-labels.cjs
+```
+
+Detail from the re-anchored gate:
+
+```
+=== [1] External published charts above 60°N ===
+Björk — Reykjavík, 64°09′N (Astrotheme, Rodden AA, retrieved 2026-08-18)
+   src/screens/PrashnaScreen.tsx  PR_cast
+      Asc Scorpio 18°18'53"  (0.1′ from published)
+      MC  Virgo 25°26'19"  (0.3′ from published)
+      cusp 10 Virgo 25°26'19"  (0.3′ from the published MC — in Placidus the 10th cusp IS the MC)
+
+=== [4] The horary screen and the chart screen, same place, same moment ===
+  15 latitudes × 4 hours: both surfaces Placidus, twelve cusps each
+  worst disagreement 6.471″ (tolerance 1′)
+  Before the fix the same sweep read up to 81.34° apart at Reykjavík.
+
+  above the polar circle the two surfaces still differ BY DESIGN:
+    Prashna 69.65°N → equal (equal house, rule 9)   Jyotish → Porphyry (Placidus undefined at this latitude)
+
+  OPEN HANDOFF — the Jyotish chart screen (src/engine/kundli.ts) has no polar quadrant
+  correction, so its lagna is the DESCENDANT for 18 of the 96 polar hours sampled.
+
+rings checked          1437
+geometric asc checks   528   worst |altitude| 0.00000° (tolerance 0.02°)
+Placidus definition    1728   worst residual  0.00301° (tolerance 0.02°)
+worst |span sum−360|   5.68e-14°
+
+✓ prashna-high-latitude: 14945 passed, 0 failed
+```
+
+`npm run build`: `✓ built in 1.47s`, no errors.
+
+## 8. What is closed and what is not
+
+* **Closed:** F17. Below the polar circle the horary screen and the chart screen now give the same
+  house ring, everywhere, in both hemispheres — 0.00° apart to within 6.5 arcseconds of ayanamsa
+  residue. The frozen block's two copies moved together, proven over 111,228 solutions. The
+  assertions that used to encode the error are now anchored to published charts and to the published
+  definition of the system.
+* **Open, handed off, not this lane's files:**
+  1. `src/engine/kundli.ts` — the polar quadrant correction (§4). Exact change written above.
+  2. One convention above the polar circle instead of two (equal house vs Porphyry). A product call;
+     it changes shipped Jyotish charts and needs its own external anchor.
+* **Not touched:** `src/screens/ChartScreen.tsx`, `plans/task-log.md`, `plans/backlog.md`,
+  `plans/backlog-acceptance-register.md`, `plans/backlog-sheet-sync.json`.
