@@ -82,9 +82,12 @@ function renderReading(r, lang) {
     seeded += 1;
     if (seeded === 1 && init === null) return [r.topic, () => {}];        // selected
     if (seeded === 2 && init === '') return [r.mode === 'number' ? String(r.number) : '', () => {}]; // numberInput
-    if (seeded === 3 && init === null) return [result, () => {}];         // result
+    if (seeded === 3 && init === null) return [r.unlocked ? null : result, () => {}];  // result
     if (seeded === 5) return [true, () => {}];                            // showFull — open the tables
-    if (seeded === 7 && init === false) return [true, () => {}];          // locked — a cast reading always is
+    if (seeded === 7 && init === false) return [!r.unlocked, () => {}];    // locked — a cast reading always is
+    if (seeded === 8 && init === false) return [!!r.override, () => {}];  // useCustom — the judgment-place panel
+    if (seeded === 12 && init === '' && r.override) return [r.override.when || '', () => {}];  // customWhen
+    if (seeded === 13 && r.override && 'zone' in r.override) return [r.override.zone, () => {}]; // customZone
     return realUseState(init);
   };
   try {

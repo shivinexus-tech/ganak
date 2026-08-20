@@ -949,25 +949,51 @@ function PR_resolveJudgmentMoment(raw, zone, hi) {
   if (y < YEAR_MIN || y > YEAR_MAX) return { ms: NaN, problem: hi
     ? `निर्णय का समय ${y} में है। गणक ग्रह-स्थिति ${YEAR_MIN}–${YEAR_MAX} के लिए निकालता है; इससे बाहर उत्तर भरोसेमंद नहीं होगा, इसलिए गणना नहीं की गई।`
     : `The judgment moment is in ${y}. Ganak calculates planetary positions for ${YEAR_MIN}–${YEAR_MAX}; outside that range the answer would not be trustworthy, so nothing was calculated.` };
-  const off = (zone && zoneOffset(zone, y, mo, d, hh, mi));
-  // No zone (or an unknown one): fall back to the device, which is what the
-  // screen has always done — but the caption says so, and the panel now offers
-  // the zone when the app knows it.
+  const named = typeof zone === 'string' && zone.trim() !== '';
+  const off = named ? zoneOffset(zone, y, mo, d, hh, mi) : null;
+  /* A zone the app CANNOT resolve is refused, never quietly read on the device's
+     clock. Silently falling back is F4 itself, one layer down: the Cast button is
+     already disabled for an unrecognised name, but a resolver that answers anyway
+     is a trap waiting for the next caller. No zone at all still falls back to the
+     device — that is the shipped default and the caption says so. */
+  if (named && off == null) return { ms: NaN, problem: hi
+    ? `“${zone}” कोई पहचाना हुआ समयक्षेत्र नहीं है, इसलिए निर्णय का समय पढ़ा नहीं जा सका। Asia/Kolkata जैसा नाम दें, या समयक्षेत्र खाली छोड़ दें।`
+    : `“${zone}” is not a timezone Ganak recognises, so the judgment moment could not be read. Use a name like Asia/Kolkata, or leave the timezone blank.` };
   const ms = off == null ? new Date(raw).getTime()
                          : Date.UTC(y, mo - 1, d, hh, mi) - off * 3600000;
   if (!Number.isFinite(ms)) return { ms: NaN, problem: hi
     ? 'निर्णय का समय समझ नहीं आया — कृपया पुनः चुनें।'
     : "Couldn't read that judgment time — please pick it again." };
   if (off != null) {
-    const back = new Date(ms + off * 3600000);
-    const same = back.getUTCFullYear() === y && back.getUTCMonth() + 1 === mo
-      && back.getUTCDate() === d && back.getUTCHours() === hh && back.getUTCMinutes() === mi;
-    if (!same) {
-      const clock = `${String(hh).padStart(2, '0')}:${String(mi).padStart(2, '0')}`;
-      return { ms: NaN, problem: hi
-        ? `${zone} में उस दिन ${clock} का समय होता ही नहीं — घड़ियाँ आगे बढ़ा दी गई थीं। गणक इसे स्वयं आगे नहीं खिसकाएगा; कृपया निर्णय का समय ठीक करें।`
-        : `${clock} did not exist that day in ${zone} — the clocks went forward. Ganak will not move it forward for you; please correct the judgment moment.` };
-    }
+    /* Bug bash F5, properly this time. The first fix round-tripped the resolved
+       instant through `zoneOffset` ITSELF — `new Date(ms + off * 3600000)` — which
+       agrees with the offset that produced it by construction, so it could never
+       disagree. Europe/London 2026-03-29 01:30 sailed through: `zoneOffset` returns
+       the pre-transition offset 0, the round trip reads 01:30 back, and the guard
+       said the clock existed. It does not: that instant is 02:30 BST, an hour later
+       than what was typed, and the shifted time was then printed on the verdict card
+       and baked into the share PNG. That is the same shape as the parity tautology
+       the high-latitude lane found — a check comparing a thing with itself.
+       So round-trip through the PLATFORM's IANA database instead, the same
+       `Intl.DateTimeFormat` the rest of the app resolves zones with. An hour that a
+       calendar skips reads back as a different clock and is refused; an hour a
+       calendar REPEATS (autumn fall-back) reads back as the same clock and is
+       accepted, which is right — it is ambiguous, not impossible. */
+    const clock = `${String(hh).padStart(2, '0')}:${String(mi).padStart(2, '0')}`;
+    let back = null;
+    try {
+      const p = new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric',
+        month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
+        .formatToParts(new Date(ms)).reduce((a, x) => (a[x.type] = x.value, a), {});
+      back = `${p.year}-${p.month}-${p.day}T${p.hour === '24' ? '00' : p.hour}:${p.minute}`;
+    } catch (e) { back = null; }   // no tz database for this name — handled below
+    if (back === null) return { ms: NaN, problem: hi
+      ? `“${zone}” कोई पहचाना हुआ समयक्षेत्र नहीं है, इसलिए निर्णय का समय पढ़ा नहीं जा सका। Asia/Kolkata जैसा नाम दें, या समयक्षेत्र खाली छोड़ दें।`
+      : `“${zone}” is not a timezone Ganak recognises, so the judgment moment could not be read. Use a name like Asia/Kolkata, or leave the timezone blank.` };
+    const typed = `${String(y).padStart(4, '0')}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}T${clock}`;
+    if (back !== typed) return { ms: NaN, problem: hi
+      ? `${zone} में उस दिन ${clock} का समय होता ही नहीं — घड़ियाँ आगे बढ़ा दी गई थीं। गणक इसे स्वयं आगे नहीं खिसकाएगा; कृपया निर्णय का समय ठीक करें।`
+      : `${clock} did not exist that day in ${zone} — the clocks went forward. Ganak will not move it forward for you; please correct the judgment moment.` };
   }
   return { ms, problem: null };
 }
@@ -1274,6 +1300,12 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, zone = null, placeLabel = 
      and showing it twice in two wordings is worse than showing it once. */
   const blockReason = !selected
     ? (hi ? 'ऊपर से प्रश्न का विषय चुनें' : 'Choose what your question is about, above')
+    /* Name the ONE thing that is missing. Folding an unrecognised timezone into the
+       latitude/longitude message would point the reader at two fields that are fine
+       and away from the one that is not. */
+    : !zoneValid
+      ? (hi ? 'समयक्षेत्र पहचाना नहीं गया — Asia/Kolkata जैसा नाम दें, या खाली छोड़ें'
+            : 'That timezone is not recognised — use a name like Asia/Kolkata, or leave it blank')
     : !placeValid
       ? (hi ? 'अक्षांश −90 से 90, देशान्तर −180 से 180 के बीच होना चाहिए'
             : 'Latitude must be −90 to 90 and longitude −180 to 180')
@@ -1476,9 +1508,37 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, zone = null, placeLabel = 
               style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, boxSizing: 'border-box',
                 border: `1.5px solid ${TOKENS.line}`, background: TOKENS.bg, color: TOKENS.ink,
                 fontSize: "var(--font-body)", padding: '0 10px' }} />
+            {/* Bug bash F4, remaining half. `PR_resolveJudgmentMoment` resolves the
+                typed wall clock against a named zone — and until now there was no
+                field in which to NAME one, so the override was still structurally
+                unable to express the judging place's local time whenever the app had
+                not handed the screen a zone. A practitioner in London judging a
+                question that arrived in Chennai typed 18:00 meaning IST and got
+                18:00 BST: measured over the twelve topics at Chennai, that changes
+                the cuspal sub-lord for 12 of 12 and flips 7 of 12 verdicts.
+                An unrecognised name is refused rather than silently falling back. */}
+            <input value={customZone}
+              onChange={e => { if (sessionLocked) return; setCustomZone(e.target.value); clearResult(); }}
+              aria-label={hi ? 'निर्णय स्थान का समयक्षेत्र' : 'Judgment place timezone'}
+              placeholder={hi ? 'समयक्षेत्र, जैसे Asia/Kolkata' : 'Timezone, e.g. Asia/Kolkata'}
+              style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, boxSizing: 'border-box',
+                background: TOKENS.bg, color: TOKENS.ink, fontSize: "var(--font-body)",
+                padding: '0 10px', border: `1.5px solid ${zoneValid ? TOKENS.line : TOKENS.sindoor}` }} />
+            {!zoneValid && (
+              <div style={{ fontSize: "var(--font-micro)", color: TOKENS.sindoor }}>
+                {hi ? `“${customZone.trim()}” कोई पहचाना हुआ समयक्षेत्र नहीं है। Asia/Kolkata या Europe/London जैसा नाम दें, या खाली छोड़ दें।`
+                    : `“${customZone.trim()}” is not a timezone Ganak recognises. Use a name like Asia/Kolkata or Europe/London, or leave it blank.`}
+              </div>
+            )}
             <div style={{ fontSize: "var(--font-micro)", color: TOKENS.muted, fontStyle: 'italic' }}>
-              {hi ? 'समय खाली छोड़ें तो अभी का क्षण लिया जाएगा। समय आपके उपकरण के समयक्षेत्र में पढ़ा जाता है।'
-                  : 'Leave the time blank to use this moment. Time is read in your device’s timezone.'}
+              {/* Say which zone the typed clock is actually read in. The caption used
+                  to claim the device's zone unconditionally, which stopped being true
+                  the moment the screen learned to honour a named one. */}
+              {castZone && zoneValid
+                ? (hi ? `समय खाली छोड़ें तो अभी का क्षण लिया जाएगा। लिखा हुआ समय ${castZone} की घड़ी के अनुसार पढ़ा जाता है।`
+                      : `Leave the time blank to use this moment. The time you type is read on ${castZone} clocks.`)
+                : (hi ? 'समय खाली छोड़ें तो अभी का क्षण लिया जाएगा। समयक्षेत्र बताए बिना समय आपके उपकरण के समयक्षेत्र में पढ़ा जाता है — किसी दूसरे नगर के लिए निर्णय कर रहे हों तो उसका समयक्षेत्र ऊपर लिखें।'
+                      : 'Leave the time blank to use this moment. With no timezone named, the time is read in your device’s timezone — if you are judging for another city, name its timezone above.')}
             </div>
           </div>
         )}
