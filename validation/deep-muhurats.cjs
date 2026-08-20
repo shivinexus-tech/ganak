@@ -2,9 +2,10 @@
 'use strict';
 
 const { loadApp } = require('./_load-app.cjs');
-const { MUHURTA_RULES, muhuratScanRange } = loadApp('src/engine/muhurat.ts');
+const { MUHURTA_RULES, muhuratScanRange, muhuratForDate, eventChoghadiyaVerdict, SCAN_DAY_CAP } = loadApp('src/engine/muhurat.ts');
 const { GANDA_MOOLA } = loadApp('src/engine/daily-windows.ts');
-const { MUH_CATS, MUHURAT_GUIDANCE } = loadApp('src/data/muhurat-ui.ts');
+const { MUH_CATS, MUHURAT_GUIDANCE, EVENTS } = loadApp('src/data/muhurat-ui.ts');
+const TROMSO = { label: 'Tromsø', lat: 69.6492, lon: 18.9553, zone: 'Europe/Oslo' };
 
 const DELHI = { label: 'New Delhi', lat: 28.6139, lon: 77.2090, zone: 'Asia/Kolkata' };
 const required = ['wedding', 'engagement', 'housewarming', 'bhoomi', 'construction', 'business', 'travel', 'document'];
@@ -151,6 +152,64 @@ for (const cat of SWEEP_CATS) {
     }
   }
 }
+
+// ---------------------------------------------------------------------------
+// The "today" strip helper: a good window must never BE an avoided one.
+// Choghadiya slots and the Rahu/Gulika/Yamaganda belts are the same eighths of
+// the day, so a bad eighth does not overlap a good Choghadiya -- it is one.
+// Swept over every day of 2026 and every event chip.
+// ---------------------------------------------------------------------------
+let chipClean = 0, chipBlocked = 0;
+const chipBad = [];
+for (let d = Date.UTC(2026, 0, 1); d <= Date.UTC(2026, 11, 31); d += 86400000) {
+  const dt = new Date(d);
+  const info = muhuratForDate(DELHI, 'lahiri', dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate());
+  if (!info) continue;
+  for (const chip of EVENTS) {
+    const { clean, blocked } = eventChoghadiyaVerdict(info, chip.good);
+    chipClean += clean.length; chipBlocked += blocked.length;
+    for (const w of clean) {
+      for (const [name, belt] of [['Rahu', info.rahu], ['Gulika', info.gulika], ['Yamaganda', info.yama]]) {
+        if (ovl(w, belt)) chipBad.push(`${chip.key} ${dt.toISOString().slice(0, 10)} clean ${w.key} overlaps ${name}`);
+      }
+      for (const b of (info.bhadra || [])) if (ovl(w, b)) chipBad.push(`${chip.key} ${dt.toISOString().slice(0, 10)} clean ${w.key} overlaps Bhadra`);
+    }
+    for (const w of blocked) if (!(w.blockedBy || []).length) chipBad.push(`${chip.key} ${dt.toISOString().slice(0, 10)} blocked window does not say why`);
+  }
+}
+if (chipBad.length) { fail(`${chipBad.length} event-chip windows offered as good sit inside an avoided interval`); chipBad.slice(0, 5).forEach((l) => console.error('      ' + l)); }
+if (chipBlocked < 500) fail(`event-chip sweep is vacuous: only ${chipBlocked} blocked windows in 2026`);
+// The audit's literal reproduction: 2026-02-26 New Delhi, the two windows that
+// appeared under BOTH "Good windows today" and "Best avoided today".
+{
+  const info = muhuratForDate(DELHI, 'lahiri', 2026, 2, 26);
+  const chip = EVENTS.find((e) => e.key === 'wedding') || EVENTS[0];
+  const { blocked } = eventChoghadiyaVerdict(info, chip.good);
+  const has = (key, belt) => blocked.some((w) => w.key === key && (w.blockedBy || []).includes(belt));
+  if (!has('amrit', 'rahu')) fail('2026-02-26 Delhi: the Amrit window that IS Rahu Kalam is not reported blocked');
+  if (!has('shubh', 'yama')) fail('2026-02-26 Delhi: the Shubh window that IS Yamaganda is not reported blocked');
+}
+
+// ---------------------------------------------------------------------------
+// The scan must report what it silently dropped (bug bash F5 and F8).
+// ---------------------------------------------------------------------------
+const polar = muhuratScanRange(TROMSO, 'lahiri', { y: 2026, m: 6, d: 1 }, { y: 2026, m: 6, d: 20 }, 'wedding');
+if (polar.length !== 0) fail(`Tromsø midnight-sun range should yield no rows, got ${polar.length}`);
+if (polar.requestedDays !== 20) fail(`Tromsø requestedDays expected 20, got ${polar.requestedDays}`);
+if (polar.scannedDays !== 20) fail(`Tromsø scannedDays expected 20, got ${polar.scannedDays}`);
+if (polar.noSunriseDays !== 20) fail(`Tromsø noSunriseDays expected 20, got ${polar.noSunriseDays}`);
+const delhiJune = muhuratScanRange(DELHI, 'lahiri', { y: 2026, m: 6, d: 1 }, { y: 2026, m: 6, d: 20 }, 'wedding');
+if (delhiJune.noSunriseDays !== 0) fail(`New Delhi must report zero no-sunrise days, got ${delhiJune.noSunriseDays}`);
+const twoYears = muhuratScanRange(DELHI, 'lahiri', { y: 2026, m: 1, d: 1 }, { y: 2027, m: 12, d: 31 }, 'vehicle');
+if (twoYears.requestedDays !== 730) fail(`two-year scan requestedDays expected 730, got ${twoYears.requestedDays}`);
+if (twoYears.scannedDays !== SCAN_DAY_CAP) fail(`two-year scan scannedDays expected ${SCAN_DAY_CAP}, got ${twoYears.scannedDays}`);
+if (!(twoYears.scannedDays < twoYears.requestedDays)) fail('two-year scan must report itself as truncated');
+const lastScanned = twoYears.map((r) => Date.UTC(r.y, r.m - 1, r.day)).sort((a, b) => b - a)[0];
+if (new Date(lastScanned).toISOString().slice(0, 10) !== '2027-02-04') fail(`two-year scan last date expected 2027-02-04, got ${new Date(lastScanned).toISOString().slice(0, 10)}`);
+const short = muhuratScanRange(DELHI, 'lahiri', { y: 2026, m: 3, d: 1 }, { y: 2026, m: 3, d: 31 }, 'wedding');
+if (short.requestedDays !== 31 || short.scannedDays !== 31) fail(`an in-range scan must not report truncation (${short.scannedDays}/${short.requestedDays})`);
+// The diagnostics must not leak into iteration -- existing callers map/slice this array.
+if (Object.keys(twoYears).length !== twoYears.length) fail('scan diagnostics must be non-enumerable');
 if (sweepBad.length) {
   fail(`${sweepBad.length} sweep defects across 2026 (offered window inside an avoided interval, or an unnamed Bhadra)`);
   for (const line of sweepBad.slice(0, 8)) console.error('      ' + line);
@@ -188,4 +247,4 @@ if (failures) {
   console.error(`deep-muhurats FAILED: ${failures}`);
   process.exit(1);
 }
-console.log(`✓ deep-muhurats PASSED (8 distinct public Muhurat engines, bilingual chips/guidance, dated anchors, clean-window checks; 2026 sweep: ${sweptWindows} offered windows over ${sweptDays} valid category-days, none overlapping Rahu/Gulika/Yamaganda/Bhadra; ${bhadraNamed}/${bhadraDays} Bhadra days named; ${gandaNamed}/${gandaDays} Ganda Moola days cautioned; shortest offered window ${shortestMin.toFixed(0)} min; 3 Drik Vivah Bhadra-boundary anchors)`);
+console.log(`✓ deep-muhurats PASSED (8 distinct public Muhurat engines, bilingual chips/guidance, dated anchors, clean-window checks; 2026 sweep: ${sweptWindows} offered windows over ${sweptDays} valid category-days, none overlapping Rahu/Gulika/Yamaganda/Bhadra; ${bhadraNamed}/${bhadraDays} Bhadra days named; ${gandaNamed}/${gandaDays} Ganda Moola days cautioned; ${chipClean} clean and ${chipBlocked} blocked event-chip windows; polar and 400-day-cap diagnostics; shortest offered window ${shortestMin.toFixed(0)} min; 3 Drik Vivah Bhadra-boundary anchors)`);

@@ -547,6 +547,32 @@ function cleanChoghadiyaWindows(info, category) {
     .filter((c) => keys.has(c.key))
     .map((c) => ({ start: c.start, end: c.end, kind: "choghadiya", key: c.key })));
 }
+/* For a "today" strip that offers Choghadiya windows against an event chip
+   rather than a Muhurat category (bug bash F2). The Muhurat hub built its good
+   list with a plain key filter and never tested it against the Rahu/Gulika/
+   Yamaganda list it printed beside it, so the same interval appeared under both
+   "Good windows today" and "Best avoided today", boundary for boundary --
+   Choghadiya slots and the three belts are the same eighths of the day. That is
+   a composition problem in the screen, not in the engine, and the screen is
+   mid-redesign; this helper exists so the fix is one line there.
+
+   Whole slots are classified, not clipped: the strip labels each window with its
+   Choghadiya name, and a clipped "Amrit 2:00 PM-2:00 PM" is worse than either
+   hiding it or greying it with the reason. `blocked` carries `blockedBy` so the
+   screen can name the belt, matching the hora dial's showBlockedHoras behaviour. */
+function eventChoghadiyaVerdict(info, goodKeys) {
+  const keys = Array.isArray(goodKeys) ? new Set(goodKeys) : goodKeys;
+  const belts = [["rahu", info.rahu], ["gulika", info.gulika], ["yama", info.yama],
+    ...((info.bhadra || []).map((b) => ["bhadra", b]))];
+  const clean = [], blocked = [];
+  for (const c of [...(info.choghaDay || []), ...(info.choghaNight || [])]) {
+    if (!keys.has(c.key)) continue;
+    const hit = [...new Set(belts.filter(([, w]) => overlaps(c, w)).map(([n]) => n))];
+    const win = { start: c.start, end: c.end, key: c.key, nat: c.nat };
+    if (hit.length) blocked.push({ ...win, blockedBy: hit }); else clean.push(win);
+  }
+  return { clean, blocked };
+}
 function activityWindows(place, ayanamsa, info, category) {
   if (SAMSKARA_CATEGORIES.has(category)) return applyHardExclusions(info, samskaraWindows(place, ayanamsa, info, category).map((w) => ({ ...w, kind: "samskara-lagna" })));
   if (PANCHAKA_WINDOW_CATEGORIES.has(category)) {
@@ -558,15 +584,39 @@ function activityWindows(place, ayanamsa, info, category) {
   }
   return cleanChoghadiyaWindows(info, category);
 }
-/* scan an arbitrary from→to day range (inclusive), capped at 400 days */
+/* scan an arbitrary from→to day range (inclusive), capped at SCAN_DAY_CAP days.
+
+   The returned value is still a plain array of day rows -- that contract is
+   unchanged -- but it now carries three NON-ENUMERABLE diagnostic properties,
+   because both of the ways this function can quietly return less than it was
+   asked for were invisible to every caller (bug bash F5 and F8):
+
+     requestedDays   days in the range the caller asked for
+     scannedDays     days actually walked (never more than SCAN_DAY_CAP)
+     noSunriseDays   days skipped because the place had no sunrise/sunset
+
+   scannedDays < requestedDays means the range was truncated -- a two-year
+   vehicle search returned 400 rows ending 2027-02-04 under a header that still
+   said "Jan 1, 2026 - Dec 31, 2027". rows.length === 0 with noSunriseDays > 0
+   means the LOCATION is the problem, not the range -- at Tromsø in June the
+   scan returned nothing and the screen advised trying a wider range, which can
+   never work, while never naming the real cause. The screen copy for both is
+   specified in plans/audits/2026-08-19-muhurat-screen-handoff.md.
+
+   Non-enumerable so that `for (const k in rows)`, JSON round-trips and existing
+   callers behave exactly as before. */
+const SCAN_DAY_CAP = 400;
 function muhuratScanRange(place, ayanamsa, fromYmd, toYmd, category) {
   const out = [];
   let cur = Date.UTC(fromYmd.y, fromYmd.m - 1, fromYmd.d);
   const end = Date.UTC(toYmd.y, toYmd.m - 1, toYmd.d);
-  for (let i = 0; cur <= end && i < 400; i++, cur += 86400000) {
+  const requestedDays = Math.max(0, Math.round((end - cur) / 86400000) + 1);
+  let scannedDays = 0, noSunriseDays = 0;
+  for (let i = 0; cur <= end && i < SCAN_DAY_CAP; i++, cur += 86400000) {
+    scannedDays++;
     const dt = new Date(cur);
     const info = muhuratForDate(place, ayanamsa, dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate());
-    if (!info) continue;
+    if (!info) { noSunriseDays++; continue; }
     const sc = dayScore(info, category);
     const sh = muhuratShuddhi(info, category);
     const windows=sh.valid ? activityWindows(place,ayanamsa,info,category) : [];
@@ -575,11 +625,14 @@ function muhuratScanRange(place, ayanamsa, fromYmd, toYmd, category) {
     out.push({ ...info, ...sc, valid: sh.valid&&!noWindow, blockers, samskaraWindows:SAMSKARA_CATEGORIES.has(category)?windows:[], activityWindows:windows });
   }
   out.sort((a, b) => b.score - a.score || a.rise - b.rise);
+  for (const [k, v] of [["requestedDays", requestedDays], ["scannedDays", scannedDays], ["noSunriseDays", noSunriseDays]]) {
+    Object.defineProperty(out, k, { value: v, enumerable: false, writable: false, configurable: true });
+  }
   return out;
 }
 
 export {
   NAK_GOOD, tithiScore, dayMuhurat, findMuhurat,
   muhuratForDate, dayScore, vaishnavaEkadashi, vratDetail,
-  vaishnavaEkadashiDay, MUHURTA_RULES, muhuratShuddhi, samskaraWindows, activityWindows, muhuratScanRange,
+  vaishnavaEkadashiDay, MUHURTA_RULES, muhuratShuddhi, samskaraWindows, activityWindows, eventChoghadiyaVerdict, muhuratScanRange, SCAN_DAY_CAP,
 };
