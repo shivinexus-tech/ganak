@@ -3,7 +3,7 @@
 
 const { loadApp } = require('./_load-app.cjs');
 const { MUHURTA_RULES, muhuratScanRange } = loadApp('src/engine/muhurat.ts');
-const { bhadraWindows } = loadApp('src/engine/daily-windows.ts');
+const { GANDA_MOOLA } = loadApp('src/engine/daily-windows.ts');
 const { MUH_CATS, MUHURAT_GUIDANCE } = loadApp('src/data/muhurat-ui.ts');
 
 const DELHI = { label: 'New Delhi', lat: 28.6139, lon: 77.2090, zone: 'Asia/Kolkata' };
@@ -34,6 +34,17 @@ exact(MUHURTA_RULES.construction.goodTithi, [2, 3, 5, 7, 10, 11, 12, 13], 'Const
 exact(MUHURTA_RULES.business.auspNak, [0, 6, 7, 11, 12, 13, 14, 16, 20, 21, 22, 26], 'Business nakshatra');
 exact(MUHURTA_RULES.travel.auspNak, [0, 4, 6, 7, 12, 16, 21, 22, 26], 'Travel nakshatra');
 exact(MUHURTA_RULES.document.allowWeekday, [3, 4, 5], 'Document weekdays');
+// Property registration, pinned against Drik Panchang's published 2026 New Delhi
+// Property Purchase list (drikpanchang.com/shubh-dates/property-registration-
+// auspicious-dates.html, read 2026-08-19): 69 offered days, every one a Thursday
+// or a Friday, on exactly these twelve nakshatras -- Mrigashira, Punarvasu,
+// Ashlesha, Magha, Purva Phalguni, Vishakha, Anuradha, Mula, Purva Ashadha,
+// Purva Bhadrapada, Uttara Bhadrapada, Revati. The 2026-08-18 bug bash flagged
+// this set as unsourced (F4) because three of its members are Gandamoola. They
+// are in the published table; what was missing was the Ganda Moola caution on
+// the Muhurat surface, asserted in the sweep below.
+exact(MUHURTA_RULES.property.auspNak, [4, 6, 8, 9, 10, 15, 16, 18, 19, 24, 25, 26], 'Property nakshatra (Drik 2026 Delhi Property Purchase list)');
+exact(MUHURTA_RULES.property.allowWeekday, [4, 5], 'Property weekdays (Drik: Thursday/Friday only)');
 
 const distinct = new Set(required.map((cat) => JSON.stringify({
   nak: asList(MUHURTA_RULES[cat].auspNak),
@@ -99,7 +110,7 @@ if (!(wedding.activityWindows || []).some((w) => w.kind === 'panchaka-rahita')) 
 // ===========================================================================
 const SWEEP_CATS = [...new Set([...Object.keys(MUHURTA_RULES), 'puja', 'purchase', 'general'])];
 const ovl = (a, b) => a && b && a.start < b.end && b.start < a.end;
-let sweptDays = 0, sweptWindows = 0, bhadraDays = 0, bhadraNamed = 0, shortestMin = Infinity;
+let sweptDays = 0, sweptWindows = 0, bhadraDays = 0, bhadraNamed = 0, gandaDays = 0, gandaNamed = 0, shortestMin = Infinity;
 const sweepBad = [];
 for (const cat of SWEEP_CATS) {
   const rows = muhuratScanRange(DELHI, 'lahiri', { y: 2026, m: 1, d: 1 }, { y: 2026, m: 12, d: 31 }, cat);
@@ -129,12 +140,22 @@ for (const cat of SWEEP_CATS) {
       if (!(row.factors || []).some((f) => /Vishti/.test(f.en))) sweepBad.push(`${cat} ${ymd(row.m, row.day)} carries Bhadra but no factor names it`);
       else bhadraNamed++;
     }
+    // A recommended day on a Gandamoola nakshatra must say so. Until 2026-08-19
+    // the finder printed the flagged star as the REASON the day was good --
+    // "Highly auspicious - Why this day: Mula nakshatra" on a date Ganak's own
+    // Panchang card marked Ganda Moola -- and no Muhurat surface used the term.
+    if (GANDA_MOOLA.has(row.nak)) {
+      gandaDays++;
+      if (!(row.factors || []).some((f) => /Ganda Moola/.test(f.en) && f.g === false)) sweepBad.push(`${cat} ${ymd(row.m, row.day)} is ${row.nakName} (Ganda Moola) with no caution factor`);
+      else gandaNamed++;
+    }
   }
 }
 if (sweepBad.length) {
   fail(`${sweepBad.length} sweep defects across 2026 (offered window inside an avoided interval, or an unnamed Bhadra)`);
   for (const line of sweepBad.slice(0, 8)) console.error('      ' + line);
 }
+if (gandaDays < 200) fail(`Ganda Moola sweep is vacuous: only ${gandaDays} Gandamoola valid category-days`);
 if (bhadraDays < 200) fail(`Bhadra sweep is vacuous: only ${bhadraDays} Bhadra-carrying valid category-days`);
 
 // Dated comparator anchors, NOT Ganak against Ganak: Drik Panchang's published
@@ -167,4 +188,4 @@ if (failures) {
   console.error(`deep-muhurats FAILED: ${failures}`);
   process.exit(1);
 }
-console.log(`✓ deep-muhurats PASSED (8 distinct public Muhurat engines, bilingual chips/guidance, dated anchors, clean-window checks; 2026 sweep: ${sweptWindows} offered windows over ${sweptDays} valid category-days, none overlapping Rahu/Gulika/Yamaganda/Bhadra; ${bhadraNamed}/${bhadraDays} Bhadra days named; shortest offered window ${shortestMin.toFixed(0)} min; 3 Drik Vivah Bhadra-boundary anchors)`);
+console.log(`✓ deep-muhurats PASSED (8 distinct public Muhurat engines, bilingual chips/guidance, dated anchors, clean-window checks; 2026 sweep: ${sweptWindows} offered windows over ${sweptDays} valid category-days, none overlapping Rahu/Gulika/Yamaganda/Bhadra; ${bhadraNamed}/${bhadraDays} Bhadra days named; ${gandaNamed}/${gandaDays} Ganda Moola days cautioned; shortest offered window ${shortestMin.toFixed(0)} min; 3 Drik Vivah Bhadra-boundary anchors)`);

@@ -8,7 +8,7 @@ import {
 import { ayyappaMandalaFor } from "./festivals";
 import { lakshmiPujaTimings } from "./lakshmi-puja";
 import { computeLagnaPanchaka } from "./panchaka";
-import { bhadraWindows } from "./daily-windows";
+import { bhadraWindows, GANDA_MOOLA } from "./daily-windows";
 import { panchangTermAt } from "../i18n/panchang-terms";
 
 
@@ -183,6 +183,20 @@ function dayScore(info, category) {
     else if (info.dow === 0) { s += 1; f.push({ en: "Ravi-Pushya yoga", hi: "रवि-पुष्य योग", g: true }); }
   }
   // Bhadra (Vishti) karana
+  /* Ganda Moola caution (bug bash F4). Ganak's Panchang card flags Ganda Moola
+     and, until 2026-08-19, no Muhurat surface said the word: the finder scored
+     2026-01-16 New Delhi as 6 = "Highly auspicious" and gave "Why this day: Mula
+     nakshatra" while the same app's daily card for that date read "Ganda Moola".
+     Fifteen of the 34 property days offered in 2026 H1 were like that.
+
+     It carries NO score penalty, deliberately. The category rule sets that admit
+     these stars are sourced -- Drik Panchang's published 2026 New Delhi Property
+     Purchase list offers 69 days, all Thursday or Friday, on exactly the twelve
+     nakshatras in MUHURTA_RULES.property.auspNak, Mula, Ashlesha and Purva
+     Bhadrapada among them. So this is a caution the reader must be told about,
+     not a veto Ganak may apply on their behalf. Penalising it would silently
+     overrule a published rule table. */
+  if (GANDA_MOOLA.has(info.nak)) f.push({ en: "Ganda Moola (" + info.nakName + ")", hi: "गण्ड मूल (" + nakHi + ")", g: false });
   // Bhadra: the whole sunrise-to-sunrise day, not the sunrise sample. Falls back
   // to the sunrise karana only if the interval list is unavailable.
   if ((info.bhadra || []).length ? true : info.karana === "Vishti") { s -= 2; f.push({ en: "Bhadra (Vishti) karana", hi: "भद्रा (विष्टि करण)", g: false }); }
@@ -318,6 +332,16 @@ const MUHURTA_RULES = {
     monthsLabel: { en: "Engagement follows a Vivah-like screen: clean tithi, marriage nakshatra, no Sunday/Tuesday, and no Devshayana, Kharmas or Tara Asta", hi: "सगाई में विवाह-जैसी छँटाई: शुद्ध तिथि, विवाह नक्षत्र, रविवार/मंगलवार नहीं, तथा देवशयन, खरमास या तारा-अस्त नहीं" } },
   vehicle: { auspNak: new Set([0, 3, 4, 6, 7, 12, 13, 14, 16, 21, 22, 23, 26]), goodTithi: new Set([1, 2, 3, 5, 6, 7, 8, 10, 11, 12, 13, 15]), noAmavasya: true, forbidWeekday: new Set([2, 6]),
     monthsLabel: { en: "Any month — needs an auspicious nakshatra, a clean tithi, and not Tuesday or Saturday", hi: "कोई भी मास — शुभ नक्षत्र, शुद्ध तिथि; मंगलवार व शनिवार वर्जित" } },
+  /* Property registration. Verified against Drik Panchang's published 2026 New
+     Delhi Property Purchase list (drikpanchang.com/shubh-dates/property-
+     registration-auspicious-dates.html, read 2026-08-19): 69 offered days, every
+     one a Thursday or a Friday, on exactly these twelve nakshatras -- Mrigashira,
+     Punarvasu, Ashlesha, Magha, Purva Phalguni, Vishakha, Anuradha, Mula, Purva
+     Ashadha, Purva Bhadrapada, Uttara Bhadrapada, Revati. Three of them
+     (Ashlesha, Mula, Purva Bhadrapada) are Gandamoola and one more (Revati) is
+     too; that is the published table, not an oversight, and dayScore now states
+     the Ganda Moola caution rather than removing the day. Pinned by
+     validation/deep-muhurats.cjs. */
   property: { auspNak: new Set([4, 6, 8, 9, 10, 15, 16, 18, 19, 24, 25, 26]), allowWeekday: new Set([4, 5]),
     monthsLabel: { en: "Any month — Thursdays and Fridays only, on the fixed set of registration nakshatras", hi: "कोई भी मास — केवल गुरुवार व शुक्रवार, निर्धारित नक्षत्रों में" } },
   bhoomi: { auspNak: BHOOMI_NAK, goodTithi: BHOOMI_TITHI, noAmavasya: true, allowWeekday: new Set([1, 3, 4, 5]),
