@@ -11,6 +11,7 @@ const INCIDENTS_PATH = path.join(ROOT, "validation/fixtures/figma-design-governa
 const DEFAULT_PACKET = path.join(ROOT, "plans/figma-review-evidence/batch-01-recovery.json");
 const PRECEDENCE = ["direct_owner_latest", "direct_owner_earlier", "canonical_human_record", "agent_report", "inference"];
 const REVIEW_ROLES = ["mechanical", "accessibility", "ornament_background", "blind_visual", "integrator"];
+const SCREEN_COVERAGE_CATEGORIES = ["language", "asset_rejection", "surface", "geometry", "ornament"];
 const STATUS = ["BLOCKED_FROM_OWNER_REVIEW", "NARROW_PASS", "FULL_SCREEN_PASS"];
 
 function readJson(file) {
@@ -253,10 +254,24 @@ function computeAdmission(manifest, packet) {
   if (missingGroundEvidence.length) {
     errors.push({ code: "OWNER_ADMISSION", detail: `${missingGroundEvidence.length} screens lack exact ground-colour evidence` });
   }
+  const coverage = packet.mechanicalEvidence.screenCoverage || [];
+  for (const screen of packet.screens || []) {
+    for (const category of SCREEN_COVERAGE_CATEGORIES) {
+      const proof = coverage.find(item => item.screen === screen.node && item.category === category);
+      if (!proof || proof.status !== "PASS" || !Array.isArray(proof.evidence) || proof.evidence.length === 0) {
+        errors.push({ code: "OWNER_ADMISSION", detail: `${screen.node}:${category} screen-level evidence missing` });
+      }
+    }
+  }
   const open = (packet.knownFindings || []).filter(f => f.status !== "closed");
   if (open.length) errors.push({ code: "OWNER_ADMISSION", detail: `${open.length} known findings remain open` });
-  if ((packet.holisticJudgements || []).length < (packet.screens || []).length) {
-    errors.push({ code: "OWNER_ADMISSION", detail: "natural/contact-sheet judgements incomplete" });
+  const holistic = packet.holisticJudgements || [];
+  const exactHolistic = (packet.screens || []).every(screen => {
+    const matches = holistic.filter(item => item.screen === screen.node);
+    return matches.length === 1 && matches[0].naturalScale === "PASS" && matches[0].contactSheet === "PASS";
+  });
+  if (!exactHolistic || holistic.length !== (packet.screens || []).length) {
+    errors.push({ code: "OWNER_ADMISSION", detail: "exact natural/contact-sheet PASS judgements incomplete or stale" });
   }
   if ((packet.reviews || []).some(r => r.status === "NARROW_PASS") && packet.requestedDisposition === "FULL_SCREEN_PASS") {
     errors.push({ code: "NARROW_PROMOTION", detail: "narrow PASS cannot promote a batch" });
@@ -278,6 +293,7 @@ function correctedFixture() {
       { screenFamily: "today_ordinary", slot: "non_hero_panel_left", ornamentFamily: "FLORAL-SWEEP", role: "anchor", density: "restrained" },
       { screenFamily: "today_special", slot: "answer_card_edge", ornamentFamily: "FLORAL-SWEEP", role: "anchor", density: "restrained" }
     ],
+    screenCoverage: SCREEN_COVERAGE_CATEGORIES.map(category => ({ screen: "900:0", category, status: "PASS", evidence: [`fixture-${category}`] })),
     lineage: [{ screen: "900:0", source: "800:0", regenerated: true }]
   };
 }
