@@ -1,0 +1,13 @@
+{
+  "cases": [
+    { "name": "REJ-016 exact hash active", "kind": "asset", "expected": "REJECTED_ASSET_ACTIVE" },
+    { "name": "REJ-017 exact crop active despite shared allowed raster", "kind": "crop", "expected": "REJECTED_CROP_ACTIVE" },
+    { "name": "unresolved authority conflict", "kind": "conflict", "expected": "DECISION_CONFLICT" },
+    { "name": "Hindi leakage on English screen", "kind": "language", "expected": "LANGUAGE_PURITY" },
+    { "name": "denied ivory dominant panel", "kind": "surface", "expected": "DOMINANT_SURFACE" },
+    { "name": "Property Finder cramped button geometry", "kind": "geometry", "expected": "COMPONENT_GEOMETRY" },
+    { "name": "ornament without provenance or purpose", "kind": "ornament", "expected": "ORNAMENT_PROVENANCE" },
+    { "name": "narrow PASS promoted to full-screen", "kind": "typed_status", "expected": "NARROW_PROMOTION" },
+    { "name": "owner review with open findings", "kind": "admission", "expected": "OWNER_ADMISSION" }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ganak.app/schemas/design-decision-manifest.schema.json",
+  "title": "Ganak design decision manifest",
+  "type": "object",
+  "required": ["schemaVersion", "precedence", "decisions", "conflicts", "batchAdmission"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "precedence": {
+      "const": ["direct_owner_latest", "direct_owner_earlier", "canonical_human_record", "agent_report", "inference"]
+    },
+    "decisions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/decision" }
+    },
+    "conflicts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/conflict" }
+    },
+    "batchAdmission": {
+      "type": "object",
+      "required": ["allowedStatuses", "fullScreenRequiredReviews", "zeroKnownFindings", "unresolvedConflictsBlock"],
+      "additionalProperties": false,
+      "properties": {
+        "allowedStatuses": { "const": ["BLOCKED_FROM_OWNER_REVIEW", "NARROW_PASS", "FULL_SCREEN_PASS"] },
+        "fullScreenRequiredReviews": {
+          "const": ["mechanical", "accessibility", "ornament_background", "blind_visual", "integrator"]
+        },
+        "zeroKnownFindings": { "const": true },
+        "unresolvedConflictsBlock": { "const": true }
+      }
+    }
+  },
+  "$defs": {
+    "scope": {
+      "type": "object",
+      "required": ["track", "figmaFile", "exactNodes", "allowedRoles", "prohibitedRoles"],
+      "additionalProperties": false,
+      "properties": {
+        "track": { "enum": ["website", "ganak_phone", "global"] },
+        "figmaFile": { "type": ["string", "null"] },
+        "exactNodes": { "type": "array", "items": { "type": "string", "pattern": "^[0-9]+:[0-9]+$" } },
+        "imageHashes": { "type": "array", "items": { "type": "string", "pattern": "^[a-f0-9]{40}$" } },
+        "cropSignatures": { "type": "array", "items": { "$ref": "#/$defs/crop" } },
+        "surfaceFills": { "type": "array", "items": { "type": "string", "pattern": "^#[A-F0-9]{6}$" } },
+        "allowedRoles": { "type": "array", "items": { "type": "string" } },
+        "prohibitedRoles": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "crop": {
+      "type": "object",
+      "required": ["wrapper", "raster", "offset", "clips", "contentSignature"],
+      "additionalProperties": false,
+      "properties": {
+        "wrapper": { "$ref": "#/$defs/size" },
+        "raster": { "$ref": "#/$defs/size" },
+        "offset": {
+          "type": "object",
+          "required": ["x", "y"],
+          "additionalProperties": false,
+          "properties": { "x": { "type": "number" }, "y": { "type": "number" } }
+        },
+        "clips": { "const": true },
+        "contentSignature": { "type": "string", "minLength": 12 }
+      }
+    },
+    "size": {
+      "type": "object",
+      "required": ["width", "height"],
+      "additionalProperties": false,
+      "properties": { "width": { "type": "number", "exclusiveMinimum": 0 }, "height": { "type": "number", "exclusiveMinimum": 0 } }
+    },
+    "decision": {
+      "type": "object",
+      "required": ["id", "status", "authority", "decidedAt", "source", "confidence", "scope", "supersedes", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^(APP|REJ|PARK|RULE)-[0-9]{3}$" },
+        "status": { "enum": ["approved", "rejected", "parked", "rule"] },
+        "authority": { "enum": ["direct_owner_latest", "direct_owner_earlier", "canonical_human_record", "agent_report", "inference"] },
+        "decidedAt": { "type": "string", "format": "date" },
+        "source": { "type": "string", "minLength": 3 },
+        "confidence": { "enum": ["confirmed", "reported", "inferred"] },
+        "scope": { "$ref": "#/$defs/scope" },
+        "supersedes": { "type": "array", "items": { "type": "string" } },
+        "reason": { "type": "string", "minLength": 10 }
+      }
+    },
+    "conflict": {
+      "type": "object",
+      "required": ["id", "decisionIds", "status", "resolution"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "decisionIds": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+        "status": { "enum": ["resolved", "unresolved"] },
+        "resolution": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

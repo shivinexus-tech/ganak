@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "batchId": "BATCH-01-RECOVERY",
+  "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+  "sectionNode": "769:17254",
+  "historicalFigmaLabel": "OWNER REVIEW · BATCH 01 · 12-SCREEN QUALITY CHECKPOINT",
+  "expectedDisposition": "FULL_SCREEN_PASS",
+  "requestedDisposition": "FULL_SCREEN_PASS",
+  "sourceFirstRequired": true,
+  "contactSheet": "https://www.figma.com/api/mcp/asset/a2a3260e-5633-45d3-9764-ecd688769fe0.png",
+  "screens": [
+    { "node": "851:18729", "name": "Today ordinary", "sourceNode": "762:16084", "screenshot": "https://www.figma.com/api/mcp/asset/341e0dde-af73-4f7a-84ab-a796ca10b7ef.png" },
+    { "node": "858:2", "name": "Today special", "sourceNode": "762:16339", "screenshot": "https://www.figma.com/api/mcp/asset/6e41669c-dbad-41d9-b05f-3d8c496ad2b3.png" },
+    { "node": "858:266", "name": "Full Panchang", "sourceNode": "762:16597", "screenshot": "https://www.figma.com/api/mcp/asset/8d46027c-8dec-41e1-adc8-5fe4e2b8cba5.png" },
+    { "node": "851:19585", "name": "Calendar selected day", "sourceNode": "762:16932", "screenshot": "https://www.figma.com/api/mcp/asset/aa9b8359-d846-4c33-a081-5094d7ff29de.png" },
+    { "node": "851:19660", "name": "Festivals discovery", "sourceNode": "730:15152", "screenshot": "https://www.figma.com/api/mcp/asset/76dfdced-2c17-4dee-9ccd-ccf903861f97.png" },
+    { "node": "851:19762", "name": "Festival calendar", "sourceNode": "730:15339", "screenshot": "https://www.figma.com/api/mcp/asset/5b398113-b2b5-4777-b9c2-793e6983321a.png" },
+    { "node": "851:20865", "name": "Story festival detail", "sourceNode": "730:15940", "screenshot": "https://www.figma.com/api/mcp/asset/e67fc5b7-645f-4175-862e-8916db9a6c13.png" },
+    { "node": "851:20938", "name": "Vrat guide", "sourceNode": "763:17139", "screenshot": "https://www.figma.com/api/mcp/asset/c6660418-5861-41e4-91a9-9ce3fd1f80e7.png" },
+    { "node": "851:21024", "name": "Muhurat hub", "sourceNode": "730:14646", "screenshot": "https://www.figma.com/api/mcp/asset/0a98ecda-0299-45b3-9bdb-4306a11469cc.png" },
+    { "node": "851:21080", "name": "Property finder", "sourceNode": "730:14805", "screenshot": "https://www.figma.com/api/mcp/asset/82afebe1-a291-486a-95f2-98930ab4f509.png" },
+    { "node": "851:21162", "name": "Prashna ask", "sourceNode": "730:16288", "screenshot": "https://www.figma.com/api/mcp/asset/3bda91ea-9e5d-4cf8-9d93-bbdb5cc3a03c.png" },
+    { "node": "851:21250", "name": "Prashna answer", "sourceNode": "730:16467", "screenshot": "https://www.figma.com/api/mcp/asset/b0ec8bca-388a-4d74-a728-d5a593dbd962.png" }
+  ],
+  "mechanicalEvidence": {
+    "activeAssets": [
+      { "node": "762:16550", "sourceNode": "762:16550", "hash": "c69d89b16c8068f8f06ea86b4a3852a19db33732", "role": "active_screen" }
+    ],
+    "visibleTexts": [
+      { "node": "730:15971", "screen": "730:15940", "lang": "en", "value": "DEVSHAYANI EKADASHI" },
+      { "node": "730:15980", "screen": "730:15940", "lang": "en", "value": "Read in Hindi" },
+      { "node": "I851:18986;349:5", "sourceNode": "349:5", "screen": "851:18729", "lang": "en", "role": "language_switch_label", "value": "English / हिन्दी · About Ganak · Sources & conventions · Privacy · Terms" }
+    ],
+    "surfaces": [
+      { "node": "851:19660", "screen": "851:19660", "fill": "#F9FCFD", "role": "canvas", "areaPercent": 100 },
+      { "node": "851:19762", "screen": "851:19762", "fill": "#F9FCFD", "role": "canvas", "areaPercent": 100 },
+      { "node": "851:21000", "screen": "851:20938", "fill": "#ECF4F7", "role": "meaning_context_block", "areaPercent": 10 }
+    ],
+    "controls": [
+      { "node": "730:14866", "screen": "730:14805", "height": 54, "touchWidth": 170, "touchHeight": 54, "paddingLeft": 18, "paddingRight": 18, "labelCenterOffset": 0, "overflow": false, "labelInset": 18 }
+    ],
+    "ornaments": [
+      { "node": "851:20911", "sourceNode": "760:6", "libraryRoot": "760:20", "role": "editorial_anchor", "clearSpace": 16 },
+      { "node": "851:20982", "sourceNode": "760:4", "libraryRoot": "760:20", "role": "hero_anchor", "clearSpace": 16 },
+      { "node": "851:21079", "sourceNode": "759:12", "libraryRoot": "759:20", "role": "structural_transition", "clearSpace": 12 },
+      { "node": "851:21249", "sourceNode": "759:14", "libraryRoot": "759:20", "role": "structural_transition", "clearSpace": 12 }
+    ],
+    "lineage": [
+      { "screen": "851:18729", "source": "762:16084", "regenerated": true },
+      { "screen": "858:2", "source": "762:16339", "regenerated": true },
+      { "screen": "858:266", "source": "762:16597", "regenerated": true },
+      { "screen": "851:19585", "source": "762:16932", "regenerated": true },
+      { "screen": "851:19660", "source": "730:15152", "regenerated": true },
+      { "screen": "851:19762", "source": "730:15339", "regenerated": true },
+      { "screen": "851:20865", "source": "730:15940", "regenerated": true },
+      { "screen": "851:20938", "source": "763:17139", "regenerated": true },
+      { "screen": "851:21024", "source": "730:14646", "regenerated": true },
+      { "screen": "851:21080", "source": "730:14805", "regenerated": true },
+      { "screen": "851:21162", "source": "730:16288", "regenerated": true },
+      { "screen": "851:21250", "source": "730:16467", "regenerated": true }
+    ]
+  },
+  "reviews": [
+    { "role": "mechanical", "status": "FULL_SCREEN_PASS", "reviewer": "independent QA task 01a018d9-dca3-70b3-a851-b46eccd965cf", "evidence": ["12/12 final frames; zero under-42 or text-bound reactions; zero overflow; zero denied assets/crops/fills; footer Hindi renders"], "coversAllScreens": true, "cold": false },
+    { "role": "accessibility", "status": "FULL_SCREEN_PASS", "reviewer": "accessibility QA task 01a01ac0-0303-7f62-a3bf-05b3208ade26", "evidence": ["12/12 static desktop frames plus focus specimen 851:18665; zero screenshot-visible design findings"], "coversAllScreens": true, "cold": false },
+    { "role": "ornament_background", "status": "FULL_SCREEN_PASS", "reviewer": "ornament/background QA task 01a01ac0-0ddc-7683-aec4-6fe23ed651d6", "evidence": ["12/12 provenance, role, crop, clear-space and semantic-surface review; zero findings"], "coversAllScreens": true, "cold": false },
+    { "role": "blind_visual", "status": "FULL_SCREEN_PASS", "reviewer": "cold holistic QA task 01a01abf-f955-7353-881c-4d595838f47f", "evidence": ["fresh natural-scale captures and full-section contact sheet; 12/12 plus contact sheet PASS"], "coversAllScreens": true, "cold": true },
+    { "role": "integrator", "status": "FULL_SCREEN_PASS", "reviewer": "recovery integrator task 01a01ff2-9355-7d73-bef7-ff996ab182cf", "evidence": ["source-first lineage for all 12; mandatory reviewer scopes aggregated; zero open known findings; executable admission gate"], "coversAllScreens": true, "cold": false }
+  ],
+  "knownFindings": [
+    { "id": "OWNER-001", "screen": "851:18729", "category": "composition", "status": "closed", "summary": "Today panel rebalanced upstream and passed blind review." },
+    { "id": "OWNER-002", "screen": "851:18729", "category": "rejected_asset", "status": "closed", "summary": "Rejected asset absent; exact hash/crop denylist passes." },
+    { "id": "OWNER-003", "screen": "851:18729", "category": "ornament", "status": "closed", "summary": "Cramped ribbon removed upstream; ornament review passes." },
+    { "id": "OWNER-004", "screen": "batch", "category": "ornament", "status": "closed", "summary": "All active ornament roles, provenance and clear space re-reviewed." },
+    { "id": "OWNER-005", "screen": "851:21080", "category": "component_geometry", "status": "closed", "summary": "Property CTA is 170x54 with 18px insets; all mapped targets pass." },
+    { "id": "OWNER-006", "screen": "batch", "category": "language", "status": "closed", "summary": "English content purity passes; footer Hindi renders on all 12." },
+    { "id": "OWNER-007", "screen": "batch", "category": "ornament", "status": "closed", "summary": "Purpose, density, spacing, indentation and composition pass independent review." },
+    { "id": "OWNER-008", "screen": "batch", "category": "surface", "status": "closed", "summary": "No rejected dominant ivory; blue and white surfaces have reviewed semantic roles." }
+  ],
+  "holisticJudgements": [
+    { "screen": "851:18729", "naturalScale": "PASS", "contactSheet": "PASS" },
+    { "screen": "858:2", "naturalScale": "PASS", "contactSheet": "PASS" },
+    { "screen": "858:266", "naturalScale": "PASS", "contactSheet": "PASS" },
+    { "screen": "851:19585", "naturalScale": "PASS", "contactSheet": "PASS" },
+    { "screen": "851:19660", "naturalScale": "PASS", "contactSheet": "PASS" },
+    { "screen": "851:19762", "naturalScale": "PASS", "contactSheet": "PASS" },
+    { "screen": "851:20865", "naturalScale": "PASS", "contactSheet": "PASS" },
+    { "screen": "851:20938", "naturalScale": "PASS", "contactSheet": "PASS" },
+    { "screen": "851:21024", "naturalScale": "PASS", "contactSheet": "PASS" },
+    { "screen": "851:21080", "naturalScale": "PASS", "contactSheet": "PASS" },
+    { "screen": "851:21162", "naturalScale": "PASS", "contactSheet": "PASS" },
+    { "screen": "851:21250", "naturalScale": "PASS", "contactSheet": "PASS" }
+  ],
+  "limitations": [
+    "Static desktop Figma cannot prove browser DOM order, keyboard execution, assistive-technology semantics, responsive zoom/reflow, production routing or live state preservation.",
+    "Admission is limited to these twelve English desktop frames and focus-state design evidence; it does not claim the implemented website or redesign programme is solved."
+  ]
+}

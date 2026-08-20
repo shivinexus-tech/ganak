@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "precedence": [
+    "direct_owner_latest",
+    "direct_owner_earlier",
+    "canonical_human_record",
+    "agent_report",
+    "inference"
+  ],
+  "decisions": [
+    {
+      "id": "APP-001",
+      "status": "approved",
+      "authority": "direct_owner_earlier",
+      "decidedAt": "2026-08-11",
+      "source": "ganak-figma-authority.md §4; owner pale-blue/white baseline decision",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["104:49", "116:49", "135:50", "135:254", "135:662", "135:866", "135:1089", "135:1312"],
+        "surfaceFills": ["#F9FCFD", "#FFFFFF", "#ECF4F7"],
+        "allowedRoles": ["canvas", "surface", "secondary_surface"],
+        "prohibitedRoles": []
+      },
+      "supersedes": [],
+      "reason": "Approved safe website bases; they are foundations, not an exclusive palette."
+    },
+    {
+      "id": "REJ-004",
+      "status": "rejected",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-19",
+      "source": "ganak-design-rejection-log.md REJ-004; GDF-012",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["206:108", "206:115", "274:690", "552:61", "552:68", "552:86"],
+        "surfaceFills": ["#F9FAF9", "#FCFBF8", "#FFFDFC", "#FAF9F4"],
+        "allowedRoles": ["small_rule", "stroke", "icon", "artwork_with_explicit_role"],
+        "prohibitedRoles": ["canvas", "page", "header", "card", "panel", "context", "breadcrumb", "footer", "input", "hero", "empty_region", "dominant_area_2_percent_or_more"]
+      },
+      "supersedes": [],
+      "reason": "The owner repeatedly rejected dominant dull ivory or cream and unrelated palette drift."
+    },
+    {
+      "id": "PARK-001",
+      "status": "parked",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-18",
+      "source": "ganak-figma-authority.md product-track boundary",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "ganak_phone",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["554:7622", "556:2", "537:7450", "537:7480", "537:7510", "537:7557", "537:7604", "537:7650", "537:7717", "537:7882", "537:7825", "537:7920"],
+        "allowedRoles": ["parked_research", "future_native_app"],
+        "prohibitedRoles": ["website_source", "website_component", "website_owner_review", "website_lineage"]
+      },
+      "supersedes": [],
+      "reason": "Ganak Phone is preserved future-native research and cannot provide website lineage."
+    },
+    {
+      "id": "REJ-016",
+      "status": "rejected",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-19",
+      "source": "ganak-design-rejection-log.md REJ-016; owner correction",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["485:24", "485:51", "493:22", "495:22", "495:23", "495:24", "760:21", "760:22"],
+        "imageHashes": ["b7559c796e972db13b8aa54daba3a1405264f488"],
+        "allowedRoles": ["rejected_archive_evidence"],
+        "prohibitedRoles": ["active_screen", "shared_component", "approved", "owner_review", "qa_pass", "derived_crop", "trace", "recolour"]
+      },
+      "supersedes": ["historical-485-51-approved-claim"],
+      "reason": "The exact floral asset and every derived presentation are rejected archive-only."
+    },
+    {
+      "id": "REJ-017",
+      "status": "rejected",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "ganak-design-rejection-log.md REJ-017; owner crop-scope correction",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["107:50", "107:51", "116:391", "116:392", "762:16314", "762:16315"],
+        "imageHashes": ["c69d89b16c8068f8f06ea86b4a3852a19db33732"],
+        "cropSignatures": [
+          {
+            "wrapper": { "width": 88, "height": 446 },
+            "raster": { "width": 1536, "height": 1119 },
+            "offset": { "x": -21, "y": -253 },
+            "clips": true,
+            "contentSignature": "faded-red-orange-muted-green-gold-curl-ivory-edge"
+          },
+          {
+            "wrapper": { "width": 100, "height": 446 },
+            "raster": { "width": 1536, "height": 1119 },
+            "offset": { "x": -21, "y": -253 },
+            "clips": true,
+            "contentSignature": "historical-faded-floral-edge-crop"
+          }
+        ],
+        "allowedRoles": ["rejected_archive_evidence", "same_hash_materially_different_approved_crop"],
+        "prohibitedRoles": ["active_screen", "shared_component", "approved", "owner_review", "qa_pass", "exact_instance_copy"]
+      },
+      "supersedes": ["broad-tall-narrow-botanical-family-ban"],
+      "reason": "Only the exact screenshot crop identity is rejected; its shared full-raster hash is not globally denied."
+    },
+    {
+      "id": "APP-002",
+      "status": "approved",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "ganak-figma-authority.md §4.1 and task-log ornament inventory row",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["760:20", "759:20", "800:2"],
+        "allowedRoles": ["named_role_only", "floral_set", "structural_border_set", "inventory_reference"],
+        "prohibitedRoles": ["automatic_screen_approval", "purpose_free_decoration", "unscoped_propagation"]
+      },
+      "supersedes": [],
+      "reason": "Library membership establishes provenance but never approves a particular composition or slot."
+    },
+    {
+      "id": "RULE-001",
+      "status": "rule",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "owner-approved bottleneck recovery implementation",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "global",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["769:17254"],
+        "allowedRoles": ["historical_owner_review_label", "frozen_evidence", "narrow_pass_evidence"],
+        "prohibitedRoles": ["owner_link_send", "full_screen_pass", "promotion_without_zero_findings"]
+      },
+      "supersedes": ["ad50cc2-batch01-admission"],
+      "reason": "Batch 01 remains preserved but is blocked from owner review until the recovery admission gate passes."
+    },
+    {
+      "id": "RULE-002",
+      "status": "rule",
+      "authority": "canonical_human_record",
+      "decidedAt": "2026-08-20",
+      "source": "ganak-redesign-requirements.md bilingual language control; recovery explicit-whitelist policy",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["349:5"],
+        "allowedRoles": ["language_switch_label"],
+        "prohibitedRoles": ["mixed_address_language", "bilingual_eyebrow", "bilingual_action_copy", "unscoped_devanagari_on_english_screen"]
+      },
+      "supersedes": [],
+      "reason": "Only the explicit language-switch label may name the alternate language; an arbitrary whitelist reason cannot bypass language purity."
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "CONFLICT-485-51-AUTHORITY",
+      "decisionIds": ["REJ-016", "historical-485-51-approved-claim"],
+      "status": "resolved",
+      "resolution": "REJ-016 is the later direct owner decision and supersedes every earlier approval claim."
+    },
+    {
+      "id": "CONFLICT-REJ-017-SCOPE",
+      "decisionIds": ["REJ-017", "broad-tall-narrow-botanical-family-ban"],
+      "status": "resolved",
+      "resolution": "The later direct owner correction rejects the exact crop signature, not the raster hash or botanical aspect ratio globally."
+    },
+    {
+      "id": "CONFLICT-BATCH01-ADMISSION",
+      "decisionIds": ["RULE-001", "ad50cc2-batch01-admission"],
+      "status": "resolved",
+      "resolution": "Historical OWNER REVIEW naming is preserved, but operational admission is blocked under the later owner-approved recovery."
+    }
+  ],
+  "batchAdmission": {
+    "allowedStatuses": ["BLOCKED_FROM_OWNER_REVIEW", "NARROW_PASS", "FULL_SCREEN_PASS"],
+    "fullScreenRequiredReviews": ["mechanical", "accessibility", "ornament_background", "blind_visual", "integrator"],
+    "zeroKnownFindings": true,
+    "unresolvedConflictsBlock": true
+  }
+}
