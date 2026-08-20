@@ -6,7 +6,7 @@
   "designRejectionRegister": {
     "path": "plans/ganak-design-rejection-log.md",
     "role": "canonical rejection vocabulary; the GDF ledger remains the regression/action register",
-    "canonicalRejectIds": "REJ-001 through REJ-014",
+    "canonicalRejectIds": "REJ-001 through REJ-015",
     "nodeMap": {
       "REJ-001": { "rejectedNodes": ["47:2"] },
       "REJ-002": { "rejectedNodes": ["79:12"] },
@@ -33,6 +33,11 @@
         "hiddenNodes": ["116:400", "277:961", "513:6978", "513:7319", "562:8043", "562:8296", "562:8549", "562:8864", "562:9212", "562:9560", "562:9910", "601:9802", "622:10525", "652:13974"],
         "visibleWebsiteOccurrencesAfterSweep": 0,
         "substituteAdded": false
+      },
+      "REJ-015": {
+        "rejectedNodes": ["730:14247"],
+        "reason": "No meaningful ornament structure; elements were placed rather than composing a frame, path or transition.",
+        "stillLikedNotApproved": ["restrained direction", "rich direction"]
       }
     }
   },
@@ -64,6 +69,7 @@
       ,"parkedPhoneLaneB": "556:2"
       ,"responsiveSharedSystemQa": "596:66"
       ,"ownerReviewVisualVocabulary": "707:14247"
+      ,"ownerReviewExpandedFloralArtFamily": "743:16083"
     },
     "frames": {
       "approvedDesktopMaster": "31:2",
@@ -191,6 +197,29 @@
     "contains": ["palette roles and proven contrast combinations", "ornament families", "placement and density rules", "three small composition swatches", "anti-vocabulary", "controlled-improvisation rule", "exact source references"],
     "controlledImprovisation": "New work may vary motif, density and colour balance only within named evidenced families and roles. A genuinely new family or an existing extraction used in a new structural job returns to the owner.",
     "screenDesignsCreated": 0,
+    "screenshotSanity": "PASS"
+  },
+  "expandedFloralArtReview": {
+    "ownerDecisionRecorded": "2026-08-19",
+    "decisionState": "OWNER REVIEW",
+    "section": "743:16083",
+    "sectionName": "OWNER REVIEW · EXPANDED FLORAL ART FAMILY",
+    "board": "743:16084",
+    "correctedOriginSource": {
+      "path": "/Users/shivie/Downloads/avif_xLarge.avif",
+      "sha256": "7c9fc29a761eb7876c7eb18c473a834dddcff61e52aff679b6de70e2eace4222",
+      "status": "SOURCE / INSPIRATION; not a shippable asset or blanket approval"
+    },
+    "explorationArtworkNodes": ["743:16091", "743:16097", "743:16103", "743:16109", "743:16115", "743:16121", "743:16127", "743:16133", "743:16139"],
+    "approvedQualityControl": {
+      "sourceNode": "485:51",
+      "reviewCloneNode": "743:16145",
+      "scope": "Festival/Vrat hero only"
+    },
+    "artworkKinds": ["side-growing restrained sweep", "side-growing rich sweep", "side-growing editorial sweep", "horizontal botanical transition", "vertical climbing vine", "bottom-right corner garden", "open floral arch", "wide botanical ending band", "deity-adjacent foliage"],
+    "isolatableTransparentAssets": true,
+    "screenDesignsCreated": 0,
+    "screensChanged": 0,
     "screenshotSanity": "PASS"
   },
   "approvedVratBotanicalTreatment": {
@@ -450,9 +479,10 @@
     ,"responsive-shared-system-structure-contrast-target-audit-pass-2026-08-19"
     ,"shared-context-base-unbound-and-pilot-instance-state-binding-2026-08-19"
     ,"owner-review-visual-vocabulary-board-707-14247-created-from-existing-evidence-2026-08-19"
+    ,"expanded-floral-art-family-743-16083-created-from-corrected-source-language-2026-08-19"
   ],
   "pendingValidations": [
-    "owner-approval-or-changes-on-visual-vocabulary-707-14247-before-family-propagation",
+    "owner-selection-or-changes-on-expanded-floral-art-family-743-16083-before-family-propagation",
     "owner-click-through-sign-off-on-wired-prototype",
     "posthog-festival-navigation-validation-after-launch",
     "remaining-desktop-screen-state-prototypes",
