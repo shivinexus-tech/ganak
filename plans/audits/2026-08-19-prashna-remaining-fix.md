@@ -604,6 +604,35 @@ board in the meantime.
 
 ---
 
+## Gate board
+
+`bash scripts/run-all-gates.sh`, the whole repository, after every fix above:
+
+```
+99 passed, 0 failed.
+```
+
+The Prashna lane inside it:
+
+```
+PASS  prashna-249.cjs                 PASS  prashna-high-latitude.cjs
+PASS  prashna-249-chart.cjs           PASS  prashna-judgment-zone.cjs     (new)
+PASS  prashna-249-input.cjs           PASS  prashna-ruling-planets.cjs    (new)
+PASS  prashna-copy.cjs                PASS  vara-consistency.cjs          (new)
+PASS  prashna-practitioner.cjs        PASS  screen-snapshots.cjs
+PASS  prashna-sublord-boundary.cjs    PASS  prashna-parity.js
+PASS  prashna-sublord-labels.cjs      PASS  prashna-calc.js
+```
+
+`npm run build` clean. **The parity-frozen engine region is byte-identical to
+`origin/main`** — verified by extracting the 19,550 bytes between the two markers
+from both trees and comparing them, not by trusting the diff.
+
+The one gate that did fail on the first full run was `language-leak-scan`, on the
+new Hindi timezone copy; it is fixed above and the board is green.
+
+---
+
 ## Where the seventeen stand
 
 | # | Sev | State | By |
