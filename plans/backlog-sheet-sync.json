@@ -449,7 +449,10 @@
         88,
         89,
         90,
-        91
+        91,
+        92,
+        93,
+        94
       ]
     },
     {
@@ -465,7 +468,8 @@
         70,
         71,
         74,
-        75
+        75,
+        95
       ]
     },
     {
@@ -1005,6 +1009,26 @@
     "91": {
       "section": "P0",
       "title": "Dasha and transit: three P0s, and no gate anywhere asserted a dasha date (`BUGBASH-DASHA-TRANSIT`)",
+      "technicalComplexity": "Medium"
+    },
+    "92": {
+      "section": "P0",
+      "title": "Above the polar circle the rising sign was the setting sign (`POLAR-QUADRANT`)",
+      "technicalComplexity": "Medium"
+    },
+    "93": {
+      "section": "P0",
+      "title": "One quantity implemented in several places — the root cause behind the worst findings (`RETIRE-DUPLICATES`)",
+      "technicalComplexity": "Medium"
+    },
+    "94": {
+      "section": "P0",
+      "title": "Two intervals shipped under the name Pradosha, and two fast days did not exist (`PRADOSHA-DEFINITION`)",
+      "technicalComplexity": "Low"
+    },
+    "95": {
+      "section": "P1",
+      "title": "A gate that catches Ganak contradicting itself (`CROSS-SURFACE-CONSISTENCY`)",
       "technicalComplexity": "Medium"
     }
   }

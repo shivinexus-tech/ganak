@@ -15,7 +15,7 @@ const config = JSON.parse(await readFile(new URL("../plans/backlog-sheet-sync.js
 const markdown = await readFile(new URL("../plans/backlog-acceptance-register.md", import.meta.url), "utf8");
 const base = parseRegister(markdown, config, "test base");
 
-assert.equal(base.rows.size, 91);
+assert.equal(base.rows.size, 95);
 // 85-91 added 2026-08-19: the second day of the audit-and-fix sweep. 88, 90 and 91
 // are registered with their remaining share named rather than rounded up — one of
 // four Muhurat P0s fixed, roughly eleven Prashna findings still open, and a dasha
@@ -295,7 +295,7 @@ assert.throws(
 );
 assert.equal(
   parseRegister(preAutomationMarkdown, config, "bootstrap historical fixture", { allowMetadataTitleMismatch: true }).rows.size,
-  91,
+  95,
   "the first run may parse a pre-metadata base while preserving its old cell values",
 );
 
