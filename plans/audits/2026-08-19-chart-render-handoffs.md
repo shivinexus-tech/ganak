@@ -32,12 +32,12 @@ that to a text file. A mirror can only ever show the lines somebody remembered t
 nobody had mirrored a dasha date, an ayanamsa footnote, a marriage row or a graha colour.
 
 Proof, not assertion: **the `chart.*` baselines did not move by a single byte during this
-change.** `screen-snapshots` still reports `60 baselines match` before and after. Eight
+change.** `screen-snapshots` still reports `60 baselines match` before and after. Ten
 reader-visible defects were fixed underneath a green mirror.
 
 So the deliverable here is the same shape as the dasha lane's: fix the list, and close the
 hole. The gate section added yesterday — § 6, which renders the real `ChartScreen` — is
-extended by seven new sections (§ 6g–6m) that assert on what a reader actually sees, with no
+extended by eight new sections (§ 6g–6n) that assert on what a reader actually sees, with no
 baseline, so they cannot be re-blessed by regenerating a file.
 
 ---
@@ -258,6 +258,64 @@ retyped, so the prose cannot drift from the arithmetic that produced the ranking
 fails if the engine's weights are reordered. The English branch also stopped interpolating the
 raw lord and now goes through `planetName` like every other graha on the screen.
 
+### Found while fixing F17 — the gate that forbade the leak is what caused it
+
+Fixing F17 turned `validation/language-leak-scan.cjs` § 1f **red**, and the reason turned out
+to be the most useful finding of the pass.
+
+```
+AssertionError: A KP/dasha lord reaches the screen in the engine's own language:
+  src/screens/ChartScreen.tsx:836 — lord rendered unlocalised: {RP.ascSignLord}
+  … all seven Ruling Planets call sites …
+Wrap it: planetName(lang, x.subLord)
+```
+
+`<RPItem pl={RP.ascSignLord} />` is not a leak. `RPItem` localises the value *and* uses the
+English key to look the graha colour up in `PLANET_COLOR`. The scan's own comment, eight lines
+above the rule that fired, already blesses exactly this shape:
+
+> *"Anchored to text position on purpose: `pl={pl}` and `key={pl}` pass the value on to
+> something that localises it, and flagging those would teach agents to silence the gate rather
+> than to fix the leak."*
+
+That anchoring was applied to the bare-identifier rule and **never to the dotted-path rule
+beside it.** So the gate flagged the prop, and whoever met it did the one thing that silences
+the gate: `pl={planetName(lang, RP.ascSignLord)}`. The words stayed right, `PLANET_COLOR["राहु"]`
+became `undefined`, and the strip lost its colour in Hindi for months. **The gate wrote the
+bug, exactly as its own comment predicted it would.**
+
+`RAW_LORD` now ignores attribute position, matching `BARE_LORD`. Mutation-proved still strict:
+
+```
+MUTANT  {planetName(lang, sl.starLord)} -> {sl.starLord}   (JSX text position)
+  AssertionError: src/screens/ChartScreen.tsx:770 — lord rendered unlocalised: {sl.starLord}
+```
+
+**The half that is given up — a prop handed to a component that does *not* localise — is
+re-established on rendered output, which is stronger.** § 6n asserts that the whole rendered
+Hindi `ChartScreen`, on all four panels, carries no Latin graha, rashi or nakshatra name. It
+found two raw sites within a minute of being written, **neither of which the source scan had
+ever matched at all**, because neither `item.pl` nor `p.name` is a lord-shaped path:
+
+```
+Before (Hindi kundli)
+  Yogi Point       कर्क 20°02′  H1  · Mercury
+  Avayogi Point    मकर 26°42′   H7  · Mars
+  राशि कुंडली से भाव बदला: Moon H8→H9 , Mars H9→H10 , Jupiter H12→H1 , Venus H10→H11
+
+After
+  Yogi Point       कर्क 20°02′  H1  · बुध
+  Avayogi Point    मकर 26°42′   H7  · मंगल
+  राशि कुंडली से भाव बदला: चन्द्र H8→H9 , मंगल H9→H10 , गुरु H12→H1 , शुक्र H10→H11
+```
+Both were fixed. Fail-then-pass: reverting just those two lines turns § 6n red on `kundli`,
+`dashas`, `matching` and `vault` with the exact strings above.
+
+The general lesson, worth more than the two lines: **a source-shape gate cannot tell "reaches
+the reader" from "is passed to something that handles it", and when it guesses wrong it does
+not merely annoy — it dictates a fix. Pair every source-shape rule with a rendered-output
+assertion, and let the rendered one carry the guarantee.**
+
 ---
 
 ## NOT closed — needs sourcing, not drafting
@@ -355,7 +413,7 @@ told not to touch. Each is repeated here with its exact change.
 
 New assertions, all in files this lane owns:
 
-**`validation/screen-snapshots.cjs` § 6g–6m** — extends yesterday's real-`ChartScreen` section
+**`validation/screen-snapshots.cjs` § 6g–6n** — extends yesterday's real-`ChartScreen` section
 rather than the composed mirror, and carries **no baseline**, so these are invariants that
 cannot be re-blessed by regenerating a file.
 
@@ -374,6 +432,12 @@ cannot be re-blessed by regenerating a file.
   weight that ranked it, and the ranking card must not be headed by an ordering it does not use.
 - **6m** F13 (dasha) — the English `DASHA_NOTE` must keep all nine lords with nine distinct
   significations.
+- **6n** the rendered half of `language-leak-scan` § 1f — no Latin graha, rashi or nakshatra
+  name anywhere on the Hindi chart screen, on any of the four panels.
+
+**`validation/language-leak-scan.cjs` § 1f** — `RAW_LORD` no longer fires in attribute
+position, which is the rule `BARE_LORD` beside it already stated. See the F17 section above:
+that inconsistency is what caused F17, and § 6n carries the guarantee instead.
 
 **`validation/vimshottari-dasha.cjs` § 7–8** — § 7 measures the one-minute birth-time
 sensitivity the new footnote claims; § 8 pins the ruling-planet weight ordering the new
@@ -437,7 +501,7 @@ The last one is the honest proof that § 7 is not vacuously true.
 ```
 ✓ screen-snapshots: 60 baselines match
 ```
-Identical before and after. Eight reader-visible defects were fixed and the committed
+Identical before and after. Ten reader-visible defects were fixed and the committed
 `chart.*` baselines did not change by one byte — **do not use them to prove anything about
 what a reader sees.** No baseline was regenerated in this pass.
 
@@ -470,6 +534,10 @@ what a reader sees.** No baseline was regenerated in this pass.
 - The ruling-planet summary told the reader that a graha ranked first because it *appeared
   more often*, directly above a list showing a different graha appearing more often. It now
   explains the ranking Ganak actually uses.
+- On a **Hindi** kundli, the Yogi and Avayogi tiles named their graha in English — `· Mercury`,
+  `· Mars` — and the line saying which planets change house between the rasi and bhava-chalit
+  charts named all of them in English. Both now read in Devanagari. Neither was on the handoff
+  list; a new check on the rendered screen found them.
 - **Still owed:** the nine per-graha Hindi mahadasha meanings. A Hindi reader still gets one
   generic sentence where an English reader gets nine distinct ones. That is a sourcing decision
   and a human gate, not something this pass would invent.
