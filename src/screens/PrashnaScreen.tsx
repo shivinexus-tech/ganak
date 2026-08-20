@@ -119,28 +119,42 @@ const PR_gmst = (jdUT, Tut) => norm360(280.46061837 + 360.98564736629 * (jdUT - 
    tan(RA) = cos(eps) * tan(lambda). Used only by the polar quadrant correction
    below. */
 const PR_raOfEcl = (lam, eps) => norm360(Math.atan2(cosD(eps) * sinD(lam), cosD(lam)) * R2D);
+/* THE rising degree for a given RAMC — ONE definition for this whole file.
+   ======================================================================
+   POLAR QUADRANT CORRECTION (2026-08-18). The standard ascendant formula
+   returns ONE of the two antipodal points where the ecliptic cuts the horizon.
+   Below the polar circle that is always the eastern one. Above it -- Murmansk
+   68.96, Tromso 69.65, and everything nearer the pole -- the arctangent lands
+   in the other quadrant for part of the day and the function returns the
+   DESCENDANT instead: at Tromso on 2026-08-18 it did so at 18:00Z and 20:00Z,
+   handing back Scorpio 22 deg 57 min as the rising degree when that degree was
+   setting. The whole chart is then rotated by six houses.
+   Diurnal motion is uniform, so the fix is the definition itself: everything
+   on the eastern half of the horizon is rising and everything on the western
+   half is setting. Take the hour angle of the computed point; if it is west of
+   the meridian, the formula returned the descendant, so take its opposite.
+   Below the polar circle sin(H) is never positive here, so this is a no-op for
+   every latitude Ganak's earlier gates covered. Proven at 528 sampled
+   latitude/hour pairs by validation/prashna-high-latitude.cjs, which tests
+   "rising" against published spherical astronomy rather than against a second
+   copy of this code.
+
+   EXTRACTED 2026-08-19 (dedupe lane). The correction was applied here in
+   PR_ascMc on 2026-08-18, but PR_ramcForAsc further down the file carried its
+   own SECOND copy of the bare arctangent and never received it. Both callers
+   now share this one function, so the correction cannot reach one and miss the
+   other again. This is the same definition as `risingDegree` in
+   src/engine/ephemeris.ts; the two files keep separate copies only because this
+   region is parity-frozen and must stay plain, import-free JS
+   (validation/prashna-parity.js evaluates it standalone). */
+function PR_risingDegree(ramc, eps, lat) {
+  const asc = norm360(Math.atan2(cosD(ramc), -(sinD(ramc) * cosD(eps) + tanD(lat) * sinD(eps))) * R2D);
+  return sinD(norm360(ramc - PR_raOfEcl(asc, eps))) > 0 ? norm360(asc + 180) : asc;
+}
 function PR_ascMc(jdUT, Tut, lat, lonE) {
   const eps = PR_obliquity(Tut), ramc = norm360(PR_gmst(jdUT, Tut) + lonE);
-  let asc = norm360(Math.atan2(cosD(ramc), -(sinD(ramc) * cosD(eps) + tanD(lat) * sinD(eps))) * R2D);
+  const asc = PR_risingDegree(ramc, eps, lat);
   const mc = norm360(Math.atan2(sinD(ramc), cosD(ramc) * cosD(eps)) * R2D);
-  /* POLAR QUADRANT CORRECTION (2026-08-18). The standard ascendant formula
-     returns ONE of the two antipodal points where the ecliptic cuts the horizon.
-     Below the polar circle that is always the eastern one. Above it -- Murmansk
-     68.96, Tromso 69.65, and everything nearer the pole -- the arctangent lands
-     in the other quadrant for part of the day and the function returns the
-     DESCENDANT instead: at Tromso on 2026-08-18 it did so at 18:00Z and 20:00Z,
-     handing back Scorpio 22 deg 57 min as the rising degree when that degree was
-     setting. The whole chart is then rotated by six houses.
-     Diurnal motion is uniform, so the fix is the definition itself: everything
-     on the eastern half of the horizon is rising and everything on the western
-     half is setting. Take the hour angle of the computed point; if it is west of
-     the meridian, the formula returned the descendant, so take its opposite.
-     Below the polar circle sin(H) is never positive here, so this is a no-op for
-     every latitude Ganak's earlier gates covered. Proven at 528 sampled
-     latitude/hour pairs by validation/prashna-high-latitude.cjs, which tests
-     "rising" against published spherical astronomy rather than against a second
-     copy of this code. */
-  if (sinD(norm360(ramc - PR_raOfEcl(asc, eps))) > 0) asc = norm360(asc + 180);
   return { asc, mc, ramc, eps };
 }
 const PR_eclFromRA = (ra, eps) => norm360(Math.atan2(sinD(ra), cosD(ra) * cosD(eps)) * R2D);
@@ -374,7 +388,20 @@ const GRAHA_HI: Record<string, string> = Object.fromEntries(
    Deterministic and fast (a few hundred cheap evals). Verified against Swiss
    Ephemeris (swe_houses_armc, Placidus) to 0.0000″ across 1–249 × 3 latitudes. */
 function PR_ramcForAsc(targetAscTrop, eps, lat) {
-  const ascOf = ramc => norm360(Math.atan2(cosD(ramc), -(sinD(ramc) * cosD(eps) + tanD(lat) * sinD(eps))) * R2D);
+  /* The RISING degree, not the bare arctangent. Until 2026-08-19 this line held
+     a second, uncorrected copy of the ascendant formula while PR_ascMc above had
+     carried the polar quadrant correction since 2026-08-18 — so the search was
+     inverting a function that, above the polar circle, returns the descendant
+     for part of the turn. Measured before the change (.scratch/dedupe/
+     prashna-ramc-variants.cjs, 25,920 target degrees over 18 latitudes): the two
+     variants pick the same RAMC everywhere below the polar circle, and differ in
+     only 10 of 15,235 solvable polar cases, every one of them a grazing moment
+     with the target within 0.5° of the meridian where no degree is cleanly
+     rising. So this is a correctness-neutral change TODAY. It is made anyway
+     because the whole point of this lane is that a formula living in two places
+     is where the next disagreement comes from — and here the correction had
+     already reached one copy and not the other. */
+  const ascOf = ramc => PR_risingDegree(ramc, eps, lat);
   const target = norm360(targetAscTrop);
   const STEP = 0.5;                       // 720 samples: keeps each cell's asc-span « 180°
   let r0 = 0, a0 = ascOf(0);
@@ -2074,5 +2101,11 @@ function NumberSetBox({ info, favor, deny, cusp, hi, cuspLabel, cuspIsAscendant 
 export default PrashnaScreen;
 // Named exports for the validation gates (parity + number-mode chart). The
 // parity gate slices only the marked engine region, so these do not affect it.
+/* PR_ramcForAsc is exported for validation only — nothing in the UI imports it.
+   It inverts the ascendant equation, so it is the one place a gate can ask "is
+   the degree this RAMC was chosen for actually RISING there?" against published
+   spherical astronomy instead of against a second copy of Ganak's own formula.
+   See validation/prashna-high-latitude.cjs. */
 export { PR_cast, PR_castNumber, PR_judge, QUESTIONS, PR_kpNewAyan, PR_cuspalTable, PR_significatorGrid,
-  PR_buildResult, PR_rulingPlanets, PR_rpConfirmation, PR_judgmentVara, PR_resolveJudgmentMoment };
+  PR_buildResult, PR_rulingPlanets, PR_rpConfirmation, PR_judgmentVara, PR_resolveJudgmentMoment,
+  PR_ramcForAsc };

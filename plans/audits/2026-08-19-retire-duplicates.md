@@ -149,3 +149,108 @@ npm run build             ✓ built in 1.89s
 
 No snapshot under `validation/snapshots/` needed re-baselining — the expected result, since no
 ordinary chart moved.
+
+---
+
+## Item 2 — `PrashnaScreen.tsx` `PR_ramcForAsc`: the duplicate was real, the predicted defect was not
+
+### Scope note
+
+`PR_ramcForAsc` sits at line ~376. The parity-frozen region ends at the `END ENGINE` marker on line
+342, so the function is **outside** the frozen block and ordinary rules applied. One small change was
+made *inside* the markers — see "The extraction" — and it is a pure factoring with no behavioural
+change, proven by the parity gate and by byte-identical output.
+
+### What was being calculated twice
+
+The same "which degree is rising" arctangent as item 1, written out a second time inside this file.
+`PR_ascMc` (the time-mode chart) received the polar quadrant correction on 2026-08-18.
+`PR_ramcForAsc`'s inner `ascOf` — used by the KP **number** chart to find the moment whose ascendant
+is the number's degree — kept the uncorrected copy.
+
+### The predicted defect, measured, and not confirmed
+
+The polar lane predicted (explicitly "not measured further here") that above the polar circle the
+search would settle on a moment where the number's degree is the **descendant**, giving the wrong MC
+and the wrong house ring. That was tested before changing anything.
+
+`.scratch/dedupe/prashna-ramc-repro.cjs` — the returned RAMC checked against published spherical
+astronomy (Meeus, *Astronomical Algorithms* 2nd ed. ch. 13), never against Ganak:
+
+```
+   TOTAL 3 of 12240 target degrees resolved to a RAMC where the degree is SETTING
+```
+
+`.scratch/dedupe/prashna-ramc-variants.cjs` — the identical search run with the bare and the
+corrected `ascOf` side by side, 25,920 target degrees across 18 latitudes:
+
+```
+   TOTAL  targets 25920  solvable 15235  RAMC differs 10  bare wrong 4  corrected wrong 4
+```
+
+**Four wrong before, four wrong after.** Below the polar circle the two variants agree exactly
+everywhere. The 10 polar cases where the RAMC moves are all grazing moments —
+`.scratch/dedupe/prashna-ramc-diffcases.cjs` shows every one of them has the target within 0.5° of
+the meridian (hour angle 0.07°–0.46°), where the ecliptic is tangent to the horizon and no degree is
+cleanly rising:
+
+```
+lat 67  target Gem 19°00'   ΔRAMC 0.2181°
+   bare      RAMC 258.5000  alt -1.77e-2 H 180.462° RISING
+   corrected RAMC 258.2819  alt -1.82e-2 H 180.244° RISING
+```
+
+A forward/inverse round-trip was also tried as a discriminator and rejected: above the polar circle
+the forward map is many-to-one, so both variants "fail" it about equally (1406 vs 1411 of 5760) and
+the invariant is simply not true up there.
+
+**So the second copy was real; the 180° inversion it was expected to cause was not.** Reporting that
+honestly is the result — the alternative was to ship a fix and claim a defect nobody could reproduce.
+
+### The extraction
+
+The correction is now in one function, `PR_risingDegree`, called by both `PR_ascMc` and
+`PR_ramcForAsc`. The arctangent is written out exactly once in the file. `PR_ramcForAsc` is exported
+for validation only, so a gate can reach it.
+
+### Nothing moved
+
+`.scratch/dedupe/dump-p.cjs` — both Prashna modes: `PR_cast` at 14 ordinary/Indian/diaspora places ×
+5 moments, **all 249 KP numbers** at those places × 2 moments, `PR_ramcForAsc` across 144 target
+degrees per place, plus `PR_cast` and all 249 numbers at **four polar cities**:
+
+```
+PRASHNA DUMP: IDENTICAL — byte for byte (all 10079 lines)
+```
+
+```
+prashna-parity.js   ✓ parity EXACT: 198 values across 6 charts | worst numeric diff 5.68e-14° | 0 mismatch(es)
+prashna-calc.js     ALL TESTS PASSED  (24 pass / 0 fail)
+npm run build       ✓ built in 1.29s
+```
+
+### The new assertion — structural, because nothing numeric discriminates
+
+Since the correction is correctness-neutral today, **no numeric assertion can tell the fixed code
+from the broken code**. A check that passed either way would be worse than none: it would look like
+protection. The property that actually mattered — one formula living in two places, so a correction
+reaches one and misses the other — is asserted at the source level in
+`validation/prashna-high-latitude.cjs` [4], where it does discriminate.
+
+**Fail-then-pass, both failure directions:**
+
+```
+two copies present (the pre-fix state):
+  FAIL  prashna one-ascendant-formula: the ascendant arctangent is written out 2 times ...
+  [4] ascendant arctangent written out in PrashnaScreen.tsx: 2 time(s) (must be exactly 1)
+  ✗ prashna-high-latitude: 6444 passed, 1 failed
+
+formula validly rewritten so the regex stops matching (the "gone blind" case):
+  FAIL  prashna one-ascendant-formula: the ascendant arctangent pattern matched NOTHING ...
+  [4] ascendant arctangent written out in PrashnaScreen.tsx: 0 time(s) (must be exactly 1)
+  ✗ prashna-high-latitude: 6444 passed, 1 failed
+
+as shipped:
+  [4] ascendant arctangent written out in PrashnaScreen.tsx: 1 time(s) (must be exactly 1)
+  ✓ prashna-high-latitude: 6445 passed, 0 failed
+```

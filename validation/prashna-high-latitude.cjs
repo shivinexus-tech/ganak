@@ -333,6 +333,51 @@ for (const lat of [60.01, 64.15, 69.65]) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// [4] ONE ASCENDANT FORMULA IN THIS FILE — a structural check, not a numeric one
+//
+// WHY IT IS STRUCTURAL. PrashnaScreen.tsx used to hold the ascendant arctangent
+// TWICE: once in PR_ascMc, which received the polar quadrant correction on
+// 2026-08-18, and once inside PR_ramcForAsc's `ascOf`, which did not. The polar
+// lane predicted that the second copy would make the KP number chart settle on a
+// moment where the number's degree is the DESCENDANT, giving the wrong MC and
+// the wrong ring.
+//
+// That prediction was MEASURED on 2026-08-19 (dedupe lane) and did not hold. The
+// two variants pick the same RAMC at every latitude below the polar circle, and
+// differ in only 10 of 15,235 solvable polar cases — every one a grazing moment
+// with the target within 0.5 deg of the meridian, where no ecliptic degree is
+// cleanly rising and neither answer is better. Applying the correction changed
+// PR_cast and all 249 PR_castNumber charts by nothing at all, at four polar
+// cities included.
+//
+// So there is no numeric assertion that can tell the corrected code from the
+// uncorrected code: a check that passes either way would be worse than none,
+// because it would look like protection. What IS true, and what actually
+// mattered, is that one formula lived in two places and a correction reached one
+// and missed the other. That is the property asserted here, at the source level,
+// where it does discriminate.
+//
+// The regex is SELF-CHECKING: zero matches fails just as loudly as two. A
+// pattern that silently stops matching is how this class of check goes blind.
+// ---------------------------------------------------------------------------
+{
+  const src = require('fs').readFileSync('src/screens/PrashnaScreen.tsx', 'utf8');
+  // The ascendant arctangent: atan2(cos(RAMC), -(sin(RAMC)cos(eps) + tan(lat)sin(eps)))
+  const ASC_ARCTAN = /Math\.atan2\(\s*cosD\([A-Za-z_$][\w$]*\)\s*,\s*-\(\s*sinD\([A-Za-z_$][\w$]*\)\s*\*\s*cosD\([A-Za-z_$][\w$]*\)/g;
+  const hits = src.match(ASC_ARCTAN) || [];
+  assert(hits.length > 0,
+    'prashna one-ascendant-formula: the ascendant arctangent pattern matched NOTHING in ' +
+    'src/screens/PrashnaScreen.tsx. The formula was renamed or rewritten and this check has gone ' +
+    'blind — re-derive the pattern rather than deleting the assertion.');
+  assert(hits.length <= 1,
+    `prashna one-ascendant-formula: the ascendant arctangent is written out ${hits.length} times in ` +
+    'src/screens/PrashnaScreen.tsx. It must appear exactly once, in PR_risingDegree, so that a ' +
+    'correction cannot reach one copy and miss the other — which is exactly what happened between ' +
+    '2026-08-18 (PR_ascMc corrected) and 2026-08-19 (PR_ramcForAsc still bare).');
+  console.log(`\n  [4] ascendant arctangent written out in PrashnaScreen.tsx: ${hits.length} time(s) (must be exactly 1)`);
+}
+
 /* ------------------------------------------------------ OPEN: bug bash F17
    The ring is sound in both modes. What is still true above 60° is that Ganak
    frames it two different ways on two screens, and this is where a reader of this
