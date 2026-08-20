@@ -144,8 +144,28 @@ function PR_ascMc(jdUT, Tut, lat, lonE) {
   return { asc, mc, ramc, eps };
 }
 const PR_eclFromRA = (ra, eps) => norm360(Math.atan2(sinD(ra), cosD(ra) * cosD(eps)) * R2D);
+/* WHERE PLACIDUS ENDS (2026-08-19, bug bash F17). Placidus is undefined exactly
+   where a cusp-defining ecliptic point is CIRCUMPOLAR -- |tan(lat) * tan(dec)| >= 1,
+   the test inside solve() below. Because an ecliptic point's declination never
+   exceeds the obliquity, that condition first bites at the polar circle (~66.56 deg),
+   not at a round number. This function used to bail one step earlier, on a flat
+   |lat| > 60 with nothing behind the 60. src/engine/houses.ts -- the Placidus the
+   Jyotish chart screen draws -- has always used the geometric test, so between 60 deg
+   and the polar circle one place at one moment got real Placidus cusps on the Jyotish
+   screen and equal-house cusps here: at Reykjavik 64.15N on 2026-06-21 the twelve
+   cusps stood 6.6-15.9 deg apart at 12:00Z and as much as 81.3 deg apart at other
+   hours, and Helsinki, Whitehorse, Anchorage, Yellowknife, Trondheim and Fairbanks
+   were the same story. KP is a Placidus system -- "for the
+   other cusps take only the LATITUDE, prepared per the PLACIDUS system" (KP Reader VI,
+   Section IV, page-pinned in plans/prashna-249-ksk-verify.md) -- so wherever Placidus
+   exists KP horary uses it, and the flat 60 was denying it to places that have it.
+   Above the polar circle Placidus genuinely does not exist and PR_ring falls back to
+   equal house (rule 9, a Ganak product decision, not KSK).
+   The identical change is in validation/prashna-calc.js placidusCuspsTropical --
+   changing only one of the two would leave prashna-parity.js green while the two
+   engines disagreed. Anchored to published charts and to the published Placidus
+   definition, never to the sibling copy, by validation/prashna-high-latitude.cjs. */
 function PR_placidus(ramc, eps, lat) {
-  if (Math.abs(lat) > 60) return null;
   const solve = (offsetFn, start) => {
     let ra = norm360(ramc + start);
     for (let i = 0; i < 24; i++) {
@@ -1786,8 +1806,8 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, zone = null, placeLabel = 
               <div style={{ marginTop: "0.5rem" }}>
                 <Gloss>
                   {hi
-                    ? `तारा/उप = नक्षत्र स्वामी / कृष्णमूर्ति पद्धति का उप-स्वामी — प्रश्न इसी दो-स्तरीय स्वामित्व को पढ़ता है। भाव = ग्रह का भाव (${result.chart.system === 'placidus' ? 'प्लेसिडस भाव — कृष्णमूर्ति पद्धति का मानक' : 'समान भाव — उच्च अक्षांश विकल्प'})। स्थितियाँ: ${isNum ? 'कृष्णमूर्ति पद्धति का नया अयनांश (अंक विधि)' : 'लाहिरी अयनांश — द्रिक पंचांग की मानक परिपाटी'}, मध्यम राहु/केतु।`
-                    : `Star/Sub = nakshatra lord / KP sub-lord — the two-level rulership Prashna reads. House = the house the planet occupies (${result.chart.system === 'placidus' ? 'Placidus cusps, the KP standard' : 'equal houses — high-latitude fallback'}). Positions: ${isNum ? 'KP-New ayanamsa (KP number method)' : 'Lahiri ayanamsa — the same conventions as Drik Panchang defaults'}, mean Rahu/Ketu.`}
+                    ? `तारा/उप = नक्षत्र स्वामी / कृष्णमूर्ति पद्धति का उप-स्वामी — प्रश्न इसी दो-स्तरीय स्वामित्व को पढ़ता है। भाव = ग्रह का भाव (${result.chart.system === 'placidus' ? 'प्लेसिडस भाव — कृष्णमूर्ति पद्धति का मानक' : 'समान भाव — ध्रुव वृत्त के ऊपर प्लेसिडस सम्भव नहीं; ज्योतिष कुंडली वहाँ पोर्फ़री लेती है'})। स्थितियाँ: ${isNum ? 'कृष्णमूर्ति पद्धति का नया अयनांश (अंक विधि)' : 'लाहिरी अयनांश — द्रिक पंचांग की मानक परिपाटी'}, मध्यम राहु/केतु।`
+                    : `Star/Sub = nakshatra lord / KP sub-lord — the two-level rulership Prashna reads. House = the house the planet occupies (${result.chart.system === 'placidus' ? 'Placidus cusps, the KP standard' : 'equal houses — above the polar circle Placidus does not exist; the Jyotish chart screen falls back to Porphyry there'}). Positions: ${isNum ? 'KP-New ayanamsa (KP number method)' : 'Lahiri ayanamsa — the same conventions as Drik Panchang defaults'}, mean Rahu/Ketu.`}
                 </Gloss>
               </div>
               <CuspalTable chart={result.chart} hi={hi} judgedCusp={v.q.cusp} mode={result.mode} />
