@@ -84,6 +84,14 @@ const SARVARTHA: Record<number, number[]> = {
   3:[3,16,12,2,4], 4:[26,16,0,6,7], 5:[26,16,0,6,21], 6:[21,3,14],
 };
 const AMRITA_SIDDHI: Record<number, number> = { 0:12, 1:4, 2:0, 3:16, 4:7, 5:26, 6:21 };
+/* Ganda Moola nakshatras. "According to Vedic astrology, Ashwini, Ashlesha,
+   Magha, Jyeshtha, Mula and Revati Nakshatras are known as Ganda Mool
+   Nakshatras" -- Drik Panchang, Ganda Mool page summary
+   (drikpanchang.com/panchang/bhadra-dates-timings.html, read 2026-08-19).
+   Exported so the Muhurat engine cannot keep a second, drifting copy: until
+   2026-08-19 no Muhurat surface mentioned Ganda Moola at all, while the Panchang
+   card flagged it, and the finder printed the flagged star as the reason a
+   property-registration day was "Highly auspicious" (bug bash F4). */
 const GANDA_MOOLA = new Set([0,8,9,17,18,26]);
 const RAVI_YOGA_SEPARATION = new Set([4,6,9,10,13,20]);
 const ANANDADI_NAMES = [
@@ -266,4 +274,4 @@ function scanSpecialYogaCalendar(place: any, atMs: number, days = 60) {
   return out;
 }
 
-export { computeDailyWindows, scanSpecialYogaCalendar, specialYogas, specialYogaWindows, anandadiYoga, gowriWindows, chandraBala, taraBala, VARJYA_GHATI };
+export { computeDailyWindows, scanSpecialYogaCalendar, specialYogas, specialYogaWindows, anandadiYoga, gowriWindows, bhadraWindows, GANDA_MOOLA, chandraBala, taraBala, VARJYA_GHATI };
