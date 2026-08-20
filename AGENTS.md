@@ -54,6 +54,36 @@ tell what the app is doing. UI must follow the language toggle (hi/en) everywher
   Panchang defaults. Never silently switch; it changes every chart in the app.
 
 ## Validation gates — run after EVERY structural edit, paste passing output
+
+**Run them all, not the ones you remember.** The repository has ~100 gates and the
+named list below is a fraction of them; before this runner existed each agent ran the
+handful it recalled and nobody saw the whole board:
+
+```bash
+bash scripts/run-all-gates.sh    # every gate, one line each, non-zero exit on any failure
+```
+
+A full run takes a few minutes on an idle machine and much longer when several agents
+are working — be patient with it rather than assuming it has hung. Failing gates are
+listed at the end with the path to their full output.
+
+**Gates added 2026-08-18/19, each written because a real defect had shipped past every
+existing gate:** `vimshottari-dasha` (nothing anywhere asserted a dasha date, a period
+length or that sub-periods tile their parent), `samvatsara-years` (a fixed era offset
+that would have started printing wrong year names in 2028), `zone-offset-dst`,
+`adhik-masa`, `ekadashi-lunar-naming`, `festival-day-rules`, `malayalam-kollavarsham`,
+`screen-snapshots` (rendered text for 27 screens in both languages — the first gate in
+this repo that proves what a reader actually sees), and `language-leak-scan`.
+
+**A gate must never compare Ganak to a copy of Ganak.** Three separate defects survived
+for months inside gates that did exactly that: a horary parity check comparing the
+screen's copy of a calculation against the engine's identical copy, a daylight-saving
+guard checking Ganak's answer against Ganak's own answer, and an ayanamsa test whose
+harness gave each module its own private copy of the global it was meant to catch
+leaking. Anchor assertions to a dated, attributed published source instead.
+
+The frequently-named subset:
+
 ```bash
 node validation/parse-check.js src/kundli-app.tsx    # syntax, duplicates, orphans, storage ban
 node validation/prashna-parity.js src/screens/PrashnaScreen.tsx # Prashna engine == validated engine
