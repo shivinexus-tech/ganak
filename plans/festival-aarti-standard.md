@@ -148,6 +148,42 @@ so a future re-check does not read them as drift.
 agreed on the refrain, the stanza order and the substance of every verse. Owner skim
 sign-off is still the final step before these are called complete.
 
+### Tier-2 deity aartis (verified 2026-08-20, `P2-FESTIVAL-AARTI-BREADTH`)
+
+Same contract as Tier 1: drikpanchang (hi) primary, one independent source cross-checked
+before entry, variants noted so a re-check does not read them as drift.
+
+- **Vishwakarma — प्रभु श्री विश्वकर्मा घर आवो:** drikpanchang `/lyrics/aarti/lord-vishwakarma/shri-vishwakarma-aarti.html` (hi).
+  Refrain + 4 stanzas. Cross-checked against SriMandir and Bhaktvatsal — agreement is exact,
+  including the refrain-between-verses pattern that we render as the cue. Variant: बांध/बाध.
+- **Tulsi — जय जय तुलसी माता:** drikpanchang `/lyrics/aarti/tulasi-mata/tulasi-mata-aarti.html` (hi).
+  Refrain + 5 stanzas. **This is a genuinely multi-version aarti** — BhaktiBharat and Times Now
+  arrange the opening differently (`मैय्या जय तुलसी माता` as a second refrain line) and differ on
+  several words (सब योगों के/से ऊपर, बहु/बटु पुत्री, रुज से रक्षा/रज से रक्ष). The primary anchor's
+  form is kept per §1. **Confidence MED, not HIGH — this is the one most worth an owner ear.**
+- **Kubera — ॐ जै यक्ष कुबेर हरे:** drikpanchang `/lyrics/aarti/lord-kubera/lord-kubera-aarti.html` (hi).
+  Refrain + 7 stanzas. Cross-checked against Times Now Navbharat and BhajanPedia. **The "स्वामी …"
+  echo half-lines are KEPT**, per the owner fidelity rule in §2 — this aarti is traditionally sung
+  call-and-response and must not be condensed to bare couplets. Note the anchor prints जै, not जय;
+  §1 has no rule normalising one to the other, so the source form stands. See the open question below.
+- **Annapurna — बारम्बार प्रणाम:** drikpanchang `/lyrics/aarti/annapurna-mata/annapurna-mata-aarti.html` (hi).
+  Refrain + 5 stanzas. Cross-checked against SriMandir and BhaktiBharat. Variants: तिहारे/तिहारो, लेते/लेत.
+  The single-line refrain ends with a single danda in the source; normalised to ॥ per §1.
+- **Radha — आरती श्री वृषभानुसुता की:** drikpanchang `/lyrics/aarti/shri-radha/shri-radha-aarti.html` (hi).
+  Refrain + 4 stanzas of three lines each. Cross-checked against Times Now and HinduismFAQ, which
+  split the opening line off as its own refrain — that split is adopted here, since it matches the
+  sung form better than the anchor's three-line first group.
+- **Kali — मंगल की सेवा:** drikpanchang `/lyrics/aarti/kali-mata/mahakali-mata-aarti.html` (hi).
+  Refrain + 12 stanzas. Cross-checked against Bhajan Diary and Bhajan Times. Source typography
+  cleaned: quote marks around 'मंगल' and 'आदित' dropped, and a stray trailing comma after
+  `कहीं भार्या भोग करे।` corrected to a comma mid-line — a source typo, not a textual variant.
+
+**Open question for the owner (§2 inconsistency, surfaced 2026-08-20).** The fidelity rule says
+to KEEP echo half-lines and not condense them to bare couplets, but the Om Jai Jagdish Hare entry
+below records them as "echo half-lines condensed". Those two cannot both be right. Kubera follows
+the rule as written (echoes kept). If the owner prefers the condensed form, Kubera and the Om Jai
+Jagdish Hare note should be brought into line with each other either way.
+
 ### Diwali proof slice (verified 2026-07-26)
 - **Ganesh — Jai Ganesh Deva:** drikpanchang `/lyrics/aarti/shree-ganesh/jay-ganesh-aarti.html` (hi). Standard couplet form; parenthetical regional variants and `x2` repeat markers dropped for a clean single reading.
 - **Lakshmi — Om Jai Lakshmi Mata:** drikpanchang `/lyrics/aarti/lakshmi-mata/lakshmi-mata-aarti.html` (hi). Full 8-stanza form.

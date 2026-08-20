@@ -46,6 +46,26 @@ Original priority list below.
 | 6 | *Vaishno Devi / Sherawali aarti* | Vaishno Devi | Navratri + year-round pilgrimage search |
 | 7 | *Aarti Ganga Maiya* — ॐ जय गंगे माता | Ganga | Ganga aarti (Haridwar/Varanasi); very high search |
 
+## Tier 2 — ✅ ENTERED 2026-08-20 (six of seven; see the weekday note)
+
+Vishwakarma, Tulsi, Kubera, Annapurna, Radha and Kali are in `src/data/aarti-texts.ts`,
+cross-validated with citations in `plans/festival-aarti-standard.md` §6 and covered by the
+standalone-deity section of `validation/festival-aarti.cjs` — now **13 deity aartis, 83 stanzas**.
+
+**Row 13, the weekday (Mon–Sun) set, is deliberately NOT entered as new text.** It is a bundling
+job, not a sourcing one: six of the seven weekday deities are already covered — Monday Shiva,
+Tuesday Hanuman, Wednesday Ganesh, Friday Santoshi/Lakshmi, Saturday Shani, Sunday Surya — so the
+work is a mapping that only becomes meaningful once `P2-FESTIVAL-AARTI-FINDER` gives these URLs.
+The one genuine gap is **Thursday (Brihaspati)**, which the primary anchor does not carry; it needs
+a different source and its own confidence call, so it is left open rather than filled from a weaker one.
+
+**Confidence:** HIGH for five. **Tulsi is MED** — it is a genuinely multi-version aarti and the
+second source arranges it differently; it is the one most worth an owner ear.
+
+As with Tier 1, none of these has a URL of its own yet. Owner skim sign-off outstanding.
+
+Original priority list below.
+
 ## Tier 2 — strong · festival/weekly · broad
 
 | # | Aarti | Deity | Demand driver |

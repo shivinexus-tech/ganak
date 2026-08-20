@@ -70,7 +70,7 @@ for (const key of COVERED) {
 }
 
 /* ------------------------------------------------------------------------
-   Standalone deity aartis (P2-FESTIVAL-AARTI-BREADTH, Tier 1).
+   Standalone deity aartis (P2-FESTIVAL-AARTI-BREADTH, Tiers 1 and 2).
 
    The checks above reach an aarti only through a festival guide, so a deity
    aarti that belongs to a weekday vrat or a pilgrimage rather than to one
@@ -94,6 +94,13 @@ const DEITY_AARTIS = {
   KHATU_SHYAM_AARTI: 'ॐ जय श्री श्याम हरे',
   VAISHNO_AARTI: 'जय वैष्णवी माता',
   GANGA_AARTI: 'ॐ जय गंगे माता',
+  // Tier 2
+  VISHWAKARMA_AARTI: 'प्रभु श्री विश्वकर्मा घर आवो',
+  TULSI_AARTI: 'जय जय तुलसी माता',
+  KUBERA_AARTI: 'ॐ जै यक्ष कुबेर हरे',
+  ANNAPURNA_AARTI: 'बारम्बार प्रणाम',
+  RADHA_AARTI: 'आरती श्री वृषभानुसुता की',
+  KALI_AARTI: 'मंगल की सेवा',
 };
 
 for (const [name, anchor] of Object.entries(DEITY_AARTIS)) {
