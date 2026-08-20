@@ -66,7 +66,13 @@ const SCREENS = [
   { key: 'personalize', entry: 'src/screens/PersonalizeScreen.tsx',
     props: (lang) => ({ ...base(lang), onLanguage: noop, onClearPreferences: noop, onBack: noop }) },
   { key: 'prashna', entry: 'src/screens/PrashnaScreen.tsx', props: base,
-    note: 'verdict appears only after casting — covered by result snapshots' },
+    /* The empty form only. The cast reading — verdict card, plain-language lines,
+       graha / cuspal / significator tables and the Ruling Planets panel — now has
+       its own baseline (prashna-result.*) built through PrashnaScreen's own
+       PR_buildResult; see snapshot-results.cjs. Until 2026-08-19 it had none, and
+       all seventeen findings of the KP horary bug bash lived where this file could
+       not look. */
+    note: 'verdict appears only after casting — covered by the prashna-result baselines' },
   { key: 'chart', entry: 'src/screens/ChartScreen.tsx', props: (lang) => ({ C, card, lang }),
     note: 'chart body appears only after a cast — covered by result snapshots' },
   { key: 'matching', entry: 'src/screens/MatchingScreen.tsx', props: base,

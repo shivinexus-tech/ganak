@@ -141,6 +141,29 @@ function matchText(lang) {
   }
 }
 
+/* ------------------------------------------------------------- prashna result
+   The Prashna screen's committed baseline (validation/snapshots/prashna.*.txt) is
+   37 lines long and contains no "favourable", no "lagna", no "cusp" and no
+   "sub-lord": it ends at "Ask now", because renderToStaticMarkup presses no
+   buttons. Every one of the seventeen findings in the 2026-08-18 KP horary bug
+   bash lived on the surface that baseline could not see, and all seventeen passed
+   all nine Prashna gates.
+
+   Three readings, chosen to hold both lanes' fixes in place:
+     · number mode 139 / marriage — the KSK worked anchor (Reader VI scan p.269,
+       "20° Libra-Nirayana ... for the number 139"), so the baseline's own first
+       lines are a primary-source check;
+     · time mode / health — the default mode, and the topic whose deny side is the
+       6th house (bug bash F1 and F2 both landed there);
+     · time mode / career at Tromso 69.65°N — inside the band where the equal-house
+       ring was collapsing eight of nine planets into house 4 (F3).
+   The composition comes from PrashnaScreen's own PR_buildResult, so the baseline
+   records the shipping reading rather than a hand-built object. See
+   validation/_prashna-seed.cjs for the seeding technique. */
+function prashnaResultText(lang) {
+  return require('./_prashna-seed.cjs').prashnaResultText(lang);
+}
+
 function transitText(lang) {
   const { upcomingEvents } = loadApp('src/engine/panchang.ts');
   const { transitLabel } = loadApp('src/engine/transit-copy.ts');
@@ -154,8 +177,9 @@ function generateResults() {
     out.set(`chart.${lang}`, chartText(lang));
     out.set(`transits.${lang}`, transitText(lang));
     out.set(`match-result.${lang}`, matchText(lang));
+    out.set(`prashna-result.${lang}`, prashnaResultText(lang));
   }
   return out;
 }
 
-module.exports = { generateResults, chartText, transitText, matchText };
+module.exports = { generateResults, chartText, transitText, matchText, prashnaResultText };

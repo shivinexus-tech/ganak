@@ -939,7 +939,7 @@ if (failures) {
 
 const covered = SCREENS.filter((s) => !s.skip).length;
 const skipped = SCREENS.filter((s) => s.skip);
-console.log(`✓ screen-snapshots: ${fresh.size} baselines match · ${covered} screens × ${LANGS.length} languages + chart/transit/match results`);
+console.log(`✓ screen-snapshots: ${fresh.size} baselines match · ${covered} screens × ${LANGS.length} languages + chart/transit/match/prashna results`);
 console.log(`✓ calculator cross-seeding: ${clean} mismatched-result renders identical to no result (0 crashes, 0 foreign answers) · ${answered} own-result renders still answer`);
 console.log(`✓ yoga content parity: ${Object.keys(YOGA_EN).length} yoga templates × ${yogaRows} parameter sets · ${yogaEnTexts.size} distinct English interpretations → ${yogaEnToHiText.size} distinct Hindi (no collapse)`);
 console.log(`✓ cast chart rendered for real: ${panelChecks} panel visibility checks across ${PANEL_KEYS.length} panels (nothing unmounts) · ?panel= restores the open panel · birth panchang, Papa references, dosha ayanamsa and the marriage search range all read in both languages`);

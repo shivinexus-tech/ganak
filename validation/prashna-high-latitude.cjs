@@ -333,6 +333,37 @@ for (const lat of [60.01, 64.15, 69.65]) {
   }
 }
 
+/* ------------------------------------------------------ OPEN: bug bash F17
+   The ring is sound in both modes. What is still true above 60° is that Ganak
+   frames it two different ways on two screens, and this is where a reader of this
+   gate should learn that, because this is the file about that band.
+
+   Jyotish (src/engine/houses.ts placidusCusps, via src/engine/kundli.ts) bails out
+   on the GEOMETRIC degeneracy test — a cusp-defining ecliptic point being
+   circumpolar, effectively ~66.56° — and falls back to Porphyry. Prashna's inlined
+   PR_placidus bails on a flat |lat| > 60 and falls back to equal house. Between the
+   two cutoffs the same place gets real Placidus KP cusps on one screen and equal
+   cusps on the other, under two different system names, and a KP practitioner
+   comparing them finds them ~19–35° apart.
+
+   Reported, not asserted: PR_placidus is INSIDE the parity-frozen engine markers,
+   so the fix is not a change any lane may make unilaterally. The exact change is
+   written out in plans/audits/2026-08-19-prashna-remaining-fix.md § F17 — including
+   that the identical edit must land in validation/prashna-calc.js in the same
+   commit, and that the Reykjavík anchor above should then be re-pinned to
+   "published MC == cusp 10" rather than to the equal-house relation. */
+{
+  const src = require('fs').readFileSync('src/screens/PrashnaScreen.tsx', 'utf8');
+  const flat = /if \(Math\.abs\(lat\) > 60\) return null/.test(src);
+  console.log(flat
+    ? '\n  OPEN (bug bash F17) — PR_placidus cuts at a flat |lat| > 60 while\n' +
+      '  src/engine/houses.ts cuts at the geometric circumpolar test (~66.56°). Helsinki,\n' +
+      '  Anchorage, Whitehorse, Yellowknife, Trondheim, Reykjavik and Fairbanks therefore\n' +
+      '  get Placidus cusps on the Jyotish screen and equal cusps on Prashna, ~19-35 deg apart.\n' +
+      '  Inside the parity-frozen markers; see plans/audits/2026-08-19-prashna-remaining-fix.md.\n'
+    : '\n  bug bash F17: the two Placidus cutoffs now agree ✓\n');
+}
+
 console.log(`rings checked          ${ringsChecked}`);
 console.log(`geometric asc checks   ${geomChecked}   worst |altitude| ${worstAlt.toFixed(5)}° (tolerance ${ALT_TOL_DEG}°)`);
 console.log(`worst |span sum−360|   ${worstSum.toExponential(2)}°`);

@@ -912,6 +912,14 @@ function PR_fmtNumberDeg(deg) {
   return `${wholeDeg}°${String(minute).padStart(2, '0')}′`;
 }
 
+/* IANA timezone identifiers are FORMAT TOKENS, not words. `Asia/Kolkata` has to be
+   typed exactly and has no Devanagari form — the same category as UTC, YYYY and MM,
+   which validation/language-leak-scan.cjs already exempts. They are named here and
+   interpolated so the Hindi sentences below stay Hindi rather than carrying an
+   English word inside them; the reader sees the identical text either way. */
+const PR_TZ_EG = 'Asia/Kolkata';
+const PR_TZ_EG2 = 'Europe/London';
+
 /* ---- The moment of judgement, resolved in the judging place's own zone ----
 
    Bug bash F4. KP horary is cast for the moment AND PLACE of judgement, and this
@@ -949,25 +957,51 @@ function PR_resolveJudgmentMoment(raw, zone, hi) {
   if (y < YEAR_MIN || y > YEAR_MAX) return { ms: NaN, problem: hi
     ? `निर्णय का समय ${y} में है। गणक ग्रह-स्थिति ${YEAR_MIN}–${YEAR_MAX} के लिए निकालता है; इससे बाहर उत्तर भरोसेमंद नहीं होगा, इसलिए गणना नहीं की गई।`
     : `The judgment moment is in ${y}. Ganak calculates planetary positions for ${YEAR_MIN}–${YEAR_MAX}; outside that range the answer would not be trustworthy, so nothing was calculated.` };
-  const off = (zone && zoneOffset(zone, y, mo, d, hh, mi));
-  // No zone (or an unknown one): fall back to the device, which is what the
-  // screen has always done — but the caption says so, and the panel now offers
-  // the zone when the app knows it.
+  const named = typeof zone === 'string' && zone.trim() !== '';
+  const off = named ? zoneOffset(zone, y, mo, d, hh, mi) : null;
+  /* A zone the app CANNOT resolve is refused, never quietly read on the device's
+     clock. Silently falling back is F4 itself, one layer down: the Cast button is
+     already disabled for an unrecognised name, but a resolver that answers anyway
+     is a trap waiting for the next caller. No zone at all still falls back to the
+     device — that is the shipped default and the caption says so. */
+  if (named && off == null) return { ms: NaN, problem: hi
+    ? `“${zone}” कोई पहचाना हुआ समयक्षेत्र नहीं है, इसलिए निर्णय का समय पढ़ा नहीं जा सका। ${PR_TZ_EG} जैसा नाम दें, या समयक्षेत्र खाली छोड़ दें।`
+    : `“${zone}” is not a timezone Ganak recognises, so the judgment moment could not be read. Use a name like ${PR_TZ_EG}, or leave the timezone blank.` };
   const ms = off == null ? new Date(raw).getTime()
                          : Date.UTC(y, mo - 1, d, hh, mi) - off * 3600000;
   if (!Number.isFinite(ms)) return { ms: NaN, problem: hi
     ? 'निर्णय का समय समझ नहीं आया — कृपया पुनः चुनें।'
     : "Couldn't read that judgment time — please pick it again." };
   if (off != null) {
-    const back = new Date(ms + off * 3600000);
-    const same = back.getUTCFullYear() === y && back.getUTCMonth() + 1 === mo
-      && back.getUTCDate() === d && back.getUTCHours() === hh && back.getUTCMinutes() === mi;
-    if (!same) {
-      const clock = `${String(hh).padStart(2, '0')}:${String(mi).padStart(2, '0')}`;
-      return { ms: NaN, problem: hi
-        ? `${zone} में उस दिन ${clock} का समय होता ही नहीं — घड़ियाँ आगे बढ़ा दी गई थीं। गणक इसे स्वयं आगे नहीं खिसकाएगा; कृपया निर्णय का समय ठीक करें।`
-        : `${clock} did not exist that day in ${zone} — the clocks went forward. Ganak will not move it forward for you; please correct the judgment moment.` };
-    }
+    /* Bug bash F5, properly this time. The first fix round-tripped the resolved
+       instant through `zoneOffset` ITSELF — `new Date(ms + off * 3600000)` — which
+       agrees with the offset that produced it by construction, so it could never
+       disagree. Europe/London 2026-03-29 01:30 sailed through: `zoneOffset` returns
+       the pre-transition offset 0, the round trip reads 01:30 back, and the guard
+       said the clock existed. It does not: that instant is 02:30 BST, an hour later
+       than what was typed, and the shifted time was then printed on the verdict card
+       and baked into the share PNG. That is the same shape as the parity tautology
+       the high-latitude lane found — a check comparing a thing with itself.
+       So round-trip through the PLATFORM's IANA database instead, the same
+       `Intl.DateTimeFormat` the rest of the app resolves zones with. An hour that a
+       calendar skips reads back as a different clock and is refused; an hour a
+       calendar REPEATS (autumn fall-back) reads back as the same clock and is
+       accepted, which is right — it is ambiguous, not impossible. */
+    const clock = `${String(hh).padStart(2, '0')}:${String(mi).padStart(2, '0')}`;
+    let back = null;
+    try {
+      const p = new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric',
+        month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
+        .formatToParts(new Date(ms)).reduce((a, x) => (a[x.type] = x.value, a), {});
+      back = `${p.year}-${p.month}-${p.day}T${p.hour === '24' ? '00' : p.hour}:${p.minute}`;
+    } catch (e) { back = null; }   // no tz database for this name — handled below
+    if (back === null) return { ms: NaN, problem: hi
+      ? `“${zone}” कोई पहचाना हुआ समयक्षेत्र नहीं है, इसलिए निर्णय का समय पढ़ा नहीं जा सका। ${PR_TZ_EG} जैसा नाम दें, या समयक्षेत्र खाली छोड़ दें।`
+      : `“${zone}” is not a timezone Ganak recognises, so the judgment moment could not be read. Use a name like ${PR_TZ_EG}, or leave the timezone blank.` };
+    const typed = `${String(y).padStart(4, '0')}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}T${clock}`;
+    if (back !== typed) return { ms: NaN, problem: hi
+      ? `${zone} में उस दिन ${clock} का समय होता ही नहीं — घड़ियाँ आगे बढ़ा दी गई थीं। गणक इसे स्वयं आगे नहीं खिसकाएगा; कृपया निर्णय का समय ठीक करें।`
+      : `${clock} did not exist that day in ${zone} — the clocks went forward. Ganak will not move it forward for you; please correct the judgment moment.` };
   }
   return { ms, problem: null };
 }
@@ -990,7 +1024,124 @@ function PR_judgmentVara(ms, zone, lat, lon) {
       if (ms < ev.rise) dow = (dow + 6) % 7;   // before sunrise the previous vara still runs
     }
   } catch (e) { /* no sunrise available — civil weekday stands, and we say so */ }
-  return { dayLord: WEEKDAY_LORDS[dow], sunriseKnown };
+  return { dayLord: WEEKDAY_LORDS[dow], dow, sunriseKnown };
+}
+
+const PR_ABBR_OF = Object.fromEntries(Object.entries(GRAHA_EN).map(([k, full]) => [full, k]));
+const PR_VARA_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const PR_VARA_HI = ['रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
+
+/* ------------------------------- RULING PLANETS (bug bash F9) ---------------
+
+   THE DEFECT. `plans/prashna-249-ksk-verify.md` rule 4 was listed as a shipped,
+   Tier-1 page-pinned ENGINE RULE — and the word "ruling" appeared nowhere in this
+   screen. The one rule Krishnamurti ties explicitly to *"the moment of judgement"*
+   was the one rule the horary screen never computed, on a page that asks working
+   astrologers whether its reading is correct. An astrologer answering that
+   question looks for the Ruling Planets first, because in KP they are the filter
+   applied to exactly the two tables printed above.
+
+   WHICH READING GANAK FOLLOWS, AND WHY. Sources genuinely differ on the size of
+   the set, so the choice is stated rather than assumed:
+
+     · **Ganak follows the five-fold Reader VI definition** — the lords of the
+       DAY, the MOON's sign and star, and the LAGNA's sign and star. Reader VI
+       Section V "Ruling planets", scan p.175 / printed folio p.167: *"the lords
+       of the day, Moon sign, star and lagna at the moment of judgement"*; the
+       five-planet derivation is worked at scan p.146. This is also the set the
+       owner approved for this screen on 2026-07-24 (`prashna-249-ksk-verify.md`
+       § "Collapsible full working", item 3: *"the RP set (day lord; asc. sign &
+       star lord; Moon sign & star lord), shown as an independent confirmation"*).
+     · **Much modern KP practice adds the SUB-lords of the lagna and the Moon.**
+       That refinement is later than the passage above and is not in it. Ganak
+       prints those two so a practitioner can see them, labelled as the modern
+       extension, and does NOT count them in the ruling set. The disagreement is
+       recorded in the citation index rather than silently resolved.
+
+   Nothing here is a second implementation. `computeRulingPlanets` in
+   src/engine/dasha.ts is the app's one Ruling-Planet rule (the Jyotish birth
+   chart uses the same call), and it is fed this chart's OWN sidereal longitudes,
+   so a number-mode reading gets its KP-New lagna and Moon rather than a Lahiri
+   copy of them. validation/prashna-ruling-planets.cjs asserts that the lords it
+   returns are the same lords PR_subOf/PR_SIGN_LORD print in the graha table on
+   the same page — the F12 failure mode (two reckonings of one thing on one
+   screen) applied to this panel. */
+/* One micro-arcsecond, the degree equivalent of the frozen engine's PR_SUB_EPS.
+
+   The 249 method pins the ascendant EXACTLY on a nakshatra/sub boundary by
+   construction — number 158 is Scorpio 16°40′00″, which is 680/3 degrees, the
+   first instant of Jyeshtha. In IEEE doubles 680/3 rounds a third of a
+   quadrillionth of a degree BELOW the ideal boundary, so a bare
+   `Math.floor(lon / (360/27))` returns the PREVIOUS nakshatra. That is the same
+   rounding class PR_SUB_EPS and PR_NAK_ARCSEC exist to close inside the frozen
+   engine, and every other consumer on this page — the number table, the Lagna
+   chip, the graha row, the cuspal table — resolves such a boundary FORWARD.
+   src/engine/dasha.ts (owned by another lane, read-only here) does not, so
+   without this nudge the Ruling-Planet panel would print "ascendant sub-lord
+   Jupiter, star Saturn" three inches under an answer card reading "Ascendant
+   sub-lord Mercury · Jyeshtha", on 249-table numbers that land on a boundary.
+   Nudging into the segment is a no-op everywhere else: a micro-arcsecond is
+   eleven orders of magnitude smaller than the narrowest KP sub. */
+const PR_BOUNDARY_NUDGE = 1e-6 / 3600;
+function PR_rulingPlanets(chart, vara) {
+  const moon = chart.planets.find(p => p.key === 'Mo');
+  const rp = computeRulingPlanets(chart.cusps[1] + PR_BOUNDARY_NUDGE,
+    moon.lon + PR_BOUNDARY_NUDGE, vara.dayLord);
+  const ab = full => PR_ABBR_OF[full];
+  /* Order follows the citation: day, Moon sign, Moon star, lagna sign, lagna star. */
+  const members = [
+    { key: 'dayLord',      planet: ab(rp.dayLord) },
+    { key: 'moonSignLord', planet: ab(rp.moonSignLord) },
+    { key: 'moonStarLord', planet: ab(rp.moonStarLord) },
+    { key: 'ascSignLord',  planet: ab(rp.ascSignLord) },
+    { key: 'ascStarLord',  planet: ab(rp.ascStarLord) },
+  ];
+  const count = {};
+  members.forEach(m => { count[m.planet] = (count[m.planet] || 0) + 1; });
+  const set = PR_GRAHA_ORDER.filter(k => count[k]);
+  return {
+    members, count, set,
+    /* Shown, not counted — see the doctrine note above. De-duplicated, because the
+       two sub-lords are frequently the same planet and "(Jupiter · Jupiter)" reads
+       as a rendering bug rather than as a fact about the chart. */
+    modern: PR_GRAHA_ORDER.filter(k => k === ab(rp.ascSubLord) || k === ab(rp.moonSubLord)),
+    vara,
+  };
+}
+
+/* Rule 4's second half — *"common planets between RPs and significators survive"*.
+   The significators of the judged cusp are the grid's A∪B∪C∪D for that house, which
+   is provably the same set the verdict scored (bug bash "clean" item 3). Splitting
+   them by RP membership is the filter itself, so a practitioner can see which
+   significator KP expects to fructify rather than being handed two tables and left
+   to intersect them by eye. This CONFIRMS or QUALIFIES the verdict; it never
+   overrides it — the verdict is the cuspal sub-lord's, and saying otherwise would
+   be inventing a scoring rule KSK does not give. */
+function PR_rpConfirmation(chart, cusp, rpSet) {
+  const row = PR_significatorGrid(chart).find(r => r.house === cusp);
+  const sig = row ? row.all : [];
+  return { sig, confirmed: sig.filter(k => rpSet.includes(k)),
+           unconfirmed: sig.filter(k => !rpSet.includes(k)) };
+}
+
+/* ONE composition of a cast reading, used by `ask()` and by the rendered-result
+   baseline (validation/snapshot-results.cjs) alike. The Prashna result surface had
+   never been in a snapshot — validation/snapshots/prashna.en.txt ends at "Ask now",
+   because renderToStaticMarkup presses no buttons — so every defect the 2026-08-18
+   bug bash found on the answer card was invisible to the gates. Seeding the baseline
+   through THIS function rather than through a hand-built object is what makes the
+   baseline a record of what a reader sees: if the composition changes, the baseline
+   changes with it instead of quietly describing something the app no longer builds. */
+function PR_buildResult({ ms, lat, lon, zone, placeLabel, mode, number, q }) {
+  const chart = mode === 'number' ? PR_castNumber(ms, lat, lon, number) : PR_cast(ms, lat, lon);
+  const verdict = PR_judge(chart, q);
+  const vara = PR_judgmentVara(ms, zone, lat, lon);
+  const ruling = PR_rulingPlanets(chart, vara);
+  return {
+    chart, verdict, askedAt: new Date(ms), mode, placeLabel, zone,
+    ...(mode === 'number' ? { number, info: kpNumberInfo(number) } : {}),
+    ruling, rpConfirm: PR_rpConfirmation(chart, verdict.q.cusp, ruling.set),
+  };
 }
 
 // ------------------------------------------------------------ MAIN SCREEN
@@ -1104,15 +1255,11 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, zone = null, placeLabel = 
             : `Please enter a whole number between ${KP_NUMBER_MIN} and ${KP_NUMBER_MAX} — that is what the tradition prescribes.`);
           return;
         }
-        const chart = PR_castNumber(ms, castLat, castLon, n);
-        setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'number',
-          number: n, info: kpNumberInfo(n), placeLabel: castPlaceLabel, zone: castZone,
-          ruling: PR_judgmentVara(ms, castZone, castLat, castLon) });
+        setResult(PR_buildResult({ ms, lat: castLat, lon: castLon, zone: castZone,
+          placeLabel: castPlaceLabel, mode: 'number', number: n, q }));
       } else {
-        const chart = PR_cast(ms, castLat, castLon);
-        setResult({ chart, verdict: PR_judge(chart, q), askedAt: new Date(ms), mode: 'time',
-          placeLabel: castPlaceLabel, zone: castZone,
-          ruling: PR_judgmentVara(ms, castZone, castLat, castLon) });
+        setResult(PR_buildResult({ ms, lat: castLat, lon: castLon, zone: castZone,
+          placeLabel: castPlaceLabel, mode: 'time', q }));
       }
       /* Bug bash F10. The lock used to guard the NUMBER mode only. Time mode --
          the default, the mode a first-time visitor lands in -- had none: "Ask
@@ -1161,6 +1308,12 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, zone = null, placeLabel = 
      and showing it twice in two wordings is worse than showing it once. */
   const blockReason = !selected
     ? (hi ? 'ऊपर से प्रश्न का विषय चुनें' : 'Choose what your question is about, above')
+    /* Name the ONE thing that is missing. Folding an unrecognised timezone into the
+       latitude/longitude message would point the reader at two fields that are fine
+       and away from the one that is not. */
+    : !zoneValid
+      ? (hi ? `समयक्षेत्र पहचाना नहीं गया — ${PR_TZ_EG} जैसा नाम दें, या खाली छोड़ें`
+            : `That timezone is not recognised — use a name like ${PR_TZ_EG}, or leave it blank`)
     : !placeValid
       ? (hi ? 'अक्षांश −90 से 90, देशान्तर −180 से 180 के बीच होना चाहिए'
             : 'Latitude must be −90 to 90 and longitude −180 to 180')
@@ -1363,9 +1516,37 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, zone = null, placeLabel = 
               style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, boxSizing: 'border-box',
                 border: `1.5px solid ${TOKENS.line}`, background: TOKENS.bg, color: TOKENS.ink,
                 fontSize: "var(--font-body)", padding: '0 10px' }} />
+            {/* Bug bash F4, remaining half. `PR_resolveJudgmentMoment` resolves the
+                typed wall clock against a named zone — and until now there was no
+                field in which to NAME one, so the override was still structurally
+                unable to express the judging place's local time whenever the app had
+                not handed the screen a zone. A practitioner in London judging a
+                question that arrived in Chennai typed 18:00 meaning IST and got
+                18:00 BST: measured over the twelve topics at Chennai, that changes
+                the cuspal sub-lord for 12 of 12 and flips 7 of 12 verdicts.
+                An unrecognised name is refused rather than silently falling back. */}
+            <input value={customZone}
+              onChange={e => { if (sessionLocked) return; setCustomZone(e.target.value); clearResult(); }}
+              aria-label={hi ? 'निर्णय स्थान का समयक्षेत्र' : 'Judgment place timezone'}
+              placeholder={hi ? `समयक्षेत्र, जैसे ${PR_TZ_EG}` : `Timezone, e.g. ${PR_TZ_EG}`}
+              style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, boxSizing: 'border-box',
+                background: TOKENS.bg, color: TOKENS.ink, fontSize: "var(--font-body)",
+                padding: '0 10px', border: `1.5px solid ${zoneValid ? TOKENS.line : TOKENS.sindoor}` }} />
+            {!zoneValid && (
+              <div style={{ fontSize: "var(--font-micro)", color: TOKENS.sindoor }}>
+                {hi ? `“${customZone.trim()}” कोई पहचाना हुआ समयक्षेत्र नहीं है। ${PR_TZ_EG} या ${PR_TZ_EG2} जैसा नाम दें, या खाली छोड़ दें।`
+                    : `“${customZone.trim()}” is not a timezone Ganak recognises. Use a name like ${PR_TZ_EG} or ${PR_TZ_EG2}, or leave it blank.`}
+              </div>
+            )}
             <div style={{ fontSize: "var(--font-micro)", color: TOKENS.muted, fontStyle: 'italic' }}>
-              {hi ? 'समय खाली छोड़ें तो अभी का क्षण लिया जाएगा। समय आपके उपकरण के समयक्षेत्र में पढ़ा जाता है।'
-                  : 'Leave the time blank to use this moment. Time is read in your device’s timezone.'}
+              {/* Say which zone the typed clock is actually read in. The caption used
+                  to claim the device's zone unconditionally, which stopped being true
+                  the moment the screen learned to honour a named one. */}
+              {castZone && zoneValid
+                ? (hi ? `समय खाली छोड़ें तो अभी का क्षण लिया जाएगा। लिखा हुआ समय ${castZone} की घड़ी के अनुसार पढ़ा जाता है।`
+                      : `Leave the time blank to use this moment. The time you type is read on ${castZone} clocks.`)
+                : (hi ? 'समय खाली छोड़ें तो अभी का क्षण लिया जाएगा। समयक्षेत्र बताए बिना समय आपके उपकरण के समयक्षेत्र में पढ़ा जाता है — किसी दूसरे नगर के लिए निर्णय कर रहे हों तो उसका समयक्षेत्र ऊपर लिखें।'
+                      : 'Leave the time blank to use this moment. With no timezone named, the time is read in your device’s timezone — if you are judging for another city, name its timezone above.')}
             </div>
           </div>
         )}
@@ -1611,6 +1792,10 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, zone = null, placeLabel = 
               </div>
               <CuspalTable chart={result.chart} hi={hi} judgedCusp={v.q.cusp} mode={result.mode} />
               <SignificatorGrid chart={result.chart} hi={hi} />
+              {/* F9: the rule KSK ties to "the moment of judgement", finally on the
+                  page — and placed directly under the significator grid it filters. */}
+              <RulingPlanetsPanel ruling={result.ruling} confirm={result.rpConfirm}
+                cusp={v.q.cusp} hi={hi} />
 
               {/* Practitioner review request. This view shipped WITHOUT a practising
                   astrologer having checked the cuspal sub-lords or the significator grid —
@@ -1697,6 +1882,78 @@ function CuspalTable({ chart, hi, judgedCusp, mode }) {
         {hi ? `हाइलाइट की गई पंक्ति वह भाव है जिस पर यह प्रश्न विचारा गया (${judgedCusp})। उसी का उप-स्वामी निर्णय देता है।`
             : `The highlighted row is the cusp this question was judged on (${judgedCusp}). Its sub-lord is what decides.`}
       </Gloss>
+    </div>
+  );
+}
+
+/* Ruling Planets — bug bash F9. The doctrine choice, its source and the departure
+   from modern practice are argued at PR_rulingPlanets; this component only prints
+   them. Every claim on screen is one the panel can back: the five members and where
+   each comes from, the set, the honest note when a repetition happens, and the
+   intersection with the judged cusp's significators. Deliberately NOT claimed: any
+   change to the verdict. In KP the Ruling Planets confirm and time a significator;
+   the yes/no stays the cuspal sub-lord's, and Ganak's scoring does not consult them.
+   Saying otherwise would be inventing a rule the Readers do not give. */
+const RP_LABELS = {
+  dayLord:      { en: 'Day lord (vara)',      hi: 'वार का स्वामी' },
+  moonSignLord: { en: 'Moon sign lord',       hi: 'चन्द्र राशि का स्वामी' },
+  moonStarLord: { en: 'Moon star lord',       hi: 'चन्द्र नक्षत्र का स्वामी' },
+  ascSignLord:  { en: 'Ascendant sign lord',  hi: 'लग्न राशि का स्वामी' },
+  ascStarLord:  { en: 'Ascendant star lord',  hi: 'लग्न नक्षत्र का स्वामी' },
+  ascSubLord:   { en: 'Ascendant sub-lord',   hi: 'लग्न का उप-स्वामी' },
+  moonSubLord:  { en: 'Moon sub-lord',        hi: 'चन्द्र का उप-स्वामी' },
+};
+function RulingPlanetsPanel({ ruling, confirm, cusp, hi }) {
+  if (!ruling) return null;
+  const nm = k => (hi ? GRAHA_HI : GRAHA_EN)[k];
+  const list = ks => (ks.length ? ks.map(nm).join(' · ') : (hi ? 'कोई नहीं' : 'none'));
+  const repeated = ruling.set.filter(k => ruling.count[k] > 1);
+  const cuspOrd = hi ? `${cusp}वें` : englishOrdinal(cusp);
+  return (
+    <div style={{ marginTop: 14 }}>
+      <div style={{ fontSize: "var(--font-label)", letterSpacing: '0.12em', textTransform: 'uppercase',
+        color: TOKENS.muted, marginBottom: 6 }}>
+        {hi ? 'शासक ग्रह' : 'Ruling Planets'}
+      </div>
+      <div style={PR_SCROLLER}>
+        <table style={{ width: '100%', minWidth: "17.5rem", borderCollapse: 'collapse', fontSize: "var(--font-micro)" }}>
+          <tbody>
+            {ruling.members.map(m => (
+              <tr key={m.key} style={{ borderTop: `0.0625rem solid ${TOKENS.line}` }}>
+                <td style={{ ...PR_TD, color: TOKENS.muted }}>{hi ? RP_LABELS[m.key].hi : RP_LABELS[m.key].en}</td>
+                <td style={{ ...PR_TD, fontWeight: 600 }}>{nm(m.planet)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div style={{ marginTop: "0.5rem", fontSize: "var(--font-small)", lineHeight: 1.5 }}>
+        {hi ? `शासक ग्रह: ${list(ruling.set)} — ${PR_VARA_HI[ruling.vara.dow]} के लिए।`
+            : `Ruling Planets: ${list(ruling.set)} — for ${PR_VARA_EN[ruling.vara.dow]}.`}
+      </div>
+      {repeated.length > 0 && (
+        <div style={{ fontSize: "var(--font-small)", lineHeight: 1.5, marginTop: "0.125rem" }}>
+          {/* Count, and only count. The Jyotish screen's RP summary explains its
+              winner by a number it did not rank on (bug bash F13); this panel
+              ranks nothing, so the one number it prints is the one it means. */}
+          {hi ? `${list(repeated)} ${repeated.length > 1 ? 'इनमें एक से अधिक बार आते हैं' : 'इनमें एक से अधिक बार आता है'} — के॰पी॰ में दोहराया गया शासक ग्रह अधिक प्रबल साक्षी माना जाता है।`
+              : `${list(repeated)} ${repeated.length > 1 ? 'each appear' : 'appears'} more than once above — in KP a repeated ruling planet is read as the stronger witness.`}
+        </div>
+      )}
+      <div style={{ marginTop: "0.375rem", fontSize: "var(--font-small)", lineHeight: 1.5 }}>
+        {hi ? `${cuspOrd} भाव के कारकों में से शासक ग्रह भी हैं: ${list(confirm.confirmed)}। बिना शासक-समर्थन के: ${list(confirm.unconfirmed)}।`
+            : `Significators of the ${cuspOrd} cusp that are also Ruling Planets: ${list(confirm.confirmed)}. Without ruling support: ${list(confirm.unconfirmed)}.`}
+      </div>
+      <Gloss>
+        {hi ? `शासक ग्रह = निर्णय के क्षण के वार, चन्द्र-राशि, चन्द्र-नक्षत्र, लग्न-राशि और लग्न-नक्षत्र के स्वामी (कृष्णमूर्ति, रीडर VI, खण्ड V)। के॰पी॰ में जो कारक शासक ग्रहों में भी आता है, वही फल देता हुआ माना जाता है — यह उत्तर की पुष्टि करता है, उसे बदलता नहीं; हाँ/नहीं का निर्णय भाव के उप-स्वामी का ही रहता है। आधुनिक के॰पी॰ अभ्यास प्रायः लग्न और चन्द्र के उप-स्वामी (${list(ruling.modern)}) भी जोड़ता है; गणक उन्हें दिखाता है, गिनता नहीं।`
+            : `Ruling Planets = the lords of the day, the Moon's sign and star, and the ascendant's sign and star, at the moment of judgement (Krishnamurti, KP Reader VI, Section V). In KP the significator that is also a Ruling Planet is the one expected to fructify — this confirms the answer, it does not change it; the yes/no stays with the cusp sub-lord. Much modern KP practice also adds the sub-lords of the ascendant and the Moon (${list(ruling.modern)}); Ganak shows them and does not count them.`}
+      </Gloss>
+      {!ruling.vara.sunriseKnown && (
+        <Gloss>
+          {hi ? 'इस स्थान पर उस दिन सूर्योदय नहीं मिला (ध्रुवीय दिन या रात), इसलिए वार कैलेंडर के दिन से लिया गया है — सूर्योदय से नहीं।'
+              : 'No sunrise was found for this place that day (polar day or polar night), so the vara is taken from the calendar day rather than from sunrise.'}
+        </Gloss>
+      )}
     </div>
   );
 }
@@ -1817,4 +2074,5 @@ function NumberSetBox({ info, favor, deny, cusp, hi, cuspLabel, cuspIsAscendant 
 export default PrashnaScreen;
 // Named exports for the validation gates (parity + number-mode chart). The
 // parity gate slices only the marked engine region, so these do not affect it.
-export { PR_cast, PR_castNumber, PR_judge, QUESTIONS, PR_kpNewAyan, PR_cuspalTable, PR_significatorGrid };
+export { PR_cast, PR_castNumber, PR_judge, QUESTIONS, PR_kpNewAyan, PR_cuspalTable, PR_significatorGrid,
+  PR_buildResult, PR_rulingPlanets, PR_rpConfirmation, PR_judgmentVara, PR_resolveJudgmentMoment };

@@ -112,6 +112,45 @@ pins is now tabulated in the "printed-folio confirmation pass" section below** (
 | 6 | **Repeat / sincerity / one-question** — first sincere number stands; no test questions; successive queries handled | ✅ **Tier 1 — page-pinned** | **Reader VI**, Section II **Prasna Gyana** translation. Scan **p.43** — *"Only when the consultant is **serious and sincere**, then only truth will come out; prediction will prove to be correct"*; **p.66** (*"Unless one is sincere, even Veda is not useful …"*). Successive-question handling (use the Moon's bhava for a second question) sits in the same Prasna Gyana slokas. |
 | 7 | **Whose place/time** — the location where the question is judged (Ganak = self-service ⇒ user's confirmed place) | ⚠️ **Tier 2 — by design, NOT KSK** | **Unchanged and honestly kept.** Reader VI assumes the **astrologer's locality** implicitly (e.g. worked charts *"at Bombay at 5.30 P.M."*, scan p.173/217); the self-service adaptation (querent's confirmed place = the judging place) is a **Ganak product decision**. Disclosed as an adaptation — **no KSK backing claimed**, and it must not be upgraded. |
 | 8 | **"12th-from" negation** — the 12th house from any house opposes that house's matter (deny-side glosses) | ⚠️ **Tier 1 (base meaning) + standard-KP application** — PARTIAL upgrade | The **12th-house = loss/negation** meaning is now pinned: **Reader VI p.129** (*"Twelfth house: **Loss** and impediments, restraint and limitation, waste and extravagance, expenses …"*). The **rotational "12th counted *from* a house negates that house"** is the standard KP *application* of that meaning via the significator/counter-house method — **not stated as a single sentence** in the accessible scan (OCR-searched "negat*", "twelfth", none surfaced a rotational sentence). So the deny-side glosses in [prashna-house-glosses.md](prashna-house-glosses.md) rest on a **primary-text house meaning + a standard-KP derivation**, labeled as such — not overclaimed as a verbatim KSK "12th-from" rule. |
+| 9 | **High-latitude house frame** — above the latitude where Placidus is undefined, the twelve cusps are **equal house from the ascendant** (`cusp h = asc + 30°(h−1)`, the MC included and therefore *not* the tenth cusp) | ⚠️ **Tier 2 — by design, NOT KSK** | **KP is a Placidus system and the KP Readers record no polar convention at all**, so nothing here is or can be attributed to Krishnamurti. This is a **Ganak product decision**, in the same category as rule 7, taken 2026-08-18 when the bug bash found that the shipped "equal-house fallback" was not equal — it left cusps 4 and 10 as the real IC/MC inside an otherwise equal ring, so above 60° the ring ran out of order and eight of nine planets read into house 4. Equal house was chosen because it exists wherever an ascendant exists, keeps the ascendant (the angle KP horary is judged from) exact, and is what the shipped disclosure already promised the reader. **Stated in the user-facing copy** ("equal houses — high-latitude fallback" / "समान भाव — उच्च अक्षांश विकल्प", on screen and on the share card). Externally anchored — not to a sibling copy of Ganak's own code — in `validation/prashna-high-latitude.cjs`. **Must not be upgraded to a KSK claim.** |
+
+---
+
+## Rule 4 in practice — which Ruling-Planet set Ganak follows (recorded 2026-08-19)
+
+Rule 4 was listed as a shipped engine rule from 2026-07-29, and until 2026-08-19 the
+Prashna screen never computed it: the word "ruling" did not appear in
+`src/screens/PrashnaScreen.tsx` at all (bug bash F9). It is now computed for the
+moment of judgement and rendered under the significator grid, through the app's one
+Ruling-Planet implementation (`computeRulingPlanets`, `src/engine/dasha.ts`), fed the
+Prashna chart's **own** sidereal longitudes so a number-mode reading uses its KP-New
+lagna and Moon rather than a Lahiri copy of them.
+
+**The sources genuinely disagree on the size of the set, so the choice is stated
+rather than assumed.**
+
+- **Ganak follows the five-fold Reader VI definition** — the lords of the **day**, the
+  **Moon's sign and star**, and the **lagna's sign and star**. Section V "Ruling
+  planets", scan **p.175** / printed folio **p.167**: *"the lords of the day, Moon
+  sign, star and lagna at the moment of judgement"*; the five-planet derivation is
+  worked at scan **p.146**. This is also the set the **owner approved for this screen
+  on 2026-07-24** (§ "Collapsible full working", item 3).
+- **Much modern KP practice adds the sub-lords of the lagna and the Moon.** That
+  refinement is later than the passage above and is not in it. Ganak **prints those
+  two, labelled as the modern extension, and does not count them** — the panel says so
+  in both languages. `computeRulingPlanets` returns seven witnesses because the
+  Jyotish birth chart uses all seven; the Prashna panel takes the sourced five.
+- **What the set is used FOR.** Rule 4's second half — *"common planets between RPs
+  and significators survive"* — is applied as a **confirmation**: the judged cusp's
+  significators are split into those that are also Ruling Planets and those that are
+  not. It does **not** touch the verdict. The yes/no remains the cuspal sub-lord's
+  (rule 3), Ganak's scoring has no RP term, and `validation/prashna-ruling-planets.cjs`
+  asserts that it never acquires one. Reading the intersection as a scoring input
+  would be inventing a weight the Readers do not give.
+- **The vara is reckoned from sunrise**, at the judging place, not from the calendar
+  date — so a judgment made between midnight and sunrise carries the previous
+  weekday's lord. Where the sun neither rises nor sets, the panel says the vara came
+  from the calendar day instead of pretending otherwise.
 
 ---
 
