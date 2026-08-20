@@ -489,10 +489,23 @@ function subtractIntervals(win, avoid) {
 function hardAvoidIntervals(info) {
   return [info.rahu, info.gulika, info.yama, ...(info.bhadra || [])].filter(Boolean);
 }
+/* Usability floor on an OFFERED window (bug bash F7). Before this, the day-clamp
+   and the exclusions above could leave a seven-minute remnant, and the card
+   printed it in the same tick-list, at the same weight and in the same styling
+   as the 140-minute window above it -- New Delhi, wedding, 2026-04-20 offered
+   "4:08 AM-4:15 AM" as one of six equal clean windows.
+
+   Fifteen minutes is a STATED PRODUCT DEFAULT, not a sourced rule: it is under a
+   third of a muhurta (48 minutes, the length of Ganak's own Abhijit and Do-Ghati
+   windows) and too short to begin the rite the window is offered for. The owner
+   may reasonably want it higher. Raising it costs days: at 15 min the Drik
+   anchor recall is unchanged, and the screen still needs to print each window's
+   length so a 20-minute window never reads as equal to a two-hour one. */
+const MIN_OFFERED_WINDOW_MS = 15 * 60000;
 function applyHardExclusions(info, windows) {
   const avoid = hardAvoidIntervals(info);
   const out = [];
-  for (const w of windows) for (const p of subtractIntervals(w, avoid)) if (p.end > p.start) out.push(p);
+  for (const w of windows) for (const p of subtractIntervals(w, avoid)) if (p.end - p.start >= MIN_OFFERED_WINDOW_MS) out.push(p);
   return out.sort((a, b) => a.start - b.start);
 }
 /* Day AND night Choghadiya. The Panchaka categories have always been offered

@@ -99,7 +99,7 @@ if (!(wedding.activityWindows || []).some((w) => w.kind === 'panchaka-rahita')) 
 // ===========================================================================
 const SWEEP_CATS = [...new Set([...Object.keys(MUHURTA_RULES), 'puja', 'purchase', 'general'])];
 const ovl = (a, b) => a && b && a.start < b.end && b.start < a.end;
-let sweptDays = 0, sweptWindows = 0, bhadraDays = 0, bhadraNamed = 0;
+let sweptDays = 0, sweptWindows = 0, bhadraDays = 0, bhadraNamed = 0, shortestMin = Infinity;
 const sweepBad = [];
 for (const cat of SWEEP_CATS) {
   const rows = muhuratScanRange(DELHI, 'lahiri', { y: 2026, m: 1, d: 1 }, { y: 2026, m: 12, d: 31 }, cat);
@@ -109,6 +109,11 @@ for (const cat of SWEEP_CATS) {
     for (const w of (row.activityWindows || [])) {
       sweptWindows++;
       if (!(w.end > w.start)) sweepBad.push(`${cat} ${ymd(row.m, row.day)} non-positive window`);
+      // Usability floor: an offered window must be long enough to begin the rite
+      // it is offered for. 2026-04-20 New Delhi wedding used to offer 4:08-4:15.
+      const mins = (w.end - w.start) / 60000;
+      if (mins < 15) sweepBad.push(`${cat} ${ymd(row.m, row.day)} offers a ${mins.toFixed(0)}-minute window`);
+      if (mins < shortestMin) shortestMin = mins;
       for (const [name, belt] of [['Rahu', row.rahu], ['Gulika', row.gulika], ['Yamaganda', row.yama]]) {
         if (ovl(w, belt)) sweepBad.push(`${cat} ${ymd(row.m, row.day)} offered ${new Date(w.start).toISOString()}..${new Date(w.end).toISOString()} overlaps ${name}`);
       }
@@ -162,4 +167,4 @@ if (failures) {
   console.error(`deep-muhurats FAILED: ${failures}`);
   process.exit(1);
 }
-console.log(`✓ deep-muhurats PASSED (8 distinct public Muhurat engines, bilingual chips/guidance, dated anchors, clean-window checks; 2026 sweep: ${sweptWindows} offered windows over ${sweptDays} valid category-days, none overlapping Rahu/Gulika/Yamaganda/Bhadra; ${bhadraNamed}/${bhadraDays} Bhadra days named; 3 Drik Vivah Bhadra-boundary anchors)`);
+console.log(`✓ deep-muhurats PASSED (8 distinct public Muhurat engines, bilingual chips/guidance, dated anchors, clean-window checks; 2026 sweep: ${sweptWindows} offered windows over ${sweptDays} valid category-days, none overlapping Rahu/Gulika/Yamaganda/Bhadra; ${bhadraNamed}/${bhadraDays} Bhadra days named; shortest offered window ${shortestMin.toFixed(0)} min; 3 Drik Vivah Bhadra-boundary anchors)`);
