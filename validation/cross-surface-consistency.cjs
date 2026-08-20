@@ -639,13 +639,20 @@ const src = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
       `expected 100 city-evenings, got ${compared}`,
     ]);
   }
+  /* RESOLVED 2026-08-19 by the lane this finding was dispatched to. Pradosha shipped
+     under two definitions about an hour apart at each end, and the festival engine chose
+     the observance day with one rule while printing the window from the other — which
+     also put two Pradosh Vrat days in 2026 that no published panchang lists. There is now
+     one sourced definition (sunset to the first fifth of the night) and all three call
+     sites read it. Kept as an assertion at 0 rather than deleted: a second definition
+     reappearing is precisely what this is here to notice. */
   pin({
     id: 'XS-PRADOSHA-TWO',
     section: '§6 one name',
-    title: 'two intervals ship under the name Pradosha',
-    expect: 100,   // i.e. every single one of the 100 sampled evenings
+    title: 'Pradosha is one interval — the window shown and the day chosen come from the same rule',
+    expect: 0,
     measure: differing,
-    resolve: 'pick one definition (src/engine/daily-windows.ts:248 centres 3 muhurtas on sunset; src/engine/lakshmi-puja.ts:49 runs sunset → first fifth of night, which its header attributes to Drik Panchang), put it in one place, and have both surfaces read it — then delete this pin',
+    resolve: 'this is now an invariant, not a known defect — above 0 means a second Pradosha definition has reappeared',
     evidence: rows.concat([`${differing} of ${compared} city-evenings differ by more than 5 minutes`]),
   });
 }
