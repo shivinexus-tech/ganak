@@ -36,7 +36,19 @@ function computeSpecialPoints(ctx) {
   let gulika = null;
   if (rise != null) {
     const dayLen = set - rise, nightLen = 24 * 3600000 - dayLen;
-    const dow = new Date(birthMs + tz * 3600000).getUTCDay(); // 0=Sun
+    /* Bug bash F12. Gulika is a VARA construction — the weekday's eight parts, day
+       and night — and a vara begins at SUNRISE, not at midnight. This line used the
+       civil weekday alone, so every birth between midnight and sunrise ran Gulika on
+       tomorrow's weekday while the SAME chart's Ruling Planets (kundli.ts) ran on the
+       correct sunrise-reckoned vara, and the page printed both. Delhi 2026-08-18
+       03:00 IST: Ruling Planets said Monday/Moon, Gulika said Tuesday/Mars, and
+       Gulika landed at Aquarius 1°30′ instead of Aquarius 29°36′.
+       The night branch below already picks the PREVIOUS evening's sunset for such a
+       birth, i.e. it already treats the night as the previous vara's night — the
+       weekday it counted the parts from was the only thing left uncorrected. Same
+       one-line correction as src/engine/kundli.ts, so one vara serves one chart. */
+    let dow = new Date(birthMs + tz * 3600000).getUTCDay(); // 0=Sun
+    if (birthMs < rise) dow = (dow + 6) % 7;                // before sunrise the previous vara still runs
     let gMs;
     if (isDay) {
       const i = ((6 - dow) % 7 + 7) % 7;       // Saturn's part index 0..6 within the day
