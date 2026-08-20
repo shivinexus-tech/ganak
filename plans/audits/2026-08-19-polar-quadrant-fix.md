@@ -356,8 +356,40 @@ edited right now.
 
 ## 10. Gate board
 
-`bash scripts/run-all-gates.sh` — see §11 below (pasted from the run on the final tree).
-`npm run build`: `✓ built in 1.85s`, no errors.
+`bash scripts/run-all-gates.sh`, whole repository, on the tree carrying the fix (`7878f0e`):
+
+```
+102 passed, 0 failed.
+```
+
+The gates closest to this change:
+
+```
+PASS  polar-chart.cjs                              5s     <- new in this lane
+PASS  chart-styles-ayanamsha.cjs                  29s
+PASS  prashna-high-latitude.cjs                    1s
+PASS  screen-snapshots.cjs                        23s
+PASS  parse-check.js                               0s
+PASS  prashna-parity.js                            0s
+```
+
+`screen-snapshots.cjs` passed **unchanged** — no snapshot under `validation/snapshots/` needed
+re-baselining, which is the expected result: no screen's rendered text moved, because no ordinary
+chart moved. Nothing in `validation/snapshots/**` was touched.
+
+One inert change landed after that board: `raOfEcl` was dropped from `houses.ts`'s export list
+(nothing imports it; `risingDegree` is the only export this lane added that anything uses). It was
+re-verified on its own — build clean, the gazetteer and grid dumps still byte-identical to pre-fix,
+the reproduction still 0 of 192, and `polar-chart`, `chart-styles-ayanamsha`, `screen-snapshots`,
+`prashna-high-latitude`, `parse-check` and `prashna-parity` all green — and then confirmed by a
+second full run of the suite.
+
+`npm run build`: `✓ built in 1.93s`, no errors.
+
+**One operational note for other agents:** running gates *concurrently* with a full
+`scripts/run-all-gates.sh` can report spurious FAILs — `parse-check.js` and `prashna-parity.js` both
+reported FAIL while the suite was running beside them and both exit 0 when run on their own. Do not
+trust a gate result taken while another suite is in flight.
 
 ## 11. What is closed and what is not
 

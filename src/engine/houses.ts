@@ -79,4 +79,4 @@ function placidusCusps(RAMC, eps, phi) {
   return { cusps: c, ok };
 }
 
-export { placidusCusps, risingDegree, raOfEcl };
+export { placidusCusps, risingDegree };
