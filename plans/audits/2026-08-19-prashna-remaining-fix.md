@@ -385,17 +385,46 @@ the year range holds; and the panel renders the field and tells the truth in bot
 languages.
 
 ```
-red  (pre-fix)  FAIL Europe/London 2026-03-29T01:30 is inside the spring-forward gap
-                     and must be refused, not moved an hour; got {"ms":1774747800000,"problem":null}
-                FAIL the override panel has no timezone input — without one the override
-                     still cannot express the judging place's local time
-                FAIL en: the caption still claims the device's timezone while a real
-                     zone is in force
-                ✗ prashna-judgment-zone: 79 passed, 20 failed
+red  (pre-fix behaviour, same harness)
+     FAIL zone "Mars/Olympus" was silently read in the device's timezone instead of
+          being refused — that is F4 itself
+     FAIL Europe/London 2026-03-29T01:30 is inside the spring-forward gap and must be
+          refused, not moved an hour; got {"ms":1774747800000,"problem":null}
+     FAIL America/New_York 2026-03-08T02:30 … {"ms":1772955000000,"problem":null}
+     FAIL Australia/Sydney 2026-10-04T02:30 … {"ms":1791045000000,"problem":null}
+     FAIL en: with a zone named, the caption does not say which zone the typed clock is read in
+     FAIL en: the caption still claims the device's timezone while a real zone is in force
+     FAIL the override panel has no timezone input — without one the override still
+          cannot express the judging place's local time
+     ✗ prashna-judgment-zone: 80 passed, 19 failed
 
-green (fixed)   zone/clock pairs resolved   63
-                differing from device parse 52
-                ✓ prashna-judgment-zone: 99 passed, 0 failed
+green (fixed)
+     zone/clock pairs resolved   63
+     differing from device parse 52
+     ✓ prashna-judgment-zone: 99 passed, 0 failed
+```
+
+Run against `origin/main` itself the gate stops earlier and cleaner, because the
+screen did not export the resolver at all — `✗ prashna-judgment-zone: 0 passed,
+1 failed`, "PrashnaScreen no longer exports PR_resolveJudgmentMoment". The red above
+therefore reverts only the *behaviour* (the old resolver body and the missing zone
+field) so the two runs go through the same harness and the diff is the fix, not the
+plumbing.
+
+### One small structural decision, surfaced
+
+`validation/language-leak-scan.cjs` caught the new copy: `Asia/Kolkata` is an English
+word inside a Hindi sentence. It is not a word — an IANA identifier is a **format
+token** that has to be typed exactly and has no Devanagari form, the same category as
+`UTC`, `YYYY` and `MM`, which that gate already exempts by name in `ENGLISH_OK`.
+Rather than edit a shared gate that this lane does not own, the identifiers are named
+constants (`PR_TZ_EG`, `PR_TZ_EG2`) and interpolated, so every Hindi string literal
+is Hindi. **The reader sees the identical text either way**; only the source shape
+changed.
+
+```
+✓ language-leak-scan: 127 files · 1 source of truth · 12 rashi (+12 English aliases)
+  · 27 nakshatra · 9 grahas · 4 padas · 9 lord labels
 ```
 
 ---

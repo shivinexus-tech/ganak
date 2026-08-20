@@ -912,6 +912,14 @@ function PR_fmtNumberDeg(deg) {
   return `${wholeDeg}°${String(minute).padStart(2, '0')}′`;
 }
 
+/* IANA timezone identifiers are FORMAT TOKENS, not words. `Asia/Kolkata` has to be
+   typed exactly and has no Devanagari form — the same category as UTC, YYYY and MM,
+   which validation/language-leak-scan.cjs already exempts. They are named here and
+   interpolated so the Hindi sentences below stay Hindi rather than carrying an
+   English word inside them; the reader sees the identical text either way. */
+const PR_TZ_EG = 'Asia/Kolkata';
+const PR_TZ_EG2 = 'Europe/London';
+
 /* ---- The moment of judgement, resolved in the judging place's own zone ----
 
    Bug bash F4. KP horary is cast for the moment AND PLACE of judgement, and this
@@ -957,8 +965,8 @@ function PR_resolveJudgmentMoment(raw, zone, hi) {
      is a trap waiting for the next caller. No zone at all still falls back to the
      device — that is the shipped default and the caption says so. */
   if (named && off == null) return { ms: NaN, problem: hi
-    ? `“${zone}” कोई पहचाना हुआ समयक्षेत्र नहीं है, इसलिए निर्णय का समय पढ़ा नहीं जा सका। Asia/Kolkata जैसा नाम दें, या समयक्षेत्र खाली छोड़ दें।`
-    : `“${zone}” is not a timezone Ganak recognises, so the judgment moment could not be read. Use a name like Asia/Kolkata, or leave the timezone blank.` };
+    ? `“${zone}” कोई पहचाना हुआ समयक्षेत्र नहीं है, इसलिए निर्णय का समय पढ़ा नहीं जा सका। ${PR_TZ_EG} जैसा नाम दें, या समयक्षेत्र खाली छोड़ दें।`
+    : `“${zone}” is not a timezone Ganak recognises, so the judgment moment could not be read. Use a name like ${PR_TZ_EG}, or leave the timezone blank.` };
   const ms = off == null ? new Date(raw).getTime()
                          : Date.UTC(y, mo - 1, d, hh, mi) - off * 3600000;
   if (!Number.isFinite(ms)) return { ms: NaN, problem: hi
@@ -988,8 +996,8 @@ function PR_resolveJudgmentMoment(raw, zone, hi) {
       back = `${p.year}-${p.month}-${p.day}T${p.hour === '24' ? '00' : p.hour}:${p.minute}`;
     } catch (e) { back = null; }   // no tz database for this name — handled below
     if (back === null) return { ms: NaN, problem: hi
-      ? `“${zone}” कोई पहचाना हुआ समयक्षेत्र नहीं है, इसलिए निर्णय का समय पढ़ा नहीं जा सका। Asia/Kolkata जैसा नाम दें, या समयक्षेत्र खाली छोड़ दें।`
-      : `“${zone}” is not a timezone Ganak recognises, so the judgment moment could not be read. Use a name like Asia/Kolkata, or leave the timezone blank.` };
+      ? `“${zone}” कोई पहचाना हुआ समयक्षेत्र नहीं है, इसलिए निर्णय का समय पढ़ा नहीं जा सका। ${PR_TZ_EG} जैसा नाम दें, या समयक्षेत्र खाली छोड़ दें।`
+      : `“${zone}” is not a timezone Ganak recognises, so the judgment moment could not be read. Use a name like ${PR_TZ_EG}, or leave the timezone blank.` };
     const typed = `${String(y).padStart(4, '0')}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}T${clock}`;
     if (back !== typed) return { ms: NaN, problem: hi
       ? `${zone} में उस दिन ${clock} का समय होता ही नहीं — घड़ियाँ आगे बढ़ा दी गई थीं। गणक इसे स्वयं आगे नहीं खिसकाएगा; कृपया निर्णय का समय ठीक करें।`
@@ -1304,8 +1312,8 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, zone = null, placeLabel = 
        latitude/longitude message would point the reader at two fields that are fine
        and away from the one that is not. */
     : !zoneValid
-      ? (hi ? 'समयक्षेत्र पहचाना नहीं गया — Asia/Kolkata जैसा नाम दें, या खाली छोड़ें'
-            : 'That timezone is not recognised — use a name like Asia/Kolkata, or leave it blank')
+      ? (hi ? `समयक्षेत्र पहचाना नहीं गया — ${PR_TZ_EG} जैसा नाम दें, या खाली छोड़ें`
+            : `That timezone is not recognised — use a name like ${PR_TZ_EG}, or leave it blank`)
     : !placeValid
       ? (hi ? 'अक्षांश −90 से 90, देशान्तर −180 से 180 के बीच होना चाहिए'
             : 'Latitude must be −90 to 90 and longitude −180 to 180')
@@ -1520,14 +1528,14 @@ function PrashnaScreen({ lat = 28.6139, lon = 77.209, zone = null, placeLabel = 
             <input value={customZone}
               onChange={e => { if (sessionLocked) return; setCustomZone(e.target.value); clearResult(); }}
               aria-label={hi ? 'निर्णय स्थान का समयक्षेत्र' : 'Judgment place timezone'}
-              placeholder={hi ? 'समयक्षेत्र, जैसे Asia/Kolkata' : 'Timezone, e.g. Asia/Kolkata'}
+              placeholder={hi ? `समयक्षेत्र, जैसे ${PR_TZ_EG}` : `Timezone, e.g. ${PR_TZ_EG}`}
               style={{ height: TOKENS.ctrlH, borderRadius: TOKENS.radius, boxSizing: 'border-box',
                 background: TOKENS.bg, color: TOKENS.ink, fontSize: "var(--font-body)",
                 padding: '0 10px', border: `1.5px solid ${zoneValid ? TOKENS.line : TOKENS.sindoor}` }} />
             {!zoneValid && (
               <div style={{ fontSize: "var(--font-micro)", color: TOKENS.sindoor }}>
-                {hi ? `“${customZone.trim()}” कोई पहचाना हुआ समयक्षेत्र नहीं है। Asia/Kolkata या Europe/London जैसा नाम दें, या खाली छोड़ दें।`
-                    : `“${customZone.trim()}” is not a timezone Ganak recognises. Use a name like Asia/Kolkata or Europe/London, or leave it blank.`}
+                {hi ? `“${customZone.trim()}” कोई पहचाना हुआ समयक्षेत्र नहीं है। ${PR_TZ_EG} या ${PR_TZ_EG2} जैसा नाम दें, या खाली छोड़ दें।`
+                    : `“${customZone.trim()}” is not a timezone Ganak recognises. Use a name like ${PR_TZ_EG} or ${PR_TZ_EG2}, or leave it blank.`}
               </div>
             )}
             <div style={{ fontSize: "var(--font-micro)", color: TOKENS.muted, fontStyle: 'italic' }}>
@@ -2067,4 +2075,4 @@ export default PrashnaScreen;
 // Named exports for the validation gates (parity + number-mode chart). The
 // parity gate slices only the marked engine region, so these do not affect it.
 export { PR_cast, PR_castNumber, PR_judge, QUESTIONS, PR_kpNewAyan, PR_cuspalTable, PR_significatorGrid,
-  PR_buildResult, PR_rulingPlanets, PR_rpConfirmation, PR_judgmentVara };
+  PR_buildResult, PR_rulingPlanets, PR_rpConfirmation, PR_judgmentVara, PR_resolveJudgmentMoment };

@@ -41,22 +41,19 @@ let pass = 0, fail = 0;
 const failures = [];
 const ok = (cond, msg) => { if (cond) pass += 1; else { fail += 1; failures.push(msg); } };
 
-/* PR_resolveJudgmentMoment is internal to the screen module. Slice it out of the
-   source and evaluate it against the same helpers it imports, rather than exporting
-   a function purely for a test — the point is to check the SHIPPING text. */
-function resolver() {
-  const src = fs.readFileSync('src/screens/PrashnaScreen.tsx', 'utf8');
-  const i = src.indexOf('function PR_resolveJudgmentMoment');
-  ok(i !== -1, 'PR_resolveJudgmentMoment is gone — the judgment moment is no longer resolved in a named zone');
-  if (i === -1) return null;
-  const j = src.indexOf('\n}', i);
-  const body = src.slice(i, j + 2);
-  const { zoneOffset } = loadApp('src/engine/panchang.ts');
-  // eslint-disable-next-line no-new-func
-  return new Function('zoneOffset', 'YEAR_MIN', 'YEAR_MAX',
-    `${body}\nreturn PR_resolveJudgmentMoment;`)(zoneOffset, YEAR_MIN, YEAR_MAX);
+/* The screen exports the SHIPPING resolver, so this gate exercises the function
+   `ask()` calls rather than a copy of it or a slice of its source. */
+const { PR_resolveJudgmentMoment: resolve } = scr;
+ok(typeof resolve === 'function',
+  'PrashnaScreen no longer exports PR_resolveJudgmentMoment — the judgment moment is no ' +
+  'longer resolved in a named zone, or the export was dropped');
+/* Nothing to sweep without it. Stop with the verdict rather than a TypeError, so a
+   red run reads as a finding about the product and not as a broken harness. */
+if (typeof resolve !== 'function') {
+  failures.forEach((f) => console.log(`FAIL  ${f}`));
+  console.log(`\n✗ prashna-judgment-zone: ${pass} passed, ${fail} failed`);
+  process.exit(1);
 }
-const resolve = resolver();
 
 // -------------------------------------------------------- [1] a named zone is honoured
 const ZONES = ['Asia/Kolkata', 'Europe/London', 'America/New_York', 'Australia/Sydney',
