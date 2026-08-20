@@ -277,6 +277,24 @@ const RAW_LORD = new RegExp(String.raw`[{](?:\s*)(` + LORD_PATH + String.raw`)\s
    to something that localises it, and flagging those would teach agents to silence
    the gate rather than to fix the leak. */
 const BARE_LORD = /(?:^\s*|>)\{\s*(lord|pl|planet)\s*\}(?:\s*$|<)/;
+/* The dotted rule above was NOT anchored the same way, and that inconsistency is
+   what produced bug-bash F17. `<RPItem pl={RP.ascSignLord} />` hands the canonical
+   English lord to a component that localises it AND uses it to look the graha
+   colour up in PLANET_COLOR, which is keyed in English — exactly the shape the
+   BARE_LORD comment above blesses. Flagged as a leak, it was "fixed" the only way
+   that silences the gate: `pl={planetName(lang, RP.ascSignLord)}`. The words stayed
+   right, PLANET_COLOR["राहु"] became undefined, and the Ruling Planets strip lost
+   all its graha colour in Hindi and in Hindi only, for months.
+
+   So a lord-valued expression in an ATTRIBUTE is passing the value on and is not a
+   leak; in JSX text or a template literal it reaches the reader and still is.
+   The half this gives up — a prop handed to a component that does NOT localise — is
+   picked up by rendered output instead, which is stronger: screen-snapshots.cjs
+   § 6n asserts that the whole rendered Hindi chart screen contains no Latin graha,
+   rashi or nakshatra name. That check found two further raw sites the same day
+   (`· {item.pl}` on the Yogi/Avayogi tiles and `{p.name}` on the bhava-chalit shift
+   line) that this source scan had never matched at all. */
+const ATTR_POSITION = new RegExp(String.raw`[A-Za-z_$][\w$]*\s*=\s*\{\s*` + LORD_PATH + String.raw`\s*\}`);
 const HAND_SHORT = new RegExp(String.raw`(?:` + LORD_PATH + String.raw`|\bpl)\.slice\(`);
 const rawLords = [];
 for (const file of files) {
@@ -293,7 +311,10 @@ for (const file of files) {
     const localisedBranch = /\bhi\s*\?/.test(line)
       && /(GRAHA_HI|panchangTerm|panchangTermAt|planetName|planetShort)\s*[([]/.test(line);
     if (localisedBranch) return;
-    const m = RAW_LORD.exec(line) || BARE_LORD.exec(line);
+    /* Strip attribute positions before testing: `pl={RP.dayLord}` passes the lord on,
+       `{RP.dayLord}` in text renders it. See ATTR_POSITION above. */
+    const rendered = line.replace(new RegExp(ATTR_POSITION.source, 'g'), '');
+    const m = RAW_LORD.exec(rendered) || BARE_LORD.exec(rendered);
     if (m) rawLords.push(`${rel}:${i + 1} — lord rendered unlocalised: {${(m[1] || m[2] || m[0]).trim()}}`);
     else if (HAND_SHORT.test(line)) rawLords.push(`${rel}:${i + 1} — lord name clipped by hand: ${st.slice(0, 90)}`);
   });

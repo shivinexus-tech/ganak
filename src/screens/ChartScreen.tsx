@@ -996,7 +996,7 @@ export default function ChartScreen({ C, card, lang }) {
                   <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: C.ivory, display: "flex", alignItems: "baseline", gap: "0.4375rem", flexWrap: "wrap" }}>
                     {signLabel(lang, SIGNS[Math.floor(item.v / 30)])} <span style={{ fontSize: "var(--font-small)", color: C.muted, fontVariantNumeric: "tabular-nums" }}>{fmtDeg(item.v % 30)}</span>
                     <span style={{ fontSize: "var(--font-label)", color: C.gold }}>H{hOf(item.v)}</span>
-                    {item.pl && <span style={{ fontSize: "var(--font-label)", color: PLANET_COLOR[item.pl] }}>· {item.pl}</span>}
+                    {item.pl && <span style={{ fontSize: "var(--font-label)", color: PLANET_COLOR[item.pl] }}>· {planetName(lang, item.pl)}</span>}
                   </div>
                   <div style={{ color: C.muted, fontSize: "var(--font-micro)", marginTop: "0.25rem", lineHeight: 1.45 }}>{hi ? (SPECIAL_POINT_COPY[item.k]?.hi || "यह विशेष बिंदु कुंडली के एक सूक्ष्म जीवन-विषय को दर्शाता है।") : (SPECIAL_POINT_COPY[item.k]?.en || item.note)}</div>
                   <div style={{ color: C.muted, fontSize: "var(--font-micro)", marginTop: "0.25rem", lineHeight: 1.45, fontStyle: "italic" }}>{hi ? (SPECIAL_POINT_COPY[item.k]?.useHi || "") : (SPECIAL_POINT_COPY[item.k]?.useEn || "")}</div>
@@ -1053,7 +1053,7 @@ export default function ChartScreen({ C, card, lang }) {
                     {shifts.map((p, i) => (
                       <span key={p.name}>
                         {i > 0 && ", "}
-                        <span style={{ color: C.ivory }}>{p.name}</span> <span style={{ color: C.sindoor }}>H{p.house}→H{r.bhava.chalit[p.name]}</span>
+                        <span style={{ color: C.ivory }}>{planetName(lang, p.name)}</span> <span style={{ color: C.sindoor }}>H{p.house}→H{r.bhava.chalit[p.name]}</span>
                       </span>
                     ))}
                   </p>

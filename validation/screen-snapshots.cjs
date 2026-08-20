@@ -1157,6 +1157,42 @@ for (const lang of LANGS) {
   }
 }
 
+/* --- 6n. no Latin graha, rashi or nakshatra name survives anywhere on the Hindi chart --- */
+/* This is the rendered half of validation/language-leak-scan.cjs § 1f, and it exists
+   because the SOURCE half cannot be made both strict and correct at once.
+
+   That scan flags a lord-shaped expression wherever it appears on a line. But
+   `<RPItem pl={RP.ascSignLord} />` is not a leak: RPItem localises the value and uses
+   the English key to look the graha COLOUR up in PLANET_COLOR. Flagged as a leak, it
+   was "fixed" the one way that silences the scan — wrapping the argument — and the
+   Ruling Planets strip lost all its colour coding in Hindi (bug-bash F17). The scan
+   now exempts attribute position, matching the rule its own BARE_LORD comment already
+   states, and the guarantee is re-established HERE, where it is about what a reader
+   sees rather than about the shape of a line.
+
+   Stronger, not weaker: on the day it was written this check immediately found two raw
+   sites the source scan had never matched at all — "· Mercury" on the Yogi/Avayogi
+   tiles and "Moon H8→H9" on the bhava-chalit shift line, both on a Hindi screen. */
+{
+  /* Sun and Moon are ordinary English words that occur in Hindi copy as part of
+     transliterated compounds; LATIN_TERMS excludes them for that reason, and the seven
+     remaining grahas plus every rashi and nakshatra are unambiguous. */
+  for (const panel of ['kundli', 'dashas', 'matching', 'vault']) {
+    const { text } = renderChart({ lang: 'hi', urlSearch: `?panel=${panel}` });
+    const leaked = LATIN_TERMS.filter((t) =>
+      new RegExp(`\\b${t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(text));
+    if (leaked.length) {
+      console.error(`FAIL chart.hi (?panel=${panel}): the rendered Hindi chart prints Latin term names: ${leaked.slice(0, 8).join(', ')}`);
+      leaked.slice(0, 3).forEach((t) => {
+        const line = text.split('\n').find((l) => new RegExp(`\\b${t}\\b`).test(l));
+        console.error(`    ${t}: ${line}`);
+      });
+      console.error('    Route it through planetName / signLabel / panchangTerm from src/i18n/panchang-terms.ts.');
+      failures++;
+    }
+  }
+}
+
 if (failures) {
   console.error(`\n✗ screen-snapshots FAILED (${failures})`);
   console.error('If the change was intentional: node validation/snapshot-generate.cjs --write, then commit the diff.');
@@ -1169,6 +1205,7 @@ console.log(`✓ screen-snapshots: ${fresh.size} baselines match · ${covered} s
 console.log(`✓ calculator cross-seeding: ${clean} mismatched-result renders identical to no result (0 crashes, 0 foreign answers) · ${answered} own-result renders still answer`);
 console.log(`✓ yoga content parity: ${Object.keys(YOGA_EN).length} yoga templates × ${yogaRows} parameter sets · ${yogaEnTexts.size} distinct English interpretations → ${yogaEnToHiText.size} distinct Hindi (no collapse)`);
 console.log(`✓ cast chart rendered for real: ${panelChecks} panel visibility checks across ${PANEL_KEYS.length} panels (nothing unmounts) · ?panel= restores the open panel · birth panchang, Papa references, dosha ayanamsa and the marriage search range all read in both languages`);
+console.log('✓ rendered Hindi chart: no Latin graha, rashi or nakshatra name on any of the four panels — the rendered half of language-leak-scan § 1f');
 console.log('✓ Vimshottari surface: dates localised and year-stamped at every level · no running period is explained, not left blank · repeat cycles labelled · ayanamsa, 365.25-day year and the one-minute caveat stated · trimmed marriage windows admit the trim · graha colours survive Hindi · ruling-planet summary explains the ranking it actually uses');
 if (skipped.length) console.log(`  not covered (${skipped.length}): ${skipped.map((s) => s.key).join(', ')} — inner modules needing parent-computed data`);
 /* A green run must never be read as "this screen is fully proven". Screens whose
