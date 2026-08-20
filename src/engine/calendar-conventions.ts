@@ -54,6 +54,18 @@ const BENGALI_NATIVE = ["বৈশাখ","জ্যৈষ্ঠ","আষাঢ�
 const MALAYALAM_EN = ["Medam","Edavam","Mithunam","Karkidakam","Chingam","Kanni","Thulam","Vrischikam","Dhanu","Makaram","Kumbham","Meenam"];
 const MALAYALAM_HI = ["मेडम","एडवम","मिथुनम","कर्कटकम","चिंगम","कन्नि","तुलाम","वृश्चिकम","धनु","मकरम","कुंभम","मीनम"];
 const MALAYALAM_NATIVE = ["മേടം","ഇടവം","മിഥുനം","കർക്കടകം","ചിങ്ങം","കന്നി","തുലാം","വൃശ്ചികം","ധനു","മകരം","കുംഭം","മീനം"];
+/* NOT a duplicate of `SAMVATSARA` in src/engine/panchang.ts — DO NOT MERGE THEM.
+   Both lists are the same sixty-year cycle in the same order, index 0 =
+   Prabhava; this one carries the Tamil-tradition spellings (Pramodoota,
+   Prajotpatti, Durmukhi, Hevilambi, Pramadicha, Nala) where the other carries
+   the Sanskrit ones (Pramoda, Prajapati, Durmukha, Hemalamba, Pramadi, Anala).
+   Six of the sixty differ, and every one of those six is a real regional
+   variant a Tamil reader would expect to see — collapsing them into one list
+   would flatten a genuine difference into a false uniformity. The two lists
+   must nonetheless stay index-aligned and exactly sixty long, which
+   validation/samvatsara-years.cjs § 8 asserts (it also pins the six divergent
+   indices, so a seventh divergence fails the gate). Reasoning and sources:
+   plans/research/samvatsara-year-names.md § 5. */
 const TAMIL_YEARS_EN = ["Prabhava","Vibhava","Shukla","Pramodoota","Prajotpatti","Angirasa","Shrimukha","Bhava","Yuva","Dhata","Ishvara","Bahudhanya","Pramathi","Vikrama","Vrisha","Chitrabhanu","Svabhanu","Tarana","Parthiva","Vyaya","Sarvajit","Sarvadhari","Virodhi","Vikriti","Khara","Nandana","Vijaya","Jaya","Manmatha","Durmukhi","Hevilambi","Vilambi","Vikari","Sharvari","Plava","Shubhakrit","Shobhakrit","Krodhi","Vishvavasu","Parabhava","Plavanga","Kilaka","Saumya","Sadharana","Virodhikrit","Paridhavi","Pramadicha","Ananda","Rakshasa","Nala","Pingala","Kalayukti","Siddharthi","Raudra","Durmati","Dundubhi","Rudhirodgari","Raktakshi","Krodhana","Akshaya"];
 
 type Place = { lat:number; lon:number; zone:string };

@@ -103,6 +103,12 @@ const RAHU_SEGMENT = { 0: 8, 1: 2, 2: 7, 3: 5, 4: 6, 5: 4, 6: 3 };
 const YAMA_SEGMENT = { 0: 5, 1: 4, 2: 3, 3: 2, 4: 1, 5: 7, 6: 6 };
 const GULIKA_SEGMENT = { 0: 7, 1: 6, 2: 5, 3: 4, 4: 3, 5: 2, 6: 1 };
 const MONTHS_HINDU = ["Chaitra", "Vaishakha", "Jyeshtha", "Ashadha", "Shravana", "Bhadrapada", "Ashwina", "Kartika", "Margashirsha", "Pausha", "Magha", "Phalguna"];
+/* The sixty-year (Jovian) cycle, index 0 = Prabhava. This is the Sanskrit
+   romanisation. `TAMIL_YEARS_EN` in src/engine/calendar-conventions.ts is the
+   SAME sixty names in the same order, spelled the Tamil way (Pramodoota,
+   Durmukhi, Hevilambi, Nala …). That is a real regional difference, not a
+   duplicate to be merged away — see plans/research/samvatsara-year-names.md § 5.
+   validation/samvatsara-years.cjs asserts the two stay index-aligned. */
 const SAMVATSARA = ["Prabhava", "Vibhava", "Shukla", "Pramoda", "Prajapati", "Angirasa", "Shrimukha", "Bhava", "Yuva", "Dhata", "Ishvara", "Bahudhanya", "Pramathi", "Vikrama", "Vrisha", "Chitrabhanu", "Svabhanu", "Tarana", "Parthiva", "Vyaya", "Sarvajit", "Sarvadhari", "Virodhi", "Vikriti", "Khara", "Nandana", "Vijaya", "Jaya", "Manmatha", "Durmukha", "Hemalamba", "Vilambi", "Vikari", "Sharvari", "Plava", "Shubhakrit", "Shobhakrit", "Krodhi", "Vishvavasu", "Parabhava", "Plavanga", "Kilaka", "Saumya", "Sadharana", "Virodhikrit", "Paridhavi", "Pramadi", "Ananda", "Rakshasa", "Anala", "Pingala", "Kalayukti", "Siddharthi", "Raudra", "Durmati", "Dundubhi", "Rudhirodgari", "Raktakshi", "Krodhana", "Akshaya"];
 
 const jdOf = (ms) => ms / 86400000 + 2440587.5;
@@ -251,17 +257,60 @@ function lunarMonthInfo(nowMs, isKrishna) {
   return { amanta, purnimanta, idx: nameIdx, adhik };
 }
 
+/* BARHASPATYA (JOVIAN) SAMVATSARA — the northern reckoning, which EXPUNGES.
+   A Jovian year is ~361.03 days, about 4.23 days SHORT of a solar year, so the
+   cycle creeps forward and roughly every 85 solar years one samvatsara begins
+   and ends inside a single solar year and is expunged (kshaya) — Sewell &
+   Dikshit, *The Indian Calendar* (1896), Arts. 54-55. That is why the northern
+   name cannot be a fixed offset from the year number: Art. 62 records the
+   northern count as 12 ahead of the southern in 1896, and it is 13 today and 14
+   from 2028. Full sourcing: plans/research/samvatsara-year-names.md.
+
+   Constants: period and epoch are a least-squares fit to the 191 published
+   Barhaspatya boundary instants Drik Panchang prints for New Delhi over
+   1900-2090 (fetched 2026-08-19; residuals under 1.5 h, no missing or extra
+   boundary). Epoch = the start of #47 Pramadi, 1900-10-08 12:36 IST, expressed
+   in UT to match `jdOf`. The Surya-Siddhanta's own 361.026721 d differs by
+   0.0056 d/yr and places the expunctions ten years earlier; see the note § 3.4.
+   Reproduced exactly, 1900-2100, by validation/samvatsara-years.cjs. */
+const JOVIAN_YEAR_DAYS = 361.032279;
+const JOVIAN_EPOCH_JD = 2415300.813243;
+const JOVIAN_EPOCH_IDX = 46;
+const jovianSamvatsara = (ms) =>
+  (((JOVIAN_EPOCH_IDX + Math.floor((jdOf(ms) - JOVIAN_EPOCH_JD) / JOVIAN_YEAR_DAYS)) % 60) + 60) % 60;
+
+/* Three era years, three DIFFERENT sixty-cycle names on the same day — verified
+   correct, not a bug. They are three separate reckonings that roll on three
+   different days and, in the northern case, follow a different rule entirely:
+
+   - Shaka: southern LUNI-SOLAR cycle, no expunction since Saka 828/831 (~906-909
+     CE). Sewell & Dikshit Art. 62 gives the rule as "add 11 to the current Saka
+     year, and divide by 60" counting Prabhava as 1; `shaka` here is the expired
+     year panchangs print, so the 0-based index is (shaka + 11) % 60. Rolls at
+     Chaitra Shukla 1.
+   - Vikram: northern BARHASPATYA cycle. Art. 55 — the samvatsara current at the
+     start of the solar year is coupled with all its days — so it is read at that
+     year's Mesha sankranti, NOT at Chaitra and NOT "now".
+   - Gujarati: Kartikadi (Bestu Varas) era with its own non-expunging cyclic
+     count, (guj + 8) % 60. Rolls at Kartika Shukla 1, so for ~5 months a year
+     its number is one BEHIND Vikram's. Verified against Drik Panchang 1900-2100
+     and hinducalculator.com; the derivation of the +8 is not independently
+     sourced — note § 4, confidence MEDIUM. */
 function samvatInfo(nowMs, gy) {
   const mesha = solveCross(sunSidMs, Date.UTC(gy, 2, 18), 0, 45);
   const chaitraNY = lastNewMoonBefore(mesha);
-  const base = nowMs >= chaitraNY ? gy : gy - 1;
+  const started = nowMs >= chaitraNY;
+  const base = started ? gy : gy - 1;
   const shaka = base - 78, vikram = base + 57;
+  /* Jan 1 to Chaitra we are still inside the PREVIOUS Vikram year, whose solar
+     year opened at the previous Mesha sankranti. */
+  const vikramMesha = started ? mesha : solveCross(sunSidMs, Date.UTC(gy - 1, 2, 18), 0, 45);
   const vrish = solveCross(sunSidMs, Date.UTC(gy, 9, 18), 210, 45);
   const gujNY = lastNewMoonBefore(vrish);
   const guj = nowMs >= gujNY ? gy + 57 : gy + 56;
   return {
     shaka: `${shaka} ${SAMVATSARA[(shaka + 11) % 60]}`,
-    vikram: `${vikram} ${SAMVATSARA[(vikram + 9) % 60]}`,
+    vikram: `${vikram} ${SAMVATSARA[jovianSamvatsara(vikramMesha)]}`,
     guj: `${guj} ${SAMVATSARA[(guj + 8) % 60]}`,
   };
 }
