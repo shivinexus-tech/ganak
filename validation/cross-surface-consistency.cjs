@@ -205,6 +205,25 @@ const src = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
     'src/data/medical-muhurat-ui.ts (MEDICAL_LABELS)':
       grabPairs(src('src/data/medical-muhurat-ui.ts'), /(abhijit|rahu):\s*\{\s*en:\s*"([^"]*)",\s*hi:\s*"([^"]*)"\s*\}/),
   };
+  /* A regex that stops matching would silently reduce the number of copies and
+     make the comparison below look cleaner than the code is. Each source must
+     still yield the keys it is known to carry. */
+  const EXPECTED_KEYS = {
+    'src/i18n.ts (tr(lang, "rahuL") — Daily + Muhurat hub cards)': ['rahu', 'gulika', 'yama', 'abhijit'],
+    'src/screens/MuhuratHub.tsx (winName, the "Good & avoid times today" card)': ['rahu', 'gulika', 'yama', 'abhijit'],
+    'src/components/TimingLanes.tsx (BLOCKER_LABEL, the lane below that card)': ['rahu', 'gulika', 'yama'],
+    'src/data/medical-muhurat-ui.ts (MEDICAL_LABELS)': ['rahu', 'abhijit'],
+  };
+  for (const [where, want] of Object.entries(EXPECTED_KEYS)) {
+    const missing = want.filter((k) => !copies[where][k]);
+    if (missing.length) {
+      disagree('§1 vocabulary', 'this check can no longer read one of the label tables it compares', [
+        `${where} no longer yields: ${missing.join(', ')}`,
+        'Either the table moved (good — check it now reads src/i18n.ts) or it was reformatted and this check went blind. Re-point it.',
+      ]);
+    } else ok();
+  }
+
   const labelRows = [];
   for (const key of ['rahu', 'gulika', 'yama', 'abhijit']) {
     for (const lang of ['en', 'hi']) {
