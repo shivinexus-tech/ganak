@@ -54,7 +54,8 @@
       "scope": {
         "track": "website",
         "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
-        "exactNodes": [],
+        "exactNodes": ["851:18746", "897:23904", "858:281", "897:24274", "897:24444", "897:24639", "851:20882", "894:23291", "894:23452", "894:23627", "851:21265", "894:23695", "851:21284"],
+        "surfaceFills": ["#FFFDF9", "#F8F2E8"],
         "paletteTraits": ["ivory_ground", "cream_ground", "bone_ground", "oatmeal_ground", "warm_off_white_ground"],
         "allowedRoles": [],
         "prohibitedRoles": ["canvas", "page", "header", "card", "panel", "context", "ribbon", "ornament_backing", "artwork_ground", "exported_asset_ground", "active_screen"]
