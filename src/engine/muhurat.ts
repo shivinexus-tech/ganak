@@ -8,6 +8,7 @@ import {
 import { ayyappaMandalaFor } from "./festivals";
 import { lakshmiPujaTimings } from "./lakshmi-puja";
 import { computeLagnaPanchaka } from "./panchaka";
+import { bhadraWindows } from "./daily-windows";
 import { panchangTermAt } from "../i18n/panchang-terms";
 
 
@@ -147,6 +148,13 @@ function muhuratForDate(place, ayanamsa, y, m, day) {
     choghaNight: choghaSlots(dow, ev.set, nextRise, false),
     abhijit: dow === 3 ? null : { start: ev.transit - dayLen / 30, end: ev.transit + dayLen / 30 },
     rahu: eighth(RAHU_SEGMENT[dow]), gulika: eighth(GULIKA_SEGMENT[dow]), yama: eighth(YAMA_SEGMENT[dow]),
+    /* Every Bhadra (Vishti karana) interval in this sunrise-to-sunrise day, not
+       the karana that happened to be running at sunrise. `karana` above is the
+       sunrise sample and stays for display; a Bhadra that BEGINS after sunrise
+       was invisible to the finder until 2026-08-19 (bug bash F6), so a wedding
+       day whose sunrise karana was Gara could offer four windows sitting inside
+       Bhadra while the same page said to avoid it. */
+    bhadra: bhadraWindows(ev.rise, nextRise),
   };
 }
 function dayScore(info, category) {
@@ -175,7 +183,9 @@ function dayScore(info, category) {
     else if (info.dow === 0) { s += 1; f.push({ en: "Ravi-Pushya yoga", hi: "रवि-पुष्य योग", g: true }); }
   }
   // Bhadra (Vishti) karana
-  if (info.karana === "Vishti") { s -= 2; f.push({ en: "Bhadra (Vishti) karana", hi: "भद्रा (विष्टि करण)", g: false }); }
+  // Bhadra: the whole sunrise-to-sunrise day, not the sunrise sample. Falls back
+  // to the sunrise karana only if the interval list is unavailable.
+  if ((info.bhadra || []).length ? true : info.karana === "Vishti") { s -= 2; f.push({ en: "Bhadra (Vishti) karana", hi: "भद्रा (विष्टि करण)", g: false }); }
   // intra-day flexibility
   const good = info.choghaDay.filter((c) => c.nat === "good").length;
   if (good >= 3) { s += 1; f.push({ en: good + " good day choghadiya", hi: good + " शुभ दिन चौघड़िया", g: true }); }
@@ -460,8 +470,24 @@ function subtractIntervals(win, avoid) {
   }
   return parts;
 }
+/* Bhadra (Vishti karana) is subtracted from every offered window as well.
+   Source: Drik Panchang's published 2026 New Delhi Vivah Muhurat list
+   (https://www.drikpanchang.com/shubh-dates/shubh-marriage-dates-with-muhurat.html,
+   read 2026-08-19). Of the 21 listed marriage days that carry a Bhadra, not one
+   published window enters it: the window OPENS at the minute Bhadra closes --
+   21 Feb 2026 Bhadra ends 13:01 and the window starts 13:00; 1 May 2026 ends
+   10:00, window starts 10:00; 29 Jun 2026 ends 16:17, window starts 16:16. Total
+   overlap across the whole year is four minutes of rounding. Unlike Rahu Kalam,
+   there is no disagreement here between the published rule and the published
+   generator, and Ganak's own Panchang card already prints "Avoid starting
+   auspicious work during Bhadra" on the same page as the finder.
+
+   NOT modelled, and deliberately so: the Bhadra-vaas refinement (Bhadra held to
+   be harmless while it resides in heaven or the nether world, by the Moon's
+   sign). Ganak lists plain Bhadra intervals exactly as Drik's Bhadra Vichar page
+   does; adopting vaas would need its own source and its own decision. */
 function hardAvoidIntervals(info) {
-  return [info.rahu, info.gulika, info.yama].filter(Boolean);
+  return [info.rahu, info.gulika, info.yama, ...(info.bhadra || [])].filter(Boolean);
 }
 function applyHardExclusions(info, windows) {
   const avoid = hardAvoidIntervals(info);
@@ -469,9 +495,18 @@ function applyHardExclusions(info, windows) {
   for (const w of windows) for (const p of subtractIntervals(w, avoid)) if (p.end > p.start) out.push(p);
   return out.sort((a, b) => a.start - b.start);
 }
+/* Day AND night Choghadiya. The Panchaka categories have always been offered
+   windows from the full sunrise-to-sunrise day, and the Muhurat hub's own
+   Choghadiya strip already lists both halves; only this finder was daytime-only.
+   It matters once Bhadra is subtracted: on a day whose Bhadra covers the whole
+   daylight span the finder would otherwise return nothing and set the day aside,
+   while Drik Panchang publishes a night window for exactly those days -- e.g.
+   Vehicle Purchase, New Delhi, 13 Dec 2026, Bhadra to 16:48, Drik's window
+   16:47 to 07:06 next morning. Restoring the night half keeps Drik-anchor recall
+   at 100% (vehicle) and 91% (property), unchanged by the Bhadra rule. */
 function cleanChoghadiyaWindows(info, category) {
   const keys = ACTIVITY_CHOGHADIYA[category] || new Set(["amrit", "shubh", "labh"]);
-  return applyHardExclusions(info, (info.choghaDay || [])
+  return applyHardExclusions(info, [...(info.choghaDay || []), ...(info.choghaNight || [])]
     .filter((c) => keys.has(c.key))
     .map((c) => ({ start: c.start, end: c.end, kind: "choghadiya", key: c.key })));
 }
