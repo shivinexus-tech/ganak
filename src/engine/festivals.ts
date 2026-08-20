@@ -3,6 +3,10 @@ import {
   amantaMonthIdx, elongMs, lunarMonthInfo, moonEvents, moonSidMs, pitruPakshaDay, planetSidMs,
   solveCross, sunEvents, sunSidMs, zoneOffset, karanaName,
 } from "./panchang";
+/* The observance day and the window printed on that day's page MUST come from the
+   same rule. Until 2026-08-19 they did not: this file decided with one Pradosha
+   and lakshmi-puja.ts printed another. See plans/research/pradosha-definition.md. */
+import { pradoshaWindow, nishithaWindow } from "./daily-windows";
 
 /* Twelve solar sankrantis — Sun enters each sidereal sign (Lahiri). Makar (270°)
    also surfaces pongal alongside makarSankranti. */
@@ -505,7 +509,8 @@ function scanDayParts(y, m, day, fallbackTz, place) {
     if (ev.rise != null && ev.set != null) { rise = ev.rise; set = ev.set; }
     if (evN.rise != null) nextRise = evN.rise;
   }
-  const dayLen = set - rise, nightLen = nextRise - set, nightMid = set + nightLen / 2;
+  const dayLen = set - rise;
+  const pradosha = pradoshaWindow(set, nextRise), nishita = nishithaWindow(set, nextRise);
   return {
     y, m, day, tz, noon, rise, set, nextRise, moonrise: undefined, observer: hasObserver ? { lat, lon } : null,
     arunodaya: [rise - 96 * 60000, rise],
@@ -526,9 +531,18 @@ function scanDayParts(y, m, day, fallbackTz, place) {
        04:24 PM to 07:09 PM" = the final fifth of a 13h42m day. */
     sayahna: [rise + 4 * dayLen / 5, set],
     sunset: [set - 60000, set + 60000],
-    pradosha: [set - dayLen / 10, set + nightLen / 10],
-    nishita: [nightMid - nightLen / 30, nightMid + nightLen / 30],
+    /* ONE definition each, shared with the Panchang card and the festival guide —
+       imported from daily-windows.ts, never re-derived here. */
+    pradosha: [pradosha.start, pradosha.end],
+    nishita: [nishita.start, nishita.end],
   };
+}
+/* Day parts for the civil day before (y, m, day), month and year borrows handled
+   by Date rather than by arithmetic on `day`. Only reached by the rare kshaya
+   branches, so evicting the one-entry sunEvents cache here costs nothing. */
+function previousDayParts(y, m, day, tz, place) {
+  const d = new Date(Date.UTC(y, m - 1, day - 1));
+  return scanDayParts(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate(), tz, place);
 }
 function kalaInterval(parts, kala) {
   if (kala === "moonrise") {
@@ -634,7 +648,30 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
           const kshaya = !overlap && rule.baseKey === "ekadashi" && rule.kala === "udaya"
             && tithiIndexAt(parts.rise + 1000) === (target + 29) % 30
             && tithiIndexAt(parts.nextRise + 1000) === (target + 1) % 30;
-          if (!overlap && !kshaya) continue;
+          /* The same problem, in the evening. A short Trayodashi can begin after
+             one Pradosha has closed and end before the next one opens, so it
+             reaches no Pradosha at all and the vrata would vanish from the
+             calendar. It is kept on the day the tithi actually ran — present at
+             that sunrise, gone by that sunset. Longitude decides whether this
+             happens: Drik publishes Soma Pradosh on 2026-08-10 for New Delhi,
+             London AND Washington D.C., but Trayodashi (09 Aug 22:31 → 10 Aug
+             19:25 EDT) is still running at the London and Delhi sunsets while it
+             has ended 45 minutes before Washington's, so only Washington takes
+             this branch. Pushed with zero overlap, so if any evening did catch
+             the tithi that day wins on the greater-share test below.
+
+             The previous evening is re-derived here rather than left to the
+             greater-share test, because that test can only see days already
+             inside this scan. Washington D.C. on 2026-01-01 is exactly that
+             trap: Trayodashi ran 31 Dec 15:18 → 01 Jan 11:52 EST and filled the
+             31st's Pradosha completely, so the 1st is not a kshaya at all — but
+             a calendar that opens on 1 January has no 31 December to compare
+             with, and the vrata would be printed twice. */
+          const kshayaPradosha = !overlap && rule.baseKey === "pradosh"
+            && tithiIndexAt(parts.rise + 1000) === target
+            && tithiIndexAt(parts.set - 1000) !== target
+            && !tithiKalaOverlap(previousDayParts(y, m, day, tz, place), "pradosha", target);
+          if (!overlap && !kshaya && !kshayaPradosha) continue;
           // Named vrata identity rides on the LUNAR month, never the Gregorian one.
           // Krishna-paksha names use the Purnimanta month (Drik: "Yogini Ekadashi
           // falls during Krishna Paksha of Ashadha month according to North Indian
@@ -643,9 +680,36 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
           const obs = observancesFor(krishna, rule.tithi, month, dow, parts.noon, calendarConvention).filter((o) => obsKind(o.key) === rule.baseKey);
           for (const o of obs) {
             if (!o.fasting) continue;
-            const prev = [...fasts].reverse().find((x) => x.key === o.key);
-            if (prev && parts.noon - prev.ms <= 1.5 * DAY) continue;
-            fasts.push({ key: o.key, ms: parts.noon, decidingKala: kshaya ? "kshaya-tithi-start" : rule.kala });
+            /* One occurrence, decided the way the FESTIVALS path below decides
+               its own ties: when a vrata tithi reaches the deciding kala on two
+               consecutive days, the day holding the GREATER share of that kala
+               keeps the observance.
+
+               Two things were wrong here until 2026-08-19. The candidate was
+               matched on its display key, but Pradosh is named for its weekday,
+               so `pradosh_Tuesday` and `pradosh_Wednesday` are two names for one
+               observance and walked straight past a key-identity test. And the
+               earlier day won unconditionally, which is not the vyapini rule and
+               not what this file already does for festivals.
+
+               Both halves show up in New Delhi 2026. Trayodashi runs 28 Apr 18:52
+               → 29 Apr 19:52 and reaches Pradosha on both evenings, holding 130
+               min of it on the 28th against 57 on the 29th: Drik publishes Bhaum
+               Pradosh on the 28th, and Ganak now agrees. On 15/16 Jan the tithi
+               arrives 20:17, catching only the last 11 min of the 15th's window
+               against 162 min on the 16th, and the observance belongs to the
+               16th — which the old "earlier day wins" rule got backwards.
+               All 25 of Drik's published 2026 New Delhi Pradosh dates follow from
+               this one rule; see plans/research/pradosha-definition.md § 4. */
+            const prev = [...fasts].reverse().find((x) => obsKind(x.key) === rule.baseKey);
+            if (prev && parts.noon - prev.ms <= 1.5 * DAY) {
+              if (overlap <= prev.overlap) continue;
+              fasts.splice(fasts.indexOf(prev), 1);
+            }
+            /* A kshaya Pradosha still reports "pradosha" as its deciding kala:
+               the observance is the same one, and the guide's existing label for
+               it stays true for the reader. */
+            fasts.push({ key: o.key, ms: parts.noon, overlap, decidingKala: kshaya ? "kshaya-tithi-start" : rule.kala });
           }
         }
       }
