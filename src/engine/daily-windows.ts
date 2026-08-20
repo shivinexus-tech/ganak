@@ -206,6 +206,48 @@ function taraBala(currentNak: number) {
   });
 }
 
+/* ── Pradosha and Nishitha: ONE definition each, for the whole app ────────────
+   Sourced and argued in plans/research/pradosha-definition.md (2026-08-19).
+   `festivals.ts` and `lakshmi-puja.ts` import these. Do not re-derive either
+   window anywhere else — that is precisely the defect this replaced.
+
+   PRADOSHA begins AT local sunset and runs for the first fifth of the night —
+   three night-muhurtas, the night from sunset to the NEXT sunrise being divided
+   into fifteen. That is the classical six-ghatika reckoning of the Kala-nirnaya
+   texts (Nirnaya Sindhu, Dharma Sindhu) stated proportionally, the way every
+   other Vedic window in this engine is stated; six ghatikas is a flat 2h24m only
+   at the equinox.
+
+   Anchored to Drik Panchang's published 2026 Pradosh Puja times, fetched
+   2026-08-19 from drikpanchang.com/vrats/pradoshdates.html. All 49 published
+   rows for New Delhi and Washington D.C. agree with this rule intersected with
+   Trayodashi; 44 match at BOTH ends to within a minute, and the five that do not
+   are the days Drik itself clips the puja window to the tithi, each of which
+   still matches at its unclipped end. Gated in validation/daily-windows.cjs.
+
+   Until 2026-08-19 this file and festivals.ts used `sunset - dayLen/10` to
+   `sunset + nightLen/10` — 1.5 muhurtas either side of sunset — which matched no
+   published source, disagreed with lakshmi-puja.ts (which was right) on 25 of 25
+   sampled city-evenings by about an hour at each end, and manufactured two
+   Pradosh Vrat days in 2026 that no panchang lists, because the pre-sunset hour
+   caught Trayodashi on an extra evening. The festival engine decided the day
+   with that window and displayed the other one on the same page.
+
+   A minority popular convention puts Pradosha 90 minutes of clock time either
+   side of sunset (English Wikipedia, and a number of devotional sites). Ganak
+   does not follow it; the observance copy says so rather than hiding it.
+
+   NISHITHA is the central night-muhurta: the midpoint of the night, plus and
+   minus a thirtieth of it. Its rule is unchanged — but it too had drifted into
+   four hand-written copies, and three of them are now this one. */
+const pradoshaWindow = (set: number, nextRise: number) =>
+  ({ start: set, end: set + (nextRise - set) / 5 });
+
+const nishithaWindow = (set: number, nextRise: number) => {
+  const nightLen = nextRise - set, mid = set + nightLen / 2;
+  return { start: mid - nightLen / 30, end: mid + nightLen / 30 };
+};
+
 function computeDailyWindows(place: any, atMs: number) {
   const probe = new Date(atMs);
   const tz = zoneOffset(place.zone, probe.getUTCFullYear(), probe.getUTCMonth()+1, probe.getUTCDate()) ?? 5.5;
@@ -216,8 +258,7 @@ function computeDailyWindows(place: any, atMs: number) {
   const next = sunEvents(y,m,d+1,tz,place.lat,place.lon);
   if (next.rise == null) return null;
   const anchor=ev.rise, end=next.rise, dow=new Date(anchor+tz*3600000).getUTCDay();
-  const dayUnit=(ev.set-ev.rise)/15, nightUnit=(next.rise-ev.set)/15;
-  const nishitaMid=ev.set+(next.rise-ev.set)/2;
+  const nightUnit=(next.rise-ev.set)/15;
   const nak=Math.floor(moonSidMs(anchor)/NW), sunNak=Math.floor(sunSidMs(anchor)/NW);
   const moonAtRise=moonSidMs(anchor);
   const tn=Math.floor(rev(elongMs(anchor))/12), tithiNum=(tn%15)+1;
@@ -231,7 +272,7 @@ function computeDailyWindows(place: any, atMs: number) {
     varjyam:nkWindows.filter(x=>x.kind==="varjyam"),
     amrit:nkWindows.filter(x=>x.kind==="amrit"),
     brahma:{start:next.rise-2*nightUnit,end:next.rise-nightUnit},
-    nishita:{start:nishitaMid-nightUnit/2,end:nishitaMid+nightUnit/2},
+    nishita:nishithaWindow(ev.set,next.rise),
     // Godhuli Muhurta (C3-GODHULI-DRIK) — the declared convention is: it BEGINS
     // at sunset and runs for half a night muhurta, the night from sunset to the
     // next sunrise being divided into fifteen muhurtas. It is a dusk window that
@@ -243,9 +284,10 @@ function computeDailyWindows(place: any, atMs: number) {
     //   Chennai   2026-07-25  18:38→19:01  (Drik 18:38–19:01)
     // The old rule centred a half-muhurta on sunset and so opened ~14 min early.
     godhuli:{start:ev.set,end:ev.set+nightUnit/2},
-    // Three-muhurta twilight centred on sunset, matching the festival
-    // deciding-kala convention already used by Ganak.
-    pradosha:{start:ev.set-(ev.set-ev.rise)/10,end:ev.set+(next.rise-ev.set)/10},
+    // Pradosha — see the sourced block above pradoshaWindow. Sunset to the first
+    // fifth of the night. The SAME function decides the observance day in
+    // festivals.ts and prints the Lakshmi Puja panel in lakshmi-puja.ts.
+    pradosha:pradoshaWindow(ev.set,next.rise),
     dishaShool:DISHA[dow],
     chandraBala:chandraBala(Math.floor(moonSidMs(anchor)/30),tn<15),
     taraBala:taraBala(nak),
@@ -266,4 +308,4 @@ function scanSpecialYogaCalendar(place: any, atMs: number, days = 60) {
   return out;
 }
 
-export { computeDailyWindows, scanSpecialYogaCalendar, specialYogas, specialYogaWindows, anandadiYoga, gowriWindows, chandraBala, taraBala, VARJYA_GHATI };
+export { computeDailyWindows, scanSpecialYogaCalendar, specialYogas, specialYogaWindows, anandadiYoga, gowriWindows, chandraBala, taraBala, VARJYA_GHATI, pradoshaWindow, nishithaWindow };

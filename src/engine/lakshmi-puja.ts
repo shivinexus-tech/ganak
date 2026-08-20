@@ -1,11 +1,17 @@
 /* City-specific Lakshmi Puja windows on Diwali Amavasya.
-   Pradosh Kaal follows Drik Panchang: sunset through the first fifth of the night.
+   Pradosh Kaal and Nishita come from the SINGLE app-wide definitions in
+   daily-windows.ts — this file used to carry its own copies. They were the
+   correct ones; the Panchang card and the festival day-decider disagreed with
+   them by about an hour at each end. Sourced in
+   plans/research/pradosha-definition.md; the same functions now decide the
+   observance day in festivals.ts, so the day and the window can no longer fork.
    The primary muhurat is Vrishabha (sthir) lagna intersecting Pradosh while Amavasya
    prevails — the usual North-Indian household rule. Benchmark: validation/lakshmi-puja-timings.cjs */
 
 import { rev } from "./ephemeris";
 import { computeLagnaPanchaka } from "./panchaka";
 import { sidereal, solveCross, sunEvents, zoneOffset } from "./panchang";
+import { pradoshaWindow, nishithaWindow } from "./daily-windows";
 
 const VRISHABHA_SIGN = 1;
 const MINUTE = 60000;
@@ -44,10 +50,8 @@ function lakshmiPujaTimings(place, ayanamsa = "lahiri", ms) {
   const ev = sunEvents(y, m, day, tz, place.lat, place.lon);
   const evN = sunEvents(y, m, day + 1, tz, place.lat, place.lon);
   if (ev.rise == null || ev.set == null || evN.rise == null) throw new Error("sun-events-unavailable");
-  const nightLen = evN.rise - ev.set;
-  const nightMid = ev.set + nightLen / 2;
-  const pradosh = { start: ev.set, end: ev.set + nightLen / 5 };
-  const nishita = { start: nightMid - nightLen / 30, end: nightMid + nightLen / 30 };
+  const pradosh = pradoshaWindow(ev.set, evN.rise);
+  const nishita = nishithaWindow(ev.set, evN.rise);
   const { lagnaSchedule } = computeLagnaPanchaka(place, ayanamsa, ev.rise);
   let vrishabha = null;
   let primary = null;
