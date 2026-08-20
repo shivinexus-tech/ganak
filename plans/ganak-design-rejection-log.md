@@ -357,6 +357,29 @@ Evidence labels used below:
 - **Confidence / limitation:** exact owner decision, complete website-page sweep and
   exact node list; high.
 
+### REJ-015 — “Balanced” ornament-atlas composition
+
+- **Decision date / status:** 2026-08-19 · `REJECTED / DO NOT REUSE`
+- **Track / scope:** Website · `PATTERN`
+- **Figma / archive evidence:** application frame `730:14247` inside atlas section
+  `723:14636`; it is now visibly named
+  `REJECTED · BALANCED · no structural ornament path`.
+- **Rejected:** the “Balanced” application as an ornament-composition source.
+- **Owner reason:** **Verbatim:** it had “no meaningful ornament structure”; its
+  elements “feel placed rather than composing a frame/path/transition.”
+- **Underlying ornament-language/design lesson:** Ganak ornament must grow from an
+  edge or side and establish a connected visual path, frame, transition or anchor.
+  Richness is not a count of small motifs, and scattered decoration is not
+  composition.
+- **Prohibited reuse:** do not cite, clone or propagate `730:14247` as an approved
+  layout, density recipe or ornament source.
+- **Still approved / liked / exploratory:** the owner liked the separate Restrained
+  and Rich directions as evidence, but did not approve them as reusable layouts.
+  Approved botanical `485:51` remains Festival/Vrat-hero-only. New isolatable
+  artworks in `743:16083` remain `EXPLORATION` until individually selected.
+- **Related rules:** `GDF-019`, `GDF-040`, `GDF-056`.
+- **Confidence / limitation:** exact owner decision and exact rejected node; high.
+
 ## Approved ornament-language boundary
 
 The owner corrected the phrase “design vocabulary.” The intended source of truth is
@@ -373,13 +396,16 @@ the **approved elements within Ganak's ornament language and approved colours**:
   gold, powder blue, restrained botanical greens and other evidenced source colours.
 
 These are element families, not interchangeable assets or automatically approved
-swatches. The exact approved website
-reference is the owner-supplied
-`/Users/shivie/Downloads/GanakPanchangApprovedWebsite.png` and Figma locked reference
-`31:2`. Vrat hero source `485:24` / botanical node `485:51` remains a separately
-scoped approval and is not the Today ornament source. Compact owner-review board
-`707:14247` turns this evidence into explicit role, placement, density, contrast and
-controlled-improvisation decisions before broader propagation.
+swatches. The corrected ornament-origin reference is
+`/Users/shivie/Downloads/avif_xLarge.avif` (SHA-256
+`7c9fc29a761eb7876c7eb18c473a834dddcff61e52aff679b6de70e2eace4222`); it is
+inspiration/source evidence, not a website asset or blanket approval of every crop.
+The earlier `GanakPanchangApprovedWebsite.png` is superseded for ornament-origin
+recovery. Figma locked reference `31:2` remains appearance evidence only. Vrat hero
+source `485:24` / botanical node `485:51` remains a separately scoped approval and
+is not a universal ornament source. Compact board `707:14247` records guardrails;
+expanded owner-review section `743:16083` shows nine real isolatable
+`EXPLORATION` artworks beside `485:51` as the Vrat-only approved quality control.
 
 ## Read-only recovery inventory for owner
 
