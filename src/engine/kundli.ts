@@ -12,9 +12,10 @@ import { vargaSign } from "./varga";
 import { computeAshtakavarga, computeArudhas, detectYogas, SEVEN } from "./classical";
 import { computeShadbala } from "./shadbala";
 import {
-  DASHA_SEQ, VIM_LORDS, subLordChain, vimSub,
+  DASHA_SEQ, VIM_LORDS, subLordChain, vimSub, vimSubOf, clipPeriods,
   computeKPSignificators, computeRulingPlanets, WEEKDAY_LORDS,
 } from "./dasha";
+import { planetSpeed } from "./planet-calendar";
 import { computeSpecialPoints } from "./special-points";
 import { computeBhavaChalit } from "./bhava";
 import { computeBNN } from "./bhrigu";
@@ -38,10 +39,18 @@ function computeKundli({ y, m, day, hh, mi, tz, lat, lon, ayanamsa = "lahiri" })
   });
   bodies.Ketu = { trop: rev(trop.Rahu + 180), sid: rev(trop.Rahu + 180 - ayan) };
 
-  // retrograde
+  /* Retrograde flag — bug-bash 2026-08-18 F8.
+     This used a BACKWARD difference (`trop(d) − trop(d−0.5)`), i.e. the mean motion
+     over the 12 h *before* the moment, so the flag turned over ~6 h after the true
+     station. Every other surface in the app — the planet calendar card, the gochar
+     timeline, the transit event line — uses the CENTRED ±12 h difference, which
+     flips at the station itself. A chart cast in one of those windows printed ℞ next
+     to a planet Ganak's own planet calendar called direct (79 disagreeing hourly
+     samples across all 12 of 2026's stations).
+     There is now ONE definition: `planetSpeed` from planet-calendar.ts, the same
+     function `planetStatesAt` uses, so the two surfaces cannot drift again. */
   ["Mars", "Mercury", "Jupiter", "Venus", "Saturn"].forEach((k) => {
-    const diff = ((trop[k] - tropPrev[k] + 540) % 360) - 180;
-    bodies[k].retro = diff < 0;
+    bodies[k].retro = planetSpeed(k, utcMs) < 0;
   });
   bodies.Rahu.retro = true;
   bodies.Ketu.retro = true;
@@ -88,32 +97,74 @@ function computeKundli({ y, m, day, hh, mi, tz, lat, lon, ayanamsa = "lahiri" })
   const startSeq = nakIdx % 9;
   const birthMs = utcMs;
   const YEAR = 365.25 * 86400000;
+  const now = Date.now();
+  /* The Vimshottari table is one 120-year cycle from birth — nine mahadashas — and
+     then it stops. Vimshottari itself does not: it repeats. For any birth before
+     roughly 1910 (and the app accepts 1800 onward, `src/components/birth-input.ts`)
+     `now` fell past the ninth row, `current` came back undefined, and the WHOLE
+     drill-down — current highlight, % elapsed bar, five-level strip, antardasha
+     tree — disappeared with no message at all. 67 % of the supported birth range
+     rendered nothing (bug-bash 2026-08-18 F4).
+     Repeat the cycle until the table covers `now` (capped, so a corrupt input
+     cannot spin). Charts whose first cycle already reaches today — every birth from
+     ~1910 on, i.e. nearly every real chart — get exactly the nine rows they always
+     had; `cycle` is 0 on all of them. */
+  const MAX_CYCLES = 4;                       // 480 years: covers 1800 births comfortably
   const dashas = [];
   let cursor = birthMs;
-  for (let i = 0; i < 9; i++) {
-    const [lord, yrs] = DASHA_SEQ[(startSeq + i) % 9];
-    const span = (i === 0 ? (1 - frac) * yrs : yrs) * YEAR;
-    dashas.push({ lord, yrs, start: cursor, end: cursor + span, balance: i === 0 ? (1 - frac) * yrs : yrs });
-    cursor += span;
+  for (let cyc = 0; cyc < MAX_CYCLES; cyc++) {
+    for (let i = 0; i < 9; i++) {
+      const [lord, yrs] = DASHA_SEQ[(startSeq + i) % 9];
+      const partial = cyc === 0 && i === 0;
+      const span = (partial ? (1 - frac) * yrs : yrs) * YEAR;
+      dashas.push({ lord, yrs, cycle: cyc, start: cursor, end: cursor + span, balance: partial ? (1 - frac) * yrs : yrs });
+      cursor += span;
+    }
+    if (cursor > now) break;
   }
-  const now = Date.now();
   const current = dashas.find((dsh) => now >= dsh.start && now < dsh.end);
+  /* If `current` is still absent the reason is no longer "the table ran out": it is
+     that the native has not been born yet (a chart cast for a future birth date,
+     which the 1800–2150 input range permits). Say so in words rather than rendering
+     an empty panel — AGENTS.md: silent failure is unacceptable. */
+  const dashaStatus = current
+    ? { ok: true, reason: null, en: null, hi: null }
+    : now < birthMs
+      ? {
+        ok: false,
+        reason: "birth-in-future",
+        en: "This birth date is in the future, so no Vimshottari period is running yet. The table below starts at birth.",
+        hi: "यह जन्म-तिथि भविष्य में है, इसलिए अभी कोई विंशोत्तरी दशा नहीं चल रही। नीचे की तालिका जन्म से आरम्भ होती है।",
+      }
+      : {
+        ok: false,
+        reason: "outside-timeline",
+        en: "The Vimshottari timeline for this chart does not reach today, so no current period can be shown.",
+        hi: "इस कुंडली की विंशोत्तरी समय-रेखा आज तक नहीं पहुँचती, इसलिए वर्तमान दशा नहीं दिखाई जा सकती।",
+      };
   let antars = [], curAntar = null, pratyantars = [], curPratya = null,
-      sookshmas = [], curSookshma = null, pranas = [], curPrana = null;
+      sookshmas = [], curSookshma = null, pranas = [], curPrana = null,
+      antarsBeforeBirth = 0;
   if (current) {
-    // antardashas run the full lord-cycle proportionally across the FULL maha
+    // Antardashas run the full lord-cycle proportionally across the FULL maha
     // period; for a partial first dasha we back-compute the notional full start.
+    // That convention is right, but the resulting list may open before the native
+    // was born, so it is clipped to the birth instant on the way out and the
+    // wholly-prenatal periods are counted rather than silently deleted (F2).
     const fullStart = current.end - current.yrs * YEAR;
-    antars = vimSub(current.lord, fullStart, current.yrs * YEAR).filter((a) => a.end > birthMs);
+    antars = clipPeriods(vimSub(current.lord, fullStart, current.yrs * YEAR), birthMs);
+    antarsBeforeBirth = antars.droppedBeforeBirth || 0;
     curAntar = antars.find((a) => now >= a.start && now < a.end);
     if (curAntar) {
-      pratyantars = vimSub(curAntar.lord, curAntar.start, curAntar.end - curAntar.start);
+      // vimSubOf, not vimSub: sub-periods are always proportioned over the parent's
+      // TRUE span and then clipped, so a clipped antar does not shrink its children.
+      pratyantars = vimSubOf(curAntar);
       curPratya = pratyantars.find((p) => now >= p.start && now < p.end);
       if (curPratya) {
-        sookshmas = vimSub(curPratya.lord, curPratya.start, curPratya.end - curPratya.start);
+        sookshmas = vimSubOf(curPratya);
         curSookshma = sookshmas.find((s) => now >= s.start && now < s.end);
         if (curSookshma) {
-          pranas = vimSub(curSookshma.lord, curSookshma.start, curSookshma.end - curSookshma.start);
+          pranas = vimSubOf(curSookshma);
           curPrana = pranas.find((p) => now >= p.start && now < p.end);
         }
       }
@@ -203,7 +254,7 @@ function computeKundli({ y, m, day, hh, mi, tz, lat, lon, ayanamsa = "lahiri" })
     panchang: { weekday, tithiName, paksha, tithiNum, yoga: YOGAS[yogaIdx], nak: NAKSHATRAS[nakIdx], karana: karanaName(elong) },
     tz,
     birthMs: utcMs,
-    dashas, current, antars,
+    dashas, current, antars, antarsBeforeBirth, dashaStatus,
     curAntar, pratyantars, curPratya, sookshmas, curSookshma, pranas, curPrana,
     bnn: computeBNN(rows),
     moon: rows.find((r) => r.name === "Moon"),

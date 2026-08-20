@@ -2,7 +2,7 @@
 
 import React from "react";
 import { fmtDateT } from "./format";
-import { vimSub, DASHA_LEVELS } from "../engine/dasha";
+import { vimSubOf, DASHA_LEVELS } from "../engine/dasha";
 import { planetName } from "../i18n/panchang-terms";
 
 function DashaTree({ periods, level, now, openD, toggle, C, tz, lang = "en" }) {
@@ -15,7 +15,12 @@ function DashaTree({ periods, level, now, openD, toggle, C, tz, lang = "en" }) {
         const key = level + ":" + p.start;
         const open = openD.has(key);
         const canDrill = level < 3;
-        const kids = open && canDrill ? vimSub(p.lord, p.start, p.end - p.start) : null;
+        /* vimSubOf, not vimSub(p.lord, p.start, p.end - p.start): a period clipped to
+           the birth instant keeps its true span in fullStart/fullEnd, and its children
+           must be proportioned over THAT span and then clipped the same way. Using the
+           displayed start here re-proportioned the whole sub-tree over a shortened
+           period (bug-bash 2026-08-18 F2). */
+        const kids = open && canDrill ? vimSubOf(p) : null;
         return (
           <div key={p.start}>
             <div

@@ -118,6 +118,45 @@ function vimSub(startLord, startMs, durMs) {
   return out;
 }
 
+/* ---------------- birth clipping (bug-bash 2026-08-18 F2) ----------------
+   Vimshottari sub-periods of a *balance* mahadasha are proportioned over the
+   notional FULL span of that maha — the correct classical convention, and the one
+   this engine has always used. The consequence is that the first few sub-periods
+   of a balance maha elapsed before the native was born.
+
+   Rendering them verbatim put "Rahu antardasha from 17 Nov 2022" five lines under
+   "Rahu mahadasha from 29 Feb 2024" on the same card; dropping them outright
+   deleted three sub-periods with no marker. Neither is acceptable, so:
+
+   - a period that ended before birth is removed and COUNTED (`droppedBeforeBirth`),
+   - the period straddling the birth instant is clipped to it for display, keeping
+     its true span in `fullStart`/`fullEnd`,
+   - every surviving period carries `clippedFrom` so its own children are computed
+     over the TRUE parent span and then clipped the same way. Without that the
+     clipped antar's pratyantars would be proportioned over the shortened span and
+     silently wrong. */
+function clipPeriods(periods, fromMs) {
+  const out = [];
+  for (const x of periods) {
+    if (x.end <= fromMs) continue;
+    out.push(x.start < fromMs
+      ? { ...x, start: fromMs, fullStart: x.start, fullEnd: x.end, clippedFrom: fromMs }
+      : { ...x, clippedFrom: fromMs });
+  }
+  out.droppedBeforeBirth = periods.length - out.length;
+  return out;
+}
+
+/* Sub-periods of one period, always proportioned over its TRUE span and clipped
+   the same way the period itself was. Use this instead of calling `vimSub` with a
+   period's displayed start/end — that is what produced F2's pre-birth sub-tree. */
+function vimSubOf(p) {
+  const s = p.fullStart != null ? p.fullStart : p.start;
+  const e = p.fullEnd != null ? p.fullEnd : p.end;
+  const subs = vimSub(p.lord, s, e - s);
+  return p.clippedFrom != null ? clipPeriods(subs, p.clippedFrom) : subs;
+}
+
 /* ---------------- birth-time rectification: structural sweep + dasha anchors ----------------
    Reuses ascendantAt / vargaSign / subLordChain for the four time-sensitive markers, and
    rebuilds the Vimshottari Maha timeline per candidate time (the balance shifts ~2 days per
@@ -170,7 +209,7 @@ function runDashaAt(tl, eventMs) {
 
 export {
   DASHA_SEQ, VIM_LORDS, VIM_YEARS, DASHA_LEVELS, KP_PLANETS, WEEKDAY_LORDS,
-  nakLordOf, subLordChain, vimSub,
+  nakLordOf, subLordChain, vimSub, vimSubOf, clipPeriods,
   computeKPSignificators, computeRulingPlanets,
   rectAtMin, rectSweep, mahaTimelineAt, runDashaAt,
 };
