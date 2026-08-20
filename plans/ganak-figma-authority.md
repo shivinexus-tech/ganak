@@ -130,42 +130,34 @@ The full node inventory and historical approval dates live in
   canonical writer. It does not supersede shared components or approve unrelated
   layout changes.
 
-### 4.1 Approved Vrat botanical hero treatment
+### 4.1 Rejected historical Vrat floral crop; current replacement boundary
 
-**Owner decision durably recorded from the read-only specialist handoff on
-2026-08-18.** The approved choice is the **bright botanical editorial** direction,
-and its approval scope is the Vrat/Festival Guide **hero treatment only**.
+**Binding owner correction, 2026-08-19.** The earlier record calling `485:24` /
+`485:51` approved was wrong and is superseded. Exact asset node `485:51`, image hash
+`b7559c796e972db13b8aa54daba3a1405264f488`, every exact/cropped/derived
+presentation of it, and every name claiming “Hero floral stem / exact approved
+crop” are `REJECTED / ARCHIVE ONLY`.
 
-- Approved editable source: `485:24`
-- Source section: `485:22`
-- Botanical artwork node: `485:51`
-- Figma image hash: `b7559c796e972db13b8aa54daba3a1405264f488`
-- Official Vrat screens: A `357:4`, B `357:212`, C `357:419`, D `357:627`
-- Official hero nodes: A `357:117`, B `357:325`, C `357:532`, D `357:740`
-- Applied botanical instances: A `493:22`, B `495:22`, C `495:23`, D `495:24`
-- Approved instance geometry: `927.36 × 410.32`, bottom-left at `x=0`,
-  `y=35.68` — the owner-selected artwork reduced to 92% after review.
+- Historical section `485:22`, composition `485:24`, fixture section `357:2`, hero
+  nodes `357:117`, `357:325`, `357:532`, `357:740` and exact-hash instances
+  `493:22`, `495:22`, `495:23`, `495:24` are visibly relabelled rejected archive
+  evidence. They are not website sources.
+- Former shared component `760:21` and child `760:22` moved out of the active
+  library into archive section `778:2`; no lane may instantiate or cite them.
+- Active Figma enforcement denies node `485:51`, the exact hash above, descendant
+  lineage to either, and approval-name claims in any `APPROVED`, `OWNER REVIEW` or
+  `QA PASS` subtree. The post-correction whole-file sweep reports zero active reuse.
+- The broader rich, source-inspired botanical direction remains valid through the
+  nine separately owner-approved components in set `760:20`. Those assets have
+  distinct source lineage and hashes; they are not derivatives of `485:51`.
+- Batch 01 Vrat source `763:17139` and review clone `769:19148` now instantiate
+  `760:4` through linked instances `781:2` and `781:4`. No substitute crop, trace,
+  recolour or resize of `485:51` was created.
 
-The treatment uses a white/pale-blue-white shell, saturated deep navy,
-burgundy/crimson, luminous clean gold and restrained blue/green support. The floral
-sweep grows from the left/bottom-left; mapped deity artwork occupies the right with a
-thin gold edge. Ornament is structural and varies by purpose; the exact textile
-border or flower cluster is not pasted onto every screen.
-
-**Decision state:** `485:24` is `APPROVED` as a visual-treatment source. This does
-not approve the generated/raster source as a production website asset, nor does it
-approve the parent A–D screen layouts, copy or data. Those frames remain
-`OWNER REVIEW` until their canonical engine fixtures, shared-component linkage,
-EN/HI and responsive evidence pass the migration contract. In particular, sparse D
-must retain Follow even when artwork collapses, and its current Follow omission is
-not an approved exception.
-
-Specialist task `01a00933-7378-7331-a468-574b8e9cd62c` explicitly stopped writing to
-the official Vrat nodes and shared system before handing them over. Under the later
-parallel-lane decision, that task may now write only inside `WORKBENCH B · Festivals
-+ Vrat`; it remains read-only for these official nodes, approved sources and every
-shared component/variable/style. The canonical integrator owns every mutation and
-propagation outside that isolated workbench.
+This correction changes the asset authority only. It does not authorize unrelated
+screen, content, hierarchy or interaction changes. Historical art remains visible
+only under clearly labelled rejected/archive ancestors so the failure cannot be
+forgotten or accidentally promoted again.
 
 ## 5. Rejected and non-authoritative sources
 
@@ -240,10 +232,11 @@ decisions: Today/Panchang desktop EN and Festival/Vrat detail desktop EN. Each h
 390px EN companion only to prove responsive mobile-web reflow; the 390px frame is not
 a second design direction and is not Ganak Phone/native work. Hindi and 320px frames
 also remain mandatory attached QA evidence, but none are additional visual decisions
-for the owner. Only exact-node independent-QA `PASS` candidates may enter the
-integrator-owned review surface, now named
-`OWNER REVIEW · WEBSITE BASELINE · TODAY + VRAT`; failed, experimental,
-parked-phone and production-interaction `CHANGES REQUESTED` work stays outside it.
+for the owner. Only exact-node independent-QA `PASS` candidates may enter an
+integrator-owned owner-review surface. Batch 01 section `769:17254` passed its
+independent P0 re-QA on 2026-08-19 and is now `OWNER REVIEW · BATCH 01 · 12-SCREEN
+QUALITY CHECKPOINT` for visual-direction review only. Former baseline `652:13736`
+remains `CHANGES REQUESTED` historical evidence and is not review authority.
 
 The responsive shared system above was created before lane resumption. Its linked
 EN/HI 390px proof has no text below 13px, no mapped target below 42px, no missing
@@ -251,23 +244,24 @@ font, no prohibited Phone/native instance, and a measured minimum text contrast 
 5.3:1. Lane A and Lane B must instantiate these variants; a local redraw, detached
 copy or scaled desktop shell is not acceptable evidence of shared lineage.
 
-**Visual-direction review batch created 2026-08-19.** Independent QA passed the
-visual-direction and accessibility gate on the exact primary source pairs after the
-last contrast corrections. The integrator therefore created section `652:13736`, now
-named `OWNER REVIEW · WEBSITE BASELINE · TODAY + VRAT`, containing only:
+**Historical visual-direction review batch created 2026-08-19.** Independent QA
+previously passed the exact primary pairs, but that PASS is withdrawn by the later
+binding asset correction. Section `652:13736` retains these four evidence frames:
 
 - Today/Panchang desktop EN `652:13737` <- candidate `601:9563`;
 - Today/Panchang 390px EN `652:13989` <- candidate `601:8508`;
 - Festival/Vrat detail desktop EN `652:14035` <- candidate `535:7265`;
 - Festival/Vrat detail 390px EN `652:14120` <- candidate `544:8016`.
 
-The desktop frames are the two owner visual-direction decisions. The 390px frames are
-responsive-website QA companions only. On 2026-08-19 the owner rejected the minimal
-vertical floral edge and detached lower-right ornament inside the ordinary-Today
-panel, then clarified that both must be replaced rather than merely removed. The next
-direct paste of Vrat botanical sweep `485:51` was also rejected: `485:51` is the
-Festival/Vrat hero source, not the whole Ganak ornament vocabulary and not a universal
-replacement.
+The desktop frames were the two owner visual-direction decisions and the 390px frames
+were responsive-website QA companions only. Their `OWNER REVIEW` status is now
+withdrawn by the binding `485:51` rejection: section `652:13736`, desktop Vrat
+`652:14035` and responsive Vrat `652:14120` are `CHANGES REQUESTED`, and exact-hash
+children `652:14062` / `652:14131` are hidden archive evidence. On 2026-08-19 the
+owner also rejected the minimal vertical floral edge and detached lower-right
+ornament inside the ordinary-Today panel. The later direct paste of `485:51` was not
+merely a cross-archetype mistake; the exact asset itself is now canonically rejected
+under `REJ-016` / `GDF-062`.
 
 The subsequent textile-bookplate correction was also rejected by the owner as an
 invented composition that did not match the already-created vocabulary. Its nodes
@@ -282,12 +276,11 @@ approved screen or a new design direction. Do not apply any one treatment to Tod
 without a job-specific decision; the recovery exists to prevent another invented or
 single-asset substitution.
 
-This is not production-readiness approval. The source candidates remain
-`CHANGES REQUESTED` for interaction implementation: several current Figma reactions
-target internal prototype nodes or routes that do not yet exist in the production
-router. Owner review of `652:13736` approves or rejects visual direction only; route,
-state-preservation and interaction acceptance stay open under `GDF-009`, `GDF-011`,
-`GDF-025` and `GDF-047`.
+This is not production-readiness or current visual approval. The source candidates
+remain `CHANGES REQUESTED`: exact asset and surface enforcement must pass independent
+re-QA, and several reactions still target internal prototype nodes or routes that do
+not exist in the production router. Route, state-preservation and interaction
+acceptance also stay open under `GDF-009`, `GDF-011`, `GDF-025` and `GDF-047`.
 
 **Binding owner correction, 2026-08-19.** Most of the four-frame baseline is
 approved/acceptable and its composition, content, hierarchy and responsive behavior
@@ -303,6 +296,17 @@ are frozen. Two recurrent defects alone were corrected:
    `#ECF4F7`. This was a targeted correction, not a rule to make every surface pale
    blue. Navy, crimson, gold, botanical art and purposeful source-derived colour
    relationships were not changed.
+
+**P0 surface enforcement, 2026-08-19.** A later Batch 01 audit found the same drift
+again as full-opacity dominant UI fills: `#F9FAF9` canvas, `#FCFBF8` header,
+`#FFFDFC` card/panel/input and `#FAF9F4` Today hero. These four values are denied
+when used by a canvas/page/header/card/panel/context/breadcrumb/footer/input/hero or
+empty-region role, or when a filled area is at least 2% of its root screen. Small
+warm rules, strokes, icons and artwork remain permitted only with an explicit role.
+The shared context fields `206:108`, `206:115`, `274:690`, `552:61`, `552:68` and
+`552:86` were corrected upstream to `#FFFFFF`; all twelve Batch 01 sources and
+clones were then refreshed to canvas `#F9FCFD`, surface `#FFFFFF` and secondary
+`#ECF4F7`. The exact post-fix source/clone sweep reports zero denied fills.
 
 The rejected mark and palette drift are recorded as `REJ-014` and `REJ-004` in the
 canonical rejection log and as `GDF-057` / `GDF-012` in the regression ledger.
@@ -334,9 +338,12 @@ The minimum stable shared library is section `753:2` on components page `38:3`:
 - cross-site structural-border component set `759:20`, variants `757:6`, `759:2`,
   `759:4`, `759:6`, `759:8`, `759:10`, `759:12`, `759:14`, `759:16`, `759:18`;
 - approved floral-vocabulary set `760:20`, variants `760:2`, `760:4`, `760:6`,
-  `760:8`, `760:10`, `760:12`, `760:14`, `760:16`, `760:18`; and
-- Festival/Vrat-only celebratory hero sweep `760:21`, preserving exact source
-  `485:51` and approved hero composition `485:24`.
+  `760:8`, `760:10`, `760:12`, `760:14`, `760:16`, `760:18`.
+
+Former component `760:21` is **not** part of the active library. It and child
+`760:22` are rejected historical evidence under archive section `778:2` because
+they preserve exact rejected asset `485:51` / hash
+`b7559c796e972db13b8aa54daba3a1405264f488`.
 
 `Restrained` and `Rich` are contextual usage modes, not competing themes.
 `Celebratory` is reserved for Festival/Vrat heroes. `Balanced` remains rejected

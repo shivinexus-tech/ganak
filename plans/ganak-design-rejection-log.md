@@ -105,6 +105,10 @@ Evidence labels used below:
   `652:13786`, `652:13825`, `652:13918`, `652:13964`, `652:13979`,
   `652:14060`, `I652:14060;206:108`, `I652:14060;206:115`,
   `I652:14060;274:690` and `652:14092`.
+  The later Batch 01 P0 audit found exact full-opacity dominant surfaces:
+  `#F9FAF9` canvas, `#FCFBF8` header, `#FFFDFC` card/panel/input and `#FAF9F4`
+  hero across sources `762:*`, `730:*`, shared context `206:135` / `552:2` and
+  review clones `769:*`.
 - **Rejected:** dull ivory/cream wash as the dominant website atmosphere; muddy
   orangish gradients; unrelated generic palette substitutions; repeated ivory drift
   in headers, breadcrumbs, panels and footers.
@@ -117,8 +121,11 @@ Evidence labels used below:
   powder blue, botanical greens and other evidenced colours. Warmth and variety need
   a named role; they must not collapse into an aged beige wash.
 - **Prohibited reuse:** no dominant dull-ivory/cream atmosphere and no unrelated
-  generic palette substitution. Do not interpret this as a ban on every warm,
-  cream-adjacent, gold or botanical source colour.
+  generic palette substitution. Exact values `#F9FAF9`, `#FCFBF8`, `#FFFDFC` and
+  `#FAF9F4` are hard blockers for canvas/page/header/card/panel/context/breadcrumb/
+  footer/input/hero/empty-region roles, or a filled area ≥2% of its root. Do not
+  interpret this as a ban on small warm rules, strokes, icons, antique gold or
+  botanical artwork with explicit role evidence.
 - **Still approved / parked:** canvas `#F9FCFD`, surface `#FFFFFF` and secondary
   `#ECF4F7` are approved-safe bases. Source-derived navy, crimson/burgundy,
   luminous/antique gold, powder blue, botanical greens and other evidenced colours
@@ -126,9 +133,10 @@ Evidence labels used below:
   defined. Extraction alone is not approval. Board `707:14247` is the current owner
   review surface for those role and combination rules.
 - **Related rules:** `GDF-012`, `GDF-024`, `GDF-029`, `GDF-045`, `GDF-046`.
-- **Confidence / limitation:** high. The four current review frames now use exact
-  `#F9FCFD`, `#FFFFFF` and `#ECF4F7` surface roles where drift was found; the older
-  rejected experiment-to-colour node map remains TODO.
+- **Confidence / limitation:** high. Shared fields `206:108`, `206:115`, `274:690`,
+  `552:61`, `552:68`, `552:86`, all twelve Batch 01 source screens and all twelve
+  `769:17254` clones were corrected upstream; the exact post-fix sweep reports zero
+  denied values. The older rejected experiment-to-colour node map remains TODO.
 
 ### REJ-005 — Full invitation/card crop and mandatory deity frame
 
@@ -205,7 +213,7 @@ Evidence labels used below:
 - **Decision date / status:** 2026-08-19 · `REJECTED / HIDDEN`
 - **Track / scope:** Website · `PATTERN` boundary
 - **Figma / archive evidence:** hidden rejected node `666:14247`, parent
-  `652:13964`; source asset `485:51`; approved Vrat hero `485:24`.
+  `652:13964`; exact asset `485:51`; historical composition `485:24`.
 - **Rejected:** treating Vrat botanical asset `485:51` as the whole Ganak ornament
   system and pasting it directly into the ordinary Today card.
 - **Owner reason:** **Verbatim:** it looked “mindlessly placed,” “doesnt make any
@@ -216,9 +224,11 @@ Evidence labels used below:
   flowers/vines/lattice/border character.
 - **Prohibited reuse:** `485:51` is not a Today source and `666:14247` must remain
   hidden/rejected.
-- **Still approved / parked:** `485:24` and `485:51` remain approved for the
-  Festival/Vrat hero scope only; their rejection in Today does not revoke that.
-- **Related rules:** `GDF-019`, `GDF-040`, `GDF-054`, `GDF-056`.
+- **Still approved / parked:** this older cross-archetype lesson remains useful, but
+  the later owner correction supersedes its asset-scope exception: `485:24` /
+  `485:51` are now rejected archive evidence under `REJ-016`. The separately
+  approved nine-asset floral family `760:20` remains available by role.
+- **Related rules:** `GDF-019`, `GDF-040`, `GDF-054`, `GDF-056`, `GDF-062`.
 - **Confidence / limitation:** exact nodes and verbatim evidence; high.
 
 ### REJ-009 — Invented textile-bookplate Today correction
@@ -376,9 +386,41 @@ Evidence labels used below:
 - **Still approved / liked / exploratory:** the owner subsequently approved
   `Restrained` and `Rich` as contextual usage modes—not reusable layouts or competing
   themes—and approved the nine isolatable artworks in `743:16083` as per-element
-  vocabulary. Approved botanical `485:51` remains Festival/Vrat-hero-only.
+  vocabulary. Exact asset `485:51` is separately rejected under `REJ-016`.
 - **Related rules:** `GDF-019`, `GDF-040`, `GDF-056`, `GDF-058`–`GDF-060`.
 - **Confidence / limitation:** exact owner decision and exact rejected node; high.
+
+### REJ-016 — Exact floral stem/crop `485:51` and false composition-to-asset approval
+
+- **Decision date / status:** 2026-08-19 · `REJECTED / ARCHIVE ONLY · MACHINE ENFORCED`
+- **Track / scope:** Website · `GLOBAL` asset and source authority
+- **Figma / archive evidence:** exact node `485:51`; image hash
+  `b7559c796e972db13b8aa54daba3a1405264f488`; containing composition `485:24`;
+  fixture instances `493:22`, `495:22`, `495:23`, `495:24`; former shared component
+  `760:21` / child `760:22`; baseline descendants `652:14062`, `652:14131`; Batch
+  descendant `769:19175`; all named “Hero floral stem / exact approved crop” nodes.
+  Historical source sections `485:22` and `357:2` are visibly rejected archive
+  evidence; component archive is `778:2`.
+- **Rejected:** the exact floral stem/crop, every exact/cropped/derived presentation,
+  and the inference that approval of a complete composition approves an extracted
+  asset. The prior canonical approval claim is withdrawn.
+- **Owner reason:** **Verbatim evidence:** the owner said this exact element had been
+  rejected repeatedly (“1000+ times”) and ordered propagation/QA stopped.
+- **Underlying ornament-language/design lesson:** composition approval and asset
+  approval are different decisions. A source image, crop or embedded artwork cannot
+  become reusable vocabulary by lineage inference, repetition, resizing or naming.
+- **Prohibited reuse:** no active `APPROVED`, `OWNER REVIEW` or `QA PASS` subtree may
+  contain the exact hash, node/derived lineage or an approval-name claim. Do not
+  resize, crop, recolour, trace or cite it as a quality control.
+- **Still approved / parked:** the broader desire for rich source-inspired botanical
+  art remains; the nine independently approved assets in `743:16083` / shared set
+  `760:20` remain usable by named role. Batch Vrat now uses unrelated component
+  `760:4` through linked instances `781:2` and `781:4`. Historical evidence remains
+  visible only under rejected/archive ancestors.
+- **Related rules:** `GDF-002`, `GDF-007`, `GDF-019`, `GDF-040`, `GDF-056`,
+  `GDF-060`, `GDF-062`.
+- **Confidence / limitation:** exact owner correction, exact node/hash/name sweep and
+  whole-file post-fix evidence; high. Post-fix active reuse is zero.
 
 ## Approved ornament-language boundary
 
@@ -401,14 +443,12 @@ swatches. The corrected ornament-origin reference is
 `7c9fc29a761eb7876c7eb18c473a834dddcff61e52aff679b6de70e2eace4222`); it is
 inspiration/source evidence, not a website asset or blanket approval of every crop.
 The earlier `GanakPanchangApprovedWebsite.png` is superseded for ornament-origin
-recovery. Figma locked reference `31:2` remains appearance evidence only. Vrat hero
-source `485:24` / botanical node `485:51` remains a separately scoped approval and
-is not a universal ornament source. Compact board `707:14247` records guardrails;
-expanded owner-review section `743:16083` shows nine real isolatable
-artworks now approved as per-element vocabulary beside `485:51` as the Vrat-only
-approved quality control. Cross-site structural borders are shared set `759:20`;
-the floral vocabulary is shared set `760:20`; exact Vrat celebratory sweep component
-`760:21` preserves source `485:51`. Ornate architectural pieces remain
+recovery. Figma locked reference `31:2` remains appearance evidence only. Compact
+board `707:14247` records guardrails; expanded section `743:16083` contains the nine
+independently approved isolatable artworks. Exact crop `485:51`, composition
+`485:24` and former component `760:21` are rejected historical evidence and are not
+quality controls. Cross-site structural borders are shared set `759:20`; the active
+floral vocabulary is shared set `760:20`. Ornate architectural pieces remain
 Festival/Vrat-only, while full invitation framing and universal border repetition
 remain prohibited.
 
@@ -422,17 +462,20 @@ remain prohibited.
 | Today special / ordinary | `104:49`, `116:49` | Approved editable website archetypes for their exact states. |
 | Festivals discovery | `135:50`, `135:254`, `135:662` | Default list A, Calendar B, returning personalised D. |
 | Festival detail | `135:866`, `135:1089`, `135:1312` | General, story and vrat intent templates. |
-| Vrat hero treatment | `485:24`; asset `485:51` | Approved only for Festival/Vrat hero composition. |
+| Historical rejected Vrat crop/composition | `485:24`; asset `485:51`; archive `778:2` | Rejected/archive-only; never active authority. Use separately approved `760:20` variants by role. |
 | Shared date context/footer | `206:135`, `552:2`, footer set `349:14` | Desktop website shared sources. |
 | Responsive website system | headers `588:204`/`590:268`; context `584:116`/`587:116`; footer `591:161`/`592:161`; Quick Access `593:174`/`594:174` | Website-responsive components; not Ganak Phone. |
 
 ### Current visual baseline review
 
-Verified on 2026-08-19: section `652:13736` contains exactly four direct children,
-with no rejected bookplate node present and all retained rejected ornament nodes
-hidden. The binding correction also removed the Shashthi mark and corrected only
-confirmed dull-ivory drift to approved-safe white/pale-blue bases without changing
-purposeful source colour, content, hierarchy or responsive behavior.
+Section `652:13736` retains exactly four direct children as historical baseline
+evidence, but it is now `CHANGES REQUESTED`. Exact rejected hash descendants
+`652:14062` and `652:14131` are hidden and the Vrat frames are no longer owner-review
+authority. Batch section `769:17254` returned to `OWNER REVIEW` only after independent
+QA confirmed both machine gates on 2026-08-19. Its twelve sources/clones and shared
+context were corrected from denied dominant values `#F9FAF9`, `#FCFBF8`, `#FFFDFC`,
+`#FAF9F4`; its Vrat screen uses unrelated approved component `760:4`, not `485:51`.
+Whole-file active rejected-hash and prohibited approval-name hits are zero.
 
 | Role | Review node | Source candidate |
 |---|---:|---:|
@@ -441,7 +484,7 @@ purposeful source colour, content, hierarchy or responsive behavior.
 | Festival/Vrat desktop website | `652:14035` | `535:7265` |
 | Festival/Vrat responsive website QA companion | `652:14120` | `544:8016` |
 
-Section name: `OWNER REVIEW · WEBSITE BASELINE · TODAY + VRAT`.
+Current section name: `CHANGES REQUESTED · WEBSITE BASELINE · P0 REJECTED FLORAL REMOVED`.
 
 ### Rejected and removed inventory
 
@@ -462,8 +505,8 @@ Section name: `OWNER REVIEW · WEBSITE BASELINE · TODAY + VRAT`.
 
 ### Current missing decisions / TODO
 
-1. Owner yes/changes on compact visual-vocabulary section `707:14247` before broader
-   family propagation.
+1. Independent exact-node re-QA must pass `GDF-012` and `GDF-062` before any current
+   pilot section returns to owner review.
 2. The correct ordinary-Today ornament replacement remains parked; do not infer
    approval from archive `682:22` and do not reopen it during vocabulary review.
 3. Muhurat grouped-list replacement accent remains unresolved.
