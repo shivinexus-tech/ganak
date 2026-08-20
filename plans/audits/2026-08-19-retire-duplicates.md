@@ -254,3 +254,121 @@ as shipped:
   [4] ascendant arctangent written out in PrashnaScreen.tsx: 1 time(s) (must be exactly 1)
   ✓ prashna-high-latitude: 6445 passed, 0 failed
 ```
+
+---
+
+## Item 3 — the five speed estimators: 5 → 4
+
+### What was being calculated five times
+
+"How fast is this planet moving, and is it going backwards" — the retrograde ℞ flag. The August
+bug-bash defect was exactly this: one of the copies measured motion over the *preceding* twelve hours
+instead of the twelve hours *centred* on the moment, so the chart printed ℞ next to a planet Ganak's
+own planet calendar called direct, for about six hours after every station.
+
+### What was retired
+
+`src/engine/gochar.ts` held a character-for-character copy of the centred estimator. It now calls
+one shared function. `planet-calendar.ts` gained `centredDailyMotion(f, ms)` — generic in the
+longitude function, because gochar needs the same quantity for the lunar nodes, whose longitude is a
+mean expression rather than a table lookup — and `planetSpeed(name, ms)` is now defined in terms of
+it. Same arithmetic, one place.
+
+```
+XS-DUP-SPEED  [measured 4, pinned 4]     (was 5)
+```
+
+Byte-identical: the gochar timeline, the planet calendar, all 1914 gazetteer charts and all 34176
+grid charts are unchanged.
+
+### The three that remain, and why this lane could not take them
+
+**All three are outside this lane's file scope**, which is a real limit on this item rather than a
+judgement that they are fine. They are now named in the pin itself, in priority order:
+
+1. **`src/engine/kundli.ts`** — Shadbala's Cheshta Bala input, the **backward-and-tropical** one. This
+   is the live risk: the same shape of estimator that caused the August defect, still shipping on the
+   same chart object beside a retrograde flag computed the other way. It feeds a *score* rather than a
+   stated ℞ flag, so no reader currently sees two answers — but nothing prevents that. `kundli.ts` is
+   on this lane's do-not-touch list.
+2. **`src/engine/panchang.ts`** `upcomingEvents` — its own centred copy, algebraically identical
+   today, so a drift risk rather than a defect. Also do-not-touch.
+3. **`src/screens/PrashnaScreen.tsx`** `PR_speed` — **may be legitimate.** It reads Prashna's own
+   ephemeris and its own KP-New ayanamsa, and it sits *inside* the parity-frozen markers, where the
+   region has to stay plain import-free JS. Merging it means deciding whether Prashna should share the
+   main ephemeris at all — a product/architecture call, not a dedupe.
+
+---
+
+## Item 4 — the 23 duplicated literal tables: 23 → 21
+
+Two retired, four proven **not** to be defects and annotated in place, the rest named in the pin.
+
+### Retired
+
+| table | was | now |
+|---|---|---|
+| the two-letter sign abbreviations `["Ar","Ta",…]` | `src/data/chart-divisions.ts` + `src/i18n/panchang-terms.ts` | chart-divisions re-exports `SIGN_SHORT_EN`; i18n is the one source of truth, which is what `language-leak-scan.cjs` exists to protect |
+| the four Chhath day-keys | `src/data/festival-pages.ts` + `src/engine/chhath.ts` | festival-pages imports `CHHATH_KEYS` from the engine that computes those four days |
+
+### Checked and deliberately NOT merged — each carries a comment saying why
+
+This is the part the brief asked for explicitly, after an earlier lane nearly flattened a real
+regional difference by merging two lists that only looked identical.
+
+- **The Tamil and Bengali month-name series** (`src/data/regional-calendar-evidence.ts` vs
+  `src/engine/calendar-conventions.ts`) — **duplicated on purpose.** The evidence file is the
+  *published source* the regional-calendar gates check the implementation against;
+  `validation/regional-calendar-modes.cjs` and `validation/malayalam-kollavarsham.cjs` both load it as
+  `evidence`. Merging them would make those gates compare Ganak to a copy of Ganak — the exact pattern
+  AGENTS.md forbids. Two of the 21.
+- **`[2,5,8,11]`** (`navratri.ts` vs `shadbala.ts`) — **not the same quantity.** In navratri these are
+  *zero-indexed sign* indices: Mithuna, Kanya, Dhanu, Meena, the four dual rashis. In shadbala they
+  are *one-indexed house* numbers, the panaphara houses scoring 30 in Kendradi Bala. Same four digits,
+  two different indexing bases. Merging would have been a real defect.
+- **`[c11,c12,c2,c3]`** (`houses.ts` vs `PrashnaScreen.tsx`) — **a detector artefact.** Both are a
+  null-check over four local *variables* that happen to share names. There is no table.
+
+**So this count can never reach zero: four of the 21 are non-defects.** That is now stated in the pin
+so a future lane does not chase them.
+
+### Named, still open, not taken here
+
+The 27 Latin nakshatra names (panchang.ts + i18n), the Gregorian and Hindi month names (three screens
++ birth-input.ts), the weekday names in both scripts (muhurat.ts + i18n), the Manglik house set
+`[1,2,4,7,8,12]` (doshas.ts + mangal-dosha.ts + matching.ts), and the graha name lists (up to seven
+modules each) — every one of these has at least one copy in a file on this lane's do-not-touch list
+(`panchang.ts`, `kundli.ts`, `muhurat.ts`, `dasha.ts`, `matching.ts`, or `src/screens/`), so retiring
+them needs a lane that owns those files.
+
+One is a genuine open reconciliation rather than a mechanical move: the **travel choghadiya set**
+(`src/data/muhurat-ui.ts` + `src/engine/muhurat.ts`). The two tables are keyed differently — this one
+carries puja/housewarming/wedding, the engine carries document/property/vehicle — and the orderings
+differ where they overlap, so a mechanical merge would change what the Daily events picker shows.
+Annotated at the site; `muhurat.ts` is out of scope.
+
+```
+XS-DUP-TABLES  [measured 21, pinned 21]  (was 23)
+```
+
+### Gates for items 3 and 4
+
+```
+cross-surface-consistency.cjs   PASS   (both pins re-measured and re-pinned, gate exit 0)
+language-leak-scan.cjs          PASS
+festival-page-coverage.cjs      PASS
+festival-deeplinks.cjs          PASS
+route-reachability.cjs          PASS
+regional-calendar-modes.cjs     PASS
+malayalam-kollavarsham.cjs      PASS
+npm run build                   ✓ built in 1.57s
+```
+
+All four dumps re-run after items 3 and 4 together:
+
+```
+GAZETTEER (1914 charts)            IDENTICAL — byte for byte
+DENSE GRID (34176 charts)          IDENTICAL — byte for byte
+NEIGHBOURING SURFACES (895 lines)  IDENTICAL — byte for byte
+PRASHNA both modes (10079 lines)   IDENTICAL — byte for byte
+```

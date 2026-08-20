@@ -934,18 +934,49 @@ const RENDERED = (() => {
     id: 'XS-DUP-TABLES',
     section: '§10 duplicates',
     title: 'literal tables typed out in more than one module',
-    expect: 23,
+    expect: 21,
     measure: dupTables.length,
-    resolve: 'move each table to one module and import it. When the count drops, lower this number; it must never rise. Notable members: the 27 Latin nakshatra names (engine + i18n), the Gregorian month names (three screens), the weekday names (muhurat.ts + i18n), and the Manglik house set [1,2,4,7,8,12] (doshas.ts + mangal-dosha.ts + matching.ts)',
+    resolve: 'move each table to one module and import it. When the count drops, lower this number; it must never rise. '
+      + 'Was 23 until 2026-08-19, when the dedupe lane retired two: the two-letter sign abbreviations '
+      + '(src/data/chart-divisions.ts now re-exports SIGN_SHORT_EN from src/i18n/panchang-terms.ts) and the four '
+      + 'Chhath day-keys (src/data/festival-pages.ts now imports CHHATH_KEYS from src/engine/chhath.ts). '
+      + 'STILL OPEN and genuinely duplicated: the 27 Latin nakshatra names (panchang.ts + i18n), the Gregorian month '
+      + 'names (three screens + birth-input.ts), the Hindi month names (two screens), the weekday names in both '
+      + 'scripts (muhurat.ts + i18n), the Manglik house set [1,2,4,7,8,12] (doshas.ts + mangal-dosha.ts + matching.ts), '
+      + 'the graha name lists (up to seven modules each), and the travel choghadiya set (muhurat-ui.ts + muhurat.ts, '
+      + 'which is keyed differently on the two sides so it needs reconciling, not a mechanical merge). '
+      + 'FOUR OF THE 21 ARE NOT DEFECTS and this count can therefore never reach zero — do not chase them: '
+      + '(a) the Tamil and (b) the Bengali month-name series are duplicated ON PURPOSE between '
+      + 'src/data/regional-calendar-evidence.ts and src/engine/calendar-conventions.ts, because the evidence file is '
+      + 'the published source the regional-calendar gates check the implementation against, and merging them would '
+      + 'make those gates compare Ganak to a copy of Ganak; (c) [2,5,8,11] is zero-indexed SIGN indices in '
+      + 'navratri.ts and one-indexed HOUSE numbers in shadbala.ts, two unrelated quantities; (d) [c11,c12,c2,c3] is a '
+      + 'null-check over local variable names in houses.ts and PrashnaScreen.tsx, a detector artefact with no shared '
+      + 'data. Each of the four carries a comment at its site saying so',
     evidence: dupTables.map((s) => '  ' + s),
   });
   pin({
     id: 'XS-DUP-SPEED',
     section: '§10 duplicates',
     title: 'separate implementations of "how fast is this planet moving"',
-    expect: 5,
+    expect: 4,
     measure: speedCopies.length,
-    resolve: 'planet-calendar.ts planetSpeed is the one definition — computeKundli already imports it. Point gochar.ts, panchang.ts upcomingEvents and PrashnaScreen.tsx PR_speed at it, and give Shadbala the same sidereal centred value instead of its tropical backward one. Then lower this number',
+    resolve: 'src/engine/planet-calendar.ts is the one definition: centredDailyMotion(f, ms) for any longitude '
+      + 'function, and planetSpeed(name, ms) for a named graha. computeKundli already imports planetSpeed. '
+      + 'Was 5 until 2026-08-19, when the dedupe lane retired gochar.ts\'s character-for-character copy — it now '
+      + 'calls centredDailyMotion, and the gochar timeline, the planet calendar and the chart were proven '
+      + 'byte-identical before and after. THREE REMAIN, all outside that lane\'s file scope, in priority order: '
+      + '(1) src/engine/kundli.ts Shadbala\'s Cheshta Bala input is a BACKWARD difference on TROPICAL longitudes — '
+      + 'the exact shape of the August retrograde defect, still shipping on the same chart object as rows[].retro '
+      + 'computed the other way. It feeds a score rather than a stated retrograde flag, so no reader sees two '
+      + 'answers TODAY, but nothing stops that; give it the same sidereal centred value. '
+      + '(2) src/engine/panchang.ts upcomingEvents has its own centred copy — algebraically identical today, so it '
+      + 'is a drift risk rather than a live defect; point it at centredDailyMotion. '
+      + '(3) src/screens/PrashnaScreen.tsx PR_speed is NOT straightforwardly mergeable and may be legitimate: it '
+      + 'reads Prashna\'s own ephemeris and its own KP-New ayanamsa, and it sits INSIDE the parity-frozen engine '
+      + 'markers, where the region must stay plain import-free JS for validation/prashna-parity.js. Reconciling it '
+      + 'means deciding whether Prashna should share the main ephemeris at all — a bigger call than dedupe. '
+      + 'Then lower this number',
     evidence: speedCopies.map((s) => '  ' + s).concat([
       '  The August retrograde defect was exactly this: one of these copies used a backward difference and the chart',
       '  disagreed with the planet calendar for six hours after every station. It was fixed by DELETING the copy.',

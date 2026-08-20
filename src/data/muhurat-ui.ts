@@ -21,6 +21,16 @@ const PANCHAKA_NAME = { shubha: { en: "Panchaka Rahita", hi: "पञ्चक �
 const PANCHAKA_SHORT = { shubha: { en: "Shubha", hi: "शुभ" }, mrityu: { en: "Mrityu", hi: "मृत्यु" }, agni: { en: "Agni", hi: "अग्नि" }, raja: { en: "Raja", hi: "राज" }, chora: { en: "Chora", hi: "चोर" }, roga: { en: "Roga", hi: "रोग" } };
 const PANCHAKA_GLOSS = { shubha: { en: "auspicious — free of blemish", hi: "शुभ — दोषरहित" }, mrityu: { en: "avoid — risk to life", hi: "टालें — प्राण जोखिम" }, agni: { en: "avoid — fire risk", hi: "टालें — अग्नि भय" }, raja: { en: "caution — authority/government", hi: "सावधानी — सत्ता" }, chora: { en: "avoid — theft risk", hi: "टालें — चोरी भय" }, roga: { en: "avoid — illness risk", hi: "टालें — रोग भय" } };
 
+/* The `good` choghadiya lists below overlap src/engine/muhurat.ts
+   ACTIVITY_CHOGHADIYA, and the travel row is literally identical. NOT merged
+   here, and this is a real open item rather than a false positive: the two
+   tables are keyed differently (this one carries puja / housewarming / wedding,
+   which the engine table does not, and the engine carries document / property /
+   vehicle, which this one does not) and the orderings differ where they overlap,
+   so a mechanical merge would change what the Daily events picker shows.
+   src/engine/muhurat.ts is outside this lane's file scope, so the reconciliation
+   — one keyed table, engine-owned, this file importing it — was not attempted.
+   Recorded 2026-08-19 (dedupe lane); see plans/audits/2026-08-19-retire-duplicates.md. */
 const EVENTS = [
   { key: "purchase", en: "New purchase", hi: "नई खरीद", good: ["labh", "amrit", "shubh"] },
   { key: "venture", en: "New venture / business", hi: "नया व्यवसाय", good: ["labh", "amrit", "shubh"] },

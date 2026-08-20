@@ -5,10 +5,14 @@
 import { FEST_META, FEST_NAME, OBS_META, OBS_NAME } from "./festival-meta";
 import { VRAT_VIDHI } from "./vrat-vidhis";
 import { NAVADURGA_PAGE_ENTRIES } from "./navadurga-pages";
+import { CHHATH_KEYS } from "../engine/chhath";
 
-const CHHATH_SHARED_KEYS = Object.freeze([
-  "chhathNahayKhay", "chhathKharna", "chhath", "chhathUshaArghya",
-]);
+/* The four Chhath day-keys are NOT typed out again here. src/engine/chhath.ts
+   owns them (CHHATH_KEYS) because it computes the four days' timings; this
+   registry only needs to know which keys share one page. A second copy is how
+   a fifth day, or a renamed key, reaches the engine and never reaches the route
+   table. (Retired as a duplicate 2026-08-19.) */
+const CHHATH_SHARED_KEYS = CHHATH_KEYS;
 
 const DEFERRED_MULTI_DAY_KEYS = Object.freeze([]);
 

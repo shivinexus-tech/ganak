@@ -16,6 +16,12 @@ import {
 
 const DAY = 86400000;
 const MINUTE = 60000;
+/* NOT a duplicate of src/engine/shadbala.ts:96, which also reads [2, 5, 8, 11].
+   These are ZERO-INDEXED SIGN indices — Mithuna, Kanya, Dhanu, Meena, the four
+   dual (dvisvabhava) rashis. Shadbala's are ONE-INDEXED HOUSE numbers, the
+   panaphara houses that score 30 in Kendradi Bala. Same four digits, two
+   unrelated quantities on two different indexing bases; merging them would be a
+   real defect, not a cleanup. Checked 2026-08-19 (dedupe lane). */
 const DUAL_SIGNS = new Set([2, 5, 8, 11]); // Mithuna, Kanya, Dhanu, Meena
 
 /* Navratri is a Lahiri-only surface (project invariant). Binding the accessors

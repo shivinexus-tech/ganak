@@ -5,6 +5,16 @@
  * Panchang (New Delhi/IST). The two month-start series are independently
  * published as complete daily calendars by Drik Panchang and Prokerala / the
  * cited native-calendar sources in plans/regional-calendar-source-register.md.
+ *
+ * DELIBERATELY DUPLICATED — DO NOT MERGE WITH src/engine/calendar-conventions.ts.
+ * The duplicate-table scan pairs the Tamil and Bengali month-name series here
+ * with the implementation's own copies. That pairing is the whole point: this
+ * file is the PUBLISHED SOURCE the gates check the implementation against
+ * (validation/regional-calendar-modes.cjs, validation/malayalam-kollavarsham.cjs
+ * both load it as `evidence`). Importing the implementation's names here would
+ * make those gates compare Ganak to a copy of Ganak — the exact pattern
+ * AGENTS.md forbids, and the one that let three defects survive for months.
+ * Checked 2026-08-19 (dedupe lane); left as two copies on purpose.
  */
 
 export const PUBLISHED_2026_SANKRANTI_UTC=[

@@ -1,5 +1,7 @@
 /* Shodasha varga catalog + special chart themes (SPLIT-UI-CHART-01c). */
 
+import { SIGN_SHORT_EN } from "../i18n/panchang-terms";
+
 /* ---------------- shodasavarga: the 16 divisional charts ---------------- */
 const VARGAS = [
   { k: "D1", name: "Rasi", theme: "body, self & life as a whole" },
@@ -31,7 +33,13 @@ const SPECIAL_CHARTS = [
   { k: "KARAK", name: "Karakamsa", theme: "Jaimini swamsa — the navamsa seen from the Atmakaraka" },
 ];
 
-const SIGN_SHORT = ["Ar", "Ta", "Ge", "Cn", "Le", "Vi", "Li", "Sc", "Sg", "Cp", "Aq", "Pi"];
+/* The two-letter sign abbreviations are NOT typed out here. They are the same
+   twelve strings the rest of the app renders, and `validation/language-leak-scan.cjs`
+   exists because rashi/nakshatra/graha names drifting between modules is a real
+   defect class in this repo. src/i18n/panchang-terms.ts is the one source of
+   truth; this is a re-export so the varga grid and every other surface cannot
+   disagree about what "Cn" is. (Retired as a duplicate 2026-08-19.) */
+const SIGN_SHORT = SIGN_SHORT_EN;
 
 const PLANET_GLYPH = { Sun: "Su", Moon: "Mo", Mars: "Ma", Mercury: "Me", Jupiter: "Ju", Venus: "Ve", Saturn: "Sa", Rahu: "Ra", Ketu: "Ke" };
 

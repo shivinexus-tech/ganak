@@ -36,6 +36,10 @@ function placidusCusps(RAMC, eps, phi) {
   const c12 = solve((AD) => RAMC + 2 * (90 + AD) / 3, rev(RAMC + 60));
   const c2 = solve((AD) => RAMC + 180 - 2 * (90 - AD) / 3, rev(RAMC + 120));
   const c3 = solve((AD) => RAMC + 180 - (90 - AD) / 3, rev(RAMC + 150));
+  /* The duplicate-table scan pairs this with src/screens/PrashnaScreen.tsx:175.
+     Both are a null-check over four LOCAL VARIABLES that happen to be named
+     c11/c12/c2/c3 — there is no shared data here at all, and nothing to merge.
+     A detector artefact, verified 2026-08-19 (dedupe lane). */
   const ok = [c11, c12, c2, c3].every((c) => c != null);
   const c = new Array(13).fill(null);
   c[10] = mc; c[1] = asc; c[4] = rev(mc + 180); c[7] = rev(asc + 180);

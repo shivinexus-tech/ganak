@@ -2,6 +2,7 @@
 
 import { rev } from "./ephemeris";
 import { jdOf, ayanAt, planetSidMs } from "./panchang";
+import { centredDailyMotion } from "./planet-calendar";
 
 /* ---- Gochar (transit) timeline for a planet: its sign-change sequence with durations & retro stations ---- */
 const PLANET_PERIOD_DAYS = { Sun: 400, Moon: 35, Mars: 760, Mercury: 400, Jupiter: 430, Venus: 400, Saturn: 1200, Rahu: 560, Ketu: 560 };
@@ -21,7 +22,12 @@ function signSeq(f, fromMs, spanDays, retroMotion) {
   const startSign = Math.floor(f(fromMs) / 30);
   seq.push({ sign: startSign, enter: null });
   let prevSign = startSign;
-  const speed = (ms) => (((f(ms + 43200000) - f(ms - 43200000) + 540) % 360) - 180);
+  /* The ONE centred ±12 h estimator, from planet-calendar.ts. This line used to
+     be a character-for-character copy of it. Retired 2026-08-19: the August
+     retrograde defect was a chart and a calendar disagreeing because one of five
+     copies of this expression used a backward difference, and it was fixed by
+     deleting the copy rather than by making the copies agree. */
+  const speed = (ms) => centredDailyMotion(f, ms);
   let pv = speed(fromMs);
   const stations = [];
   const step = 0.5; // half-day resolution
