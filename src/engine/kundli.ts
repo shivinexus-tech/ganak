@@ -1,13 +1,13 @@
 /* Birth-chart computation (SPLIT-UI-CHART-02). Modules-only copy; shell still has its own until wired. */
 
 import {
-  rev, sd, cdg, tdg, atan2d, tropicalLongitudes, ascendantAt, moonLon,
+  rev, sd, cdg, atan2d, tropicalLongitudes, ascendantAt, moonLon,
 } from "./ephemeris";
 import {
   ayanAt, SIGN_LORD, NAKSHATRAS, SIGNS,
   TITHIS, YOGAS, karanaName, sunEvents,
 } from "./panchang";
-import { placidusCusps } from "./houses";
+import { placidusCusps, risingDegree } from "./houses";
 import { vargaSign } from "./varga";
 import { computeAshtakavarga, computeArudhas, detectYogas, SEVEN } from "./classical";
 import { computeShadbala } from "./shadbala";
@@ -55,11 +55,16 @@ function computeKundli({ y, m, day, hh, mi, tz, lat, lon, ayanamsa = "lahiri" })
   bodies.Rahu.retro = true;
   bodies.Ketu.retro = true;
 
-  // ascendant
-  const gmst = rev(280.46061837 + 360.98564736629 * (JD - 2451545.0));
-  const ramc = rev(gmst + lon);
+  /* ascendant — the RISING degree, via the one definition in houses.ts.
+     This used to be the bare arctangent, which above the polar circle returns
+     the DESCENDANT for part of the day and rotated the whole chart by six
+     houses (46 of 192 sampled polar hours at Tromso, Murmansk, Utqiagvik and
+     Longyearbyen). `risingDegree` carries the derivation and the no-op proof;
+     it is the same correction the horary screen has applied since 2026-08-18,
+     and validation/polar-chart.cjs now holds the two surfaces together. */
+  const ramc = rev(rev(280.46061837 + 360.98564736629 * (JD - 2451545.0)) + lon);
   const eps = 23.4393 - 3.563e-7 * d;
-  const ascTrop = atan2d(cdg(ramc), -(sd(ramc) * cdg(eps) + tdg(lat) * sd(eps)));
+  const ascTrop = risingDegree(ramc, eps, lat);
   const ascSid = rev(ascTrop - ayan);
   const ascSign = Math.floor(ascSid / 30);
 
@@ -176,7 +181,6 @@ function computeKundli({ y, m, day, hh, mi, tz, lat, lon, ayanamsa = "lahiri" })
   const av = computeAshtakavarga(signOf, ascSign);
 
   // Shadbala — needs sunrise/sunset for the birth date + planet speeds + tropical longitudes
-  const epsB = 23.4393 - 3.563e-7 * d;
   const speedsB = {};
   ["Mars", "Mercury", "Jupiter", "Venus", "Saturn"].forEach((p) => {
     speedsB[p] = ((((trop[p] - tropPrev[p]) + 540) % 360) - 180) / 0.5;
@@ -185,22 +189,25 @@ function computeKundli({ y, m, day, hh, mi, tz, lat, lon, ayanamsa = "lahiri" })
   const shadbala = computeShadbala({
     rows, ascSign, ascLong: ascSid,
     sunLon: bodies.Sun.sid, moonLon: bodies.Moon.sid,
-    tropLon: trop, eps: epsB, speeds: speedsB,
+    tropLon: trop, eps, speeds: speedsB,
     birthMs: utcMs, tz, lon, rise: evB.rise, set: evB.set,
   });
   const special = computeSpecialPoints({
     asc: ascSid, sun: bodies.Sun.sid, moon: bodies.Moon.sid, rahu: bodies.Rahu.sid,
     ascSign, birthMs: utcMs, tz, lat, lon, ayan, rise: evB.rise, set: evB.set, JD,
   });
-  const ramcK = rev(rev(280.46061837 + 360.98564736629 * (JD - 2451545.0)) + lon);
-  const mcSid = rev(atan2d(sd(ramcK), cdg(ramcK) * cdg(23.4393 - 3.563e-7 * d)) - ayan);
+  /* `ramc` and `eps` are the ones computed for the ascendant above. They used to
+     be recomputed here from the identical expressions (`ramcK`, `epsObl`) — the
+     duplication that let the polar correction land on one copy of a formula and
+     not the other in the first place. ONE local each, used by the MC, the KP
+     Placidus ring and the ascendant alike. */
+  const mcSid = rev(atan2d(sd(ramc), cdg(ramc) * cdg(eps)) - ayan);
   const planetLonsK = {};
   ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].forEach((p) => (planetLonsK[p] = bodies[p].sid));
   const bhava = computeBhavaChalit(ascSid, mcSid, planetLonsK, ascSign, shadbala);
 
   // KP: Placidus cusps (sidereal), cuspal sub-lords, and planet placements by Placidus house
-  const epsObl = 23.4393 - 3.563e-7 * d;
-  const placRes = placidusCusps(ramcK, epsObl, lat);
+  const placRes = placidusCusps(ramc, eps, lat);
   const kpCusps = placRes.cusps.map((c) => (c == null ? null : rev(c - ayan)));
   let kpHouseSystem = "Placidus";
   if (!placRes.ok) {
