@@ -87,10 +87,10 @@ const DAY = 86400000;
 const iso = (ms) => (ms == null ? '—' : new Date(ms).toISOString().slice(0, 16).replace('T', ' ') + 'Z');
 
 // ---------------------------------------------------------------------------
-// Reporting. Every finding is a {section, id, lines}. A finding whose id is in
-// KNOWN is a pin: it is EXPECTED to be found, and the gate fails if the pinned
-// measurement grows OR disappears (a pin that silently rots is worse than no
-// pin). Anything not pinned fails immediately.
+// Reporting. A disagreement that is not pinned fails the run immediately.
+// A PIN is a disagreement this lane deliberately did not fix: it is EXPECTED to
+// be found, and the gate fails if the pinned measurement grows OR shrinks (a
+// pin that silently rots hides the next regression).
 // ---------------------------------------------------------------------------
 const findings = [];   // unpinned disagreements — these fail the run
 const pinsSeen = new Map();
@@ -106,10 +106,8 @@ function ok(n = 1) { checks += n; }
    fixed by this lane. `measure` is a stable, comparable summary of the defect's
    CURRENT size; the pin fails if it differs from `expect` in either direction.
    `resolve` says, in one line, what makes the pin deletable. */
-const KNOWN = [];
 function pin({ id, section, title, expect, measure, resolve, evidence }) {
   pinsSeen.set(id, { id, section, title, expect, measure, resolve, evidence: [].concat(evidence || []) });
-  KNOWN.push(id);
   if (measure !== expect) {
     disagree(section, `PIN MOVED — ${id}: ${title}`, [
       `pinned measurement : ${expect}`,
@@ -772,6 +770,35 @@ const RENDERED = (() => {
     return out;
   }
 
+  /* The detector must be shown to detect. A comparison that quietly extracts
+     nothing passes every surface, so these nine cases run first: four are the
+     historical defect shapes (a shifted lunar date, a shifted clock, a shifted
+     numeric date, a shifted score) and five are the legitimate language
+     differences that must NOT be reported (an abbreviation, a locale date
+     order, a lowercase meridiem, "Mars 34" reading as a March date). */
+  const SELF_TEST = [
+    ['a full moon dated one day apart', 'Full moon · 27 August 2026', 'पूर्ण चंद्र · 28 अगस्त 2026', true],
+    ['the same full moon', 'Full moon · 27 August 2026', 'पूर्ण चंद्र · 27 अगस्त 2026', false],
+    ['"Sept" vs "सित॰" is an abbreviation, not a defect', 'Autumn equinox · 23 Sept 2026', 'शरद् विषुव · 23 सित॰ 2026', false],
+    ['M/D/Y vs D/M/Y is a locale order, not a defect', 'Cast for 8/18/2026', '18/8/2026 को पूछा गया', false],
+    ['a numeric date genuinely shifted', 'Cast for 8/18/2026', '19/8/2026 को पूछा गया', true],
+    ['a clock an hour apart', 'Rahu Kalam 11:07 AM–12:43 PM', 'राहु काल 12:07 PM–12:43 PM', true],
+    ['"6:19 am" vs "6:19 AM" is casing, not a defect', 'sunrise (6:19 am)', 'सूर्योदय (6:19 AM)', false],
+    ['a score out of 36 that moved', 'Total 21 / 36', 'कुल 22 / 36', true],
+    ['"Mars 34" must not be read as a March date', 'Mars 34 points', 'मंगल 34 अंक', false],
+  ];
+  for (const [name, enText, hiText, shouldFlag] of SELF_TEST) {
+    const a = facts(enText, 'en'), b = facts(hiText, 'hi');
+    const flagged = ['times', 'dates', 'years', 'fractions'].some((c) => compare(a[c], b[c]).length > 0);
+    if (flagged !== shouldFlag) {
+      disagree('§8 languages', `the English/Hindi detector itself is broken: ${name}`, [
+        `expected it to ${shouldFlag ? 'FLAG' : 'IGNORE'} this pair, and it did not`,
+        `  en: ${enText}`, `  hi: ${hiText}`,
+        'Every "no disagreement" below is worthless until this passes.',
+      ]);
+    } else ok();
+  }
+
   const keys = [...RENDERED.keys()].filter((k) => k.endsWith('.en')).map((k) => k.slice(0, -3));
   let surfaces = 0;
   for (const key of keys) {
@@ -796,7 +823,8 @@ const RENDERED = (() => {
     } else ok();
   }
   if (!surfaces) disagree('§8 languages', 'no rendered surfaces were compared — the snapshot harness produced nothing', []);
-  COVERAGE.push(`§8  ${surfaces} rendered surfaces compared English-vs-Hindi (clock times, worded and numeric dates, years, score fractions)`);
+  COVERAGE.push(`§8  ${surfaces} rendered surfaces compared English-vs-Hindi (clock times, worded and numeric dates, years, score fractions), `
+    + `after ${SELF_TEST.length} self-tests proving the detector flags the four historical defect shapes and ignores the five legitimate language differences`);
 }
 
 // ===========================================================================
