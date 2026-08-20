@@ -276,8 +276,53 @@ date header writes `14 अग` where the rest of the Hindi render writes `15 अ
 
 ## Fail-then-pass proof
 
-See the commit that follows this note. The historical disagreement reintroduced is the Manglik one:
-`MANGLIK_HOUSES` in `src/engine/matching.ts` dropped house 2, so the matching card and the Mangal
-Dosha calculator read one birth differently — the shape of the original finding, "the matching card
-said one partner was Manglik while Ganak's own calculator said both were". The gate went red with a
-named birth, a named reference and both surfaces' answers; the edit was reverted and it went green.
+The historical disagreement reintroduced is the Manglik one — "the matching card said one partner was
+Manglik while Ganak's own Mangal Dosha calculator said both were". One character of
+`src/engine/matching.ts:67`, dropping house 2 from the matching card's private copy of the published
+house set, so the card and the calculator read one birth differently. **The existing
+`validation/mangal-dosha.cjs` does not see this**: it compares the two modules' *exception* and
+*aspect* tables, and asserts the calculator's own `MANGAL_DOSHA_HOUSES`, but never
+matching's `MANGLIK_HOUSES` and never the two implementations' end-to-end verdicts.
+
+**RED** — `const MANGLIK_HOUSES = [1,4,7,8,12];`
+
+```
+2 DISAGREEMENTS
+
+[§3 doshas] src/engine/matching.ts MANGLIK_HOUSES no longer matches the published Manglik house set
+    published [BPHS] : 1, 2, 4, 7, 8, 12
+    this surface     : 1, 4, 7, 8, 12
+
+[§3 doshas] the matching card and the Mangal Dosha calculator read one birth differently
+    1975-04-15 01:34 Delhi — Manglik? calculator true, matching card false; strength: calculator "limited", matching card "none"; raw count: 1 vs 0; adjusted score: 1 vs 0; lagna counted: true vs false
+    1986-09-04 12:17 Chennai — Manglik? calculator true, matching card false; strength: calculator "limited", matching card "none"; raw count: 1 vs 0; adjusted score: 1 vs 0; lagna counted: true vs false
+    1966-09-12 02:07 Chennai — strength: calculator "moderate", matching card "limited"; raw count: 3 vs 2; adjusted score: 1.5 vs 1; lagna counted: true vs false; lagna mitigations: [jupiterSupport] vs []
+    2016-03-27 14:21 Kolkata — Manglik? calculator true, matching card false; strength: calculator "limited", matching card "none"; raw count: 1 vs 0; adjusted score: 0.5 vs 0; moon counted: true vs false; moon mitigations: [ownOrExalted] vs []
+    2009-09-24 20:36 New York — strength: calculator "moderate", matching card "limited"; raw count: 2 vs 1; adjusted score: 1.5 vs 1; lagna counted: true vs false; lagna mitigations: [traditionSpecific] vs []
+    1998-05-09 04:20 Kolkata — strength: calculator "moderate", matching card "limited"; raw count: 3 vs 2; adjusted score: 1.5 vs 1; venus counted: true vs false; venus mitigations: [ownOrExalted] vs []
+    500 births swept across 5 cities, 1950-2025
+    src/engine/matching.ts manglikProfile is a second implementation of src/engine/mangal-dosha.ts mangalDoshaReport — see §10.
+
+cross-surface-consistency: FAIL
+RED exit=1
+```
+
+**GREEN** — `git checkout -- src/engine/matching.ts`, restoring `[1,2,4,7,8,12]`
+
+```
+5478 cross-surface agreements verified. What was actually swept:
+  §2  12 stations of 2026 cross-checked between the planet calendar, the gochar timeline and the transit line; 276 chart-vs-calendar retrograde samples around them; 53 dates × 9 grahas of sign placement
+  §3  500 births swept for Manglik (matching card vs calculator) and 120 for Kala Sarpa / Pitra / Papa (chart panel vs "Full page →")
+  §4  150 city-days across 5 cities: Abhijit, Rahu, Gulika and Yamaganda compared between the Panchang screen, the muhurat finder and the medical screen
+  §5  750 activity-days of the Muhurat hub's own two lanes
+  §6  100 city-evenings of Pradosha (Panchang daily-windows card vs the festival guide's Lakshmi Puja panel)
+  §7  3192 windows rendered under the "Rahu, Gulika and Yamaganda are excluded" note, checked against those three belts
+  §8  30 rendered surfaces compared English-vs-Hindi (clock times, worded and numeric dates, years, score fractions)
+  §10 127 source files scanned for duplicated literal tables and duplicated speed estimators
+
+6 known disagreements pinned …
+cross-surface-consistency: PASS
+GREEN exit=0
+```
+
+The product edit was reverted; `git status` is clean apart from this lane's own two files.
