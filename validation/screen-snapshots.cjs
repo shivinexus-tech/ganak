@@ -931,6 +931,232 @@ for (const lang of LANGS) {
   }
 }
 
+/* --- 6g. F5 + F12: the Vimshottari surface speaks the reader's language, with years --- */
+/* `fmtDateT` hardcoded the "en-IN" locale in BOTH languages, so the dasha table on a
+   Hindi kundli printed "15 Jun 1990" — three inches above a marriage card that printed
+   "जून 2026", because that one already asked for the reader's locale. Its with-time
+   branch also dropped the YEAR, so the prana line read "31 Dec, 11:48 PM – 1 Jan,
+   4:02 AM" and a period straddling New Year appeared to run backwards.
+
+   Neither line exists in the chart.* baselines: those are a composed mirror, and a
+   mirror only ever shows what somebody remembered to mirror. This reads the real
+   rendered card. */
+const LATIN_MONTH = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/;
+const dashaBlock = (text) => {
+  const lines = text.split('\n');
+  const i = lines.findIndex((l) => /^(Vimshottari dasha · maha to prana|विंशोत्तरी दशा)$/.test(l));
+  if (i < 0) return '';
+  const j = lines.findIndex((l, k) => k > i && /^(Marriage — supportive timing|विवाह — सम्भावित समय)$/.test(l));
+  return lines.slice(i, j < 0 ? undefined : j).join('\n');
+};
+{
+  const blkHi = dashaBlock(renderChart({ lang: 'hi' }).text);
+  const blkEn = dashaBlock(renderChart({ lang: 'en' }).text);
+  if (!blkHi || !blkEn) {
+    console.error('FAIL chart: the Vimshottari dasha card did not render — 6g-6i have stopped proving anything.');
+    failures++;
+  } else {
+    /* The ayanamsa label ("Lahiri (Chitrapaksha)") is a proper name and stays Latin in
+       both languages, exactly as the dosha panel's already does; the DATES must not. */
+    const dateLines = blkHi.split('\n').filter((l) => /\d{4}/.test(l) && !/अयनांश/.test(l));
+    const leaked = dateLines.filter((l) => LATIN_MONTH.test(l));
+    if (leaked.length) {
+      console.error(`FAIL chart.hi: the dasha card prints ${leaked.length} date line(s) in an English locale:`);
+      leaked.slice(0, 3).forEach((l) => console.error(`    ${l}`));
+      console.error('    Route every date on this surface through dashaDate/dashaMoment in src/components/DashaTree.tsx.');
+      failures++;
+    }
+    for (const [lang, blk] of [['en', blkEn], ['hi', blkHi]]) {
+      /* The running-now line is the one place a with-time stamp renders without the
+         reader opening anything, so it is the only static proof the year survived. */
+      const prana = blk.split('\n').find((l) => /^(Current prana|वर्तमान प्राण):/.test(l));
+      if (!prana) {
+        console.error(`FAIL chart.${lang}: the "current prana" line is gone — the with-time date branch is no longer covered.`);
+        failures++;
+      } else if ((prana.match(/\b(19|20|21)\d\d\b/g) || []).length < 2) {
+        console.error(`FAIL chart.${lang}: a prana row must carry the year at both ends, or a list crossing 31 December reads as running backwards.`);
+        console.error(`    ${prana}`);
+        failures++;
+      }
+    }
+  }
+}
+
+/* --- 6h. F4b: when nothing is running, say why; a repeat cycle says which round it is --- */
+/* The engine works out and words the reason in both languages. Nothing rendered it, so
+   for a chart with no current period the current highlight, the % elapsed bar, the
+   five-level strip and the whole antardasha tree vanished together, in silence.
+   AGENTS.md: "Errors must surface visibly in the UI." */
+for (const lang of LANGS) {
+  const { text } = renderChart({ lang, birth: { ...FIXTURE, y: 2075 } });
+  const blk = dashaBlock(text);
+  const hasReason = /(no Vimshottari period is running yet|कोई विंशोत्तरी दशा नहीं चल रही)/.test(blk);
+  const hasDrill = /(Running now · all five levels|अभी चल रहा क्रम)/.test(blk);
+  if (hasDrill) {
+    console.error(`FAIL chart.${lang}: a birth in the future must not render a running period.`);
+    failures++;
+  } else if (!hasReason) {
+    console.error(`FAIL chart.${lang}: the dasha card renders a bare table and no explanation when no period is running.`);
+    console.error('    Render r.dashaStatus.{en,hi} — the engine already words it in both languages.');
+    failures++;
+  }
+}
+{
+  /* A birth before roughly 1910 outruns one 120-year Vimshottari cycle, so the engine
+     repeats it. Nine more lords in the same order with no marker is a table a
+     practitioner cannot read; every row carries `cycle`. */
+  const early = renderChart({ lang: 'en', birth: { ...FIXTURE, y: 1869 } });
+  const r = computeKundli({ y: 1869, m: FIXTURE.m, day: FIXTURE.day, hh: FIXTURE.hh, mi: FIXTURE.mi,
+    tz: FIXTURE.tz, lat: FIXTURE.lat, lon: FIXTURE.lon, ayanamsa: 'lahiri' });
+  if (!r.dashas.some((d) => d.cycle > 0)) {
+    console.error('FAIL chart: the 1869 fixture no longer produces a repeat cycle — 6h has stopped proving anything.');
+    failures++;
+  } else if (!/cycle 2/.test(dashaBlock(early.text))) {
+    console.error('FAIL chart.en: rows from the second 120-year round are indistinguishable from the first.');
+    console.error('    Label them from dsh.cycle — the engine sets it on every row.');
+    failures++;
+  }
+}
+
+/* --- 6i. F10 + F11: the dasha card states the convention its dates depend on --- */
+/* The gochar panel and the planet calendar both name theirs. This card — whose dates
+   move by weeks when the reader taps a different ayanamsa chip a screen above, and
+   which prints prana boundaries to the MINUTE — named nothing at all.
+   validation/vimshottari-dasha.cjs measures the one-minute shift (1.5-5.3 days), so the
+   sentence below is a gated claim rather than a comfortable one. */
+for (const lang of LANGS) {
+  for (const [ay, label] of [['lahiri', 'Lahiri (Chitrapaksha)'], ['raman', 'Raman (B.V. Raman)']]) {
+    const blk = dashaBlock(renderChart({ lang, ayanamsa: ay }).text);
+    if (!blk.includes(label)) {
+      console.error(`FAIL chart.${lang}: on a ${label} chart the dasha card never names the ayanamsa its dates were computed on.`);
+      failures++;
+    }
+    if (!blk.includes('365.25')) {
+      console.error(`FAIL chart.${lang}: the dasha card must state the Vimshottari year length it uses.`);
+      failures++;
+    }
+    if (!/(one minute|एक मिनट)/.test(blk)) {
+      console.error(`FAIL chart.${lang}: the card prints prana boundaries to the minute and must say what that precision is worth.`);
+      console.error('    A one-minute birth-time difference moves these dates by days — measured in validation/vimshottari-dasha.cjs § 7.');
+      failures++;
+    }
+  }
+}
+
+/* --- 6j. F7b: a marriage window trimmed to the age floor says so --- */
+/* The row is LABELLED with an antardasha but its dates were the part of that period
+   left after the 18-year floor. So the card said "Jun 2029" while the dasha tree on the
+   same screen said "Aug 2028" for one named period, and nothing said a trim had
+   happened. The offered window stays trimmed — moving it back would put a marriage
+   window under age 18 — so what the row owes the reader is the difference. */
+{
+  const TRIM_BIRTH = { ...FIXTURE, y: 2011 };
+  const mw = marriageTiming.marriageWindows(computeKundli({
+    y: TRIM_BIRTH.y, m: TRIM_BIRTH.m, day: TRIM_BIRTH.day, hh: TRIM_BIRTH.hh, mi: TRIM_BIRTH.mi,
+    tz: TRIM_BIRTH.tz, lat: TRIM_BIRTH.lat, lon: TRIM_BIRTH.lon, ayanamsa: 'lahiri',
+  }));
+  const trimmed = mw.windows.filter((w) => w.trimmedToAge);
+  if (!trimmed.length) {
+    console.error('FAIL chart: the 2011 fixture no longer produces a trimmed marriage window — 6j has stopped proving anything.');
+    failures++;
+  } else {
+    for (const lang of LANGS) {
+      const { text } = renderChart({ lang, birth: TRIM_BIRTH });
+      const i = text.split('\n').findIndex((l) => /^(Marriage — supportive timing|विवाह — सम्भावित समय)$/.test(l));
+      const blk = i < 0 ? '' : text.split('\n').slice(i, i + 16).join('\n');
+      if (!/(the antardasha itself begins|यह अंतरदशा वस्तुतः)/.test(blk)) {
+        console.error(`FAIL chart.${lang}: a window trimmed to the age floor prints the trimmed start under the period's name and never admits the trim.`);
+        console.error('    The engine hands the card w.periodStart / w.trimmedToAge / w.ageFloorYears.');
+        failures++;
+      }
+    }
+  }
+}
+
+/* --- 6k. F17: the Ruling Planets strip keeps its graha colours in Hindi --- */
+/* PLANET_COLOR is keyed in English. The strip passed planetName(lang, …) into it, so in
+   Hindi every lookup was PLANET_COLOR["राहु"] — undefined — and the colour coding that
+   is the whole point of the strip disappeared, in one language only. Rendered TEXT
+   cannot see this, which is why it needs the HTML. */
+{
+  const between = (html, a, b) => {
+    const i = html.indexOf(a);
+    if (i < 0) return '';
+    const j = html.indexOf(b, i);
+    return html.slice(i, j < 0 ? undefined : j);
+  };
+  const grahaColours = (html, a, b) =>
+    (between(html, a, b).match(/#[0-9A-Fa-f]{6}/g) || []).filter((h) => h.toUpperCase() !== '#000000');
+  const en = grahaColours(renderChart({ lang: 'en' }).html, 'Ruling Planets · birth moment', 'Support ranking');
+  const hi = grahaColours(renderChart({ lang: 'hi' }).html, 'शासक ग्रह · जन्म क्षण', 'समर्थन क्रम');
+  if (en.length < 7) {
+    console.error(`FAIL chart.en: the Ruling Planets strip shows ${en.length} graha colours, not the seven lords it lists.`);
+    failures++;
+  } else if (en.join() !== hi.join()) {
+    console.error(`FAIL chart.hi: the Ruling Planets strip loses its graha colour coding in Hindi (en ${en.length} colours, hi ${hi.length}).`);
+    console.error('    Pass the canonical ENGLISH lord into RPItem and localise inside it, next to the PLANET_COLOR lookup.');
+    failures++;
+  }
+}
+
+/* --- 6l. Prashna bug bash F13: the summary explains the winner by what actually ranked it --- */
+/* computeRulingPlanets ranks by weight (sign lord 3, star and sub lord 2, day lord 1).
+   The summary explained the winner by COUNT — "it appears through 2 sources" — over a
+   chip row that showed a different graha appearing three times. On 5 of 552 sampled
+   charts the top graha has fewer sources than another (validation/vimshottari-dasha.cjs
+   § 8), so the stated reason contradicted the evidence beside it. */
+{
+  const rp = computeKundli({ y: FIXTURE.y, m: FIXTURE.m, day: FIXTURE.day, hh: FIXTURE.hh, mi: FIXTURE.mi,
+    tz: FIXTURE.tz, lat: FIXTURE.lat, lon: FIXTURE.lon, ayanamsa: 'lahiri' }).rulingPlanets;
+  const top = rp.ranked[0];
+  for (const lang of LANGS) {
+    const { text } = renderChart({ lang });
+    const line = text.split('\n').find((l) => /(strongest Ruling Planet|सबसे समर्थ शासक ग्रह)/.test(l)) || '';
+    if (!line) {
+      console.error(`FAIL chart.${lang}: the ruling-planet summary did not render.`);
+      failures++;
+      continue;
+    }
+    if (/(appears through \d+ source|\d+ संकेतों में आया)/.test(line)) {
+      console.error(`FAIL chart.${lang}: the summary still explains the winner by how many sources it appears in, which is not what ranked it.`);
+      console.error(`    ${line}`);
+      failures++;
+    }
+    if (!new RegExp(`(combined weight of|कुल भार)\\s*${top.weight}\\b`).test(line)) {
+      console.error(`FAIL chart.${lang}: the summary must state the weight (${top.weight}) that actually put ${top.planet} first.`);
+      console.error(`    ${line}`);
+      failures++;
+    }
+    const rankHead = text.split('\n').find((l) => /(Support ranking|समर्थन क्रम)/.test(l)) || '';
+    if (/(how often each planet appears|कितनी बार आया)/.test(rankHead)) {
+      console.error(`FAIL chart.${lang}: the ranking card is headed by an ordering it does not use.`);
+      failures++;
+    }
+  }
+}
+
+/* --- 6m. handoff F13 (dasha) — the ENGLISH mahadasha note must stay complete ---
+   This one is NOT closed: English has nine per-lord significations and Hindi has a
+   single generic sentence for all nine, so a Hindi reader gets a thinner product on a
+   religious surface. Writing the nine Hindi entries is a sourcing decision and a
+   standing human gate on this project, not something an agent composes — see
+   plans/audits/2026-08-19-chart-render-handoffs.md. What this check does prevent is the
+   English side quietly decaying to match, or a lord rendering "undefined". */
+{
+  const src = fs.readFileSync(path.join(ROOT, 'src/screens/ChartScreen.tsx'), 'utf8');
+  const body = (src.match(/const DASHA_NOTE = \{([\s\S]*?)\n\};/) || [])[1] || '';
+  const entries = [...body.matchAll(/^\s*(\w+):\s*"([^"]+)"/gm)].map((m) => [m[1], m[2]]);
+  const LORDS = ['Ketu', 'Venus', 'Sun', 'Moon', 'Mars', 'Rahu', 'Jupiter', 'Saturn', 'Mercury'];
+  const missing = LORDS.filter((l) => !entries.some(([k]) => k === l));
+  if (missing.length) {
+    console.error(`FAIL chart: DASHA_NOTE has no entry for ${missing.join(', ')} — that mahadasha sentence renders "undefined".`);
+    failures++;
+  } else if (new Set(entries.map(([, v]) => v)).size !== LORDS.length) {
+    console.error('FAIL chart: two mahadashas share one signification — the English side has started collapsing the way Hindi already has.');
+    failures++;
+  }
+}
+
 if (failures) {
   console.error(`\n✗ screen-snapshots FAILED (${failures})`);
   console.error('If the change was intentional: node validation/snapshot-generate.cjs --write, then commit the diff.');
@@ -943,6 +1169,7 @@ console.log(`✓ screen-snapshots: ${fresh.size} baselines match · ${covered} s
 console.log(`✓ calculator cross-seeding: ${clean} mismatched-result renders identical to no result (0 crashes, 0 foreign answers) · ${answered} own-result renders still answer`);
 console.log(`✓ yoga content parity: ${Object.keys(YOGA_EN).length} yoga templates × ${yogaRows} parameter sets · ${yogaEnTexts.size} distinct English interpretations → ${yogaEnToHiText.size} distinct Hindi (no collapse)`);
 console.log(`✓ cast chart rendered for real: ${panelChecks} panel visibility checks across ${PANEL_KEYS.length} panels (nothing unmounts) · ?panel= restores the open panel · birth panchang, Papa references, dosha ayanamsa and the marriage search range all read in both languages`);
+console.log('✓ Vimshottari surface: dates localised and year-stamped at every level · no running period is explained, not left blank · repeat cycles labelled · ayanamsa, 365.25-day year and the one-minute caveat stated · trimmed marriage windows admit the trim · graha colours survive Hindi · ruling-planet summary explains the ranking it actually uses');
 if (skipped.length) console.log(`  not covered (${skipped.length}): ${skipped.map((s) => s.key).join(', ')} — inner modules needing parent-computed data`);
 /* A green run must never be read as "this screen is fully proven". Screens whose
    answer only appears after the reader acts are covered in their INITIAL state
