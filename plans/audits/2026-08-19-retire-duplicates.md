@@ -372,3 +372,50 @@ DENSE GRID (34176 charts)          IDENTICAL — byte for byte
 NEIGHBOURING SURFACES (895 lines)  IDENTICAL — byte for byte
 PRASHNA both modes (10079 lines)   IDENTICAL — byte for byte
 ```
+
+---
+
+## What this lane changed, in plain language
+
+Four things Ganak was working out in more than one place are now worked out in one place.
+
+1. **Where the horizon is.** The single most important number in a birth chart — which sign is
+   rising — was being computed by three separate pieces of code. One had been corrected for a bug at
+   extreme northern and southern latitudes; the other two had not. That meant the chart's own reading
+   and the readings built on top of it (the Gulika and Mandi points that appear in *every* chart, the
+   Panchaka windows, the Navratri timings, the muhurat pages) could point at **opposite sides of the
+   sky**. There is now one piece of code, so they cannot disagree.
+
+2. **The same thing again inside the horary screen.** The KP question chart had its own second copy.
+   It has been retired too. Here the honest finding is that the copy had **not** yet produced a wrong
+   answer — that was predicted, and measurement showed it was not happening. The copy was removed
+   anyway, because a formula in two places is how the first problem started.
+
+3. **How fast a planet is moving.** Five separate versions of this existed; one has been retired.
+   This is the calculation behind the ℞ "retrograde" mark, and a mismatched copy is what made the
+   chart and the planet calendar disagree earlier this month.
+
+4. **Lists typed out twice.** Two have been merged into one. Four more were examined and deliberately
+   **left as two copies**, with a comment at each one explaining why — including two regional calendar
+   name lists that exist twice on purpose, because one copy is the published reference the tests check
+   the other against.
+
+**Nothing a normal user sees has changed.** Every ordinary birth, every Indian city, both Prashna
+modes and all 249 KP numbers produce character-for-character the same output as before — proven by
+diffing complete chart dumps before and after each step.
+
+## What is NOT done, named honestly
+
+- **Three of the five speed calculations remain**, all in files this lane was not allowed to edit.
+  The important one is in the birth-chart engine: it still measures motion *backwards* and in the
+  *wrong zodiac*, which is the exact shape of the bug fixed earlier this month. It currently feeds a
+  strength score rather than a visible ℞ mark, so no reader sees two answers today — but nothing
+  prevents that. **This is the most valuable single follow-up from this lane.**
+- **Nineteen of the twenty-one duplicated lists remain.** Fifteen or so are real and need a lane that
+  owns `panchang.ts`, `kundli.ts`, `muhurat.ts`, `matching.ts` or `src/screens/`. Four are not defects
+  and are now marked as such, so the count can never reach zero — that is recorded in the pin itself
+  so nobody wastes a lane chasing it.
+- **The travel-choghadiya table** (`muhurat-ui.ts` + `muhurat.ts`) needs *reconciling*, not merging:
+  the two sides are keyed differently and ordered differently, so a mechanical merge would change what
+  the Daily screen shows.
+- **Both `§10` pins were lowered, neither deleted**, and each now names what remains and why.
