@@ -845,8 +845,8 @@ export default function ChartScreen({ C, card, lang }) {
 
                   {RP.ranked && (
                     <div className="rise" style={{ ...card, padding: "0.75rem 0.875rem", marginBottom: "0.875rem" }}>
-                      {/* The heading said "how often each planet appears" over a list that is
-                          not ordered by that. Same F13 defect, one card lower. */}
+                      {/* The heading used to promise a frequency ordering over a list that is
+                          ordered by weight. Same F13 defect, one card lower. */}
                       <div style={{ ...T.label, color: C.muted, marginBottom: "0.5rem" }}>{hi ? "समर्थन क्रम · भार के अनुसार (सर्वाधिक पहले)" : "Support ranking · by weight, strongest first"}</div>
                       <div style={{ display: "grid", gap: "0.5rem" }}>
                         {RP.ranked.map((rp, idx) => (

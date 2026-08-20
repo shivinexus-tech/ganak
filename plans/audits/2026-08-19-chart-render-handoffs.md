@@ -373,6 +373,51 @@ quietly decaying to match the Hindi one — all nine lords must have an entry, a
 share a signification. It cannot make the Hindi side whole; it can stop the gap being closed
 from the wrong end.
 
+### Second gate that had pinned a defect — `validation/ruling-planets.cjs`
+
+The full suite came back `100 passed, 1 failed`, and the one failure was:
+
+```
+FAIL  ruling-planets.cjs
+AssertionError: ChartScreen missing RP UI marker: Support ranking · how often each planet appears
+```
+
+That gate pinned the **exact wrong heading** as a required UI marker. The list under it is
+ordered by weight and never was ordered by how often a graha appears — that is the Prashna bug
+bash's F13, and a gate was requiring it to stay. A gate that pins wrong copy makes the wrong
+copy the thing you have to keep.
+
+The marker is now the stable half of the heading (`'Support ranking'`, `'समर्थन क्रम'`), and
+three **negative** assertions were added in its place, matching the shapes the discredited
+explanation actually took rather than the words it used:
+
+```js
+[/how often each planet appears/, /appears through \{[^}]*\.count/, /संकेतों में आया/]
+```
+
+They match the *affirmative* claim only, because the corrected copy has to be able to name the
+count in order to disown it ("not by how many times a graha appears", "इस गिनती से नहीं कि ग्रह
+कितनी बार आया"). That is the same allowance `transit-event-language.cjs` § 7 already makes for a
+line that says सायन **with** नहीं — precedent followed, not invented.
+
+Mutation-proved:
+```
+MUTANT  the Hindi count sentence restored
+  AssertionError: ChartScreen explains the Ruling Planets ranking by source COUNT again
+                  (/संकेतों में आया/) — it is ranked by weight.
+```
+
+**Declared out-of-allowlist edit.** `validation/ruling-planets.cjs` is not in this lane's file
+list and not in its do-not-touch list; the only task-log row that ever owned it,
+`CLAUDE-FIX-DASHA-TRANSIT-2026-08-18`, is MERGED. The alternative was to leave the suite red or
+to restore the wrong heading, so the edit was made rather than deferred. Flagging it explicitly
+for the integrator, exactly as the dasha lane flagged its two-line `DashaTree.tsx` edit.
+
+**Two gates in one pass, both pinning the defect they were written to prevent** (this one and
+`language-leak-scan` § 1f above). Worth saying plainly: on this repo a red gate after a correct
+fix is now roughly as likely to be the gate's fault as the fix's, and the first question should
+be "what does this gate actually pin — the invariant, or one draft of the copy?"
+
 ---
 
 ## Out of this lane's file scope — restated so the next lane does not re-diagnose them
