@@ -123,8 +123,8 @@ authorisation before any new work, because it puts a family into a job it has no
 | Card or panel corner | `CORNER` | anchor | Restrained | Pre-authorised | Yes |
 | Page ending, above footer | `ENDING` | ending | Restrained | Pre-authorised | Yes |
 | Footer band | `FLORAL-TRANSITION` | ending | Rich | Pre-authorised | No |
-| Today — non-hero panel, left | `FLORAL-SWEEP` | anchor | Restrained | Pre-authorised — owner, 2026-08-20; §3 rule 7 applies | No |
-| Today — answer card edge | `FLORAL-SWEEP` | anchor | Restrained | Pre-authorised — owner, 2026-08-20; §3 rule 7 applies | Yes |
+| Today — non-hero panel, left | None in the current composition | — | — | Family permission does not override the completed A/B/C comparison; §6 | **Yes — selected** |
+| Today — special hero lower-right / answer-card edge | None in the current composition | — | — | Removed source-first after cold art-direction finding; no substitute; §6 | **Yes — selected** |
 
 ### 4.2 Festival and Vrat screens
 
@@ -163,9 +163,10 @@ place has not been given a job yet, and must ask rather than choose.
 
 ## 6. Owner decision — recorded 2026-08-20
 
-**Approved:** `FLORAL-SWEEP` in the `anchor` role at `Restrained` density is now legal on
-**Today's non-hero left panel** and **Today's answer-card edge**. This is the first time a
-floral family has been opened to an everyday screen.
+**Family permission, not a placement requirement:** `FLORAL-SWEEP` in the `anchor`
+role at `Restrained` density may be considered for Today's non-hero left panel and
+special hero/answer-card edge. That permission never establishes that either current
+composition needs an ornament.
 
 The approval covers both routes:
 
@@ -180,9 +181,16 @@ The approval covers both routes:
 owner attached this condition to the approval itself — the approval opens the family, not
 the rejected asset or any fragment of it.
 
-**What this unblocks:** the recorded comparison for that panel (`811:18395`) chose
-*"C — no added ornament"* because no other option was legal. It now has legal options, and
-subsequent work there does not need to come back to the owner.
+**Current operational decisions supersede placement:** the same-screen comparison
+`811:18395` chose C `811:19095` — no added ornament — because it was compositionally
+strongest. A and B used valid library families but were rejected for this Today slot on
+density, backing and role, not because the families were illegal. Current ordinary
+Today therefore keeps that slot empty. Current Today special also keeps its lower-right
+slot empty after the pasted flourish was removed source-first without replacement and
+the resulting composition passed cold art-direction review. Any future ornament in
+either slot requires a fresh same-screen comparison and independent review; the family
+permission above is not an automatic placement, propagation instruction or machine
+`requiredPlacements` rule.
 
 ## 7. Enforcement
 

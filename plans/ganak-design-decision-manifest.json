@@ -168,25 +168,72 @@
       "reason": "The disliked faded-coral, washed-sage, thin-gold-curl and ivory look is rejected by resemblance, while botanical shape remains unrestricted."
     },
     {
-      "id": "APP-003",
-      "status": "approved",
+      "id": "REJ-018",
+      "status": "rejected",
       "authority": "direct_owner_latest",
       "decidedAt": "2026-08-20",
-      "source": "ganak-ornament-slot-table.md Today slot decisions",
+      "source": "direct owner rejection of responsive Calendar 899:27940 and its long continuous mobile-scroll treatment",
       "confidence": "confirmed",
       "scope": {
         "track": "website",
         "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
-        "exactNodes": [],
-        "requiredPlacements": [
-          { "screenFamily": "today_ordinary", "slot": "non_hero_panel_left", "ornamentFamily": "FLORAL-SWEEP", "role": "anchor", "density": "restrained" },
-          { "screenFamily": "today_special", "slot": "answer_card_edge", "ornamentFamily": "FLORAL-SWEEP", "role": "anchor", "density": "restrained" }
-        ],
-        "allowedRoles": ["today_non_hero_left_anchor_restrained", "today_answer_card_edge_anchor_restrained", "floral_sweep"],
-        "prohibitedRoles": ["rejected_palette", "automatic_other_slot_approval", "unscoped_propagation"]
+        "exactNodes": ["899:27940"],
+        "allowedRoles": ["rejected_archive_evidence"],
+        "prohibitedRoles": ["responsive_template", "owner_review", "qa_pass", "desktop_full_page_continuous_stack", "long_unsectioned_mobile_scroll", "propagated_derivative"]
       },
-      "supersedes": ["ordinary-today-no-added-ornament-slot-decision"],
-      "reason": "FLORAL-SWEEP is approved for both named Today slots at restrained density, excluding every rejected resemblance trait."
+      "supersedes": [],
+      "reason": "Responsive Ganak must use the approved visual language with intentional mobile information architecture; stacking the full desktop page into one very long column is not an approved target."
+    },
+    {
+      "id": "APP-003",
+      "status": "approved",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "owner-directed no-ornament comparison; independent winner 811:19095; final source-first Today reviews",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["811:19095", "762:16084", "762:16339", "851:18729", "897:23887"],
+        "requiredPlacements": [],
+        "prohibitedPlacements": [
+          {
+            "screenFamily": "today_ordinary",
+            "slot": "non_hero_panel_left",
+            "ornamentFamily": "ANY",
+            "role": "ANY",
+            "density": "ANY"
+          },
+          {
+            "screenFamily": "today_special",
+            "slot": "hero_lower_right_or_answer_card_edge",
+            "ornamentFamily": "ANY",
+            "role": "ANY",
+            "density": "ANY"
+          }
+        ],
+        "allowedRoles": ["today_ordinary_no_added_ornament", "today_special_single_deity_focal_point", "clean_breathing_room"],
+        "prohibitedRoles": ["added_ornament_in_named_slots", "replacement_sticker", "automatic_other_slot_approval", "unscoped_propagation"]
+      },
+      "supersedes": [],
+      "reason": "Ordinary Today decisively chose no added ornament, and Today special passed only after the lower-right pasted flourish was removed without replacement."
+    },
+    {
+      "id": "APP-004",
+      "status": "approved",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "owner-directed shared website masthead recovery; independent token and natural-scale QA",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["908:6", "906:27", "907:2", "941:21", "941:53"],
+        "allowedRoles": ["shared_desktop_website_header", "shared_desktop_jyotish_header", "shared_desktop_festivals_header", "semantic_active_navigation_token", "english_variant", "hindi_variant"],
+        "prohibitedRoles": ["runtime_route_proof", "state_preservation_proof", "local_header_redraw", "responsive_header_substitute"]
+      },
+      "supersedes": [],
+      "reason": "The released desktop header set provides linked Jyotish and Festivals variants in both languages. Festivals language switching remains on the Festivals route; prototype URLs still do not prove production routing or preserved application state."
     },
     {
       "id": "RULE-001",
@@ -198,12 +245,12 @@
       "scope": {
         "track": "global",
         "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
-        "exactNodes": ["769:17254"],
-        "allowedRoles": ["historical_owner_review_label", "frozen_evidence", "narrow_pass_evidence"],
-        "prohibitedRoles": ["owner_link_send", "full_screen_pass", "promotion_without_zero_findings"]
+        "exactNodes": ["769:17254", "851:18729", "897:23887", "858:266", "952:37373", "956:2", "956:292", "851:20865", "952:37448", "894:23276", "894:23437", "894:23612", "851:21250"],
+        "allowedRoles": ["historical_owner_review_label", "frozen_evidence", "narrow_pass_evidence", "full_screen_pass_after_zero_findings", "exact_current_roster"],
+        "prohibitedRoles": ["owner_link_send_without_full_screen_pass", "promotion_with_open_findings", "runtime_claim_from_static_figma", "responsive_claim_from_desktop_evidence"]
       },
       "supersedes": ["ad50cc2-batch01-admission"],
-      "reason": "Batch 01 remains preserved but is blocked from owner review until the recovery admission gate passes."
+      "reason": "Batch 01 history remains preserved; operational admission is determined only by the executable zero-findings gate for this exact roster, with static-Figma limitations explicit."
     },
     {
       "id": "RULE-002",
@@ -221,6 +268,40 @@
       },
       "supersedes": [],
       "reason": "Only the explicit language-switch label may name the alternate language; an arbitrary whitelist reason cannot bypass language purity."
+    },
+    {
+      "id": "RULE-003",
+      "status": "rule",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "direct owner priority change pausing all mobile and responsive website design work",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["583:3", "899:26238", "899:27940", "921:31733", "931:37063", "931:40258"],
+        "allowedRoles": ["paused_unapproved_evidence", "historical_responsive_evidence", "shared_component_preserved_without_mutation"],
+        "prohibitedRoles": ["responsive_create", "responsive_revision", "responsive_qa", "responsive_promotion", "responsive_propagation"]
+      },
+      "supersedes": [],
+      "reason": "All 390px and 320px website work is paused until the owner explicitly resumes it; desktop website design and desktop QA continue."
+    },
+    {
+      "id": "RULE-004",
+      "status": "rule",
+      "authority": "canonical_human_record",
+      "decidedAt": "2026-08-20",
+      "source": "validation/ekadashi-lunar-naming.cjs published-reference New Delhi anchor plus shipped calendar snapshots",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["762:16932", "730:15152", "730:15339", "763:17139", "897:24259", "897:24427", "897:24622", "897:24853", "952:37373", "956:2", "956:292", "952:37448"],
+        "allowedRoles": ["published_anchor_2026_08_23", "source_first_fixture_correction", "historical_visual_pass_evidence", "corrected_regenerated_current_primary"],
+        "prohibitedRoles": ["owner_admission_with_2026_08_24_putrada", "cross_date_fixture_merge", "clone_only_data_patch"]
+      },
+      "supersedes": ["figma-putrada-2026-08-24-fixture-claim"],
+      "reason": "Shravana Putrada Ekadashi for the New Delhi 2026 fixture is anchored to Sunday 23 August 2026. Exact sources were corrected source-first; replacement primaries 952:37373, 956:2, 956:292 and 952:37448 were regenerated and independently cold-QA'd. The superseded 24 August clones remain historical evidence only."
     }
   ],
   "conflicts": [
@@ -240,7 +321,7 @@
       "id": "CONFLICT-BATCH01-ADMISSION",
       "decisionIds": ["RULE-001", "ad50cc2-batch01-admission"],
       "status": "resolved",
-      "resolution": "Historical OWNER REVIEW naming is preserved, but operational admission is blocked under the later owner-approved recovery."
+      "resolution": "Historical OWNER REVIEW naming is preserved; the later owner-approved executable recovery gate determines operational admission for the exact current 12-node roster."
     }
   ],
   "batchAdmission": {

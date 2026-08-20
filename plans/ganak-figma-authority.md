@@ -67,6 +67,15 @@ regression rules were checked.
 - Shared Date & Calendar Context component: `206:135`
 - Shared Hindi desktop Date & Calendar Context component: `552:2`
 - Shared website footer component set: `349:14`
+- Shared desktop website header component set: `908:6`
+  - `Current=Jyotish`: English `906:27`; Hindi `907:2`
+  - `Current=Festivals`: English `941:21`; Hindi `941:53`
+  - Active-navigation semantic token `VariableID:917:188` (`color/navigation-active`)
+  - All four variants retain 1536×96 geometry and mapped targets at 44px or larger.
+    Festivals language switching remains on the Festivals route. Visual/component
+    lineage is released; production route preservation remains blocked where the
+    current Jyotish link selects `panel=kundli` and the current Muhurat link uses the
+    legacy Daily hash destination.
 - Responsive website component sets, created and integrator-QA'd 2026-08-19:
   - Header EN `588:204`; Header HI `590:268`
   - Date & Calendar Context EN `584:116`; HI `587:116`
@@ -255,8 +264,8 @@ four Today/Panchang, four Festivals/Vrat and four Muhurat/Prashna desktop-Englis
 primaries. Responsive 390/320 and Hindi frames remain attached QA evidence, not
 additional owner-choice screens; responsive website proof is never Ganak Phone/native
 work. Only exact-node independent-QA `PASS` candidates may enter an integrator-owned
-owner-review surface. Batch 01 section `769:17254` is now
-`OWNER REVIEW · BATCH 01 · 12-SCREEN QUALITY CHECKPOINT`. On 2026-08-20 the
+owner-review surface. Batch 01 section `769:17254` previously carried
+`OWNER REVIEW · BATCH 01 · 12 DESKTOP EN PRIMARIES · FULL_SCREEN_PASS`. On 2026-08-20 the
 permanent ornament/surface reviewer and independent exact-node QA both passed all
 twelve desktop-English primaries after the targeted contrast and composition
 corrections. The final audit found zero denied dominant surfaces, zero active
@@ -267,34 +276,64 @@ production routes, keyboard/focus behavior, responsive reflow and assistive-
 technology semantics remain separately gated. Former baseline `652:13736` remains
 `CHANGES REQUESTED` historical evidence and is not review authority.
 
-#### Superseding operational recovery admission — 2026-08-20
+The section's current operational label is
+`OWNER REVIEW · BATCH 01 · 12-SCREEN DESKTOP QUALITY CHECKPOINT · 23 AUGUST FIXTURE`.
+The historical pass below remains preserved separately from the corrected current
+roster.
 
-The executable admission gate now records `BATCH-01-RECOVERY` as
-`FULL_SCREEN_PASS` with zero blockers for this exact active desktop-English node
-set, in review order:
+#### Historical operational recovery admission — superseded 2026-08-20
+
+At that historical checkpoint, the executable admission gate recorded
+`BATCH-01-RECOVERY` as `FULL_SCREEN_PASS` with zero blockers for this exact
+desktop-English node set, in review order:
 
 1. Today ordinary `851:18729`;
-2. Today special `858:2`;
+2. Today special `897:23887`;
 3. Full Panchang `858:266`;
-4. Calendar selected day/return `851:19585`;
-5. Festivals discovery `851:19660`;
-6. Festival calendar `851:19762`;
+4. Calendar selected day/return `897:24259`;
+5. Festivals discovery `897:24427`;
+6. Festival calendar `897:24622`;
 7. Story-led festival detail `851:20865`;
-8. Vrat guide `851:20938`;
-9. Muhurat hub `851:21024`;
-10. Property finder `851:21080`;
-11. Prashna ask `851:21162`;
+8. Vrat guide `897:24853`;
+9. Muhurat hub `894:23276`;
+10. Property finder `894:23437`;
+11. Prashna ask `894:23612`;
 12. Prashna answer `851:21250`.
 
-This exact set supersedes earlier Batch 01 node lists for **operational recovery
-admission only**. Historical `OWNER REVIEW`, `QA PASS`, rejected and predecessor
+This exact set superseded earlier Batch 01 node lists for that **historical
+operational recovery admission only**. Historical `OWNER REVIEW`, `QA PASS`,
+rejected and predecessor
 records remain preserved as decision history and must not be deleted or rewritten
-as though they were the active set. The pass proves current static-Figma geometry,
+as though they were the active set. That historical pass proved the then-current
+static-Figma geometry,
 reaction attachment metadata, visible text/overflow/contrast checks, rejected-use
-checks and shared-instance lineage. It does not prove browser DOM or tab order,
+checks and shared-instance lineage. It did not prove browser DOM or tab order,
 keyboard execution, assistive-technology semantics, responsive reflow/zoom, or
-production routing. Owner communication remains with the root communication task;
-this record does not itself publish an owner link.
+production routing. The Design Director sent the then-authorized owner milestone
+after that promotion; this record does not restore current admission or broaden the
+historical evidence beyond the named static desktop-English frames.
+
+#### Current operational recovery admission — Putrada closure, 2026-08-20
+
+The published-reference New Delhi anchor in
+`validation/ekadashi-lunar-naming.cjs` and the shipped Calendar search/year
+snapshots place Shravana Putrada Ekadashi on **Sunday 23 August 2026**. Exact
+sources `762:16932`, `730:15152`, `730:15339` and `763:17139` were corrected
+source-first without mixing the 23/24 August fixtures. Corrected primaries
+`952:37373`, `956:2`, `956:292` and `952:37448` were then regenerated, checked for
+exact source/reaction fidelity and independently reviewed at natural scale.
+
+The exact current twelve-screen roster is `851:18729`, `897:23887`, `858:266`,
+`952:37373`, `956:2`, `956:292`, `851:20865`, `952:37448`, `894:23276`,
+`894:23437`, `894:23612`, `851:21250`. `OWNER-013` is closed and
+`BATCH-01-RECOVERY` computes `FULL_SCREEN_PASS` for this static desktop owner-review
+scope. The four superseded 24 August clones remain hidden historical evidence; they
+were not deleted or rewritten.
+
+Latest owner priority also pauses all 390/320 responsive website design and QA.
+Exact rejected Calendar `899:27940` and every long continuous stacked-mobile
+derivative are frozen as unapproved evidence; no responsive artifact may be created,
+revised, QA'd, promoted or propagated until the owner explicitly resumes the scope.
 
 The responsive shared system above was created before lane resumption. Its linked
 EN/HI 390px proof has no text below 13px, no mapped target below 42px, no missing

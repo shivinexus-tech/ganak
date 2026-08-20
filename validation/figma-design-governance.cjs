@@ -13,6 +13,7 @@ const PRECEDENCE = ["direct_owner_latest", "direct_owner_earlier", "canonical_hu
 const REVIEW_ROLES = ["mechanical", "accessibility", "ornament_background", "blind_visual", "integrator"];
 const SCREEN_COVERAGE_CATEGORIES = ["language", "asset_rejection", "surface", "geometry", "ornament"];
 const STATUS = ["BLOCKED_FROM_OWNER_REVIEW", "NARROW_PASS", "FULL_SCREEN_PASS"];
+const BATCH_SECTION = "769:17254";
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, "utf8"));
@@ -98,6 +99,9 @@ function validateManifestShape(manifest, schema) {
       assert(Number.isFinite(crop.offset.x) && Number.isFinite(crop.offset.y), `${d.id}: bad crop offset`);
       assert(crop.clips === true && crop.contentSignature.length >= 12, `${d.id}: incomplete crop signature`);
     }
+    for (const placement of [...(d.scope.requiredPlacements || []), ...(d.scope.prohibitedPlacements || [])]) {
+      assert(["screenFamily", "slot", "ornamentFamily", "role", "density"].every(key => typeof placement[key] === "string" && placement[key].length), `${d.id}: incomplete ornament placement contract`);
+    }
   }
   return ids;
 }
@@ -108,6 +112,12 @@ function sameCrop(a, b) {
     a.raster.width === b.raster.width && a.raster.height === b.raster.height &&
     a.offset.x === b.offset.x && a.offset.y === b.offset.y && a.clips === b.clips &&
     a.contentSignature === b.contentSignature;
+}
+
+function placementMatches(actual, rule) {
+  return ["screenFamily", "slot", "ornamentFamily", "role", "density"].every(key =>
+    rule[key] === "ANY" || actual[key] === rule[key]
+  );
 }
 
 function decisionErrors(manifest) {
@@ -174,6 +184,24 @@ function auditMechanical(manifest, evidence) {
       }
     }
   }
+  for (const layout of evidence.responsiveLayouts || []) {
+    const pauseRule = manifest.decisions.find(d => d.id === "RULE-003" && d.status === "rule");
+    if (pauseRule) {
+      const pausedRoles = new Set(pauseRule.scope.prohibitedRoles || []);
+      const preservedRoles = new Set(pauseRule.scope.allowedRoles || []);
+      if (pausedRoles.has(layout.role) && !preservedRoles.has(layout.role)) {
+        errors.push({ code: "RESPONSIVE_SCOPE_PAUSED", detail: `${pauseRule.id}:${layout.node}:${layout.role}` });
+      }
+    }
+    for (const d of rejected) {
+      const nodeHit = d.scope.exactNodes.includes(layout.node) || (layout.sourceNode && d.scope.exactNodes.includes(layout.sourceNode));
+      const patternHit = (d.scope.prohibitedRoles || []).includes(layout.pattern);
+      const archived = (d.scope.allowedRoles || []).includes(layout.role);
+      if ((nodeHit || patternHit) && !archived) {
+        errors.push({ code: "REJECTED_RESPONSIVE_DIRECTION", detail: `${d.id}:${layout.node}:${layout.pattern || "exact-node"}` });
+      }
+    }
+  }
 
   const languageSwitchNodes = new Set(manifest.decisions.filter(d => d.id === "RULE-002").flatMap(d => d.scope.exactNodes));
   const latinUi = /\b(Today|Festivals|Muhurat|Prashna|Find best days|Ask now|Calendar|Place|Date)\b/;
@@ -222,18 +250,34 @@ function auditMechanical(manifest, evidence) {
   }
   const actualPlacements = evidence.ornamentPlacements || [];
   for (const required of manifest.decisions.flatMap(d => d.scope.requiredPlacements || [])) {
-    const found = actualPlacements.some(actual =>
-      actual.screenFamily === required.screenFamily && actual.slot === required.slot &&
-      actual.ornamentFamily === required.ornamentFamily && actual.role === required.role &&
-      actual.density === required.density
-    );
+    const found = actualPlacements.some(actual => placementMatches(actual, required));
     if (!found) errors.push({ code: "REQUIRED_ORNAMENT_MISSING", detail: `${required.screenFamily}:${required.slot}:${required.ornamentFamily}` });
+  }
+  for (const prohibited of manifest.decisions.flatMap(d => d.scope.prohibitedPlacements || [])) {
+    const found = actualPlacements.some(actual => placementMatches(actual, prohibited));
+    if (found) errors.push({ code: "PROHIBITED_ORNAMENT_PLACEMENT", detail: `${prohibited.screenFamily}:${prohibited.slot}` });
   }
   return errors;
 }
 
 function computeAdmission(manifest, packet) {
   const errors = [...decisionErrors(manifest), ...auditMechanical(manifest, packet.mechanicalEvidence || {})];
+  if (!Array.isArray(packet.mechanicalEvidence?.ornamentPlacements)) {
+    errors.push({ code: "OWNER_ADMISSION", detail: "explicit ornament placement inventory is missing" });
+  }
+  const screens = packet.screens || [];
+  const screenIds = screens.map(screen => screen.node);
+  if (new Set(screenIds).size !== screenIds.length) errors.push({ code: "OWNER_ADMISSION", detail: "duplicate screen in exact roster" });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(packet.inspectedAt || "")) errors.push({ code: "OWNER_ADMISSION", detail: "packet inspection date missing" });
+  const batchRule = manifest.decisions.find(decision => decision.id === "RULE-001");
+  const canonicalScreens = (batchRule?.scope.exactNodes || []).filter(node => node !== BATCH_SECTION);
+  const submittedSet = new Set(screenIds);
+  const canonicalSet = new Set(canonicalScreens);
+  const exactRoster = canonicalScreens.length > 0 && screenIds.length === canonicalScreens.length &&
+    canonicalScreens.every(node => submittedSet.has(node)) && screenIds.every(node => canonicalSet.has(node));
+  if (!batchRule || packet.sectionNode !== BATCH_SECTION || packet.figmaFile !== batchRule.scope.figmaFile || !exactRoster) {
+    errors.push({ code: "OWNER_ADMISSION", detail: "packet is not bound to canonical Figma file, Batch 01 section and exact RULE-001 roster" });
+  }
   const reviews = new Map((packet.reviews || []).map(r => [r.role, r]));
   for (const role of REVIEW_ROLES) {
     const r = reviews.get(role);
@@ -245,32 +289,69 @@ function computeAdmission(manifest, packet) {
   if (!blind || blind.cold !== true) errors.push({ code: "OWNER_ADMISSION", detail: "blind visual review is not cold" });
   const lineage = packet.mechanicalEvidence.lineage || [];
   const coveredLineage = new Set(lineage.filter(x => x.regenerated === true).map(x => x.screen));
-  const everyScreenRegenerated = (packet.screens || []).every(s => coveredLineage.has(s.node));
+  const everyScreenRegenerated = screens.every(s => coveredLineage.has(s.node));
   if (packet.sourceFirstRequired !== true || !lineage.length || !everyScreenRegenerated) {
     errors.push({ code: "OWNER_ADMISSION", detail: "source-first lineage not proven" });
   }
-  const groundScreens = new Set((packet.mechanicalEvidence.surfaces || []).filter(s => s.isGround === true || s.role === "canvas").map(s => s.screen));
-  const missingGroundEvidence = (packet.screens || []).filter(s => !groundScreens.has(s.node));
-  if (missingGroundEvidence.length) {
-    errors.push({ code: "OWNER_ADMISSION", detail: `${missingGroundEvidence.length} screens lack exact ground-colour evidence` });
+  const screenAudits = packet.screenAudits || [];
+  const auditIds = screenAudits.map(audit => audit.screen);
+  if (screenAudits.length !== screens.length || new Set(auditIds).size !== screens.length || auditIds.some(id => !screenIds.includes(id))) {
+    errors.push({ code: "OWNER_ADMISSION", detail: "screen audits do not bind one-to-one to exact roster" });
+  }
+  const auditByScreen = new Map(screenAudits.map(audit => [audit.screen, audit]));
+  const groundSurfaces = (packet.mechanicalEvidence.surfaces || []).filter(surface => surface.isGround === true || surface.role === "canvas");
+  for (const screen of screens) {
+    const audit = auditByScreen.get(screen.node);
+    const grounds = groundSurfaces.filter(surface => surface.screen === screen.node);
+    if (!audit || audit.screenshot !== screen.screenshot || audit.inspectedAt !== packet.inspectedAt || !audit.auditor) {
+      errors.push({ code: "OWNER_ADMISSION", detail: `${screen.node}: exact audit/capture binding missing` });
+      continue;
+    }
+    if (grounds.length !== 1 || grounds[0].node !== screen.node || grounds[0].fill !== audit.rootFill || grounds[0].capture !== screen.screenshot) {
+      errors.push({ code: "OWNER_ADMISSION", detail: `${screen.node}: unique root surface is not bound to exact capture` });
+    }
+    if (audit.visibleTextCount <= 0 || audit.unexpectedLanguageCount !== 0) errors.push({ code: "OWNER_ADMISSION", detail: `${screen.node}: language audit failed` });
+    if (audit.activeRejectedHashCount !== 0 || audit.activeRejectedCropCount !== 0) errors.push({ code: "OWNER_ADMISSION", detail: `${screen.node}: rejected asset audit failed` });
+    if (!/^#[A-F0-9]{6}$/.test(audit.rootFill || "") || audit.blockedDeniedSurfaceCount !== 0) errors.push({ code: "OWNER_ADMISSION", detail: `${screen.node}: surface audit failed` });
+    if (audit.mappedReactionCount <= 0 || audit.under42Count !== 0 || audit.directTextReactionCount !== 0 || audit.overflowCount !== 0) errors.push({ code: "OWNER_ADMISSION", detail: `${screen.node}: geometry audit failed` });
+    if (audit.ornamentFindingCount !== 0 || audit.forbiddenOrnamentPlacementCount !== 0) errors.push({ code: "OWNER_ADMISSION", detail: `${screen.node}: ornament audit failed` });
+    if (/^Today (ordinary|special)$/.test(screen.name || "")) {
+      const hidden = audit.checkedHiddenOrnamentNodes || [];
+      if (!audit.emptySlotEvidence || !hidden.length || hidden.some(item => !isNodeId(item.node) || item.effectiveVisible !== false)) {
+        errors.push({ code: "OWNER_ADMISSION", detail: `${screen.node}: Today no-ornament evidence missing` });
+      }
+    }
   }
   const coverage = packet.mechanicalEvidence.screenCoverage || [];
-  for (const screen of packet.screens || []) {
+  const coverageKeys = coverage.map(item => `${item.screen}:${item.category}`);
+  if (coverage.length !== screens.length * SCREEN_COVERAGE_CATEGORIES.length || new Set(coverageKeys).size !== coverage.length) {
+    errors.push({ code: "OWNER_ADMISSION", detail: "screen coverage is not exact or contains duplicates" });
+  }
+  for (const screen of screens) {
+    const audit = auditByScreen.get(screen.node);
     for (const category of SCREEN_COVERAGE_CATEGORIES) {
       const proof = coverage.find(item => item.screen === screen.node && item.category === category);
       if (!proof || proof.status !== "PASS" || !Array.isArray(proof.evidence) || proof.evidence.length === 0) {
         errors.push({ code: "OWNER_ADMISSION", detail: `${screen.node}:${category} screen-level evidence missing` });
       }
+      const categoryPass = audit && (
+        (category === "language" && audit.visibleTextCount > 0 && audit.unexpectedLanguageCount === 0) ||
+        (category === "asset_rejection" && audit.activeRejectedHashCount === 0 && audit.activeRejectedCropCount === 0) ||
+        (category === "surface" && audit.blockedDeniedSurfaceCount === 0) ||
+        (category === "geometry" && audit.mappedReactionCount > 0 && audit.under42Count === 0 && audit.directTextReactionCount === 0 && audit.overflowCount === 0) ||
+        (category === "ornament" && audit.ornamentFindingCount === 0 && audit.forbiddenOrnamentPlacementCount === 0)
+      );
+      if (!categoryPass) errors.push({ code: "OWNER_ADMISSION", detail: `${screen.node}:${category} narrative coverage lacks matching mechanical evidence` });
     }
   }
   const open = (packet.knownFindings || []).filter(f => f.status !== "closed");
   if (open.length) errors.push({ code: "OWNER_ADMISSION", detail: `${open.length} known findings remain open` });
   const holistic = packet.holisticJudgements || [];
-  const exactHolistic = (packet.screens || []).every(screen => {
+  const exactHolistic = screens.every(screen => {
     const matches = holistic.filter(item => item.screen === screen.node);
     return matches.length === 1 && matches[0].naturalScale === "PASS" && matches[0].contactSheet === "PASS";
   });
-  if (!exactHolistic || holistic.length !== (packet.screens || []).length) {
+  if (!exactHolistic || holistic.length !== screens.length) {
     errors.push({ code: "OWNER_ADMISSION", detail: "exact natural/contact-sheet PASS judgements incomplete or stale" });
   }
   if ((packet.reviews || []).some(r => r.status === "NARROW_PASS") && packet.requestedDisposition === "FULL_SCREEN_PASS") {
@@ -279,22 +360,57 @@ function computeAdmission(manifest, packet) {
   return { disposition: errors.length ? "BLOCKED_FROM_OWNER_REVIEW" : "FULL_SCREEN_PASS", errors };
 }
 
-function correctedFixture() {
+function canonicalBatchScreens(manifest) {
+  const batchRule = manifest.decisions.find(decision => decision.id === "RULE-001");
+  assert(batchRule, "RULE-001 must define canonical Batch 01 admission");
+  const screens = batchRule.scope.exactNodes.filter(node => node !== BATCH_SECTION);
+  assert(screens.length > 0 && new Set(screens).size === screens.length, "RULE-001 must define a non-empty unique screen roster");
+  return screens;
+}
+
+function fixtureName(node) {
+  if (node === "851:18729") return "Today ordinary";
+  if (node === "897:23887") return "Today special";
+  return `Fixture ${node}`;
+}
+
+function correctedFixture(manifest) {
+  const screens = canonicalBatchScreens(manifest);
   return {
     activeAssets: [],
-    visibleTexts: [
-      { node: "900:1", lang: "en", value: "Find best days" },
-      { node: "900:2", lang: "hi", value: "शुभ दिन खोजें" }
-    ],
-    surfaces: [{ node: "900:3", screen: "900:0", fill: "#FFFFFF", role: "canvas", areaPercent: 100, isGround: true }],
-    controls: [{ node: "900:4", height: 42, touchWidth: 120, touchHeight: 42, paddingLeft: 16, paddingRight: 16, labelCenterOffset: 0, overflow: false, labelInset: 16 }],
-    ornaments: [{ node: "900:5", sourceNode: "760:4", libraryRoot: "760:20", role: "section_finish", clearSpace: 16 }],
-    ornamentPlacements: [
-      { screenFamily: "today_ordinary", slot: "non_hero_panel_left", ornamentFamily: "FLORAL-SWEEP", role: "anchor", density: "restrained" },
-      { screenFamily: "today_special", slot: "answer_card_edge", ornamentFamily: "FLORAL-SWEEP", role: "anchor", density: "restrained" }
-    ],
-    screenCoverage: SCREEN_COVERAGE_CATEGORIES.map(category => ({ screen: "900:0", category, status: "PASS", evidence: [`fixture-${category}`] })),
-    lineage: [{ screen: "900:0", source: "800:0", regenerated: true }]
+    responsiveLayouts: [],
+    visibleTexts: screens.map((screen, index) => ({ node: `990:${index + 1}`, screen, lang: "en", value: "Find best days" })),
+    surfaces: screens.map(screen => ({ node: screen, screen, fill: "#FFFFFF", role: "canvas", areaPercent: 100, isGround: true, capture: `fixture://${screen}` })),
+    controls: [{ node: "990:100", height: 42, touchWidth: 120, touchHeight: 42, paddingLeft: 16, paddingRight: 16, labelCenterOffset: 0, overflow: false, labelInset: 16 }],
+    ornaments: [{ node: "990:101", sourceNode: "760:4", libraryRoot: "760:20", role: "section_finish", clearSpace: 16 }],
+    ornamentPlacements: [],
+    screenCoverage: screens.flatMap(screen => SCREEN_COVERAGE_CATEGORIES.map(category => ({ screen, category, status: "PASS", evidence: [`fixture-${screen}-${category}`] }))),
+    lineage: screens.map((screen, index) => ({ screen, source: `980:${index + 1}`, regenerated: true }))
+  };
+}
+
+function correctedPacket(manifest) {
+  const screenIds = canonicalBatchScreens(manifest);
+  const screens = screenIds.map(node => ({ node, name: fixtureName(node), screenshot: `fixture://${node}` }));
+  const screenAudits = screens.map((screen, index) => {
+    const audit = {
+      screen: screen.node, screenshot: screen.screenshot, inspectedAt: "2026-08-20", auditor: "fixture", rootFill: "#FFFFFF",
+      visibleTextCount: 1, unexpectedLanguageCount: 0, activeRejectedHashCount: 0, activeRejectedCropCount: 0,
+      rawDeniedFillHitCount: 0, blockedDeniedSurfaceCount: 0, mappedReactionCount: 1, under42Count: 0,
+      directTextReactionCount: 0, overflowCount: 0, ornamentFindingCount: 0, forbiddenOrnamentPlacementCount: 0
+    };
+    if (/^Today (ordinary|special)$/.test(screen.name)) {
+      audit.emptySlotEvidence = "fixture no-ornament slot verified";
+      audit.checkedHiddenOrnamentNodes = [{ node: `970:${index + 1}`, effectiveVisible: false }];
+    }
+    return audit;
+  });
+  return {
+    batchId: "FIXTURE-BATCH-01", figmaFile: manifest.decisions.find(decision => decision.id === "RULE-001").scope.figmaFile,
+    sectionNode: BATCH_SECTION, inspectedAt: "2026-08-20", screens, screenAudits, sourceFirstRequired: true,
+    mechanicalEvidence: correctedFixture(manifest),
+    reviews: REVIEW_ROLES.map(role => ({ role, status: "FULL_SCREEN_PASS", reviewer: `fixture-${role}`, evidence: ["fixture"], coversAllScreens: true, cold: role === "blind_visual" })),
+    knownFindings: [], holisticJudgements: screenIds.map(screen => ({ screen, naturalScale: "PASS", contactSheet: "PASS" })), requestedDisposition: "FULL_SCREEN_PASS"
   };
 }
 
@@ -302,12 +418,8 @@ function runIncidentSelfTests(manifest, incidents) {
   let passed = 0;
   for (const incident of incidents.cases) {
     const localManifest = JSON.parse(JSON.stringify(manifest));
-    const evidence = correctedFixture();
-    let packet = {
-      screens: [{ node: "900:0" }], sourceFirstRequired: true, mechanicalEvidence: evidence,
-      reviews: REVIEW_ROLES.map(role => ({ role, status: "FULL_SCREEN_PASS", reviewer: `fixture-${role}`, evidence: ["fixture"], coversAllScreens: true, cold: role === "blind_visual" })),
-      knownFindings: [], holisticJudgements: [{ screen: "900:0", naturalScale: "PASS", contactSheet: "PASS" }], requestedDisposition: "FULL_SCREEN_PASS"
-    };
+    const packet = correctedPacket(localManifest);
+    const evidence = packet.mechanicalEvidence;
     if (incident.kind === "asset") evidence.activeAssets.push({ node: "999:1", sourceNode: "485:51", hash: "b7559c796e972db13b8aa54daba3a1405264f488", role: "active_screen" });
     if (incident.kind === "crop") evidence.activeAssets.push({ node: "999:2", hash: "c69d89b16c8068f8f06ea86b4a3852a19db33732", role: "active_screen", crop: localManifest.decisions.find(d => d.id === "REJ-017").scope.cropSignatures[0] });
     if (incident.kind === "conflict") localManifest.conflicts.push({ id: "FIXTURE", decisionIds: ["APP-001", "REJ-004"], status: "unresolved", resolution: null });
@@ -317,17 +429,22 @@ function runIncidentSelfTests(manifest, incidents) {
     if (incident.kind === "resemblance") evidence.activeAssets.push({ node: "999:8", role: "active_screen", visualTraits: ["faded_coral_bloom", "washed_sage_foliage", "thin_gold_curl", "ivory_ground"] });
     if (incident.kind === "geometry") evidence.controls.push({ node: "999:5", height: 34, touchWidth: 70, touchHeight: 34, paddingLeft: 2, paddingRight: 2, labelCenterOffset: 7, overflow: true, labelInset: 2 });
     if (incident.kind === "ornament") evidence.ornaments.push({ node: "999:6", sourceNode: null, libraryRoot: null, role: "decoration", clearSpace: 2 });
+    if (incident.kind === "prohibited_placement") evidence.ornamentPlacements.push({ screenFamily: "today_ordinary", slot: "non_hero_panel_left", ornamentFamily: "FLORAL-SWEEP", role: "anchor", density: "restrained" });
+    if (incident.kind === "responsive_direction") evidence.responsiveLayouts.push({ node: "899:27940", sourceNode: "899:27940", pattern: "desktop_full_page_continuous_stack", role: "responsive_template" });
+    if (incident.kind === "responsive_pause") evidence.responsiveLayouts.push({ node: "999:999", pattern: "new_responsive_screen", role: "responsive_create" });
+    if (incident.kind === "surface_binding") packet.screenAudits[0].rootFill = "#F9FCFD";
+    if (incident.kind === "coverage_claim") packet.screenAudits[0].overflowCount = 1;
+    if (incident.kind === "empty_roster") packet.screens = [];
+    if (incident.kind === "wrong_section") packet.sectionNode = "769:99999";
+    if (incident.kind === "roster_mismatch") packet.screens[0].node = "999:999";
+    if (incident.kind === "missing_ornament_inventory") delete packet.mechanicalEvidence.ornamentPlacements;
     if (incident.kind === "typed_status") packet.reviews[0].status = "NARROW_PASS";
     if (incident.kind === "admission") packet.knownFindings.push({ id: "OPEN", status: "open" });
     const errors = computeAdmission(localManifest, packet).errors;
     assert(errors.some(e => e.code === incident.expected), `${incident.name}: expected ${incident.expected}, got ${errors.map(e => e.code).join(",")}`);
     passed++;
   }
-  const clean = computeAdmission(manifest, {
-    screens: [{ node: "900:0" }], sourceFirstRequired: true, mechanicalEvidence: correctedFixture(),
-    reviews: REVIEW_ROLES.map(role => ({ role, status: "FULL_SCREEN_PASS", reviewer: `fixture-${role}`, evidence: ["fixture"], coversAllScreens: true, cold: role === "blind_visual" })),
-    knownFindings: [], holisticJudgements: [{ screen: "900:0", naturalScale: "PASS", contactSheet: "PASS" }], requestedDisposition: "FULL_SCREEN_PASS"
-  });
+  const clean = computeAdmission(manifest, correctedPacket(manifest));
   assert(clean.disposition === "FULL_SCREEN_PASS", `corrected fixture should pass: ${JSON.stringify(clean.errors)}`);
   return passed;
 }

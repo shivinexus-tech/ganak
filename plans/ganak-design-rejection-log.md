@@ -592,8 +592,9 @@ visible as rejection evidence. Library inclusion does not mean use everywhere.
 Section `652:13736` retains exactly four direct children as historical baseline
 evidence, but it is now `CHANGES REQUESTED`. Exact rejected hash descendants
 `652:14062` and `652:14131` are hidden and the Vrat frames are no longer owner-review
-authority. Batch section `769:17254` is now `OWNER REVIEW · BATCH 01 · 12-SCREEN
-QUALITY CHECKPOINT`. Its twelve sources/clones and shared context remain corrected
+authority. Batch section `769:17254` historically carried `OWNER REVIEW · BATCH 01 · 12 DESKTOP EN
+PRIMARIES · FULL_SCREEN_PASS`; its current label is `OWNER REVIEW · BATCH 01 · 12-SCREEN DESKTOP
+QUALITY CHECKPOINT · 23 AUGUST FIXTURE`. Its twelve sources/clones and shared context remain corrected
 from denied dominant values `#F9FAF9`, `#FCFBF8`, `#FFFDFC`, `#FAF9F4`; its Vrat
 screen uses unrelated approved component `760:4`, not `485:51`. On 2026-08-20 the
 permanent ornament/surface reviewer and independent exact-node QA both passed all
@@ -602,15 +603,25 @@ zero active REJ-017 exact-crop reuse and zero denied dominant surface hits. The 
 is limited to desktop visual direction and screenshot-visible accessibility;
 production interaction and responsive behavior remain separately gated.
 
-The superseding **operational recovery** set is `851:18729`, `858:2`, `858:266`,
-`851:19585`, `851:19660`, `851:19762`, `851:20865`, `851:20938`, `851:21024`,
-`851:21080`, `851:21162`, `851:21250`. Executable gate
-`BATCH-01-RECOVERY` reports `FULL_SCREEN_PASS` with zero blockers and zero active
-`REJ-016`/`REJ-017` or denied-surface violations for that exact set. This update
+The superseding **operational recovery** set is `851:18729`, `897:23887`, `858:266`,
+`952:37373`, `956:2`, `956:292`, `851:20865`, `952:37448`, `894:23276`,
+`894:23437`, `894:23612`, `851:21250`. Executable gate
+`BATCH-01-RECOVERY` historically reported `FULL_SCREEN_PASS` with zero visual/
+mechanical blockers and zero active `REJ-016`/`REJ-017` or denied-surface violations
+for that exact set. This update
 does not delete or overwrite the historical review nodes above; it only identifies
 which descendants are operationally current. Static-Figma limitations remain:
 browser DOM/tab order, keyboard execution, assistive-technology semantics,
 responsive reflow/zoom and production routing are not proved by this admission.
+
+Operational admission was temporarily withdrawn on 2026-08-20 when the
+Calendar/Festivals/Vrat frames used Monday 24 August for Shravana Putrada while the
+published-reference engine anchor and shipped snapshots pinned New Delhi 2026 to
+Sunday 23 August. `OWNER-013` / `GDF-066` is now closed: the exact sources were
+corrected first, then replacement primaries `952:37373`, `956:2`, `956:292` and
+`952:37448` were regenerated and independently cold-QA'd. Superseded 24 August
+clones remain hidden historical evidence. Responsive node `899:27940` is separately
+rejected under `REJ-018`, and all responsive work remains paused under `GDF-065`.
 
 | Role | Review node | Source candidate |
 |---|---:|---:|

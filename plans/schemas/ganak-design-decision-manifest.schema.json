@@ -48,21 +48,26 @@
         "paletteTraits": { "type": "array", "items": { "type": "string", "minLength": 3 } },
         "requiredPlacements": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "required": ["screenFamily", "slot", "ornamentFamily", "role", "density"],
-            "additionalProperties": false,
-            "properties": {
-              "screenFamily": { "type": "string" },
-              "slot": { "type": "string" },
-              "ornamentFamily": { "type": "string" },
-              "role": { "type": "string" },
-              "density": { "type": "string" }
-            }
-          }
+          "items": { "$ref": "#/$defs/placement" }
+        },
+        "prohibitedPlacements": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/placement" }
         },
         "allowedRoles": { "type": "array", "items": { "type": "string" } },
         "prohibitedRoles": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "placement": {
+      "type": "object",
+      "required": ["screenFamily", "slot", "ornamentFamily", "role", "density"],
+      "additionalProperties": false,
+      "properties": {
+        "screenFamily": { "type": "string", "minLength": 1 },
+        "slot": { "type": "string", "minLength": 1 },
+        "ornamentFamily": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "minLength": 1 },
+        "density": { "type": "string", "minLength": 1 }
       }
     },
     "crop": {
