@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { T } from "../components/ui-style-contract";
 import { Card, SectionHeader } from "../components/ui-primitives";
-import { fmtDeg, fmtDateT } from "../components/format";
+import { fmtDeg } from "../components/format";
 import { searchOffline, searchOnline } from "../data/places";
 import MatchMaker from "./MatchingScreen";
 import DiamondChart from "../components/DiamondChart";
@@ -20,7 +20,7 @@ import { KP_PLANETS, vimSub } from "../engine/dasha";
 import { computeKundli } from "../engine/kundli";
 import { kalaSarpaFromRows, pitraDoshaFromRows, papaCount } from "../engine/doshas";
 import { marriageWindows, MARRIAGE_AGE_FLOOR_YEARS, MARRIAGE_HORIZON_YEARS } from "../engine/marriage-timing";
-import { DashaTree } from "../components/DashaTree";
+import { DashaTree, dashaDate, dashaMoment } from "../components/DashaTree";
 import { ChartVault } from "../components/ChartVault";
 import { JyotishPanelNav, JYOTISH_GROUPS } from "../components/JyotishPanelNav";
 import { BNNModule, BhriguModule } from "./JyotishBnnScreen";
@@ -785,6 +785,23 @@ export default function ChartScreen({ C, card, lang }) {
             {(() => {
               const RP = r.rulingPlanets;
               const topRp = RP.ranked?.[0];
+              /* Prashna bug-bash 2026-08-18 F13. computeRulingPlanets ranks by WEIGHT
+                 (sign lord 3, star and sub lord 2, day lord 1); the summary sentence
+                 explained the winner by COUNT — "it appears through 2 sources" — and
+                 the chip row directly beneath it showed a DIFFERENT planet appearing
+                 three times. On 6456 sampled charts the top-ranked graha has fewer
+                 sources than another, so the stated reason contradicted the evidence
+                 next to it. Ganak's weighting is defensible; it just was not what the
+                 sentence said.
+                 The weights below are read back off the engine's own `sources` array
+                 rather than retyped here, so the sentence cannot drift from the
+                 arithmetic that produced the ranking. validation/vimshottari-dasha.cjs
+                 additionally asserts the ordering the prose describes. */
+              const rpWeightOf = {};
+              (RP.sources || []).forEach((sc) => { rpWeightOf[sc.key] = sc.weight; });
+              const rpSourceText = (keys) => (keys || [])
+                .map((k) => `${hi ? RP_SOURCE_LABELS[k].hi : RP_SOURCE_LABELS[k].en} ${rpWeightOf[k]}`)
+                .join(" + ");
               const Chip = ({ pl, dim }) => (
                 <span style={{ display: "inline-block", padding: "0.125rem 0.4375rem", borderRadius: "0.375rem", fontSize: "var(--font-label)", fontWeight: 600, margin: "0.125rem 0.1875rem 0.125rem 0",
                   color: dim ? C.muted : "var(--on-accent)", background: dim ? "transparent" : PLANET_COLOR[pl], border: dim ? `0.0625rem solid ${PLANET_COLOR[pl]}` : "none" }}>
@@ -803,33 +820,41 @@ export default function ChartScreen({ C, card, lang }) {
                     <div className="rise" style={{ ...card, padding: "0.875rem 1rem", borderLeft: "0.25rem solid var(--accent)", marginBottom: "0.75rem", background: "var(--surface-raised)" }}>
                       <div style={{ ...T.label, color: C.gold, marginBottom: "0.375rem" }}>{hi ? "पहले पढ़ें · शासक ग्रह का सार" : "Read first · ruling-planet summary"}</div>
                       <p style={{ margin: 0, color: C.ivory, lineHeight: 1.6, fontSize: "var(--font-small)" }}>
-                        {hi ? <>इस जन्म-क्षण में सबसे समर्थ शासक ग्रह <strong style={{ color: PLANET_COLOR[topRp.planet] }}>{panchangTerm("hi", "planet", topRp.planet) || topRp.planet}</strong> है — यह {topRp.count} संकेतों में आया है। KP में बार-बार आने वाला ग्रह प्रश्न/घटना के फलित होने में अधिक ध्यान योग्य माना जाता है; इसे वादा नहीं, प्राथमिकता-सूचक मानें।</> : <>The strongest Ruling Planet at this birth moment is <strong style={{ color: PLANET_COLOR[topRp.planet] }}>{topRp.planet}</strong> — it appears through {topRp.count} source{topRp.count > 1 ? "s" : ""}. In KP, repeated ruling planets are read as higher-priority witnesses for timing and judgement; treat this as a priority signal, not a promise.</>}
+                        {hi ? <>इस जन्म-क्षण में सबसे समर्थ शासक ग्रह <strong style={{ color: PLANET_COLOR[topRp.planet] }}>{planetName(lang, topRp.planet)}</strong> है — कुल भार {topRp.weight} ({rpSourceText(topRp.sources)})। गणक क्रम इसी भार से बनाता है, इस गिनती से नहीं कि ग्रह कितनी बार आया: राशि स्वामी का भार सबसे अधिक, नक्षत्र और उप-स्वामी का उससे कम, वार स्वामी का सबसे कम — इसलिए नीचे की सूची में अधिक बार आने वाला ग्रह भी नीचे रह सकता है। इसे वादा नहीं, प्राथमिकता-सूचक मानें।</> : <>The strongest Ruling Planet at this birth moment is <strong style={{ color: PLANET_COLOR[topRp.planet] }}>{planetName(lang, topRp.planet)}</strong>, with a combined weight of {topRp.weight} ({rpSourceText(topRp.sources)}). Ganak ranks by that weight, not by how many times a graha appears: a sign lord counts most, a star or sub-lord less, the day lord least — so a graha named more often in the list below can still rank lower. Treat this as a priority signal, not a promise.</>}
                       </p>
                     </div>
                   )}
                   <div className="rise" style={{ ...card, padding: "0.875rem 1rem", borderLeft: "0.1875rem solid var(--accent)", marginBottom: "0.875rem" }}>
                     <div style={{ ...T.label, color: C.gold, marginBottom: "0.5rem" }}>{hi ? "शासक ग्रह · जन्म क्षण" : "Ruling Planets · birth moment"}</div>
                     <div style={{ display: "flex", flexWrap: "wrap", rowGap: "0.25rem" }}>
-                      <RPItem label={hi ? "लग्न स्वामी" : "Asc lord"} pl={planetName(lang, RP.ascSignLord)} />
-                      <RPItem label={hi ? "लग्न नक्षत्र" : "Asc star"} pl={planetName(lang, RP.ascStarLord)} />
-                      <RPItem label={hi ? "लग्न उप" : "Asc sub"} pl={planetName(lang, RP.ascSubLord)} />
-                      <RPItem label={hi ? "चन्द्र स्वामी" : "Moon lord"} pl={planetName(lang, RP.moonSignLord)} />
-                      <RPItem label={hi ? "चन्द्र नक्षत्र" : "Moon star"} pl={planetName(lang, RP.moonStarLord)} />
-                      <RPItem label={hi ? "चन्द्र उप" : "Moon sub"} pl={planetName(lang, RP.moonSubLord)} />
-                      <RPItem label={hi ? "वार स्वामी" : "Day lord"} pl={planetName(lang, RP.dayLord)} />
+                      {/* The canonical ENGLISH lord, never the localised name: RPItem looks
+                          the graha colour up in PLANET_COLOR, which is keyed in English, and
+                          localises for display itself — exactly as Chip beneath it already
+                          did. Passing planetName(lang, …) in here meant PLANET_COLOR["राहु"]
+                          was undefined, so the whole Ruling Planets strip lost its graha
+                          colour coding in Hindi and in Hindi only (bug-bash F17). */}
+                      <RPItem label={hi ? "लग्न स्वामी" : "Asc lord"} pl={RP.ascSignLord} />
+                      <RPItem label={hi ? "लग्न नक्षत्र" : "Asc star"} pl={RP.ascStarLord} />
+                      <RPItem label={hi ? "लग्न उप" : "Asc sub"} pl={RP.ascSubLord} />
+                      <RPItem label={hi ? "चन्द्र स्वामी" : "Moon lord"} pl={RP.moonSignLord} />
+                      <RPItem label={hi ? "चन्द्र नक्षत्र" : "Moon star"} pl={RP.moonStarLord} />
+                      <RPItem label={hi ? "चन्द्र उप" : "Moon sub"} pl={RP.moonSubLord} />
+                      <RPItem label={hi ? "वार स्वामी" : "Day lord"} pl={RP.dayLord} />
                     </div>
                   </div>
 
                   {RP.ranked && (
                     <div className="rise" style={{ ...card, padding: "0.75rem 0.875rem", marginBottom: "0.875rem" }}>
-                      <div style={{ ...T.label, color: C.muted, marginBottom: "0.5rem" }}>{hi ? "समर्थन क्रम · कौन-सा ग्रह कितनी बार आया" : "Support ranking · how often each planet appears"}</div>
+                      {/* The heading used to promise a frequency ordering over a list that is
+                          ordered by weight. Same F13 defect, one card lower. */}
+                      <div style={{ ...T.label, color: C.muted, marginBottom: "0.5rem" }}>{hi ? "समर्थन क्रम · भार के अनुसार (सर्वाधिक पहले)" : "Support ranking · by weight, strongest first"}</div>
                       <div style={{ display: "grid", gap: "0.5rem" }}>
                         {RP.ranked.map((rp, idx) => (
                           <div key={rp.planet} style={{ display: "grid", gridTemplateColumns: "1.75rem minmax(3.375rem, 4.375rem) 1fr", alignItems: "center", gap: "0.5rem" }}>
                             <span style={{ color: C.muted, fontSize: "var(--font-micro)" }}>#{idx + 1}</span>
                             <span style={{ color: PLANET_COLOR[rp.planet], fontWeight: 700 }}>{planetName(lang, rp.planet)}</span>
                             <span style={{ color: C.muted, fontSize: "var(--font-micro)", lineHeight: 1.4 }}>
-                              {rp.sources.map((s) => hi ? RP_SOURCE_LABELS[s].hi : RP_SOURCE_LABELS[s].en).join(" · ")}
+                              {(hi ? "भार " : "weight ") + rp.weight} · {rp.sources.map((s) => hi ? RP_SOURCE_LABELS[s].hi : RP_SOURCE_LABELS[s].en).join(" · ")}
                             </span>
                           </div>
                         ))}
@@ -971,7 +996,7 @@ export default function ChartScreen({ C, card, lang }) {
                   <div style={{ fontFamily: "var(--font-display-family)", fontSize: "var(--font-body)", color: C.ivory, display: "flex", alignItems: "baseline", gap: "0.4375rem", flexWrap: "wrap" }}>
                     {signLabel(lang, SIGNS[Math.floor(item.v / 30)])} <span style={{ fontSize: "var(--font-small)", color: C.muted, fontVariantNumeric: "tabular-nums" }}>{fmtDeg(item.v % 30)}</span>
                     <span style={{ fontSize: "var(--font-label)", color: C.gold }}>H{hOf(item.v)}</span>
-                    {item.pl && <span style={{ fontSize: "var(--font-label)", color: PLANET_COLOR[item.pl] }}>· {item.pl}</span>}
+                    {item.pl && <span style={{ fontSize: "var(--font-label)", color: PLANET_COLOR[item.pl] }}>· {planetName(lang, item.pl)}</span>}
                   </div>
                   <div style={{ color: C.muted, fontSize: "var(--font-micro)", marginTop: "0.25rem", lineHeight: 1.45 }}>{hi ? (SPECIAL_POINT_COPY[item.k]?.hi || "यह विशेष बिंदु कुंडली के एक सूक्ष्म जीवन-विषय को दर्शाता है।") : (SPECIAL_POINT_COPY[item.k]?.en || item.note)}</div>
                   <div style={{ color: C.muted, fontSize: "var(--font-micro)", marginTop: "0.25rem", lineHeight: 1.45, fontStyle: "italic" }}>{hi ? (SPECIAL_POINT_COPY[item.k]?.useHi || "") : (SPECIAL_POINT_COPY[item.k]?.useEn || "")}</div>
@@ -1028,7 +1053,7 @@ export default function ChartScreen({ C, card, lang }) {
                     {shifts.map((p, i) => (
                       <span key={p.name}>
                         {i > 0 && ", "}
-                        <span style={{ color: C.ivory }}>{p.name}</span> <span style={{ color: C.sindoor }}>H{p.house}→H{r.bhava.chalit[p.name]}</span>
+                        <span style={{ color: C.ivory }}>{planetName(lang, p.name)}</span> <span style={{ color: C.sindoor }}>H{p.house}→H{r.bhava.chalit[p.name]}</span>
                       </span>
                     ))}
                   </p>
@@ -1232,15 +1257,30 @@ export default function ChartScreen({ C, card, lang }) {
                       <tr key={dsh.start} style={isNow ? { background: "var(--surface-hover)" } : null}>
                         <td style={{ color: isNow ? C.gold : C.ivory, fontWeight: isNow ? 600 : 400 }}>
                           {planetName(lang, dsh.lord)}{isNow && (hi ? " · वर्तमान" : " · current")}
+                          {/* A birth before ~1910 outruns one 120-year cycle, so the engine
+                              repeats it (F4). Rows from the second round used to be
+                              indistinguishable from the first — nine more lords in the same
+                              order, with no hint that the wheel had come round again. */}
+                          {dsh.cycle > 0 && <span style={{ color: C.muted, fontWeight: 400 }}>{hi ? ` · चक्र ${dsh.cycle + 1}` : ` · cycle ${dsh.cycle + 1}`}</span>}
                         </td>
-                        <td>{fmtDateT(dsh.start, r.tz, false)}</td>
-                        <td>{fmtDateT(dsh.end, r.tz, false)}</td>
+                        <td>{dashaDate(dsh.start, r.tz, lang)}</td>
+                        <td>{dashaDate(dsh.end, r.tz, lang)}</td>
                         <td style={{ fontVariantNumeric: "tabular-nums" }}>{dsh.balance.toFixed(1)}</td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
+              {/* F4b. When no period is running the whole drill-down below is gated off —
+                  current highlight, % elapsed bar, five-level strip and antardasha tree all
+                  vanish at once. Until now they vanished in SILENCE, which AGENTS.md forbids
+                  outright ("Errors must surface visibly in the UI"). The engine already
+                  works out and words the reason in both languages; this renders it. */}
+              {!r.current && r.dashaStatus && !r.dashaStatus.ok && (
+                <p style={{ margin: "0.875rem 0.125rem 0", color: C.gold, fontSize: "var(--font-small)", lineHeight: 1.6 }}>
+                  {hi ? r.dashaStatus.hi : r.dashaStatus.en}
+                </p>
+              )}
               {r.current && (
                 <>
                   {(() => {
@@ -1278,17 +1318,50 @@ export default function ChartScreen({ C, card, lang }) {
                       </div>
                       {r.curPrana && (
                         <div style={{ fontSize: "var(--font-label)", color: C.muted, marginTop: "0.5625rem" }}>
-                          {hi ? "वर्तमान प्राण" : "Current prana"}: {planetName(lang, r.curPrana.lord)} · {fmtDateT(r.curPrana.start, r.tz, true)} – {fmtDateT(r.curPrana.end, r.tz, true)}
+                          {hi ? "वर्तमान प्राण" : "Current prana"}: {planetName(lang, r.curPrana.lord)} · {dashaMoment(r.curPrana.start, r.tz, lang)} – {dashaMoment(r.curPrana.end, r.tz, lang)}
                         </div>
                       )}
                     </div>
                   )}
                   <div style={{ ...T.label, color: C.muted, margin: "1rem 0 0.25rem" }}>
                     {planetName(lang, r.current.lord)} {hi ? "के भीतर अंतरदशाएँ — आगे के स्तर खोलने के लिए किसी अवधि को दबाएँ" : "Antardashas — tap any period to drill down"}
+                    {/* Sub-periods of a balance mahadasha are proportioned over its notional
+                        FULL span, so the first few of them genuinely elapsed before the
+                        native was born. The engine clips them out of the list and counts
+                        them; printing "9 antardashas" with six rows and no explanation was
+                        the other half of bug-bash F2. */}
+                    {r.antarsBeforeBirth > 0 && (hi
+                      ? ` · ${r.antarsBeforeBirth} अंतरदशाएँ जन्म से पहले बीत चुकीं`
+                      : ` · ${r.antarsBeforeBirth} sub-period${r.antarsBeforeBirth > 1 ? "s" : ""} elapsed before birth`)}
                   </div>
                   <DashaTree periods={r.antars} level={0} now={Date.now()} openD={openD} toggle={toggleD} C={C} tz={r.tz} lang={lang} />
                 </>
               )}
+              {/* F10 + F11. The gochar panel and the planet calendar both state the
+                  convention their numbers were computed on; this card, the one surface
+                  whose dates move by weeks when the reader taps a different ayanamsa
+                  chip, stated nothing at all — and printed prana boundaries to the
+                  minute on top of that.
+
+                  Both halves are one sentence because they are one fact: every boundary
+                  in this card, at all five levels, is fixed by the Moon's longitude at
+                  the birth instant. Change the ayanamsa and it moves; change the typed
+                  birth time by a minute and it moves further. The minute-level clock on
+                  the deeper rows is precise, not accurate, and the card now says so
+                  rather than letting the typography imply otherwise.
+                  `validation/vimshottari-dasha.cjs` measures the one-minute shift, so
+                  this sentence is a gated claim rather than a comfortable one. */}
+              {(() => {
+                const ayanKey = chartContext?.ayanamsa || ayanamsa;
+                const ayanText = AYANAMSA[ayanKey]?.label || ayanKey;
+                return (
+                  <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "1rem 0.125rem 0", lineHeight: 1.6 }}>
+                    {hi
+                      ? `गणना-पद्धति — विंशोत्तरी, 365.25 दिन का वर्ष; प्रथम दशा-स्वामी जन्म के चन्द्र-नक्षत्र से और उसका शेष उस नक्षत्र के बीते अंश से; प्रत्येक उप-अवधि अपनी ऊपरी अवधि का (स्वामी के वर्ष ÷ 120) भाग। ग्रह-स्थिति ऊपर चुने गए अयनांश (${ayanText}) तथा मध्यम राहु-केतु पर आधारित है। हर सन्धि जन्म-क्षण की चन्द्र-स्थिति से निश्चित होती है, इसलिए अयनांश बदलने पर या जन्म-समय में एक मिनट का अन्तर होने पर भी ये तिथियाँ कई दिन खिसक जाती हैं — गहरे स्तरों पर दिखा समय क्रम में स्थान है, नियत मुहूर्त नहीं।`
+                      : `Convention — Vimshottari over a 365.25-day year; the first lord comes from the Moon's nakshatra at birth and its balance from how much of that nakshatra had already passed; every sub-period is its own lord's years ÷ 120 of the period above it. Positions use the ayanamsa selected above (${ayanText}) with mean Rahu/Ketu. Every boundary here is fixed by the Moon's longitude at the birth instant, so switching ayanamsa — or a birth time uncertain by one minute — moves these dates by days. Read the clock on the deeper levels as a place in the sequence, not as an appointment.`}
+                  </p>
+                );
+              })()}
             </div>
 
             {/* marriage timing — supportive Vimshottari windows, heavily qualified */}
@@ -1323,7 +1396,25 @@ export default function ChartScreen({ C, card, lang }) {
                       {mw.windows.map((w, i) => (
                         <div key={i} style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", padding: "0.5rem 0.125rem", borderBottom: "0.0625rem solid var(--line-soft)" }}>
                           <span style={{ color: C.gold, fontSize: "var(--font-small)", minWidth: "8rem", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{fmtY(w.start)} – {fmtY(w.end)}</span>
-                          <span style={{ fontSize: "var(--font-small)", color: C.ivory, flex: 1 }}>{hi ? `${planetName(lang, w.maha)} / ${planetName(lang, w.antar)} दशा` : `${planetName(lang, w.maha)} / ${planetName(lang, w.antar)} dasha`}</span>
+                          <span style={{ fontSize: "var(--font-small)", color: C.ivory, flex: 1 }}>
+                            {hi ? `${planetName(lang, w.maha)} / ${planetName(lang, w.antar)} दशा` : `${planetName(lang, w.maha)} / ${planetName(lang, w.antar)} dasha`}
+                            {/* F7b. The row is LABELLED with an antardasha but the dates
+                                beside it were the part of that antardasha left after the
+                                marriageable-age floor was applied — so this card said
+                                "Jun 2029" while the dasha tree on the same screen said
+                                "Aug 2028" for one named period, and nothing said a trim
+                                had happened. The offered window is still the trimmed one
+                                (moving it back would put a marriage window under age 18);
+                                what changes is that the row now admits the difference and
+                                names the period's real span, which the engine hands it. */}
+                            {w.trimmedToAge && (
+                              <span style={{ color: C.muted, fontSize: "var(--font-label)" }}>
+                                {hi
+                                  ? ` — यह अंतरदशा वस्तुतः ${fmtY(w.periodStart)} से चलती है; ${w.ageFloorYears} वर्ष की आयु से पहले का भाग यहाँ नहीं दिया गया।`
+                                  : ` — the antardasha itself begins ${fmtY(w.periodStart)}; the part before age ${w.ageFloorYears} is not offered here.`}
+                              </span>
+                            )}
+                          </span>
                         </div>
                       ))}
                     </div>

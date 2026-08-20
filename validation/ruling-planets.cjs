@@ -21,8 +21,24 @@ for (let i = 1; i < rp.ranked.length; i++) assert(rp.ranked[i - 1].weight >= rp.
 const direct = dasha.computeRulingPlanets(chart.ascSid, chart.moon.lon, 'Moon');
 assert(direct.sources && direct.ranked, 'direct computeRulingPlanets export must carry source/ranking metadata');
 
-['Read first · ruling-planet summary','Support ranking · how often each planet appears','RP_SOURCE_LABELS','priority signal, not a promise','पहले पढ़ें · शासक ग्रह का सार','समर्थन क्रम'].forEach(marker => {
+/* The heading marker used to pin the literal string "Support ranking · how often each
+   planet appears" — which is the Prashna bug bash's F13 defect, not a feature: this
+   list is ordered by WEIGHT and never was ordered by how often a graha appears. A gate
+   that pins wrong copy makes the wrong copy the thing you have to keep. Pin the two
+   invariants instead: the explanatory UI is present, and the discredited explanation
+   has not come back. */
+['Read first · ruling-planet summary','Support ranking','RP_SOURCE_LABELS','priority signal, not a promise','पहले पढ़ें · शासक ग्रह का सार','समर्थन क्रम'].forEach(marker => {
   assert(chartSource.includes(marker), `ChartScreen missing RP UI marker: ${marker}`);
+});
+/* The three shapes the discredited explanation actually took, not the words it used.
+   The corrected copy has to be able to NAME the count in order to disown it — "not by
+   how many times a graha appears", "इस गिनती से नहीं कि ग्रह कितनी बार आया" — the same
+   allowance transit-event-language.cjs § 7 makes for a line that says सायन *with* नहीं.
+   So these match the AFFIRMATIVE claim: a heading promising a frequency ordering, the
+   English sentence interpolating `.count`, and the Hindi "appeared in N witnesses". */
+[/how often each planet appears/, /appears through \{[^}]*\.count/, /संकेतों में आया/].forEach(bad => {
+  assert(!bad.test(chartSource),
+    `ChartScreen explains the Ruling Planets ranking by source COUNT again (${bad}) — it is ranked by weight. See Prashna bug bash 2026-08-18 F13.`);
 });
 
 console.log('Ruling Planets: PASS — source witnesses, ranking metadata and UI explanation markers verified');

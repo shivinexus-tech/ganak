@@ -277,4 +277,72 @@ checks += 3;
     'the ayanamsa selector really does move the dasha boundaries — the card must say which one is in force');
 }
 
+// ---------------------------------------------------------------------------
+// 7. How far one minute of birth time moves the table (handoff F11)
+//
+// The prana rows print to the minute. That typography promises minute accuracy on
+// a figure that does not have it: every boundary in the card, at all five levels,
+// is derived from the Moon's longitude at the birth instant, and the Moon moves.
+// The chart card now says so in words — "a birth time uncertain by one minute
+// moves these dates by days" — and a sentence like that must be a MEASURED claim,
+// not a comfortable one, or the next agent will trim it as flannel.
+// ---------------------------------------------------------------------------
+{
+  const shifts = [];
+  for (let y = 1950; y <= 2010; y += 5) {
+    for (const [hh, mi] of [[4, 30], [11, 15], [19, 45]]) {
+      const base = { y, m: 3, day: 9, hh, mi, ...DELHI, ayanamsa: 'lahiri' };
+      const a = computeKundli(base);
+      const b = computeKundli({ ...base, mi: mi + 1 });
+      // The end of the balance mahadasha is the first boundary the reader sees that
+      // is NOT the birth instant itself, so it isolates the sensitivity cleanly.
+      shifts.push(Math.abs(a.dashas[0].end - b.dashas[0].end) / 86400000);
+    }
+  }
+  const lo = Math.min(...shifts), hiD = Math.max(...shifts);
+  ok(lo > 1,
+    `one minute of birth time must move a mahadasha boundary by more than a day for the card's caveat to be true; smallest observed shift was ${lo.toFixed(2)} days`);
+  console.log(`  birth-time sensitivity: 1 minute moves the first mahadasha boundary by ${lo.toFixed(1)}-${hiD.toFixed(1)} days across ${shifts.length} sampled births`);
+}
+
+// ---------------------------------------------------------------------------
+// 8. Ruling Planets are ranked by WEIGHT, and the screen must say so
+//    (Prashna bug bash 2026-08-18 F13)
+//
+// The chart screen's ruling-planet summary used to explain the winner by how many
+// sources it appeared in, while computeRulingPlanets ranks by weight. Those are
+// different orderings, and the chip row underneath showed the difference. The
+// sentence now describes the weighting; these assertions pin the weighting it
+// describes, so the prose cannot quietly stop being true.
+// ---------------------------------------------------------------------------
+{
+  const rp = computeKundli({ y: 1990, m: 6, day: 15, hh: 8, mi: 30, tz: 5.5, lat: 19.076, lon: 72.8777, ayanamsa: 'lahiri' }).rulingPlanets;
+  const w = {};
+  rp.sources.forEach((sc) => { w[sc.key] = sc.weight; });
+  ok(w.ascSignLord === w.moonSignLord && w.ascStarLord === w.moonStarLord && w.ascSubLord === w.moonSubLord,
+    'the ascendant and the Moon must be weighted alike, lord for lord');
+  ok(w.ascSignLord > w.ascStarLord && w.ascSignLord > w.ascSubLord,
+    'the screen says a sign lord counts most — the engine must agree');
+  ok(w.ascStarLord > w.dayLord && w.ascSubLord > w.dayLord,
+    'the screen says the day lord counts least — the engine must agree');
+  ok(rp.ranked.every((x, i, arr) => i === 0 || arr[i - 1].weight >= x.weight),
+    'the ranked list must be ordered by weight, descending');
+
+  // And the ordering really is not the count ordering, on real charts — which is
+  // exactly why explaining the winner by its source count was wrong.
+  let disagree = 0, sampled = 0;
+  for (let y = 1960; y <= 2005; y += 1) {
+    for (const m of [2, 7, 11]) {
+      for (const hh of [3, 9, 15, 21]) {
+        const r = computeKundli({ y, m, day: 4, hh, mi: 12, ...DELHI, ayanamsa: 'lahiri' }).rulingPlanets;
+        sampled++;
+        if (r.ranked.some((x) => x.count > r.ranked[0].count)) disagree++;
+      }
+    }
+  }
+  ok(disagree > 0,
+    'if no chart ever ranks a lower-count graha first, the summary sentence has nothing to explain — re-check the sample');
+  console.log(`  ruling planets: ranked by weight (sign ${w.ascSignLord} > star/sub ${w.ascStarLord} > day ${w.dayLord}) · ${disagree}/${sampled} sampled charts rank a graha above one that appears MORE often`);
+}
+
 console.log(`Vimshottari dasha: PASS — ${checks} assertions · 5 published Drik anchors (balance, cusp handover) · 36 four-level tiling checks · no period before birth · 351-year birth-range sweep`);
