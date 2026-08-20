@@ -46,6 +46,21 @@
         "cropSignatures": { "type": "array", "items": { "$ref": "#/$defs/crop" } },
         "surfaceFills": { "type": "array", "items": { "type": "string", "pattern": "^#[A-F0-9]{6}$" } },
         "paletteTraits": { "type": "array", "items": { "type": "string", "minLength": 3 } },
+        "requiredPlacements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["screenFamily", "slot", "ornamentFamily", "role", "density"],
+            "additionalProperties": false,
+            "properties": {
+              "screenFamily": { "type": "string" },
+              "slot": { "type": "string" },
+              "ornamentFamily": { "type": "string" },
+              "role": { "type": "string" },
+              "density": { "type": "string" }
+            }
+          }
+        },
         "allowedRoles": { "type": "array", "items": { "type": "string" } },
         "prohibitedRoles": { "type": "array", "items": { "type": "string" } }
       }

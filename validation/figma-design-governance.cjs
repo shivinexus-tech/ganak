@@ -219,6 +219,15 @@ function auditMechanical(manifest, evidence) {
       errors.push({ code: "ORNAMENT_PROVENANCE", detail: `${ornament.node}: insufficient clear space` });
     }
   }
+  const actualPlacements = evidence.ornamentPlacements || [];
+  for (const required of manifest.decisions.flatMap(d => d.scope.requiredPlacements || [])) {
+    const found = actualPlacements.some(actual =>
+      actual.screenFamily === required.screenFamily && actual.slot === required.slot &&
+      actual.ornamentFamily === required.ornamentFamily && actual.role === required.role &&
+      actual.density === required.density
+    );
+    if (!found) errors.push({ code: "REQUIRED_ORNAMENT_MISSING", detail: `${required.screenFamily}:${required.slot}:${required.ornamentFamily}` });
+  }
   return errors;
 }
 
@@ -239,6 +248,11 @@ function computeAdmission(manifest, packet) {
   if (packet.sourceFirstRequired !== true || !lineage.length || !everyScreenRegenerated) {
     errors.push({ code: "OWNER_ADMISSION", detail: "source-first lineage not proven" });
   }
+  const groundScreens = new Set((packet.mechanicalEvidence.surfaces || []).filter(s => s.isGround === true || s.role === "canvas").map(s => s.screen));
+  const missingGroundEvidence = (packet.screens || []).filter(s => !groundScreens.has(s.node));
+  if (missingGroundEvidence.length) {
+    errors.push({ code: "OWNER_ADMISSION", detail: `${missingGroundEvidence.length} screens lack exact ground-colour evidence` });
+  }
   const open = (packet.knownFindings || []).filter(f => f.status !== "closed");
   if (open.length) errors.push({ code: "OWNER_ADMISSION", detail: `${open.length} known findings remain open` });
   if ((packet.holisticJudgements || []).length < (packet.screens || []).length) {
@@ -257,9 +271,13 @@ function correctedFixture() {
       { node: "900:1", lang: "en", value: "Find best days" },
       { node: "900:2", lang: "hi", value: "शुभ दिन खोजें" }
     ],
-    surfaces: [{ node: "900:3", fill: "#FFFFFF", role: "panel", areaPercent: 30 }],
+    surfaces: [{ node: "900:3", screen: "900:0", fill: "#FFFFFF", role: "canvas", areaPercent: 100, isGround: true }],
     controls: [{ node: "900:4", height: 42, touchWidth: 120, touchHeight: 42, paddingLeft: 16, paddingRight: 16, labelCenterOffset: 0, overflow: false, labelInset: 16 }],
     ornaments: [{ node: "900:5", sourceNode: "760:4", libraryRoot: "760:20", role: "section_finish", clearSpace: 16 }],
+    ornamentPlacements: [
+      { screenFamily: "today_ordinary", slot: "non_hero_panel_left", ornamentFamily: "FLORAL-SWEEP", role: "anchor", density: "restrained" },
+      { screenFamily: "today_special", slot: "answer_card_edge", ornamentFamily: "FLORAL-SWEEP", role: "anchor", density: "restrained" }
+    ],
     lineage: [{ screen: "900:0", source: "800:0", regenerated: true }]
   };
 }

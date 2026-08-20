@@ -177,6 +177,10 @@
         "track": "website",
         "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
         "exactNodes": [],
+        "requiredPlacements": [
+          { "screenFamily": "today_ordinary", "slot": "non_hero_panel_left", "ornamentFamily": "FLORAL-SWEEP", "role": "anchor", "density": "restrained" },
+          { "screenFamily": "today_special", "slot": "answer_card_edge", "ornamentFamily": "FLORAL-SWEEP", "role": "anchor", "density": "restrained" }
+        ],
         "allowedRoles": ["today_non_hero_left_anchor_restrained", "today_answer_card_edge_anchor_restrained", "floral_sweep"],
         "prohibitedRoles": ["rejected_palette", "automatic_other_slot_approval", "unscoped_propagation"]
       },
