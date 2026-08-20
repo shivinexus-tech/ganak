@@ -76,8 +76,50 @@ if ((business.activityWindows || []).some((w) => w.key === 'char')) fail('Busine
 const wedding = one('wedding', 2, 26);
 if (!(wedding.activityWindows || []).some((w) => w.kind === 'panchaka-rahita')) fail('Wedding does not expose Panchaka-Rahita windows');
 
+// ===========================================================================
+// FULL-YEAR SWEEP — every offered window, every category, every day of 2026.
+//
+// Written because the 2026-08-18 Muhurat bug bash found 182 of 538 New Delhi
+// wedding windows overlapping Rahu Kalam, Gulika or Yamaganda while all nine
+// muhurat gates stayed green: every one of them was a spot check on a handful
+// of dates. A defect that appears on a third of the year's windows must not be
+// able to hide between two anchors again, so this walks the whole year for
+// every category the engine can be asked about.
+//
+// Convention asserted here (see the block comment above `subtractIntervals` in
+// src/engine/muhurat.ts for the sourcing and the recorded disagreement):
+// Ganak never OFFERS a window that overlaps Rahu Kalam, Gulika Kalam or
+// Yamaganda, in any category.
+//
+// Runtime is ~2 minutes: 19 categories x 365 days. That is the price of the
+// only assertion that would have caught the defect.
+// ===========================================================================
+const SWEEP_CATS = [...new Set([...Object.keys(MUHURTA_RULES), 'puja', 'purchase', 'general'])];
+const ovl = (a, b) => a && b && a.start < b.end && b.start < a.end;
+let sweptDays = 0, sweptWindows = 0;
+const sweepBad = [];
+for (const cat of SWEEP_CATS) {
+  const rows = muhuratScanRange(DELHI, 'lahiri', { y: 2026, m: 1, d: 1 }, { y: 2026, m: 12, d: 31 }, cat);
+  for (const row of rows) {
+    if (!row.valid) continue;
+    sweptDays++;
+    for (const w of (row.activityWindows || [])) {
+      sweptWindows++;
+      if (!(w.end > w.start)) sweepBad.push(`${cat} ${ymd(row.m, row.day)} non-positive window`);
+      for (const [name, belt] of [['Rahu', row.rahu], ['Gulika', row.gulika], ['Yamaganda', row.yama]]) {
+        if (ovl(w, belt)) sweepBad.push(`${cat} ${ymd(row.m, row.day)} offered ${new Date(w.start).toISOString()}..${new Date(w.end).toISOString()} overlaps ${name}`);
+      }
+    }
+  }
+}
+if (sweepBad.length) {
+  fail(`${sweepBad.length} offered windows overlap Rahu/Gulika/Yamaganda across the 2026 sweep`);
+  for (const line of sweepBad.slice(0, 8)) console.error('      ' + line);
+}
+if (sweptWindows < 3000) fail(`sweep is vacuous: only ${sweptWindows} windows over ${sweptDays} valid category-days`);
+
 if (failures) {
   console.error(`deep-muhurats FAILED: ${failures}`);
   process.exit(1);
 }
-console.log('✓ deep-muhurats PASSED (8 distinct public Muhurat engines, bilingual chips/guidance, dated anchors, clean-window checks)');
+console.log(`✓ deep-muhurats PASSED (8 distinct public Muhurat engines, bilingual chips/guidance, dated anchors, clean-window checks; 2026 sweep: ${sweptWindows} offered windows over ${sweptDays} valid category-days, none overlapping Rahu/Gulika/Yamaganda)`);

@@ -412,20 +412,76 @@ const ACTIVITY_CHOGHADIYA = {
 };
 const PANCHAKA_WINDOW_CATEGORIES = new Set(["wedding", "engagement", "housewarming", "bhoomi", "construction", "puja"]);
 function overlaps(a, b) { return a && b && a.start < b.end && b.start < a.end; }
+
+/* ---------------- hard exclusions on every OFFERED window ----------------
+   DECLARED CONVENTION (2026-08-19, muhurat bug bash F1/F6):
+   Ganak subtracts Rahu Kalam, Gulika Kalam and Yamaganda from every window it
+   offers as a time to BEGIN an activity, in every category — Choghadiya-based,
+   Panchaka-Rahita and Samskara-lagna alike.
+
+   Source: Drik Panchang, "About Rahu Kaal"
+   (https://www.drikpanchang.com/panchang/rahu-kaal.html, read 2026-08-19):
+   "the time under the influence of Rahu should be avoided to do any auspicious
+   work ... Auspicious activities like marriage rituals, engagement, Graha
+   Pravesh, any purchase of stocks, shares, gold, home, car and starting new
+   business or trade are avoided during this time ... Rahu Kaal is considered
+   only for undertaking any new work and already started work can be continued."
+   That names every category Ganak offers windows for, and a muhurat window is
+   precisely the instant of undertaking.
+
+   RECORDED DISAGREEMENT: published muhurat GENERATORS do not all subtract it.
+   Drik's own 2026 New Delhi Vivah list publishes 59 marriage windows, and 34 of
+   them (58%) contain Rahu Kalam, Gulika or Yamaganda — e.g. 6 Feb 2026,
+   07:06-23:37 — because the classical Vivah screen (panchanga-shuddhi plus
+   lagna-shuddhi) does not include the kalavela day-divisions, and Rahu Kaal
+   avoidance is emphasised most strongly in South India. So one publisher states
+   the rule and does not apply it. Ganak follows the STATED rule, which is also
+   the convention Ganak already applies to its seven Choghadiya categories and
+   states on the Muhurat hub for the hora dial ("a favourable hora that falls
+   inside Rahu Kaal/Gulika/Yamaganda is never offered as a clean recommendation").
+   Before this change the Panchaka branch below silently did neither, while the
+   card printed the exclusion as though it had happened: 182 of 538 wedding
+   windows in 2026 New Delhi overlapped one of the three belts.
+
+   Windows are CLIPPED, not dropped whole: a Panchaka-Rahita window runs two to
+   three hours and a belt is ~90 minutes, so dropping would discard usable time
+   on either side of the belt. */
+function subtractIntervals(win, avoid) {
+  let parts = [win];
+  for (const a of avoid) {
+    if (!a || !(a.end > a.start)) continue;
+    const next = [];
+    for (const p of parts) {
+      if (a.end <= p.start || a.start >= p.end) { next.push(p); continue; }
+      if (a.start > p.start) next.push({ ...p, start: p.start, end: a.start });
+      if (a.end < p.end) next.push({ ...p, start: a.end, end: p.end });
+    }
+    parts = next;
+  }
+  return parts;
+}
+function hardAvoidIntervals(info) {
+  return [info.rahu, info.gulika, info.yama].filter(Boolean);
+}
+function applyHardExclusions(info, windows) {
+  const avoid = hardAvoidIntervals(info);
+  const out = [];
+  for (const w of windows) for (const p of subtractIntervals(w, avoid)) if (p.end > p.start) out.push(p);
+  return out.sort((a, b) => a.start - b.start);
+}
 function cleanChoghadiyaWindows(info, category) {
   const keys = ACTIVITY_CHOGHADIYA[category] || new Set(["amrit", "shubh", "labh"]);
-  const avoid = [info.rahu, info.gulika, info.yama].filter(Boolean);
-  return (info.choghaDay || [])
-    .filter((c) => keys.has(c.key) && !avoid.some((w) => overlaps(c, w)))
-    .map((c) => ({ start: c.start, end: c.end, kind: "choghadiya", key: c.key }));
+  return applyHardExclusions(info, (info.choghaDay || [])
+    .filter((c) => keys.has(c.key))
+    .map((c) => ({ start: c.start, end: c.end, kind: "choghadiya", key: c.key })));
 }
 function activityWindows(place, ayanamsa, info, category) {
-  if (SAMSKARA_CATEGORIES.has(category)) return samskaraWindows(place, ayanamsa, info, category).map((w) => ({ ...w, kind: "samskara-lagna" }));
+  if (SAMSKARA_CATEGORIES.has(category)) return applyHardExclusions(info, samskaraWindows(place, ayanamsa, info, category).map((w) => ({ ...w, kind: "samskara-lagna" })));
   if (PANCHAKA_WINDOW_CATEGORIES.has(category)) {
     const p = computeLagnaPanchaka(place, ayanamsa, info.rise);
-    const clean = (p.panchakaWindows || [])
+    const clean = applyHardExclusions(info, (p.panchakaWindows || [])
       .filter((w) => w.shubha && w.end > info.rise && w.start < info.rise + 86400000)
-      .map((w) => ({ start: Math.max(w.start, info.rise), end: Math.min(w.end, info.rise + 86400000), kind: "panchaka-rahita", type: w.type }));
+      .map((w) => ({ start: Math.max(w.start, info.rise), end: Math.min(w.end, info.rise + 86400000), kind: "panchaka-rahita", type: w.type })));
     return clean.length ? clean : cleanChoghadiyaWindows(info, category);
   }
   return cleanChoghadiyaWindows(info, category);

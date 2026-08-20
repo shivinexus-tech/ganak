@@ -266,4 +266,4 @@ function scanSpecialYogaCalendar(place: any, atMs: number, days = 60) {
   return out;
 }
 
-export { computeDailyWindows, scanSpecialYogaCalendar, specialYogas, specialYogaWindows, anandadiYoga, gowriWindows, chandraBala, taraBala, VARJYA_GHATI };
+export { computeDailyWindows, scanSpecialYogaCalendar, specialYogas, specialYogaWindows, anandadiYoga, gowriWindows, bhadraWindows, chandraBala, taraBala, VARJYA_GHATI };
