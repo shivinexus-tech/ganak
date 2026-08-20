@@ -52,6 +52,27 @@ const PLANET_HI: Record<string, string> = {
   Venus: "शुक्र", Saturn: "शनि", Rahu: "राहु", Ketu: "केतु",
 };
 
+/* The 27 nitya yogas and the 11 karanas. Added 2026-08-19: the chart screen's birth
+   panchang printed all five of its values raw, so a Hindi reader read "Priti",
+   "Vishti" and "Shukravara (Fri)" on their own kundli. Tithi, paksha and nakshatra
+   already had tables here; yoga, karana and the vara did not, which is exactly why
+   those three were the ones nobody had localised. */
+const YOGA_HI: Record<string, string> = {
+  Vishkambha: "विष्कम्भ", Priti: "प्रीति", Ayushman: "आयुष्मान्", Saubhagya: "सौभाग्य",
+  Shobhana: "शोभन", Atiganda: "अतिगण्ड", Sukarma: "सुकर्मा", Dhriti: "धृति",
+  Shula: "शूल", Ganda: "गण्ड", Vriddhi: "वृद्धि", Dhruva: "ध्रुव",
+  Vyaghata: "व्याघात", Harshana: "हर्षण", Vajra: "वज्र", Siddhi: "सिद्धि",
+  Vyatipata: "व्यतीपात", Variyana: "वरीयान्", Parigha: "परिघ", Shiva: "शिव",
+  Siddha: "सिद्ध", Sadhya: "साध्य", Shubha: "शुभ", Shukla: "शुक्ल",
+  Brahma: "ब्रह्म", Indra: "इन्द्र", Vaidhriti: "वैधृति",
+};
+
+const KARANA_HI: Record<string, string> = {
+  Bava: "बव", Balava: "बालव", Kaulava: "कौलव", Taitila: "तैतिल", Gara: "गर",
+  Vanija: "वणिज", Vishti: "विष्टि", Shakuni: "शकुनि", Chatushpada: "चतुष्पाद",
+  Naga: "नाग", Kimstughna: "किंस्तुघ्न",
+};
+
 /* Canonical order. Several callers hold an INDEX (0-11 rashi, 0-26 nakshatra) rather
    than a name — before this module they each kept a private parallel array, which is
    how three spellings of "Purva Phalguni" and two of "Kumbha" got into the app. Index
@@ -81,6 +102,15 @@ const WEEKDAY_EN = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Fri
 const WEEKDAY_SHORT_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 const WEEKDAY_HI = ["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"] as const;
 const WEEKDAY_SHORT_HI = ["रवि", "सोम", "मंगल", "बुध", "गुरु", "शुक्र", "शनि"] as const;
+
+/* The VARA as the kundli engine spells it — "Shukravara (Fri)". It is the same seven
+   days as WEEKDAY_HI, so the Devanagari is taken from that array rather than typed a
+   second time: two spellings of Friday on one screen is precisely what this module
+   exists to prevent. panchangTerm strips the "(Fri)" before the lookup. */
+const VARA_EN = ["Ravivara", "Somavara", "Mangalavara", "Budhavara",
+  "Guruvara", "Shukravara", "Shanivara"] as const;
+const VARA_HI: Record<string, string> = {};
+VARA_EN.forEach((v, i) => { VARA_HI[v] = WEEKDAY_HI[i]; });
 
 /** Weekday name for a JS day index (0 = Sunday). */
 export function weekdayName(lang: string, index: unknown, short = false): string {
@@ -162,7 +192,8 @@ export function planetShort(lang: string, value: unknown): string {
 
 const ORDERS = { sign: SIGN_ORDER, nakshatra: NAKSHATRA_ORDER } as const;
 
-const TABLES = { tithi: TITHI_HI, paksha: PAKSHA_HI, month: MONTH_HI, sign: SIGN_HI, nakshatra: NAKSHATRA_HI, planet: PLANET_HI };
+const TABLES = { tithi: TITHI_HI, paksha: PAKSHA_HI, month: MONTH_HI, sign: SIGN_HI,
+  nakshatra: NAKSHATRA_HI, planet: PLANET_HI, yoga: YOGA_HI, karana: KARANA_HI, vara: VARA_HI };
 
 export type PanchangTermKind = keyof typeof TABLES;
 export type PanchangIndexKind = keyof typeof ORDERS;
@@ -227,6 +258,7 @@ export function signLabel(lang: string, value: unknown): string {
 }
 
 export { TITHI_HI, PAKSHA_HI, MONTH_HI, SIGN_HI, NAKSHATRA_HI, PLANET_HI, PADA_LABEL, PLANET_SHORT_EN,
+  YOGA_HI, KARANA_HI, VARA_HI, VARA_EN,
   SIGN_ORDER, NAKSHATRA_ORDER, SIGN_EN_WESTERN,
   WEEKDAY_EN, WEEKDAY_SHORT_EN, WEEKDAY_HI, WEEKDAY_SHORT_HI,
   SIGN_SHORT_HI, SIGN_SHORT_EN };

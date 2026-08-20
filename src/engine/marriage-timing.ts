@@ -13,6 +13,20 @@ import { SIGN_LORD } from "./panchang";
 
 const YEAR = 365.25 * 86400000;
 
+/* The two edges of the search. They are EXPORTED because the screen prints them, not
+   because anything else computes with them: before 2026-08-19 an empty list rendered
+   as "No clearly supportive window found in the next twenty years", which reads as a
+   finding about the marriage when it is a statement about the range Ganak looked in.
+   A 2075 birth returns zero windows for the arithmetic reason that the horizon (twenty
+   years from today) falls before the chart's first dasha even begins. The floor was
+   never stated anywhere at all.
+
+   Deliberately constants the UI renders rather than extra fields on the result object:
+   an unrendered computed field is the F23 defect the 2026-08-18 lane removed, and this
+   must not reintroduce it. */
+export const MARRIAGE_AGE_FLOOR_YEARS = 18;
+export const MARRIAGE_HORIZON_YEARS = 20;
+
 export function marriageWindows(chart: any, nowMs: number = Date.now()) {
   const asc = chart.ascSign;
   const seventhLord = SIGN_LORD[(asc + 6) % 12];
@@ -20,8 +34,8 @@ export function marriageWindows(chart: any, nowMs: number = Date.now()) {
   const activators = new Set<string>(["Venus", "Jupiter", seventhLord, ...occ7]);
 
   const birthMs = chart.birthMs;
-  const fromMs = birthMs + 18 * YEAR;        // marriageable age floor
-  const horizonMs = nowMs + 20 * YEAR;       // don't project absurdly far
+  const fromMs = birthMs + MARRIAGE_AGE_FLOOR_YEARS * YEAR;   // marriageable age floor
+  const horizonMs = nowMs + MARRIAGE_HORIZON_YEARS * YEAR;    // don't project absurdly far
 
   const windows: any[] = [];
   for (const maha of chart.dashas) {

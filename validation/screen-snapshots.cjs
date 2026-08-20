@@ -653,6 +653,283 @@ for (const [field, bucket] of [['text', yogaEnToHiText], ['name', yogaEnToHiName
 }
 const yogaEnTexts = new Set([...yogaEnToHiText.values()].flatMap((s) => [...s]));
 
+/* ------------------------ 6. the CAST chart, rendered for real (2026-08-19) --------
+   `chart.en` / `chart.hi` are a COMPOSED MIRROR — snapshot-results.cjs re-assembles a
+   few values out of computeKundli with the display helpers. That mirror is green on
+   every defect below, because a mirror can only ever show the lines somebody
+   remembered to mirror. Four of the five findings the 2026-08-18 bug bash left in this
+   screen lived in lines the mirror does not contain:
+
+     · the birth-panchang block printed all five values in English on a Hindi screen;
+     · the Papa Dosha card printed the engine's internal keys ("moon: 3") in English;
+     · the dosha panel followed the reader's ayanamsa while naming none, and linked to
+       pages that hard-force Lahiri — a different Kala Sarpa NAME on the same birth;
+     · switching Jyotish panels UNMOUNTED the matching form, destroying two people's
+       birth records and the computed match with no user action.
+
+   So this section renders the real ChartScreen with a real computeKundli result seeded
+   into its own `result` slot — the technique snapshot-results.cjs already uses for the
+   match result — and asserts on what a reader would actually see. No baseline: these
+   are invariants, so they must not be re-blessable by regenerating a file. */
+const chartMod = (() => {
+  const rel = `src/.snapshot-chartseed-${process.pid}.tsx`;
+  const abs = path.join(ROOT, rel);
+  fs.writeFileSync(abs,
+    'export { ComfortProvider } from "./accessibility/ComfortProvider";\n' +
+    'export { default as Screen } from "./screens/ChartScreen";\n', 'utf8');
+  try { return loadApp(rel); } finally { try { fs.unlinkSync(abs); } catch { /* gone */ } }
+})();
+const { computeKundli } = loadApp('src/engine/kundli.ts');
+const { JYOTISH_GROUPS } = loadApp('src/components/JyotishPanelNav.tsx');
+const marriageTiming = loadApp('src/engine/marriage-timing.ts');
+
+/* ChartScreen declares exactly three null-initialised slots, in this order: place,
+   result, chartContext. Seeding by ORDER OF NULLS rather than by hook index keeps the
+   gate correct when the screen gains, loses or reorders any non-null state — and the
+   count itself is asserted below, so a fourth null cannot slip past unnoticed. */
+const CHART_NULL_SLOTS = ['place', 'result', 'chartContext'];
+/* The open panel is set the only way a reader can set it — through the URL. Seeding it
+   as a hook value would prove nothing about the ?panel= wiring, and a hook seeded by
+   initial VALUE cannot see a lazy initialiser anyway. */
+function renderChart({ lang, activePanel = 'kundli', ayanamsa = 'lahiri', birth = FIXTURE, urlSearch = `?panel=${activePanel}` }) {
+  const r = computeKundli({
+    y: birth.y, m: birth.m, day: birth.day, hh: birth.hh, mi: birth.mi,
+    tz: birth.tz, lat: birth.lat, lon: birth.lon, ayanamsa,
+  });
+  const form = {
+    name: 'Snapshot',
+    date: `${birth.y}-${String(birth.m).padStart(2, '0')}-${String(birth.day).padStart(2, '0')}`,
+    time: `${String(birth.hh).padStart(2, '0')}:${String(birth.mi).padStart(2, '0')}`,
+  };
+  const seedFor = { place: PLACE, result: r, chartContext: { form, place: PLACE, ayanamsa } };
+  const realState = React.useState;
+  let nulls = 0;
+  /* Patched ONLY while ChartScreen's own body runs. Its children — ChartVault and
+     MatchMaker — are rendered by React afterwards and declare null slots of their own
+     (that is the whole point of the F9 fix), so a patch left in place would swallow
+     theirs and the slot count below would stop meaning anything. */
+  const Wrapped = (props) => {
+    React.useState = function seeded(init) {
+      if (init && typeof init === 'object' && 'name' in init && 'date' in init && 'time' in init) return [form, () => {}];
+      if (init === null) {
+        const slot = CHART_NULL_SLOTS[nulls++];
+        if (slot) return [seedFor[slot], () => {}];
+      }
+      if (init === 'lahiri') return [ayanamsa, () => {}];
+      return realState(init);
+    };
+    try { return chartMod.Screen(props); } finally { React.useState = realState; }
+  };
+  /* urlPrefGet reads window.location.search inside a useState initialiser and swallows
+     any throw, so a bare object is all the screen needs to restore ?panel=. */
+  const hadWindow = 'window' in global;
+  if (urlSearch !== null && !hadWindow) global.window = { location: { search: urlSearch } };
+  try {
+    const html = renderToStaticMarkup(React.createElement(chartMod.ComfortProvider, null,
+      React.createElement(Wrapped, { C, card, lang })));
+    return { html, text: toText(html), nulls };
+  } finally {
+    React.useState = realState;
+    if (urlSearch !== null && !hadWindow) delete global.window;
+  }
+}
+
+const PANEL_KEYS = JYOTISH_GROUPS.map((g) => g.key);
+/* Each panel's container and a string that only its contents produce, so "mounted"
+   means the component really rendered rather than a nav entry naming it. */
+const PANELS = [
+  { key: 'matching', id: 'match-panel', marker: /Guna Milan|कुण्डली मिलान/ },
+  { key: 'vault', id: 'vault', marker: /id="vault"/ },
+];
+const RESULTS_ID = 'chart-results';
+const containerHidden = (html, id) => new RegExp(`<div id="${id}" hidden(=""|\\s|>)`).test(html);
+const containerPresent = (html, id) => new RegExp(`<div id="${id}"[\\s>]`).test(html);
+
+/* --- 6a. F9: switching panels must HIDE, never unmount --- */
+/* MatchMaker holds two names, two dates, two times, two places and the computed match
+   in ten useState slots. Unmounting it threw all ten away, so a couple who tapped
+   "Vault" and came back were shown the hard-coded demo births instead of their own.
+   AGENTS.md: "no state resets without a user action" — moving to another panel is not
+   a request to discard two birth records. */
+let panelChecks = 0;
+for (const key of PANEL_KEYS) {
+  const { html, nulls } = renderChart({ lang: 'en', activePanel: key });
+  if (nulls !== CHART_NULL_SLOTS.length) {
+    console.error(`FAIL chart panels: ChartScreen now declares ${nulls} null-initialised state slots, not ${CHART_NULL_SLOTS.length}.`);
+    console.error('    Update CHART_NULL_SLOTS in this gate to name them in order — the seeding above is silently wrong until you do.');
+    failures++;
+    break;
+  }
+  for (const p of PANELS) {
+    if (!containerPresent(html, p.id)) {
+      console.error(`FAIL chart panels: with panel="${key}" the ${p.key} panel is not mounted at all.`);
+      console.error('    Render it always and set hidden={activePanel !== "…"}. Unmounting destroys everything the reader typed into it.');
+      failures++;
+    } else if (containerHidden(html, p.id) !== (key !== p.key)) {
+      console.error(`FAIL chart panels: with panel="${key}" the ${p.key} panel hidden=${containerHidden(html, p.id)} (expected ${key !== p.key}).`);
+      failures++;
+    } else panelChecks++;
+  }
+  const resultsShouldHide = key === 'matching' || key === 'vault';
+  if (!containerPresent(html, RESULTS_ID)) {
+    console.error(`FAIL chart panels: with panel="${key}" the cast chart's result column is not mounted.`);
+    failures++;
+  } else if (containerHidden(html, RESULTS_ID) !== resultsShouldHide) {
+    console.error(`FAIL chart panels: with panel="${key}" the result column hidden=${containerHidden(html, RESULTS_ID)} (expected ${resultsShouldHide}).`);
+    failures++;
+  } else panelChecks++;
+}
+
+/* --- 6b. F9: the open panel survives a reload and a shared link --- */
+for (const key of ['matching', 'vault', 'dashas']) {
+  const { html } = renderChart({ lang: 'en', urlSearch: `?panel=${key}` });
+  const shown = PANELS.filter((p) => containerPresent(html, p.id) && !containerHidden(html, p.id)).map((p) => p.key);
+  const expect = key === 'dashas' ? [] : [key];
+  if (JSON.stringify(shown) !== JSON.stringify(expect)) {
+    console.error(`FAIL chart panels: ?panel=${key} opened ${JSON.stringify(shown)} instead of ${JSON.stringify(expect)}.`);
+    console.error('    activePanel must initialise from urlPrefGet("panel") and be written back with urlPrefSet, the way chartStyle already is.');
+    failures++;
+  }
+}
+{
+  const src = fs.readFileSync(path.join(ROOT, 'src/screens/ChartScreen.tsx'), 'utf8');
+  if (!/urlPrefSet\(\s*["']panel["']/.test(src)) {
+    console.error('FAIL chart panels: choosing a panel never writes it to the URL — reload and Back would still lose it.');
+    failures++;
+  }
+}
+
+/* --- 6c. F14: the birth panchang is the reader's language, all five values --- */
+/* These come out of computeKundli as canonical English ("Shukravara (Fri)", "Priti",
+   "Vishti") and were interpolated raw, so a Hindi reader's own birth panchang was in
+   English. Only tithi/paksha/nakshatra had tables in panchang-terms.ts; the vara, the
+   yoga and the karana had none, which is exactly why those were the ones left. */
+const PANCHANG_LABELS_HI = ['वार', 'तिथि', 'नक्षत्र', 'योग', 'करण'];
+{
+  const { text } = renderChart({ lang: 'hi' });
+  const lines = text.split('\n');
+  const start = lines.lastIndexOf('पञ्चाङ्ग');
+  if (start < 0) {
+    console.error('FAIL chart.hi: the birth-panchang block did not render — this check has stopped proving anything.');
+    failures++;
+  } else {
+    const blk = lines.slice(start);
+    for (const label of PANCHANG_LABELS_HI) {
+      const i = blk.indexOf(label);
+      if (i < 0) { console.error(`FAIL chart.hi: birth panchang has no "${label}" row.`); failures++; continue; }
+      const value = blk[i + 1] || '';
+      if (/[A-Za-z]/.test(value)) {
+        console.error(`FAIL chart.hi: the birth panchang prints "${label}" in English: ${value}`);
+        console.error('    Route it through panchangTerm(lang, "vara"|"tithi"|"paksha"|"nakshatra"|"yoga"|"karana", …).');
+        failures++;
+      }
+    }
+  }
+}
+/* Exhaustive, so a value this one fixture never lands on cannot hide: every yoga,
+   karana and vara the engine can return must have a Devanagari name. */
+{
+  const { YOGAS, KARANAS_MOV, karanaName } = loadApp('src/engine/panchang.ts');
+  /* karanaName covers the four fixed karanas by their own elongation windows rather
+     than by a hand-copied list, so a rename in the engine shows up here. */
+  const allKaranas = [...new Set([...KARANAS_MOV,
+    ...[0, 57, 58, 59].map((k) => karanaName(k * 6 + 0.5))])];
+  const varas = terms.VARA_EN ? [...terms.VARA_EN] : [];
+  /* A missing table must read as a failure, not as a stack trace that aborts the gate
+     before the checks below it ever run. */
+  const hiOf = (kind, v) => { try { return terms.panchangTerm('hi', kind, v); } catch { return ''; } };
+  const untranslated = [
+    ...YOGAS.filter((y) => !DEVANAGARI.test(hiOf('yoga', y))).map((y) => `yoga ${y}`),
+    ...allKaranas.filter((k) => !DEVANAGARI.test(hiOf('karana', k))).map((k) => `karana ${k}`),
+    ...(varas.length ? varas : ['(no VARA_EN table)'])
+      .filter((v) => !DEVANAGARI.test(hiOf('vara', `${v} (x)`))).map((v) => `vara ${v}`),
+  ];
+  if (untranslated.length) {
+    console.error(`FAIL panchang terms: ${untranslated.length} value(s) have no Devanagari name: ${untranslated.slice(0, 8).join(', ')}`);
+    console.error('    Add them to YOGA_HI / KARANA_HI / VARA_HI in src/i18n/panchang-terms.ts.');
+    failures++;
+  }
+}
+
+/* --- 6d. F13: the Papa Dosha card names its three references, in both languages --- */
+/* English was the degraded language here: Hindi mapped the keys, English printed the
+   engine's own "lagna: 4 · moon: 3 · venus: 2". */
+const PAPA_EXPECT = { en: [/\bLagna: \d/, /\bMoon: \d/, /\bVenus: \d/], hi: [/लग्न: \d/, /चन्द्र: \d/, /शुक्र: \d/] };
+for (const lang of LANGS) {
+  const { text } = renderChart({ lang });
+  for (const re of PAPA_EXPECT[lang]) {
+    if (!re.test(text)) {
+      console.error(`FAIL chart.${lang}: the Papa Dosha card does not name its reference points (${re}).`);
+      failures++;
+    }
+  }
+  if (/\b(lagna|moon|venus): \d/.test(text)) {
+    console.error(`FAIL chart.${lang}: the Papa Dosha card prints the engine's internal keys instead of words.`);
+    console.error(`    ${text.split('\n').find((l) => /\b(lagna|moon|venus): \d/.test(l))}`);
+    failures++;
+  }
+}
+
+/* --- 6e. F7: the dosha panel names the ayanamsa it used --- */
+/* It reads the chart the reader is looking at, so it follows the ayanamsa chips — but
+   every "Full page →" beneath it routes through code that hard-forces Lahiri. On a
+   Raman chart the same birth gave Shankhachuda here and Karkotaka there. Either the
+   panel is pinned or it says so; silence is the one thing AGENTS.md forbids. */
+const doshaBlock = (text) => {
+  const lines = text.split('\n');
+  const i = lines.findIndex((l) => /^(Dosha analysis|दोष विश्लेषण)$/.test(l));
+  return i < 0 ? '' : lines.slice(i, i + 20).join('\n');
+};
+for (const lang of LANGS) {
+  for (const [ay, label] of [['lahiri', 'Lahiri'], ['raman', 'Raman']]) {
+    const blk = doshaBlock(renderChart({ lang, ayanamsa: ay }).text);
+    if (!blk) { console.error(`FAIL chart.${lang}: the dosha panel did not render.`); failures++; continue; }
+    if (!blk.includes(label)) {
+      console.error(`FAIL chart.${lang}: the dosha panel on a ${label} chart never names the ayanamsa it computed with.`);
+      failures++;
+    }
+    /* On anything but Lahiri the panel must also warn that the page it links to will
+       answer differently — a link that quietly contradicts its own card is the defect. */
+    const warns = /Lahiri \(Chitrapaksha\)/.test(blk) && /Full page|विस्तृत पृष्ठ/.test(blk);
+    if (ay !== 'lahiri' && !warns) {
+      console.error(`FAIL chart.${lang}: on a ${label} chart the dosha panel must say the linked full pages compute with Lahiri.`);
+      console.error(`    ${blk.split('\n').slice(-3).join(' | ')}`);
+      failures++;
+    }
+  }
+}
+
+/* --- 6f. F22: "no supportive window" states the range it searched --- */
+/* A 2075 birth returns zero windows because the horizon (twenty years from today)
+   falls before the chart's first dasha begins. Rendered as "No clearly supportive
+   window found in the next twenty years", that reads as a finding about the marriage.
+   The 18-year floor was never stated at all. The numbers below come from the engine's
+   own exported constants, so the sentence cannot drift from the arithmetic. */
+const FLOOR = marriageTiming.MARRIAGE_AGE_FLOOR_YEARS;
+const HORIZON = marriageTiming.MARRIAGE_HORIZON_YEARS;
+if (!(FLOOR > 0 && HORIZON > 0)) {
+  console.error('FAIL marriage timing: the age floor and horizon must be exported constants the screen can print.');
+  failures++;
+}
+for (const lang of LANGS) {
+  for (const [what, birth] of [['beyond the horizon', { ...FIXTURE, y: 2075 }], ['ordinary', FIXTURE]]) {
+    const { text } = renderChart({ lang, birth });
+    const lines = text.split('\n');
+    const i = lines.findIndex((l) => /^(Marriage — supportive timing|विवाह — सम्भावित समय)$/.test(l));
+    const blk = i < 0 ? '' : lines.slice(i, i + 6).join('\n');
+    if (!blk) { console.error(`FAIL chart.${lang}: the marriage-timing block did not render.`); failures++; continue; }
+    if (!blk.includes(String(FLOOR)) || !blk.includes(String(HORIZON))) {
+      console.error(`FAIL chart.${lang} (${what} birth): the marriage block must state both edges of the search — age ${FLOOR} and ${HORIZON} years from today.`);
+      console.error(`    ${blk.split('\n')[2] || '(no range line)'}`);
+      failures++;
+    }
+  }
+  const empty = renderChart({ lang, birth: { ...FIXTURE, y: 2075 } }).text;
+  if (/next twenty years|आगामी बीस वर्षों/.test(empty)) {
+    console.error(`FAIL chart.${lang}: an empty window list still reads as a finding about the marriage rather than a limit of the range searched.`);
+    failures++;
+  }
+}
 
 if (failures) {
   console.error(`\n✗ screen-snapshots FAILED (${failures})`);
@@ -665,6 +942,7 @@ const skipped = SCREENS.filter((s) => s.skip);
 console.log(`✓ screen-snapshots: ${fresh.size} baselines match · ${covered} screens × ${LANGS.length} languages + chart/transit/match results`);
 console.log(`✓ calculator cross-seeding: ${clean} mismatched-result renders identical to no result (0 crashes, 0 foreign answers) · ${answered} own-result renders still answer`);
 console.log(`✓ yoga content parity: ${Object.keys(YOGA_EN).length} yoga templates × ${yogaRows} parameter sets · ${yogaEnTexts.size} distinct English interpretations → ${yogaEnToHiText.size} distinct Hindi (no collapse)`);
+console.log(`✓ cast chart rendered for real: ${panelChecks} panel visibility checks across ${PANEL_KEYS.length} panels (nothing unmounts) · ?panel= restores the open panel · birth panchang, Papa references, dosha ayanamsa and the marriage search range all read in both languages`);
 if (skipped.length) console.log(`  not covered (${skipped.length}): ${skipped.map((s) => s.key).join(', ')} — inner modules needing parent-computed data`);
 /* A green run must never be read as "this screen is fully proven". Screens whose
    answer only appears after the reader acts are covered in their INITIAL state
