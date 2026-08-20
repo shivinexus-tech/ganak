@@ -356,7 +356,7 @@ Aquarius 5°47′Dhanishta-4Ma/Mo4
 Ketu
 Leo 5°47′Magha-2Ke/Ra10
 Rx = retrograde, appears to move backward in the sky
-Star/Sub = nakshatra lord / KP sub-lord — the two-level rulership Prashna reads. House = the house the planet occupies (equal houses — high-latitude fallback). Positions: Lahiri ayanamsa — the same conventions as Drik Panchang defaults, mean Rahu/Ketu.
+Star/Sub = nakshatra lord / KP sub-lord — the two-level rulership Prashna reads. House = the house the planet occupies (equal houses — above the polar circle Placidus does not exist; the Jyotish chart screen falls back to Porphyry there). Positions: Lahiri ayanamsa — the same conventions as Drik Panchang defaults, mean Rahu/Ketu.
 All twelve cuspal sub-lords
 CuspSignNakshatraStarSub
 1Libra 12°33′Swati-2RahuSaturn

@@ -116,6 +116,34 @@ pins is now tabulated in the "printed-folio confirmation pass" section below** (
 
 ---
 
+## Rule 9 in practice — where Placidus actually ends (corrected 2026-08-19)
+
+Rule 9 is about the band **above** the latitude where Placidus is undefined. Until 2026-08-19 the
+Prashna engine put that latitude in the wrong place: `PR_placidus` opened with a flat
+`if (Math.abs(lat) > 60) return null`, and nothing in KP, in this document or in spherical astronomy
+supports a boundary at 60°. Placidus is undefined exactly where a cusp-defining ecliptic point is
+circumpolar (`|tan φ · tan δ| ≥ 1`); because an ecliptic point's declination never exceeds the
+obliquity, that first bites at the **polar circle, ≈66.56°**.
+
+The consequence was a cross-surface contradiction, not merely an internal one: `src/engine/houses.ts`
+— the Placidus the **Jyotish chart screen** draws — has always used the geometric test, so Helsinki,
+Whitehorse, Anchorage, Yellowknife, Trondheim, Reykjavík, Fairbanks and everything up to the polar
+circle got real Placidus cusps on one screen and equal-house cusps on the other, in the same app for
+the same moment — up to **81°** apart at Reykjavík (bug bash F17).
+
+**Which is right is not a case of sources disagreeing.** KP is a Placidus system, and the primary
+casting rule is explicit: *"for the other cusps take only the LATITUDE, prepared per the PLACIDUS
+system"* (Reader VI, Section IV — the same rule pinned for rule 1). Wherever Placidus exists, KP
+horary uses it. The flat 60 was an unsourced constant, now removed from both engine copies.
+
+**Rule 9 itself is unchanged and still Tier 2.** Above the polar circle the Readers record no polar
+convention, equal house remains Ganak's stated product decision, and it must not be upgraded to a KSK
+claim. What changed is only the boundary at which rule 9 starts to apply. Full evidence, the
+re-anchored gate and the open handoff on the Jyotish side:
+[`audits/2026-08-19-prashna-house-system.md`](audits/2026-08-19-prashna-house-system.md).
+
+---
+
 ## Rule 4 in practice — which Ruling-Planet set Ganak follows (recorded 2026-08-19)
 
 Rule 4 was listed as a shipped engine rule from 2026-07-29, and until 2026-08-19 the
