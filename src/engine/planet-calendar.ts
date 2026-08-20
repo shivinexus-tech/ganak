@@ -13,6 +13,11 @@ const COMBUST_ORB: Record<string, number> = { Mars: 17, Mercury: 14, Jupiter: 11
 const DAY = 86400000;
 /* shortest angular separation of a planet from the Sun, 0..180° */
 const sunSep = (name: string, ms: number) => { const d = rev(planetSidMs(name, ms) - sunSidMs(ms)); return d > 180 ? 360 - d : d; };
+/* Apparent daily motion, CENTRED on `ms` (±12 h). Centred, not backward: a backward
+   difference reports the mean motion over the preceding half-day, so a retrograde
+   flag built on it turns over ~6 h after the true station. This is the single
+   definition of planetary speed for the whole app — the birth chart's ℞ flag reads
+   it too (bug-bash 2026-08-18 F8). */
 const planetSpeed = (name: string, ms: number) => (((planetSidMs(name, ms + DAY / 2) - planetSidMs(name, ms - DAY / 2) + 540) % 360) - 180);
 
 /* Retrograde/direct station events: each moment a star planet reverses motion. */
@@ -66,4 +71,4 @@ export function planetStatesAt(atMs: number) {
   }));
 }
 
-export { STAR_PLANETS, COMBUST_ORB };
+export { STAR_PLANETS, COMBUST_ORB, planetSpeed };

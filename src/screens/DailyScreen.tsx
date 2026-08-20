@@ -421,7 +421,7 @@ export default function DailyScreen({ C, card, lang, place, onPlace }) {
                             );
                           })}
                         </div>
-                        <div className="technical-only" style={{ fontSize: "var(--font-micro)", color: C.muted, marginTop: "0.25rem", fontStyle: "italic" }}>{lang === "hi" ? "सायन (लाहिरी) · समय " : "Sidereal (Lahiri) · times in "}{(place && place.label) || (lang === "hi" ? "स्थानीय" : "local")}{lang === "hi" ? " समय अनुसार · धीमे ग्रहों हेतु ±1 दिन" : " time · ±1 day for slow planets"}</div>
+                        <div className="technical-only" style={{ fontSize: "var(--font-micro)", color: C.muted, marginTop: "0.25rem", fontStyle: "italic" }}>{lang === "hi" ? "निरयण (लाहिरी) · समय " : "Sidereal (Lahiri) · times in "}{(place && place.label) || (lang === "hi" ? "स्थानीय" : "local")}{lang === "hi" ? " समय अनुसार · धीमे ग्रहों हेतु ±1 दिन" : " time · ±1 day for slow planets"}</div>
                         {showExpert && <div style={{ fontSize: "var(--font-micro)", color: C.muted, marginTop: "0.25rem", fontVariantNumeric: "tabular-nums" }}>
                           {(lang === "hi" ? "अयनांश " : "Ayanamsa ") + ayanamsa + " · UTC" + (todayP.tz >= 0 ? "+" : "") + todayP.tz + " · " + (lang === "hi" ? "मध्यम राहु/केतु · पूर्ण-राशि भाव" : "mean Rahu/Ketu · whole-sign houses")}
                         </div>}

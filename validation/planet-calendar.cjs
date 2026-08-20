@@ -40,4 +40,36 @@ const now = pc.planetStatesAt(Date.UTC(2026, 6, 1));
 assert.strictEqual(now.length, 5, 'planetStatesAt must cover the five star planets');
 assert(now.every((s) => typeof s.retro === 'boolean' && typeof s.combust === 'boolean' && s.sep >= 0 && s.sep <= 180), 'state shape invalid');
 
-console.log('planet-calendar.cjs OK — 12 station events (Mercury R×3, Feb-26 anchor), combustion alternation, states');
+
+// ---- the birth chart and this calendar must agree about retrograde ----
+/* Bug bash 2026-08-18 F8: the chart flagged retrograde from a BACKWARD 12h
+   difference while everything else used a CENTRED one, so a chart cast in the
+   6-7 hours after a station printed ℞ next to a planet this card called direct.
+   79 disagreeing hourly samples across all 12 of 2026's stations, invisible to
+   every gate. Both surfaces now read one definition (planetSpeed); this sweeps
+   ±36 h around every station at one-hour resolution to keep it that way. */
+const { computeKundli } = require('./_load-app.cjs').loadApp('src/engine/kundli.ts');
+let compared = 0, disagreed = 0;
+const worst = [];
+for (const ev of retro) {
+  for (let h = -36; h <= 36; h++) {
+    const t0 = ev.t + h * 3600000, dt = new Date(t0);
+    // the chart only carries minute resolution, so ask both surfaces about the
+    // SAME truncated instant — otherwise the sub-minute station itself looks like
+    // a disagreement when it is only a rounding difference.
+    const t = Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate(), dt.getUTCHours(), dt.getUTCMinutes());
+    const chart = computeKundli({
+      y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, day: dt.getUTCDate(),
+      hh: dt.getUTCHours(), mi: dt.getUTCMinutes(), tz: 0, lat: 28.6139, lon: 77.209, ayanamsa: 'lahiri',
+    });
+    const inChart = chart.rows.find((r) => r.name === ev.planet).retro;
+    const inCalendar = pc.planetStatesAt(t).find((s) => s.planet === ev.planet).retro;
+    compared++;
+    if (inChart !== inCalendar) { disagreed++; if (worst.length < 5) worst.push(`${ev.planet} ${new Date(t).toISOString().slice(0, 16)} chart=${inChart} calendar=${inCalendar}`); }
+  }
+}
+assert.strictEqual(disagreed, 0,
+  `birth chart and planet calendar disagree about retrograde at ${disagreed}/${compared} sampled instants: ${worst.join(' | ')}`);
+assert(compared >= 800, `expected a dense sweep around every station, only compared ${compared} instants`);
+
+console.log(`planet-calendar.cjs OK — 12 station events (Mercury R×3, Feb-26 anchor), combustion alternation, states, and ${compared} chart-vs-calendar retrograde samples around all 12 stations`);
