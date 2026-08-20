@@ -237,8 +237,8 @@ export const VRAT_VIDHI = {
   pradosh: {
     aartis: [GANESH_AARTI, OM_JAI_SHIV_OMKARA],
     verdict: {
-      en: "This twice-monthly Shiva observance falls when Trayodashi overlaps the local evening Pradosh period. Worship Shiva and Nandi in the time shown above.",
-      hi: "यह मास में दो बार होने वाला शिव-व्रत उस दिन पड़ता है जब त्रयोदशी स्थानीय सायंकालीन प्रदोष से मिलती है। ऊपर दिखाए समय में शिव और नन्दी की पूजा करें।",
+      en: "This twice-monthly Shiva observance falls when Trayodashi overlaps the local evening Pradosh period. Ganak reckons Pradosh from local sunset through the first fifth of the night — the classical three-muhurta measure that published panchangs follow. A popular alternative keeps an hour and a half either side of sunset; follow your household rule. Worship Shiva and Nandi in the time shown above.",
+      hi: "यह मास में दो बार होने वाला शिव-व्रत उस दिन पड़ता है जब त्रयोदशी स्थानीय सायंकालीन प्रदोष से मिलती है। गणक प्रदोष की गणना स्थानीय सूर्यास्त से रात्रि के प्रथम पंचमांश तक करता है — यही शास्त्रीय तीन-मुहूर्त मान है और प्रकाशित पंचांगों की रीति भी। लोक-परम्परा में सूर्यास्त से डेढ़ घंटा पूर्व और पश्चात् भी माना जाता है; अपने कुल का नियम मानें। ऊपर दिखाए समय में शिव और नन्दी की पूजा करें।",
     },
     vidhi: [
       { en: "Bathe in the morning and choose full fast, phalahar or one satvik meal.", hi: "प्रातः स्नान कर पूर्ण उपवास, फलाहार या एक सात्त्विक भोजन चुनें।" },

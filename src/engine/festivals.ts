@@ -537,6 +537,13 @@ function scanDayParts(y, m, day, fallbackTz, place) {
     nishita: [nishita.start, nishita.end],
   };
 }
+/* Day parts for the civil day before (y, m, day), month and year borrows handled
+   by Date rather than by arithmetic on `day`. Only reached by the rare kshaya
+   branches, so evicting the one-entry sunEvents cache here costs nothing. */
+function previousDayParts(y, m, day, tz, place) {
+  const d = new Date(Date.UTC(y, m - 1, day - 1));
+  return scanDayParts(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate(), tz, place);
+}
 function kalaInterval(parts, kala) {
   if (kala === "moonrise") {
     if (parts.moonrise === undefined) {
@@ -641,7 +648,30 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
           const kshaya = !overlap && rule.baseKey === "ekadashi" && rule.kala === "udaya"
             && tithiIndexAt(parts.rise + 1000) === (target + 29) % 30
             && tithiIndexAt(parts.nextRise + 1000) === (target + 1) % 30;
-          if (!overlap && !kshaya) continue;
+          /* The same problem, in the evening. A short Trayodashi can begin after
+             one Pradosha has closed and end before the next one opens, so it
+             reaches no Pradosha at all and the vrata would vanish from the
+             calendar. It is kept on the day the tithi actually ran — present at
+             that sunrise, gone by that sunset. Longitude decides whether this
+             happens: Drik publishes Soma Pradosh on 2026-08-10 for New Delhi,
+             London AND Washington D.C., but Trayodashi (09 Aug 22:31 → 10 Aug
+             19:25 EDT) is still running at the London and Delhi sunsets while it
+             has ended 45 minutes before Washington's, so only Washington takes
+             this branch. Pushed with zero overlap, so if any evening did catch
+             the tithi that day wins on the greater-share test below.
+
+             The previous evening is re-derived here rather than left to the
+             greater-share test, because that test can only see days already
+             inside this scan. Washington D.C. on 2026-01-01 is exactly that
+             trap: Trayodashi ran 31 Dec 15:18 → 01 Jan 11:52 EST and filled the
+             31st's Pradosha completely, so the 1st is not a kshaya at all — but
+             a calendar that opens on 1 January has no 31 December to compare
+             with, and the vrata would be printed twice. */
+          const kshayaPradosha = !overlap && rule.baseKey === "pradosh"
+            && tithiIndexAt(parts.rise + 1000) === target
+            && tithiIndexAt(parts.set - 1000) !== target
+            && !tithiKalaOverlap(previousDayParts(y, m, day, tz, place), "pradosha", target);
+          if (!overlap && !kshaya && !kshayaPradosha) continue;
           // Named vrata identity rides on the LUNAR month, never the Gregorian one.
           // Krishna-paksha names use the Purnimanta month (Drik: "Yogini Ekadashi
           // falls during Krishna Paksha of Ashadha month according to North Indian
@@ -676,6 +706,9 @@ function scanPanchangCalendar(fromMs, tz, days = 400, fastDays = 46, place = nul
               if (overlap <= prev.overlap) continue;
               fasts.splice(fasts.indexOf(prev), 1);
             }
+            /* A kshaya Pradosha still reports "pradosha" as its deciding kala:
+               the observance is the same one, and the guide's existing label for
+               it stays true for the reader. */
             fasts.push({ key: o.key, ms: parts.noon, overlap, decidingKala: kshaya ? "kshaya-tithi-start" : rule.kala });
           }
         }

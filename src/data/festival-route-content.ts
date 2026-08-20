@@ -127,7 +127,7 @@ const PRADOSH_ROWS = [
 const pradosh = (row) => record(
   row[0], "named-variant", [row[1], row[2]], [row[3], row[4]], [row[5], row[6] || `${row[2]} में शिव को जल, मान्य हो तो बिल्व और दीप अर्पित करें; लोक-फल को निश्चित न मानें।`],
   ["Complete after the local Pradosha Shiva worship according to the household fast rule.", "स्थानीय प्रदोष शिव-पूजन के बाद कुल के व्रत-नियम से पूर्ण करें।"],
-  ["Use the displayed local Pradosha twilight; weekday naming does not replace the calculated interval.", "दिखाया स्थानीय प्रदोष सन्ध्या-समय मानें; वार-नाम गणित अवधि को नहीं बदलता।"],
+  ["Use the displayed local Pradosha window — sunset to the first fifth of the night, the measure published panchangs follow; a popular alternative reckons an hour and a half either side of sunset. Weekday naming does not replace the calculated interval.", "दिखाया स्थानीय प्रदोष समय मानें — सूर्यास्त से रात्रि के प्रथम पंचमांश तक, यही प्रकाशित पंचांगों की रीति है; लोक-परम्परा में सूर्यास्त से डेढ़ घंटा पूर्व-पश्चात् भी माना जाता है। वार-नाम गणित अवधि को नहीं बदलता।"],
   ["Weekday intentions are regional or popular traditions and never guaranteed outcomes.", "वार-सम्बन्धी भाव क्षेत्रीय या लोक-परम्परा हैं, निश्चित फल नहीं।"],
 );
 
