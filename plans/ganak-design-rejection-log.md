@@ -422,6 +422,39 @@ Evidence labels used below:
 - **Confidence / limitation:** exact owner correction, exact node/hash/name sweep and
   whole-file post-fix evidence; high. Post-fix active reuse is zero.
 
+### REJ-017 — Exact faded floral-stem screenshot crop; crop-signature rejection only
+
+- **Decision date / status:** 2026-08-20 · `REJECTED / ARCHIVE ONLY · EXACT ELEMENT`
+- **Track / scope:** Website · `PATTERN` asset/crop authority
+- **Figma / screenshot evidence:** owner negative reference
+  `/Users/shivie/Desktop/Screenshot 2026-08-19 at 11.54.47 PM.png`; canonical crop
+  `107:50` / raster `107:51`; active Batch wrapper `762:16314` / raster
+  `762:16315`; source wrapper `116:391` / raster `116:392`. The reliable crop
+  signature is an `88×446` clipped wrapper (historical canonical `100×446` form)
+  over a `1536×1119` raster at `x=-21,y=-253`, backed by source-sheet hash
+  `c69d89b16c8068f8f06ea86b4a3852a19db33732`.
+- **Rejected:** this exact faded red/orange, muted-green, gold-curl, ivory-backed
+  floral drawing/crop because it does not match Ganak colours or design.
+- **Owner reason:** **Verbatim evidence:** the owner rejected only the element shown
+  in the screenshot and explicitly cancelled the broader interpretation that
+  vertical, tall, narrow, side-growing or botanical compositions are categorically
+  rejected.
+- **Underlying ornament-language/design lesson:** a shared raster hash cannot
+  identify a crop decision. Ganak must classify the exact wrapper geometry, offset,
+  content and role; legitimate crops from the same source sheet must remain usable.
+- **Prohibited reuse:** no active candidate, component or owner-review surface may
+  render this exact crop or an exact-instance copy. Do **not** globally deny the
+  `c69d89…33732` hash and do not create a broad aspect-ratio/botanical-family rule.
+- **Still approved / parked:** all nine approved floral components `760:2`–`760:18`,
+  other vertical/edge botanical compositions, and the cross-site border set
+  `759:20` remain governed by their own roles. Independent same-screen review chose
+  **no added ornament** for the ordinary-Today slot: comparison `811:18395`, winner
+  `811:19095`; A `811:18400` / `759:18` and B `811:18747` / `757:6` were rejected
+  only for this slot, not globally.
+- **Related rules:** `GDF-054`, `GDF-056`, `GDF-058`, `GDF-060`, `GDF-063`.
+- **Confidence / limitation:** exact owner screenshot, crop geometry, source-sheet
+  relationship, 14-instance cleanup and independent visual-art ranking; high.
+
 ## Approved ornament-language boundary
 
 The owner corrected the phrase “design vocabulary.” The intended source of truth is
@@ -452,6 +485,11 @@ floral vocabulary is shared set `760:20`. Ornate architectural pieces remain
 Festival/Vrat-only, while full invitation framing and universal border repetition
 remain prohibited.
 
+Consolidated owner inventory `800:2` (`ORNAMENT LIBRARY · COMPLETE INVENTORY ·
+OWNER VIEW`) shows 68 numbered items with status, scope and lineage. Its red zone
+`806:21` is the only review surface where REJ-016/REJ-017 previews are deliberately
+visible as rejection evidence. Library inclusion does not mean use everywhere.
+
 ## Read-only recovery inventory for owner
 
 ### Approved website baseline sources
@@ -471,11 +509,12 @@ remain prohibited.
 Section `652:13736` retains exactly four direct children as historical baseline
 evidence, but it is now `CHANGES REQUESTED`. Exact rejected hash descendants
 `652:14062` and `652:14131` are hidden and the Vrat frames are no longer owner-review
-authority. Batch section `769:17254` returned to `OWNER REVIEW` only after independent
-QA confirmed both machine gates on 2026-08-19. Its twelve sources/clones and shared
-context were corrected from denied dominant values `#F9FAF9`, `#FCFBF8`, `#FFFDFC`,
-`#FAF9F4`; its Vrat screen uses unrelated approved component `760:4`, not `485:51`.
-Whole-file active rejected-hash and prohibited approval-name hits are zero.
+authority. Batch section `769:17254` is again `CHANGES REQUESTED` pending a complete
+exact-node re-QA after REJ-017. Its twelve sources/clones and shared context remain
+corrected from denied dominant values `#F9FAF9`, `#FCFBF8`, `#FFFDFC`, `#FAF9F4`;
+its Vrat screen uses unrelated approved component `760:4`, not `485:51`. Current
+page sweeps report zero active REJ-016 hash/name reuse and zero active REJ-017 exact
+crop reuse; this is cleanup evidence, not a full Batch re-approval.
 
 | Role | Review node | Source candidate |
 |---|---:|---:|
@@ -505,10 +544,11 @@ Current section name: `CHANGES REQUESTED · WEBSITE BASELINE · P0 REJECTED FLOR
 
 ### Current missing decisions / TODO
 
-1. Independent exact-node re-QA must pass `GDF-012` and `GDF-062` before any current
-   pilot section returns to owner review.
-2. The correct ordinary-Today ornament replacement remains parked; do not infer
-   approval from archive `682:22` and do not reopen it during vocabulary review.
+1. Independent exact-node re-QA must pass `GDF-012`, `GDF-062` and `GDF-063` before
+   any current pilot section returns to owner review.
+2. Ordinary Today uses **no added ornament** in the former rejected slot. Independent
+   visual-art review selected C `811:19095` from comparison `811:18395`; A/B remain
+   evidence of valid assets that were wrong for this specific composition.
 3. Muhurat grouped-list replacement accent remains unresolved.
 4. Exact rejected nodes/screenshots for the older palette, invitation-crop, Muhurat
    accent, unsupported-source and Quick Access experiments remain recovery TODOs,

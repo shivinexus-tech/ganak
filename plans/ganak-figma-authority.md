@@ -159,6 +159,29 @@ screen, content, hierarchy or interaction changes. Historical art remains visibl
 only under clearly labelled rejected/archive ancestors so the failure cannot be
 forgotten or accidentally promoted again.
 
+### 4.2 Exact screenshot floral crop; no broad botanical-family rejection
+
+**Binding owner scope correction, 2026-08-20.** The exact faded red/orange,
+muted-green, gold-curl, ivory-backed crop shown in
+`/Users/shivie/Desktop/Screenshot 2026-08-19 at 11.54.47 PM.png` is rejected because
+that specific element does not match Ganak colours or design. Its canonical wrapper
+and raster are `107:50` / `107:51`; source `116:391` / `116:392`; Batch occurrence
+`762:16314` / `762:16315`. The identifying signature is an `88×446` clipped wrapper
+(historical `100×446` form) over a `1536×1119` raster at `x=-21,y=-253`.
+
+The backing source-sheet hash
+`c69d89b16c8068f8f06ea86b4a3852a19db33732` is shared by legitimate, materially
+different crops and is therefore **not** a global deny-list hash. There is no ban on
+tall, narrow, vertical, edge-growing or botanical art. Only the exact crop/signature
+and exact-instance copies are `REJECTED / ARCHIVE ONLY` under `REJ-017` / `GDF-063`.
+
+For the ordinary-Today slot, independent natural-scale comparison `811:18395`
+selected C `811:19095` — no added ornament — because the screen already has a
+context ribbon, transition rule, lower-right botanical finish and ending band. A
+`811:18400` (`759:18`) and B `811:18747` (`757:6`) remain valid library assets but
+were rejected for this slot only. Source `762:16084` retains the empty slot; unrelated
+content, hierarchy and palette remain frozen.
+
 ## 5. Rejected and non-authoritative sources
 
 The canonical rejection vocabulary, exact node evidence, owner reasons and
@@ -233,10 +256,12 @@ decisions: Today/Panchang desktop EN and Festival/Vrat detail desktop EN. Each h
 a second design direction and is not Ganak Phone/native work. Hindi and 320px frames
 also remain mandatory attached QA evidence, but none are additional visual decisions
 for the owner. Only exact-node independent-QA `PASS` candidates may enter an
-integrator-owned owner-review surface. Batch 01 section `769:17254` passed its
-independent P0 re-QA on 2026-08-19 and is now `OWNER REVIEW · BATCH 01 · 12-SCREEN
-QUALITY CHECKPOINT` for visual-direction review only. Former baseline `652:13736`
-remains `CHANGES REQUESTED` historical evidence and is not review authority.
+integrator-owned owner-review surface. Batch 01 section `769:17254` previously
+passed an earlier P0 re-QA, but that PASS was withdrawn after the exact screenshot-
+crop correction in §4.2. It remains `CHANGES REQUESTED · RE-QA PENDING` until all
+twelve exact desktop primaries pass `GDF-012`, `GDF-062` and `GDF-063`. Former
+baseline `652:13736` also remains `CHANGES REQUESTED` historical evidence and is not
+review authority.
 
 The responsive shared system above was created before lane resumption. Its linked
 EN/HI 390px proof has no text below 13px, no mapped target below 42px, no missing
@@ -352,6 +377,14 @@ detached stickers, invented devotional marks and ornament that competes with dat
 remain prohibited. The owner-review atlas classification is visible at `755:16083`.
 Ceremonial non-floral components beyond the stable V1 are deferred rather than
 locally redrawn by lanes.
+
+The complete consolidated owner inventory is section `800:2`,
+`ORNAMENT LIBRARY · COMPLETE INVENTORY · OWNER VIEW`. It contains 68 deduplicated,
+numbered cards: 9 active/owner-liked floral artworks, 7 cross-site borders/rules,
+6 textile/lattice/geometric elements, 14 Festival/Vrat-only ceremonial elements,
+17 dividers/transitions/corners/frames/cartouches and 15 rejected/archive-only
+items. Rejected evidence is physically separated in red zone `806:21`; library
+inclusion never means use everywhere.
 
 ## 8. Communication
 

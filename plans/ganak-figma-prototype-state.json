@@ -6,7 +6,7 @@
   "designRejectionRegister": {
     "path": "plans/ganak-design-rejection-log.md",
     "role": "canonical rejection vocabulary; the GDF ledger remains the regression/action register",
-    "canonicalRejectIds": "REJ-001 through REJ-016",
+    "canonicalRejectIds": "REJ-001 through REJ-017",
     "nodeMap": {
       "REJ-001": { "rejectedNodes": ["47:2"] },
       "REJ-002": { "rejectedNodes": ["79:12"] },
@@ -59,6 +59,21 @@
         "activeWholeFileHashHitsAfterSweep": 0,
         "activeWholeFileApprovalNameHitsAfterSweep": 0,
         "enforcement": "active APPROVED / OWNER REVIEW / QA PASS subtrees deny exact hash, node/derived lineage and approval-name claims"
+      },
+      "REJ-017": {
+        "decisionState": "REJECTED / ARCHIVE ONLY / EXACT CROP SIGNATURE",
+        "ownerScreenshot": "/Users/shivie/Desktop/Screenshot 2026-08-19 at 11.54.47 PM.png",
+        "canonicalWrapper": "107:50",
+        "canonicalRaster": "107:51",
+        "sourceWrapper": "116:391",
+        "sourceRaster": "116:392",
+        "batchWrapper": "762:16314",
+        "batchRaster": "762:16315",
+        "cropSignature": { "wrapperWidth": 88, "wrapperHeight": 446, "clipsContent": true, "rasterWidth": 1536, "rasterHeight": 1119, "rasterX": -21, "rasterY": -253 },
+        "sharedSourceSheetHashNotGloballyRejected": "c69d89b16c8068f8f06ea86b4a3852a19db33732",
+        "activeExactCropHitsAfterSweep": 0,
+        "broadBotanicalFamilyRejection": false,
+        "ordinaryTodaySlotDecision": { "comparison": "811:18395", "winner": "811:19095", "choice": "no added ornament", "rejectedOnlyForThisSlot": ["811:18400", "811:18747"] }
       }
     }
   },
@@ -78,6 +93,14 @@
       "areaThresholdPercentOfRoot": 2,
       "allowlistedUse": "small rules, strokes, icons, text punctuation or artwork with exact role evidence",
       "lastBatchSweep": { "date": "2026-08-19", "sourceSharedAndReviewHits": 0 }
+    },
+    "exactScreenshotCropDenylist": {
+      "rule": "match exact crop geometry, raster offset and content nodes; do not deny the shared source-sheet hash globally",
+      "canonicalNodes": ["107:50", "107:51"],
+      "signature": { "wrapperWidth": 88, "wrapperHeight": 446, "clipsContent": true, "rasterWidth": 1536, "rasterHeight": 1119, "rasterX": -21, "rasterY": -253 },
+      "sourceSheetHashNotGloballyDenied": "c69d89b16c8068f8f06ea86b4a3852a19db33732",
+      "activeExactCropHitsAfterSweep": 0,
+      "broadAspectRatioOrBotanicalHeuristic": false
     }
   },
   "entities": {
@@ -112,6 +135,8 @@
       ,"ownerDecisionNonFloralAtlas": "755:16083"
       ,"approvedOrnamentLibrary": "753:2"
       ,"ownerReviewBatch01TwelveScreenCheckpoint": "769:17254"
+      ,"completeOrnamentInventoryOwnerView": "800:2"
+      ,"todayOrdinaryOrnamentComparison": "811:18395"
     },
     "frames": {
       "approvedDesktopMaster": "31:2",
@@ -298,12 +323,31 @@
     "usageModes": { "Restrained": "approved", "Rich": "approved", "Celebratory": "Festival/Vrat hero only", "Balanced": "rejected" },
     "deferred": "Festival ceremonial arches/niches/cartouches/ribbons remain uncomponentized until a later exact need; lanes may not crop them locally."
   },
+  "completeOrnamentInventoryOwnerView": {
+    "created": "2026-08-20",
+    "section": "800:2",
+    "sectionName": "ORNAMENT LIBRARY · COMPLETE INVENTORY · OWNER VIEW",
+    "board": "800:3",
+    "sourceReference": "800:9",
+    "counts": {
+      "activeOwnerLikedFloral": 9,
+      "crossSiteStructuralBordersRules": 7,
+      "textileLatticeGeometric": 6,
+      "festivalVratCeremonial": 14,
+      "dividersTransitionsCornersFramesCartouches": 17,
+      "rejectedArchiveOnly": 15,
+      "total": 68
+    },
+    "rejectedZone": "806:21",
+    "audit": { "blankPreviews": 0, "cardOverflow": 0, "broadRejectionRuleHits": 0 },
+    "usageBoundary": "Library inclusion does not mean use everywhere; each item remains governed by its status, role and allowed scope."
+  },
   "ownerReviewBatch01": {
     "assembled": "2026-08-19",
-    "decisionState": "OWNER REVIEW · VISUAL DIRECTION ONLY · INDEPENDENT QA PASS",
-    "independentQa": "PASS 2026-08-19: zero active rejected hash/approval-name reuse; zero denied dominant surfaces; all twelve screenshots pass visual/accessibility sanity",
+    "decisionState": "CHANGES REQUESTED · FULL EXACT-NODE RE-QA PENDING",
+    "independentQa": "PREVIOUS PASS WITHDRAWN after REJ-017 exact screenshot-crop correction; current cleanup sweeps are evidence, not full Batch approval",
     "section": "769:17254",
-    "sectionName": "OWNER REVIEW · BATCH 01 · 12-SCREEN QUALITY CHECKPOINT",
+    "sectionName": "CHANGES REQUESTED · BATCH 01 · EXACT ORNAMENT CORRECTION · RE-QA PENDING",
     "desktopEnglishPrimaries": {
       "01TodayOrdinary": "769:17261",
       "02TodaySpecial": "769:17610",
@@ -332,6 +376,16 @@
       "deniedHex": ["#F9FAF9", "#FCFBF8", "#FFFDFC", "#FAF9F4"],
       "safeRoleMapping": { "canvas": "#F9FCFD", "surface": "#FFFFFF", "secondaryHero": "#ECF4F7" },
       "deniedHitsAcrossSourcesSharedAndBatchAfterSweep": 0
+    },
+    "p0ExactScreenshotCropCorrection": {
+      "ownerScreenshot": "/Users/shivie/Desktop/Screenshot 2026-08-19 at 11.54.47 PM.png",
+      "rejectedCropNodes": ["107:50", "107:51", "116:391", "116:392", "762:16314", "762:16315"],
+      "sourceSheetHashNotGloballyRejected": "c69d89b16c8068f8f06ea86b4a3852a19db33732",
+      "activeExactCropHitsAfterSweep": 0,
+      "ordinaryTodayComparison": "811:18395",
+      "ordinaryTodayWinner": "811:19095",
+      "ordinaryTodayDecision": "C — no added ornament",
+      "fullBatchReQa": "PENDING"
     },
     "reviewQuestions": ["Does this now feel like one coherent Ganak website?", "Which screens feel weakest?", "Is any earlier mistake repeating?"]
   },
@@ -400,10 +454,10 @@
   },
   "currentTwoScreenQualityGate": {
     "ownerDecisionRecorded": "2026-08-19",
-    "state": "OWNER REVIEW — P0 FLORAL AND SURFACE GATES PASS; VISUAL DIRECTION ONLY",
+    "state": "CHANGES REQUESTED — REJ-017 CORRECTED; FULL EXACT-NODE RE-QA PENDING",
     "queueRule": "Do not place a pilot, wrapper or comparison board in the Owner Review Queue until same-viewport integrator comparison and exact-node independent QA pass every applicable GDF rule.",
     "feedbackLedger": "plans/ganak-design-feedback-ledger.md",
-    "canonicalFeedbackIds": "GDF-001 through GDF-062",
+    "canonicalFeedbackIds": "GDF-001 through GDF-063",
     "independentQaTask": "01a018d9-dca3-70b3-a851-b46eccd965cf",
     "todayPanchangSource": "116:49",
     "festivalVratSources": ["135:1312", "760:20"],
@@ -420,7 +474,7 @@
       "320px responsive website reflow",
       "long, special, sparse and error state specimens"
     ],
-    "ownerReviewSectionRule": "Only exact-node candidates that pass both GDF-012 dominant-surface enforcement and GDF-062 rejected-asset enforcement may be OWNER REVIEW. Batch 01 section 769:17254 passed on 2026-08-19; baseline section 652:13736 remains CHANGES REQUESTED historical evidence.",
+    "ownerReviewSectionRule": "Only exact-node candidates that pass GDF-012 dominant-surface enforcement, GDF-062 rejected-asset enforcement and GDF-063 exact-crop enforcement may be OWNER REVIEW. Batch 01 section 769:17254 is CHANGES REQUESTED pending a full twelve-screen exact-node re-QA; baseline section 652:13736 remains CHANGES REQUESTED historical evidence.",
     "ownerReviewVisualBatch": {
       "section": "652:13736",
       "sectionName": "CHANGES REQUESTED · WEBSITE BASELINE · P0 REJECTED FLORAL REMOVED",
