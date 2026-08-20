@@ -66,7 +66,10 @@ const JYOTISH_GROUPS = [
 // link that scrolls to nothing — a dead-end is worse than a missing entry.
 const TECHNICAL_ANCHORS = new Set(["#shadbala", "#av"]);
 
-function JyotishPanelNav({ lang, C, place = null, showTechnical = true, activeGroup = "kundli", onSelectGroup = () => {} }) {
+/* onSelectGroup receives the group KEY ("kundli" | "dashas" | "matching" | "tools" |
+   "vault"). The default used to take no argument at all, which typed the prop as a
+   nullary callback and hid the fact that the caller is handed the key it must persist. */
+function JyotishPanelNav({ lang, C, place = null, showTechnical = true, activeGroup = "kundli", onSelectGroup = (_key: string) => {} }) {
   const hi = lang === "hi";
   const showReading = SIGN_TRAITS.every((entry) => entry.status === "owner-verified");
   return (

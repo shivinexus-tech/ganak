@@ -19,10 +19,10 @@ import { BALA_PARTS } from "../engine/shadbala";
 import { KP_PLANETS, vimSub } from "../engine/dasha";
 import { computeKundli } from "../engine/kundli";
 import { kalaSarpaFromRows, pitraDoshaFromRows, papaCount } from "../engine/doshas";
-import { marriageWindows } from "../engine/marriage-timing";
+import { marriageWindows, MARRIAGE_AGE_FLOOR_YEARS, MARRIAGE_HORIZON_YEARS } from "../engine/marriage-timing";
 import { DashaTree } from "../components/DashaTree";
 import { ChartVault } from "../components/ChartVault";
-import { JyotishPanelNav } from "../components/JyotishPanelNav";
+import { JyotishPanelNav, JYOTISH_GROUPS } from "../components/JyotishPanelNav";
 import { BNNModule, BhriguModule } from "./JyotishBnnScreen";
 /* Same reason as JyotishPanelNav: the "browse all calculators" card used to emit a
    bare ?lang=, silently discarding the reader's city on the way in. */
@@ -147,7 +147,16 @@ export default function ChartScreen({ C, card, lang }) {
   const chooseStyle = (v) => { setChartStyle(v); urlPrefSet("cstyle", v); };
   const [err, setErr] = useState("");
   const [casting, setCasting] = useState(false);
-  const [activePanel, setActivePanel] = useState("kundli");
+  /* Which Jyotish panel is open. It lives in the URL for the same reason chartStyle
+     does: reload, Back/Forward and a shared link must all land on the panel the
+     reader was actually looking at. The valid keys come from the nav's own group
+     list, never a second hand-written copy — a panel added there but missing here
+     would silently fall back to Kundli. */
+  const [activePanel, setActivePanel] = useState(() => {
+    const p = urlPrefGet("panel");
+    return JYOTISH_GROUPS.some((g) => g.key === p) ? p : "kundli";
+  });
+  const choosePanel = (v) => { setActivePanel(v); urlPrefSet("panel", v); };
   const resultsRef = React.useRef(null);
 
   useEffect(() => {
@@ -289,7 +298,7 @@ export default function ChartScreen({ C, card, lang }) {
     const tz = tzOverride !== "" ? parseFloat(tzOverride) : tzAtBirth(effPlace.zone, y, m, day, hh, mi);
     if (tz === null || isNaN(tz)) { setErr(lang === "hi" ? "इस स्थान का समय-क्षेत्र नहीं मिला — कृपया नीचे UTC ऑफ़सेट स्वयं भरें।" : "Couldn't resolve the timezone for this place — enter the UTC offset manually below."); return; }
     setCasting(true);
-    setActivePanel("kundli");
+    choosePanel("kundli");
     requestAnimationFrame(() => {
       try {
         setResult(computeKundli({ y, m, day, hh, mi, tz, lat: effPlace.lat, lon: effPlace.lon, ayanamsa }));
@@ -367,7 +376,7 @@ export default function ChartScreen({ C, card, lang }) {
     <>
       {r && (
         <Card density="compact" tone="sunken" elevated={false} style={{ padding: 0, marginBottom: T.s3 }}>
-          <JyotishPanelNav lang={lang} C={C} place={place} showTechnical={showTechnical} activeGroup={activePanel} onSelectGroup={setActivePanel} />
+          <JyotishPanelNav lang={lang} C={C} place={place} showTechnical={showTechnical} activeGroup={activePanel} onSelectGroup={choosePanel} />
         </Card>
       )}
           <>
@@ -492,17 +501,27 @@ export default function ChartScreen({ C, card, lang }) {
           </a>
         </Card>
 
-        {activePanel === "vault" && <div id="vault" style={{ scrollMarginTop: 72 }}>
+        {/* Every panel stays MOUNTED and is hidden, exactly as the sibling sections
+            inside the results column are (the effect above sets child.hidden).
+            Conditionally mounting these three destroyed React state the reader had
+            typed: MatchMaker holds two names, two dates, two times, two places and
+            the computed match in ten useState slots, so tapping "Vault" and coming
+            back handed the couple the hard-coded demo births instead of their own.
+            AGENTS.md: no state resets without a user action — and moving to another
+            panel is not a request to discard two birth records. */}
+        <div id="vault" hidden={activePanel !== "vault"} style={{ scrollMarginTop: 72 }}>
           <ChartVault snapshot={{ form, place, tzOverride, ayanamsa }} result={result} onLoad={loadChart} C={C} card={card} lang={lang} />
-        </div>}
+        </div>
 
         {/* kundali matching */}
-        {activePanel === "matching" && <><Eyebrow id="match" deva="कुण्डली मिलान" en="Kundali matching · Guna Milan" />
-        <MatchMaker C={C} card={card} computeKundli={computeKundli} lang={lang} /></>}
+        <div id="match-panel" hidden={activePanel !== "matching"}>
+          <Eyebrow id="match" deva="कुण्डली मिलान" en="Kundali matching · Guna Milan" />
+          <MatchMaker C={C} card={card} computeKundli={computeKundli} lang={lang} />
+        </div>
           </>
 
-      {r && activePanel !== "matching" && activePanel !== "vault" && (
-          <div ref={resultsRef}>
+      {r && (
+          <div id="chart-results" ref={resultsRef} hidden={activePanel === "matching" || activePanel === "vault"}>
             {/* Save-as-PDF (print). Hidden in the printed output itself. */}
             <div className="no-print" style={{ display: "flex", justifyContent: "flex-end", marginBottom: "0.375rem" }}>
               <button onClick={() => window.print()} style={{ display: "inline-flex", alignItems: "center", gap: "0.4375rem", padding: "0.5rem 1rem", borderRadius: "0.5625rem", border: `0.0625rem solid ${C.gold}`, background: "var(--surface-sunken)", color: C.gold, cursor: "pointer", fontFamily: "var(--font-body-family)", fontSize: "var(--font-small)" }}>
@@ -1121,6 +1140,23 @@ export default function ChartScreen({ C, card, lang }) {
               const ksa = kalaSarpaFromRows(r.rows, r.ascSign);
               const pit = pitraDoshaFromRows(r.rows, r.ascSign);
               const papa = papaCount(r);
+              /* These three read the chart the reader is looking at, so they follow the
+                 ayanamsa chips above — which is right: a Kala Sarpa panel that disagreed
+                 with the houses drawn six inches higher would be worse. What was wrong is
+                 that it said so nowhere, while every "Full page →" below hard-forces
+                 Lahiri (src/engine/mangal-dosha.ts, sade-sati-report.ts). On a Raman
+                 chart the same birth gave Shankhachuda here and Karkotaka there, 1 Pitra
+                 indication here and 0 there. AGENTS.md: never silently switch. So the
+                 panel names the ayanamsa it used and, when that is not Lahiri, says
+                 plainly that the page it links to will answer differently. */
+              const doshaAyan = chartContext?.ayanamsa || ayanamsa;
+              const ayanLabel = (k) => AYANAMSA[k]?.label || k;
+              const doshaAyanNote = (hi
+                ? `गणना अयनांश: ${ayanLabel(doshaAyan)} — वही जिस पर यह कुंडली बनी है।`
+                : `Computed with the ayanamsa this chart was cast on: ${ayanLabel(doshaAyan)}.`)
+                + (doshaAyan === "lahiri" ? "" : (hi
+                  ? ` नीचे दिए “विस्तृत पृष्ठ →” सदा ${ayanLabel("lahiri")} पर गणना करते हैं, इसलिए वहाँ का उत्तर इस पैनल से भिन्न हो सकता है।`
+                  : ` The “Full page →” links below always compute with ${ayanLabel("lahiri")}, so their answers can differ from this panel.`));
               const gradeHi = { low: "न्यून", moderate: "मध्यम", high: "उच्च" };
               const ksAnswer = ksa.full
                 ? (hi ? `पूर्ण ${ksa.typeHi} काल सर्प (राहु ${ksa.rahuHouse}वें भाव)` : `Full ${ksa.typeEn} Kala Sarpa (Rahu in house ${ksa.rahuHouse})`)
@@ -1130,6 +1166,14 @@ export default function ChartScreen({ C, card, lang }) {
               const pitAnswer = pit.count === 0
                 ? (hi ? "कोई पितृ दोष संकेत नहीं" : "No indications found")
                 : (hi ? `${pit.count} संकेत मिले` : `${pit.count} indication${pit.count > 1 ? "s" : ""}`);
+              /* Papasamyam counts the malefic load from three reference points. Two are
+                 grahas, so their names come from the shared vocabulary; the ascendant is
+                 not a graha and has no entry there. English used to print the engine's
+                 internal key — "lagna: 4 · moon: 3 · venus: 2" — while Hindi read
+                 properly, so English was the degraded language on this card. */
+              const PAPA_REF_GRAHA = { moon: "Moon", venus: "Venus" };
+              const papaRefLabel = (ref) => (ref === "lagna" ? (hi ? "लग्न" : "Lagna")
+                : PAPA_REF_GRAHA[ref] ? planetName(lang, PAPA_REF_GRAHA[ref]) : ref);
               const cards = [
                 { id: "kala-sarpa", head: hi ? "काल सर्प" : "Kala Sarpa", answer: ksAnswer,
                   detail: hi ? `${ksa.typeHi} · ${ksa.areaHi}` : `${ksa.typeEn} · ${ksa.areaEn}`,
@@ -1138,7 +1182,7 @@ export default function ChartScreen({ C, card, lang }) {
                   detail: pit.count ? pit.checks.filter((c) => c.fired).map((c) => hi ? c.hi : c.en).join(" · ") : (hi ? "सूर्य व नवम भाव आधारित जाँच" : "Sun & 9th-house based checks"),
                   hot: pit.count >= 2 },
                 { id: "papa-dosha", head: hi ? "पाप दोष" : "Papa Dosha", answer: hi ? `भार ${papa.total}/15 · ${gradeHi[papa.grade]}` : `Load ${papa.total}/15 · ${papa.grade}`,
-                  detail: papa.byRef.map((rr) => `${hi ? { lagna: "लग्न", moon: "चन्द्र", venus: "शुक्र" }[rr.ref] : rr.ref}: ${rr.points}`).join(" · "),
+                  detail: papa.byRef.map((rr) => `${papaRefLabel(rr.ref)}: ${rr.points}`).join(" · "),
                   hot: papa.grade === "high" },
               ];
               return (
@@ -1155,6 +1199,9 @@ export default function ChartScreen({ C, card, lang }) {
                       </div>
                     ))}
                   </div>
+                  <p style={{ margin: "0.625rem 0.125rem 0", color: doshaAyan === "lahiri" ? C.muted : C.gold, fontSize: "var(--font-label)", lineHeight: 1.6 }}>
+                    {doshaAyanNote}
+                  </p>
                   <p style={{ margin: "0.625rem 0.125rem 0", color: C.muted, fontSize: "var(--font-small)", lineHeight: 1.6 }}>
                     {hi
                       ? "ये पारम्परिक व्याख्यात्मक रचनाएँ हैं, स्पष्ट नियमों के साथ दिखाई गई हैं—किसी अनिष्ट या शाप की भविष्यवाणी नहीं। परम्पराएँ भिन्न होती हैं; किसी योग्य ज्योतिषी से परामर्श करें।"
@@ -1256,8 +1303,21 @@ export default function ChartScreen({ C, card, lang }) {
                       ? <>विवाह के कारक — शुक्र व गुरु, सप्तम भाव का स्वामी (<strong>{planetName(lang, mw.seventhLord)}</strong>){mw.occ7.length ? <> तथा सप्तम में स्थित ग्रह</> : null} — जिन दशा-अवधियों में सक्रिय होते हैं, परम्परा उन्हें विवाह हेतु अनुकूल मानती है।</>
                       : <>Periods run by the marriage significators — Venus &amp; Jupiter, the 7th lord (<strong>{planetName(lang, mw.seventhLord)}</strong>){mw.occ7.length ? <> and planets in the 7th</> : null} — are traditionally seen as supportive for marriage.</>}
                   </p>
+                  {/* The search has two edges and the screen has to name them, because an
+                      empty list is a fact about the RANGE, not about the marriage. The
+                      numbers come from the engine's own exported constants so the sentence
+                      cannot drift away from the arithmetic that produced it. */}
+                  <p style={{ color: C.muted, fontSize: "var(--font-label)", margin: "0 0 0.75rem", lineHeight: 1.55 }}>
+                    {hi
+                      ? `खोज की सीमा: जन्म से ${MARRIAGE_AGE_FLOOR_YEARS} वर्ष की आयु से लेकर आज से ${MARRIAGE_HORIZON_YEARS} वर्ष आगे तक। इस सीमा के बाहर की अवधियाँ यहाँ नहीं दिखतीं।`
+                      : `Searched between age ${MARRIAGE_AGE_FLOOR_YEARS} — the marriageable-age floor Ganak uses — and ${MARRIAGE_HORIZON_YEARS} years from today. Periods outside that range are not shown.`}
+                  </p>
                   {mw.windows.length === 0 ? (
-                    <p style={{ color: C.muted, fontSize: "var(--font-small)" }}>{hi ? "आगामी बीस वर्षों में कोई स्पष्ट अनुकूल अवधि नहीं मिली।" : "No clearly supportive window found in the next twenty years."}</p>
+                    <p style={{ color: C.muted, fontSize: "var(--font-small)", lineHeight: 1.6 }}>
+                      {hi
+                        ? `उपर्युक्त सीमा के भीतर कोई स्पष्ट अनुकूल अवधि नहीं मिली। यह सीमा का परिणाम है, कुंडली का निष्कर्ष नहीं — इस सीमा के बाहर अनुकूल अवधि हो सकती है।`
+                        : `No clearly supportive window falls inside that range. That is a limit of the range, not a finding about the chart — supportive periods can fall outside it.`}
+                    </p>
                   ) : (
                     <div style={{ display: "grid", gap: "0.5rem" }}>
                       {mw.windows.map((w, i) => (
@@ -1278,12 +1338,16 @@ export default function ChartScreen({ C, card, lang }) {
             {/* panchang */}
             <Eyebrow id="birth-panchang" deva="पञ्चाङ्ग" en="Birth panchang" />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.75rem" }}>
+              {/* All five values are canonical ENGLISH strings out of the engine, so
+                  every one of them has to be localised here. Until 2026-08-19 they were
+                  printed raw and a Hindi reader's own birth panchang read "Shukravara
+                  (Fri) · Krishna Saptami · Shatabhisha · Priti · Vishti". */}
               {[
-                [hi ? "वार" : "Vara", r.panchang.weekday],
-                [hi ? "तिथि" : "Tithi", `${r.panchang.paksha} ${r.panchang.tithiName}`],
-                [hi ? "नक्षत्र" : "Nakshatra", r.panchang.nak],
-                [hi ? "योग" : "Yoga", r.panchang.yoga],
-                [hi ? "करण" : "Karana", r.panchang.karana],
+                [hi ? "वार" : "Vara", panchangTerm(lang, "vara", r.panchang.weekday)],
+                [hi ? "तिथि" : "Tithi", `${panchangTerm(lang, "paksha", r.panchang.paksha)} ${panchangTerm(lang, "tithi", r.panchang.tithiName)}`],
+                [hi ? "नक्षत्र" : "Nakshatra", panchangTerm(lang, "nakshatra", r.panchang.nak)],
+                [hi ? "योग" : "Yoga", panchangTerm(lang, "yoga", r.panchang.yoga)],
+                [hi ? "करण" : "Karana", panchangTerm(lang, "karana", r.panchang.karana)],
               ].map(([k, v]) => (
                 <div key={k} style={{ ...card, padding: "0.875rem 1rem" }}>
                   <div style={{ ...T.label, color: C.muted, marginBottom: "0.375rem" }}>{k}</div>
