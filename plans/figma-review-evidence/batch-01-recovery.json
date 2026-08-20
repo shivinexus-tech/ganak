@@ -4,8 +4,8 @@
   "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
   "sectionNode": "769:17254",
   "historicalFigmaLabel": "OWNER REVIEW · BATCH 01 · 12-SCREEN QUALITY CHECKPOINT",
-  "expectedDisposition": "FULL_SCREEN_PASS",
-  "requestedDisposition": "FULL_SCREEN_PASS",
+  "expectedDisposition": "BLOCKED_FROM_OWNER_REVIEW",
+  "requestedDisposition": "BLOCKED_FROM_OWNER_REVIEW",
   "sourceFirstRequired": true,
   "contactSheet": "https://www.figma.com/api/mcp/asset/a2a3260e-5633-45d3-9764-ecd688769fe0.png",
   "screens": [
@@ -64,8 +64,8 @@
     { "role": "mechanical", "status": "FULL_SCREEN_PASS", "reviewer": "independent QA task 01a018d9-dca3-70b3-a851-b46eccd965cf", "evidence": ["12/12 final frames; zero under-42 or text-bound reactions; zero overflow; zero denied assets/crops/fills; footer Hindi renders"], "coversAllScreens": true, "cold": false },
     { "role": "accessibility", "status": "FULL_SCREEN_PASS", "reviewer": "accessibility QA task 01a01ac0-0303-7f62-a3bf-05b3208ade26", "evidence": ["12/12 static desktop frames plus focus specimen 851:18665; zero screenshot-visible design findings"], "coversAllScreens": true, "cold": false },
     { "role": "ornament_background", "status": "FULL_SCREEN_PASS", "reviewer": "ornament/background QA task 01a01ac0-0ddc-7683-aec4-6fe23ed651d6", "evidence": ["12/12 provenance, role, crop, clear-space and semantic-surface review; zero findings"], "coversAllScreens": true, "cold": false },
-    { "role": "blind_visual", "status": "FULL_SCREEN_PASS", "reviewer": "cold holistic QA task 01a01abf-f955-7353-881c-4d595838f47f", "evidence": ["fresh natural-scale captures and full-section contact sheet; 12/12 plus contact sheet PASS"], "coversAllScreens": true, "cold": true },
-    { "role": "integrator", "status": "FULL_SCREEN_PASS", "reviewer": "recovery integrator task 01a01ff2-9355-7d73-bef7-ff996ab182cf", "evidence": ["source-first lineage for all 12; mandatory reviewer scopes aggregated; zero open known findings; executable admission gate"], "coversAllScreens": true, "cold": false }
+    { "role": "blind_visual", "status": "NARROW_PASS", "reviewer": "fresh independent quality task /root/independent_quality", "evidence": ["9 screens pass; 3 exact composition findings remain at 858:34/35, 851:21079 and 851:21249"], "coversAllScreens": true, "cold": true },
+    { "role": "integrator", "status": "NARROW_PASS", "reviewer": "governance integrator /root/governance_integrator", "evidence": ["prior admission withdrawn pending source-level warmth audit, three composition fixes and fresh cold screenshots"], "coversAllScreens": true, "cold": false }
   ],
   "knownFindings": [
     { "id": "OWNER-001", "screen": "851:18729", "category": "composition", "status": "closed", "summary": "Today panel rebalanced upstream and passed blind review." },
@@ -75,7 +75,11 @@
     { "id": "OWNER-005", "screen": "851:21080", "category": "component_geometry", "status": "closed", "summary": "Property CTA is 170x54 with 18px insets; all mapped targets pass." },
     { "id": "OWNER-006", "screen": "batch", "category": "language", "status": "closed", "summary": "English content purity passes; footer Hindi renders on all 12." },
     { "id": "OWNER-007", "screen": "batch", "category": "ornament", "status": "closed", "summary": "Purpose, density, spacing, indentation and composition pass independent review." },
-    { "id": "OWNER-008", "screen": "batch", "category": "surface", "status": "closed", "summary": "No rejected dominant ivory; blue and white surfaces have reviewed semantic roles." }
+    { "id": "OWNER-008", "screen": "batch", "category": "surface", "status": "open", "summary": "Later direct owner decision rejects every ivory or cream ground at any size; exact rendered fills require a fresh source-level warmth audit." },
+    { "id": "OWNER-009", "screen": "858:2", "category": "ornament", "status": "open", "summary": "Visible hero-bottom flourish 858:34/35 resembles the rejected look and requires source-first removal or replacement." },
+    { "id": "OWNER-010", "screen": "851:21024", "category": "ornament", "status": "open", "summary": "Floating Muhurat rule 851:21079 lacks a convincing structural attachment." },
+    { "id": "OWNER-011", "screen": "851:21250", "category": "ornament", "status": "open", "summary": "Floating Prashna rule 851:21249 lacks a convincing structural attachment." },
+    { "id": "OWNER-012", "screen": "851:18729", "category": "ornament", "status": "open", "summary": "Latest owner decision approves restrained FLORAL-SWEEP in both named Today slots; fresh source-first composition evidence is required." }
   ],
   "holisticJudgements": [
     { "screen": "851:18729", "naturalScale": "PASS", "contactSheet": "PASS" },

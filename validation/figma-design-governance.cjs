@@ -79,7 +79,7 @@ function validateManifestShape(manifest, schema) {
 
   const ids = new Set();
   for (const d of manifest.decisions) {
-    assert(/^(APP|REJ|PARK|RULE)-\d{3}$/.test(d.id), `bad decision id ${d.id}`);
+    assert(/^(APP|REJ|PARK|RULE)-\d{3}[A-Z]?$/.test(d.id), `bad decision id ${d.id}`);
     assert(!ids.has(d.id), `duplicate decision id ${d.id}`);
     ids.add(d.id);
     assert(["approved", "rejected", "parked", "rule"].includes(d.status), `${d.id}: bad status`);
@@ -143,6 +143,17 @@ function rejectedDecisions(manifest) {
   return manifest.decisions.filter(d => d.status === "rejected");
 }
 
+function hexRgb(hex) {
+  const value = String(hex || "").toUpperCase();
+  if (!/^#[A-F0-9]{6}$/.test(value)) return null;
+  return { r: Number.parseInt(value.slice(1, 3), 16), g: Number.parseInt(value.slice(3, 5), 16), b: Number.parseInt(value.slice(5, 7), 16) };
+}
+
+function isWarmOffWhite(hex) {
+  const rgb = hexRgb(hex);
+  return Boolean(rgb && Math.min(rgb.r, rgb.g, rgb.b) >= 220 && rgb.r > rgb.b);
+}
+
 function auditMechanical(manifest, evidence) {
   const errors = [];
   const rejected = rejectedDecisions(manifest);
@@ -156,6 +167,10 @@ function auditMechanical(manifest, evidence) {
         errors.push({ code: "REJECTED_ASSET_ACTIVE", detail: `${d.id}:${asset.node}` });
       }
       if (cropHit && roleDenied) errors.push({ code: "REJECTED_CROP_ACTIVE", detail: `${d.id}:${asset.node}` });
+      const forbiddenTraits = new Set(d.scope.paletteTraits || []);
+      if ((asset.visualTraits || []).some(trait => forbiddenTraits.has(trait)) && roleDenied) {
+        errors.push({ code: "REJECTED_RESEMBLANCE", detail: `${d.id}:${asset.node}` });
+      }
     }
   }
 
@@ -176,6 +191,11 @@ function auditMechanical(manifest, evidence) {
     if (!d) continue;
     if (d.scope.prohibitedRoles.includes(surface.role) || surface.areaPercent >= 2) {
       errors.push({ code: "DOMINANT_SURFACE", detail: `${surface.node}:${surface.fill}:${surface.role}` });
+    }
+  }
+  for (const surface of evidence.surfaces || []) {
+    if (surface.isGround !== false && isWarmOffWhite(surface.fill)) {
+      errors.push({ code: "IVORY_GROUND", detail: `${surface.node}:${surface.fill}:${surface.role}` });
     }
   }
 
@@ -259,6 +279,8 @@ function runIncidentSelfTests(manifest, incidents) {
     if (incident.kind === "conflict") localManifest.conflicts.push({ id: "FIXTURE", decisionIds: ["APP-001", "REJ-004"], status: "unresolved", resolution: null });
     if (incident.kind === "language") evidence.visibleTexts.push({ node: "999:3", lang: "en", value: "आज का Muhurat" });
     if (incident.kind === "surface") evidence.surfaces.push({ node: "999:4", fill: "#FFFDFC", role: "panel", areaPercent: 15 });
+    if (incident.kind === "nearby_ivory") evidence.surfaces.push({ node: "999:7", fill: "#F8F4EC", role: "small_card", areaPercent: 1, isGround: true });
+    if (incident.kind === "resemblance") evidence.activeAssets.push({ node: "999:8", role: "active_screen", visualTraits: ["faded_coral_bloom", "washed_sage_foliage", "thin_gold_curl", "ivory_ground"] });
     if (incident.kind === "geometry") evidence.controls.push({ node: "999:5", height: 34, touchWidth: 70, touchHeight: 34, paddingLeft: 2, paddingRight: 2, labelCenterOffset: 7, overflow: true, labelInset: 2 });
     if (incident.kind === "ornament") evidence.ornaments.push({ node: "999:6", sourceNode: null, libraryRoot: null, role: "decoration", clearSpace: 2 });
     if (incident.kind === "typed_status") packet.reviews[0].status = "NARROW_PASS";

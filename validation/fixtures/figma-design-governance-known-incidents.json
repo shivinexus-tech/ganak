@@ -8,6 +8,8 @@
     { "name": "Property Finder cramped button geometry", "kind": "geometry", "expected": "COMPONENT_GEOMETRY" },
     { "name": "ornament without provenance or purpose", "kind": "ornament", "expected": "ORNAMENT_PROVENANCE" },
     { "name": "narrow PASS promoted to full-screen", "kind": "typed_status", "expected": "NARROW_PROMOTION" },
-    { "name": "owner review with open findings", "kind": "admission", "expected": "OWNER_ADMISSION" }
+    { "name": "owner review with open findings", "kind": "admission", "expected": "OWNER_ADMISSION" },
+    { "name": "nearby ivory value is rejected even when small", "kind": "nearby_ivory", "expected": "IVORY_GROUND" },
+    { "name": "rejected faded-coral visual resemblance is blocked", "kind": "resemblance", "expected": "REJECTED_RESEMBLANCE" }
   ]
 }

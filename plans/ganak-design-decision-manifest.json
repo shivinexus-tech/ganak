@@ -45,6 +45,24 @@
       "reason": "The owner repeatedly rejected dominant dull ivory or cream and unrelated palette drift."
     },
     {
+      "id": "REJ-004A",
+      "status": "rejected",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "ganak-design-rejection-log.md REJ-004A; owner: no ivory ground anywhere",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": [],
+        "paletteTraits": ["ivory_ground", "cream_ground", "bone_ground", "oatmeal_ground", "warm_off_white_ground"],
+        "allowedRoles": [],
+        "prohibitedRoles": ["canvas", "page", "header", "card", "panel", "context", "ribbon", "ornament_backing", "artwork_ground", "exported_asset_ground", "active_screen"]
+      },
+      "supersedes": ["REJ-004-dominance-only-interpretation"],
+      "reason": "Ivory or cream ground is rejected at every size; exact-hex and area thresholds are insufficient."
+    },
+    {
       "id": "PARK-001",
       "status": "parked",
       "authority": "direct_owner_latest",
@@ -129,6 +147,41 @@
       },
       "supersedes": [],
       "reason": "Library membership establishes provenance but never approves a particular composition or slot."
+    },
+    {
+      "id": "REJ-017A",
+      "status": "rejected",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "ganak-design-rejection-log.md REJ-017A; direct owner resemblance correction",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": [],
+        "paletteTraits": ["faded_coral_bloom", "salmon_bloom", "orange_red_bloom", "washed_sage_foliage", "thin_gold_curl", "ivory_ground", "cream_ground"],
+        "allowedRoles": ["rejected_archive_evidence"],
+        "prohibitedRoles": ["active_screen", "shared_component", "approved", "owner_review", "qa_pass"]
+      },
+      "supersedes": ["REJ-017-exact-identity-only-colour-scope"],
+      "reason": "The disliked faded-coral, washed-sage, thin-gold-curl and ivory look is rejected by resemblance, while botanical shape remains unrestricted."
+    },
+    {
+      "id": "APP-003",
+      "status": "approved",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "ganak-ornament-slot-table.md Today slot decisions",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": [],
+        "allowedRoles": ["today_non_hero_left_anchor_restrained", "today_answer_card_edge_anchor_restrained", "floral_sweep"],
+        "prohibitedRoles": ["rejected_palette", "automatic_other_slot_approval", "unscoped_propagation"]
+      },
+      "supersedes": ["ordinary-today-no-added-ornament-slot-decision"],
+      "reason": "FLORAL-SWEEP is approved for both named Today slots at restrained density, excluding every rejected resemblance trait."
     },
     {
       "id": "RULE-001",
