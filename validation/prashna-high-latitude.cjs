@@ -41,8 +41,26 @@
 //       whatever formula produced it.
 //   [3] RING INVARIANTS, which are arithmetic and need no source at all: a
 //       house ring must advance monotonically once round the zodiac, its twelve
-//       spans must sum to exactly 360°, and no house may be degenerate or
-//       oversized. This is the single assertion that catches the whole class.
+//       spans must sum to exactly 360°, and no house may be degenerate. This is
+//       the single assertion that catches the whole class.
+//
+// EXTENDED 2026-08-19 (bug bash F17), when the same tautology was found to have
+// been written INTO this file: the Björk anchor asserted the equal-house ring at
+// 64°N, because both engine copies wrongly bailed out of Placidus at a flat
+// |lat| > 60 that no source supports, while src/engine/houses.ts — the Jyotish
+// chart screen's Placidus — used the real geometric test and gave the same place
+// a different ring, up to 81° apart. Added since:
+//
+//   [1b] THE EQUAL BRANCH, above the polar circle where it actually belongs.
+//   [2b] THE PUBLISHED DEFINITION OF PLACIDUS — each intermediate cusp must
+//        trisect its own semi-diurnal or semi-nocturnal arc, recomputed here from
+//        published spherical astronomy. This REPLACED a 120°-wide-house cap that
+//        was a fair proxy while everything above 60° was equal-house and is false
+//        for a genuine Placidus house near the pole. A cap admits any wrong cusp
+//        under 120°; the trisection admits exactly one value.
+//   [4]  THE TWO SURFACES, side by side. The one deliberate Ganak-to-Ganak
+//        comparison in this file, because the defect IS a disagreement between
+//        two Ganak surfaces — a consistency check, never a correctness anchor.
 //
 //   node validation/prashna-high-latitude.cjs
 // ============================================================================

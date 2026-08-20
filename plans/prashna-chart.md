@@ -120,5 +120,10 @@ Walk these by hand:
   scope decision, not a bug fix to sneak in here.
 - **Verdict is significator-based, not dasha-timed.** v1 answers "will it?" — not
   "when?". Ruling-planet timing is a v2 feature. Do not fake a timing answer.
-- **Above 60° latitude** Placidus degenerates and the engine falls back to equal
-  houses. This is labelled in the UI. Correct behaviour, not a defect.
+- **Above the polar circle (~66.56°)** Placidus is undefined and the engine falls
+  back to equal houses. This is labelled in the UI. Correct behaviour, not a defect.
+  *(Corrected 2026-08-19: this line used to say "above 60°", and so did the code —
+  an unsourced constant that gave the Jyotish chart screen and the Prashna screen
+  two different house rings for the same place, up to 81° apart. Placidus ends where
+  a cusp-defining ecliptic point is circumpolar, which is the polar circle. See
+  `audits/2026-08-19-prashna-house-system.md`.)*
