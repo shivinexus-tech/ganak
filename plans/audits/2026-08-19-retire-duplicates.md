@@ -1,0 +1,151 @@
+# Retiring duplicate implementations — one quantity, one place
+
+- **Date:** 2026-08-19
+- **Agent:** Claude (dedupe lane)
+- **Branch / worktree:** `claude/retire-duplicate-implementations` · `.scratch/worktrees/dedupe`
+- **Base:** `origin/main` `2e917bd`, plus the two lanes this work directly follows on from
+  (see "Base" below).
+
+---
+
+## The problem in one sentence, for the owner
+
+Ganak has been computing **the same thing in more than one place**. The copies were typed out
+separately, so when somebody corrected one, the others kept the old answer — and two screens then
+told the reader two different things about the same moment. Two days of adversarial testing produced
+about ninety findings and this single cause is behind the worst of them. This lane deletes copies
+rather than trying to keep them in step.
+
+---
+
+## Base — why this branch merged two other branches before starting
+
+The work list for this lane assumes two fixes that had **not reached `main`** when it started:
+
+| branch merged | what it carries |
+|---|---|
+| `origin/claude/fix-polar-quadrant` | `risingDegree` in `houses.ts` — the corrected rising degree the chart now uses, plus `validation/polar-chart.cjs` |
+| `origin/claude/cross-surface-consistency` | `validation/cross-surface-consistency.cjs` — the gate whose pins this lane is asked to move |
+
+Without them there is no `risingDegree` to call and no pins to update. Both merged cleanly, touch
+disjoint files, and were already reviewed on their own lanes. `origin/main` was verified identical to
+this branch's starting point (`2e917bd`) before the merges, so nothing was skipped.
+
+---
+
+## Item 1 — `ephemeris.ts` `ascendantAt`: a live 180° disagreement, now closed
+
+### What was being calculated twice
+
+"Which degree of the zodiac is rising on the eastern horizon right now" — the **lagna**, the single
+most load-bearing number in a birth chart. It was written out three times: once in the chart engine,
+once in the horary screen, and once in `ephemeris.ts`. The chart's copy was corrected on 2026-08-19
+for a polar bug; `ephemeris.ts`'s copy was not.
+
+That copy is not a backwater. It feeds:
+
+- **Gulika and Mandi** — inside *every* birth chart Ganak draws
+- the **KP birth-time rectification** markers
+- **Panchaka** windows, **Navratri** Ghatasthapana timings, and the **Muhurat hub**
+
+So for one day Ganak answered the same question two ways: the chart's lagna and `ascendantAt` were
+**exactly 180° apart** — the opposite point of the sky — in 87 of 384 sampled polar hours.
+
+### Reproduced before changing anything
+
+`.scratch/dedupe/neighbours.cjs` (the polar lane's own measurement script, re-run unchanged on this
+tree). The reference it checks against re-derives "rising" from published spherical astronomy — it
+does not ask Ganak.
+
+```
+1. src/engine/ephemeris.ts  ascendantAt()
+   polar hours sampled 384, returning the DESCENDANT: 88 (22.9%)
+
+2. The same app now answers the same question two ways at polar latitudes:
+   87 of 384 polar hours where kundli.ts and ephemeris.ascendantAt differ by 180°
+      Tromso 2026-6-21 00:00Z  chart lagna Cap  8°32'  |  ephemeris.ascendantAt Can  8°32'  Δ 180.00°
+      Tromso 2026-6-21 21:00Z  chart lagna Tau  6°19'  |  ephemeris.ascendantAt Sco  6°19'  Δ 180.00°
+      Tromso 2026-6-21 22:00Z  chart lagna Ari 23°40'  |  ephemeris.ascendantAt Lib 23°40'  Δ 180.00°
+      Tromso 2026-6-21 23:00Z  chart lagna Aqu 11°16'  |  ephemeris.ascendantAt Leo 11°16'  Δ 180.00°
+```
+
+### The change — a deletion, not a reconciliation
+
+`risingDegree` **moved** from `houses.ts` into `ephemeris.ts` and `ascendantAt` now calls it. There is
+now exactly one definition in `src/`:
+
+```
+$ grep -rn "function risingDegree" src/
+src/engine/ephemeris.ts:359:function risingDegree(RAMC, eps, phi) {
+```
+
+It moved *down* rather than being imported *up* because `houses.ts` already imports its primitives
+(`rev`, `sd`, `cdg`, `tdg`, `atan2d`) from `ephemeris.ts`. Importing back the other way would have
+created a module cycle. `houses.ts` re-exports it, so `kundli.ts` and `validation/polar-chart.cjs`
+are untouched by the move. The `raOfEcl` helper moved with it; no orphaned reference remains.
+
+### After
+
+```
+1. src/engine/ephemeris.ts  ascendantAt()
+   polar hours sampled 384, returning the DESCENDANT: 1 (0.3%)
+
+2. The same app now answers the same question two ways at polar latitudes:
+   0 of 384 polar hours where kundli.ts and ephemeris.ascendantAt differ by 180°
+```
+
+**88 → 1, and 87 → 0.** The two surfaces can no longer disagree at all, because there is no longer a
+second formula for them to disagree with.
+
+### The residual 1 was inspected, not waved through
+
+`.scratch/dedupe/residual-one.cjs`:
+
+```
+Utqiagvik 2026-3-20 14:00Z
+  ascendantAt      Sco 23°45'   alt 6.361e-15  d(alt)/min -1.017e-4
+  altitude  -1min -2.315e-4   0 6.361e-15   +1min -1.017e-4
+```
+
+The altitude *rises to exactly zero and falls again*: this is a *grazing* moment, where the ecliptic
+is tangent to the horizon at the meridian and "rising" has no first-order answer. It is **inherent to
+`risingDegree` itself, not introduced here** — the chart engine has had the identical residual since
+its own fix, which is precisely why the two surfaces now agree at all 384 hours.
+`validation/polar-chart.cjs` §2 already counts and prints these grazing moments rather than asserting
+them away (9 of 9,984).
+
+### Proof that ordinary and Indian births did not move
+
+Full chart dumps — ascendant, every graha's sign/house/KP house/nakshatra/pada, all twelve KP cusps,
+Bhava Chalit, Bhava Bala, yogas, arudhas, ashtakavarga, **special points (Gulika/Mandi)**, karakas,
+ruling planets, KP significators, BNN, panchang, the dasha table and Shadbala — before and after,
+diffed. Plus a new dump of the surfaces the chart dump does not reach.
+
+```
+=== GAZETTEER (319 cities x 6 births = 1914 charts) ===   IDENTICAL — byte for byte
+=== DENSE GRID |lat| <= 66.5 (34176 charts) ===           IDENTICAL — byte for byte
+=== NEIGHBOURING SURFACES (895 lines) ===                 IDENTICAL — byte for byte
+```
+
+The gazetteer is Ganak's own `src/data/places.ts` — every city the app offers as a birthplace,
+latitude −43.53 to 60.17. The third dump (`.scratch/dedupe/dump-c.cjs`, new in this lane) covers
+**Panchaka** lagna schedules and windows, **Navratri** Ghatasthapana/parana/Navadurga dates, the **KP
+rectification markers**, the **gochar** timeline, the **planet calendar** stations/combustion/states,
+and the **transit copy** strings, across 15 ordinary and Indian places.
+
+### Gates
+
+```
+polar-chart.cjs           PASS
+panchaka-windows.cjs      PASS
+navratri-timings.cjs      PASS
+prashna-high-latitude.cjs PASS
+screen-snapshots.cjs      PASS
+language-leak-scan.cjs    PASS
+parse-check.js            PASS
+prashna-parity.js         PASS   ✓ parity EXACT: 198 values across 6 charts | worst numeric diff 5.68e-14° | 0 mismatch(es)
+npm run build             ✓ built in 1.89s
+```
+
+No snapshot under `validation/snapshots/` needed re-baselining — the expected result, since no
+ordinary chart moved.

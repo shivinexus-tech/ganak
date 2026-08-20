@@ -312,18 +312,67 @@ function tropicalLongitudes(d) {
     Rahu: rev(125.1228 - 0.0529538083 * d),
   };
 }
+/* Right ascension of an ecliptic degree (ecliptic latitude zero):
+   tan(RA) = cos(eps) * tan(lambda). Used only by the polar quadrant correction. */
+const raOfEcl = (lam, eps) => atan2d(cdg(eps) * sd(lam), cdg(lam));
+
+/* THE rising degree — ONE definition for the whole engine.
+   =====================================================================
+   The textbook ascendant arctangent returns ONE of the two antipodal points
+   where the ecliptic cuts the horizon. Below the polar circle that is always
+   the eastern, RISING one. Above it — Murmansk 68.96, Tromso 69.65, Utqiagvik
+   71.29, Longyearbyen 78.22 — the arctangent lands in the other quadrant for
+   part of the day and hands back the DESCENDANT as the rising degree, which
+   rotates the entire chart by six houses: lagna becomes the 7th, every graha's
+   house is wrong by six, and every house-based reading built on it is read
+   from the wrong end.
+
+   POLAR QUADRANT CORRECTION (2026-08-19, defect found by the horary lane on
+   2026-08-18; see plans/audits/2026-08-19-polar-quadrant-fix.md). Diurnal
+   motion is uniform, so the fix is the definition itself. Differentiating the
+   published altitude relation
+       sin(alt) = sin(phi)sin(dec) + cos(phi)cos(dec)cos(H)
+   with respect to the hour angle H, which increases uniformly with time, gives
+       d(sin alt)/dH = -cos(phi)cos(dec)sin(H),
+   so a point is rising exactly while sin(H) < 0 — that is, while it is EAST of
+   the meridian. The two ecliptic/horizon intersections are antipodal, so their
+   hour angles differ by exactly 180 degrees and precisely one of them is east.
+   Take the hour angle of the computed point; if it is west of the meridian the
+   formula returned the descendant, so take its opposite.
+
+   Below the polar circle sin(H) is never positive here, so this is a strict
+   no-op for every latitude Ganak's other gates cover — measured over 387,720
+   latitude/RAMC/obliquity samples: 32,284 corrected, none of them at
+   |latitude| <= 66.5607, the lowest touched being 67.00.
+
+   WHY IT LIVES HERE AND NOT IN houses.ts (2026-08-19, dedupe lane). The
+   correction was first applied in houses.ts, for the chart's lagna and the
+   Placidus cusp 1. `ascendantAt` below is a THIRD copy of the same arctangent
+   and it did not get the correction, so for one day Ganak answered the same
+   question two ways at polar latitudes — 87 of 384 sampled polar hours, 180
+   degrees apart, because Gulika/Mandi, the KP rectification markers, Panchaka,
+   Navratri and the Muhurat hub all read `ascendantAt` while the chart's own
+   lagna read `risingDegree`. houses.ts already imports its primitives from
+   this module, so the shared definition belongs at the bottom of the stack
+   where both callers can reach it without a cycle. houses.ts re-exports it so
+   its existing importers are unaffected. Do not add a fourth copy: call this. */
+function risingDegree(RAMC, eps, phi) {
+  const asc = atan2d(cdg(RAMC), -(sd(RAMC) * cdg(eps) + tdg(phi) * sd(eps)));
+  return sd(rev(RAMC - raOfEcl(asc, eps))) > 0 ? rev(asc + 180) : asc;
+}
+
 // Sidereal ascendant for an instant -- moved from the shell (SPLIT-UI-03c).
 function ascendantAt(JD, lat, lon, ayan) {
   const dd = JD - 2451543.5;
   const gmst = rev(280.46061837 + 360.98564736629 * (JD - 2451545.0));
   const ramc = rev(gmst + lon);
   const eps = 23.4393 - 3.563e-7 * dd;
-  const ascTrop = atan2d(cdg(ramc), -(sd(ramc) * cdg(eps) + tdg(lat) * sd(eps)));
+  const ascTrop = risingDegree(ramc, eps, lat);
   return rev(ascTrop - ayan);
 }
 
 export {
-  D2R, rev, sd, cdg, tdg, atan2d, ascendantAt,
+  D2R, rev, sd, cdg, tdg, atan2d, ascendantAt, risingDegree,
   deltaTsec, nutationLon, moonGeo, sunGeo, jdeFromD, sunPos, keplerE,
   moonLon, planetGeoApparent, planetGeoLon, tropicalLongitudes,
 };
