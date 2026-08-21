@@ -302,6 +302,40 @@
       },
       "supersedes": ["figma-putrada-2026-08-24-fixture-claim"],
       "reason": "Shravana Putrada Ekadashi for the New Delhi 2026 fixture is anchored to Sunday 23 August 2026. Exact sources were corrected source-first; replacement primaries 952:37373, 956:2, 956:292 and 952:37448 were regenerated and independently cold-QA'd. The superseded 24 August clones remain historical evidence only."
+    },
+    {
+      "id": "RULE-005",
+      "status": "rule",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "owner-authorized mandatory desktop Visual Art gate",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["769:17254"],
+        "allowedRoles": ["desktop_visual_art_evidence", "independent_exact_node_review"],
+        "prohibitedRoles": ["mobile_admission", "self_approval", "stale_node_evidence", "mutable_evidence_binding", "incomplete_visual_art_review"]
+      },
+      "supersedes": ["desktop-full-screen-pass-without-machine-visual-art-evidence"],
+      "reason": "Desktop owner review, release and full-screen admission require independent immutable exact-node Visual Art evidence; any node mutation or reclone invalidates it."
+    },
+    {
+      "id": "RULE-006",
+      "status": "rule",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "owner-authorized mandatory desktop Ornament Library gate",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["759:20", "760:20", "800:2"],
+        "allowedRoles": ["RESTRAINED", "RICH", "CELEBRATORY", "NONE", "approved_library_provenance", "independent_curator_evidence"],
+        "prohibitedRoles": ["BALANCED", "arbitrary_decoration", "unknown_provenance", "admitted_exploration", "creator_self_approval", "unfinished_none"]
+      },
+      "supersedes": ["balanced-ornament-mode", "library-membership-implies-screen-approval"],
+      "reason": "Every admitted desktop screen needs an exact ornament mode, complete purposeful inventory, no-ornament comparison and independent Visual Art verdict; exploration cannot ship before separate library approval."
     }
   ],
   "conflicts": [
@@ -326,8 +360,31 @@
   ],
   "batchAdmission": {
     "allowedStatuses": ["BLOCKED_FROM_OWNER_REVIEW", "NARROW_PASS", "FULL_SCREEN_PASS"],
-    "fullScreenRequiredReviews": ["mechanical", "accessibility", "ornament_background", "blind_visual", "integrator"],
+    "fullScreenRequiredReviews": ["mechanical", "accessibility", "ornament_background", "blind_visual", "visual_art", "integrator"],
     "zeroKnownFindings": true,
-    "unresolvedConflictsBlock": true
+    "unresolvedConflictsBlock": true,
+    "visualArtGate": {
+      "platform": "desktop",
+      "requiredForStatuses": ["OWNER_REVIEW", "RELEASED", "FULL_SCREEN_PASS"],
+      "independentReviewer": true,
+      "exactNodeBinding": true,
+      "immutableEvidenceBinding": true,
+      "nodeMutationInvalidates": true,
+      "requiredScreenJudgements": ["background_rationale", "composition_balance", "ornament_inventory", "rejected_resemblance", "open_findings"],
+      "requiredOrnamentJudgements": ["decision", "purpose", "library_provenance", "space", "alignment", "scale"]
+    },
+    "ornamentLibraryGate": {
+      "platform": "desktop",
+      "requiredForStatuses": ["OWNER_REVIEW", "RELEASED", "FULL_SCREEN_PASS"],
+      "allowedModes": ["RESTRAINED", "RICH", "CELEBRATORY", "NONE"],
+      "rejectedModes": ["BALANCED"],
+      "celebratoryContexts": ["festival", "vrat", "ceremonial_hero"],
+      "explorationAdmissible": false,
+      "creatorMayApprove": false,
+      "mutationInvalidates": true,
+      "completeInventoryRequired": true,
+      "noOrnamentComparisonRequired": true,
+      "independentVisualArtVerdictRequired": true
+    }
   }
 }

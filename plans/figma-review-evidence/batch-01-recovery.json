@@ -6,8 +6,8 @@
   "historicalFigmaLabel": "OWNER REVIEW · BATCH 01 · 12-SCREEN QUALITY CHECKPOINT",
   "currentSectionLabel": "OWNER REVIEW · BATCH 01 · 12-SCREEN DESKTOP QUALITY CHECKPOINT · 23 AUGUST FIXTURE",
   "inspectedAt": "2026-08-20",
-  "expectedDisposition": "FULL_SCREEN_PASS",
-  "requestedDisposition": "FULL_SCREEN_PASS",
+  "expectedDisposition": "BLOCKED_FROM_OWNER_REVIEW",
+  "requestedDisposition": null,
   "sourceFirstRequired": true,
   "contactSheet": "https://www.figma.com/api/mcp/asset/6dbc67d8-e3c4-4b5d-bb93-214e5dc29c53.png",
   "screens": [
@@ -91,6 +91,7 @@
       { "screen": "894:23612", "source": "730:16288", "regenerated": true },
       { "screen": "851:21250", "source": "730:16467", "regenerated": true }
     ],
+    "nodeFingerprints": [],
     "screenCoverage": [
       { "screen": "851:18729", "category": "language", "status": "PASS", "evidence": ["Independent English-purity audit; only the intentional shared footer language twin contains Devanagari"] },
       { "screen": "851:18729", "category": "asset_rejection", "status": "PASS", "evidence": ["Exact b7559c and rejected screenshot-crop sweep zero-active-use on the current frame"] },
@@ -165,12 +166,38 @@
       { "screen": "851:21250", "category": "ornament", "status": "PASS", "evidence": ["Redundant rule remains hidden; answer card gold edge owns the threshold"] }
     ]
   },
+  "visualArtEvidence": {
+    "platform": "desktop",
+    "binding": {
+      "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+      "sectionNode": "769:17254",
+      "screenNodes": ["851:18729", "897:23887", "858:266", "952:37373", "956:2", "956:292", "851:20865", "952:37448", "894:23276", "894:23437", "894:23612", "851:21250"],
+      "nodeFingerprints": []
+    },
+    "naturalScaleScreenshots": [],
+    "contactSheet": {
+      "url": "https://www.figma.com/api/mcp/asset/6dbc67d8-e3c4-4b5d-bb93-214e5dc29c53.png",
+      "artifactDigest": null,
+      "memberNodes": ["851:18729", "897:23887", "858:266", "952:37373", "956:2", "956:292", "851:20865", "952:37448", "894:23276", "894:23437", "894:23612", "851:21250"]
+    },
+    "reviewer": {
+      "taskId": "/root/figma_state_audit",
+      "independent": true,
+      "builderTaskIds": ["019faab9-9aee-7620-a5e0-9b604d37b3a2"],
+      "integratorTaskId": "019faab9-9aee-7620-a5e0-9b604d37b3a2"
+    },
+    "reviewedAt": "2026-08-20T00:00:00Z",
+    "screenJudgements": [],
+    "evidenceDigest": null,
+    "invalidationReason": "The current exact-node screenshots/contact sheet predate the mandatory immutable Visual Art and Ornament Library contracts; artifact digests, current node fingerprints and complete mode/inventory judgments are absent."
+  },
   "reviews": [
     { "role": "mechanical", "status": "FULL_SCREEN_PASS", "reviewer": "independent QA task 01a018d9-dca3-70b3-a851-b46eccd965cf", "evidence": ["12/12 final frames; zero under-42 or text-bound reactions; zero overflow; zero denied assets/crops/fills; footer Hindi renders"], "coversAllScreens": true, "cold": false },
     { "role": "accessibility", "status": "FULL_SCREEN_PASS", "reviewer": "accessibility QA task 01a01ac0-0303-7f62-a3bf-05b3208ade26", "evidence": ["12/12 static desktop frames plus focus specimen 851:18665; zero screenshot-visible design findings"], "coversAllScreens": true, "cold": false },
     { "role": "ornament_background", "status": "FULL_SCREEN_PASS", "reviewer": "ornament/background QA task 01a01ac0-0ddc-7683-aec4-6fe23ed651d6", "evidence": ["12/12 provenance, role, crop, clear-space and semantic-surface review; zero findings"], "coversAllScreens": true, "cold": false },
     { "role": "blind_visual", "status": "FULL_SCREEN_PASS", "reviewer": "independent final desktop task /root/figma_state_audit", "evidence": ["12/12 exact current primaries re-read at natural scale; source-fidelity replacements verified; final contact-sheet review; zero static desktop owner-review findings"], "coversAllScreens": true, "cold": true },
-    { "role": "integrator", "status": "FULL_SCREEN_PASS", "reviewer": "Design Director 019faab9-9aee-7620-a5e0-9b604d37b3a2", "evidence": ["exact source parity and source reactions preserved on 12 current visible frames; 40 predecessors remain hidden; review metadata promoted only after independent full-screen admission"], "coversAllScreens": true, "cold": false }
+    { "role": "visual_art", "status": "PENDING", "reviewer": null, "evidence": [], "coversAllScreens": false, "cold": true },
+    { "role": "integrator", "status": "NARROW_PASS", "reviewer": "Design Director 019faab9-9aee-7620-a5e0-9b604d37b3a2", "evidence": ["prior exact source parity and independent visual review preserved; new immutable Visual Art and Ornament Library admission is pending"], "coversAllScreens": true, "cold": false }
   ],
   "knownFindings": [
     { "id": "OWNER-001", "screen": "851:18729", "category": "composition", "status": "closed", "summary": "Today panel rebalanced upstream and passed blind review." },
@@ -185,7 +212,9 @@
     { "id": "OWNER-010", "screen": "894:23276", "category": "ornament", "status": "closed", "summary": "Muhurat source floating rule 762:18724 remains hidden; the current source-first clone passes hierarchy and empty-gap review." },
     { "id": "OWNER-011", "screen": "894:23612", "category": "ornament", "status": "closed", "summary": "Prashna source floating rule 762:18728 remains hidden; the current source-first clone passes hierarchy and empty-gap review." },
     { "id": "OWNER-012", "screen": "851:18729", "category": "ornament", "status": "closed", "summary": "Ordinary Today retains the independently preferred no-added-ornament composition; current natural-scale and contact-sheet reviews find the panel balanced." },
-    { "id": "OWNER-013", "screen": "batch", "category": "data_integrity", "status": "closed", "summary": "Exact sources 762:16932, 730:15152, 730:15339 and 763:17139 were corrected source-first to the published Sunday 23 August 2026 New Delhi Putrada fixture (5:54/6:53 where applicable); exact replacements 952:37373, 956:2, 956:292 and 952:37448 were regenerated, reaction-parity checked and independently cold-QA'd." }
+    { "id": "OWNER-013", "screen": "batch", "category": "data_integrity", "status": "closed", "summary": "Exact sources 762:16932, 730:15152, 730:15339 and 763:17139 were corrected source-first to the published Sunday 23 August 2026 New Delhi Putrada fixture (5:54/6:53 where applicable); exact replacements 952:37373, 956:2, 956:292 and 952:37448 were regenerated, reaction-parity checked and independently cold-QA'd." },
+    { "id": "VISART-001", "screen": "batch", "category": "visual_art_evidence", "status": "open", "summary": "Current desktop nodes lack immutable screenshot artifact digests, node fingerprints and exact-node Visual Art judgments under the new owner gate." },
+    { "id": "ORNAMENT-GATE-001", "screen": "batch", "category": "ornament_library_evidence", "status": "open", "summary": "Current nodes lack mandatory mode, rationale, permitted-context, complete instance inventory, no-ornament comparison and curator-bound independent Visual Art evidence." }
   ],
   "holisticJudgements": [
     { "screen": "851:18729", "naturalScale": "PASS", "contactSheet": "PASS" },
