@@ -213,7 +213,11 @@
       "websiteHeaderDesktopJyotishEN": "906:27",
       "websiteHeaderDesktopJyotishHI": "907:2",
       "websiteHeaderDesktopFestivalsEN": "941:21",
-      "websiteHeaderDesktopFestivalsHI": "941:53"
+      "websiteHeaderDesktopFestivalsHI": "941:53",
+      "websiteHeaderDesktopMuhuratEN": "967:39449",
+      "websiteHeaderDesktopMuhuratHI": "967:39481",
+      "websiteHeaderDesktopPrashnaEN": "967:39534",
+      "websiteHeaderDesktopPrashnaHI": "967:39566"
       ,"responsiveWebsiteContextEN": "584:116"
       ,"responsiveWebsiteContextHI": "587:116"
       ,"responsiveWebsiteHeaderEN": "588:204"
@@ -232,8 +236,12 @@
       "jyotishHindiVariant": "907:2",
       "festivalsEnglishVariant": "941:21",
       "festivalsHindiVariant": "941:53",
+      "muhuratEnglishVariant": "967:39449",
+      "muhuratHindiVariant": "967:39481",
+      "prashnaEnglishVariant": "967:39534",
+      "prashnaHindiVariant": "967:39566",
       "semanticActiveNavigationToken": "VariableID:917:188",
-      "visualComponentState": "PASS 2026-08-20 — Jyotish and Festivals EN/HI variants retain 1536×96 geometry, semantic active-state binding and targets at 44px or larger; Festivals language switching remains on the Festivals route",
+      "visualComponentState": "PASS 2026-08-20 — Jyotish, Festivals, Muhurat and Prashna EN/HI variants retain 1536×96 geometry, semantic active-state binding and targets at 44px or larger. Muhurat/Prashna exact nodes passed independent Visual Art review with unchanged end fingerprints.",
       "productionRouteState": "FINDING — Jyotish/language targets select panel=kundli and Muhurat uses legacy daily hash; static Figma does not prove runtime state preservation"
     },
     "sharedContextStateBinding": {
@@ -367,8 +375,8 @@
   },
   "ownerReviewBatch01": {
     "assembled": "2026-08-19",
-    "decisionState": "OWNER REVIEW · DESKTOP VISUAL DIRECTION + SCREENSHOT ACCESSIBILITY PASS",
-    "independentQa": "PASS 2026-08-20 — permanent ornament/surface reviewer and independent exact-node QA each passed all twelve desktop primaries; production routing, keyboard/focus, responsive reflow and assistive-technology semantics remain separate gates",
+    "decisionState": "BLOCKED FROM OWNER REVIEW · FRESH EXACT VISUAL ART PASS REQUIRED",
+    "independentQa": "Earlier mechanical, accessibility, ornament/background and holistic passes remain narrow evidence. Latest owner authority requires fresh independent exact-node Visual Art release records; any mutation invalidates them.",
     "section": "769:17254",
     "sectionName": "OWNER REVIEW · BATCH 01 · 12-SCREEN DESKTOP QUALITY CHECKPOINT · 23 AUGUST FIXTURE",
     "finalSectionScreenshotAudit": "PASS 2026-08-20 — current 12-screen section captured after metadata-only status promotion; no screen mutation or layout regression",
@@ -388,10 +396,10 @@
     },
     "operationalRecoveryAdmission": {
       "gateId": "BATCH-01-RECOVERY",
-      "decisionState": "FULL_SCREEN_PASS",
+      "decisionState": "BLOCKED_FROM_OWNER_REVIEW",
       "date": "2026-08-20",
-      "blockerCount": 0,
-      "openFinding": null,
+      "blockerCount": 2,
+      "openFinding": "OWNER-014 — 956:2 Visual Art asset-quality finding; OWNER-015 — exact Ornament Library admission remains withheld",
       "supersedesEarlierNodeListsFor": "operational recovery admission only",
       "historicalReviewRecordsPreserved": true,
       "finalDesktopEnglishPrimaries": {
@@ -424,7 +432,29 @@
       ],
       "ownerCommunicationOwner": "root communication task"
     },
-    "scopeBoundary": "The exact twelve-screen English desktop roster passes the static owner-review gate. All 390/320 responsive website work remains paused by latest owner authority. Production routes/interactions remain separate gates.",
+    "visualArtReleaseGate": {
+      "feedbackId": "GDF-067",
+      "required": true,
+      "independentReviewer": true,
+      "authorCannotApprove": true,
+      "mutationInvalidatesPass": true,
+      "requiredEvidence": ["exact node ID", "fresh natural-scale screenshot", "fresh batch-context view", "background decision", "complete per-ornament decision and purpose/provenance/fit/clear-space/alignment/scale", "no-ornament comparison", "balance/empty/dull/crowded assessment", "rejected-resemblance PASS", "zero unresolved visual findings", "unchanged content fingerprint"]
+    },
+    "desktopOrnamentCurator": {
+      "feedbackId": "GDF-068",
+      "atlas": "723:14636",
+      "modes": { "RESTRAINED": "owner-liked", "RICH": "owner-liked", "CELEBRATORY": "Festival/Vrat/ceremonial hero only", "BALANCED": "rejected-unstructured" },
+      "screenRule": "Select a released library ornament by named structural/contextual job or explicitly choose NO ORNAMENT.",
+      "newAdditionRule": "Source-derived Ganak-theme additions remain EXPLORATION with at least two alternatives and documented role/context; no automatic approval.",
+      "benchmark": "Successful hero floral establishes coherence/richness only and does not revive exact rejected assets or crops.",
+      "releaseChain": ["curator proposes", "independent Visual Art reviews", "Director releases/integrates"],
+      "compulsoryGate": "ORNAMENT_LIBRARY_GATE",
+      "exactNodeEvidence": ["content fingerprint", "mode and rationale", "permitted context", "named job", "exact approved-library component provenance", "placement and clear space", "alignment and scale", "no-ornament comparison", "composition completeness", "independent Visual Art PASS", "Director release"],
+      "mutationInvalidatesEvidence": true,
+      "creatorOrCuratorCannotSelfApprove": true,
+      "currentBatchState": "eleven exact selections released; independent Visual Art provisionally selected literal no-image 975:39033 for 956:2, withheld pending live curator-board fingerprint confirmation and source-first reclone"
+    },
+    "scopeBoundary": "The exact twelve-screen English desktop roster is blocked from owner review until GDF-067 and GDF-068 evidence are complete. All 390/320 responsive website work remains paused by latest owner authority. Production routes/interactions remain separate gates.",
     "fixtureCorrection": "CLOSED: exact sources were corrected to the Sunday 23 August 2026 New Delhi Putrada anchor; replacements 952:37373, 956:2, 956:292 and 952:37448 were regenerated with source/reaction fidelity and independently cold-QA'd.",
     "p0FloralCorrection": {
       "rejectedNode": "485:51",
@@ -520,7 +550,7 @@
     "supersededBy": "ownerReviewBatch01",
     "queueRule": "Do not place a pilot, wrapper or comparison board in the Owner Review Queue until same-viewport integrator comparison and exact-node independent QA pass every applicable GDF rule.",
     "feedbackLedger": "plans/ganak-design-feedback-ledger.md",
-    "canonicalFeedbackIds": "GDF-001 through GDF-063",
+    "canonicalFeedbackIds": "GDF-001 through GDF-068",
     "independentQaTask": "01a018d9-dca3-70b3-a851-b46eccd965cf",
     "todayPanchangSource": "116:49",
     "festivalVratSources": ["135:1312", "760:20"],
@@ -537,7 +567,7 @@
       "320px responsive website reflow",
       "long, special, sparse and error state specimens"
     ],
-    "ownerReviewSectionRule": "Only exact-node candidates with zero open findings may be OWNER REVIEW. Batch 01 section 769:17254 now meets that static desktop rule with the corrected 23 August roster and FULL_SCREEN_PASS; baseline section 652:13736 remains CHANGES REQUESTED historical evidence.",
+    "ownerReviewSectionRule": "Only exact current desktop nodes with zero open findings and fresh independent GDF-067 Visual Art evidence may be OWNER REVIEW, RELEASED or FULL_SCREEN_PASS. Batch 01 section 769:17254 is currently BLOCKED_FROM_OWNER_REVIEW on OWNER-014; its visible OWNER REVIEW label must be withdrawn when Figma write mode returns. Baseline section 652:13736 remains CHANGES REQUESTED historical evidence.",
     "ownerReviewVisualBatch": {
       "section": "652:13736",
       "sectionName": "CHANGES REQUESTED · WEBSITE BASELINE · P0 REJECTED FLORAL REMOVED",

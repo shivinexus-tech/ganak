@@ -70,8 +70,13 @@ regression rules were checked.
 - Shared desktop website header component set: `908:6`
   - `Current=Jyotish`: English `906:27`; Hindi `907:2`
   - `Current=Festivals`: English `941:21`; Hindi `941:53`
+  - `Current=Muhurat`: English `967:39449`; Hindi `967:39481`
+  - `Current=Prashna`: English `967:39534`; Hindi `967:39566`
   - Active-navigation semantic token `VariableID:917:188` (`color/navigation-active`)
-  - All four variants retain 1536×96 geometry and mapped targets at 44px or larger.
+  - All eight variants retain 1536×96 geometry and mapped targets at 44px or larger.
+    The Muhurat/Prashna variants passed independent exact-node Visual Art review
+    with white masthead background, retained structural gold rules, one semantic
+    active underline and no rejected resemblance; end fingerprints were unchanged.
     Festivals language switching remains on the Festivals route. Visual/component
     lineage is released; production route preservation remains blocked where the
     current Jyotish link selects `panel=kundli` and the current Muhurat link uses the
@@ -271,15 +276,19 @@ twelve desktop-English primaries after the targeted contrast and composition
 corrections. The final audit found zero denied dominant surfaces, zero active
 `REJ-016` hash/name reuse, zero active `REJ-017` exact-crop reuse, zero sub-12px
 visible text, zero overflow, zero reviewer prose and zero Phone/native lineage.
-This is a desktop visual-direction and screenshot-visible accessibility gate only;
-production routes, keyboard/focus behavior, responsive reflow and assistive-
-technology semantics remain separately gated. Former baseline `652:13736` remains
-`CHANGES REQUESTED` historical evidence and is not review authority.
+Those checks remain historical/narrow evidence. The later binding `GDF-067` charter
+does not inherit them as exact current Visual Art release evidence, so current
+owner-review admission is withdrawn until every unchanged current node receives a
+fresh independent Visual Art PASS. Production routes, keyboard/focus behavior,
+responsive reflow and assistive-technology semantics remain separately gated.
+Former baseline `652:13736` remains `CHANGES REQUESTED` historical evidence and is
+not review authority.
 
 The section's current operational label is
 `OWNER REVIEW · BATCH 01 · 12-SCREEN DESKTOP QUALITY CHECKPOINT · 23 AUGUST FIXTURE`.
-The historical pass below remains preserved separately from the corrected current
-roster.
+That Figma label must be withdrawn when write access returns; it is not current
+admission authority. The historical pass below remains preserved separately from
+the corrected current roster.
 
 #### Historical operational recovery admission — superseded 2026-08-20
 
@@ -325,10 +334,34 @@ exact source/reaction fidelity and independently reviewed at natural scale.
 
 The exact current twelve-screen roster is `851:18729`, `897:23887`, `858:266`,
 `952:37373`, `956:2`, `956:292`, `851:20865`, `952:37448`, `894:23276`,
-`894:23437`, `894:23612`, `851:21250`. `OWNER-013` is closed and
-`BATCH-01-RECOVERY` computes `FULL_SCREEN_PASS` for this static desktop owner-review
-scope. The four superseded 24 August clones remain hidden historical evidence; they
-were not deleted or rewritten.
+`894:23437`, `894:23612`, `851:21250`. `OWNER-013` is closed. `OWNER-014` and
+`OWNER-015` are open: `BATCH-01-RECOVERY` computes `BLOCKED_FROM_OWNER_REVIEW`.
+Fresh independent `GDF-067` Visual Art records now bind to all twelve exact unchanged
+nodes, with eleven PASS and one open asset-quality finding at `956:102`/`956:103`.
+The compulsory `GDF-068` `ORNAMENT_LIBRARY_GATE` also binds exact mode/job/provenance
+decisions to the roster; Director release remains withheld for `956:2` until its
+independent Visual Art finding is corrected. The four
+superseded 24 August clones remain hidden historical evidence; they were not deleted
+or rewritten.
+
+For each exact desktop candidate, Visual Art admission requires a fresh natural-
+scale screenshot and batch-context view, an explicit background decision, a
+complete per-ornament `KEEP`/`REMOVE`/`REPLACE`/`PROPOSE` inventory with purpose,
+provenance, fit, clear space, alignment and scale, an explicit no-ornament
+comparison, balance/empty/dull/crowded assessment, rejected-resemblance PASS, zero
+unresolved visual findings, an independent non-author reviewer, and a matching
+content fingerprint proving no post-review mutation. A mutation or reclone
+invalidates the pass.
+
+The Ornament Library gate separately requires an identifiable `RESTRAINED`, `RICH`,
+`CELEBRATORY` or literal `NONE` mode; rationale and permitted context; every active
+ornament's named structural/contextual job and exact approved-library component
+provenance; placement, clear space, alignment and scale assessment; a no-ornament
+comparison and complete-composition rationale; independent Visual Art PASS; a
+matching unchanged content fingerprint; and Director release. `BALANCED` is invalid.
+`CELEBRATORY` is limited to Festival/Vrat/ceremonial heroes. Creator/curator
+self-approval and post-review mutation fail the gate. Source-derived additions stay
+`EXPLORATION` with alternatives until independently reviewed and admitted.
 
 Latest owner priority also pauses all 390/320 responsive website design and QA.
 Exact rejected Calendar `899:27940` and every long continuous stacked-mobile

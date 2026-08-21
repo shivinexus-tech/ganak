@@ -21,15 +21,26 @@
     },
     "batchAdmission": {
       "type": "object",
-      "required": ["allowedStatuses", "fullScreenRequiredReviews", "zeroKnownFindings", "unresolvedConflictsBlock"],
+      "required": ["allowedStatuses", "fullScreenRequiredReviews", "zeroKnownFindings", "unresolvedConflictsBlock", "exactVisualArtPassRequired", "visualArtMutationInvalidatesPass", "independentVisualArtReviewerRequired", "ornamentCuratorReviewRequired", "directorOnlyLibraryRelease", "ornamentLibraryGateRequired", "ornamentLibraryMutationInvalidatesPass", "independentOrnamentVisualArtRequired", "balancedModeRejected", "celebratoryScopeRestricted", "explicitNoOrnamentRationaleRequired"],
       "additionalProperties": false,
       "properties": {
         "allowedStatuses": { "const": ["BLOCKED_FROM_OWNER_REVIEW", "NARROW_PASS", "FULL_SCREEN_PASS"] },
         "fullScreenRequiredReviews": {
-          "const": ["mechanical", "accessibility", "ornament_background", "blind_visual", "integrator"]
+          "const": ["mechanical", "accessibility", "ornament_background", "ornament_curator", "blind_visual", "visual_art", "integrator"]
         },
         "zeroKnownFindings": { "const": true },
-        "unresolvedConflictsBlock": { "const": true }
+        "unresolvedConflictsBlock": { "const": true },
+        "exactVisualArtPassRequired": { "const": true },
+        "visualArtMutationInvalidatesPass": { "const": true },
+        "independentVisualArtReviewerRequired": { "const": true },
+        "ornamentCuratorReviewRequired": { "const": true },
+        "directorOnlyLibraryRelease": { "const": true },
+        "ornamentLibraryGateRequired": { "const": true },
+        "ornamentLibraryMutationInvalidatesPass": { "const": true },
+        "independentOrnamentVisualArtRequired": { "const": true },
+        "balancedModeRejected": { "const": true },
+        "celebratoryScopeRestricted": { "const": true },
+        "explicitNoOrnamentRationaleRequired": { "const": true }
       }
     }
   },

@@ -228,12 +228,12 @@
       "scope": {
         "track": "website",
         "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
-        "exactNodes": ["908:6", "906:27", "907:2", "941:21", "941:53"],
-        "allowedRoles": ["shared_desktop_website_header", "shared_desktop_jyotish_header", "shared_desktop_festivals_header", "semantic_active_navigation_token", "english_variant", "hindi_variant"],
+        "exactNodes": ["908:6", "906:27", "907:2", "941:21", "941:53", "967:39449", "967:39481", "967:39534", "967:39566"],
+        "allowedRoles": ["shared_desktop_website_header", "shared_desktop_jyotish_header", "shared_desktop_festivals_header", "shared_desktop_muhurat_header", "shared_desktop_prashna_header", "semantic_active_navigation_token", "english_variant", "hindi_variant"],
         "prohibitedRoles": ["runtime_route_proof", "state_preservation_proof", "local_header_redraw", "responsive_header_substitute"]
       },
       "supersedes": [],
-      "reason": "The released desktop header set provides linked Jyotish and Festivals variants in both languages. Festivals language switching remains on the Festivals route; prototype URLs still do not prove production routing or preserved application state."
+      "reason": "The released desktop header set provides linked Jyotish, Festivals, Muhurat and Prashna variants in both languages. The four added Muhurat/Prashna variants passed independent exact-node structural and Visual Art review without mutation. Prototype URLs still do not prove production routing or preserved application state."
     },
     {
       "id": "RULE-001",
@@ -302,6 +302,57 @@
       },
       "supersedes": ["figma-putrada-2026-08-24-fixture-claim"],
       "reason": "Shravana Putrada Ekadashi for the New Delhi 2026 fixture is anchored to Sunday 23 August 2026. Exact sources were corrected source-first; replacement primaries 952:37373, 956:2, 956:292 and 952:37448 were regenerated and independently cold-QA'd. The superseded 24 August clones remain historical evidence only."
+    },
+    {
+      "id": "RULE-005",
+      "status": "rule",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "direct owner mandatory independent Visual Art desktop release charter",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["769:17254", "967:39893"],
+        "allowedRoles": ["desktop_candidate_pending_visual_art", "independent_visual_art_pass_with_fresh_evidence", "historical_label_withdrawn"],
+        "prohibitedRoles": ["owner_review_without_exact_visual_art_pass", "released_without_exact_visual_art_pass", "full_screen_pass_without_exact_visual_art_pass", "self_approved_visual_art", "stale_visual_art_pass_after_mutation", "visual_art_pass_with_open_findings"]
+      },
+      "supersedes": ["batch01-static-pass-without-current-mandatory-visual-art-record"],
+      "reason": "Every exact desktop candidate needs a fresh independent Visual Art PASS with natural-scale and batch-context evidence, background and per-ornament decisions, composition and rejected-resemblance review, and proof that the node has not changed since review."
+    },
+    {
+      "id": "APP-005",
+      "status": "approved",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "direct owner desktop Ornament Artist & Library Curator charter",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["723:14636"],
+        "allowedRoles": ["desktop_ornament_atlas", "restrained_mode", "rich_mode", "celebratory_festival_vrat_ceremonial_hero_only", "successful_hero_coherence_benchmark", "curator_proposal_source"],
+        "prohibitedRoles": ["balanced_mode", "automatic_screen_approval", "automatic_library_release", "exact_rejected_asset_revival", "exact_rejected_crop_revival", "mobile_source"]
+      },
+      "supersedes": ["balanced-ornament-mode"],
+      "reason": "Atlas 723:14636 is the desktop curator source. Restrained and Rich remain identifiable owner-liked modes; Celebratory is limited to Festival/Vrat or ceremonial hero contexts; Balanced is rejected as unstructured."
+    },
+    {
+      "id": "RULE-006",
+      "status": "rule",
+      "authority": "direct_owner_latest",
+      "decidedAt": "2026-08-20",
+      "source": "direct owner desktop Ornament Artist & Library Curator operating model",
+      "confidence": "confirmed",
+      "scope": {
+        "track": "website",
+        "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
+        "exactNodes": ["723:14636", "769:17254", "967:39893"],
+        "allowedRoles": ["named_structural_job", "named_contextual_job", "explicit_no_ornament", "curator_proposal", "independent_visual_art_review", "director_library_release", "exploration_with_alternatives"],
+        "prohibitedRoles": ["unnamed_decoration", "balanced_mode", "celebratory_outside_festival_vrat_ceremonial_hero", "exploration_auto_approval", "curator_self_release", "screen_lane_library_release", "rejected_asset_or_crop_revival"]
+      },
+      "supersedes": [],
+      "reason": "Screen lanes select an existing atlas ornament by named job or explicitly choose none. The curator proposes, independent Visual Art reviews, and only the Director releases or integrates; new source-derived additions stay EXPLORATION with alternatives."
     }
   ],
   "conflicts": [
@@ -326,8 +377,19 @@
   ],
   "batchAdmission": {
     "allowedStatuses": ["BLOCKED_FROM_OWNER_REVIEW", "NARROW_PASS", "FULL_SCREEN_PASS"],
-    "fullScreenRequiredReviews": ["mechanical", "accessibility", "ornament_background", "blind_visual", "integrator"],
+    "fullScreenRequiredReviews": ["mechanical", "accessibility", "ornament_background", "ornament_curator", "blind_visual", "visual_art", "integrator"],
     "zeroKnownFindings": true,
-    "unresolvedConflictsBlock": true
+    "unresolvedConflictsBlock": true,
+    "exactVisualArtPassRequired": true,
+    "visualArtMutationInvalidatesPass": true,
+    "independentVisualArtReviewerRequired": true,
+    "ornamentCuratorReviewRequired": true,
+    "directorOnlyLibraryRelease": true,
+    "ornamentLibraryGateRequired": true,
+    "ornamentLibraryMutationInvalidatesPass": true,
+    "independentOrnamentVisualArtRequired": true,
+    "balancedModeRejected": true,
+    "celebratoryScopeRestricted": true,
+    "explicitNoOrnamentRationaleRequired": true
   }
 }

@@ -10,7 +10,7 @@ const SCHEMA_PATH = path.join(ROOT, "plans/schemas/ganak-design-decision-manifes
 const INCIDENTS_PATH = path.join(ROOT, "validation/fixtures/figma-design-governance-known-incidents.json");
 const DEFAULT_PACKET = path.join(ROOT, "plans/figma-review-evidence/batch-01-recovery.json");
 const PRECEDENCE = ["direct_owner_latest", "direct_owner_earlier", "canonical_human_record", "agent_report", "inference"];
-const REVIEW_ROLES = ["mechanical", "accessibility", "ornament_background", "blind_visual", "integrator"];
+const REVIEW_ROLES = ["mechanical", "accessibility", "ornament_background", "ornament_curator", "blind_visual", "visual_art", "integrator"];
 const SCREEN_COVERAGE_CATEGORIES = ["language", "asset_rejection", "surface", "geometry", "ornament"];
 const STATUS = ["BLOCKED_FROM_OWNER_REVIEW", "NARROW_PASS", "FULL_SCREEN_PASS"];
 const BATCH_SECTION = "769:17254";
@@ -78,6 +78,11 @@ function validateManifestShape(manifest, schema) {
   assert(JSON.stringify(manifest.batchAdmission.fullScreenRequiredReviews) === JSON.stringify(REVIEW_ROLES), "mandatory reviewer roles drifted");
   assert(manifest.batchAdmission.zeroKnownFindings === true, "owner admission must require zero findings");
   assert(manifest.batchAdmission.unresolvedConflictsBlock === true, "unresolved conflicts must block");
+  assert(manifest.batchAdmission.exactVisualArtPassRequired === true, "exact Visual Art PASS must be mandatory");
+  assert(manifest.batchAdmission.visualArtMutationInvalidatesPass === true, "post-review mutation must invalidate Visual Art PASS");
+  assert(manifest.batchAdmission.independentVisualArtReviewerRequired === true, "Visual Art reviewer must be independent");
+  assert(manifest.batchAdmission.ornamentCuratorReviewRequired === true, "ornament curator review must be mandatory");
+  assert(manifest.batchAdmission.directorOnlyLibraryRelease === true, "only the Director may release library selections");
 
   const ids = new Set();
   for (const d of manifest.decisions) {
@@ -287,6 +292,88 @@ function computeAdmission(manifest, packet) {
   }
   const blind = reviews.get("blind_visual");
   if (!blind || blind.cold !== true) errors.push({ code: "OWNER_ADMISSION", detail: "blind visual review is not cold" });
+  const visualArt = packet.visualArtReviews || [];
+  const visualArtIds = visualArt.map(review => review.screen);
+  if (visualArt.length !== screens.length || new Set(visualArtIds).size !== screens.length || visualArtIds.some(id => !screenIds.includes(id))) {
+    errors.push({ code: "VISUAL_ART_ADMISSION", detail: "Visual Art reviews do not bind one-to-one to the exact current roster" });
+  }
+  const visualArtByScreen = new Map(visualArt.map(review => [review.screen, review]));
+  const ornamentDecisions = new Set(["KEEP", "REMOVE", "REPLACE", "PROPOSE"]);
+  for (const screen of screens) {
+    const art = visualArtByScreen.get(screen.node);
+    if (!art) continue;
+    const composition = art.composition || {};
+    const resemblance = art.rejectedResemblance || {};
+    const noOrnament = art.noOrnamentComparison || {};
+    const background = art.background || {};
+    const ornaments = art.ornaments;
+    const screenshotsBound = /^(https:\/\/|fixture:\/\/)/.test(art.naturalScaleScreenshot || "") &&
+      art.batchContextScreenshot === packet.visualArtContactSheet;
+    const contentBound = typeof screen.contentFingerprint === "string" && screen.contentFingerprint.length >= 12 &&
+      art.contentFingerprint === screen.contentFingerprint && art.contentUnchangedSinceReview === true &&
+      art.mutatedAfterReview === false;
+    const independent = art.independent === true && art.authoredByReviewer === false && Boolean(art.reviewer);
+    const backgroundComplete = ornamentDecisions.has(background.decision) && typeof background.reason === "string" && background.reason.length >= 12;
+    const ornamentComplete = art.ornamentInventoryComplete === true && Array.isArray(ornaments) && ornaments.every(ornament =>
+      isNodeId(ornament.node) && ornamentDecisions.has(ornament.decision) &&
+      ["purpose", "provenance", "fit", "clearSpace", "alignment", "scale"].every(key => typeof ornament[key] === "string" && ornament[key].length >= 3)
+    );
+    const noOrnamentComplete = noOrnament.performed === true && typeof noOrnament.assessment === "string" && noOrnament.assessment.length >= 12;
+    const compositionComplete = ["balance", "empty", "dull", "crowded"].every(key => composition[key] === "PASS") &&
+      typeof composition.assessment === "string" && composition.assessment.length >= 12;
+    const resemblanceComplete = resemblance.status === "PASS" && Array.isArray(resemblance.evidence) && resemblance.evidence.length > 0;
+    if (art.decision !== "PASS" || art.unresolvedVisualFindingCount !== 0 || !screenshotsBound || !contentBound || !independent ||
+        !backgroundComplete || !ornamentComplete || !noOrnamentComplete || !compositionComplete || !resemblanceComplete ||
+        art.inspectedAt !== packet.inspectedAt) {
+      errors.push({ code: "VISUAL_ART_ADMISSION", detail: `${screen.node}: exact independent Visual Art release evidence is missing, stale or incomplete` });
+    }
+  }
+  const curatorReviews = packet.ornamentCuratorReviews || [];
+  const curatorIds = curatorReviews.map(review => review.screen);
+  if (curatorReviews.length !== screens.length || new Set(curatorIds).size !== screens.length || curatorIds.some(id => !screenIds.includes(id))) {
+    errors.push({ code: "ORNAMENT_CURATOR_ADMISSION", detail: "Ornament Curator reviews do not bind one-to-one to the exact current roster" });
+  }
+  const allowedModes = new Set(["NONE", "RESTRAINED", "RICH", "CELEBRATORY"]);
+  const celebratoryContexts = new Set(["festival", "vrat", "ceremonial_hero"]);
+  const screenById = new Map(screens.map(screen => [screen.node, screen]));
+  for (const review of curatorReviews) {
+    const libraryNodes = review.libraryNodes || [];
+    const curatorOrnaments = review.ornaments || [];
+    const screen = screenById.get(review.screen);
+    const art = visualArtByScreen.get(review.screen);
+    const explorationValid = (review.newSourceDerivedAdditions || []).every(addition =>
+      addition.status === "EXPLORATION" && Array.isArray(addition.alternatives) && addition.alternatives.length >= 2 &&
+      addition.autoApproved === false && addition.directorReleased === false && typeof addition.role === "string" && addition.role.length >= 3 &&
+      typeof addition.context === "string" && addition.context.length >= 3
+    );
+    const selectionValid = review.selection === "NO_ORNAMENT"
+      ? review.mode === "NONE" && libraryNodes.length === 0 && curatorOrnaments.length === 0
+      : review.selection === "LIBRARY_ORNAMENT" && review.mode !== "NONE" && libraryNodes.length > 0 && libraryNodes.every(isNodeId) &&
+        curatorOrnaments.length === libraryNodes.length && curatorOrnaments.every(ornament =>
+          isNodeId(ornament.node) && isNodeId(ornament.componentNode) && libraryNodes.includes(ornament.componentNode) &&
+          ["job", "provenance", "placement", "clearSpace", "alignment", "scale"].every(key =>
+            typeof ornament[key] === "string" && ornament[key].length >= 3
+          )
+        );
+    const celebratoryValid = review.mode !== "CELEBRATORY" || celebratoryContexts.has(review.contextClass);
+    const contextValid = Array.isArray(review.permittedContexts) && review.permittedContexts.includes(review.contextClass);
+    const rationaleValid = typeof review.rationale === "string" && review.rationale.length >= 12 &&
+      typeof review.compositionRationale === "string" && review.compositionRationale.length >= 12 &&
+      review.noOrnamentComparison?.performed === true &&
+      typeof review.noOrnamentComparison?.assessment === "string" && review.noOrnamentComparison.assessment.length >= 12;
+    const contentBound = screen && review.contentFingerprint === screen.contentFingerprint &&
+      review.contentUnchangedSinceReview === true && review.mutatedAfterReview === false;
+    const independentCurator = review.independent === true && review.authoredByCurator === false && Boolean(review.curator) &&
+      art && art.reviewer !== review.curator;
+    const independentVisualArtPass = art?.decision === "PASS" && art.unresolvedVisualFindingCount === 0 &&
+      art.independent === true && art.authoredByReviewer === false && review.visualArtReviewed === true;
+    if (!allowedModes.has(review.mode) || review.mode === "BALANCED" || !selectionValid || !celebratoryValid || !contextValid ||
+        !rationaleValid || !contentBound || !independentCurator || !independentVisualArtPass || !explorationValid ||
+        review.atlasNode !== "723:14636" || typeof review.job !== "string" || review.job.length < 3 ||
+        review.directorReleased !== true) {
+      errors.push({ code: "ORNAMENT_CURATOR_ADMISSION", detail: `${review.screen}: curator selection is missing, unscoped, unreleased or uses a rejected mode` });
+    }
+  }
   const lineage = packet.mechanicalEvidence.lineage || [];
   const coveredLineage = new Set(lineage.filter(x => x.regenerated === true).map(x => x.screen));
   const everyScreenRegenerated = screens.every(s => coveredLineage.has(s.node));
@@ -391,7 +478,7 @@ function correctedFixture(manifest) {
 
 function correctedPacket(manifest) {
   const screenIds = canonicalBatchScreens(manifest);
-  const screens = screenIds.map(node => ({ node, name: fixtureName(node), screenshot: `fixture://${node}` }));
+  const screens = screenIds.map(node => ({ node, name: fixtureName(node), screenshot: `fixture://${node}`, contentFingerprint: `fixture-content-${node}` }));
   const screenAudits = screens.map((screen, index) => {
     const audit = {
       screen: screen.node, screenshot: screen.screenshot, inspectedAt: "2026-08-20", auditor: "fixture", rootFill: "#FFFFFF",
@@ -407,9 +494,29 @@ function correctedPacket(manifest) {
   });
   return {
     batchId: "FIXTURE-BATCH-01", figmaFile: manifest.decisions.find(decision => decision.id === "RULE-001").scope.figmaFile,
-    sectionNode: BATCH_SECTION, inspectedAt: "2026-08-20", screens, screenAudits, sourceFirstRequired: true,
+    sectionNode: BATCH_SECTION, inspectedAt: "2026-08-20", contactSheet: "fixture://batch", visualArtContactSheet: "fixture://visual-art-batch", screens, screenAudits, sourceFirstRequired: true,
     mechanicalEvidence: correctedFixture(manifest),
     reviews: REVIEW_ROLES.map(role => ({ role, status: "FULL_SCREEN_PASS", reviewer: `fixture-${role}`, evidence: ["fixture"], coversAllScreens: true, cold: role === "blind_visual" })),
+    visualArtReviews: screens.map(screen => ({
+      screen: screen.node, decision: "PASS", inspectedAt: "2026-08-20", reviewer: "fixture-independent-visual-art",
+      independent: true, authoredByReviewer: false, naturalScaleScreenshot: screen.screenshot,
+      batchContextScreenshot: "fixture://visual-art-batch", contentFingerprint: screen.contentFingerprint,
+      contentUnchangedSinceReview: true, mutatedAfterReview: false, unresolvedVisualFindingCount: 0,
+      background: { decision: "KEEP", reason: "Fixture background is appropriate for the exact screen." },
+      ornamentInventoryComplete: true, ornaments: [],
+      noOrnamentComparison: { performed: true, assessment: "Fixture no-ornament comparison confirms the current composition." },
+      composition: { balance: "PASS", empty: "PASS", dull: "PASS", crowded: "PASS", assessment: "Fixture composition is balanced at natural and batch scale." },
+      rejectedResemblance: { status: "PASS", evidence: ["Fixture rejected-resemblance sweep is clear."] }
+    })),
+    ornamentCuratorReviews: screens.map(screen => ({
+      screen: screen.node, curator: "fixture-ornament-curator", atlasNode: "723:14636", selection: "NO_ORNAMENT",
+      independent: true, authoredByCurator: false, mode: "NONE", contextClass: "data", permittedContexts: ["data"],
+      job: "Explicit no-ornament composition", rationale: "Fixture screen requires no local ornament for its functional composition.",
+      libraryNodes: [], ornaments: [], noOrnamentComparison: { performed: true, assessment: "Fixture comparison confirms no ornament is the stronger composition." },
+      compositionRationale: "Fixture content and shared boundaries complete the page without local decoration.",
+      contentFingerprint: screen.contentFingerprint, contentUnchangedSinceReview: true, mutatedAfterReview: false,
+      newSourceDerivedAdditions: [], visualArtReviewed: true, directorReleased: true
+    })),
     knownFindings: [], holisticJudgements: screenIds.map(screen => ({ screen, naturalScale: "PASS", contactSheet: "PASS" })), requestedDisposition: "FULL_SCREEN_PASS"
   };
 }
@@ -438,6 +545,28 @@ function runIncidentSelfTests(manifest, incidents) {
     if (incident.kind === "wrong_section") packet.sectionNode = "769:99999";
     if (incident.kind === "roster_mismatch") packet.screens[0].node = "999:999";
     if (incident.kind === "missing_ornament_inventory") delete packet.mechanicalEvidence.ornamentPlacements;
+    if (incident.kind === "missing_visual_art") packet.visualArtReviews = [];
+    if (incident.kind === "self_visual_art") packet.visualArtReviews[0].authoredByReviewer = true;
+    if (incident.kind === "mutated_visual_art") packet.visualArtReviews[0].mutatedAfterReview = true;
+    if (incident.kind === "visual_finding") packet.visualArtReviews[0].unresolvedVisualFindingCount = 1;
+    if (incident.kind === "missing_curator") packet.ornamentCuratorReviews = [];
+    if (incident.kind === "balanced_curator") packet.ornamentCuratorReviews[0].mode = "BALANCED";
+    if (incident.kind === "self_curator") packet.ornamentCuratorReviews[0].authoredByCurator = true;
+    if (incident.kind === "mutated_curator") packet.ornamentCuratorReviews[0].mutatedAfterReview = true;
+    if (incident.kind === "curator_missing_provenance") {
+      packet.ornamentCuratorReviews[0].selection = "LIBRARY_ORNAMENT";
+      packet.ornamentCuratorReviews[0].mode = "RICH";
+      packet.ornamentCuratorReviews[0].libraryNodes = ["760:6"];
+      packet.ornamentCuratorReviews[0].ornaments = [{ node: "990:1", componentNode: "760:6", job: "edge" }];
+    }
+    if (incident.kind === "none_without_rationale") packet.ornamentCuratorReviews[0].compositionRationale = "";
+    if (incident.kind === "celebratory_scope") {
+      packet.ornamentCuratorReviews[0].selection = "LIBRARY_ORNAMENT";
+      packet.ornamentCuratorReviews[0].mode = "CELEBRATORY";
+      packet.ornamentCuratorReviews[0].libraryNodes = ["760:4"];
+      packet.ornamentCuratorReviews[0].contextClass = "data";
+    }
+    if (incident.kind === "autoapprove_exploration") packet.ornamentCuratorReviews[0].newSourceDerivedAdditions.push({ status: "APPROVED", alternatives: ["A", "B"], autoApproved: true, directorReleased: true, role: "hero", context: "festival" });
     if (incident.kind === "typed_status") packet.reviews[0].status = "NARROW_PASS";
     if (incident.kind === "admission") packet.knownFindings.push({ id: "OPEN", status: "open" });
     const errors = computeAdmission(localManifest, packet).errors;

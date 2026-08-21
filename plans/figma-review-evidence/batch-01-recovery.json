@@ -6,23 +6,24 @@
   "historicalFigmaLabel": "OWNER REVIEW · BATCH 01 · 12-SCREEN QUALITY CHECKPOINT",
   "currentSectionLabel": "OWNER REVIEW · BATCH 01 · 12-SCREEN DESKTOP QUALITY CHECKPOINT · 23 AUGUST FIXTURE",
   "inspectedAt": "2026-08-20",
-  "expectedDisposition": "FULL_SCREEN_PASS",
-  "requestedDisposition": "FULL_SCREEN_PASS",
+  "expectedDisposition": "BLOCKED_FROM_OWNER_REVIEW",
+  "requestedDisposition": "BLOCKED_FROM_OWNER_REVIEW",
   "sourceFirstRequired": true,
   "contactSheet": "https://www.figma.com/api/mcp/asset/6dbc67d8-e3c4-4b5d-bb93-214e5dc29c53.png",
+  "visualArtContactSheet": "https://www.figma.com/api/mcp/asset/b09eb750-c25c-4275-b0c8-462fbbb7b920.png",
   "screens": [
-    { "node": "851:18729", "name": "Today ordinary", "sourceNode": "762:16084", "screenshot": "https://www.figma.com/api/mcp/asset/9ce2de3a-8f7b-4c3d-ab0a-6991c4014165.png" },
-    { "node": "897:23887", "name": "Today special", "sourceNode": "762:16339", "screenshot": "https://www.figma.com/api/mcp/asset/2eee6506-7543-48f3-aca3-0f01e8af567a.png" },
-    { "node": "858:266", "name": "Full Panchang", "sourceNode": "762:16597", "screenshot": "https://www.figma.com/api/mcp/asset/6b40e619-113c-4c98-a7bd-3bebde52e82c.png" },
-    { "node": "952:37373", "name": "Calendar selected day", "sourceNode": "762:16932", "screenshot": "https://www.figma.com/api/mcp/asset/2390472b-7e70-4139-99a4-2fae0a2340d3.png" },
-    { "node": "956:2", "name": "Festivals discovery", "sourceNode": "730:15152", "screenshot": "https://www.figma.com/api/mcp/asset/e6a33b6f-dae7-4411-9ae3-f6df0a5986cb.png" },
-    { "node": "956:292", "name": "Festival calendar", "sourceNode": "730:15339", "screenshot": "https://www.figma.com/api/mcp/asset/c5de1505-62e7-4ffa-a004-be32ebac66e7.png" },
-    { "node": "851:20865", "name": "Story festival detail", "sourceNode": "730:15940", "screenshot": "https://www.figma.com/api/mcp/asset/8f10f321-871f-4f19-9380-ea72ad09360b.png" },
-    { "node": "952:37448", "name": "Vrat guide", "sourceNode": "763:17139", "screenshot": "https://www.figma.com/api/mcp/asset/f1d238eb-785a-4183-9804-5f059a5b23bc.png" },
-    { "node": "894:23276", "name": "Muhurat hub", "sourceNode": "730:14646", "screenshot": "https://www.figma.com/api/mcp/asset/0797a1af-4a71-470a-8b4e-9900ff0734c2.png" },
-    { "node": "894:23437", "name": "Property finder", "sourceNode": "730:14805", "screenshot": "https://www.figma.com/api/mcp/asset/bea70722-147b-4f15-afbd-d301c05d32c8.png" },
-    { "node": "894:23612", "name": "Prashna ask", "sourceNode": "730:16288", "screenshot": "https://www.figma.com/api/mcp/asset/6d38ceee-7ba0-4c1b-9e07-09d0ed4733de.png" },
-    { "node": "851:21250", "name": "Prashna answer", "sourceNode": "730:16467", "screenshot": "https://www.figma.com/api/mcp/asset/3be197d4-41ea-4f88-841b-7ad2af8d1c47.png" }
+    { "node": "851:18729", "name": "Today ordinary", "sourceNode": "762:16084", "screenshot": "https://www.figma.com/api/mcp/asset/9ce2de3a-8f7b-4c3d-ab0a-6991c4014165.png", "contentFingerprint": "figma-7935110d" },
+    { "node": "897:23887", "name": "Today special", "sourceNode": "762:16339", "screenshot": "https://www.figma.com/api/mcp/asset/2eee6506-7543-48f3-aca3-0f01e8af567a.png", "contentFingerprint": "figma-e4ce9ead" },
+    { "node": "858:266", "name": "Full Panchang", "sourceNode": "762:16597", "screenshot": "https://www.figma.com/api/mcp/asset/6b40e619-113c-4c98-a7bd-3bebde52e82c.png", "contentFingerprint": "figma-785cf3ca" },
+    { "node": "952:37373", "name": "Calendar selected day", "sourceNode": "762:16932", "screenshot": "https://www.figma.com/api/mcp/asset/2390472b-7e70-4139-99a4-2fae0a2340d3.png", "contentFingerprint": "figma-9ef03ff0" },
+    { "node": "956:2", "name": "Festivals discovery", "sourceNode": "730:15152", "screenshot": "https://www.figma.com/api/mcp/asset/e6a33b6f-dae7-4411-9ae3-f6df0a5986cb.png", "contentFingerprint": "figma-5f35aa21" },
+    { "node": "956:292", "name": "Festival calendar", "sourceNode": "730:15339", "screenshot": "https://www.figma.com/api/mcp/asset/c5de1505-62e7-4ffa-a004-be32ebac66e7.png", "contentFingerprint": "figma-55e8222d" },
+    { "node": "851:20865", "name": "Story festival detail", "sourceNode": "730:15940", "screenshot": "https://www.figma.com/api/mcp/asset/8f10f321-871f-4f19-9380-ea72ad09360b.png", "contentFingerprint": "figma-7e7450b7" },
+    { "node": "952:37448", "name": "Vrat guide", "sourceNode": "763:17139", "screenshot": "https://www.figma.com/api/mcp/asset/f1d238eb-785a-4183-9804-5f059a5b23bc.png", "contentFingerprint": "figma-981f4a11" },
+    { "node": "894:23276", "name": "Muhurat hub", "sourceNode": "730:14646", "screenshot": "https://www.figma.com/api/mcp/asset/0797a1af-4a71-470a-8b4e-9900ff0734c2.png", "contentFingerprint": "figma-b4fe5554" },
+    { "node": "894:23437", "name": "Property finder", "sourceNode": "730:14805", "screenshot": "https://www.figma.com/api/mcp/asset/bea70722-147b-4f15-afbd-d301c05d32c8.png", "contentFingerprint": "figma-3605d03" },
+    { "node": "894:23612", "name": "Prashna ask", "sourceNode": "730:16288", "screenshot": "https://www.figma.com/api/mcp/asset/6d38ceee-7ba0-4c1b-9e07-09d0ed4733de.png", "contentFingerprint": "figma-b517c23d" },
+    { "node": "851:21250", "name": "Prashna answer", "sourceNode": "730:16467", "screenshot": "https://www.figma.com/api/mcp/asset/3be197d4-41ea-4f88-841b-7ad2af8d1c47.png", "contentFingerprint": "figma-57335786" }
   ],
   "screenAudits": [
     {
@@ -169,8 +170,239 @@
     { "role": "mechanical", "status": "FULL_SCREEN_PASS", "reviewer": "independent QA task 01a018d9-dca3-70b3-a851-b46eccd965cf", "evidence": ["12/12 final frames; zero under-42 or text-bound reactions; zero overflow; zero denied assets/crops/fills; footer Hindi renders"], "coversAllScreens": true, "cold": false },
     { "role": "accessibility", "status": "FULL_SCREEN_PASS", "reviewer": "accessibility QA task 01a01ac0-0303-7f62-a3bf-05b3208ade26", "evidence": ["12/12 static desktop frames plus focus specimen 851:18665; zero screenshot-visible design findings"], "coversAllScreens": true, "cold": false },
     { "role": "ornament_background", "status": "FULL_SCREEN_PASS", "reviewer": "ornament/background QA task 01a01ac0-0ddc-7683-aec4-6fe23ed651d6", "evidence": ["12/12 provenance, role, crop, clear-space and semantic-surface review; zero findings"], "coversAllScreens": true, "cold": false },
+    { "role": "ornament_curator", "status": "NARROW_PASS", "reviewer": "independent read-only desktop Ornament Curator /root/festival_matrix", "evidence": ["Exact 12-screen mode/job matrix completed from atlas 723:14636; eleven selections are Director-released, while 956:2 remains withheld on its open Visual Art asset-quality finding."], "coversAllScreens": false, "cold": true },
     { "role": "blind_visual", "status": "FULL_SCREEN_PASS", "reviewer": "independent final desktop task /root/figma_state_audit", "evidence": ["12/12 exact current primaries re-read at natural scale; source-fidelity replacements verified; final contact-sheet review; zero static desktop owner-review findings"], "coversAllScreens": true, "cold": true },
+    { "role": "visual_art", "status": "NARROW_PASS", "reviewer": "independent Visual Art task /root/figma_state_audit", "evidence": ["Fresh exact-node natural-scale and contact-sheet review completed: 11 PASS; 956:2 remains FINDING on pixelated Kamika artwork 956:102/956:103."], "coversAllScreens": false, "cold": true },
     { "role": "integrator", "status": "FULL_SCREEN_PASS", "reviewer": "Design Director 019faab9-9aee-7620-a5e0-9b604d37b3a2", "evidence": ["exact source parity and source reactions preserved on 12 current visible frames; 40 predecessors remain hidden; review metadata promoted only after independent full-screen admission"], "coversAllScreens": true, "cold": false }
+  ],
+  "visualArtReviews": [
+    {
+      "screen": "851:18729", "decision": "PASS", "inspectedAt": "2026-08-20", "reviewer": "independent Visual Art task /root/figma_state_audit", "independent": true, "authoredByReviewer": false,
+      "naturalScaleScreenshot": "https://www.figma.com/api/mcp/asset/25c6cb3c-c322-4e89-9e60-1650d3db6624.png", "batchContextScreenshot": "https://www.figma.com/api/mcp/asset/b09eb750-c25c-4275-b0c8-462fbbb7b920.png", "contentFingerprint": "figma-7935110d", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "unresolvedVisualFindingCount": 0,
+      "background": { "decision": "KEEP", "reason": "The pale technical canvas separates the dense three-column card stack without reading as ivory or empty decoration." },
+      "ornamentInventoryComplete": true,
+      "ornaments": [
+        { "node": "851:18731", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation labels", "alignment": "full-width top edge", "scale": "two-pixel rule" },
+        { "node": "851:18753", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation labels", "alignment": "full-width bottom edge", "scale": "two-pixel rule" },
+        { "node": "851:18755", "decision": "KEEP", "purpose": "date and place context boundary", "provenance": "linked component 206:135", "fit": "structural context band", "clearSpace": "controls remain unobstructed", "alignment": "full-width below masthead", "scale": "single shared band" },
+        { "node": "851:18986", "decision": "KEEP", "purpose": "site closure", "provenance": "linked footer 349:2", "fit": "single route ending", "clearSpace": "below all content", "alignment": "full-width terminal edge", "scale": "one footer instance" },
+        { "node": "851:18966", "decision": "KEEP", "purpose": "answer-card entry rule", "provenance": "source-first editorial panel", "fit": "content skeleton", "clearSpace": "separates heading from body", "alignment": "panel width", "scale": "thin rule" },
+        { "node": "851:18970", "decision": "KEEP", "purpose": "answer-card content rule", "provenance": "source-first editorial panel", "fit": "content skeleton", "clearSpace": "brackets the reading zone", "alignment": "panel width", "scale": "thin rule" },
+        { "node": "851:18978", "decision": "KEEP", "purpose": "answer-card end rule", "provenance": "source-first editorial panel", "fit": "content skeleton", "clearSpace": "closes the answer panel", "alignment": "panel width", "scale": "thin rule" }
+      ],
+      "noOrnamentComparison": { "performed": true, "assessment": "Removing the local floral treatment remains correct, while removing the structural panel rules weakens the answer-card skeleton." },
+      "composition": { "balance": "PASS", "empty": "PASS", "dull": "PASS", "crowded": "PASS", "assessment": "The three-column hierarchy is calm, complete and balanced at natural and contact-sheet scales." },
+      "rejectedResemblance": { "status": "PASS", "evidence": ["No active rejected hash, exact rejected crop, detached sticker or revived owner-rejected flourish is present."] }
+    },
+    {
+      "screen": "897:23887", "decision": "PASS", "inspectedAt": "2026-08-20", "reviewer": "independent Visual Art task /root/figma_state_audit", "independent": true, "authoredByReviewer": false,
+      "naturalScaleScreenshot": "https://www.figma.com/api/mcp/asset/c7d40ef7-116d-4a48-90b7-937d459722fd.png", "batchContextScreenshot": "https://www.figma.com/api/mcp/asset/b09eb750-c25c-4275-b0c8-462fbbb7b920.png", "contentFingerprint": "figma-e4ce9ead", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "unresolvedVisualFindingCount": 0,
+      "background": { "decision": "KEEP", "reason": "The pale page ground and white ceremonial hero preserve hierarchy while keeping the deity as the single focal point." },
+      "ornamentInventoryComplete": true,
+      "ornaments": [
+        { "node": "897:23889", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of labels", "alignment": "full-width top edge", "scale": "two-pixel rule" },
+        { "node": "897:23911", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of labels", "alignment": "full-width bottom edge", "scale": "two-pixel rule" },
+        { "node": "897:23913", "decision": "KEEP", "purpose": "date and place context boundary", "provenance": "linked component 206:135", "fit": "structural context band", "clearSpace": "controls remain open", "alignment": "full-width below masthead", "scale": "single shared band" },
+        { "node": "897:24150", "decision": "KEEP", "purpose": "site closure", "provenance": "linked footer 349:2", "fit": "single route ending", "clearSpace": "below content", "alignment": "full-width terminal edge", "scale": "one footer instance" }
+      ],
+      "noOrnamentComparison": { "performed": true, "assessment": "The no-local-ornament hero is stronger because the removed sticker and flourish would compete with the deity and title." },
+      "composition": { "balance": "PASS", "empty": "PASS", "dull": "PASS", "crowded": "PASS", "assessment": "The answer-first hero is ceremonial but controlled, with deliberate breathing room and no unfinished slot." },
+      "rejectedResemblance": { "status": "PASS", "evidence": ["The former pasted flourish and exact rejected crop are absent; no rejected asset lineage is active."] }
+    },
+    {
+      "screen": "858:266", "decision": "PASS", "inspectedAt": "2026-08-20", "reviewer": "independent Visual Art task /root/figma_state_audit", "independent": true, "authoredByReviewer": false,
+      "naturalScaleScreenshot": "https://www.figma.com/api/mcp/asset/f6f9e0be-e273-46bc-bf95-08cc34428045.png", "batchContextScreenshot": "https://www.figma.com/api/mcp/asset/b09eb750-c25c-4275-b0c8-462fbbb7b920.png", "contentFingerprint": "figma-785cf3ca", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "unresolvedVisualFindingCount": 0,
+      "background": { "decision": "KEEP", "reason": "The pale technical canvas separates dense white Panchang modules and preserves a readable data rhythm." },
+      "ornamentInventoryComplete": true,
+      "ornaments": [
+        { "node": "858:268", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained technical frame", "clearSpace": "clear of navigation", "alignment": "full-width top edge", "scale": "two-pixel rule" },
+        { "node": "858:288", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained technical frame", "clearSpace": "clear of navigation", "alignment": "full-width bottom edge", "scale": "two-pixel rule" },
+        { "node": "858:292", "decision": "KEEP", "purpose": "date and place context boundary", "provenance": "linked component 206:135", "fit": "structural context band", "clearSpace": "controls remain open", "alignment": "full-width below masthead", "scale": "single shared band" },
+        { "node": "858:599", "decision": "KEEP", "purpose": "site closure", "provenance": "linked footer 349:2", "fit": "single route ending", "clearSpace": "below data modules", "alignment": "full-width terminal edge", "scale": "one footer instance" }
+      ],
+      "noOrnamentComparison": { "performed": true, "assessment": "No page-local ornament is the stronger choice because dense data grouping already supplies all necessary rhythm and hierarchy." },
+      "composition": { "balance": "PASS", "empty": "PASS", "dull": "PASS", "crowded": "PASS", "assessment": "Dense technical content remains contained, legible and visually ordered at the natural desktop scale." },
+      "rejectedResemblance": { "status": "PASS", "evidence": ["Rejected crop and asset sweeps are clear; no cramped transition ornament remains active."] }
+    },
+    {
+      "screen": "952:37373", "decision": "PASS", "inspectedAt": "2026-08-20", "reviewer": "independent Visual Art task /root/figma_state_audit", "independent": true, "authoredByReviewer": false,
+      "naturalScaleScreenshot": "https://www.figma.com/api/mcp/asset/d2fb887b-5c5a-4bd8-9c04-ab5c27666517.png", "batchContextScreenshot": "https://www.figma.com/api/mcp/asset/b09eb750-c25c-4275-b0c8-462fbbb7b920.png", "contentFingerprint": "figma-9ef03ff0", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "unresolvedVisualFindingCount": 0,
+      "background": { "decision": "KEEP", "reason": "The white canvas is appropriate for a sparse selected-day utility and the semantic blue inset supplies sufficient hierarchy." },
+      "ornamentInventoryComplete": true,
+      "ornaments": [
+        { "node": "952:37375", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width top edge", "scale": "two-pixel rule" },
+        { "node": "952:37395", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width bottom edge", "scale": "two-pixel rule" },
+        { "node": "952:37402", "decision": "KEEP", "purpose": "selected date and place context", "provenance": "linked component 206:135", "fit": "structural context band", "clearSpace": "controls remain open", "alignment": "full-width below masthead", "scale": "single shared band" },
+        { "node": "952:37403", "decision": "KEEP", "purpose": "site closure", "provenance": "linked footer 349:2", "fit": "single route ending", "clearSpace": "below selected-day cards", "alignment": "full-width terminal edge", "scale": "one footer instance" }
+      ],
+      "noOrnamentComparison": { "performed": true, "assessment": "The body is clearer without a local ornament because the two-column selected-day card mass already balances the page." },
+      "composition": { "balance": "PASS", "empty": "PASS", "dull": "PASS", "crowded": "PASS", "assessment": "The selected-day summary and side facts form a balanced, complete two-column composition." },
+      "rejectedResemblance": { "status": "PASS", "evidence": ["No rejected hash, exact crop, detached sticker or owner-rejected flourish is active."] }
+    },
+    {
+      "screen": "956:2", "decision": "FINDING", "inspectedAt": "2026-08-20", "reviewer": "independent Visual Art task /root/figma_state_audit", "independent": true, "authoredByReviewer": false,
+      "naturalScaleScreenshot": "https://www.figma.com/api/mcp/asset/f5619eca-4822-4bac-a96f-f41709f2454c.png", "batchContextScreenshot": "https://www.figma.com/api/mcp/asset/b09eb750-c25c-4275-b0c8-462fbbb7b920.png", "contentFingerprint": "figma-5f35aa21", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "unresolvedVisualFindingCount": 1,
+      "background": { "decision": "KEEP", "reason": "The pale canvas and white discovery modules support the festival list without creating an empty or decorative field." },
+      "ornamentInventoryComplete": true,
+      "ornaments": [
+        { "node": "956:4", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width top edge", "scale": "two-pixel rule" },
+        { "node": "956:26", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width bottom edge", "scale": "two-pixel rule" },
+        { "node": "956:28", "decision": "KEEP", "purpose": "month and place context boundary", "provenance": "linked component 206:135", "fit": "structural context band", "clearSpace": "controls remain open", "alignment": "full-width below masthead", "scale": "single shared band" },
+        { "node": "956:105", "decision": "KEEP", "purpose": "site closure", "provenance": "linked footer 349:2", "fit": "single route ending", "clearSpace": "below discovery rail", "alignment": "full-width terminal edge", "scale": "one footer instance" },
+        { "node": "956:102", "decision": "REPLACE", "purpose": "Kamika recommendation thumbnail", "provenance": "clone lineage 952:21 to approved 176:224", "fit": "current image is visibly softer than surrounding content", "clearSpace": "thumbnail box is contained", "alignment": "right-rail square", "scale": "current 129-pixel display exposes pixelation" }
+      ],
+      "noOrnamentComparison": { "performed": true, "assessment": "No image is visually cleaner than the degraded rendering, but removal requires explicit rail rebalancing before it can be certified." },
+      "composition": { "balance": "PASS", "empty": "PASS", "dull": "PASS", "crowded": "PASS", "assessment": "The page mass is balanced, but the active Kamika thumbnail is visibly blocky and breaks the otherwise polished finish." },
+      "rejectedResemblance": { "status": "PASS", "evidence": ["The finding is asset sharpness, not rejected lineage; no rejected crop, hash or sticker signature is present."] }
+    },
+    {
+      "screen": "956:292", "decision": "PASS", "inspectedAt": "2026-08-20", "reviewer": "independent Visual Art task /root/figma_state_audit", "independent": true, "authoredByReviewer": false,
+      "naturalScaleScreenshot": "https://www.figma.com/api/mcp/asset/06fa3a18-8f6c-4b82-b344-4a4d70f79990.png", "batchContextScreenshot": "https://www.figma.com/api/mcp/asset/b09eb750-c25c-4275-b0c8-462fbbb7b920.png", "contentFingerprint": "figma-55e8222d", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "unresolvedVisualFindingCount": 0,
+      "background": { "decision": "KEEP", "reason": "The pale canvas supports the semantic calendar tints while leaving the month grid and result rail visually primary." },
+      "ornamentInventoryComplete": true,
+      "ornaments": [
+        { "node": "956:294", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width top edge", "scale": "two-pixel rule" },
+        { "node": "956:316", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width bottom edge", "scale": "two-pixel rule" },
+        { "node": "956:318", "decision": "KEEP", "purpose": "month and place context boundary", "provenance": "linked component 206:135", "fit": "structural context band", "clearSpace": "controls remain open", "alignment": "full-width below masthead", "scale": "single shared band" },
+        { "node": "956:429", "decision": "KEEP", "purpose": "site closure", "provenance": "linked footer 349:2", "fit": "single route ending", "clearSpace": "below calendar grid", "alignment": "full-width terminal edge", "scale": "one footer instance" }
+      ],
+      "noOrnamentComparison": { "performed": true, "assessment": "No local ornament is the stronger choice because the month grid and right rail already create a complete visual structure." },
+      "composition": { "balance": "PASS", "empty": "PASS", "dull": "PASS", "crowded": "PASS", "assessment": "The calendar grid, selected state and side rail remain aligned and readable without ornamental competition." },
+      "rejectedResemblance": { "status": "PASS", "evidence": ["No denied asset, rejected crop or detached decorative sticker is active."] }
+    },
+    {
+      "screen": "851:20865", "decision": "PASS", "inspectedAt": "2026-08-20", "reviewer": "independent Visual Art task /root/figma_state_audit", "independent": true, "authoredByReviewer": false,
+      "naturalScaleScreenshot": "https://www.figma.com/api/mcp/asset/2dd16b17-b9c0-44f0-a2c6-d23cc04b9c7c.png", "batchContextScreenshot": "https://www.figma.com/api/mcp/asset/b09eb750-c25c-4275-b0c8-462fbbb7b920.png", "contentFingerprint": "figma-7e7450b7", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "unresolvedVisualFindingCount": 0,
+      "background": { "decision": "KEEP", "reason": "The pale page ground and white editorial hero keep the long story readable while supporting a richer Festival mode." },
+      "ornamentInventoryComplete": true,
+      "ornaments": [
+        { "node": "851:20867", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width top edge", "scale": "two-pixel rule" },
+        { "node": "851:20889", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width bottom edge", "scale": "two-pixel rule" },
+        { "node": "851:20892", "decision": "KEEP", "purpose": "festival date and place context", "provenance": "linked component 206:135", "fit": "structural context band", "clearSpace": "controls remain open", "alignment": "full-width below masthead", "scale": "single shared band" },
+        { "node": "851:20937", "decision": "KEEP", "purpose": "site closure", "provenance": "linked footer 349:2", "fit": "single route ending", "clearSpace": "below story content", "alignment": "full-width terminal edge", "scale": "one footer instance" },
+        { "node": "851:20911", "decision": "KEEP", "purpose": "editorial hero counterweight", "provenance": "linked library component 760:6", "fit": "Festival story opening", "clearSpace": "open center and title zone", "alignment": "grounded lower-left edge", "scale": "single rich editorial sweep" },
+        { "node": "851:20913", "decision": "KEEP", "purpose": "timing-content threshold", "provenance": "source-first timing ribbon", "fit": "hero-to-detail transition", "clearSpace": "separate from deity and title", "alignment": "horizontal content threshold", "scale": "one semantic ribbon" }
+      ],
+      "noOrnamentComparison": { "performed": true, "assessment": "Removing the editorial anchor makes the hero visibly right-heavy, so the single grounded Rich-mode sweep remains warranted." },
+      "composition": { "balance": "PASS", "empty": "PASS", "dull": "PASS", "crowded": "PASS", "assessment": "The story opening balances the right deity, left editorial anchor and central reading space without crowding." },
+      "rejectedResemblance": { "status": "PASS", "evidence": ["The linked 760:6 anchor is purpose-scoped and does not revive the rejected 485:51 asset or exact crop."] }
+    },
+    {
+      "screen": "952:37448", "decision": "PASS", "inspectedAt": "2026-08-20", "reviewer": "independent Visual Art task /root/figma_state_audit", "independent": true, "authoredByReviewer": false,
+      "naturalScaleScreenshot": "https://www.figma.com/api/mcp/asset/4ed800d7-ee9a-48bb-893d-c4a47d07072a.png", "batchContextScreenshot": "https://www.figma.com/api/mcp/asset/b09eb750-c25c-4275-b0c8-462fbbb7b920.png", "contentFingerprint": "figma-981f4a11", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "unresolvedVisualFindingCount": 0,
+      "background": { "decision": "KEEP", "reason": "The pale page, white hero, navy practical card and semantic blue meaning surface support the ceremonial Vrat hierarchy." },
+      "ornamentInventoryComplete": true,
+      "ornaments": [
+        { "node": "952:37450", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width top edge", "scale": "two-pixel rule" },
+        { "node": "952:37472", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width bottom edge", "scale": "two-pixel rule" },
+        { "node": "952:37473", "decision": "KEEP", "purpose": "Vrat date and place context", "provenance": "linked component 206:135", "fit": "structural context band", "clearSpace": "controls remain open", "alignment": "full-width below masthead", "scale": "single shared band" },
+        { "node": "952:37523", "decision": "KEEP", "purpose": "site closure", "provenance": "linked footer 349:2", "fit": "single route ending", "clearSpace": "below guide content", "alignment": "full-width terminal edge", "scale": "one footer instance" },
+        { "node": "952:37492", "decision": "KEEP", "purpose": "ceremonial hero anchor", "provenance": "linked library component 760:4", "fit": "Vrat hero only", "clearSpace": "open center and deity text zone", "alignment": "grounded lower-left edge", "scale": "one substantial celebratory sweep" }
+      ],
+      "noOrnamentComparison": { "performed": true, "assessment": "Removing the 760:4 anchor makes the wide hero right-heavy; this single Vrat-scoped Celebratory gesture is stronger." },
+      "composition": { "balance": "PASS", "empty": "PASS", "dull": "PASS", "crowded": "PASS", "assessment": "The practical card, meaning surface and grounded hero anchor create a rich but controlled Vrat composition." },
+      "rejectedResemblance": { "status": "PASS", "evidence": ["The approved 760:4 benchmark is edge-grounded and does not reproduce the rejected asset or crop signature."] }
+    },
+    {
+      "screen": "894:23276", "decision": "PASS", "inspectedAt": "2026-08-20", "reviewer": "independent Visual Art task /root/figma_state_audit", "independent": true, "authoredByReviewer": false,
+      "naturalScaleScreenshot": "https://www.figma.com/api/mcp/asset/77654e25-dcfc-4136-9015-1fc7441918a9.png", "batchContextScreenshot": "https://www.figma.com/api/mcp/asset/b09eb750-c25c-4275-b0c8-462fbbb7b920.png", "contentFingerprint": "figma-b4fe5554", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "unresolvedVisualFindingCount": 0,
+      "background": { "decision": "KEEP", "reason": "The pale technical canvas and white journey modules keep the Muhurat hub professional, clear and non-ceremonial." },
+      "ornamentInventoryComplete": true,
+      "ornaments": [
+        { "node": "894:23278", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width top edge", "scale": "two-pixel rule" },
+        { "node": "894:23298", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width bottom edge", "scale": "two-pixel rule" },
+        { "node": "894:23305", "decision": "KEEP", "purpose": "Muhurat date and place context", "provenance": "linked component 206:135", "fit": "structural context band", "clearSpace": "controls remain open", "alignment": "full-width below masthead", "scale": "single shared band" },
+        { "node": "894:23306", "decision": "KEEP", "purpose": "site closure", "provenance": "linked footer 349:2", "fit": "single route ending", "clearSpace": "below hub modules", "alignment": "full-width terminal edge", "scale": "one footer instance" },
+        { "node": "894:23311", "decision": "KEEP", "purpose": "journey-heading group boundary", "provenance": "source-first heading rule", "fit": "functional grouping", "clearSpace": "directly attached to heading", "alignment": "heading width", "scale": "one-pixel line" }
+      ],
+      "noOrnamentComparison": { "performed": true, "assessment": "No library ornament is needed; the attached heading rule supplies structure without reviving the removed floating divider." },
+      "composition": { "balance": "PASS", "empty": "PASS", "dull": "PASS", "crowded": "PASS", "assessment": "The Property and Vehicle journey hierarchy is balanced and professional with clear functional grouping." },
+      "rejectedResemblance": { "status": "PASS", "evidence": ["The former floating rule is absent and no rejected asset or detached ornamental crop is active."] }
+    },
+    {
+      "screen": "894:23437", "decision": "PASS", "inspectedAt": "2026-08-20", "reviewer": "independent Visual Art task /root/figma_state_audit", "independent": true, "authoredByReviewer": false,
+      "naturalScaleScreenshot": "https://www.figma.com/api/mcp/asset/74cfd45f-ceb0-488c-831c-eb319831b8b7.png", "batchContextScreenshot": "https://www.figma.com/api/mcp/asset/b09eb750-c25c-4275-b0c8-462fbbb7b920.png", "contentFingerprint": "figma-3605d03", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "unresolvedVisualFindingCount": 0,
+      "background": { "decision": "KEEP", "reason": "The pale canvas, white functional cards and semantic blue groups separate the finder task without decorative excess." },
+      "ornamentInventoryComplete": true,
+      "ornaments": [
+        { "node": "894:23439", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width top edge", "scale": "two-pixel rule" },
+        { "node": "894:23459", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width bottom edge", "scale": "two-pixel rule" },
+        { "node": "894:23466", "decision": "KEEP", "purpose": "finder date and place context", "provenance": "linked component 206:135", "fit": "structural context band", "clearSpace": "controls remain open", "alignment": "full-width below masthead", "scale": "single shared band" },
+        { "node": "894:23467", "decision": "KEEP", "purpose": "site closure", "provenance": "linked footer 349:2", "fit": "single route ending", "clearSpace": "below finder form", "alignment": "full-width terminal edge", "scale": "one footer instance" }
+      ],
+      "noOrnamentComparison": { "performed": true, "assessment": "No local ornament is the stronger choice because the form, presets and right rail are already content-shaped and balanced." },
+      "composition": { "balance": "PASS", "empty": "PASS", "dull": "PASS", "crowded": "PASS", "assessment": "The finder form and supporting rail remain aligned, contained and visually complete at natural scale." },
+      "rejectedResemblance": { "status": "PASS", "evidence": ["No floating ornament, rejected hash, exact crop or detached sticker is active."] }
+    },
+    {
+      "screen": "894:23612", "decision": "PASS", "inspectedAt": "2026-08-20", "reviewer": "independent Visual Art task /root/figma_state_audit", "independent": true, "authoredByReviewer": false,
+      "naturalScaleScreenshot": "https://www.figma.com/api/mcp/asset/cfbfed3c-b71a-4120-acd2-0d61251a6b13.png", "batchContextScreenshot": "https://www.figma.com/api/mcp/asset/b09eb750-c25c-4275-b0c8-462fbbb7b920.png", "contentFingerprint": "figma-b517c23d", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "unresolvedVisualFindingCount": 0,
+      "background": { "decision": "KEEP", "reason": "The white root suits the sparse Prashna input state and lets focus and guidance surfaces provide structure." },
+      "ornamentInventoryComplete": true,
+      "ornaments": [
+        { "node": "894:23614", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width top edge", "scale": "two-pixel rule" },
+        { "node": "894:23634", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width bottom edge", "scale": "two-pixel rule" },
+        { "node": "894:23638", "decision": "KEEP", "purpose": "Prashna moment and place context", "provenance": "linked component 206:135", "fit": "structural context band", "clearSpace": "controls remain open", "alignment": "full-width below masthead", "scale": "single shared band" },
+        { "node": "894:23639", "decision": "KEEP", "purpose": "site closure", "provenance": "linked footer 349:2", "fit": "single route ending", "clearSpace": "below question form", "alignment": "full-width terminal edge", "scale": "one footer instance" }
+      ],
+      "noOrnamentComparison": { "performed": true, "assessment": "No local ornament is correct because the sparse form and guidance rail already balance the page without distraction." },
+      "composition": { "balance": "PASS", "empty": "PASS", "dull": "PASS", "crowded": "PASS", "assessment": "The main question form and supporting guidance rail are balanced, calm and intentionally sparse." },
+      "rejectedResemblance": { "status": "PASS", "evidence": ["The former floating divider is absent and no rejected decorative asset or crop is active."] }
+    },
+    {
+      "screen": "851:21250", "decision": "PASS", "inspectedAt": "2026-08-20", "reviewer": "independent Visual Art task /root/figma_state_audit", "independent": true, "authoredByReviewer": false,
+      "naturalScaleScreenshot": "https://www.figma.com/api/mcp/asset/9372c53e-3714-4cd5-9af0-2ceb0925db54.png", "batchContextScreenshot": "https://www.figma.com/api/mcp/asset/b09eb750-c25c-4275-b0c8-462fbbb7b920.png", "contentFingerprint": "figma-57335786", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "unresolvedVisualFindingCount": 0,
+      "background": { "decision": "KEEP", "reason": "The white root supports an answer-first Prashna result and keeps the verdict card and ownership rail primary." },
+      "ornamentInventoryComplete": true,
+      "ornaments": [
+        { "node": "851:21252", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width top edge", "scale": "two-pixel rule" },
+        { "node": "851:21272", "decision": "KEEP", "purpose": "global masthead boundary", "provenance": "source-first desktop masthead", "fit": "restrained site frame", "clearSpace": "clear of navigation", "alignment": "full-width bottom edge", "scale": "two-pixel rule" },
+        { "node": "851:21276", "decision": "KEEP", "purpose": "Prashna result context", "provenance": "linked component 206:135", "fit": "structural context band", "clearSpace": "controls remain open", "alignment": "full-width below masthead", "scale": "single shared band" },
+        { "node": "851:21277", "decision": "KEEP", "purpose": "site closure", "provenance": "linked footer 349:2", "fit": "single route ending", "clearSpace": "below answer content", "alignment": "full-width terminal edge", "scale": "one footer instance" },
+        { "node": "851:21283", "decision": "KEEP", "purpose": "verdict threshold", "provenance": "source-first answer card", "fit": "single semantic accent", "clearSpace": "separates answer heading", "alignment": "answer-card top edge", "scale": "thin gold edge" }
+      ],
+      "noOrnamentComparison": { "performed": true, "assessment": "The single answer-card edge is sufficient; adding or repeating another ornament would weaken the verdict hierarchy." },
+      "composition": { "balance": "PASS", "empty": "PASS", "dull": "PASS", "crowded": "PASS", "assessment": "The answer card, ownership rail and action pair form a balanced and complete result composition." },
+      "rejectedResemblance": { "status": "PASS", "evidence": ["No redundant ornament, rejected hash, exact crop or detached sticker is active."] }
+    }
+  ],
+  "ornamentCuratorReviews": [
+    {
+      "screen": "851:18729", "curator": "independent read-only desktop Ornament Curator /root/festival_matrix", "independent": true, "authoredByCurator": false, "atlasNode": "723:14636", "selection": "NO_ORNAMENT", "mode": "NONE", "contextClass": "daily", "permittedContexts": ["daily"], "job": "Explicit no-local-ornament composition", "rationale": "The ordinary-day answer and three-column information hierarchy require calm structure rather than decorative emphasis.", "libraryNodes": [], "ornaments": [], "noOrnamentComparison": { "performed": true, "assessment": "The hidden historical ornament stays absent; adding it would compete with the quiet answer-first hierarchy." }, "compositionRationale": "Shared boundaries finish the page, so the body is complete rather than empty without a local ornament.", "contentFingerprint": "figma-7935110d", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "newSourceDerivedAdditions": [], "visualArtReviewed": true, "directorReleased": true
+    },
+    {
+      "screen": "897:23887", "curator": "independent read-only desktop Ornament Curator /root/festival_matrix", "independent": true, "authoredByCurator": false, "atlasNode": "723:14636", "selection": "NO_ORNAMENT", "mode": "NONE", "contextClass": "ceremonial_hero", "permittedContexts": ["ceremonial_hero"], "job": "Explicit no-local-ornament hero", "rationale": "The deity and answer-first typography already carry the ceremonial emphasis; another flourish would create sticker competition.", "libraryNodes": [], "ornaments": [], "noOrnamentComparison": { "performed": true, "assessment": "The current hero is more coherent without the hidden historical flourish and needs no replacement." }, "compositionRationale": "The hero remains complete through deity, typography and structural boundaries, with deliberate breathing room.", "contentFingerprint": "figma-e4ce9ead", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "newSourceDerivedAdditions": [], "visualArtReviewed": true, "directorReleased": true
+    },
+    {
+      "screen": "858:266", "curator": "independent read-only desktop Ornament Curator /root/festival_matrix", "independent": true, "authoredByCurator": false, "atlasNode": "723:14636", "selection": "NO_ORNAMENT", "mode": "NONE", "contextClass": "data", "permittedContexts": ["data"], "job": "Explicit no-local-ornament technical layout", "rationale": "Dense Panchang modules and tabular rhythm must remain primary; a local ornament would reduce technical clarity.", "libraryNodes": [], "ornaments": [], "noOrnamentComparison": { "performed": true, "assessment": "No local ornament is stronger because the data grouping already supplies a complete visual rhythm." }, "compositionRationale": "The dense module stack is finished and balanced through semantic cards and shared boundary components.", "contentFingerprint": "figma-785cf3ca", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "newSourceDerivedAdditions": [], "visualArtReviewed": true, "directorReleased": true
+    },
+    {
+      "screen": "952:37373", "curator": "independent read-only desktop Ornament Curator /root/festival_matrix", "independent": true, "authoredByCurator": false, "atlasNode": "723:14636", "selection": "NO_ORNAMENT", "mode": "NONE", "contextClass": "calendar", "permittedContexts": ["calendar"], "job": "Explicit no-local-ornament selected-day layout", "rationale": "The selected-day cards and semantic context band already balance the sparse utility page without decorative competition.", "libraryNodes": [], "ornaments": [], "noOrnamentComparison": { "performed": true, "assessment": "The hidden transition remains absent; adding it would crowd the concise selected-day body." }, "compositionRationale": "The two-column result and side facts provide a complete, intentionally restrained utility composition.", "contentFingerprint": "figma-9ef03ff0", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "newSourceDerivedAdditions": [], "visualArtReviewed": true, "directorReleased": true
+    },
+    {
+      "screen": "956:2", "curator": "independent read-only desktop Ornament Curator /root/festival_matrix", "independent": true, "authoredByCurator": false, "atlasNode": "723:14636", "selection": "NO_ORNAMENT", "mode": "NONE", "contextClass": "festival", "permittedContexts": ["festival"], "job": "Explicit no-local-ornament discovery layout", "rationale": "Festival discovery should remain information-led; its current open finding is thumbnail quality, not a need for ornament.", "libraryNodes": [], "ornaments": [], "noOrnamentComparison": { "performed": true, "assessment": "The body needs no ornament, while the degraded Kamika image requires a separate source-quality decision and rail rebalancing." }, "compositionRationale": "The list and recommendation rail are structurally complete, but Director release is withheld until Visual Art clears the image treatment.", "contentFingerprint": "figma-5f35aa21", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "newSourceDerivedAdditions": [{ "status": "EXPLORATION", "alternatives": ["Sharp approved Kamika crop at the current job", "Reduced 64-pixel source-faithful crop with rail reflow", "No-image rail with expanded text"], "autoApproved": false, "directorReleased": false, "role": "recommendation thumbnail", "context": "festival discovery" }], "visualArtReviewed": false, "directorReleased": false
+    },
+    {
+      "screen": "956:292", "curator": "independent read-only desktop Ornament Curator /root/festival_matrix", "independent": true, "authoredByCurator": false, "atlasNode": "723:14636", "selection": "NO_ORNAMENT", "mode": "NONE", "contextClass": "calendar", "permittedContexts": ["calendar"], "job": "Explicit no-local-ornament month grid", "rationale": "The month grid, event tints and selected-day rail supply the complete composition; ornament would compete with scanning.", "libraryNodes": [], "ornaments": [], "noOrnamentComparison": { "performed": true, "assessment": "The hidden historical decoration remains absent and the grid is clearer without a local ornament." }, "compositionRationale": "Grid alignment, event hierarchy and the side rail fully terminate the screen without a decorative insert.", "contentFingerprint": "figma-55e8222d", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "newSourceDerivedAdditions": [], "visualArtReviewed": true, "directorReleased": true
+    },
+    {
+      "screen": "851:20865", "curator": "independent read-only desktop Ornament Curator /root/festival_matrix", "independent": true, "authoredByCurator": false, "atlasNode": "723:14636", "selection": "LIBRARY_ORNAMENT", "mode": "RICH", "contextClass": "festival", "permittedContexts": ["festival"], "job": "Festival story-opening editorial counterweight", "rationale": "One grounded editorial sweep balances the right-side deity while protecting the central reading column.", "libraryNodes": ["760:6"], "ornaments": [{ "node": "851:20911", "componentNode": "760:6", "job": "story-opening editorial counterweight", "provenance": "approved atlas component 760:6 from 743:16103", "placement": "grounded hero lower-left edge", "clearSpace": "at least 32 pixels from the reading column", "alignment": "edge-connected to the hero base", "scale": "240 by 128, one instance" }], "noOrnamentComparison": { "performed": true, "assessment": "Without the single Rich sweep the wide story hero becomes visibly right-heavy and less coherent." }, "compositionRationale": "The one grounded path adds richness without becoming a ceremonial canopy or detached sticker.", "contentFingerprint": "figma-7e7450b7", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "newSourceDerivedAdditions": [], "visualArtReviewed": true, "directorReleased": true
+    },
+    {
+      "screen": "952:37448", "curator": "independent read-only desktop Ornament Curator /root/festival_matrix", "independent": true, "authoredByCurator": false, "atlasNode": "723:14636", "selection": "LIBRARY_ORNAMENT", "mode": "CELEBRATORY", "contextClass": "vrat", "permittedContexts": ["vrat", "festival", "ceremonial_hero"], "job": "Vrat answer-first hero anchor", "rationale": "The approved rich floral benchmark is warranted here as a single Vrat-scoped ceremonial gesture with protected text space.", "libraryNodes": ["760:4"], "ornaments": [{ "node": "952:37492", "componentNode": "760:4", "job": "Vrat answer-first hero anchor", "provenance": "approved atlas component 760:4 from 743:16097", "placement": "grounded hero lower-left edge", "clearSpace": "protected center and deity text zones", "alignment": "edge-connected to the hero base", "scale": "one substantial sweep" }], "noOrnamentComparison": { "performed": true, "assessment": "Without the 760:4 sweep the Vrat hero is right-heavy; the single approved gesture is compositionally stronger." }, "compositionRationale": "Celebratory use remains limited to this Vrat hero and does not become a general decorative mode.", "contentFingerprint": "figma-981f4a11", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "newSourceDerivedAdditions": [], "visualArtReviewed": true, "directorReleased": true
+    },
+    {
+      "screen": "894:23276", "curator": "independent read-only desktop Ornament Curator /root/festival_matrix", "independent": true, "authoredByCurator": false, "atlasNode": "723:14636", "selection": "NO_ORNAMENT", "mode": "NONE", "contextClass": "muhurat", "permittedContexts": ["muhurat"], "job": "Explicit no-library-ornament hub", "rationale": "The journey cards and attached heading rule provide sufficient hierarchy; a floating ornament would weaken the professional tool context.", "libraryNodes": [], "ornaments": [], "noOrnamentComparison": { "performed": true, "assessment": "The removed floating rule remains absent and no library ornament is needed to complete the hub." }, "compositionRationale": "The Property and Vehicle journey groups are complete through functional cards and shared boundaries.", "contentFingerprint": "figma-b4fe5554", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "newSourceDerivedAdditions": [], "visualArtReviewed": true, "directorReleased": true
+    },
+    {
+      "screen": "894:23437", "curator": "independent read-only desktop Ornament Curator /root/festival_matrix", "independent": true, "authoredByCurator": false, "atlasNode": "723:14636", "selection": "NO_ORNAMENT", "mode": "NONE", "contextClass": "muhurat", "permittedContexts": ["muhurat"], "job": "Explicit no-library-ornament finder", "rationale": "The form, presets and right rail are functionally grouped and should remain visually precise rather than decorative.", "libraryNodes": [], "ornaments": [], "noOrnamentComparison": { "performed": true, "assessment": "No local ornament is stronger because the finder remains balanced through semantic surfaces and form geometry." }, "compositionRationale": "The finder task is complete and not empty; every major area has a functional role and clear boundary.", "contentFingerprint": "figma-3605d03", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "newSourceDerivedAdditions": [], "visualArtReviewed": true, "directorReleased": true
+    },
+    {
+      "screen": "894:23612", "curator": "independent read-only desktop Ornament Curator /root/festival_matrix", "independent": true, "authoredByCurator": false, "atlasNode": "723:14636", "selection": "NO_ORNAMENT", "mode": "NONE", "contextClass": "prashna", "permittedContexts": ["prashna"], "job": "Explicit no-library-ornament question state", "rationale": "The sparse question form and guidance rail require calm focus; ornament would distract from the judgement task.", "libraryNodes": [], "ornaments": [], "noOrnamentComparison": { "performed": true, "assessment": "The removed floating divider remains absent and the form is stronger without a local ornament." }, "compositionRationale": "The form and side guidance balance the white field, so NONE does not leave the screen unfinished.", "contentFingerprint": "figma-b517c23d", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "newSourceDerivedAdditions": [], "visualArtReviewed": true, "directorReleased": true
+    },
+    {
+      "screen": "851:21250", "curator": "independent read-only desktop Ornament Curator /root/festival_matrix", "independent": true, "authoredByCurator": false, "atlasNode": "723:14636", "selection": "NO_ORNAMENT", "mode": "NONE", "contextClass": "prashna", "permittedContexts": ["prashna"], "job": "Explicit no-library-ornament answer state", "rationale": "The verdict card edge and ownership rail already establish the result hierarchy; another ornament would be redundant.", "libraryNodes": [], "ornaments": [], "noOrnamentComparison": { "performed": true, "assessment": "The existing semantic verdict edge is sufficient and no library ornament improves the balanced answer composition." }, "compositionRationale": "The answer card, rail and actions fully occupy the intended field without decorative supplementation.", "contentFingerprint": "figma-57335786", "contentUnchangedSinceReview": true, "mutatedAfterReview": false, "newSourceDerivedAdditions": [], "visualArtReviewed": true, "directorReleased": true
+    }
   ],
   "knownFindings": [
     { "id": "OWNER-001", "screen": "851:18729", "category": "composition", "status": "closed", "summary": "Today panel rebalanced upstream and passed blind review." },
@@ -185,7 +417,9 @@
     { "id": "OWNER-010", "screen": "894:23276", "category": "ornament", "status": "closed", "summary": "Muhurat source floating rule 762:18724 remains hidden; the current source-first clone passes hierarchy and empty-gap review." },
     { "id": "OWNER-011", "screen": "894:23612", "category": "ornament", "status": "closed", "summary": "Prashna source floating rule 762:18728 remains hidden; the current source-first clone passes hierarchy and empty-gap review." },
     { "id": "OWNER-012", "screen": "851:18729", "category": "ornament", "status": "closed", "summary": "Ordinary Today retains the independently preferred no-added-ornament composition; current natural-scale and contact-sheet reviews find the panel balanced." },
-    { "id": "OWNER-013", "screen": "batch", "category": "data_integrity", "status": "closed", "summary": "Exact sources 762:16932, 730:15152, 730:15339 and 763:17139 were corrected source-first to the published Sunday 23 August 2026 New Delhi Putrada fixture (5:54/6:53 where applicable); exact replacements 952:37373, 956:2, 956:292 and 952:37448 were regenerated, reaction-parity checked and independently cold-QA'd." }
+    { "id": "OWNER-013", "screen": "batch", "category": "data_integrity", "status": "closed", "summary": "Exact sources 762:16932, 730:15152, 730:15339 and 763:17139 were corrected source-first to the published Sunday 23 August 2026 New Delhi Putrada fixture (5:54/6:53 where applicable); exact replacements 952:37373, 956:2, 956:292 and 952:37448 were regenerated, reaction-parity checked and independently cold-QA'd." },
+    { "id": "OWNER-014", "screen": "batch", "category": "visual_art_admission", "status": "open", "summary": "Fresh independent per-node Visual Art release records are required for the exact current roster. Current review found 11 PASS and one open sharpness finding at 956:102/956:103; existing earlier passes cannot authorize OWNER REVIEW, RELEASED or FULL_SCREEN_PASS." },
+    { "id": "OWNER-015", "screen": "batch", "category": "ornament_curator_admission", "status": "open", "summary": "The exact twelve-screen Ornament Library matrix from atlas 723:14636 is recorded and eleven selections are Director-released. Independent Visual Art provisionally selected literal no-image alternative 975:39033 for 956:2, but release and source-first integration remain withheld until live fingerprints for the curator boards can be independently confirmed after the Figma quota resets." }
   ],
   "holisticJudgements": [
     { "screen": "851:18729", "naturalScale": "PASS", "contactSheet": "PASS" },
@@ -204,6 +438,6 @@
   "limitations": [
     "Static desktop Figma cannot prove browser DOM order, keyboard execution, assistive-technology semantics, responsive zoom/reflow, production routing or live state preservation.",
     "Admission is limited to these twelve English desktop frames and focus-state design evidence; it does not claim the implemented website or redesign programme is solved."
-    ,"Source-first Putrada correction is closed for this static desktop owner-review gate; intentionally inert controls and production routing/state remain implementation gates."
+    ,"Source-first Putrada correction is closed, but current owner-review admission is withdrawn until OWNER-014 Visual Art and OWNER-015 Ornament Library evidence are complete and mutation-stable for every exact current node."
   ]
 }
