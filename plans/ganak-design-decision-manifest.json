@@ -308,17 +308,17 @@
       "status": "rule",
       "authority": "direct_owner_latest",
       "decidedAt": "2026-08-20",
-      "source": "direct owner mandatory independent Visual Art desktop release charter",
+      "source": "owner-authorized mandatory desktop Visual Art gate",
       "confidence": "confirmed",
       "scope": {
         "track": "website",
         "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
         "exactNodes": ["769:17254", "967:39893"],
-        "allowedRoles": ["desktop_candidate_pending_visual_art", "independent_visual_art_pass_with_fresh_evidence", "historical_label_withdrawn"],
-        "prohibitedRoles": ["owner_review_without_exact_visual_art_pass", "released_without_exact_visual_art_pass", "full_screen_pass_without_exact_visual_art_pass", "self_approved_visual_art", "stale_visual_art_pass_after_mutation", "visual_art_pass_with_open_findings"]
+        "allowedRoles": ["desktop_candidate_pending_visual_art", "desktop_visual_art_evidence", "independent_exact_node_review", "independent_visual_art_pass_with_fresh_evidence", "historical_label_withdrawn"],
+        "prohibitedRoles": ["mobile_admission", "owner_review_without_exact_visual_art_pass", "released_without_exact_visual_art_pass", "full_screen_pass_without_exact_visual_art_pass", "self_approval", "self_approved_visual_art", "stale_node_evidence", "stale_visual_art_pass_after_mutation", "mutable_evidence_binding", "incomplete_visual_art_review", "visual_art_pass_with_open_findings"]
       },
-      "supersedes": ["batch01-static-pass-without-current-mandatory-visual-art-record"],
-      "reason": "Every exact desktop candidate needs a fresh independent Visual Art PASS with natural-scale and batch-context evidence, background and per-ornament decisions, composition and rejected-resemblance review, and proof that the node has not changed since review."
+      "supersedes": ["batch01-static-pass-without-current-mandatory-visual-art-record", "desktop-full-screen-pass-without-machine-visual-art-evidence"],
+      "reason": "Desktop owner review, release and full-screen admission require fresh independent immutable exact-node Visual Art evidence, including natural-scale and batch-context artifacts, background and per-ornament decisions, composition and rejected-resemblance review; any node mutation or reclone invalidates it."
     },
     {
       "id": "APP-005",
@@ -342,17 +342,17 @@
       "status": "rule",
       "authority": "direct_owner_latest",
       "decidedAt": "2026-08-20",
-      "source": "direct owner desktop Ornament Artist & Library Curator operating model",
+      "source": "owner-authorized mandatory desktop Ornament Library gate",
       "confidence": "confirmed",
       "scope": {
         "track": "website",
         "figmaFile": "ynavdn3IEdBoGsIP43c4bD",
-        "exactNodes": ["723:14636", "769:17254", "967:39893"],
-        "allowedRoles": ["named_structural_job", "named_contextual_job", "explicit_no_ornament", "curator_proposal", "independent_visual_art_review", "director_library_release", "exploration_with_alternatives"],
-        "prohibitedRoles": ["unnamed_decoration", "balanced_mode", "celebratory_outside_festival_vrat_ceremonial_hero", "exploration_auto_approval", "curator_self_release", "screen_lane_library_release", "rejected_asset_or_crop_revival"]
+        "exactNodes": ["723:14636", "759:20", "760:20", "800:2", "769:17254", "967:39893"],
+        "allowedRoles": ["RESTRAINED", "RICH", "CELEBRATORY", "NONE", "named_structural_job", "named_contextual_job", "explicit_no_ornament", "approved_library_provenance", "curator_proposal", "independent_curator_evidence", "independent_visual_art_review", "director_library_release", "exploration_with_alternatives"],
+        "prohibitedRoles": ["BALANCED", "unnamed_decoration", "arbitrary_decoration", "balanced_mode", "celebratory_outside_festival_vrat_ceremonial_hero", "unknown_provenance", "admitted_exploration", "exploration_auto_approval", "creator_self_approval", "curator_self_release", "screen_lane_library_release", "unfinished_none", "rejected_asset_or_crop_revival"]
       },
-      "supersedes": [],
-      "reason": "Screen lanes select an existing atlas ornament by named job or explicitly choose none. The curator proposes, independent Visual Art reviews, and only the Director releases or integrates; new source-derived additions stay EXPLORATION with alternatives."
+      "supersedes": ["balanced-ornament-mode", "library-membership-implies-screen-approval"],
+      "reason": "Every admitted desktop screen needs an exact ornament mode, complete purposeful inventory, no-ornament comparison and independent Visual Art verdict. Screen lanes select an approved library ornament by named job or explicitly choose none; the curator proposes, independent Visual Art reviews, and only the Director releases or integrates. Exploration cannot ship before separate library approval."
     }
   ],
   "conflicts": [
@@ -377,19 +377,31 @@
   ],
   "batchAdmission": {
     "allowedStatuses": ["BLOCKED_FROM_OWNER_REVIEW", "NARROW_PASS", "FULL_SCREEN_PASS"],
-    "fullScreenRequiredReviews": ["mechanical", "accessibility", "ornament_background", "ornament_curator", "blind_visual", "visual_art", "integrator"],
+    "fullScreenRequiredReviews": ["mechanical", "accessibility", "ornament_background", "blind_visual", "visual_art", "integrator"],
     "zeroKnownFindings": true,
     "unresolvedConflictsBlock": true,
-    "exactVisualArtPassRequired": true,
-    "visualArtMutationInvalidatesPass": true,
-    "independentVisualArtReviewerRequired": true,
-    "ornamentCuratorReviewRequired": true,
-    "directorOnlyLibraryRelease": true,
-    "ornamentLibraryGateRequired": true,
-    "ornamentLibraryMutationInvalidatesPass": true,
-    "independentOrnamentVisualArtRequired": true,
-    "balancedModeRejected": true,
-    "celebratoryScopeRestricted": true,
-    "explicitNoOrnamentRationaleRequired": true
+    "visualArtGate": {
+      "platform": "desktop",
+      "requiredForStatuses": ["OWNER_REVIEW", "RELEASED", "FULL_SCREEN_PASS"],
+      "independentReviewer": true,
+      "exactNodeBinding": true,
+      "immutableEvidenceBinding": true,
+      "nodeMutationInvalidates": true,
+      "requiredScreenJudgements": ["background_rationale", "composition_balance", "ornament_inventory", "rejected_resemblance", "open_findings"],
+      "requiredOrnamentJudgements": ["decision", "purpose", "library_provenance", "space", "alignment", "scale"]
+    },
+    "ornamentLibraryGate": {
+      "platform": "desktop",
+      "requiredForStatuses": ["OWNER_REVIEW", "RELEASED", "FULL_SCREEN_PASS"],
+      "allowedModes": ["RESTRAINED", "RICH", "CELEBRATORY", "NONE"],
+      "rejectedModes": ["BALANCED"],
+      "celebratoryContexts": ["festival", "vrat", "ceremonial_hero"],
+      "explorationAdmissible": false,
+      "creatorMayApprove": false,
+      "mutationInvalidates": true,
+      "completeInventoryRequired": true,
+      "noOrnamentComparisonRequired": true,
+      "independentVisualArtVerdictRequired": true
+    }
   }
 }

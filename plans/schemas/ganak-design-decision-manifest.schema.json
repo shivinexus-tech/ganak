@@ -21,30 +21,172 @@
     },
     "batchAdmission": {
       "type": "object",
-      "required": ["allowedStatuses", "fullScreenRequiredReviews", "zeroKnownFindings", "unresolvedConflictsBlock", "exactVisualArtPassRequired", "visualArtMutationInvalidatesPass", "independentVisualArtReviewerRequired", "ornamentCuratorReviewRequired", "directorOnlyLibraryRelease", "ornamentLibraryGateRequired", "ornamentLibraryMutationInvalidatesPass", "independentOrnamentVisualArtRequired", "balancedModeRejected", "celebratoryScopeRestricted", "explicitNoOrnamentRationaleRequired"],
+      "required": ["allowedStatuses", "fullScreenRequiredReviews", "zeroKnownFindings", "unresolvedConflictsBlock", "visualArtGate", "ornamentLibraryGate"],
       "additionalProperties": false,
       "properties": {
         "allowedStatuses": { "const": ["BLOCKED_FROM_OWNER_REVIEW", "NARROW_PASS", "FULL_SCREEN_PASS"] },
         "fullScreenRequiredReviews": {
-          "const": ["mechanical", "accessibility", "ornament_background", "ornament_curator", "blind_visual", "visual_art", "integrator"]
+          "const": ["mechanical", "accessibility", "ornament_background", "blind_visual", "visual_art", "integrator"]
         },
         "zeroKnownFindings": { "const": true },
         "unresolvedConflictsBlock": { "const": true },
-        "exactVisualArtPassRequired": { "const": true },
-        "visualArtMutationInvalidatesPass": { "const": true },
-        "independentVisualArtReviewerRequired": { "const": true },
-        "ornamentCuratorReviewRequired": { "const": true },
-        "directorOnlyLibraryRelease": { "const": true },
-        "ornamentLibraryGateRequired": { "const": true },
-        "ornamentLibraryMutationInvalidatesPass": { "const": true },
-        "independentOrnamentVisualArtRequired": { "const": true },
-        "balancedModeRejected": { "const": true },
-        "celebratoryScopeRestricted": { "const": true },
-        "explicitNoOrnamentRationaleRequired": { "const": true }
+        "visualArtGate": { "$ref": "#/$defs/visualArtGatePolicy" },
+        "ornamentLibraryGate": { "$ref": "#/$defs/ornamentLibraryGatePolicy" }
       }
     }
   },
   "$defs": {
+    "visualArtGatePolicy": {
+      "type": "object",
+      "required": ["platform", "requiredForStatuses", "independentReviewer", "exactNodeBinding", "immutableEvidenceBinding", "nodeMutationInvalidates", "requiredScreenJudgements", "requiredOrnamentJudgements"],
+      "additionalProperties": false,
+      "properties": {
+        "platform": { "const": "desktop" },
+        "requiredForStatuses": { "const": ["OWNER_REVIEW", "RELEASED", "FULL_SCREEN_PASS"] },
+        "independentReviewer": { "const": true },
+        "exactNodeBinding": { "const": true },
+        "immutableEvidenceBinding": { "const": true },
+        "nodeMutationInvalidates": { "const": true },
+        "requiredScreenJudgements": { "const": ["background_rationale", "composition_balance", "ornament_inventory", "rejected_resemblance", "open_findings"] },
+        "requiredOrnamentJudgements": { "const": ["decision", "purpose", "library_provenance", "space", "alignment", "scale"] }
+      }
+    },
+    "ornamentLibraryGatePolicy": {
+      "type": "object",
+      "required": ["platform", "requiredForStatuses", "allowedModes", "rejectedModes", "celebratoryContexts", "explorationAdmissible", "creatorMayApprove", "mutationInvalidates", "completeInventoryRequired", "noOrnamentComparisonRequired", "independentVisualArtVerdictRequired"],
+      "additionalProperties": false,
+      "properties": {
+        "platform": { "const": "desktop" },
+        "requiredForStatuses": { "const": ["OWNER_REVIEW", "RELEASED", "FULL_SCREEN_PASS"] },
+        "allowedModes": { "const": ["RESTRAINED", "RICH", "CELEBRATORY", "NONE"] },
+        "rejectedModes": { "const": ["BALANCED"] },
+        "celebratoryContexts": { "const": ["festival", "vrat", "ceremonial_hero"] },
+        "explorationAdmissible": { "const": false },
+        "creatorMayApprove": { "const": false },
+        "mutationInvalidates": { "const": true },
+        "completeInventoryRequired": { "const": true },
+        "noOrnamentComparisonRequired": { "const": true },
+        "independentVisualArtVerdictRequired": { "const": true }
+      }
+    },
+    "visualArtEvidence": {
+      "type": "object",
+      "required": ["platform", "binding", "naturalScaleScreenshots", "contactSheet", "reviewer", "reviewedAt", "screenJudgements", "evidenceDigest"],
+      "additionalProperties": false,
+      "properties": {
+        "platform": { "const": "desktop" },
+        "binding": {
+          "type": "object",
+          "required": ["figmaFile", "sectionNode", "screenNodes", "nodeFingerprints"],
+          "additionalProperties": false,
+          "properties": {
+            "figmaFile": { "type": "string", "minLength": 3 },
+            "sectionNode": { "type": "string", "pattern": "^[0-9]+:[0-9]+$" },
+            "screenNodes": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[0-9]+:[0-9]+$" } },
+            "nodeFingerprints": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["screenNode", "fingerprint"],
+                "additionalProperties": false,
+                "properties": {
+                  "screenNode": { "type": "string", "pattern": "^[0-9]+:[0-9]+$" },
+                  "fingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+                }
+              }
+            }
+          }
+        },
+        "naturalScaleScreenshots": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/visualArtifact" }
+        },
+        "contactSheet": { "$ref": "#/$defs/contactSheetArtifact" },
+        "reviewer": { "$ref": "#/$defs/independentReviewer" },
+        "reviewedAt": { "type": "string", "minLength": 20 },
+        "screenJudgements": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/visualArtScreenJudgement" }
+        },
+        "evidenceDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "visualArtifact": {
+      "type": "object",
+      "required": ["screenNode", "url", "artifactDigest"],
+      "additionalProperties": false,
+      "properties": {
+        "screenNode": { "type": "string", "pattern": "^[0-9]+:[0-9]+$" },
+        "url": { "type": "string", "pattern": "^https://" },
+        "artifactDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "contactSheetArtifact": {
+      "type": "object",
+      "required": ["url", "artifactDigest", "memberNodes"],
+      "additionalProperties": false,
+      "properties": {
+        "url": { "type": "string", "pattern": "^https://" },
+        "artifactDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "memberNodes": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[0-9]+:[0-9]+$" } }
+      }
+    },
+    "independentReviewer": {
+      "type": "object",
+      "required": ["taskId", "independent", "builderTaskIds", "integratorTaskId"],
+      "additionalProperties": false,
+      "properties": {
+        "taskId": { "type": "string", "minLength": 3 },
+        "independent": { "const": true },
+        "builderTaskIds": { "type": "array", "items": { "type": "string" } },
+        "integratorTaskId": { "type": "string", "minLength": 3 }
+      }
+    },
+    "visualArtScreenJudgement": {
+      "type": "object",
+      "required": ["screenNode", "screenContext", "backgroundRationale", "compositionBalance", "compositionRationale", "ornamentMode", "modeRationale", "permittedContexts", "inventoryComplete", "ornaments", "noOrnamentComparison", "visualArtVerdict", "rejectedResemblance", "rejectedResemblanceRationale", "openFindings"],
+      "additionalProperties": false,
+      "properties": {
+        "screenNode": { "type": "string", "pattern": "^[0-9]+:[0-9]+$" },
+        "screenContext": { "type": "string", "minLength": 3 },
+        "backgroundRationale": { "type": "string", "minLength": 10 },
+        "compositionBalance": { "const": "PASS" },
+        "compositionRationale": { "type": "string", "minLength": 10 },
+        "ornamentMode": { "enum": ["RESTRAINED", "RICH", "CELEBRATORY", "NONE"] },
+        "modeRationale": { "type": "string", "minLength": 10 },
+        "permittedContexts": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "inventoryComplete": { "const": true },
+        "ornaments": { "type": "array", "items": { "$ref": "#/$defs/visualArtOrnamentJudgement" } },
+        "noOrnamentComparison": { "type": "string", "minLength": 10 },
+        "visualArtVerdict": { "const": "PASS" },
+        "rejectedResemblance": { "const": "PASS" },
+        "rejectedResemblanceRationale": { "type": "string", "minLength": 10 },
+        "openFindings": { "const": [] }
+      }
+    },
+    "visualArtOrnamentJudgement": {
+      "type": "object",
+      "required": ["node", "decision", "namedJob", "libraryRoot", "libraryComponentNode", "provenanceStatus", "creatorTaskId", "curatorTaskId", "curatorIndependent", "placement", "space", "alignment", "scale"],
+      "additionalProperties": false,
+      "properties": {
+        "node": { "type": "string", "pattern": "^[0-9]+:[0-9]+$" },
+        "decision": { "enum": ["keep", "remove", "none"] },
+        "namedJob": { "type": "string", "minLength": 3 },
+        "libraryRoot": { "type": "string", "pattern": "^[0-9]+:[0-9]+$" },
+        "libraryComponentNode": { "type": "string", "pattern": "^[0-9]+:[0-9]+$" },
+        "provenanceStatus": { "enum": ["APPROVED_LIBRARY", "EXPLORATION"] },
+        "creatorTaskId": { "type": ["string", "null"] },
+        "curatorTaskId": { "type": ["string", "null"] },
+        "curatorIndependent": { "type": "boolean" },
+        "placement": { "const": "PASS" },
+        "space": { "const": "PASS" },
+        "alignment": { "const": "PASS" },
+        "scale": { "const": "PASS" }
+      }
+    },
     "scope": {
       "type": "object",
       "required": ["track", "figmaFile", "exactNodes", "allowedRoles", "prohibitedRoles"],

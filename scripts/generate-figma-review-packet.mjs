@@ -31,6 +31,31 @@ for (const s of packet.screens) {
   lines.push(`| ${s.name} | \`${s.node}\` | \`${s.sourceNode}\` | ${mark(judgement.naturalScale)} | ${mark(judgement.contactSheet)} | ${mark(artMark)} | ${mark(artMark)} | ${mark(full)} | ${mark(full)} | ${mark(artMark)} | ${mark(artMark)} | ${mark(full)} | ${mark(artMark)} |`);
 }
 lines.push("");
+lines.push("## Desktop Visual Art binding");
+lines.push("");
+const visualArt = packet.visualArtEvidence;
+if (!visualArt) {
+  lines.push("- **MISSING** — owner review, release and full-screen admission are blocked.");
+} else {
+  const bound = visualArt.binding?.screenNodes || [];
+  const current = packet.screens.map(s => s.node);
+  const exact = JSON.stringify(bound) === JSON.stringify(current);
+  const contactExact = JSON.stringify(visualArt.contactSheet?.memberNodes || []) === JSON.stringify(current);
+  lines.push(`- Platform: \`${visualArt.platform}\``);
+  lines.push(`- Exact current-node binding: **${exact ? "yes" : "no — stale"}**`);
+  lines.push(`- Natural-scale immutable artifacts: ${visualArt.naturalScaleScreenshots?.length || 0}/${current.length}`);
+  lines.push(`- Contact-sheet exact membership: **${contactExact ? "yes" : "no — stale"}**`);
+  lines.push(`- Independent reviewer: ${visualArt.reviewer?.independent ? visualArt.reviewer.taskId : "missing/self-approved"}`);
+  lines.push(`- Exact-node judgments: ${visualArt.screenJudgements?.length || 0}/${current.length}`);
+  const modes = new Map();
+  for (const judgment of visualArt.screenJudgements || []) modes.set(judgment.ornamentMode || "MISSING", (modes.get(judgment.ornamentMode || "MISSING") || 0) + 1);
+  lines.push(`- Ornament modes: ${[...modes].map(([mode, count]) => `${mode}=${count}`).join(", ") || "missing"}`);
+  lines.push(`- Complete ornament inventories: ${(visualArt.screenJudgements || []).filter(j => j.inventoryComplete === true).length}/${current.length}`);
+  lines.push(`- No-ornament comparisons: ${(visualArt.screenJudgements || []).filter(j => Boolean(j.noOrnamentComparison)).length}/${current.length}`);
+  lines.push(`- Immutable evidence digest: ${visualArt.evidenceDigest || "missing"}`);
+  if (visualArt.invalidationReason) lines.push(`- Invalidation: ${visualArt.invalidationReason}`);
+}
+lines.push("");
 lines.push("## Mandatory review roles");
 lines.push("");
 for (const review of packet.reviews) {
